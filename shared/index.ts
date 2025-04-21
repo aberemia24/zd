@@ -39,3 +39,39 @@ export interface CategoriiConfig {
 import categories from './categories.json';
 
 export const categorii: CategoriiConfig = categories;
+
+/**
+ * Tipurile posibile de tranzacții folosite în aplicație
+ * - income: venit
+ * - expense: cheltuială
+ * - saving: economie
+ * - transfer: transfer între conturi
+ */
+export type TransactionType = 'income' | 'expense' | 'saving' | 'transfer';
+
+/**
+ * Tipuri de recurență pentru tranzacții recurente
+ */
+export type RecurrenceType = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+/**
+ * Modelul principal pentru o tranzacție (venit, cheltuială, economie, transfer)
+ * Inspirat din best practices ale aplicațiilor de bugetare consacrate (YNAB, Mint, Revolut, etc)
+ */
+export interface Transaction {
+  id: string;
+  userId: string;
+  type: TransactionType;
+  amount: number;
+  currency: string; // ex: 'RON', 'EUR'
+  date: string; // ISO 8601
+  category: string;
+  subcategory: string;
+  description?: string;
+  recurring?: boolean;
+  recurrence?: RecurrenceType;
+  status?: 'cleared' | 'pending' | 'scheduled';
+  accountId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}

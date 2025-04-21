@@ -42,20 +42,21 @@
 ---
 
 ## 5. Iterații propuse (roadmap inițial)
-1. Setup complet proiect, TDD, categorii/config, autentificare
-2. Dashboard și model de date (venituri, cheltuieli, economii)
-3. Adăugare și vizualizare tranzacții pe zile/luni/an
-4. Rapoarte și alerte
-5. Personalizare categorii/subcategorii
-6. Planuri Free/Premium (feature gating simplu)
-7. Feedback utilizator, accesibilitate, polish UI
-8. Pregătire pentru mobil (React Native)
+1. Setup proiect, TDD, categorii/config, autentificare
+2. Dashboard și model de date unificat (Transaction)
+3. Adăugare și vizualizare tranzacții
+4. Validare date externe cu zod pentru tranzacții
+5. Rapoarte și alerte
+6. Personalizare categorii
+7. Planuri Free/Premium
+8. Feedback, accesibilitate, polish UI
+9. Pregătire pentru mobil (React Native)
 
 ---
 
 ## 6. Ce urmează?
-- Pasul 1: Definim și implementăm modelul de date pentru venituri, cheltuieli, economii (inclusiv recurență, categorii, subcategorii).
-- Pasul 2: Setup endpoint-uri backend pentru aceste modele și testele lor.
+- Pasul 1: Definim și implementăm modelul de date unificat pentru tranzacții (Transaction), inclusiv validare runtime cu zod și acoperire TDD.
+- Pasul 2: Setup endpoint-uri backend pentru acest model și testele lor.
 - Pasul 3: Setup UI de bază pentru dashboard și adăugare tranzacții (cu TDD).
 - Pasul 4: Integrare frontend-backend pentru fluxul de bază.
 

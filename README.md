@@ -13,6 +13,7 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 - **Backend:** NestJS, MongoDB (Atlas), Firebase Auth, Jest
 - **Shared:** TypeScript, validări comune (ex: zod/joi)
 - **Tooling:** ESLint, Prettier, husky, commitlint, .env pentru config, npm workspaces
+- **zod** pentru validare runtime a modelelor de date
 
 ## 🧩 Convenții și filozofie
 - **TDD:** Test Driven Development peste tot (testele se scriu înainte de cod)
