@@ -41,7 +41,13 @@
 
 ---
 
-## 5. Iterații propuse (roadmap inițial)
+## 5. Best Practices & Lessons Learned
+
+- Sincronizează toate dependențele critice în monorepo (NestJS, ts-jest, typescript etc.).
+- Folosește TDD și acoperire cu teste pentru orice feature nou.
+- Vezi BEST_PRACTICES.md pentru reguli detaliate.
+
+## 6. Iterații propuse (roadmap inițial)
 1. Setup proiect, TDD, categorii/config, autentificare
 2. Dashboard și model de date unificat (Transaction)
 3. Adăugare și vizualizare tranzacții

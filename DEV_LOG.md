@@ -1,5 +1,15 @@
 # Dev Log / Changelog
 
+## Changelog & Lessons Learned (2025-04-21)
+
+- Toate dependențele NestJS, ts-jest, typescript și alte pachete critice au fost sincronizate la aceeași versiune în toate workspace-urile.
+- Importurile între backend și shared au fost corectate pentru compatibilitate monorepo.
+- Configurarea Jest/ts-jest a fost adusă la zi pentru a detecta și rula toate testele e2e.
+- Adăugate class-validator și class-transformer pentru ValidationPipe.
+- Toate testele e2e backend rulează și trec.
+- A fost creat și completat fișierul BEST_PRACTICES.md cu toate regulile și lecțiile critice pentru dezvoltare și mentenanță.
+- Orice lessons learned, workaround sau convenție nouă se documentează și în BEST_PRACTICES.md.
+
 Acest fișier conține toate modificările, deciziile și pașii importanți din dezvoltarea aplicației de bugetare.
 
 ---

@@ -27,6 +27,11 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 - **Versionare API:** `/api/v1/...` pentru viitoare compatibilitate
 - **Documentație:** README detaliat, convenții de commit, workflow de testare
 
+## Cum rulezi testele end-to-end
+
+- Asigură-te că toate dependențele critice (NestJS, ts-jest, typescript etc.) sunt la aceeași versiune în toate workspace-urile.
+- Vezi și BEST_PRACTICES.md pentru reguli și proceduri de lucru.
+
 ## 🔒 Securitate
 - Autentificare cu Firebase Auth
 - Date sensibile/config în `.env` (niciodată în repo)
