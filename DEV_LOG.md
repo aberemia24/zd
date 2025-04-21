@@ -38,4 +38,32 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Actualizat roadmap și README pentru a reflecta progresul
 - Toate testele trec. Structura pregătită pentru integrare API bancar și validare date externe
 
+
+
 > Orice modificare, decizie arhitecturală, bug fix sau feature nou trebuie adăugată aici cu dată și descriere clară!
+
+---
+
+## [2025-04-21 23:15] GET /transactions: filtrare, paginare, sortare
+
+- Implementat suport pentru următorii query params la endpoint-ul GET `/transactions`:
+  - `type` (string, opțional): filtrează după tipul tranzacției (`income`, `expense`, `saving`, `transfer`)
+  - `category` (string, opțional): filtrează după categorie
+  - `dateFrom` (string, opțional, format YYYY-MM-DD): tranzacții cu data >= acest parametru
+  - `dateTo` (string, opțional, format YYYY-MM-DD): tranzacții cu data <= acest parametru
+  - `limit` (number, opțional, default 20): câte rezultate să returneze (paginare)
+  - `offset` (number, opțional, default 0): de la ce index să înceapă (paginare)
+  - `sort` (string, opțional): câmp după care se face sortarea (`amount`, `date`, `id`, `category`, `type`). Prefix `-` pentru descrescător (ex: `sort=-amount`).
+
+- Structura răspunsului pentru GET `/transactions`:
+```json
+{
+  "data": [ /* array de tranzacții */ ],
+  "total": 100, // numărul total de tranzacții după filtrare
+  "limit": 20,  // limită folosită pentru paginare
+  "offset": 0   // offset folosit pentru paginare
+}
+```
+
+- Toate testele e2e pentru aceste funcționalități au trecut.
+

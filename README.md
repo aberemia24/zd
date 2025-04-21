@@ -27,6 +27,31 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 - **Versionare API:** `/api/v1/...` pentru viitoare compatibilitate
 - **Documentație:** README detaliat, convenții de commit, workflow de testare
 
+## API
+
+### GET /transactions
+
+Returnează lista de tranzacții cu suport pentru filtrare, paginare și sortare.
+
+#### Query params acceptați:
+- `type` (string, opțional): filtrează după tipul tranzacției (`income`, `expense`, `saving`, `transfer`)
+- `category` (string, opțional): filtrează după categorie
+- `dateFrom` (string, opțional, format YYYY-MM-DD): tranzacții cu data >= acest parametru
+- `dateTo` (string, opțional, format YYYY-MM-DD): tranzacții cu data <= acest parametru
+- `limit` (number, opțional, default 20): câte rezultate să returneze (paginare)
+- `offset` (number, opțional, default 0): de la ce index să înceapă (paginare)
+- `sort` (string, opțional): câmp după care se face sortarea (`amount`, `date`, `id`, `category`, `type`). Prefix `-` pentru descrescător (ex: `sort=-amount`).
+
+#### Structura răspunsului:
+```json
+{
+  "data": [ /* array de tranzacții */ ],
+  "total": 100, // numărul total de tranzacții după filtrare
+  "limit": 20,  // limită folosită pentru paginare
+  "offset": 0   // offset folosit pentru paginare
+}
+```
+
 ## Cum rulezi testele end-to-end
 
 - Asigură-te că toate dependențele critice (NestJS, ts-jest, typescript etc.) sunt la aceeași versiune în toate workspace-urile.

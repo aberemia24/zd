@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, HttpException, HttpStatus, NotFoundException, BadRequestException, HttpCode, Query } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { z } from 'zod';
 import { TransactionSchema } from '../../shared/transaction.schema';
@@ -8,35 +8,68 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Get()
-  getAll() {
-    return this.transactionService.getAll();
+  getAll(
+    @Query('type') type?: string,
+    @Query('category') category?: string,
+    @Query('dateFrom') dateFrom?: string,
+    @Query('dateTo') dateTo?: string,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+    @Query('sort') sort?: string
+  ) {
+    return this.transactionService.getAll({ type, category, dateFrom, dateTo, limit, offset, sort });
   }
 
   @Get(':id')
   getOne(@Param('id') id: string) {
-    return this.transactionService.getOne(id);
+    const transaction = this.transactionService.getOne(id);
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+    return transaction;
   }
 
   @Post()
-  create(@Body() body: any) {
+  async create(@Body() body: any) {
     const parsed = TransactionSchema.safeParse(body);
     if (!parsed.success) {
-      throw new Error('Invalid transaction: ' + JSON.stringify(parsed.error.issues));
+      throw new BadRequestException({
+        error: 'VALIDATION_ERROR',
+        messageKey: 'transactions.invalid',
+        details: parsed.error.issues,
+      });
     }
-    return this.transactionService.create(parsed.data);
+    const created = await this.transactionService.create(parsed.data);
+    return {
+      ...created,
+    };
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: any) {
+  async update(@Param('id') id: string, @Body() body: any) {
     const parsed = TransactionSchema.safeParse(body);
     if (!parsed.success) {
-      throw new Error('Invalid transaction: ' + JSON.stringify(parsed.error.issues));
+      throw new BadRequestException({
+        error: 'VALIDATION_ERROR',
+        messageKey: 'transactions.invalid',
+        details: parsed.error.issues,
+      });
     }
-    return this.transactionService.update(id, parsed.data);
+    const updated = await this.transactionService.update(id, parsed.data);
+    if (!updated) {
+      throw new NotFoundException('Transaction not found');
+    }
+    return updated;
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.transactionService.delete(id);
+  @HttpCode(204)
+  async delete(@Param('id') id: string) {
+    const deleted = await this.transactionService.delete(id);
+    if (!deleted) {
+      throw new NotFoundException('Transaction not found');
+    }
+    // 204 No Content: nu returnăm body
+    return;
   }
 }
