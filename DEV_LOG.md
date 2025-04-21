@@ -20,4 +20,12 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 
 ---
 
+## [2025-04-21] Model unificat Transaction, validare runtime și TDD
+- Adăugat modelul unificat `Transaction` în `shared/index.ts` (industry standard, compatibil cu YNAB, Mint, Revolut etc)
+- Implementat validare runtime cu `zod` (`TransactionSchema` în `shared/transaction.schema.ts`)
+- Adăugat teste TDD pentru model și schema zod (cazuri valide și invalide)
+- Instalare `zod` în workspace-ul `shared/`
+- Actualizat roadmap și README pentru a reflecta progresul
+- Toate testele trec. Structura pregătită pentru integrare API bancar și validare date externe
+
 > Orice modificare, decizie arhitecturală, bug fix sau feature nou trebuie adăugată aici cu dată și descriere clară!
