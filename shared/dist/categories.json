@@ -1,0 +1,139 @@
+{
+    "income": [
+        { "key": "income.salary" },
+        { "key": "income.dividends" },
+        { "key": "income.rent" },
+        { "key": "income.meal_tickets" },
+        { "key": "income.gifts" },
+        { "key": "income.copyrights" },
+        { "key": "income.pensions" },
+        { "key": "income.allowances" },
+        { "key": "income.other" },
+        { "key": "income.carryover" }
+    ],
+    "savings": [
+        { "key": "savings.emergency_fund" },
+        { "key": "savings.reserve_fund" },
+        { "key": "savings.general_fund" },
+        { "key": "savings.total" }
+    ],
+    "expenses": {
+        "appearance": [
+            { "key": "expenses.appearance.clothing" },
+            { "key": "expenses.appearance.salon" },
+            { "key": "expenses.appearance.cosmetics" },
+            { "key": "expenses.appearance.surgery" },
+            { "key": "expenses.appearance.personal_hygiene" },
+            { "key": "expenses.appearance.pet_hygiene" },
+            { "key": "expenses.appearance.cleaning_services" },
+            { "key": "expenses.appearance.pet_clothing" }
+        ],
+        "education": [
+            { "key": "expenses.education.taxes" },
+            { "key": "expenses.education.kindergarten" },
+            { "key": "expenses.education.courses" },
+            { "key": "expenses.education.materials" },
+            { "key": "expenses.education.licenses" }
+        ],
+        "career": [
+            { "key": "expenses.career.taxes" },
+            { "key": "expenses.career.cv_services" },
+            { "key": "expenses.career.consulting" }
+        ],
+        "health": [
+            { "key": "expenses.health.medicine" },
+            { "key": "expenses.health.prevention" },
+            { "key": "expenses.health.surgery" },
+            { "key": "expenses.health.therapy" },
+            { "key": "expenses.health.subscriptions" },
+            { "key": "expenses.health.insurance" },
+            { "key": "expenses.health.vet" },
+            { "key": "expenses.health.pet_medicine" }
+        ],
+        "nutrition": [
+            { "key": "expenses.nutrition.food" },
+            { "key": "expenses.nutrition.restaurants" },
+            { "key": "expenses.nutrition.takeaway" },
+            { "key": "expenses.nutrition.orders" },
+            { "key": "expenses.nutrition.coffee" },
+            { "key": "expenses.nutrition.pet_food" }
+        ],
+        "housing": [
+            { "key": "expenses.housing.maintenance" },
+            { "key": "expenses.housing.water" },
+            { "key": "expenses.housing.gas" },
+            { "key": "expenses.housing.electricity" },
+            { "key": "expenses.housing.phone" },
+            { "key": "expenses.housing.cable_tv" },
+            { "key": "expenses.housing.internet" },
+            { "key": "expenses.housing.repairs" },
+            { "key": "expenses.housing.cleaning_products" },
+            { "key": "expenses.housing.cleaning_services" },
+            { "key": "expenses.housing.furniture" },
+            { "key": "expenses.housing.electronics" },
+            { "key": "expenses.housing.insurance" },
+            { "key": "expenses.housing.tax" },
+            { "key": "expenses.housing.rent" },
+            { "key": "expenses.housing.garbage" }
+        ],
+        "leisure": [
+            { "key": "expenses.leisure.books" },
+            { "key": "expenses.leisure.music" },
+            { "key": "expenses.leisure.magazines" },
+            { "key": "expenses.leisure.movies" },
+            { "key": "expenses.leisure.gym" },
+            { "key": "expenses.leisure.online_services" },
+            { "key": "expenses.leisure.cinema" },
+            { "key": "expenses.leisure.pools" },
+            { "key": "expenses.leisure.games" },
+            { "key": "expenses.leisure.gifts" },
+            { "key": "expenses.leisure.hobbies" },
+            { "key": "expenses.leisure.sports_equipment" },
+            { "key": "expenses.leisure.gambling" },
+            { "key": "expenses.leisure.smoking" }
+        ],
+        "travel": [
+            { "key": "expenses.travel.accommodation" },
+            { "key": "expenses.travel.tickets" },
+            { "key": "expenses.travel.tolls" },
+            { "key": "expenses.travel.tourist_tickets" },
+            { "key": "expenses.travel.souvenirs" },
+            { "key": "expenses.travel.insurance" },
+            { "key": "expenses.travel.pet_hotel" },
+            { "key": "expenses.travel.car_rental" },
+            { "key": "expenses.travel.equipment_rental" },
+            { "key": "expenses.travel.food" }
+        ],
+        "transport": [
+            { "key": "expenses.transport.public_transport" },
+            { "key": "expenses.transport.revisions" },
+            { "key": "expenses.transport.tolls" },
+            { "key": "expenses.transport.parking" },
+            { "key": "expenses.transport.wash" },
+            { "key": "expenses.transport.rca" },
+            { "key": "expenses.transport.casco" },
+            { "key": "expenses.transport.accessories" },
+            { "key": "expenses.transport.fuel" },
+            { "key": "expenses.transport.road_tax" },
+            { "key": "expenses.transport.tax" },
+            { "key": "expenses.transport.tires" },
+            { "key": "expenses.transport.tire_hotel" },
+            { "key": "expenses.transport.repairs" }
+        ],
+        "investments": [
+            { "key": "expenses.investments.project1" },
+            { "key": "expenses.investments.project2" },
+            { "key": "expenses.investments.project3" },
+            { "key": "expenses.investments.project4" },
+            { "key": "expenses.investments.project5" },
+            { "key": "expenses.investments.project6" },
+            { "key": "expenses.investments.project7" },
+            { "key": "expenses.investments.project8" },
+            { "key": "expenses.investments.project9" },
+            { "key": "expenses.investments.project10" },
+            { "key": "expenses.investments.project11" },
+            { "key": "expenses.investments.project12" },
+            { "key": "expenses.investments.project13" }
+        ]
+    }
+}

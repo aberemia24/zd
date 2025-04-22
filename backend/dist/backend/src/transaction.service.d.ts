@@ -1,28 +1,41 @@
 import { TransactionValidated } from '../../shared/transaction.schema';
 export declare class TransactionService {
     private transactions;
-    getAll(): {
-        id: string;
-        userId: string;
-        type: "income" | "expense" | "saving" | "transfer";
-        date: string;
-        amount: number;
-        currency: string;
-        category: string;
-        subcategory: string;
-        status?: "cleared" | "pending" | "scheduled" | undefined;
-        description?: string | undefined;
-        recurring?: boolean | undefined;
-        recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-        accountId?: string | undefined;
-        createdAt?: string | undefined;
-        updatedAt?: string | undefined;
-    }[];
+    getAll(params?: {
+        type?: string;
+        category?: string;
+        dateFrom?: string;
+        dateTo?: string;
+        limit?: string;
+        offset?: string;
+        sort?: string;
+    }): {
+        data: {
+            type: "income" | "expense" | "saving" | "transfer";
+            date: string;
+            id: string;
+            userId: string;
+            amount: number;
+            currency: string;
+            category: string;
+            subcategory: string;
+            status?: "cleared" | "pending" | "scheduled" | undefined;
+            description?: string | undefined;
+            recurring?: boolean | undefined;
+            recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
+            accountId?: string | undefined;
+            createdAt?: string | undefined;
+            updatedAt?: string | undefined;
+        }[];
+        total: number;
+        limit: number;
+        offset: number;
+    };
     getOne(id: string): {
-        id: string;
-        userId: string;
         type: "income" | "expense" | "saving" | "transfer";
         date: string;
+        id: string;
+        userId: string;
         amount: number;
         currency: string;
         category: string;
@@ -36,10 +49,10 @@ export declare class TransactionService {
         updatedAt?: string | undefined;
     } | undefined;
     create(transaction: TransactionValidated): {
-        id: string;
-        userId: string;
         type: "income" | "expense" | "saving" | "transfer";
         date: string;
+        id: string;
+        userId: string;
         amount: number;
         currency: string;
         category: string;
@@ -53,10 +66,10 @@ export declare class TransactionService {
         updatedAt?: string | undefined;
     };
     update(id: string, transaction: TransactionValidated): {
-        id: string;
-        userId: string;
         type: "income" | "expense" | "saving" | "transfer";
         date: string;
+        id: string;
+        userId: string;
         amount: number;
         currency: string;
         category: string;
@@ -68,12 +81,12 @@ export declare class TransactionService {
         accountId?: string | undefined;
         createdAt?: string | undefined;
         updatedAt?: string | undefined;
-    };
+    } | undefined;
     delete(id: string): {
-        id: string;
-        userId: string;
         type: "income" | "expense" | "saving" | "transfer";
         date: string;
+        id: string;
+        userId: string;
         amount: number;
         currency: string;
         category: string;
@@ -85,5 +98,5 @@ export declare class TransactionService {
         accountId?: string | undefined;
         createdAt?: string | undefined;
         updatedAt?: string | undefined;
-    };
+    } | undefined;
 }

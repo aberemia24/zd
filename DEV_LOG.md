@@ -1,5 +1,20 @@
 # Dev Log / Changelog
 
+## [2025-04-22] Refactorizare modulară frontend, testare și best practices
+- Extragere formular tranzacție (`TransactionForm`) și tabel tranzacții (`TransactionTable`) în componente dedicate, cu tipuri și props explicite
+- Mutare și colocare teste unitare pentru fiecare componentă în subfolderul corespunzător (`components/TransactionForm/TransactionForm.test.tsx` etc)
+- `App.tsx` devine container, fără logică de UI duplicată
+- Adăugare și configurare reporteri Jest: `jest-summarizing-reporter` (terminal) și `jest-html-reporter` (HTML)
+- Îmbunătățire structură testare: acoperire pozitivă, negativă și edge pentru fiecare componentă
+- Observații importante:
+  - Pentru orice fetch în teste, trebuie mock global robust (ideal din `setupTests.ts`)
+  - Pentru orice update de stare asincron în teste, folosește `await act(...)` sau `waitFor`
+  - Console noise trebuie redus pentru claritate în rapoarte
+- Toate convențiile și best practices noi au fost adăugate în `BEST_PRACTICES.md` și memorie
+- Toate testele unitare și de integrare acoperă cazurile critice pentru UI și API
+- Documentație și workflow actualizate conform progresului
+
+
 ## Changelog & Lessons Learned (2025-04-21)
 
 - Toate dependențele NestJS, ts-jest, typescript și alte pachete critice au fost sincronizate la aceeași versiune în toate workspace-urile.

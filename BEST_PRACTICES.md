@@ -63,6 +63,17 @@ Acest fișier conține reguli, convenții și lecții învățate din dezvoltare
 - Înainte de commit, verifică să nu existe fișiere generate accidental (ex: .js în test/ sau src/).
 - Orice problemă de infrastructură trebuie rezolvată imediat, nu "lăsată pe mai târziu".
 
+
+## 11. Frontend React & Teste (2025-04-22)
+- Orice componentă complexă (ex: formulare, tabele) trebuie extrasă ca modul separat în `src/components/ComponentName/ComponentName.tsx`.
+- Testele unitare pentru fiecare componentă trebuie colocate în același folder (`ComponentName.test.tsx`), nu în src/.
+- Pentru orice fetch în teste, folosește mock global din `setupTests.ts` pentru consistență și evitare erori `.then` pe undefined.
+- Orice update de stare asincronă (ex: submit, fetch) în teste trebuie să fie învelit în `await act(...)` sau `waitFor` pentru a evita warninguri și flaky tests.
+- Structura de foldere trebuie să reflecte modularitatea și separarea responsabilităților (form, table, filters etc).
+- Folosește reporteri Jest suplimentari (`jest-summarizing-reporter`, `jest-html-reporter`) pentru claritate și partajare ușoară a rezultatelor testelor.
+- Redu la minimum console noise în teste (mock console.log/error dacă e nevoie) pentru rapoarte clare.
+- Orice convenție, workaround sau lesson learned se documentează imediat în `BEST_PRACTICES.md`, `DEV_LOG.md` și memorie.
+
 ---
 
-_Actualizat la: 2025-04-21_
+_Actualizat la: 2025-04-22_

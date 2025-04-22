@@ -4,9 +4,10 @@
   "private": true,
   "main": "dist/main.js",
   "scripts": {
-    "start": "nest start",
+    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start:prod": "npm run build && node -r tsconfig-paths/register dist/main.js",
     "start:dev": "nest start --watch",
-    "build": "nest build",
+    "build": "tsc",
     "test": "jest",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "lint": "eslint src --ext .ts",

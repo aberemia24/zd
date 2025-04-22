@@ -16,10 +16,10 @@ export declare const TransactionSchema: z.ZodObject<{
     createdAt: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
-    id: string;
-    userId: string;
     type: "income" | "expense" | "saving" | "transfer";
     date: string;
+    id: string;
+    userId: string;
     amount: number;
     currency: string;
     category: string;
@@ -32,10 +32,10 @@ export declare const TransactionSchema: z.ZodObject<{
     createdAt?: string | undefined;
     updatedAt?: string | undefined;
 }, {
-    id: string;
-    userId: string;
     type: "income" | "expense" | "saving" | "transfer";
     date: string;
+    id: string;
+    userId: string;
     amount: number;
     currency: string;
     category: string;
