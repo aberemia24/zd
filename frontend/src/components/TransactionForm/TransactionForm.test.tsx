@@ -1,14 +1,27 @@
 import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
-import TransactionForm, { TransactionFormData } from './TransactionForm';
+import TransactionForm, { TransactionFormData, categorii } from './TransactionForm';
 
-describe('TransactionForm', () => {
-  // Helper pentru a selecta opțiuni în dropdownuri
-  function selectOption(label: string, value: string) {
-    const select = screen.getByLabelText(label, { exact: true });
-    fireEvent.change(select, { target: { value } });
-  }
-  const defaultForm: TransactionFormData = {
+// Helper pentru a selecta opțiuni în dropdownuri
+function selectOption(label: string, value: string) {
+  const select = screen.getByLabelText(label, { exact: true });
+  fireEvent.change(select, { target: { value } });
+}
+
+// Helper pentru a extrage TOATE subcategoriile dintr-o definiție (string[] sau object[] cu optgroup)
+function getAllSubcategories(categoryDefinition: any[]): string[] {
+  let subcategories: string[] = [];
+  categoryDefinition.forEach(item => {
+    if (typeof item === 'string') {
+      subcategories.push(item);
+    } else if (typeof item === 'object' && item.options && Array.isArray(item.options)) {
+      subcategories = subcategories.concat(item.options);
+    }
+  });
+  return subcategories;
+}
+
+const defaultForm: TransactionFormData = {
   type: '',
   amount: '',
   category: '',
@@ -18,7 +31,8 @@ describe('TransactionForm', () => {
   frequency: '',
 };
 
-    it('afișează toate câmpurile obligatorii', () => {
+describe('TransactionForm', () => {
+  it('afișează toate câmpurile obligatorii', () => {
     render(<TransactionForm form={defaultForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
     expect(within(form).getByLabelText(/Tip/i)).toBeInTheDocument();
@@ -101,38 +115,61 @@ describe('TransactionForm', () => {
     expect(subcatSelect.disabled).toBe(true);
   });
 
-  it('afișează subcategoriile corecte pentru VENITURI', () => {
+  it('afișează TOATE subcategoriile corecte pentru VENITURI', () => {
     const formVenit = { ...defaultForm, type: 'income', category: 'VENITURI' };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
+
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
-    expect(within(subcatSelect).getByText('Salarii')).toBeInTheDocument();
-    expect(within(subcatSelect).getByText('Dividende')).toBeInTheDocument();
-    expect(within(subcatSelect).getByText('Alte venituri')).toBeInTheDocument();
-    // Verifică și optgroup-ul 'Report'
-    expect(within(subcatSelect).getByText('Venituri reportate din luna anterioară.')).toBeInTheDocument();
+    expect(subcatSelect).toBeEnabled(); // Asigurăm că e activat
+
+    const expectedSubcategories = getAllSubcategories(categorii['VENITURI']);
+    const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
+                                 .map(opt => opt.value)
+                                 .filter(val => val !== ''); // Excludem placeholderul 'Alege'
+
+    // Verificăm numărul total de opțiuni
+    expect(renderedOptions.length).toBe(expectedSubcategories.length);
+
+    // Verificăm că fiecare subcategorie așteptată există
+    expectedSubcategories.forEach(subcat => {
+      // Folosim getByRole pentru a găsi opțiunea după textul vizibil
+      // Este mai robust decât a căuta valoarea direct în HTML
+      expect(within(subcatSelect).getByRole('option', { name: subcat })).toBeInTheDocument();
+    });
   });
 
-  it('afișează subcategoriile grupate pentru CHELTUIELI', () => {
-    const formChelt = { ...defaultForm, type: 'expense', category: 'CHELTUIELI' };
-    render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
-    // Exemplu: ar trebui să existe cel puțin una din subcategoriile unei secțiuni
-    expect(within(subcatSelect).getByText('Îmbrăcăminte, încălțăminte și accesorii')).toBeInTheDocument();
-    expect(within(subcatSelect).getByText('Taxe școlare | universitare')).toBeInTheDocument();
-    expect(within(subcatSelect).getByText('Medicamente | Suplimente alimentare | Vitamine')).toBeInTheDocument();
-    // Verifică existența unui optgroup
-    expect(screen.getByRole('group', { name: 'ÎNFĂȚIȘARE' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'EDUCAȚIE' })).toBeInTheDocument();
-  });
-
-  it('afișează subcategoriile corecte pentru ECONOMII', () => {
+  it('afișează TOATE subcategoriile corecte pentru ECONOMII', () => {
     const formEcon = { ...defaultForm, type: 'saving', category: 'ECONOMII' };
     render(<TransactionForm form={formEcon} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
-    expect(within(subcatSelect).getByText('Fond de urgență')).toBeInTheDocument();
-    expect(within(subcatSelect).getByText('Fond general')).toBeInTheDocument();
-    // Verifică și optgroup-ul 'Total economii'
-    expect(within(subcatSelect).getByText('Suma totală a economiilor din toate categoriile.')).toBeInTheDocument();
+    expect(subcatSelect).toBeEnabled();
+
+    const expectedSubcategories = getAllSubcategories(categorii['ECONOMII']);
+    const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
+                                 .map(opt => opt.value)
+                                 .filter(val => val !== '');
+
+    expect(renderedOptions.length).toBe(expectedSubcategories.length);
+    expectedSubcategories.forEach(subcat => {
+      expect(within(subcatSelect).getByRole('option', { name: subcat })).toBeInTheDocument();
+    });
+  });
+
+  it('afișează TOATE subcategoriile corecte pentru CHELTUIELI', () => {
+    const formChelt = { ...defaultForm, type: 'expense', category: 'CHELTUIELI' };
+    render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
+    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
+    expect(subcatSelect).toBeEnabled();
+
+    const expectedSubcategories = getAllSubcategories(categorii['CHELTUIELI']);
+    const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
+                                 .map(opt => opt.value)
+                                 .filter(val => val !== '');
+
+    expect(renderedOptions.length).toBe(expectedSubcategories.length);
+    expectedSubcategories.forEach(subcat => {
+      expect(within(subcatSelect).getByRole('option', { name: subcat })).toBeInTheDocument();
+    });
   });
 
   it('nu permite selectarea unei categorii incompatibile cu tipul', () => {
@@ -148,7 +185,6 @@ describe('TransactionForm', () => {
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true }) as HTMLSelectElement;
     expect(subcatSelect.value).toBe(''); // valoarea se resetează
   });
-
 
   it('shows error and success messages', () => {
     render(
@@ -167,14 +203,14 @@ describe('TransactionForm', () => {
   // --- Tests for Initial Values from Props --- 
 
   const initialForm: TransactionFormData = {
-  type: 'income',
-  amount: '100',
-  category: 'VENITURI', // trebuie să corespundă exact valorii din dropdown
-  subcategory: 'Salarii', // trebuie să corespundă exact valorii din dropdown
-  date: '2025-01-15',
-  recurring: true,
-  frequency: 'lunar',
-};
+    type: 'income',
+    amount: '100',
+    category: 'VENITURI', // trebuie să corespundă exact valorii din dropdown
+    subcategory: 'Salarii', // trebuie să corespundă exact valorii din dropdown
+    date: '2025-01-15',
+    recurring: true,
+    frequency: 'lunar',
+  };
 
   it('renders initial type value from props', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
@@ -183,11 +219,11 @@ describe('TransactionForm', () => {
   });
 
   it('redă valorile inițiale pentru categorie și subcategorie din props', () => {
-  render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-  const form = screen.getByRole('form');
-  expect(within(form).getByLabelText('Categorie', { exact: true })).toHaveValue('VENITURI');
-  expect(within(form).getByLabelText('Subcategorie', { exact: true })).toHaveValue('Salarii');
-});
+    render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
+    const form = screen.getByRole('form');
+    expect(within(form).getByLabelText('Categorie', { exact: true })).toHaveValue('VENITURI');
+    expect(within(form).getByLabelText('Subcategorie', { exact: true })).toHaveValue('Salarii');
+  });
 
   it('renders initial amount value from props', async () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);

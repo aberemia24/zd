@@ -20,7 +20,7 @@ export type TransactionFormProps = {
 };
 
 // Structura completă pentru categorii și subcategorii, conform listei primite
-const categorii: Record<string, any> = {
+export const categorii: Record<string, any> = {
   'VENITURI': [
     'Salarii', 'Dividende', 'Chirii', 'Tichete de masă', 'Cadouri', 'Drepturi de autor', 'Pensii', 'Alocații (copil/de handicap etc.)', 'Alte venituri',
     { label: 'Report', options: ['Venituri reportate din luna anterioară.'] }
@@ -83,21 +83,21 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
   }
 
   return (
-    <form role="form" onSubmit={onSubmit} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24, alignItems: 'flex-end' }}>
+    <form role="form" aria-label="adăugare tranzacție" onSubmit={onSubmit} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24, alignItems: 'flex-end' }}>
       <label>
         Tip*:
         <select
-  name="type"
-  value={form.type}
-  onChange={onChange}
-  aria-label="Tip"
->
-  {/* Placeholder-ul "Alege" apare doar dacă nu este selectat niciun tip */}
-  {form.type === '' ? <option value=''>Alege</option> : null}
-  <option value='income'>Venit</option>
-  <option value='expense'>Cheltuială</option>
-  <option value='saving'>Economisire</option>
-</select>
+          name="type"
+          value={form.type}
+          onChange={onChange}
+          aria-label="Tip"
+        >
+          {/* Placeholder-ul "Alege" apare doar dacă nu este selectat niciun tip */}
+          {form.type === '' ? <option value=''>Alege</option> : null}
+          <option value='income'>Venit</option>
+          <option value='expense'>Cheltuială</option>
+          <option value='saving'>Economisire</option>
+        </select>
       </label>
       <label>
         Sumă*:
@@ -106,44 +106,44 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
       <label>
         Categorie*:
         {/* Dropdown-ul de categorie se adaptează în funcție de tip */}
-<select
-  name="category"
-  value={form.category}
-  onChange={onChange}
-  aria-label="Categorie"
-  disabled={(!form.type || categoriiFiltrate.length === 0)}
->
-  <option value=''>Alege</option>
-  {categoriiFiltrate.map((cat) => (
-    <option key={cat} value={cat}>{cat}</option>
-  ))}
-</select>
+        <select
+          name="category"
+          value={form.category}
+          onChange={onChange}
+          aria-label="Categorie"
+          disabled={(!form.type || categoriiFiltrate.length === 0)}
+        >
+          <option value=''>Alege</option>
+          {categoriiFiltrate.map((cat) => (
+            <option key={cat} value={cat}>{cat}</option>
+          ))}
+        </select>
       </label>
       <label>
         Subcategorie:
         <select
-  name="subcategory"
-  value={form.subcategory}
-  onChange={onChange}
-  aria-label="Subcategorie"
-  disabled={!form.category}
->
-  <option value=''>Alege</option>
-  {listaSubcategorii.map((subcat, idx) => {
-    if (typeof subcat === 'string') {
-      return <option key={subcat} value={subcat}>{subcat}</option>;
-    } else if (typeof subcat === 'object' && subcat.label && Array.isArray(subcat.options)) {
-      return (
-        <optgroup key={subcat.label} label={subcat.label}>
-          {subcat.options.map((opt: string) => (
-            <option key={subcat.label + '-' + opt} value={opt}>{opt}</option>
-          ))}
-        </optgroup>
-      );
-    }
-    return null;
-  })}
-</select>
+          name="subcategory"
+          value={form.subcategory}
+          onChange={onChange}
+          aria-label="Subcategorie"
+          disabled={!form.category}
+        >
+          <option value=''>Alege</option>
+          {listaSubcategorii.map((subcat, idx) => {
+            if (typeof subcat === 'string') {
+              return <option key={subcat} value={subcat}>{subcat}</option>;
+            } else if (typeof subcat === 'object' && subcat.label && Array.isArray(subcat.options)) {
+              return (
+                <optgroup key={subcat.label} label={subcat.label}>
+                  {subcat.options.map((opt: string) => (
+                    <option key={subcat.label + '-' + opt} value={opt}>{opt}</option>
+                  ))}
+                </optgroup>
+              );
+            }
+            return null;
+          })}
+        </select>
       </label>
       <label>
         Dată*:
@@ -169,8 +169,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
         </select>
       </label>
       <button type="submit">Adaugă</button>
-      {formError && <span style={{ color: 'red', display: 'block', marginTop: 8 }}>{formError}</span>}
-      {formSuccess && <span style={{ color: 'green', display: 'block', marginTop: 8 }}>{formSuccess}</span>}
+      {formError && <span data-testid="error-message" style={{ color: 'red', display: 'block', marginTop: 8 }}>{formError}</span>}
+      {formSuccess && <span data-testid="success-message" style={{ color: 'green', display: 'block', marginTop: 8 }}>{formSuccess}</span>}
     </form>
   );
 };
