@@ -123,8 +123,8 @@ describe('Tranzacții și venituri recurente', () => {
 
     fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
     fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: '10' } });
-    fireEvent.change(within(form).getByLabelText(/Monedă/i), { target: { value: 'EUR' } });
-    fireEvent.change(within(form).getByRole('textbox', { name: 'Categorie' }), { target: { value: 'test' } });
+    
+    fireEvent.change(within(form).getByRole('combobox', { name: 'Categorie' }), { target: { value: 'CHELTUIELI' } });
     fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: '2025-01-01' } });
     fireEvent.click(within(form).getByLabelText(/Recurent/i));
 
@@ -141,7 +141,10 @@ describe('Tranzacții și venituri recurente', () => {
 
   it('poți adăuga o tranzacție recurentă și apare marcată în tabel', async () => {
     const mockTransaction = {
-      id: '2', userId: 'u1', type: 'expense', amount: 50, currency: 'RON', date: '2025-04-23', category: 'abonament', subcategory: 'netflix', recurring: true, frequency: 'lunar'
+      id: '2', userId: 'u1', type: 'expense', amount: 50, currency: 'RON', date: '2025-04-23',
+      category: 'abonament', 
+      subcategory: 'Taxe școlare | universitare', 
+      recurring: true, frequency: 'lunar'
     };
 
     // Mock-uri specifice pentru acest test, în ordinea așteptată
@@ -164,14 +167,25 @@ describe('Tranzacții și venituri recurente', () => {
     form = screen.getByRole('form'); 
     submitButton = within(form).getByText(/Adaugă/i);
 
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: mockTransaction.type } });
-    fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: String(mockTransaction.amount) } });
-    fireEvent.change(within(form).getByLabelText(/Monedă/i), { target: { value: mockTransaction.currency } });
-    fireEvent.change(within(form).getByRole('textbox', { name: 'Categorie' }), { target: { value: mockTransaction.category } });
-    fireEvent.change(within(form).getByRole('textbox', { name: 'Subcategorie' }), { target: { value: mockTransaction.subcategory } });
-    fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: mockTransaction.date } });
-    fireEvent.click(within(form).getByLabelText(/Recurent/i)); 
-    fireEvent.change(within(form).getByLabelText(/Frecvență/i), { target: { value: mockTransaction.frequency } }); 
+    await act(async () => {
+      fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: mockTransaction.type } });
+      fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: String(mockTransaction.amount) } });
+    });
+    
+    await act(async () => {
+      fireEvent.change(within(form).getByRole('combobox', { name: 'Categorie' }), { target: { value: 'CHELTUIELI' } }); 
+      await waitFor(() => {
+        const select = within(form).getByRole('combobox', { name: 'Subcategorie' }) as HTMLSelectElement;
+        expect(select).not.toBeDisabled(); // Așteaptă să fie activat
+        expect(Array.from(select.options).some((opt: HTMLOptionElement) => opt.value === mockTransaction.subcategory)).toBe(true);
+      });
+      fireEvent.change(within(form).getByRole('combobox', { name: 'Subcategorie' }), { target: { value: mockTransaction.subcategory } });
+    });
+    await act(async () => {
+      fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: mockTransaction.date } });
+      fireEvent.click(within(form).getByLabelText(/Recurent/i)); 
+      fireEvent.change(within(form).getByLabelText(/Frecvență/i), { target: { value: mockTransaction.frequency } }); 
+    });
 
     await act(async () => {
       fireEvent.click(submitButton);
@@ -179,16 +193,19 @@ describe('Tranzacții și venituri recurente', () => {
 
     // Păstrăm DOAR: așteaptă ca elementele să apară în DOM
     await waitFor(() => {
-      const row = screen.getByRole('row', { name: /netflix/i });
-      // Verificăm doar prezența rândului, celelalte detalii sunt implicite dacă rândul e corect
+      const row = screen.getByRole('row', { name: /Taxe școlare | universitare/i });
       expect(row).toBeInTheDocument();
-      // expect(within(row).getByRole('cell', { name: /recurentă/i })).toBeInTheDocument();
+      // Verificăm și că celula Monedă conține 'RON'
+      expect(within(row).getByText('RON')).toBeInTheDocument();
     }, { timeout: 1500 }); // Timeout mărit
   });
 
   it('poți adăuga un venit recurent și apare marcat în tabel', async () => {
     const mockIncome = {
-      id: '3', userId: 'u1', type: 'income', amount: 200, currency: 'RON', date: '2025-04-24', category: 'salariu', subcategory: 'principal', recurring: true, frequency: 'lunar'
+      id: '3', userId: 'u1', type: 'income', amount: 200, currency: 'RON', date: '2025-04-24',
+      category: 'venit', 
+      subcategory: 'Salarii', 
+      recurring: true, frequency: 'lunar'
     };
 
     // Mock-uri specifice pentru acest test, în ordinea așteptată
@@ -206,12 +223,21 @@ describe('Tranzacții și venituri recurente', () => {
     const form = screen.getByRole('form'); 
     const submitButton = within(form).getByText(/Adaugă/i);
 
-    act(() => {
+    await act(async () => {
       fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: mockIncome.type } });
       fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: String(mockIncome.amount) } });
-      fireEvent.change(within(form).getByLabelText(/Monedă/i), { target: { value: mockIncome.currency } });
-      fireEvent.change(within(form).getByRole('textbox', { name: 'Categorie' }), { target: { value: mockIncome.category } });
-      fireEvent.change(within(form).getByRole('textbox', { name: 'Subcategorie' }), { target: { value: mockIncome.subcategory } });
+    });
+    
+    await act(async () => {
+      fireEvent.change(within(form).getByRole('combobox', { name: 'Categorie' }), { target: { value: 'VENITURI' } });
+      await waitFor(() => {
+        const select = within(form).getByRole('combobox', { name: 'Subcategorie' }) as HTMLSelectElement;
+        expect(select).not.toBeDisabled(); // Așteaptă să fie activat
+        expect(Array.from(select.options).some((opt: HTMLOptionElement) => opt.value === mockIncome.subcategory)).toBe(true);
+      });
+      fireEvent.change(within(form).getByRole('combobox', { name: 'Subcategorie' }), { target: { value: mockIncome.subcategory } });
+    });
+    await act(async () => {
       fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: mockIncome.date } });
       fireEvent.click(within(form).getByLabelText(/Recurent/i));
       fireEvent.change(within(form).getByLabelText(/Frecvență/i), { target: { value: mockIncome.frequency } });
@@ -222,10 +248,10 @@ describe('Tranzacții și venituri recurente', () => {
 
     // Păstrăm DOAR: așteaptă ca elementele să apară în DOM
     await waitFor(() => {
-      const row = screen.getByRole('row', { name: /salariu/i });
-      // Verificăm doar prezența rândului
+      const row = screen.getByRole('row', { name: /Salarii/i });
       expect(row).toBeInTheDocument();
-      // expect(within(row).getByRole('cell', { name: /recurentă/i })).toBeInTheDocument();
+      // Verificăm și că celula Monedă conține 'RON'
+      expect(within(row).getByText('RON')).toBeInTheDocument();
     }, { timeout: 1500 }); // Timeout mărit
   });
 });

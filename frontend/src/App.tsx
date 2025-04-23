@@ -2,23 +2,11 @@
 import React from 'react';
 import TransactionForm, { TransactionFormData } from './components/TransactionForm/TransactionForm';
 import TransactionTable from './components/TransactionTable/TransactionTable';
+import { Transaction } from './types/Transaction';
 
-const API_URL = "/transactions";
+import { API_URL } from './constants';
 
-type Transaction = {
-  _id?: string;
-  id?: string;
-  userId?: string;
-  type: string;
-  amount: string;
-  currency: string;
-  date: string;
-  category: string;
-  subcategory: string;
-  recurring?: boolean;
-  frequency?: string;
-}; // currency rămâne doar pentru tipul de tranzacție, nu și pentru formular
-
+export 
 const App: React.FC = () => {
   console.log('App loaded');
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
@@ -42,6 +30,8 @@ const [form, setForm] = React.useState<TransactionFormData>({
   const [sort, setSort] = React.useState<string>('date'); // default sort
   const [total, setTotal] = React.useState<number>(0);
   const [loading, setLoading] = React.useState(false);
+  // Trigger suplimentar pentru reîncărcare tranzacții
+  const [reloadTransactions, setReloadTransactions] = React.useState(0);
 
   React.useEffect(() => {
     console.log("App loaded", { type, category, limit, offset, sort });
@@ -77,18 +67,20 @@ const [form, setForm] = React.useState<TransactionFormData>({
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [type, category, limit, offset, sort]);
+  }, [type, category, limit, offset, sort, reloadTransactions]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    // La orice modificare, resetăm mesajele de succes/eroare pentru UX și teste stabile
+    setFormSuccess('');
+    setFormError('');
     const { name, value, type: inputType } = e.target;
-    // Check if the target is an HTMLInputElement before accessing 'checked'
     const isCheckbox = e.target instanceof HTMLInputElement && inputType === 'checkbox';
     const checkedValue = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
 
     setForm(prev => ({
       ...prev,
       [name]: isCheckbox ? checkedValue : value,
-      // Reset frequency if recurring is unchecked
+      // Reset frequency dacă recurent devine false
       ...(name === 'recurring' && isCheckbox && !checkedValue && { frequency: '' })
     }));
   };
@@ -97,14 +89,15 @@ const [form, setForm] = React.useState<TransactionFormData>({
     e.preventDefault();
     if (!form.type || !form.amount || !form.category || !form.date) {
       setFormError('Completează toate câmpurile obligatorii');
+      setFormSuccess('');
       return;
     }
     if (form.recurring && !form.frequency) {
       setFormError('Selectează frecvența pentru tranzacție recurentă');
+      setFormSuccess('');
       return;
     }
     setFormError('');
-    setFormSuccess('');
     setLoading(true); // Indicate loading during submit
     // La submit, adaugăm manual 'currency: "RON"' în payload
 const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
@@ -116,24 +109,22 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
       });
       if (!res.ok) throw new Error('Eroare la adăugare');
       setFormSuccess('Tranzacție adăugată cu succes');
+      setFormError('');
+      // Resetare completă a formularului după submit reușit
       setForm({ type: '', amount: '', category: '', subcategory: '', date: '', recurring: false, frequency: '' });
-      // setTimeout(() => setFormSuccess(''), 1200); // Commented out for testing
-      // Trigger refresh by resetting offset and clearing filters (or just refetch)
-      // Simplest way to force useEffect to re-run with current filters:
-      // Create a dummy state variable and toggle it.
-      // Or, more cleanly, refetch based on current params, maybe reset offset?
-      setOffset(0); // Go back to first page to see the new item
-      // Optionally clear filters or keep them:
-      // setType(undefined);
-      // setCategory(undefined);
+      // Nu ștergem mesajul de succes imediat pentru a permite testelor să-l detecteze
+      setOffset(0); // Reîncarcă tranzacțiile de la pagina 1
+      setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții
     } catch (err) {
       console.error("Submit error:", err);
       setFormError('Eroare la adăugare');
+      setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții și la POST eșuat
     } finally {
       // Resetăm loading specific pentru submit, independent de useEffect
       setLoading(false);
     }
   };
+
 
   const handlePageChange = (newOffset: number) => {
     setOffset(newOffset);

@@ -17,6 +17,12 @@
 
 ## [2025-04-23] Refactorizare avansată TransactionForm, UX dropdown-uri, testare robustă
 - Dropdown-urile pentru categorie și subcategorie filtrează dinamic opțiunile în funcție de tipul selectat (Venit, Cheltuială, Economisire).
+- Testele pentru TransactionForm validează exhaustiv TOATE subcategoriile posibile pentru fiecare tip/categorie, folosind helper dedicat pentru extragere din sursa de adevăr din cod.
+- Structura categorii/subcategorii este exportată explicit din codul sursă și importată direct în teste pentru a evita divergențe și hardcoding.
+- S-a introdus un pattern robust pentru testarea dropdown-urilor controlate: helper pentru extragere subcategorii, aserțiuni exhaustive, verificare opțiuni și optgroup-uri.
+- Orice modificare a structurii de categorii va fi reflectată automat și în teste, reducând mentenanța și riscul de bug-uri la filtrare.
+- Toate testele TransactionForm trec fără erori, acoperind filtrarea dinamică și resetarea valorilor incompatibile.
+- Lecțiile și best practices noi au fost documentate și propagate în toate fișierele relevante (BEST_PRACTICES.md, PLAN.md, README.md, memorie).
 - Opțiunea 'Transfer' eliminată complet din UI și cod.
 - Placeholderul 'Alege' la Tip apare doar dacă nu este selectat nimic, nu mai este opțiune după selectare.
 - Testele acoperă: filtrare categorii/subcategorii, scenarii negative, resetare valori incompatibile, existență optgroup-uri, UX placeholder.

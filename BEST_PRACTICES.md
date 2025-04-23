@@ -17,6 +17,12 @@ Acest document centralizează deciziile și convențiile adoptate pe parcursul d
 
 ### Dropdown-uri controlate (categorie/subcategorie/tip)
 - Folosește pattern-ul controlled component: valoarea selectată este mereu sincronizată cu starea (form.type, form.category etc.).
+- **Testare exhaustivă a filtrării subcategoriilor:**
+  - Importă sursa de adevăr (structura categorii/subcategorii) direct din codul sursă.
+  - Creează un helper pentru extragerea tuturor subcategoriilor posibile pentru fiecare categorie.
+  - În teste, verifică exhaustiv că toate opțiunile și optgroup-urile relevante apar corect în dropdown după selectarea tipului/categoriei.
+  - Orice modificare a structurii de categorii va fi reflectată automat și în teste, reducând riscul de bug-uri și mentenanța duplicată.
+  - Pattern recomandat: helper pentru extragere, aserțiuni exhaustive, fără hardcoding de opțiuni în test.
 - Pentru placeholder (ex: 'Alege'), randarea trebuie condiționată strict de valoarea selectată: opțiunea apare doar dacă value este ''.
 - Elimină opțiuni irelevante din dropdown (ex: 'Transfer' la tip) pentru UX clar și validare robustă.
 - Pentru testarea interacțiunii, folosește un wrapper cu stare locală în test, nu doar onChange dummy. Astfel, simularea reflectă comportamentul real din aplicație.

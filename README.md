@@ -18,6 +18,7 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 ## 🧩 Convenții și filozofie
 - **TDD:** Test Driven Development peste tot (testele se scriu înainte de cod)
 - **Dropdown-urile pentru categorii/subcategorii sunt filtrate dinamic după tipul selectat (Venit, Cheltuială, Economisire).**
+- **Testarea filtrării este exhaustivă, folosind helper dedicat pentru extragere subcategorii și sursa de adevăr importată direct din cod. Orice modificare a structurii este reflectată automat și în teste.**
 - **Opțiunea 'Transfer' nu mai există la tip.**
 - **Placeholderul 'Alege' la Tip este strict placeholder, nu opțiune după selectare.**
 - **Testele pentru componente controlate folosesc wrapper cu stare locală pentru simularea interacțiunii reale (React + Testing Library).**
