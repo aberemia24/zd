@@ -17,6 +17,7 @@ export type TransactionFormProps = {
   formSuccess: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
+  loading?: boolean;
 };
 
 // Structura completă pentru categorii și subcategorii, conform listei primite
@@ -63,7 +64,7 @@ export const categorii: Record<string, any> = {
   ]
 };
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, formSuccess, onChange, onSubmit }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, formSuccess, onChange, onSubmit, loading }) => {
   // Filtrare categorii în funcție de tip
   let categoriiFiltrate: string[] = [];
   if (form.type === 'income') {
@@ -168,7 +169,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
           <option value='anual'>Anual</option>
         </select>
       </label>
-      <button type="submit">Adaugă</button>
+      <button type="submit" disabled={!!loading}>Adaugă</button>
       {formError && <span data-testid="error-message" style={{ color: 'red', display: 'block', marginTop: 8 }}>{formError}</span>}
       {formSuccess && <span data-testid="success-message" style={{ color: 'green', display: 'block', marginTop: 8 }}>{formSuccess}</span>}
     </form>

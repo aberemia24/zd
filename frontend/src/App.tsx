@@ -5,6 +5,15 @@ import TransactionTable from './components/TransactionTable/TransactionTable';
 import { Transaction } from './types/Transaction';
 
 import { API_URL } from './constants';
+import TransactionFilters from './components/TransactionFilters/TransactionFilters';
+import { MESAJE } from './constants/messages';
+import { buildTransactionQueryParams } from './utils/transactions';
+
+const appContainerStyle: React.CSSProperties = {
+  maxWidth: 900,
+  margin: '2rem auto',
+  fontFamily: 'sans-serif',
+};
 
 export 
 const App: React.FC = () => {
@@ -29,20 +38,16 @@ const [form, setForm] = React.useState<TransactionFormData>({
   const [offset, setOffset] = React.useState<number>(0);
   const [sort, setSort] = React.useState<string>('date'); // default sort
   const [total, setTotal] = React.useState<number>(0);
-  const [loading, setLoading] = React.useState(false);
+  const [loadingFetch, setLoadingFetch] = React.useState(false);
+  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
   // Trigger suplimentar pentru reîncărcare tranzacții
   const [reloadTransactions, setReloadTransactions] = React.useState(0);
 
   React.useEffect(() => {
     console.log("App loaded", { type, category, limit, offset, sort });
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (type) params.append('type', type);
-    if (category) params.append('category', category);
-    params.append('limit', typeof limit !== 'undefined' ? limit.toString() : '10'); // Default limit
-    params.append('offset', typeof offset !== 'undefined' ? offset.toString() : '0'); // Default offset
-    params.append('sort', typeof sort !== 'undefined' ? sort : 'date'); // Default sort
-    fetch(`${API_URL}?${params.toString()}`)
+    setLoadingFetch(true);
+    const queryString = buildTransactionQueryParams({ type, category, limit, offset, sort });
+    fetch(`${API_URL}?${queryString}`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`HTTP error! status: ${res.status}`);
@@ -66,7 +71,7 @@ const [form, setForm] = React.useState<TransactionFormData>({
         setTransactions([]);
         setTotal(0);
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoadingFetch(false));
   }, [type, category, limit, offset, sort, reloadTransactions]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -88,17 +93,17 @@ const [form, setForm] = React.useState<TransactionFormData>({
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.type || !form.amount || !form.category || !form.date) {
-      setFormError('Completează toate câmpurile obligatorii');
+      setFormError(MESAJE.CAMPURI_OBLIGATORII);
       setFormSuccess('');
       return;
     }
     if (form.recurring && !form.frequency) {
-      setFormError('Selectează frecvența pentru tranzacție recurentă');
+      setFormError(MESAJE.FRECV_RECURENTA);
       setFormSuccess('');
       return;
     }
     setFormError('');
-    setLoading(true); // Indicate loading during submit
+    setLoadingSubmit(true); // Indicate loading during submit
     // La submit, adaugăm manual 'currency: "RON"' în payload
 const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
     try {
@@ -107,8 +112,8 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error('Eroare la adăugare');
-      setFormSuccess('Tranzacție adăugată cu succes');
+      if (!res.ok) throw new Error(MESAJE.EROARE_ADAUGARE);
+      setFormSuccess(MESAJE.SUCCES_ADAUGARE);
       setFormError('');
       // Resetare completă a formularului după submit reușit
       setForm({ type: '', amount: '', category: '', subcategory: '', date: '', recurring: false, frequency: '' });
@@ -117,11 +122,11 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
       setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții
     } catch (err) {
       console.error("Submit error:", err);
-      setFormError('Eroare la adăugare');
+      setFormError(MESAJE.EROARE_ADAUGARE);
       setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții și la POST eșuat
     } finally {
       // Resetăm loading specific pentru submit, independent de useEffect
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
 
@@ -131,7 +136,7 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
   };
 
   return (
-    <div style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'sans-serif' }}>
+    <div style={appContainerStyle}>
       <h1>Tranzacții</h1>
 
       {/* Render Transaction Form */}
@@ -141,15 +146,31 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
         formSuccess={formSuccess}
         onChange={handleChange}
         onSubmit={handleFormSubmit}
-        // Consider passing loading state to disable submit button?
+        loading={loadingSubmit}
       />
 
-      {/* TODO: Add Filtering UI (Type, Category, etc.) */}
+      {/* Filtrare tranzacții după tip și categorie */}
+      <TransactionFilters
+        type={type}
+        category={category}
+        onTypeChange={setType}
+        onCategoryChange={setCategory}
+        types={[
+          { value: 'income', label: 'Venit' },
+          { value: 'expense', label: 'Cheltuială' },
+          { value: 'savings', label: 'Economisire' },
+        ]}
+        categories={[
+          { value: 'VENITURI', label: 'VENITURI' },
+          { value: 'CHELTUIELI', label: 'CHELTUIELI' },
+          { value: 'ECONOMII', label: 'ECONOMII' },
+        ]}
+      />
 
       {/* Render Transaction Table */}
       <TransactionTable
         transactions={transactions}
-        loading={loading}
+        loading={loadingFetch}
         total={total}
         offset={offset}
         limit={limit}

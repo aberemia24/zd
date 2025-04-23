@@ -56,7 +56,7 @@
 ## 6. Iterații propuse (roadmap inițial)
 1. Setup proiect, TDD, categorii/config, autentificare
 2. Dashboard și model de date unificat (Transaction)
-3. Adăugare și vizualizare tranzacții
+3. Adăugare și vizualizare tranzacții **[FINALIZAT 2025-04-23]**
 4. Validare date externe cu zod pentru tranzacții
 5. Rapoarte și alerte
 6. Personalizare categorii
@@ -75,3 +75,13 @@
 ---
 
 > Orice modificare de strategie, arhitectură sau roadmap trebuie reflectată și aici!
+
+---
+
+### [2025-04-23] Progres funcționalitate și testare
+- Finalizare flux principal tranzacții, testare exhaustivă TransactionForm, TransactionTable, TransactionFilters
+- Pattern robust dropdown-uri: helperi, sursă de adevăr importată direct, wrapper cu stare locală
+- UI-ul rămâne placeholder până la design final, focus pe funcționalitate, reguli test ID și E2E după
+- Toate convențiile și lecțiile propagate în toate fișierele relevante (BEST_PRACTICES.md, DEV_LOG.md, PLAN.md, README.md, memorie)
+- Următorul pas: focus pe funcționalitate, apoi stilizare și testare E2E
+

@@ -84,3 +84,13 @@ Returnează lista de tranzacții cu suport pentru filtrare, paginare și sortare
 ---
 
 > Pentru orice modificare a convențiilor, actualizează și acest README!
+
+---
+
+### [2025-04-23] Progres funcționalitate și testare
+- Finalizare flux principal tranzacții, testare exhaustivă TransactionForm, TransactionTable, TransactionFilters
+- Pattern robust dropdown-uri: helperi, sursă de adevăr importată direct, wrapper cu stare locală
+- UI-ul rămâne placeholder până la design final, focus pe funcționalitate, reguli test ID și E2E după
+- Toate convențiile și lecțiile propagate în toate fișierele relevante (BEST_PRACTICES.md, DEV_LOG.md, PLAN.md, README.md, memorie)
+- Următorul pas: focus pe funcționalitate, apoi stilizare și testare E2E
+

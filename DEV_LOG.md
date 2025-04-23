@@ -16,6 +16,14 @@
 
 
 ## [2025-04-23] Refactorizare avansată TransactionForm, UX dropdown-uri, testare robustă
+
+- Finalizare flux principal adăugare și vizualizare tranzacții (frontend)
+- Testare exhaustivă TransactionForm, TransactionTable, TransactionFilters: acoperă toate scenariile critice și edge
+- Pattern robust pentru dropdown-uri: helperi pentru filtrare, sursă de adevăr importată direct, wrapper cu stare locală pentru testare
+- UI-ul rămâne placeholder, testare E2E și reguli test ID după finalizare funcționalitate
+- Toate convențiile și lecțiile propagate în toate fișierele relevante (BEST_PRACTICES.md, DEV_LOG.md, PLAN.md, README.md, memorie)
+- Următorul pas: focus pe funcționalitate, apoi stilizare și testare E2E
+
 - Dropdown-urile pentru categorie și subcategorie filtrează dinamic opțiunile în funcție de tipul selectat (Venit, Cheltuială, Economisire).
 - Testele pentru TransactionForm validează exhaustiv TOATE subcategoriile posibile pentru fiecare tip/categorie, folosind helper dedicat pentru extragere din sursa de adevăr din cod.
 - Structura categorii/subcategorii este exportată explicit din codul sursă și importată direct în teste pentru a evita divergențe și hardcoding.

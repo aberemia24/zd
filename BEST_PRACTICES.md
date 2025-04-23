@@ -123,4 +123,13 @@ Acest document centralizează deciziile și convențiile adoptate pe parcursul d
 
 ---
 
-_Actualizat la: 2025-04-22_
+### [2025-04-23] Progres major funcționalitate și testare
+- Finalizare flux principal adăugare și vizualizare tranzacții (frontend)
+- Refactorizare majoră TransactionForm: dropdown-uri filtrate dinamic, eliminare 'Transfer', UX placeholder, testare exhaustivă
+- Testele acoperă toate scenariile critice și edge pentru TransactionForm, TransactionTable, TransactionFilters
+- Pattern robust: helperi pentru filtrare, sursă de adevăr importată direct, wrapper cu stare locală pentru testare
+- Toate convențiile și lecțiile propagate în BEST_PRACTICES.md, DEV_LOG.md, PLAN.md, README.md și memorie
+- Ne concentrăm pe funcționalitate, UI-ul rămâne placeholder până la definirea designului final
+- Următorul pas: finalizare funcționalitate, apoi reguli clare pentru testare E2E și stilizare
+
+_Actualizat la: 2025-04-23_
