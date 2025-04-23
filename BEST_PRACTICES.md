@@ -1,6 +1,48 @@
-# Best Practices & Lessons Learned
+# Bune Practici și Convenții Proiect 'Budget App'
 
-Acest fișier conține reguli, convenții și lecții învățate din dezvoltarea monorepo-ului "Budget App" (NestJS, React, TDD, etc).
+Acest document centralizează deciziile și convențiile adoptate pe parcursul dezvoltării.
+
+## Convenții Generale
+
+*   **Limbă:** Întregul proiect (comunicare, cod, comentarii, documentație) va folosi **exclusiv limba română**. (Stabilit: 2025-04-23)
+*   **TDD (Test-Driven Development):** Obligatoriu pentru toate componentele și funcționalitățile noi (frontend și backend).
+*   **Commit-uri:** Frecvente, atomice și cu mesaje descriptive (ex: `feat: Adaugă validare formular tranzacții`, `fix: Corectează calcul total buget`).
+*   **Branching:** Branch `main` doar pentru cod stabil. Dezvoltarea se face pe branch-uri de feature (ex: `feature/rapoarte-lunare`).
+*   **Pull Requests (PRs):** Obligatorii pentru integrarea în `main`, chiar și pentru dezvoltare individuală (pentru istoric și context). Code review recomandat.
+*   **Documentație:** `README.md` și `DEV_LOG.md` trebuie actualizate constant cu decizii majore, modificări de arhitectură sau probleme întâmpinate.
+*   **Refactorizare:** Incrementală și mereu acoperită de teste.
+*   **Fără Breaking Changes:** Modificările care afectează compatibilitatea trebuie discutate și documentate.
+
+## Frontend (React & Testing Library)
+
+### Dropdown-uri controlate (categorie/subcategorie/tip)
+- Folosește pattern-ul controlled component: valoarea selectată este mereu sincronizată cu starea (form.type, form.category etc.).
+- Pentru placeholder (ex: 'Alege'), randarea trebuie condiționată strict de valoarea selectată: opțiunea apare doar dacă value este ''.
+- Elimină opțiuni irelevante din dropdown (ex: 'Transfer' la tip) pentru UX clar și validare robustă.
+- Pentru testarea interacțiunii, folosește un wrapper cu stare locală în test, nu doar onChange dummy. Astfel, simularea reflectă comportamentul real din aplicație.
+- Testează filtrarea dinamică a categoriilor și subcategoriilor în funcție de tipul selectat și compatibilitatea valorilor.
+- Verifică și existența optgroup-urilor folosind getByRole('group', { name: ... }) în teste.
+- Toate comentariile, denumirile și mesajele de test sunt în limba română.
+
+*   **Modularizare:** Componentele complexe (formulare, tabele) se extrag în module proprii (`src/components/NumeComponenta/`).
+*   **Colocare Teste:** Testele unitare/integrare pentru o componentă (`*.test.tsx`) se plasează în același folder cu componenta.
+*   **Mocking `fetch`:** Folosește un mock global robust pentru `fetch` (ideal în `src/setupTests.ts` sau un helper dedicat) pentru a izola testele de rețea.
+*   **Stabilitate Teste Asincrone:** Orice actualizare de stare care rezultă dintr-o operație asincronă (ex: `fetch`, `setTimeout`) trebuie anticipată în teste folosind `await waitFor(...)` sau `await findBy*()` pentru aserțiuni. Interacțiunile care declanșează actualizări asincrone ar trebui, ideal, învelite în `async act(...)`.
+*   **Testare Valori Inițiale (Formulare):** Evită asertarea simultană a multor valori inițiale după render. Împarte verificarea în teste `it(...)` mai mici, focalizate pe un singur câmp sau un grup mic de câmpuri. Folosește `await waitFor` pentru câmpurile predispuse la probleme de timing (date, number, checkbox). (Vezi Memorie ID: 3cb5254f)
+*   **Claritate Output Teste:** Minimizează `console.log`/`console.error` inutile în teste. Folosește reporteri Jest suplimentari (`jest-summarizing-reporter`, `jest-html-reporter`) pentru vizualizare mai bună.
+
+## Backend (NestJS)
+
+*   (De completat pe măsură ce avansăm)
+
+## Shared (Tipuri & Validări)
+
+*   (De completat pe măsură ce avansăm)
+
+## Managementul Dependențelor
+
+*   Folosește `npm ci` pentru instalări consistente bazate pe `package-lock.json`.
+*   Actualizează dependențele periodic și controlat.
 
 ## 1. Sincronizare versiuni pachete critice (ex: NestJS)
 - Toate pachetele `@nestjs/*` (common, core, platform-express, testing etc.) trebuie să fie la aceeași versiune exactă în toate subproiectele pentru a preveni conflicte de tipuri și runtime.
@@ -62,7 +104,6 @@ Acest fișier conține reguli, convenții și lecții învățate din dezvoltare
 - Un simplu restart la TypeScript server sau IDE poate face să dispară erori "fantomă" de tipări lipsă, dar cauza reală e lipsa tipărilor ca devDependency.
 - Înainte de commit, verifică să nu existe fișiere generate accidental (ex: .js în test/ sau src/).
 - Orice problemă de infrastructură trebuie rezolvată imediat, nu "lăsată pe mai târziu".
-
 
 ## 11. Frontend React & Teste (2025-04-22)
 - Orice componentă complexă (ex: formulare, tabele) trebuie extrasă ca modul separat în `src/components/ComponentName/ComponentName.tsx`.

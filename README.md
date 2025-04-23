@@ -17,6 +17,11 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 
 ## 🧩 Convenții și filozofie
 - **TDD:** Test Driven Development peste tot (testele se scriu înainte de cod)
+- **Dropdown-urile pentru categorii/subcategorii sunt filtrate dinamic după tipul selectat (Venit, Cheltuială, Economisire).**
+- **Opțiunea 'Transfer' nu mai există la tip.**
+- **Placeholderul 'Alege' la Tip este strict placeholder, nu opțiune după selectare.**
+- **Testele pentru componente controlate folosesc wrapper cu stare locală pentru simularea interacțiunii reale (React + Testing Library).**
+- **Toate convențiile și comentariile sunt în limba română.**
 - **Fără hardcoding:** Toate textele (UI, validări, erori, accesibilitate) sunt chei de localizare. Nicio valoare hardcodată în cod!
 - **Localizare:** i18next, limba principală română, dar totul pregătit pentru multi-limbă
 - **Structură modulară:** Fiecare funcționalitate în module separate (bugete, utilizatori, rapoarte etc)

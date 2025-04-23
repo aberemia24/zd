@@ -43,6 +43,10 @@
 
 ## 5. Best Practices & Lessons Learned
 
+- Dropdown-urile pentru categorii/subcategorii trebuie filtrate dinamic după tipul selectat, pentru UX și validare corectă.
+- Elimină opțiuni irelevante (ex: 'Transfer') din UI pentru a preveni date invalide și confuzie.
+- Pentru testarea interacțiunii cu componente controlate, folosește un wrapper cu stare locală în teste (React + Testing Library).
+- Placeholderul (ex: 'Alege') trebuie să fie doar vizibil când nu există selecție, nu ca opțiune permanentă.
 - Sincronizează toate dependențele critice în monorepo (NestJS, ts-jest, typescript etc.).
 - Folosește TDD și acoperire cu teste pentru orice feature nou.
 - Vezi BEST_PRACTICES.md pentru reguli detaliate.

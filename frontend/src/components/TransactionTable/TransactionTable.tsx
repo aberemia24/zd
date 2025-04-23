@@ -5,7 +5,7 @@ export type Transaction = {
   id?: string;
   userId?: string;
   type: string;
-  amount: string;
+  amount: string | number;
   currency: string;
   category: string;
   subcategory: string;
@@ -47,14 +47,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
           ) : (
             transactions.map((t, idx) => (
               <tr key={t._id || idx}>
-                <td>{t.type}</td>
-                <td>{t.amount}</td>
-                <td>{t.currency}</td>
-                <td>{t.category}</td>
-                <td>{t.subcategory}</td>
-                <td>{t.date}</td>
-                <td>{t.recurring ? 'Da' : 'Nu'}</td>
-                <td>{t.recurring ? t.frequency ?? '' : ''}</td>
+                <td>{t.type || ''}</td>
+                <td>{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
+                <td>{t.currency || ''}</td>
+                <td>{t.category || ''}</td>
+                <td>{t.subcategory || ''}</td>
+                <td>{t.date || ''}</td>
+                <td>{t.recurring === true ? 'Da' : 'Nu'}</td>
+                <td>{t.recurring === true && t.frequency ? t.frequency : ''}</td>
               </tr>
             ))
           ))}
@@ -63,7 +63,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
       <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <button onClick={() => onPageChange(Math.max(0, offset - limit))} disabled={offset === 0}>Înapoi</button>
         <span>Pagina {Math.floor(offset / limit) + 1} din {Math.ceil(total / limit) || 1}</span>
-        <button onClick={() => onPageChange(offset + limit)} disabled={offset + limit >= total}>Înainte</button>
+        <button onClick={() => onPageChange(offset + limit)} disabled={offset + limit >= total || offset >= total}>Înainte</button>
       </div>
     </div>
   );

@@ -15,6 +15,17 @@
 - Documentație și workflow actualizate conform progresului
 
 
+## [2025-04-23] Refactorizare avansată TransactionForm, UX dropdown-uri, testare robustă
+- Dropdown-urile pentru categorie și subcategorie filtrează dinamic opțiunile în funcție de tipul selectat (Venit, Cheltuială, Economisire).
+- Opțiunea 'Transfer' eliminată complet din UI și cod.
+- Placeholderul 'Alege' la Tip apare doar dacă nu este selectat nimic, nu mai este opțiune după selectare.
+- Testele acoperă: filtrare categorii/subcategorii, scenarii negative, resetare valori incompatibile, existență optgroup-uri, UX placeholder.
+- Pentru testarea interacțiunii cu componente controlate, se folosește un wrapper cu stare locală (pattern recomandat pentru React + Testing Library).
+- Toate convențiile și comentariile sunt în limba română.
+- Toate testele TransactionForm trec fără erori.
+- Best practices și lecții documentate pentru dropdown-uri controlate, UX placeholder și testare robustă.
+- Toate fișierele relevante (BEST_PRACTICES.md, DEV_LOG.md, PLAN.md, README.md) au fost actualizate cu aceste concluzii și convenții.
+
 ## Changelog & Lessons Learned (2025-04-21)
 
 - Toate dependențele NestJS, ts-jest, typescript și alte pachete critice au fost sincronizate la aceeași versiune în toate workspace-urile.

@@ -94,4 +94,21 @@ describe('App', () => {
       expect(screen.getByText(/Eroare la adăugare/i)).toBeInTheDocument();
     });
   });
+
+  it('nu permite submit dacă e recurent dar nu are frecvență', async () => {
+    render(<App />);
+    const form = screen.getByRole('form');
+    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+    fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: '10' } });
+    fireEvent.change(within(form).getByLabelText(/Monedă/i), { target: { value: 'RON' } });
+    fireEvent.change(within(form).getByLabelText('Categorie', { exact: true }), { target: { value: 'test' } });
+    fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: '2025-01-01' } });
+    // Bifează recurent
+    fireEvent.click(within(form).getByLabelText(/Recurent/i));
+    // Nu selectează frecvență
+    fireEvent.click(within(form).getByText(/Adaugă/i));
+    await waitFor(() => {
+      expect(screen.getByText(/Selectează frecvența pentru tranzacție recurentă/i)).toBeInTheDocument();
+    });
+  });
 });

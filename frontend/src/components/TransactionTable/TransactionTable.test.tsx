@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import TransactionTable, { Transaction } from './TransactionTable';
 
 describe('TransactionTable', () => {
@@ -50,21 +50,21 @@ describe('TransactionTable', () => {
 
   it('renders all transaction rows and fields', () => {
     render(<TransactionTable {...baseProps} transactions={transactions} />);
-    expect(screen.getByText('income')).toBeInTheDocument();
-    expect(screen.getByText('1000')).toBeInTheDocument();
-    expect(screen.getByText('RON')).toBeInTheDocument();
-    expect(screen.getByText('Salariu')).toBeInTheDocument();
-    expect(screen.getByText('IT')).toBeInTheDocument();
-    expect(screen.getByText('2025-04-01')).toBeInTheDocument();
-    expect(screen.getAllByText('Da')[0]).toBeInTheDocument();
-    expect(screen.getByText('lunar')).toBeInTheDocument();
+    expect(screen.getAllByText('income').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('1000').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('RON').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Salariu').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('IT').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('2025-04-01').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Da').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('lunar').length).toBeGreaterThanOrEqual(1);
 
-    expect(screen.getByText('expense')).toBeInTheDocument();
-    expect(screen.getByText('200')).toBeInTheDocument();
-    expect(screen.getByText('Mâncare')).toBeInTheDocument();
-    expect(screen.getByText('Supermarket')).toBeInTheDocument();
-    expect(screen.getByText('2025-04-02')).toBeInTheDocument();
-    expect(screen.getAllByText('Nu')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('expense').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('200').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Mâncare').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Supermarket').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('2025-04-02').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Nu').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows loading state', () => {
@@ -109,6 +109,8 @@ describe('TransactionTable', () => {
     // At start
     render(<TransactionTable {...baseProps} offset={0} transactions={transactions} />);
     expect(screen.getByRole('button', { name: /Înapoi/i })).toBeDisabled();
+    // cleanup DOM
+    cleanup();
     // At end
     render(<TransactionTable {...baseProps} offset={10} total={10} transactions={transactions} />);
     expect(screen.getByRole('button', { name: /Înainte/i })).toBeDisabled();

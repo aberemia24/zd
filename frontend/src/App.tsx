@@ -3,7 +3,7 @@ import React from 'react';
 import TransactionForm, { TransactionFormData } from './components/TransactionForm/TransactionForm';
 import TransactionTable from './components/TransactionTable/TransactionTable';
 
-const API_URL = "http://localhost:3000/transactions";
+const API_URL = "/transactions";
 
 type Transaction = {
   _id?: string;
@@ -17,69 +17,85 @@ type Transaction = {
   subcategory: string;
   recurring?: boolean;
   frequency?: string;
-};
+}; // currency rămâne doar pentru tipul de tranzacție, nu și pentru formular
 
 const App: React.FC = () => {
   console.log('App loaded');
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
-  const [total, setTotal] = React.useState(0);
-  const [limit, setLimit] = React.useState(10);
-  const [offset, setOffset] = React.useState(0);
-  const [type, setType] = React.useState('');
-  const [category, setCategory] = React.useState('');
-  const [sort, setSort] = React.useState('date');
+  // Starea formularului de tranzacție (fără câmpul 'currency')
+const [form, setForm] = React.useState<TransactionFormData>({
+  type: '',
+  amount: '',
+  category: '',
+  subcategory: '',
+  date: '',
+  recurring: false,
+  frequency: '',
+});
+  const [formError, setFormError] = React.useState('');
+  const [formSuccess, setFormSuccess] = React.useState('');
+  // State for filtering/pagination
+  const [type, setType] = React.useState<string | undefined>(undefined);
+  const [category, setCategory] = React.useState<string | undefined>(undefined);
+  const [limit, setLimit] = React.useState<number>(10);
+  const [offset, setOffset] = React.useState<number>(0);
+  const [sort, setSort] = React.useState<string>('date'); // default sort
+  const [total, setTotal] = React.useState<number>(0);
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
+    console.log("App loaded", { type, category, limit, offset, sort });
     setLoading(true);
     const params = new URLSearchParams();
     if (type) params.append('type', type);
     if (category) params.append('category', category);
-    params.append('limit', typeof limit !== 'undefined' ? limit.toString() : '');
-    params.append('offset', typeof offset !== 'undefined' ? offset.toString() : '');
-    params.append('sort', typeof sort !== 'undefined' ? sort : '');
+    params.append('limit', typeof limit !== 'undefined' ? limit.toString() : '10'); // Default limit
+    params.append('offset', typeof offset !== 'undefined' ? offset.toString() : '0'); // Default offset
+    params.append('sort', typeof sort !== 'undefined' ? sort : 'date'); // Default sort
     fetch(`${API_URL}?${params.toString()}`)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setTransactions(data.data);
-        setTotal(data.total);
-        setLimit(data.limit);
-        setOffset(data.offset);
+        if (data && typeof data === 'object') {
+          setTransactions(Array.isArray(data.data) ? data.data : []);
+          setTotal(typeof data.total === 'number' ? data.total : 0);
+          setLimit(typeof data.limit === 'number' ? data.limit : 10); // Use default if invalid
+          setOffset(typeof data.offset === 'number' ? data.offset : 0); // Use default if invalid
+        } else {
+          console.error("Received unexpected data structure:", data);
+          setTransactions([]);
+          setTotal(0);
+        }
+      })
+      .catch(error => {
+        console.error("Fetch error:", error);
+        setTransactions([]);
+        setTotal(0);
       })
       .finally(() => setLoading(false));
   }, [type, category, limit, offset, sort]);
 
-  const totalPages = Math.ceil(total / limit);
-  const currentPage = Math.floor(offset / limit) + 1;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type: inputType } = e.target;
+    // Check if the target is an HTMLInputElement before accessing 'checked'
+    const isCheckbox = e.target instanceof HTMLInputElement && inputType === 'checkbox';
+    const checkedValue = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
 
-  // State pentru formular
-  const [form, setForm] = React.useState({
-    type: '',
-    amount: '',
-    currency: '',
-    category: '',
-    subcategory: '',
-    date: '',
-    recurring: false,
-    frequency: '',
-  });
-  const [formError, setFormError] = React.useState('');
-  const [formSuccess, setFormSuccess] = React.useState('');
-  // Handlers formular
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
-    let fieldValue: string | boolean = value;
-    if (type === 'checkbox') {
-      fieldValue = (e.target as HTMLInputElement).checked;
-    }
-    setForm(f => ({ ...f, [name]: fieldValue }));
-    setFormError('');
-    setFormSuccess('');
+    setForm(prev => ({
+      ...prev,
+      [name]: isCheckbox ? checkedValue : value,
+      // Reset frequency if recurring is unchecked
+      ...(name === 'recurring' && isCheckbox && !checkedValue && { frequency: '' })
+    }));
   };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Validare minimă
-    if (!form.type || !form.amount || !form.currency || !form.category || !form.date) {
+    if (!form.type || !form.amount || !form.category || !form.date) {
       setFormError('Completează toate câmpurile obligatorii');
       return;
     }
@@ -89,8 +105,9 @@ const App: React.FC = () => {
     }
     setFormError('');
     setFormSuccess('');
-    // Trimite POST
-    const payload = { ...form, amount: Number(form.amount) };
+    setLoading(true); // Indicate loading during submit
+    // La submit, adaugăm manual 'currency: "RON"' în payload
+const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
@@ -99,72 +116,54 @@ const App: React.FC = () => {
       });
       if (!res.ok) throw new Error('Eroare la adăugare');
       setFormSuccess('Tranzacție adăugată cu succes');
-      setForm({ type: '', amount: '', currency: '', category: '', subcategory: '', date: '', recurring: false, frequency: '' });
-      // Refresh listă
-      setTimeout(() => setFormSuccess(''), 1200);
-      // Trigger refresh (forțat)
-      setOffset(0); setType(''); setCategory(''); setSort('date');
-    } catch {
+      setForm({ type: '', amount: '', category: '', subcategory: '', date: '', recurring: false, frequency: '' });
+      // setTimeout(() => setFormSuccess(''), 1200); // Commented out for testing
+      // Trigger refresh by resetting offset and clearing filters (or just refetch)
+      // Simplest way to force useEffect to re-run with current filters:
+      // Create a dummy state variable and toggle it.
+      // Or, more cleanly, refetch based on current params, maybe reset offset?
+      setOffset(0); // Go back to first page to see the new item
+      // Optionally clear filters or keep them:
+      // setType(undefined);
+      // setCategory(undefined);
+    } catch (err) {
+      console.error("Submit error:", err);
       setFormError('Eroare la adăugare');
+    } finally {
+      // Resetăm loading specific pentru submit, independent de useEffect
+      setLoading(false);
     }
+  };
+
+  const handlePageChange = (newOffset: number) => {
+    setOffset(newOffset);
   };
 
   return (
     <div style={{ maxWidth: 900, margin: '2rem auto', fontFamily: 'sans-serif' }}>
       <h1>Tranzacții</h1>
-      {/* Formular de adăugare tranzacție */}
+
+      {/* Render Transaction Form */}
       <TransactionForm
         form={form}
         formError={formError}
         formSuccess={formSuccess}
-        onChange={handleFormChange}
+        onChange={handleChange}
         onSubmit={handleFormSubmit}
+        // Consider passing loading state to disable submit button?
       />
-      {/* Filtre, sortare, etc. */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <label>
-          Tip:
-          <select value={type} onChange={e => setType(e.target.value)}>
-            <option value=''>Toate</option>
-            <option value='income'>Venit</option>
-            <option value='expense'>Cheltuială</option>
-            <option value='saving'>Economisire</option>
-            <option value='transfer'>Transfer</option>
-          </select>
-        </label>
-        <label>
-          Categorie:
-          <input value={category} onChange={e => setCategory(e.target.value)} placeholder="Ex: food, salary" aria-label="Categorie filtrare" />
-        </label>
-        <label>
-          Sortare:
-          <select value={sort} onChange={e => setSort(e.target.value)}>
-            <option value='date'>Dată (crescător)</option>
-            <option value='-date'>Dată (descrescător)</option>
-            <option value='amount'>Sumă (crescător)</option>
-            <option value='-amount'>Sumă (descrescător)</option>
-          </select>
-        </label>
-      </div>
-      {loading ? <div>Se încarcă...</div> : (
-        <TransactionTable
-          transactions={transactions || []}
-          loading={loading}
-          total={total}
-          offset={offset}
-          limit={limit}
-          onPageChange={setOffset}
-        />
-      )}
-      <label style={{ marginLeft: 16 }}>
-        / pagină:
-        <select value={limit} onChange={e => { setLimit(Number(e.target.value)); setOffset(0); }}>
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
-      </label>
+
+      {/* TODO: Add Filtering UI (Type, Category, etc.) */}
+
+      {/* Render Transaction Table */}
+      <TransactionTable
+        transactions={transactions}
+        loading={loading}
+        total={total}
+        offset={offset}
+        limit={limit}
+        onPageChange={handlePageChange}
+      />
     </div>
   );
 };
