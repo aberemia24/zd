@@ -165,6 +165,24 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Implementat baza pentru funcționalitățile viitoare de raportare și analiză bugetară
 - Actualizat documentele TECH_STORIES, BEST_PRACTICES.md și memorii pentru a reflecta progresul
 
+### [2025-04-24] Implementare teste unitare TDD pentru componentele primitive
+
+- Implementate teste unitare complete pentru principalele componente primitive:
+  - `Button`: teste pentru variante, disabled, clasele CSS, handlerul onClick
+  - `Input`: teste pentru label, eroare, clasele CSS, introducere de text
+  - `Select`: teste pentru opțiuni, placeholder, selectare, clasele CSS
+  - `Checkbox`: teste pentru bifare/debifare, label, clasele CSS
+  - `Textarea`: teste pentru introducere text, label, clasele CSS
+  - `Badge`: teste pentru toate culorile (primary, success, error, warning, info), clasele de bază și personalizate
+  - `Loader`: teste pentru afișarea corectă a animației, textului și accesibilitate
+- Toate testele respectă conventionțiile de limba română pentru descrieri și mesaje
+- Instalat și configurat `@testing-library/user-event` pentru testarea interacțiunilor utilizatorului
+- Teste colocate cu componentele (în același director) pentru o mai bună organizare
+- Acoperire completă a funcționalităților și props-urilor pentru toate componentele primitive
+- Toate textele vizibile în UI sunt centralizate în constants/ui.ts, inclusiv textul "Se încarcă..." din Loader
+- Corecții în componentele TransactionForm și Select pentru validarea corectă a categoriilor și afișarea placeholderului
+- Toate cele 110 teste din aplicație trec cu succes
+
 ### [2025-04-24] Implementare sursă unică de adevăr pentru enums
 - Implementată soluția definitivă pentru regula "sursă unică de adevăr pentru enums".
 - Toate enums comune (TransactionType, CategoryType, FrequencyType) sunt acum definite și menținute exclusiv în `shared/enums.ts`.
