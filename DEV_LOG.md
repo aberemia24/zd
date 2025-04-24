@@ -141,3 +141,19 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Convențiile și lecțiile învățate se documentează imediat în BEST_PRACTICES.md, DEV_LOG.md și în memorie.
 - Testele trebuie să fie DRY, robuste și ușor de întreținut.
 
+### [2025-04-24] Implementare sursă unică de adevăr pentru enums
+- Implementată soluția definitivă pentru regula "sursă unică de adevăr pentru enums".
+- Toate enums comune (TransactionType, CategoryType, FrequencyType) sunt acum definite și menținute exclusiv în `shared/enums.ts`.
+- Configurat build corect pentru shared: 
+  - `shared/package.json`: `"main": "./dist/index.js"`, `"types": "./dist/index.d.ts"`
+  - `shared/tsconfig.json`: `"include": ["**/*.ts"]` pentru compilarea tuturor fișierelor
+- Realizat pattern de re-export prin proxy care evită problemele de configurare Jest/CRA:
+  - `frontend/src/constants/enums.ts` conține doar: `export * from '../../../shared/dist/enums'`
+  - Importurile din componente rămân neschimbate: `import { TransactionType } from '../../constants/enums'`
+- Avantaje semnificative:
+  - Eliminare totală a inconsistențelor dintre frontend și backend
+  - Mentenanță redusă (modificări doar în shared, propagă automat)
+  - Zero probleme de configurare Jest/Webpack/React
+  - Compatibilitate 100% cu toolchain-ul existent
+- Toate testele rulează și trec fără erori.
+

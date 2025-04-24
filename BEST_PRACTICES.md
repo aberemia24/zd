@@ -104,7 +104,36 @@ import { LABELS, BUTTONS } from '../../constants/ui';
 - Nu folosi niciodată versiuni mixte de NestJS, nici măcar între backend și test/dev.
 - Acest principiu se aplică și la alte pachete critice (ex: ts-jest, typescript, jest, mongoose etc.).
 
-## 2. Importuri între workspace-uri
+## 2. Sursă unică de adevăr pentru enums și implementare monorepo
+
+### Enums comune între frontend și backend
+- Toate enums folosite în ambele zone (frontend și backend) trebuie să fie definite o singură dată în directorul shared (ex: `shared/enums.ts`).
+- Orice modificare la aceste enums se face doar în shared, iar frontend/backend doar importă.
+- Nu se acceptă dubluri sau enums divergente între zone.
+
+### Implementare corectă (monorepo cu Create React App fără eject)
+- Enums comune sunt definite fizic doar în `shared/enums.ts`
+- În `shared/package.json` configurăm: `"main": "./dist/index.js"` și `"types": "./dist/index.d.ts"`
+- În `shared/tsconfig.json` includem toate fișierele TS: `"include": ["**/*.ts"]`
+- După orice modificare, rulăm `npm run build` în shared pentru generarea fișierelor .js și .d.ts
+- În frontend, folosim re-export prin proxy în `frontend/src/constants/enums.ts`: 
+  ```typescript
+  // Re-export din shared ca sursă unică de adevăr pentru enums
+  export * from '../../../shared/dist/enums';
+  ```
+- Importurile din componente frontend rămân neschimbate și folosesc calea relativă normală:
+  ```typescript
+  import { TransactionType } from '../../constants/enums';
+  ```
+
+### Beneficii
+- Sursa unică de adevăr pentru tipuri critice
+- Eliminare inconsistențe între frontend/backend
+- Compatibilitate cu toolchain-ul standard (CRA, Jest, TypeScript)
+- Mentenanță redusă (modifici doar într-un singur loc)
+- Nici o configurare complexă Jest/Webpack necesară
+
+## 3. Importuri între workspace-uri (alte cazuri)
 - Folosește importuri relative corecte sau path mapping în tsconfig pentru a evita erori la build și test.
 - Dacă folosești monorepo, evită importurile cu prea multe nivele de "../"; folosește path mapping dacă devine greu de urmărit.
 - Orice schimbare de structură la shared trebuie sincronizată și testată în toate subproiectele dependente.
