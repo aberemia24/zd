@@ -49,6 +49,11 @@ export const TABLE = {
   },
 };
 
+// Texte pentru componenta de încărcare (Loader)
+export const LOADER = {
+  TEXT: 'Se încarcă...'
+};
+
 // Opțiuni pentru dropdown-uri (folosite în TransactionForm)
 import { TransactionType, CategoryType } from './enums';
 

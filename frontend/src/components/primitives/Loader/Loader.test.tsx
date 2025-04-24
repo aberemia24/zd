@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Loader from './Loader';
+import { LOADER } from '../../../constants/ui';
 
 describe('Loader', () => {
   // Test pentru randarea de bază
-  it('se randează corect', () => {
+  it('se randează corect cu textul din constants/ui.ts', () => {
     render(<Loader />);
-    // Notă: Conform convențiilor proiectului, acest text ar trebui centralizat în constants/ui.ts
-    expect(screen.getByTestId('loader-text')).toHaveTextContent('Loading...');
+    // Verificăm că se folosește textul centralizat din constants/ui.ts
+    expect(screen.getByTestId('loader-text')).toHaveTextContent(LOADER.TEXT);
   });
 
   // Test pentru prezența SVG-ului de animație
