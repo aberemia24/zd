@@ -1,9 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
-import TransactionForm, { TransactionFormData, categorii } from './TransactionForm';
-import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
-import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../test/mockData';
-import { MESAJE } from '../../constants/messages';
+import TransactionForm from './';
+import { TransactionFormData, categorii } from './TransactionForm';
+import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
+import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../../test/mockData';
+import { MESAJE } from '../../../constants/messages';
 
 // Helper pentru a selecta opțiuni în dropdownuri
 function selectOption(label: string, value: string) {

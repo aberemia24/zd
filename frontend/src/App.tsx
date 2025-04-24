@@ -1,12 +1,12 @@
 // Componenta principală a aplicației
 import React from 'react';
-import TransactionForm, { TransactionFormData } from './components/TransactionForm/TransactionForm';
-import TransactionTable from './components/TransactionTable/TransactionTable';
+import TransactionForm, { TransactionFormData } from './components/features/TransactionForm/TransactionForm';
+import TransactionTable from './components/features/TransactionTable/TransactionTable';
 import { Transaction } from './types/Transaction';
 
 import { API_URL, PAGINATION, FORM_DEFAULTS, INITIAL_FORM_STATE } from './constants/index';
 import { TransactionType, CategoryType } from './constants/enums';
-import TransactionFilters from './components/TransactionFilters/TransactionFilters';
+import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
 import { MESAJE } from './constants/messages';
 import { TITLES, OPTIONS } from './constants/ui';
 import { buildTransactionQueryParams } from './utils/transactions';

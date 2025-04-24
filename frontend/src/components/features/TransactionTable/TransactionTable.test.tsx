@@ -1,8 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
-import TransactionTable, { Transaction } from './TransactionTable';
-import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../test/mockData';
-import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
+import TransactionTable from '.';
+import { Transaction } from './TransactionTable';
+import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
+import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
 
 describe('TransactionTable', () => {
   const baseProps = {

@@ -29,9 +29,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ color: 'red', padding: 24 }}>
-          <h2>Eroare neașteptată</h2>
-          <p>{this.state.error?.message || MESAJE.EROARE_GENERALA}</p>
+        <div className="bg-red-50 border border-red-200 rounded p-6 my-8 text-center">
+          <h2 className="text-lg font-bold text-red-700 mb-2">{MESAJE.EROARE_TITLU}</h2>
+          <p className="text-red-600">{this.state.error?.message || MESAJE.EROARE_GENERALA}</p>
         </div>
       );
     }

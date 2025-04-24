@@ -1,7 +1,11 @@
 import React from 'react';
-import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
-import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '../../constants/ui';
-import { MESAJE } from '../../constants/messages';
+import Button from '../../primitives/Button';
+import Input from '../../primitives/Input';
+import Select from '../../primitives/Select';
+import Checkbox from '../../primitives/Checkbox';
+import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
+import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '../../../constants/ui';
+import { MESAJE } from '../../../constants/messages';
 
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
@@ -88,98 +92,94 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
   }
 
   return (
-    <form role="form" aria-label="adăugare tranzacție" onSubmit={onSubmit} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24, alignItems: 'flex-end' }}>
-      <label>
-        {LABELS.TYPE}*:
-        <select
-          name="type"
-          value={form.type}
-          onChange={onChange}
-          aria-label={LABELS.TYPE}
-        >
-          {/* Placeholder-ul "Alege" apare doar dacă nu este selectat niciun tip */}
-          {form.type === '' ? <option value=''>{PLACEHOLDERS.SELECT}</option> : null}
-          {OPTIONS.TYPE.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        {LABELS.AMOUNT}*:
-        <input name="amount" type="number" value={form.amount} onChange={onChange} aria-label={LABELS.AMOUNT} placeholder={PLACEHOLDERS.AMOUNT} />
-      </label>
-      <label>
-        {LABELS.CATEGORY}*:
-        {/* Dropdown-ul de categorie se adaptează în funcție de tip */}
-        <select
-          name="category"
-          value={form.category}
-          onChange={onChange}
-          aria-label={LABELS.CATEGORY}
-          disabled={(!form.type || categoriiFiltrate.length === 0)}
-        >
-          <option value=''>{PLACEHOLDERS.SELECT}</option>
-          {categoriiFiltrate.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        {LABELS.SUBCATEGORY}:
-        <select
-          name="subcategory"
-          value={form.subcategory}
-          onChange={onChange}
-          aria-label={LABELS.SUBCATEGORY}
-          disabled={!form.category}
-        >
-          <option value=''>{PLACEHOLDERS.SELECT}</option>
-          {listaSubcategorii.map((subcat, idx) => {
-            if (typeof subcat === 'string') {
-              return <option key={subcat} value={subcat}>{subcat}</option>;
-            } else if (typeof subcat === 'object' && subcat.label && Array.isArray(subcat.options)) {
-              return (
-                <optgroup key={subcat.label} label={subcat.label}>
-                  {subcat.options.map((opt: string) => (
-                    <option key={subcat.label + '-' + opt} value={opt}>{opt}</option>
-                  ))}
-                </optgroup>
-              );
-            }
-            return null;
-          })}
-        </select>
-      </label>
-      <label>
-        {LABELS.DATE}*:
-        <input name="date" type="date" value={form.date} onChange={onChange} aria-label={LABELS.DATE} placeholder={PLACEHOLDERS.DATE} />
-      </label>
-      <label>
-        <input name="recurring" type="checkbox" checked={form.recurring} onChange={onChange} aria-label={LABELS.RECURRING} /> {LABELS.RECURRING}?
-      </label>
-      <label>
-        {LABELS.FREQUENCY}:
-        <select
-          name="frequency"
-          value={form.frequency}
-          onChange={onChange}
-          aria-label={LABELS.FREQUENCY}
-          disabled={!form.recurring}
-        >
-          <option value=''>{PLACEHOLDERS.SELECT}</option>
-          {OPTIONS.FREQUENCY.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-      </label>
-      <button type="submit" disabled={!!loading}>{BUTTONS.ADD}</button>
+    <form
+  role="form"
+  aria-label="adăugare tranzacție"
+  onSubmit={onSubmit}
+  className="flex flex-wrap gap-3 mb-6 items-end"
+>
+      <Select
+        name="type"
+        label={LABELS.TYPE + '*:'}
+        value={form.type}
+        onChange={onChange}
+        aria-label={LABELS.TYPE}
+        options={OPTIONS.TYPE}
+        className="ml-2"
+        placeholder={PLACEHOLDERS.SELECT}
+      />
+      <Input
+        name="amount"
+        type="number"
+        label={LABELS.AMOUNT + '*:'}
+        value={form.amount}
+        onChange={onChange}
+        aria-label={LABELS.AMOUNT}
+        placeholder={PLACEHOLDERS.AMOUNT}
+        className="ml-2"
+      />
+      <Select
+        name="category"
+        label={LABELS.CATEGORY + '*:'}
+        value={form.category}
+        onChange={onChange}
+        aria-label={LABELS.CATEGORY}
+        options={categoriiFiltrate
+  .filter((cat): cat is string => typeof cat === 'string')
+  .map(cat => ({ value: cat, label: cat }))}
+        className="ml-2"
+        disabled={!form.type || categoriiFiltrate.length === 0}
+        placeholder={PLACEHOLDERS.SELECT}
+      />
+      <Select
+        name="subcategory"
+        label={LABELS.SUBCATEGORY}
+        value={form.subcategory}
+        onChange={onChange}
+        aria-label={LABELS.SUBCATEGORY}
+        options={listaSubcategorii
+  .filter((subcat): subcat is string => typeof subcat === 'string')
+  .map(subcat => ({ value: subcat, label: subcat }))}
+        className="ml-2"
+        disabled={!form.category}
+        placeholder={PLACEHOLDERS.SELECT}
+      />
+      <Input
+        name="date"
+        type="date"
+        label={LABELS.DATE + '*:'}
+        value={form.date}
+        onChange={onChange}
+        aria-label={LABELS.DATE}
+        placeholder={PLACEHOLDERS.DATE}
+        className="ml-2"
+      />
+      <Checkbox
+        name="recurring"
+        label={LABELS.RECURRING + '?'}
+        checked={form.recurring}
+        onChange={onChange}
+        aria-label={LABELS.RECURRING}
+      />
+      <Select
+        name="frequency"
+        label={LABELS.FREQUENCY}
+        value={form.frequency}
+        onChange={onChange}
+        aria-label={LABELS.FREQUENCY}
+        options={OPTIONS.FREQUENCY}
+        className="ml-2"
+        disabled={!form.recurring}
+        placeholder={PLACEHOLDERS.SELECT}
+      />
+      <Button type="submit" disabled={!!loading} className="ml-2">{BUTTONS.ADD}</Button>
       {formError && (
-        <span data-testid="error-message" style={{ color: 'red', display: 'block', marginTop: 8 }}>
+        <span data-testid="error-message" className="text-error block mt-2">
           {MESAJE[formError as keyof typeof MESAJE] || formError}
         </span>
       )}
       {formSuccess && (
-        <span data-testid="success-message" style={{ color: 'green', display: 'block', marginTop: 8 }}>
+        <span data-testid="success-message" className="text-success block mt-2">
           {MESAJE[formSuccess as keyof typeof MESAJE] || formSuccess}
         </span>
       )}

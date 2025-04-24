@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import TransactionFilters from './TransactionFilters';
-import { TransactionType, CategoryType } from '../../constants/enums';
-import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../test/mockData';
+import TransactionFilters from './';
+import { TransactionType, CategoryType } from '../../../constants/enums';
+import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
 
 describe('TransactionFilters', () => {
   const types = MOCK_OPTIONS.TYPE;
