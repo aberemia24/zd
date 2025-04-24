@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import TransactionForm, { TransactionFormData, categorii } from './TransactionForm';
 import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
+import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../test/mockData';
+import { MESAJE } from '../../constants/messages';
 
 // Helper pentru a selecta opțiuni în dropdownuri
 function selectOption(label: string, value: string) {
@@ -36,18 +38,18 @@ describe('TransactionForm', () => {
   it('afișează toate câmpurile obligatorii', () => {
     render(<TransactionForm form={defaultForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
-    expect(within(form).getByLabelText(/Tip/i)).toBeInTheDocument();
-    expect(within(form).getByLabelText(/Sumă/i)).toBeInTheDocument();
-    expect(within(form).getByLabelText('Categorie', { exact: true })).toBeInTheDocument();
-    expect(within(form).getByLabelText('Subcategorie', { exact: true })).toBeInTheDocument();
-    expect(within(form).getByLabelText(/Dată/i)).toBeInTheDocument();
-    expect(within(form).getByLabelText(/Recurent/i)).toBeInTheDocument();
-    expect(within(form).getByLabelText(/Frecvență/i)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.TYPE)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.AMOUNT)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.CATEGORY)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.SUBCATEGORY)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.DATE)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.RECURRING)).toBeInTheDocument();
+    expect(within(form).getByLabelText(MOCK_LABELS.FREQUENCY)).toBeInTheDocument();
   });
 
   it('nu afișează opțiunea Transfer la Tip', () => {
     render(<TransactionForm form={defaultForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const tipSelect = screen.getByLabelText(/Tip/i);
+    const tipSelect = screen.getByLabelText(MOCK_LABELS.TYPE);
     expect(within(tipSelect).queryByText('Transfer')).not.toBeInTheDocument();
   });
 
@@ -66,26 +68,26 @@ describe('TransactionForm', () => {
       );
     }
     render(<Wrapper />);
-    const tipSelect = screen.getByLabelText(/Tip/i);
+    const tipSelect = screen.getByLabelText(MOCK_LABELS.TYPE);
     // Placeholderul există doar când value este gol
     expect(tipSelect).toHaveValue('');
-    expect(within(tipSelect).getByText('Alege')).toBeInTheDocument();
+    expect(within(tipSelect).getByText(MOCK_PLACEHOLDERS.SELECT)).toBeInTheDocument();
     // După selectare, placeholderul nu mai există ca opțiune
     fireEvent.change(tipSelect, { target: { value: TransactionType.INCOME } });
     expect(tipSelect).toHaveValue(TransactionType.INCOME);
-    expect(within(tipSelect).queryByText('Alege')).not.toBeInTheDocument();
+    expect(within(tipSelect).queryByText(MOCK_PLACEHOLDERS.SELECT)).not.toBeInTheDocument();
   });
 
   it('nu permite alegerea categoriei dacă tipul nu este selectat', () => {
     render(<TransactionForm form={defaultForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const categorieSelect = screen.getByLabelText('Categorie', { exact: true }) as HTMLSelectElement;
+    const categorieSelect = screen.getByLabelText(MOCK_LABELS.CATEGORY) as HTMLSelectElement;
     expect(categorieSelect.disabled).toBe(true);
   });
 
   it('afișează doar VENITURI la categorie dacă tipul este Venit', () => {
     const formVenit = { ...defaultForm, type: TransactionType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
+    const categorieSelect = screen.getByLabelText(MOCK_LABELS.CATEGORY);
     expect(within(categorieSelect).getByText(CategoryType.INCOME)).toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.EXPENSE)).not.toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.SAVING)).not.toBeInTheDocument();
@@ -94,7 +96,7 @@ describe('TransactionForm', () => {
   it('afișează doar CHELTUIELI la categorie dacă tipul este Cheltuială', () => {
     const formChelt = { ...defaultForm, type: TransactionType.EXPENSE };
     render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
+    const categorieSelect = screen.getByLabelText(MOCK_LABELS.CATEGORY);
     expect(within(categorieSelect).getByText(CategoryType.EXPENSE)).toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.INCOME)).not.toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.SAVING)).not.toBeInTheDocument();
@@ -103,7 +105,7 @@ describe('TransactionForm', () => {
   it('afișează doar ECONOMII la categorie dacă tipul este Economisire', () => {
     const formEcon = { ...defaultForm, type: TransactionType.SAVING };
     render(<TransactionForm form={formEcon} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
+    const categorieSelect = screen.getByLabelText(MOCK_LABELS.CATEGORY);
     expect(within(categorieSelect).getByText(CategoryType.SAVING)).toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.INCOME)).not.toBeInTheDocument();
     expect(within(categorieSelect).queryByText(CategoryType.EXPENSE)).not.toBeInTheDocument();
@@ -112,7 +114,7 @@ describe('TransactionForm', () => {
   it('nu permite alegerea subcategoriei dacă nu este selectată categoria', () => {
     const formVenit = { ...defaultForm, type: TransactionType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true }) as HTMLSelectElement;
+    const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY) as HTMLSelectElement;
     expect(subcatSelect.disabled).toBe(true);
   });
 
@@ -120,7 +122,7 @@ describe('TransactionForm', () => {
     const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
 
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
+    const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
     expect(subcatSelect).toBeEnabled(); // Asigurăm că e activat
 
     const expectedSubcategories = getAllSubcategories(categorii[CategoryType.INCOME]);
@@ -142,7 +144,7 @@ describe('TransactionForm', () => {
   it('afișează TOATE subcategoriile corecte pentru ECONOMII', () => {
     const formEcon = { ...defaultForm, type: TransactionType.SAVING, category: CategoryType.SAVING };
     render(<TransactionForm form={formEcon} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
+    const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
     expect(subcatSelect).toBeEnabled();
 
     const expectedSubcategories = getAllSubcategories(categorii[CategoryType.SAVING]);
@@ -159,7 +161,7 @@ describe('TransactionForm', () => {
   it('afișează TOATE subcategoriile corecte pentru CHELTUIELI', () => {
     const formChelt = { ...defaultForm, type: TransactionType.EXPENSE, category: CategoryType.EXPENSE };
     render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
+    const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
     expect(subcatSelect).toBeEnabled();
 
     const expectedSubcategories = getAllSubcategories(categorii[CategoryType.EXPENSE]);
@@ -176,14 +178,14 @@ describe('TransactionForm', () => {
   it('nu permite selectarea unei categorii incompatibile cu tipul', () => {
     const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.EXPENSE };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const categorieSelect = screen.getByLabelText('Categorie', { exact: true }) as HTMLSelectElement;
+    const categorieSelect = screen.getByLabelText(MOCK_LABELS.CATEGORY) as HTMLSelectElement;
     expect(categorieSelect.value).toBe(''); // valoarea se resetează
   });
 
   it('nu permite selectarea unei subcategorii incompatibile cu categoria', () => {
     const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME, subcategory: 'Îmbrăcăminte, încălțăminte și accesorii' };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
-    const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true }) as HTMLSelectElement;
+    const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY) as HTMLSelectElement;
     expect(subcatSelect.value).toBe(''); // valoarea se resetează
   });
 
@@ -191,14 +193,14 @@ describe('TransactionForm', () => {
     render(
       <TransactionForm
         form={defaultForm}
-        formError="Test error"
-        formSuccess="Test success"
+        formError={MOCK_ERROR_MESSAGES.TEST_ERROR}
+        formSuccess={MOCK_ERROR_MESSAGES.TEST_SUCCESS}
         onChange={() => {}}
         onSubmit={() => {}}
       />
     );
-    expect(screen.getByText('Test error')).toBeInTheDocument();
-    expect(screen.getByText('Test success')).toBeInTheDocument();
+    expect(screen.getByText(MOCK_ERROR_MESSAGES.TEST_ERROR)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_ERROR_MESSAGES.TEST_SUCCESS)).toBeInTheDocument();
   });
 
   // --- Tests for Initial Values from Props --- 
@@ -216,21 +218,21 @@ describe('TransactionForm', () => {
   it('renders initial type value from props', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
-    expect(within(form).getByLabelText(/Tip/i)).toHaveValue(TransactionType.INCOME);
+    expect(within(form).getByLabelText(MOCK_LABELS.TYPE)).toHaveValue(TransactionType.INCOME);
   });
 
   it('redă valorile inițiale pentru categorie și subcategorie din props', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
-    expect(within(form).getByLabelText('Categorie', { exact: true })).toHaveValue(CategoryType.INCOME);
-    expect(within(form).getByLabelText('Subcategorie', { exact: true })).toHaveValue('Salarii');
+    expect(within(form).getByLabelText(MOCK_LABELS.CATEGORY)).toHaveValue(CategoryType.INCOME);
+    expect(within(form).getByLabelText(MOCK_LABELS.SUBCATEGORY)).toHaveValue('Salarii');
   });
 
   it('renders initial amount value from props', async () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
     await waitFor(() => {
-      const amountInput = within(form).getByLabelText(/Sumă/i) as HTMLInputElement;
+      const amountInput = within(form).getByLabelText(MOCK_LABELS.AMOUNT) as HTMLInputElement;
       expect(amountInput.value).toBe('100');
     });
   });
@@ -239,7 +241,7 @@ describe('TransactionForm', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
     await waitFor(() => {
-      const dateInput = within(form).getByLabelText(/Dată/i) as HTMLInputElement;
+      const dateInput = within(form).getByLabelText(MOCK_LABELS.DATE) as HTMLInputElement;
       expect(dateInput.value === '2025-01-15').toBeTruthy();
     });
   });
@@ -299,7 +301,7 @@ describe('TransactionForm', () => {
       />
     );
     const form = screen.getByRole('form');
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: TransactionType.INCOME } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: TransactionType.INCOME } });
     expect(handleChange).toHaveBeenCalled();
     fireEvent.submit(form);
     expect(handleSubmit).toHaveBeenCalled();

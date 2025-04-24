@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import TransactionTable, { Transaction } from './TransactionTable';
+import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../test/mockData';
 import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
 
 describe('TransactionTable', () => {
@@ -39,14 +40,14 @@ describe('TransactionTable', () => {
 
   it('renders table headers', () => {
     render(<TransactionTable {...baseProps} transactions={transactions} />);
-    expect(screen.getByText('Tip')).toBeInTheDocument();
-    expect(screen.getByText('Sumă')).toBeInTheDocument();
-    expect(screen.getByText('Monedă')).toBeInTheDocument();
-    expect(screen.getByText('Categorie')).toBeInTheDocument();
-    expect(screen.getByText('Subcategorie')).toBeInTheDocument();
-    expect(screen.getByText('Dată')).toBeInTheDocument();
-    expect(screen.getByText('Recurent')).toBeInTheDocument();
-    expect(screen.getByText('Frecvență')).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.TYPE)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.AMOUNT)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.CURRENCY)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.CATEGORY)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.SUBCATEGORY)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.DATE)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.RECURRING)).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.HEADERS.FREQUENCY)).toBeInTheDocument();
   });
 
   it('renders all transaction rows and fields', () => {
@@ -57,7 +58,7 @@ describe('TransactionTable', () => {
     expect(screen.getAllByText('Salariu').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('IT').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('2025-04-01').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Da').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(MOCK_TABLE.BOOL.YES).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('lunar').length).toBeGreaterThanOrEqual(1);
 
     expect(screen.getAllByText(TransactionType.EXPENSE).length).toBeGreaterThanOrEqual(1);
@@ -65,17 +66,17 @@ describe('TransactionTable', () => {
     expect(screen.getAllByText('Mâncare').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Supermarket').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('2025-04-02').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Nu').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(MOCK_TABLE.BOOL.NO).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows loading state', () => {
     render(<TransactionTable {...baseProps} loading={true} transactions={[]} />);
-    expect(screen.getByText('Se încarcă...')).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.LOADING)).toBeInTheDocument();
   });
 
   it('shows empty state', () => {
     render(<TransactionTable {...baseProps} transactions={[]} />);
-    expect(screen.getByText('Nicio tranzacție')).toBeInTheDocument();
+    expect(screen.getByText(MOCK_TABLE.EMPTY)).toBeInTheDocument();
   });
 
   it('handles missing/undefined optional fields gracefully', () => {
@@ -92,16 +93,16 @@ describe('TransactionTable', () => {
     expect(screen.getByText(TransactionType.EXPENSE)).toBeInTheDocument();
     expect(screen.getByText('0')).toBeInTheDocument();
     expect(screen.getAllByRole('row').length).toBeGreaterThan(1); // header + row
-    expect(screen.getAllByText('Nu')[0]).toBeInTheDocument();
+    expect(screen.getAllByText(MOCK_TABLE.BOOL.NO)[0]).toBeInTheDocument();
   });
 
   it('calls onPageChange when pagination buttons are clicked', () => {
     const onPageChange = jest.fn();
     render(<TransactionTable {...baseProps} transactions={transactions} onPageChange={onPageChange} />);
-    const nextBtn = screen.getByRole('button', { name: /Înainte/i });
+    const nextBtn = screen.getByRole('button', { name: MOCK_BUTTONS.NEXT_PAGE });
     fireEvent.click(nextBtn);
     expect(onPageChange).toHaveBeenCalled();
-    const prevBtn = screen.getByRole('button', { name: /Înapoi/i });
+    const prevBtn = screen.getByRole('button', { name: MOCK_BUTTONS.PREV_PAGE });
     fireEvent.click(prevBtn);
     expect(onPageChange).toHaveBeenCalled();
   });
@@ -109,11 +110,11 @@ describe('TransactionTable', () => {
   it('disables pagination buttons at edges', () => {
     // At start
     render(<TransactionTable {...baseProps} offset={0} transactions={transactions} />);
-    expect(screen.getByRole('button', { name: /Înapoi/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: MOCK_BUTTONS.PREV_PAGE })).toBeDisabled();
     // cleanup DOM
     cleanup();
     // At end
     render(<TransactionTable {...baseProps} offset={10} total={10} transactions={transactions} />);
-    expect(screen.getByRole('button', { name: /Înainte/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: MOCK_BUTTONS.NEXT_PAGE })).toBeDisabled();
   });
 });

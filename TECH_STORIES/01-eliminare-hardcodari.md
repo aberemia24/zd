@@ -63,30 +63,35 @@ Ca dezvoltator, vreau să elimin toate valorile hardcodate din aplicație și s�
 > Toate textele UI vizibile au fost extrase și centralizate în `constants/ui.ts`, inclusiv pentru filtre, tabele, form-uri și butoane. Nicio componentă nu mai conține string-uri hardcodate pentru UI.
 
 ### 6. Mesaje utilizator
-- [ ] Extinde fișierul existent `messages.ts` cu:
+- [x] Extinde fișierul existent `messages.ts` cu:
   - Toate mesajele de eroare
   - Toate mesajele de succes
   - Toate mesajele de avertizare
   - Prompturi pentru utilizator
+> Toate mesajele de eroare, succes, avertizare și prompturi au fost extrase și centralizate în `constants/messages.ts`. Nicio componentă nu mai conține string-uri hardcodate pentru aceste mesaje.
 
 ### 7. Refactorizarea codului pentru a utiliza noile constante
-- [ ] Refactorizează `App.tsx`:
+- [x] Refactorizează `App.tsx`:
   - Înlocuiește toate valorile hardcodate cu referințe la constante
   - Înlocuiește toate textele hardcodate cu referințe la constante
+  > Toate textele vizibile, opțiunile, labelurile, butoanele și valorile default au fost centralizate. Nu mai există string-uri hardcodate pentru UI sau mesaje în App.tsx.
 
-- [ ] Refactorizează `TransactionForm.tsx`:
+- [x] Refactorizează `TransactionForm.tsx`:
   - Înlocuiește valorile default hardcodate
   - Înlocuiește tipurile și opțiunile hardcodate
   - Înlocuiește mesajele și textele hardcodate
+  > Toate labelurile, placeholder-ele, butoanele, opțiunile și mesajele folosesc constante. Nu mai există string-uri hardcodate pentru UI sau mesaje.
 
-- [ ] Refactorizează `TransactionTable.tsx`:
+- [x] Refactorizează `TransactionTable.tsx`:
   - Înlocuiește headerele de tabel hardcodate
   - Înlocuiește textele de paginare hardcodate
   - Înlocuiește valorile default hardcodate
+  > Headerele de tabel, textele de paginare, butoanele și mesajele de stare folosesc constante. Nu mai există string-uri hardcodate pentru UI.
 
-- [ ] Refactorizează `TransactionFilters.tsx`:
+- [x] Refactorizează `TransactionFilters.tsx`:
   - Înlocuiește opțiunile hardcodate
   - Înlocuiește textele etichetelor
+  > Toate labelurile, placeholder-ele și opțiunile folosesc constante. Nu există string-uri hardcodate pentru UI.
 
 ### 8. Refactorizarea testelor
 - [ ] Refactorizează toate testele pentru a utiliza constantele:

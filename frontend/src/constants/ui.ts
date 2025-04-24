@@ -8,6 +8,11 @@ export const LABELS = {
   FREQUENCY: 'Frecvență',
   TYPE_FILTER: 'Tip tranzacție:',
   CATEGORY_FILTER: 'Categoria:',
+  FORM: 'adăugare tranzacție', // pentru aria-label pe <form>
+};
+
+export const TITLES = {
+  TRANZACTII: 'Tranzacții',
 };
 
 export const PLACEHOLDERS = {
@@ -38,14 +43,25 @@ export const TABLE = {
   EMPTY: 'Nicio tranzacție',
   LOADING: 'Se încarcă...',
   PAGE_INFO: 'Pagina {current} din {total}',
+  BOOL: {
+    YES: 'Da',
+    NO: 'Nu',
+  },
 };
 
 // Opțiuni pentru dropdown-uri (folosite în TransactionForm)
+import { TransactionType, CategoryType } from './enums';
+
 export const OPTIONS = {
   TYPE: [
-    { value: 'income', label: 'Venit' },
-    { value: 'expense', label: 'Cheltuială' },
-    { value: 'saving', label: 'Economisire' },
+    { value: TransactionType.INCOME, label: 'Venit' },
+    { value: TransactionType.EXPENSE, label: 'Cheltuială' },
+    { value: TransactionType.SAVING, label: 'Economisire' },
+  ],
+  CATEGORY: [
+    { value: CategoryType.INCOME, label: 'Venituri' },
+    { value: CategoryType.EXPENSE, label: 'Cheltuieli' },
+    { value: CategoryType.SAVING, label: 'Economii' },
   ],
   FREQUENCY: [
     { value: 'zilnic', label: 'Zilnic' },

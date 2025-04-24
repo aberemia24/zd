@@ -24,6 +24,7 @@ export type TransactionFormProps = {
 };
 
 // Structura completă pentru categorii și subcategorii, conform listei primite
+// TODO: Centralizează structura completă categorii/subcategorii în constants/categories.ts pentru a elimina orice hardcodare rămasă
 export const categorii: Record<string, any> = {
   [CategoryType.INCOME]: [
     'Salarii', 'Dividende', 'Chirii', 'Tichete de masă', 'Cadouri', 'Drepturi de autor', 'Pensii', 'Alocații (copil/de handicap etc.)', 'Alte venituri',

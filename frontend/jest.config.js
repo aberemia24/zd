@@ -1,6 +1,11 @@
 module.exports = {
+  preset: 'ts-jest',
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   testEnvironment: 'jsdom',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
   reporters: [
     'default',
     'jest-summarizing-reporter',
@@ -13,5 +18,8 @@ module.exports = {
         includeSuiteFailure: true
       }
     ]
+  ],
+  testMatch: [
+    '**/?(*.)+(test).[jt]s?(x)'
   ]
 };

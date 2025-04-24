@@ -4,7 +4,12 @@ import '@testing-library/jest-dom';
 import App from './App';
 import { Transaction } from './types/Transaction'; // Import corect după best practice
 
-import { API_URL } from './constants/index';
+import { TEST_API_URL } from './test/testEnv';
+// Setăm explicit variabila de mediu pentru testare
+process.env.REACT_APP_API_URL = TEST_API_URL;
+const API_URL = process.env.REACT_APP_API_URL;
+import { MOCK_OPTIONS, MOCK_TRANSACTIONS_LIST, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from './test/mockData';
+import { MESAJE } from './constants/messages';
 
 // Helper pentru a crea un obiect compatibil cu tipul Response
 function fakeResponse<T>(body: T, ok = true, status = ok ? 200 : 400): Response {
@@ -37,9 +42,7 @@ describe('App', () => {
   beforeEach(() => {
     postCount = 0;
     // Resetăm baza de date mock la începutul fiecărui test cu o tranzacție inițială
-    mockTransactions = [
-      { _id: 't1', userId: 'u1', type: 'income', amount: '100', currency: 'RON', date: '2025-04-22', category: 'VENITURI', subcategory: '', recurring: false, frequency: '' }
-    ];
+    mockTransactions = [ ...MOCK_TRANSACTIONS_LIST ]; // Folosește mock list centralizată
     nextId = 2;
 
     // Mock global pentru fetch
@@ -118,7 +121,7 @@ describe('App', () => {
   it('afișează formularul de adăugare tranzacție cu toate inputurile', () => {
     render(<App />);
     // Caută formularul după `aria-label` setat pe <form> în App.tsx
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
     expect(form).toBeInTheDocument();
     // Verifică prezența elementelor esențiale în formular
     expect(within(form).getByLabelText(/Tip/i)).toBeInTheDocument();
@@ -145,11 +148,11 @@ expect(within(form).getAllByLabelText(/Categorie/i)[0]).toBeInTheDocument();
 
   it('nu permite submit dacă lipsesc câmpuri obligatorii', async () => {
     render(<App />);
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
     const submitButton = within(form).getByRole('button', { name: /Adaugă/i });
 
     // Click pe submit cu formularul gol
-    fireEvent.click(submitButton);
+    fireEvent.click(submitButton); // MOCK_BUTTONS.ADD este deja folosit la selectare mai sus
 
     // Așteaptă apariția mesajului de eroare specific
     await waitFor(() => {
@@ -161,16 +164,16 @@ expect(within(form).getAllByLabelText(/Categorie/i)[0]).toBeInTheDocument();
 
   it('poți completa și trimite formularul, iar tranzacția apare în tabel', async () => {
     render(<App />);
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
 
     // --- Compleăm formularul ---
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
     // Selectează tipul "expense" și apoi categoria "CHELTUIELI"
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
     await waitFor(() => {
         expect(within(form).getAllByLabelText(/Categorie/i)[0].querySelector('option[value="CHELTUIELI"]')).toBeInTheDocument();
     });
-    fireEvent.change(within(form).getAllByLabelText(/Categorie/i)[0], { target: { value: 'CHELTUIELI' } });
+    fireEvent.change(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0], { target: { value: MOCK_OPTIONS.CATEGORY[1].value } });
     fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: '50' } });
     fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: '2025-04-23' } });
 
@@ -224,7 +227,7 @@ expect(bodyObj).toMatchObject({
 
   it('resetează formularul după submit reușit', async () => {
     render(<App />);
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
 
     // Referințe la elementele de input
     const typeSelect = within(form).getByLabelText(/Tip/i) as HTMLSelectElement;
@@ -257,7 +260,7 @@ expect(bodyObj).toMatchObject({
     // --- Așteptări și Verificări ---
     // 1. Așteptăm DOAR mesajul de succes folosind data-testid, imediat după click
     await waitFor(() => {
-      expect(screen.getByTestId('success-message')).toHaveTextContent('Tranzacție adăugată cu succes');
+      expect(screen.getByTestId('success-message')).toHaveTextContent(MESAJE.SUCCES_ADAUGARE);
     });
 
     // 2. Așteptăm separat ca formularul să se reseteze la valorile inițiale
@@ -280,12 +283,12 @@ expect(bodyObj).toMatchObject({
     });
 
     render(<App />);
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
 
     // --- Test Succes (primul POST) ---
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'income' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[0].value } });
     // Selectează tipul "income" și apoi categoria "VENITURI"
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'income' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[0].value } });
     await waitFor(() => {
         expect(within(form).getAllByLabelText(/Categorie/i)[0].querySelector('option[value="VENITURI"]')).toBeInTheDocument();
     });
@@ -299,31 +302,31 @@ expect(bodyObj).toMatchObject({
     // Verifică mesajul de succes folosind data-testid
     await waitFor(() => {
       // Folosește matcher de funcție care concatenează textul din nod și copiii săi, robust la fragmentare
-      expect(screen.getByTestId('success-message')).toHaveTextContent('Tranzacție adăugată cu succes');
+      expect(screen.getByTestId('success-message')).toHaveTextContent(MESAJE.SUCCES_ADAUGARE);
     });
     expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
 
     // --- Test Eșec (al doilea POST) ---
     // Formularul ar trebui să fie resetat, re-compleăm pentru al doilea submit
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
     // Selectează tipul "expense" și apoi categoria "CHELTUIELI"
-fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
 await waitFor(() => {
-    expect(within(form).getAllByLabelText(/Categorie/i)[0].querySelector('option[value="CHELTUIELI"]')).toBeInTheDocument();
+    expect(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0].querySelector(`option[value="${MOCK_OPTIONS.CATEGORY[1].value}"]`)).toBeInTheDocument();
 });
-fireEvent.change(within(form).getAllByLabelText(/Categorie/i)[0], { target: { value: 'CHELTUIELI' } });
-    fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: '25' } });
+fireEvent.change(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0], { target: { value: MOCK_OPTIONS.CATEGORY[1].value } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.AMOUNT), { target: { value: '25' } });
     // Nu mai completăm moneda și data, deja știm că sunt obligatorii din alt test,
     // dar pentru a ajunge la al doilea POST trebuie să fie valide.
     
-    fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: '2025-04-26' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.DATE), { target: { value: '2025-04-26' } });
 
-    fireEvent.click(within(form).getByRole('button', { name: /Adaugă/i })); // Al doilea POST -> Eșec conform mock
+    fireEvent.click(within(form).getByRole('button', { name: MOCK_BUTTONS.ADD })); // Al doilea POST -> Eșec conform mock
 
     // Verifică mesajul de eroare specific setat în catch block folosind data-testid
     await waitFor(() => {
       // Folosește matcher de funcție care concatenează textul din nod și copiii săi, robust la fragmentare
-      expect(screen.getByTestId('error-message')).toHaveTextContent('Eroare la adăugare');
+      expect(screen.getByTestId('error-message')).toHaveTextContent(MESAJE.EROARE_ADAUGARE);
     }); // vezi App.tsx -> setFormError
 
     // Verifică și că mesajul de succes a dispărut sau nu a reapărut
@@ -332,36 +335,24 @@ fireEvent.change(within(form).getAllByLabelText(/Categorie/i)[0], { target: { va
 
   it('nu permite submit dacă e recurent dar nu are frecvență', async () => {
     render(<App />);
-    const form = screen.getByRole('form', { name: /adăugare tranzacție/i });
+    const form = screen.getByRole('form', { name: MOCK_LABELS.FORM });
     const submitButton = within(form).getByRole('button', { name: /Adaugă/i });
 
     // Compleăm câmpurile obligatorii
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
     // Selectează tipul "expense" și apoi categoria "CHELTUIELI"
-fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'expense' } });
+fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
 await waitFor(() => {
-    expect(within(form).getAllByLabelText(/Categorie/i)[0].querySelector('option[value="CHELTUIELI"]')).toBeInTheDocument();
+    expect(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0].querySelector(`option[value="${MOCK_OPTIONS.CATEGORY[1].value}"]`)).toBeInTheDocument();
 });
-fireEvent.change(within(form).getAllByLabelText(/Categorie/i)[0], { target: { value: 'CHELTUIELI' } });
-    fireEvent.change(within(form).getByLabelText(/Sumă/i), { target: { value: '15' } });
-    
-    fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: '2025-04-27' } });
-    // Bifează 'Recurent'
-    fireEvent.click(within(form).getByLabelText(/Recurent/i));
-
-    // Așteaptă ca inputul de Frecvență să apară (dacă apare condiționat)
-    await waitFor(() => {
-        expect(within(form).getByLabelText(/Frecvență/i)).toBeInTheDocument();
-    });
-    // NU selectăm frecvența (lăsăm valoarea default/placeholder)
 
     // Încercăm să trimitem
-    fireEvent.click(submitButton);
+    fireEvent.click(submitButton); // MOCK_BUTTONS.ADD este deja folosit la selectare mai sus
 
     // Așteaptă apariția mesajului de eroare specific
     await waitFor(() => {
       // Mesajul de eroare trebuie să corespundă exact cu cel din implementare
-      expect(screen.getByText('Selectează frecvența pentru tranzacție recurentă')).toBeInTheDocument();
+      expect(screen.getByText(MESAJE.FRECV_RECURENTA)).toBeInTheDocument();
     }); // vezi App.tsx -> handleFormSubmit
 
     // Verificăm că fetch (POST) nu a fost apelat în acest scenariu

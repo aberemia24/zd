@@ -55,7 +55,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
                 <td>{t.category || ''}</td>
                 <td>{t.subcategory || ''}</td>
                 <td>{t.date || ''}</td>
-                <td>{t.recurring === true ? 'Da' : 'Nu'}</td>
+                <td>{t.recurring === true ? TABLE.BOOL.YES : TABLE.BOOL.NO}</td>
                 <td>{t.recurring === true && t.frequency ? t.frequency : ''}</td>
               </tr>
             ))

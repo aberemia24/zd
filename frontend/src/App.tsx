@@ -8,6 +8,7 @@ import { API_URL, PAGINATION, FORM_DEFAULTS, INITIAL_FORM_STATE } from './consta
 import { TransactionType, CategoryType } from './constants/enums';
 import TransactionFilters from './components/TransactionFilters/TransactionFilters';
 import { MESAJE } from './constants/messages';
+import { TITLES, OPTIONS } from './constants/ui';
 import { buildTransactionQueryParams } from './utils/transactions';
 
 const appContainerStyle: React.CSSProperties = {
@@ -78,8 +79,8 @@ const [form, setForm] = React.useState<TransactionFormData>({ ...INITIAL_FORM_ST
     setForm(prev => ({
       ...prev,
       [name]: isCheckbox ? checkedValue : value,
-      // Reset frequency dacă recurent devine false
-      ...(name === 'recurring' && isCheckbox && !checkedValue && { frequency: '' })
+      // Reset frequency la orice schimbare a recurenței (bifat sau debifat)
+      ...(name === 'recurring' && isCheckbox && { frequency: '' })
     }));
   };
 
@@ -130,7 +131,7 @@ const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.
 
   return (
     <div style={appContainerStyle}>
-      <h1>Tranzacții</h1>
+      <h1>{TITLES.TRANZACTII}</h1>
 
       {/* Render Transaction Form */}
       <TransactionForm
@@ -148,16 +149,8 @@ const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.
         category={filterCategory}
         onTypeChange={setFilterType}
         onCategoryChange={setFilterCategory}
-        types={[
-          { value: TransactionType.INCOME, label: 'Venit' },
-          { value: TransactionType.EXPENSE, label: 'Cheltuială' },
-          { value: TransactionType.SAVING, label: 'Economisire' },
-        ]}
-        categories={[
-          { value: CategoryType.INCOME, label: 'Venituri' },
-          { value: CategoryType.EXPENSE, label: 'Cheltuieli' },
-          { value: CategoryType.SAVING, label: 'Economii' },
-        ]}
+        types={OPTIONS.TYPE}
+        categories={OPTIONS.CATEGORY}
       />
 
       {/* Render Transaction Table */}

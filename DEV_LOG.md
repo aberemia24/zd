@@ -131,3 +131,13 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Orice dezvoltator care adaugă sau modifică o componentă trebuie să respecte acest pattern.
 
 ---
+
+### [2025-04-24] Convenții noi pentru testare și UI
+- Orice nouă componentă sau test trebuie să respecte patternul de centralizare a textelor UI și a helperilor de test.
+- Toate textele vizibile în UI (labeluri, butoane, dropdown-uri, placeholdere, opțiuni) se extrag și se centralizează în constants/ui.ts.
+- Nicio componentă nu are voie să folosească string-uri hardcodate pentru UI.
+- Orice helper sau mock folosit în mai multe teste trebuie centralizat în test/helpers.ts sau test/mockData.ts.
+- Dacă apar noi stringuri sau helpers, centralizează-le imediat.
+- Convențiile și lecțiile învățate se documentează imediat în BEST_PRACTICES.md, DEV_LOG.md și în memorie.
+- Testele trebuie să fie DRY, robuste și ușor de întreținut.
+

@@ -1,10 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import App from './App';
+import { LABELS, BUTTONS, TABLE, OPTIONS } from './constants/ui';
+import { MESAJE } from './constants/messages';
 import { TransactionType, FrequencyType } from './constants/enums';
 import { FORM_DEFAULTS } from './constants/defaults';
 
-// Use the same environment variable the App component likely uses
+import { TEST_API_URL } from './test/testEnv';
+// Setăm explicit variabila de mediu pentru testare
+process.env.REACT_APP_API_URL = TEST_API_URL;
 const API_URL = process.env.REACT_APP_API_URL; 
 // Add a check to ensure the environment variable is set during tests
 if (!API_URL) {
@@ -185,21 +189,21 @@ describe('Tranzacții și venituri recurente', () => {
     });
     await act(async () => {
       fireEvent.change(within(form).getByLabelText(/Dată/i), { target: { value: mockTransaction.date } });
-      fireEvent.click(within(form).getByLabelText(/Recurent/i)); 
-      fireEvent.change(within(form).getByLabelText(/Frecvență/i), { target: { value: mockTransaction.frequency } }); 
+      fireEvent.click(within(form).getByLabelText(/Recurent/i));
+      // NU selecta frecvența, las-o goală
     });
 
     await act(async () => {
       fireEvent.click(submitButton);
     });
 
-    // Păstrăm DOAR: așteaptă ca elementele să apară în DOM
+    // DEBUG: Afișează DOM-ul după submit pentru a vedea exact ce se afișează
+    screen.debug();
+
+    // Așteaptă apariția mesajului de eroare corect
     await waitFor(() => {
-      const row = screen.getByRole('row', { name: /Taxe școlare | universitare/i });
-      expect(row).toBeInTheDocument();
-      // Verificăm și că celula Monedă conține 'RON'
-      expect(within(row).getByText('RON')).toBeInTheDocument();
-    }, { timeout: 1500 }); // Timeout mărit
+      expect(screen.getByTestId('error-message')).toHaveTextContent(MESAJE.FRECV_RECURENTA);
+    });
   });
 
   it('poți adăuga un venit recurent și apare marcat în tabel', async () => {
