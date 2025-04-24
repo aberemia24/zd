@@ -39,6 +39,7 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 - Structura de subcategorii este sursă de adevăr unică, importată direct în componente și teste.
 - Testele folosesc helperi și importuri directe pentru aserțiuni exhaustive, fără stringuri hardcodate.
 - Orice modificare a structurii se reflectă automat și în UI și în teste.
+- **Pattern robust pentru API:** toate endpointurile, parametrii de query, headerele, timeout-ul și limita de retry sunt definite centralizat în `constants/api.ts`. Nu există stringuri hardcodate în fetch/axios, headerele și timeout-ul sunt configurabile, extensibilitatea e rapidă pentru orice schimbare de API.
 - Avantaje: mentenanță ușoară, consistență, testare robustă, evoluție sigură a codului.
 - Status: **FĂRĂ HARDCODĂRI - FINALIZAT**
 

@@ -6,6 +6,8 @@ export const LABELS = {
   DATE: 'Dată',
   RECURRING: 'Recurent',
   FREQUENCY: 'Frecvență',
+  TYPE_FILTER: 'Tip tranzacție:',
+  CATEGORY_FILTER: 'Categoria:',
 };
 
 export const PLACEHOLDERS = {
@@ -36,4 +38,19 @@ export const TABLE = {
   EMPTY: 'Nicio tranzacție',
   LOADING: 'Se încarcă...',
   PAGE_INFO: 'Pagina {current} din {total}',
+};
+
+// Opțiuni pentru dropdown-uri (folosite în TransactionForm)
+export const OPTIONS = {
+  TYPE: [
+    { value: 'income', label: 'Venit' },
+    { value: 'expense', label: 'Cheltuială' },
+    { value: 'saving', label: 'Economisire' },
+  ],
+  FREQUENCY: [
+    { value: 'zilnic', label: 'Zilnic' },
+    { value: 'săptămânal', label: 'Săptămânal' },
+    { value: 'lunar', label: 'Lunar' },
+    { value: 'anual', label: 'Anual' },
+  ],
 };

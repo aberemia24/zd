@@ -1,5 +1,7 @@
 import React from 'react';
 import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
+import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '../../constants/ui';
+import { MESAJE } from '../../constants/messages';
 
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
@@ -87,50 +89,50 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
   return (
     <form role="form" aria-label="adăugare tranzacție" onSubmit={onSubmit} style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 24, alignItems: 'flex-end' }}>
       <label>
-        Tip*:
+        {LABELS.TYPE}*:
         <select
           name="type"
           value={form.type}
           onChange={onChange}
-          aria-label="Tip"
+          aria-label={LABELS.TYPE}
         >
           {/* Placeholder-ul "Alege" apare doar dacă nu este selectat niciun tip */}
-          {form.type === '' ? <option value=''>Alege</option> : null}
-          <option value={TransactionType.INCOME}>Venit</option>
-          <option value={TransactionType.EXPENSE}>Cheltuială</option>
-          <option value={TransactionType.SAVING}>Economisire</option>
+          {form.type === '' ? <option value=''>{PLACEHOLDERS.SELECT}</option> : null}
+          {OPTIONS.TYPE.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
         </select>
       </label>
       <label>
-        Sumă*:
-        <input name="amount" type="number" value={form.amount} onChange={onChange} aria-label="Sumă" />
+        {LABELS.AMOUNT}*:
+        <input name="amount" type="number" value={form.amount} onChange={onChange} aria-label={LABELS.AMOUNT} placeholder={PLACEHOLDERS.AMOUNT} />
       </label>
       <label>
-        Categorie*:
+        {LABELS.CATEGORY}*:
         {/* Dropdown-ul de categorie se adaptează în funcție de tip */}
         <select
           name="category"
           value={form.category}
           onChange={onChange}
-          aria-label="Categorie"
+          aria-label={LABELS.CATEGORY}
           disabled={(!form.type || categoriiFiltrate.length === 0)}
         >
-          <option value=''>Alege</option>
+          <option value=''>{PLACEHOLDERS.SELECT}</option>
           {categoriiFiltrate.map((cat) => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
       </label>
       <label>
-        Subcategorie:
+        {LABELS.SUBCATEGORY}:
         <select
           name="subcategory"
           value={form.subcategory}
           onChange={onChange}
-          aria-label="Subcategorie"
+          aria-label={LABELS.SUBCATEGORY}
           disabled={!form.category}
         >
-          <option value=''>Alege</option>
+          <option value=''>{PLACEHOLDERS.SELECT}</option>
           {listaSubcategorii.map((subcat, idx) => {
             if (typeof subcat === 'string') {
               return <option key={subcat} value={subcat}>{subcat}</option>;
@@ -148,31 +150,38 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
         </select>
       </label>
       <label>
-        Dată*:
-        <input name="date" type="date" value={form.date} onChange={onChange} aria-label="Dată" />
+        {LABELS.DATE}*:
+        <input name="date" type="date" value={form.date} onChange={onChange} aria-label={LABELS.DATE} placeholder={PLACEHOLDERS.DATE} />
       </label>
       <label>
-        <input name="recurring" type="checkbox" checked={form.recurring} onChange={onChange} aria-label="Recurent" /> Recurent?
+        <input name="recurring" type="checkbox" checked={form.recurring} onChange={onChange} aria-label={LABELS.RECURRING} /> {LABELS.RECURRING}?
       </label>
       <label>
-        Frecvență:
+        {LABELS.FREQUENCY}:
         <select
           name="frequency"
           value={form.frequency}
           onChange={onChange}
-          aria-label="Frecvență"
+          aria-label={LABELS.FREQUENCY}
           disabled={!form.recurring}
         >
-          <option value=''>Alege</option>
-          <option value={FrequencyType.DAILY}>Zilnic</option>
-          <option value={FrequencyType.WEEKLY}>Săptămânal</option>
-          <option value={FrequencyType.MONTHLY}>Lunar</option>
-          <option value={FrequencyType.YEARLY}>Anual</option>
+          <option value=''>{PLACEHOLDERS.SELECT}</option>
+          {OPTIONS.FREQUENCY.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
         </select>
       </label>
-      <button type="submit" disabled={!!loading}>Adaugă</button>
-      {formError && <span data-testid="error-message" style={{ color: 'red', display: 'block', marginTop: 8 }}>{formError}</span>}
-      {formSuccess && <span data-testid="success-message" style={{ color: 'green', display: 'block', marginTop: 8 }}>{formSuccess}</span>}
+      <button type="submit" disabled={!!loading}>{BUTTONS.ADD}</button>
+      {formError && (
+        <span data-testid="error-message" style={{ color: 'red', display: 'block', marginTop: 8 }}>
+          {MESAJE[formError as keyof typeof MESAJE] || formError}
+        </span>
+      )}
+      {formSuccess && (
+        <span data-testid="success-message" style={{ color: 'green', display: 'block', marginTop: 8 }}>
+          {MESAJE[formSuccess as keyof typeof MESAJE] || formSuccess}
+        </span>
+      )}
     </form>
   );
 };

@@ -117,4 +117,17 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Status: **FĂRĂ HARDCODĂRI - FINALIZAT**
 - Impact: mentenanță mult redusă, testare exhaustivă, consistență și siguranță crescută în evoluția codului.
 
+### [2025-04-24] Decizie: Centralizare completă mesaje vizibile utilizatorului
+- Toate mesajele vizibile utilizatorului (erori, succes, avertismente, confirmări, prompturi) sunt centralizate în `frontend/src/constants/messages.ts`.
+- Nu se acceptă string-uri hardcodate pentru aceste mesaje în componente.
+- Orice dezvoltator care adaugă sau modifică o componentă trebuie să folosească exclusiv constantele definite în acest fișier pentru mesaje către utilizator.
+- Orice modificare, excepție sau extensie la această regulă trebuie documentată și implementată imediat.
+- Status: **FĂRĂ HARDCODĂRI DE MESAJ VIZIBIL - FINALIZAT**
+
+### [2025-04-24] Decizie: Centralizare completă texte UI
+- Toate textele vizibile din UI (labeluri, butoane, dropdown-uri, placeholdere, opțiuni etc.) au fost extrase și centralizate în `frontend/src/constants/ui.ts`.
+- S-a verificat că niciuna dintre componente nu mai folosește string-uri hardcodate pentru UI.
+- S-a introdus această regulă ca best practice obligatoriu și s-a documentat în `BEST_PRACTICES.md`.
+- Orice dezvoltator care adaugă sau modifică o componentă trebuie să respecte acest pattern.
+
 ---

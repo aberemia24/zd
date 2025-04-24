@@ -1,4 +1,5 @@
 import React from 'react';
+import { MESAJE } from '../constants/messages';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -30,7 +31,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <div style={{ color: 'red', padding: 24 }}>
           <h2>Eroare neașteptată</h2>
-          <p>{this.state.error?.message || 'A apărut o eroare la afișarea aplicației.'}</p>
+          <p>{this.state.error?.message || MESAJE.EROARE_GENERALA}</p>
         </div>
       );
     }

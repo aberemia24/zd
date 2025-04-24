@@ -43,30 +43,24 @@ Ca dezvoltator, vreau să elimin toate valorile hardcodate din aplicație și s�
 
 ### 4. Constante pentru API
 
----
-
-### CONCLUZIE FINALĂ
-- Toate hardcodările de tip, categorie, frecvență, monedă, texte UI, mesaje, valori default și endpoint-uri au fost eliminate din frontend.
-- Toate sursele de adevăr sunt centralizate în fișierele din `constants/`.
-- Patternul robust de testare și extracție (unic sursă de adevăr, helperi, aserțiuni exhaustive, import direct în teste) este implementat peste tot.
-- Testele și componentele folosesc exclusiv aceste surse centralizate.
-- Status: **FĂRĂ HARDCODĂRI - FINALIZAT**
-
-- [ ] Extrage în `api.ts` toate constantele legate de API:
+- [x] Extrage în `api.ts` toate constantele legate de API:
   - URL-uri de bază pentru API
   - Endpoint-uri specifice
   - Nume de query params
   - Nume de headere
   - Timeout-uri și limite de retry
+    > [2025-04-24] Task finalizat: endpointuri explicite, query params centralizați, headere extensibile, timeout și retry configurabile. Pattern robust, fără hardcodări, ușor de extins/testat.
 
 ### 5. Texte UI
-- [ ] Extrage toate textele UI în `ui.ts`:
+- [x] Extrage toate textele UI în `ui.ts`:
   - Etichete pentru form-uri
   - Texte pentru butoane
   - Placeholder-uri
   - Titluri și subtitluri
   - Texte pentru tabelul de tranzacții
   - Texte pentru filtre
+
+> Toate textele UI vizibile au fost extrase și centralizate în `constants/ui.ts`, inclusiv pentru filtre, tabele, form-uri și butoane. Nicio componentă nu mai conține string-uri hardcodate pentru UI.
 
 ### 6. Mesaje utilizator
 - [ ] Extinde fișierul existent `messages.ts` cu:

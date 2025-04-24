@@ -1,6 +1,6 @@
 import React from 'react';
 import { TransactionType, CategoryType } from '../../constants/enums';
-import { PLACEHOLDERS } from '../../constants/ui';
+import { PLACEHOLDERS, LABELS } from '../../constants/ui';
 
 interface TransactionFiltersProps {
   type: TransactionType | '' | undefined;
@@ -22,7 +22,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   return (
     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
       <label>
-        Tip tranzacție:
+        {LABELS.TYPE_FILTER}
         <select value={type || ''} onChange={e => onTypeChange(e.target.value as TransactionType | '')}>
           <option value="">{PLACEHOLDERS.SELECT} tipul</option>
           {types.map(opt => (
@@ -31,7 +31,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         </select>
       </label>
       <label>
-        Categoria:
+        {LABELS.CATEGORY_FILTER}
         <select value={category || ''} onChange={e => onCategoryChange(e.target.value as CategoryType | '')}>
           <option value="">{PLACEHOLDERS.SELECT} categoria</option>
           {categories.map(opt => (

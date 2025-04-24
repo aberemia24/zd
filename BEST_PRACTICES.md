@@ -39,10 +39,37 @@ Acest document centralizează deciziile și convențiile adoptate pe parcursul d
 
 ## Eliminarea hardcodărilor și patternuri robuste
 
+### Centralizare texte UI (obligatoriu)
+- Toate textele vizibile în UI (labeluri, butoane, dropdown-uri, placeholdere, opțiuni etc.) trebuie extrase și centralizate în `frontend/src/constants/ui.ts`.
+- Este interzisă folosirea string-urilor hardcodate pentru UI în componente.
+- Orice componentă nouă sau modificată trebuie să folosească DOAR constantele din `ui.ts` pentru orice text vizibil.
+- Dacă ai nevoie de un text nou, îl adaugi mai întâi în `ui.ts`, apoi îl folosești în componentă.
+- Orice excepție trebuie documentată și validată de echipă.
+
+**Pattern corect:**
+```tsx
+import { LABELS, BUTTONS } from '../../constants/ui';
+<button>{BUTTONS.ADD}</button>
+<label>{LABELS.CATEGORY}</label>
+```
+
+**Anti-pattern:**
+```tsx
+<button>Adaugă</button>
+<label>Categorie</label>
+```
+
+#### Pattern robust pentru API
+- Toate endpointurile, parametrii de query, headerele, timeout-ul și limita de retry sunt definite centralizat în `constants/api.ts`.
+- Nu există niciun string hardcodate în codul de fetch/axios; se folosește mereu sursa de adevăr unică.
+- Headerele pot fi extinse ușor (ex: Authorization).
+- Timeout-ul și retry-ul sunt configurabile dintr-un singur loc.
+- Avantaje: mentenanță ușoară, testare predictibilă, extensibilitate rapidă pentru orice schimbare de API.
+
 - **Enumuri**: Toate tipurile, categoriile, frecvențele sunt definite în `constants/enums.ts` și folosite exclusiv prin import.
 - **Subcategorii**: Structura completă exportată dintr-un singur fișier, importată direct în componente și teste. Helperi dedicați pentru extragere și filtrare.
 - **Texte UI**: Toate labelurile, butoanele, placeholder-ele, headerele de tabel sunt în `constants/ui.ts`.
-- **Mesaje**: Toate mesajele de validare, eroare, succes sunt în `constants/messages.ts`.
+- **Mesaje**: Toate mesajele de validare, eroare, succes, avertismente, confirmări și prompturi vizibile utilizatorului sunt în `constants/messages.ts`. Nu este permisă folosirea string-urilor hardcodate pentru aceste mesaje în componente. Orice excepție sau convenție nouă se documentează imediat aici și în `DEV_LOG.md`.
 - **Valori default**: Paginare, monedă, form state etc. în `constants/defaults.ts`.
 - **API**: Toate endpoint-urile, query params, headerele și URL-urile sunt în `constants/api.ts`.
 - **Testare**: Testele nu hardcodează opțiuni, folosesc import direct din sursa de adevăr și helperi pentru aserțiuni exhaustive. Orice modificare a structurii se reflectă automat și în teste.
