@@ -9,14 +9,15 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   placeholder?: string;
 }
 
-const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, ...rest }) => (
+const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, id, ...rest }) => (
   <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label className="form-label mb-1">{label}</label>}
+    {label && <label htmlFor={id || rest.name} className="form-label mb-1">{label}</label>}
     <select
+      id={id || rest.name}
       className={classNames('input-field', error && 'border-red-500', className)}
       {...rest}
     >
-      {placeholder && <option value="">{placeholder}</option>}
+      {placeholder && !rest.value && <option value="">{placeholder}</option>}
       {options.map(opt => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}

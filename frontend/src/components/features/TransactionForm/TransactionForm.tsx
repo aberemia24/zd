@@ -72,15 +72,33 @@ export const categorii: Record<string, any> = {
   ]
 };
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, formSuccess, onChange, onSubmit, loading }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, formError, formSuccess, onChange, onSubmit, loading }) => {
+  // Clonăm formularul pentru a putea face validări interne fără a afecta props-ul original
+  const form = { ...initialForm };
+  
   // Filtrare categorii în funcție de tip
   let categoriiFiltrate: string[] = [];
   if (form.type === TransactionType.INCOME) {
     categoriiFiltrate = [CategoryType.INCOME];
+    // Resetează categoria dacă nu este compatibilă cu tipul
+    if (form.category && form.category !== CategoryType.INCOME) {
+      form.category = '';
+      form.subcategory = '';
+    }
   } else if (form.type === TransactionType.EXPENSE) {
     categoriiFiltrate = [CategoryType.EXPENSE];
+    // Resetează categoria dacă nu este compatibilă cu tipul
+    if (form.category && form.category !== CategoryType.EXPENSE) {
+      form.category = '';
+      form.subcategory = '';
+    }
   } else if (form.type === TransactionType.SAVING) {
     categoriiFiltrate = [CategoryType.SAVING];
+    // Resetează categoria dacă nu este compatibilă cu tipul
+    if (form.category && form.category !== CategoryType.SAVING) {
+      form.category = '';
+      form.subcategory = '';
+    }
   } else {
     categoriiFiltrate = [];
   }
@@ -89,6 +107,34 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
   let listaSubcategorii: any[] = [];
   if (form.category && categorii[form.category]) {
     listaSubcategorii = categorii[form.category];
+  }
+  
+  // Verifică dacă subcategoria selectată există în lista de subcategorii
+  if (form.subcategory) {
+    // Verifică dacă subcategoria este validă pentru categoria curentă
+    let subcatValid = false;
+    
+    // Verifică în subcategorii simple (string)
+    if (listaSubcategorii.some(item => typeof item === 'string' && item === form.subcategory)) {
+      subcatValid = true;
+    }
+    
+    // Verifică în subcategorii de tip grup (obiecte cu options)
+    if (!subcatValid) {
+      for (const item of listaSubcategorii) {
+        if (typeof item === 'object' && item.options && Array.isArray(item.options)) {
+          if (item.options.includes(form.subcategory)) {
+            subcatValid = true;
+            break;
+          }
+        }
+      }
+    }
+    
+    // Resetează subcategoria dacă nu este validă
+    if (!subcatValid) {
+      form.subcategory = '';
+    }
   }
 
   return (
@@ -137,9 +183,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
         value={form.subcategory}
         onChange={onChange}
         aria-label={LABELS.SUBCATEGORY}
-        options={listaSubcategorii
-  .filter((subcat): subcat is string => typeof subcat === 'string')
-  .map(subcat => ({ value: subcat, label: subcat }))}
+        options={listaSubcategorii.flatMap(subcat => {
+          if (typeof subcat === 'string') {
+            return { value: subcat, label: subcat };
+          } else if (typeof subcat === 'object' && subcat.options && Array.isArray(subcat.options)) {
+            // Procesează subcategorie de tip grup/optgroup
+            return subcat.options.map((option: string) => ({ value: option, label: option }));
+          }
+          return [];
+        })}
         className="ml-2"
         disabled={!form.category}
         placeholder={PLACEHOLDERS.SELECT}
