@@ -1,6 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import App from './App';
+import { TransactionType, FrequencyType } from './constants/enums';
+import { FORM_DEFAULTS } from './constants/defaults';
 
 // Use the same environment variable the App component likely uses
 const API_URL = process.env.REACT_APP_API_URL; 
@@ -37,14 +39,14 @@ describe('Tranzacții și venituri recurente', () => {
           {
             id: 'mock-recur-income-1', // Example ID
             userId: 'u1',
-            type: 'income',
+            type: TransactionType.INCOME,
             amount: 200,
-            currency: 'RON',
+            currency: FORM_DEFAULTS.CURRENCY,
             date: '2025-04-24',
             category: 'salariu',
             subcategory: 'principal',
             recurring: true,
-            frequency: 'lunar',
+            frequency: FrequencyType.MONTHLY,
             description: 'Mocked Salariu'
           }
           // Add other transactions if needed for other tests or initial state
@@ -86,14 +88,14 @@ describe('Tranzacții și venituri recurente', () => {
           {
             id: 'mock-recur-income-1', // Example ID
             userId: 'u1',
-            type: 'income',
+            type: TransactionType.INCOME,
             amount: 200,
-            currency: 'RON',
+            currency: FORM_DEFAULTS.CURRENCY,
             date: '2025-04-24',
             category: 'salariu',
             subcategory: 'principal',
             recurring: true,
-            frequency: 'lunar',
+            frequency: FrequencyType.MONTHLY,
             description: 'Mocked Salariu'
           }
           // Add other transactions if needed for other tests or initial state
@@ -141,10 +143,10 @@ describe('Tranzacții și venituri recurente', () => {
 
   it('poți adăuga o tranzacție recurentă și apare marcată în tabel', async () => {
     const mockTransaction = {
-      id: '2', userId: 'u1', type: 'expense', amount: 50, currency: 'RON', date: '2025-04-23',
+      id: '2', userId: 'u1', type: TransactionType.EXPENSE, amount: 50, currency: FORM_DEFAULTS.CURRENCY, date: '2025-04-23',
       category: 'abonament', 
       subcategory: 'Taxe școlare | universitare', 
-      recurring: true, frequency: 'lunar'
+      recurring: true, frequency: FrequencyType.MONTHLY
     };
 
     // Mock-uri specifice pentru acest test, în ordinea așteptată
@@ -202,10 +204,10 @@ describe('Tranzacții și venituri recurente', () => {
 
   it('poți adăuga un venit recurent și apare marcat în tabel', async () => {
     const mockIncome = {
-      id: '3', userId: 'u1', type: 'income', amount: 200, currency: 'RON', date: '2025-04-24',
+      id: '3', userId: 'u1', type: TransactionType.INCOME, amount: 200, currency: FORM_DEFAULTS.CURRENCY, date: '2025-04-24',
       category: 'venit', 
       subcategory: 'Salarii', 
-      recurring: true, frequency: 'lunar'
+      recurring: true, frequency: FrequencyType.MONTHLY
     };
 
     // Mock-uri specifice pentru acest test, în ordinea așteptată

@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 import App from './App';
 import { Transaction } from './types/Transaction'; // Import corect după best practice
 
-import { API_URL } from './constants';
+import { API_URL } from './constants/index';
 
 // Helper pentru a crea un obiect compatibil cu tipul Response
 function fakeResponse<T>(body: T, ok = true, status = ok ? 200 : 400): Response {

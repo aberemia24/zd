@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import TransactionForm, { TransactionFormData, categorii } from './TransactionForm';
+import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
 
 // Helper pentru a selecta opțiuni în dropdownuri
 function selectOption(label: string, value: string) {
@@ -70,8 +71,8 @@ describe('TransactionForm', () => {
     expect(tipSelect).toHaveValue('');
     expect(within(tipSelect).getByText('Alege')).toBeInTheDocument();
     // După selectare, placeholderul nu mai există ca opțiune
-    fireEvent.change(tipSelect, { target: { value: 'income' } });
-    expect(tipSelect).toHaveValue('income');
+    fireEvent.change(tipSelect, { target: { value: TransactionType.INCOME } });
+    expect(tipSelect).toHaveValue(TransactionType.INCOME);
     expect(within(tipSelect).queryByText('Alege')).not.toBeInTheDocument();
   });
 
@@ -82,47 +83,47 @@ describe('TransactionForm', () => {
   });
 
   it('afișează doar VENITURI la categorie dacă tipul este Venit', () => {
-    const formVenit = { ...defaultForm, type: 'income' };
+    const formVenit = { ...defaultForm, type: TransactionType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
-    expect(within(categorieSelect).getByText('VENITURI')).toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('CHELTUIELI')).not.toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('ECONOMII')).not.toBeInTheDocument();
+    expect(within(categorieSelect).getByText(CategoryType.INCOME)).toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.EXPENSE)).not.toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.SAVING)).not.toBeInTheDocument();
   });
 
   it('afișează doar CHELTUIELI la categorie dacă tipul este Cheltuială', () => {
-    const formChelt = { ...defaultForm, type: 'expense' };
+    const formChelt = { ...defaultForm, type: TransactionType.EXPENSE };
     render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
-    expect(within(categorieSelect).getByText('CHELTUIELI')).toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('VENITURI')).not.toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('ECONOMII')).not.toBeInTheDocument();
+    expect(within(categorieSelect).getByText(CategoryType.EXPENSE)).toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.INCOME)).not.toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.SAVING)).not.toBeInTheDocument();
   });
 
   it('afișează doar ECONOMII la categorie dacă tipul este Economisire', () => {
-    const formEcon = { ...defaultForm, type: 'saving' };
+    const formEcon = { ...defaultForm, type: TransactionType.SAVING };
     render(<TransactionForm form={formEcon} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const categorieSelect = screen.getByLabelText('Categorie', { exact: true });
-    expect(within(categorieSelect).getByText('ECONOMII')).toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('VENITURI')).not.toBeInTheDocument();
-    expect(within(categorieSelect).queryByText('CHELTUIELI')).not.toBeInTheDocument();
+    expect(within(categorieSelect).getByText(CategoryType.SAVING)).toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.INCOME)).not.toBeInTheDocument();
+    expect(within(categorieSelect).queryByText(CategoryType.EXPENSE)).not.toBeInTheDocument();
   });
 
   it('nu permite alegerea subcategoriei dacă nu este selectată categoria', () => {
-    const formVenit = { ...defaultForm, type: 'income' };
+    const formVenit = { ...defaultForm, type: TransactionType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true }) as HTMLSelectElement;
     expect(subcatSelect.disabled).toBe(true);
   });
 
   it('afișează TOATE subcategoriile corecte pentru VENITURI', () => {
-    const formVenit = { ...defaultForm, type: 'income', category: 'VENITURI' };
+    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
 
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
     expect(subcatSelect).toBeEnabled(); // Asigurăm că e activat
 
-    const expectedSubcategories = getAllSubcategories(categorii['VENITURI']);
+    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.INCOME]);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== ''); // Excludem placeholderul 'Alege'
@@ -139,12 +140,12 @@ describe('TransactionForm', () => {
   });
 
   it('afișează TOATE subcategoriile corecte pentru ECONOMII', () => {
-    const formEcon = { ...defaultForm, type: 'saving', category: 'ECONOMII' };
+    const formEcon = { ...defaultForm, type: TransactionType.SAVING, category: CategoryType.SAVING };
     render(<TransactionForm form={formEcon} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
     expect(subcatSelect).toBeEnabled();
 
-    const expectedSubcategories = getAllSubcategories(categorii['ECONOMII']);
+    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.SAVING]);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== '');
@@ -156,12 +157,12 @@ describe('TransactionForm', () => {
   });
 
   it('afișează TOATE subcategoriile corecte pentru CHELTUIELI', () => {
-    const formChelt = { ...defaultForm, type: 'expense', category: 'CHELTUIELI' };
+    const formChelt = { ...defaultForm, type: TransactionType.EXPENSE, category: CategoryType.EXPENSE };
     render(<TransactionForm form={formChelt} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true });
     expect(subcatSelect).toBeEnabled();
 
-    const expectedSubcategories = getAllSubcategories(categorii['CHELTUIELI']);
+    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.EXPENSE]);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== '');
@@ -173,14 +174,14 @@ describe('TransactionForm', () => {
   });
 
   it('nu permite selectarea unei categorii incompatibile cu tipul', () => {
-    const formVenit = { ...defaultForm, type: 'income', category: 'CHELTUIELI' };
+    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.EXPENSE };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const categorieSelect = screen.getByLabelText('Categorie', { exact: true }) as HTMLSelectElement;
     expect(categorieSelect.value).toBe(''); // valoarea se resetează
   });
 
   it('nu permite selectarea unei subcategorii incompatibile cu categoria', () => {
-    const formVenit = { ...defaultForm, type: 'income', category: 'VENITURI', subcategory: 'Îmbrăcăminte, încălțăminte și accesorii' };
+    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME, subcategory: 'Îmbrăcăminte, încălțăminte și accesorii' };
     render(<TransactionForm form={formVenit} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const subcatSelect = screen.getByLabelText('Subcategorie', { exact: true }) as HTMLSelectElement;
     expect(subcatSelect.value).toBe(''); // valoarea se resetează
@@ -203,25 +204,25 @@ describe('TransactionForm', () => {
   // --- Tests for Initial Values from Props --- 
 
   const initialForm: TransactionFormData = {
-    type: 'income',
+    type: TransactionType.INCOME,
     amount: '100',
-    category: 'VENITURI', // trebuie să corespundă exact valorii din dropdown
+    category: CategoryType.INCOME, // trebuie să corespundă exact valorii din dropdown
     subcategory: 'Salarii', // trebuie să corespundă exact valorii din dropdown
     date: '2025-01-15',
     recurring: true,
-    frequency: 'lunar',
+    frequency: FrequencyType.MONTHLY,
   };
 
   it('renders initial type value from props', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
-    expect(within(form).getByLabelText(/Tip/i)).toHaveValue('income');
+    expect(within(form).getByLabelText(/Tip/i)).toHaveValue(TransactionType.INCOME);
   });
 
   it('redă valorile inițiale pentru categorie și subcategorie din props', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
-    expect(within(form).getByLabelText('Categorie', { exact: true })).toHaveValue('VENITURI');
+    expect(within(form).getByLabelText('Categorie', { exact: true })).toHaveValue(CategoryType.INCOME);
     expect(within(form).getByLabelText('Subcategorie', { exact: true })).toHaveValue('Salarii');
   });
 
@@ -255,7 +256,7 @@ describe('TransactionForm', () => {
     render(<TransactionForm form={initialForm} formError="" formSuccess="" onChange={() => {}} onSubmit={() => {}} />);
     const form = screen.getByRole('form');
     await waitFor(() => {
-      expect(within(form).getByLabelText(/Frecvență/i)).toHaveValue('lunar');
+      expect(within(form).getByLabelText(/Frecvență/i)).toHaveValue(FrequencyType.MONTHLY);
     });
   });
 
@@ -298,7 +299,7 @@ describe('TransactionForm', () => {
       />
     );
     const form = screen.getByRole('form');
-    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: 'income' } });
+    fireEvent.change(within(form).getByLabelText(/Tip/i), { target: { value: TransactionType.INCOME } });
     expect(handleChange).toHaveBeenCalled();
     fireEvent.submit(form);
     expect(handleSubmit).toHaveBeenCalled();

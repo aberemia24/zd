@@ -33,6 +33,15 @@ Aplicație de bugetare modernă, modulară, ușor de extins pe web, Android și 
 - **Versionare API:** `/api/v1/...` pentru viitoare compatibilitate
 - **Documentație:** README detaliat, convenții de commit, workflow de testare
 
+## Eliminarea hardcodărilor (2025-04-24)
+
+- Toate tipurile, categoriile, frecvențele, monedele, textele UI, mesajele, valorile default și endpoint-urile API sunt definite și folosite exclusiv din fișierele din `constants/`.
+- Structura de subcategorii este sursă de adevăr unică, importată direct în componente și teste.
+- Testele folosesc helperi și importuri directe pentru aserțiuni exhaustive, fără stringuri hardcodate.
+- Orice modificare a structurii se reflectă automat și în UI și în teste.
+- Avantaje: mentenanță ușoară, consistență, testare robustă, evoluție sigură a codului.
+- Status: **FĂRĂ HARDCODĂRI - FINALIZAT**
+
 ## API
 
 ### GET /transactions

@@ -4,7 +4,8 @@ import TransactionForm, { TransactionFormData } from './components/TransactionFo
 import TransactionTable from './components/TransactionTable/TransactionTable';
 import { Transaction } from './types/Transaction';
 
-import { API_URL } from './constants';
+import { API_URL, PAGINATION, FORM_DEFAULTS, INITIAL_FORM_STATE } from './constants/index';
+import { TransactionType, CategoryType } from './constants/enums';
 import TransactionFilters from './components/TransactionFilters/TransactionFilters';
 import { MESAJE } from './constants/messages';
 import { buildTransactionQueryParams } from './utils/transactions';
@@ -20,23 +21,15 @@ const App: React.FC = () => {
   console.log('App loaded');
   const [transactions, setTransactions] = React.useState<Transaction[]>([]);
   // Starea formularului de tranzacție (fără câmpul 'currency')
-const [form, setForm] = React.useState<TransactionFormData>({
-  type: '',
-  amount: '',
-  category: '',
-  subcategory: '',
-  date: '',
-  recurring: false,
-  frequency: '',
-});
+const [form, setForm] = React.useState<TransactionFormData>({ ...INITIAL_FORM_STATE });
   const [formError, setFormError] = React.useState('');
   const [formSuccess, setFormSuccess] = React.useState('');
   // State for filtering/pagination
-  const [type, setType] = React.useState<string | undefined>(undefined);
-  const [category, setCategory] = React.useState<string | undefined>(undefined);
-  const [limit, setLimit] = React.useState<number>(10);
-  const [offset, setOffset] = React.useState<number>(0);
-  const [sort, setSort] = React.useState<string>('date'); // default sort
+  const [filterType, setFilterType] = React.useState<TransactionType | '' | undefined>(undefined);
+  const [filterCategory, setFilterCategory] = React.useState<CategoryType | '' | undefined>(undefined);
+  const [limit, setLimit] = React.useState<number>(PAGINATION.DEFAULT_LIMIT);
+  const [offset, setOffset] = React.useState<number>(PAGINATION.DEFAULT_OFFSET);
+  const [sort, setSort] = React.useState<string>(PAGINATION.DEFAULT_SORT); // default sort
   const [total, setTotal] = React.useState<number>(0);
   const [loadingFetch, setLoadingFetch] = React.useState(false);
   const [loadingSubmit, setLoadingSubmit] = React.useState(false);
@@ -44,9 +37,9 @@ const [form, setForm] = React.useState<TransactionFormData>({
   const [reloadTransactions, setReloadTransactions] = React.useState(0);
 
   React.useEffect(() => {
-    console.log("App loaded", { type, category, limit, offset, sort });
+    console.log("App loaded", { filterType, filterCategory, limit, offset, sort });
     setLoadingFetch(true);
-    const queryString = buildTransactionQueryParams({ type, category, limit, offset, sort });
+    const queryString = buildTransactionQueryParams({ type: filterType, category: filterCategory, limit, offset, sort });
     fetch(`${API_URL}?${queryString}`)
       .then(res => {
         if (!res.ok) {
@@ -72,7 +65,7 @@ const [form, setForm] = React.useState<TransactionFormData>({
         setTotal(0);
       })
       .finally(() => setLoadingFetch(false));
-  }, [type, category, limit, offset, sort, reloadTransactions]);
+  }, [filterType, filterCategory, limit, offset, sort, reloadTransactions]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     // La orice modificare, resetăm mesajele de succes/eroare pentru UX și teste stabile
@@ -105,7 +98,7 @@ const [form, setForm] = React.useState<TransactionFormData>({
     setFormError('');
     setLoadingSubmit(true); // Indicate loading during submit
     // La submit, adaugăm manual 'currency: "RON"' în payload
-const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
+const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.CURRENCY };
     try {
       const res = await fetch(API_URL, {
         method: 'POST',
@@ -151,19 +144,19 @@ const payload = { ...form, amount: Number(form.amount), currency: 'RON' };
 
       {/* Filtrare tranzacții după tip și categorie */}
       <TransactionFilters
-        type={type}
-        category={category}
-        onTypeChange={setType}
-        onCategoryChange={setCategory}
+        type={filterType}
+        category={filterCategory}
+        onTypeChange={setFilterType}
+        onCategoryChange={setFilterCategory}
         types={[
-          { value: 'income', label: 'Venit' },
-          { value: 'expense', label: 'Cheltuială' },
-          { value: 'savings', label: 'Economisire' },
+          { value: TransactionType.INCOME, label: 'Venit' },
+          { value: TransactionType.EXPENSE, label: 'Cheltuială' },
+          { value: TransactionType.SAVING, label: 'Economisire' },
         ]}
         categories={[
-          { value: 'VENITURI', label: 'VENITURI' },
-          { value: 'CHELTUIELI', label: 'CHELTUIELI' },
-          { value: 'ECONOMII', label: 'ECONOMII' },
+          { value: CategoryType.INCOME, label: 'Venituri' },
+          { value: CategoryType.EXPENSE, label: 'Cheltuieli' },
+          { value: CategoryType.SAVING, label: 'Economii' },
         ]}
       />
 

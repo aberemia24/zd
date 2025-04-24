@@ -1,16 +1,18 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TransactionFilters from './TransactionFilters';
+import { TransactionType, CategoryType } from '../../constants/enums';
 
 describe('TransactionFilters', () => {
   const types = [
-    { value: 'income', label: 'Venit' },
-    { value: 'expense', label: 'Cheltuială' },
-    { value: 'savings', label: 'Economisire' }
+    { value: TransactionType.INCOME, label: 'Venit' },
+    { value: TransactionType.EXPENSE, label: 'Cheltuială' },
+    { value: TransactionType.SAVING, label: 'Economisire' }
   ];
   const categories = [
-    { value: 'salary', label: 'Salariu' },
-    { value: 'rent', label: 'Chirie' }
+    { value: CategoryType.INCOME, label: 'Venituri' },
+    { value: CategoryType.EXPENSE, label: 'Cheltuieli' },
+    { value: CategoryType.SAVING, label: 'Economii' }
   ];
 
   it('afișează opțiunile de tip și categorie și permite selectarea', () => {
@@ -18,8 +20,8 @@ describe('TransactionFilters', () => {
     const onCategoryChange = jest.fn();
     render(
       <TransactionFilters
-        type="income"
-        category="salary"
+        type={TransactionType.INCOME}
+        category={CategoryType.INCOME}
         onTypeChange={onTypeChange}
         onCategoryChange={onCategoryChange}
         types={types}
@@ -29,10 +31,10 @@ describe('TransactionFilters', () => {
     expect(screen.getByLabelText(/Tip tranzacție/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Categoria/i)).toBeInTheDocument();
     // Selectează alt tip
-    fireEvent.change(screen.getByLabelText(/Tip tranzacție/i), { target: { value: 'expense' } });
-    expect(onTypeChange).toHaveBeenCalledWith('expense');
+    fireEvent.change(screen.getByLabelText(/Tip tranzacție/i), { target: { value: TransactionType.EXPENSE } });
+    expect(onTypeChange).toHaveBeenCalledWith(TransactionType.EXPENSE);
     // Selectează altă categorie
-    fireEvent.change(screen.getByLabelText(/Categoria/i), { target: { value: 'rent' } });
-    expect(onCategoryChange).toHaveBeenCalledWith('rent');
+    fireEvent.change(screen.getByLabelText(/Categoria/i), { target: { value: CategoryType.EXPENSE } });
+    expect(onCategoryChange).toHaveBeenCalledWith(CategoryType.EXPENSE);
   });
 });

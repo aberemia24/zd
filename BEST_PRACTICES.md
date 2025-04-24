@@ -37,6 +37,18 @@ Acest document centralizează deciziile și convențiile adoptate pe parcursul d
 *   **Testare Valori Inițiale (Formulare):** Evită asertarea simultană a multor valori inițiale după render. Împarte verificarea în teste `it(...)` mai mici, focalizate pe un singur câmp sau un grup mic de câmpuri. Folosește `await waitFor` pentru câmpurile predispuse la probleme de timing (date, number, checkbox). (Vezi Memorie ID: 3cb5254f)
 *   **Claritate Output Teste:** Minimizează `console.log`/`console.error` inutile în teste. Folosește reporteri Jest suplimentari (`jest-summarizing-reporter`, `jest-html-reporter`) pentru vizualizare mai bună.
 
+## Eliminarea hardcodărilor și patternuri robuste
+
+- **Enumuri**: Toate tipurile, categoriile, frecvențele sunt definite în `constants/enums.ts` și folosite exclusiv prin import.
+- **Subcategorii**: Structura completă exportată dintr-un singur fișier, importată direct în componente și teste. Helperi dedicați pentru extragere și filtrare.
+- **Texte UI**: Toate labelurile, butoanele, placeholder-ele, headerele de tabel sunt în `constants/ui.ts`.
+- **Mesaje**: Toate mesajele de validare, eroare, succes sunt în `constants/messages.ts`.
+- **Valori default**: Paginare, monedă, form state etc. în `constants/defaults.ts`.
+- **API**: Toate endpoint-urile, query params, headerele și URL-urile sunt în `constants/api.ts`.
+- **Testare**: Testele nu hardcodează opțiuni, folosesc import direct din sursa de adevăr și helperi pentru aserțiuni exhaustive. Orice modificare a structurii se reflectă automat și în teste.
+- **Documentare**: Orice convenție nouă sau lecție învățată se documentează imediat în `BEST_PRACTICES.md`, `DEV_LOG.md`, `PLAN.md` și `README.md`.
+- **Status**: Fără hardcodări în frontend. Patternul robust este respectat peste tot.
+
 ## Backend (NestJS)
 
 *   (De completat pe măsură ce avansăm)

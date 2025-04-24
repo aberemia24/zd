@@ -1,4 +1,5 @@
 import React from 'react';
+import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
 
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
@@ -22,15 +23,15 @@ export type TransactionFormProps = {
 
 // Structura completă pentru categorii și subcategorii, conform listei primite
 export const categorii: Record<string, any> = {
-  'VENITURI': [
+  [CategoryType.INCOME]: [
     'Salarii', 'Dividende', 'Chirii', 'Tichete de masă', 'Cadouri', 'Drepturi de autor', 'Pensii', 'Alocații (copil/de handicap etc.)', 'Alte venituri',
     { label: 'Report', options: ['Venituri reportate din luna anterioară.'] }
   ],
-  'ECONOMII': [
+  [CategoryType.SAVING]: [
     'Fond de urgență', 'Fond de rezervă', 'Fond general',
     { label: 'Total economii', options: ['Suma totală a economiilor din toate categoriile.'] }
   ],
-  'CHELTUIELI': [
+  [CategoryType.EXPENSE]: [
     { label: 'ÎNFĂȚIȘARE', options: [
       'Îmbrăcăminte, încălțăminte și accesorii', 'Salon de înfrumusețare', 'Produse cosmetice', 'Operații estetice', 'Produse de igienă personală', 'Produse de igienă pentru animale de companie', 'Curățătorie, călcătorie, croitorie, cizmărie', 'Îmbrăcăminte și accesorii pentru animale de companie'
     ] },
@@ -67,12 +68,12 @@ export const categorii: Record<string, any> = {
 const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, formSuccess, onChange, onSubmit, loading }) => {
   // Filtrare categorii în funcție de tip
   let categoriiFiltrate: string[] = [];
-  if (form.type === 'income') {
-    categoriiFiltrate = ['VENITURI'];
-  } else if (form.type === 'expense') {
-    categoriiFiltrate = ['CHELTUIELI'];
-  } else if (form.type === 'saving') {
-    categoriiFiltrate = ['ECONOMII'];
+  if (form.type === TransactionType.INCOME) {
+    categoriiFiltrate = [CategoryType.INCOME];
+  } else if (form.type === TransactionType.EXPENSE) {
+    categoriiFiltrate = [CategoryType.EXPENSE];
+  } else if (form.type === TransactionType.SAVING) {
+    categoriiFiltrate = [CategoryType.SAVING];
   } else {
     categoriiFiltrate = [];
   }
@@ -95,9 +96,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
         >
           {/* Placeholder-ul "Alege" apare doar dacă nu este selectat niciun tip */}
           {form.type === '' ? <option value=''>Alege</option> : null}
-          <option value='income'>Venit</option>
-          <option value='expense'>Cheltuială</option>
-          <option value='saving'>Economisire</option>
+          <option value={TransactionType.INCOME}>Venit</option>
+          <option value={TransactionType.EXPENSE}>Cheltuială</option>
+          <option value={TransactionType.SAVING}>Economisire</option>
         </select>
       </label>
       <label>
@@ -163,10 +164,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form, formError, form
           disabled={!form.recurring}
         >
           <option value=''>Alege</option>
-          <option value='zilnic'>Zilnic</option>
-          <option value='săptămânal'>Săptămânal</option>
-          <option value='lunar'>Lunar</option>
-          <option value='anual'>Anual</option>
+          <option value={FrequencyType.DAILY}>Zilnic</option>
+          <option value={FrequencyType.WEEKLY}>Săptămânal</option>
+          <option value={FrequencyType.MONTHLY}>Lunar</option>
+          <option value={FrequencyType.YEARLY}>Anual</option>
         </select>
       </label>
       <button type="submit" disabled={!!loading}>Adaugă</button>

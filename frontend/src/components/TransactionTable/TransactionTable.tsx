@@ -1,13 +1,15 @@
 import React from 'react';
+import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
+import { TABLE, BUTTONS } from '../../constants/ui';
 
 export type Transaction = {
   _id?: string;
   id?: string;
   userId?: string;
-  type: string;
+  type: TransactionType | string;
   amount: string | number;
   currency: string;
-  category: string;
+  category: CategoryType | string;
   subcategory: string;
   date: string;
   recurring?: boolean;
@@ -29,21 +31,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr>
-            <th>Tip</th>
-            <th>Sumă</th>
-            <th>Monedă</th>
-            <th>Categorie</th>
-            <th>Subcategorie</th>
-            <th>Dată</th>
-            <th>Recurent</th>
-            <th>Frecvență</th>
+            <th>{TABLE.HEADERS.TYPE}</th>
+            <th>{TABLE.HEADERS.AMOUNT}</th>
+            <th>{TABLE.HEADERS.CURRENCY}</th>
+            <th>{TABLE.HEADERS.CATEGORY}</th>
+            <th>{TABLE.HEADERS.SUBCATEGORY}</th>
+            <th>{TABLE.HEADERS.DATE}</th>
+            <th>{TABLE.HEADERS.RECURRING}</th>
+            <th>{TABLE.HEADERS.FREQUENCY}</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan={8}>Se încarcă...</td></tr>
+            <tr><td colSpan={8}>{TABLE.LOADING}</td></tr>
           ) : (transactions.length === 0 ? (
-            <tr><td colSpan={8}>Nicio tranzacție</td></tr>
+            <tr><td colSpan={8}>{TABLE.EMPTY}</td></tr>
           ) : (
             transactions.map((t, idx) => (
               <tr key={t._id || idx}>
@@ -61,9 +63,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
         </tbody>
       </table>
       <div style={{ marginTop: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button onClick={() => onPageChange(Math.max(0, offset - limit))} disabled={offset === 0}>Înapoi</button>
-        <span>Pagina {Math.floor(offset / limit) + 1} din {Math.ceil(total / limit) || 1}</span>
-        <button onClick={() => onPageChange(offset + limit)} disabled={offset + limit >= total || offset >= total}>Înainte</button>
+        <button onClick={() => onPageChange(Math.max(0, offset - limit))} disabled={offset === 0}>{BUTTONS.PREV_PAGE}</button>
+        <span>{TABLE.PAGE_INFO.replace('{current}', String(Math.floor(offset / limit) + 1)).replace('{total}', String(Math.ceil(total / limit) || 1))}</span>
+        <button onClick={() => onPageChange(offset + limit)} disabled={offset + limit >= total || offset >= total}>{BUTTONS.NEXT_PAGE}</button>
       </div>
     </div>
   );

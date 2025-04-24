@@ -107,3 +107,14 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 
 - Toate testele e2e pentru aceste funcționalități au trecut.
 
+
+## [2025-04-24] Eliminare completă hardcodări frontend
+
+- Toate hardcodările de tip, categorie, frecvență, monedă, texte UI, mesaje, valori default și endpoint-uri au fost eliminate din frontend.
+- Enumuri, structuri de categorii/subcategorii, UI, mesaje, valori default și API sunt centralizate în `constants/`.
+- Testele folosesc import direct din sursa de adevăr, fără stringuri hardcodate.
+- Pattern robust: helperi pentru extragere, aserțiuni exhaustive, orice modificare a structurii se reflectă automat și în teste.
+- Status: **FĂRĂ HARDCODĂRI - FINALIZAT**
+- Impact: mentenanță mult redusă, testare exhaustivă, consistență și siguranță crescută în evoluția codului.
+
+---

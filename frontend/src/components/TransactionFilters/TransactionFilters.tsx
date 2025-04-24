@@ -1,12 +1,14 @@
 import React from 'react';
+import { TransactionType, CategoryType } from '../../constants/enums';
+import { PLACEHOLDERS } from '../../constants/ui';
 
 interface TransactionFiltersProps {
-  type: string | undefined;
-  category: string | undefined;
-  onTypeChange: (type: string) => void;
-  onCategoryChange: (category: string) => void;
-  types: Array<{ value: string; label: string }>;
-  categories: Array<{ value: string; label: string }>;
+  type: TransactionType | '' | undefined;
+  category: CategoryType | '' | undefined;
+  onTypeChange: (type: TransactionType | '') => void;
+  onCategoryChange: (category: CategoryType | '') => void;
+  types: Array<{ value: TransactionType; label: string }>;
+  categories: Array<{ value: CategoryType; label: string }>;
 }
 
 const TransactionFilters: React.FC<TransactionFiltersProps> = ({
@@ -21,8 +23,8 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
       <label>
         Tip tranzacție:
-        <select value={type || ''} onChange={e => onTypeChange(e.target.value)}>
-          <option value="">Alege tipul</option>
+        <select value={type || ''} onChange={e => onTypeChange(e.target.value as TransactionType | '')}>
+          <option value="">{PLACEHOLDERS.SELECT} tipul</option>
           {types.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
@@ -30,8 +32,8 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
       </label>
       <label>
         Categoria:
-        <select value={category || ''} onChange={e => onCategoryChange(e.target.value)}>
-          <option value="">Alege categoria</option>
+        <select value={category || ''} onChange={e => onCategoryChange(e.target.value as CategoryType | '')}>
+          <option value="">{PLACEHOLDERS.SELECT} categoria</option>
           {categories.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}

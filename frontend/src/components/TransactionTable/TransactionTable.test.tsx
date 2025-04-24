@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import TransactionTable, { Transaction } from './TransactionTable';
+import { TransactionType, CategoryType, FrequencyType } from '../../constants/enums';
 
 describe('TransactionTable', () => {
   const baseProps = {
@@ -14,18 +15,18 @@ describe('TransactionTable', () => {
   const transactions: Transaction[] = [
     {
       _id: '1',
-      type: 'income',
+      type: TransactionType.INCOME,
       amount: '1000',
       currency: 'RON',
       category: 'Salariu',
       subcategory: 'IT',
       date: '2025-04-01',
       recurring: true,
-      frequency: 'lunar',
+      frequency: FrequencyType.MONTHLY,
     },
     {
       _id: '2',
-      type: 'expense',
+      type: TransactionType.EXPENSE,
       amount: '200',
       currency: 'RON',
       category: 'Mâncare',
@@ -50,7 +51,7 @@ describe('TransactionTable', () => {
 
   it('renders all transaction rows and fields', () => {
     render(<TransactionTable {...baseProps} transactions={transactions} />);
-    expect(screen.getAllByText('income').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(TransactionType.INCOME).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('1000').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('RON').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Salariu').length).toBeGreaterThanOrEqual(1);
@@ -59,7 +60,7 @@ describe('TransactionTable', () => {
     expect(screen.getAllByText('Da').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('lunar').length).toBeGreaterThanOrEqual(1);
 
-    expect(screen.getAllByText('expense').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(TransactionType.EXPENSE).length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('200').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Mâncare').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Supermarket').length).toBeGreaterThanOrEqual(1);
@@ -79,7 +80,7 @@ describe('TransactionTable', () => {
 
   it('handles missing/undefined optional fields gracefully', () => {
     const edgeTx: Transaction = {
-      type: 'expense',
+      type: TransactionType.EXPENSE,
       amount: '0',
       currency: '',
       category: '',
@@ -88,7 +89,7 @@ describe('TransactionTable', () => {
       // recurring and frequency omitted
     };
     render(<TransactionTable {...baseProps} transactions={[edgeTx]} />);
-    expect(screen.getByText('expense')).toBeInTheDocument();
+    expect(screen.getByText(TransactionType.EXPENSE)).toBeInTheDocument();
     expect(screen.getByText('0')).toBeInTheDocument();
     expect(screen.getAllByRole('row').length).toBeGreaterThan(1); // header + row
     expect(screen.getAllByText('Nu')[0]).toBeInTheDocument();
