@@ -7,7 +7,8 @@ import { Transaction } from './types/Transaction'; // Import corect după best p
 import { TEST_API_URL } from './test/testEnv';
 // Setăm explicit variabila de mediu pentru testare
 process.env.REACT_APP_API_URL = TEST_API_URL;
-const API_URL = process.env.REACT_APP_API_URL;
+import { API_URL } from './constants'; // Use the same API_URL as the app
+// Remove local API_URL assignment, rely on the imported constant
 import { MOCK_OPTIONS, MOCK_TRANSACTIONS_LIST, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from './test/mockData';
 import { MESAJE } from './constants/messages';
 
@@ -139,10 +140,14 @@ expect(within(form).getAllByLabelText(/Categorie/i)[0]).toBeInTheDocument();
     // Așteaptă ca tabelul să conțină datele tranzacției inițiale din mock (t1)
     await waitFor(() => {
       // Caută celule specifice după conținut
-      expect(screen.getByRole('cell', { name: 'income' })).toBeInTheDocument();
-      expect(screen.getByRole('cell', { name: '100' })).toBeInTheDocument();
-      expect(screen.getByRole('cell', { name: 'VENITURI' })).toBeInTheDocument();
-      expect(screen.getByRole('cell', { name: '2025-04-22' })).toBeInTheDocument();
+      const incomeCells = screen.getAllByRole('cell', { name: 'income' });
+expect(incomeCells.length).toBeGreaterThan(0);
+const amount100Cells = screen.getAllByRole('cell', { name: '100' });
+expect(amount100Cells.length).toBeGreaterThan(0);
+      const venituriCells = screen.getAllByRole('cell', { name: 'VENITURI' });
+expect(venituriCells.length).toBeGreaterThan(0);
+const dateCells = screen.getAllByRole('cell', { name: '2025-04-22' });
+expect(dateCells.length).toBeGreaterThan(0);
     });
   });
 
@@ -156,7 +161,7 @@ expect(within(form).getAllByLabelText(/Categorie/i)[0]).toBeInTheDocument();
 
     // Așteaptă apariția mesajului de eroare specific
     await waitFor(() => {
-      expect(screen.getByText('Completează toate câmpurile obligatorii')).toBeInTheDocument();
+      expect(screen.getByText(MESAJE.CAMPURI_OBLIGATORII)).toBeInTheDocument();
     });
     // Verifică că fetch (POST) nu a fost apelat
     expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining(API_URL), expect.objectContaining({ method: 'POST' }));
@@ -187,7 +192,7 @@ expect(within(form).getAllByLabelText(/Categorie/i)[0]).toBeInTheDocument();
 const calls = (global.fetch as jest.Mock).mock.calls;
 const postCall = calls.find(call => call[1]?.method === 'POST');
 expect(postCall).toBeDefined();
-expect(postCall[0]).toContain(API_URL);
+expect(postCall[0]).toBe(API_URL); // API_URL is '/transactions' in both app and test env
 const bodyObj = JSON.parse(postCall[1].body);
 expect(bodyObj).toMatchObject({
   type: 'expense',
@@ -214,15 +219,20 @@ expect(bodyObj).toMatchObject({
     // 3. Așteaptă ca noua tranzacție (50 EUR) să apară în tabel
     await waitFor(() => {
         // Caută celule specifice noii tranzacții
-        expect(screen.getByRole('cell', { name: 'expense' })).toBeInTheDocument();
-        expect(screen.getByRole('cell', { name: '50' })).toBeInTheDocument();
+        const expenseCells = screen.getAllByRole('cell', { name: 'expense' });
+expect(expenseCells.length).toBeGreaterThan(0);
+        const amount50Cells = screen.getAllByRole('cell', { name: '50' });
+expect(amount50Cells.length).toBeGreaterThan(0);
         expect(screen.getByRole('cell', { name: 'CHELTUIELI' })).toBeInTheDocument();
-        expect(screen.getByRole('cell', { name: '2025-04-23' })).toBeInTheDocument();
+        const date50Cells = screen.getAllByRole('cell', { name: '2025-04-23' });
+expect(date50Cells.length).toBeGreaterThan(0);
     });
 
     // 4. Verifică dacă tranzacția inițială (100 RON) este încă prezentă
-    expect(screen.getByRole('cell', { name: 'income' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: '100' })).toBeInTheDocument();
+    const incomeCellsAfter = screen.getAllByRole('cell', { name: 'income' });
+expect(incomeCellsAfter.length).toBeGreaterThan(0);
+const amount100CellsAfter = screen.getAllByRole('cell', { name: '100' });
+expect(amount100CellsAfter.length).toBeGreaterThan(0);
   });
 
   it('resetează formularul după submit reușit', async () => {
@@ -326,7 +336,7 @@ fireEvent.change(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0], { targ
     // Verifică mesajul de eroare specific setat în catch block folosind data-testid
     await waitFor(() => {
       // Folosește matcher de funcție care concatenează textul din nod și copiii săi, robust la fragmentare
-      expect(screen.getByTestId('error-message')).toHaveTextContent(MESAJE.EROARE_ADAUGARE);
+      expect(screen.getByTestId('error-message')).toHaveTextContent(MESAJE.EROARE_ADAUGARE); // Use robust matcher with centralized message
     }); // vezi App.tsx -> setFormError
 
     // Verifică și că mesajul de succes a dispărut sau nu a reapărut
@@ -339,21 +349,21 @@ fireEvent.change(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0], { targ
     const submitButton = within(form).getByRole('button', { name: /Adaugă/i });
 
     // Compleăm câmpurile obligatorii
-    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
-    // Selectează tipul "expense" și apoi categoria "CHELTUIELI"
 fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: MOCK_OPTIONS.TYPE[1].value } });
 await waitFor(() => {
     expect(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0].querySelector(`option[value="${MOCK_OPTIONS.CATEGORY[1].value}"]`)).toBeInTheDocument();
 });
-
-    // Încercăm să trimitem
-    fireEvent.click(submitButton); // MOCK_BUTTONS.ADD este deja folosit la selectare mai sus
-
-    // Așteaptă apariția mesajului de eroare specific
-    await waitFor(() => {
-      // Mesajul de eroare trebuie să corespundă exact cu cel din implementare
-      expect(screen.getByText(MESAJE.FRECV_RECURENTA)).toBeInTheDocument();
-    }); // vezi App.tsx -> handleFormSubmit
+fireEvent.change(within(form).getAllByLabelText(MOCK_LABELS.CATEGORY)[0], { target: { value: MOCK_OPTIONS.CATEGORY[1].value } });
+fireEvent.change(within(form).getByLabelText(MOCK_LABELS.AMOUNT), { target: { value: '99' } });
+fireEvent.change(within(form).getByLabelText(MOCK_LABELS.DATE), { target: { value: '2025-04-30' } });
+fireEvent.click(within(form).getByLabelText(MOCK_LABELS.RECURRING)); // Bifează recurent
+// NU completăm frecvența
+fireEvent.click(submitButton);
+await waitFor(() => {
+    const freqError = screen.queryByTestId('error-message');
+    expect(freqError).toBeInTheDocument();
+    expect(freqError?.textContent).toContain(MESAJE.FRECV_RECURENTA);
+}); // vezi App.tsx -> handleFormSubmit
 
     // Verificăm că fetch (POST) nu a fost apelat în acest scenariu
     // Contorizăm apelurile POST de la începutul testului

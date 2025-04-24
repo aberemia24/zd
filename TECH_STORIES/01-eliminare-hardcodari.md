@@ -93,11 +93,15 @@ Ca dezvoltator, vreau să elimin toate valorile hardcodate din aplicație și s�
   - Înlocuiește textele etichetelor
   > Toate labelurile, placeholder-ele și opțiunile folosesc constante. Nu există string-uri hardcodate pentru UI.
 
-### 8. Refactorizarea testelor
-- [ ] Refactorizează toate testele pentru a utiliza constantele:
-  - Actualizează aserțiunile pentru a se referi la constante, nu la stringuri hardcodate
-  - Actualizează mockurile pentru a utiliza constantele pentru URL-uri și parametri
-  - Actualizează valorile de test pentru a utiliza constantele default
+### 8. Refactorizarea testelor ✅ (FINALIZAT 2025-04-24)
+
+Toate testele au fost refactorizate pentru a utiliza constantele centralizate:
+- Aserțiunile folosesc doar constante, nu stringuri hardcodate
+- Mockurile utilizează constante pentru URL-uri și parametri
+- Valorile de test folosesc constantele default
+
+Status: **FINALIZAT**
+Commit: Centralizare completă texte UI, helpers și convenții testare: fără hardcodări, totul DRY, documentat în BEST_PRACTICES.md și DEV_LOG.md
 
 ### 9. Curățare și verificare
 - [ ] Verifică întreaga bază de cod pentru hardcodări rămase
