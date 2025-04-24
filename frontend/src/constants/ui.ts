@@ -54,6 +54,19 @@ export const LOADER = {
   TEXT: 'Se încarcă...'
 };
 
+// Texte pentru componenta ExcelGrid
+export const EXCEL_GRID = {
+  HEADERS: {
+    LUNA: 'Luna',
+    VENITURI: 'Venituri',
+    CHELTUIELI: 'Cheltuieli',
+    ECONOMII: 'Economii',
+    SOLD: 'Sold',
+  },
+  NO_DATA: 'Nu există date disponibile',
+  LOADING: 'Se încarcă datele...'
+};
+
 // Opțiuni pentru dropdown-uri (folosite în TransactionForm)
 import { TransactionType, CategoryType } from './enums';
 

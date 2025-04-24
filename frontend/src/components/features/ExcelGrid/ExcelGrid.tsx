@@ -1,4 +1,5 @@
 import React from 'react';
+import { EXCEL_GRID } from '../../../constants/ui';
 
 // Structura pentru datele lunare
 export type MonthlyData = {
@@ -24,22 +25,15 @@ const ExcelGrid: React.FC<ExcelGridProps> = ({
   loading = false,
   className = '',
 }) => {
-  // La cardul următor vom importa aceste texte din constants/ui.ts
-  // când vom avea nevoie de ele în UI real
-  const headers = {
-    LUNA: 'Luna',
-    VENITURI: 'Venituri',
-    CHELTUIELI: 'Cheltuieli',
-    ECONOMII: 'Economii',
-    SOLD: 'Sold',
-  };
+  // Folosim textele centralizate din constants/ui.ts
+  const headers = EXCEL_GRID.HEADERS;
 
   if (loading) {
-    return <div className="text-center py-8">Se încarcă datele...</div>;
+    return <div className="text-center py-8" data-testid="excel-grid-loading">{EXCEL_GRID.LOADING}</div>;
   }
 
   if (data.length === 0) {
-    return <div className="text-center py-8">Nu există date disponibile</div>;
+    return <div className="text-center py-8" data-testid="excel-grid-no-data">{EXCEL_GRID.NO_DATA}</div>;
   }
 
   return (
