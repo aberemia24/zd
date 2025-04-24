@@ -187,12 +187,14 @@ import { LABELS, BUTTONS } from '../../constants/ui';
 - Înainte de commit, verifică să nu existe fișiere generate accidental (ex: .js în test/ sau src/).
 - Orice problemă de infrastructură trebuie rezolvată imediat, nu "lăsată pe mai târziu".
 
-## 11. Frontend React & Teste (2025-04-22)
-- Orice componentă complexă (ex: formulare, tabele) trebuie extrasă ca modul separat în `src/components/ComponentName/ComponentName.tsx`.
+## 11. Frontend React & Teste (2025-04-22, actualizat 2025-04-24)
+- Componentele sunt organizate în două directoare principale:
+  - `src/components/primitives/` - componente mici, reutilizabile (Button, Input, Select, Checkbox etc.)
+  - `src/components/features/` - componente complexe, specifice aplicației (TransactionForm, TransactionTable, TransactionFilters)
 - Testele unitare pentru fiecare componentă trebuie colocate în același folder (`ComponentName.test.tsx`), nu în src/.
 - Pentru orice fetch în teste, folosește mock global din `setupTests.ts` pentru consistență și evitare erori `.then` pe undefined.
 - Orice update de stare asincronă (ex: submit, fetch) în teste trebuie să fie învelit în `await act(...)` sau `waitFor` pentru a evita warninguri și flaky tests.
-- Structura de foldere trebuie să reflecte modularitatea și separarea responsabilităților (form, table, filters etc).
+- Structura de foldere reflectă modularitatea și separarea responsabilităților (primitive/features).
 - Folosește reporteri Jest suplimentari (`jest-summarizing-reporter`, `jest-html-reporter`) pentru claritate și partajare ușoară a rezultatelor testelor.
 - Redu la minimum console noise în teste (mock console.log/error dacă e nevoie) pentru rapoarte clare.
 - Orice convenție, workaround sau lesson learned se documentează imediat în `BEST_PRACTICES.md`, `DEV_LOG.md` și memorie.
@@ -208,4 +210,28 @@ import { LABELS, BUTTONS } from '../../constants/ui';
 - Ne concentrăm pe funcționalitate, UI-ul rămâne placeholder până la definirea designului final
 - Următorul pas: finalizare funcționalitate, apoi reguli clare pentru testare E2E și stilizare
 
-_Actualizat la: 2025-04-23_
+### [2025-04-24] Refactorizare structură componente și configurare Tailwind CSS
+- Restructurare completă a directorului de componente în două subdirectoare principale:
+  - `components/primitives/`: componente mici, generice, reutilizabile (Button, Input, Select, Checkbox etc.)
+  - `components/features/`: componente complexe, specifice aplicației (TransactionForm, TransactionTable, TransactionFilters)
+- Toate importurile actualizate pentru a reflecta noua structură de directoare
+- Adăugare suport pentru Jest DOM matchers prin:
+  - Crearea fișierului `src/types/jest-dom.d.ts`
+  - Actualizarea `tsconfig.json` pentru a include tipurile necesare
+- Configurare VS Code pentru Tailwind CSS:
+  - Instalare extensie Tailwind CSS IntelliSense pentru a elimina avertismentele de directivă @apply/@tailwind
+  - Creare fișier `.vscode/settings.json` pentru a configura editorul să recunoască directivele Tailwind
+  - Adăugare comentariu `/* tailwindcss */` în fișierele CSS pentru a ajuta IntelliSense
+
+### [2025-04-24] Standardizare Tailwind CSS și componente avansate
+- Finalizarea tech story pentru implementarea Tailwind CSS ca sistem de stilizare standard
+- Componentele primitive au fost implementate cu clasele Tailwind (Button, Input, Select, etc.)
+- Utilizarea claselor Tailwind direct în componente în loc de stiluri inline (ex. App.tsx)
+- Implementarea unei componente exemplu de tip Excel-like grid (`ExcelGrid`) pentru UI-uri complexe:
+  - Utilizează clasele `excel-cell`, `excel-header` din utils.css
+  - Demonstrează layout de tip grid cu culori semantice 
+  - Oferă baza pentru funcționalități viitoare de raportare și analiză bugetară
+- Orice componentă nouă trebuie să utilizeze clasele Tailwind, nu stiluri inline sau CSS separat
+- Respectarea convenției claselor utility-first cu extragerea componentelor comune în utils.css
+
+_Actualizat la: 2025-04-24_

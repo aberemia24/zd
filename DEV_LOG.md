@@ -141,6 +141,30 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 - Convențiile și lecțiile învățate se documentează imediat în BEST_PRACTICES.md, DEV_LOG.md și în memorie.
 - Testele trebuie să fie DRY, robuste și ușor de întreținut.
 
+### [2025-04-24] Refactorizare structură componente și rezolvare avertismente Tailwind
+
+- Restructurare completă a directoarelor de componente pentru organizare clară și scalabilă:
+  - `components/primitives/`: componente mici, generice, reutilizabile (Button, Input, Select, Checkbox etc.)
+  - `components/features/`: componente complexe, specifice aplicației (TransactionForm, TransactionTable, TransactionFilters)
+- Eliminare director vechi `components/[ComponentName]`
+- Actualizare importuri în toate fișierele pentru a reflecta noua structură
+- Rezolvare erori de tipuri Jest DOM matchers prin:
+  - Adăugare fișier `src/types/jest-dom.d.ts` pentru a defini tipurile `toBeInTheDocument`, `toHaveValue`, etc.
+  - Actualizare `tsconfig.json` pentru a include tipurile necesare
+- Configurare tooling pentru Tailwind CSS:
+  - Instalare extensie VSCode Tailwind CSS IntelliSense
+  - Adăugare configurare VS Code în `.vscode/settings.json` pentru a elimina avertismentele legate de directivele Tailwind
+  - Adăugare comentariu `/* tailwindcss */` în fișierele CSS pentru a ajuta IntelliSense
+
+### [2025-04-24] Finalizare implementare Tailwind CSS și componenta Excel-like
+
+- Finalizat toate punctele din tech story pentru Tailwind CSS
+- Actualizat App.tsx pentru a folosi clase Tailwind în loc de stiluri inline
+- Verificat că componentele primitive (Button, Input, Select) sunt deja implementate și folosesc clasele Tailwind
+- Creat o componentă exemplu de tip Excel-like grid (`ExcelGrid`) care demonstrează capabilitățile Tailwind pentru UI-uri complexe
+- Implementat baza pentru funcționalitățile viitoare de raportare și analiză bugetară
+- Actualizat documentele TECH_STORIES, BEST_PRACTICES.md și memorii pentru a reflecta progresul
+
 ### [2025-04-24] Implementare sursă unică de adevăr pentru enums
 - Implementată soluția definitivă pentru regula "sursă unică de adevăr pentru enums".
 - Toate enums comune (TransactionType, CategoryType, FrequencyType) sunt acum definite și menținute exclusiv în `shared/enums.ts`.

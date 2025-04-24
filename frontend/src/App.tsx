@@ -11,11 +11,7 @@ import { MESAJE } from './constants/messages';
 import { TITLES, OPTIONS } from './constants/ui';
 import { buildTransactionQueryParams } from './utils/transactions';
 
-const appContainerStyle: React.CSSProperties = {
-  maxWidth: 900,
-  margin: '2rem auto',
-  fontFamily: 'sans-serif',
-};
+// Folosim clase Tailwind în loc de stiluri inline
 
 export 
 const App: React.FC = () => {
@@ -130,8 +126,8 @@ const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.
   };
 
   return (
-    <div style={appContainerStyle}>
-      <h1>{TITLES.TRANZACTII}</h1>
+    <div className="max-w-[900px] mx-auto my-8 font-sans">
+      <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
 
       {/* Render Transaction Form */}
       <TransactionForm
