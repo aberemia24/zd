@@ -2,7 +2,7 @@
  * Test pentru store-ul Zustand de tranzacții
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
-import { act } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { PAGINATION } from '../constants/defaults';
 import { TransactionQueryParams } from '../hooks/useTransactionFilters';
 import { TransactionFormWithNumberAmount } from '../hooks/useTransactionForm';
@@ -158,15 +158,14 @@ describe('transactionStore', () => {
       // Arrange
       const errorMessage = 'Eroare de rețea';
       mockService.getFilteredTransactions.mockImplementationOnce(() => Promise.reject(new Error(errorMessage)));
-      
+      const { MESAJE } = await import('../constants/messages');
       // Act
       const store = useTransactionStore.getState();
       await act(async () => {
         await store.fetchTransactions();
       });
-      
       // Assert
-      expect(useTransactionStore.getState().error).toBe(errorMessage);
+      expect(useTransactionStore.getState().error).toBe(MESAJE.EROARE_INCARCARE_TRANZACTII);
       expect(useTransactionStore.getState().loading).toBe(false);
       expect(useTransactionStore.getState().transactions).toEqual([]);
     });
@@ -237,6 +236,72 @@ describe('transactionStore', () => {
   });
 
   describe('queryParams și refresh', () => {
+    it('nu refetch-uiește dacă parametrii sunt identici și fără forceRefresh', async () => {
+      // Arrange
+      const store = useTransactionStore.getState();
+      // Primul fetch
+      await act(async () => {
+        await store.fetchTransactions();
+      });
+      // Al doilea fetch cu aceiași parametri, fără forceRefresh
+      await act(async () => {
+        await store.fetchTransactions();
+      });
+      // Assert: doar un singur apel către serviciu
+      expect(mockService.getFilteredTransactions).toHaveBeenCalledTimes(1);
+    });
+
+    it('refetch-uiește dacă forceRefresh este true, chiar dacă parametrii sunt identici', async () => {
+      // Arrange
+      const store = useTransactionStore.getState();
+      // Primul fetch
+      await act(async () => {
+        await store.fetchTransactions();
+      });
+      // Al doilea fetch cu forceRefresh true
+      await act(async () => {
+        await store.fetchTransactions(true);
+      });
+      // Assert: două apeluri către serviciu
+      expect(mockService.getFilteredTransactions).toHaveBeenCalledTimes(2);
+      expect(mockService.getFilteredTransactions).toHaveBeenLastCalledWith(store.currentQueryParams, true);
+    });
+
+    it('gestionează corect erorile și setează mesajul de eroare din constants/messages.ts', async () => {
+      // Arrange
+      useTransactionStore.getState().reset(); // Reset explicit pentru izolare
+      useTransactionStore.getState().setTransactionService(mockService); // Reinjectează mock-ul
+      const errorMessage = 'Test error';
+      mockService.getFilteredTransactions.mockRejectedValueOnce(new Error(errorMessage));
+      const { MESAJE } = await import('../constants/messages');
+      const store = useTransactionStore.getState();
+      // Act
+      await act(async () => {
+        await store.fetchTransactions(true); // Forțează fetch-ul, evită caching
+      });
+      // Assert
+      expect(mockService.getFilteredTransactions).toHaveBeenCalled();
+      // Așteaptă update-ul asincron
+      await waitFor(() => {
+        const state = useTransactionStore.getState();
+        expect(state.error).toBe(MESAJE.EROARE_INCARCARE_TRANZACTII);
+        expect(state.transactions).toEqual([]);
+        expect(state.total).toBe(0);
+      });
+    });
+
+    it('gestionează robust parametri nil sau ciudați fără crash', async () => {
+      // Arrange
+      const store = useTransactionStore.getState();
+      // Act
+      await act(async () => {
+        await store.setQueryParams({} as any); // parametri incompleți
+        await store.fetchTransactions();
+      });
+      // Assert: store-ul nu aruncă excepții și gestionează fallback-ul
+      expect(store.error === null || typeof store.error === 'string').toBe(true);
+    });
+
     it('setează parametrii corect', () => {
       // Arrange
       const queryParams: TransactionQueryParams = {

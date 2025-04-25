@@ -256,6 +256,15 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 #### Pași următori:
 
 1. Implementarea testelor pentru App.tsx refactorizat
+
+---
+
+### [2025-04-25] Decizie arhitecturală: un singur store Zustand
+
+- În acest moment există un singur store Zustand (`useTransactionStore`), dedicat tranzacțiilor.
+- Fragmentarea pe mai multe store-uri nu este necesară la nivelul actual de funcționalitate.
+- Dacă vor apărea noi domenii (ex: utilizatori, rapoarte, setări), arhitectura permite extinderea cu store-uri dedicate, conform best practices.
+- Decizia este documentată și în tech story și best practices.
 2. Integrarea completă a tuturor componentelor în aplicație
 3. Verificarea coerentei și consistenței UI/UX în urma refactorizării
 
@@ -297,6 +306,17 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 
 ### [2025-04-25] Refactorizare cu Custom Hooks și Pattern-ul Service
 
+---
+
+## Lecții din debugging-ul Zustand (aprilie 2025)
+- Caching-ul store-ului trebuie invalidat explicit după orice operație CRUD (save/remove/reset), altfel fetch-ul poate fi blocat de parametrii identici.
+- Pentru error handling, folosește mereu mesajele din `constants/messages.ts`, nu stringuri hardcodate sau fallback-uri inutile.
+- În testele Zustand, folosește mereu `getState()` proaspăt după acțiuni asincrone pentru a verifica starea actualizată; nu păstra referințe vechi la store.
+- Pentru asserts pe starea asincronă, folosește `waitFor` de la `@testing-library/react`, nu expect direct după act.
+- Testele trebuie să reseteze store-ul și să reinjecteze mock-urile înainte de fiecare test pentru izolare completă.
+- Dacă store-ul nu setează error, verifică dacă cheia din `constants/messages.ts` există și nu are typo.
+
+
 - Finalizată refactorizarea `App.tsx` utilizând pattern-ul de custom hooks și servicii:
   - `useTransactionForm`: Gestionează starea formularului, validarea și reset la submit
   - `useTransactionFilters`: Gestionează filtrarea și paginarea rezultatelor
@@ -315,3 +335,9 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
   - Optimizare performance pentru cache-ul din TransactionService
   - Documentare completă în BEST_PRACTICES.md a pattern-ului de hook-uri+servicii
 
+
+### [2025-04-25] Migrare și testare useTransactionFilters la Zustand
+- Implementat store Zustand pentru filtre tranzacții cu selectors ca funcții, acțiuni și reset.
+- Teste TDD, colocate, robuste, fără hardcodări (import sursă de adevăr).
+- Am folosit workaround pentru mock-uri Jest/TypeScript (doar metode publice).
+- A fost necesară configurare Jest/ts-jest pentru suport TypeScript modern.

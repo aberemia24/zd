@@ -328,6 +328,15 @@ _Actualizat la: 2025-04-25_
 
 #### Pattern-uri pentru testarea store-urilor Zustand
 
+##### [2025-04-25] Best practices extrase din migrarea useTransactionFilters la Zustand
+- Folosește selectors ca funcții, nu ca proprietăți, pentru performanță și testabilitate.
+- Importă valorile implicite și enums doar din sursa de adevăr (`constants/defaults.ts`, `constants/enums.ts`).
+- Testele pentru store-uri trebuie să fie colocate, independente și să acopere toate ramurile (inițializare, setare, paginare, reset, edge cases).
+- Pentru mock-uri Jest cu TypeScript, mock-uiește doar metodele publice, nu proprietăți private (vezi workaround memorii).
+- TDD strict: întâi scrii testul, apoi implementarea.
+- Asigură-te că Jest/ts-jest este configurat corect pentru a permite testarea TypeScript modern.
+
+
 - **Setup test**
   - Folosește `jest.mock()` la nivel de modul pentru servicii
   - Izolează fiecare test cu `beforeEach(() => store.reset())`

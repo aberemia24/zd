@@ -16,6 +16,8 @@ interface TransactionState {
   transactions: Transaction[];
   total: number;
   currentQueryParams: TransactionQueryParams;
+  // Intern: pentru caching parametri fetch
+  _lastQueryParams?: TransactionQueryParams;
   
   // Stare UI
   loading: boolean;
@@ -101,17 +103,27 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   setTransactionService: (service) => set({ transactionService: service }),
   
   // Operațiuni asincrone
+  // Referință internă pentru caching parametri
+  _lastQueryParams: undefined as TransactionQueryParams | undefined,
+
   fetchTransactions: async (forceRefresh = false) => {
-    const { transactionService, currentQueryParams } = get();
-    
+    const { transactionService, currentQueryParams, _lastQueryParams, setError } = get();
+
+    // Caching: nu refetch dacă parametrii identici și fără forceRefresh
+    if (!forceRefresh && _lastQueryParams && JSON.stringify(_lastQueryParams) === JSON.stringify(currentQueryParams)) {
+      set({ loading: false });
+      return;
+    }
+
     set({ loading: true, error: null });
-    
+
     try {
+      // Actualizează referința
+      set({ _lastQueryParams: { ...currentQueryParams } });
       const response = await transactionService.getFilteredTransactions(
         currentQueryParams,
         forceRefresh
       );
-      
       set({ 
         transactions: response.data,
         total: response.total,
@@ -123,7 +135,7 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
         transactions: [],
         total: 0,
         loading: false,
-        error: err instanceof Error ? err.message : MESAJE.EROARE_NECUNOSCUTA
+        error: MESAJE.EROARE_INCARCARE_TRANZACTII
       });
     }
   },
@@ -138,12 +150,14 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     
     try {
       result = await transactionService.saveTransaction(data, id);
+      // Resetăm cache-ul pentru a forța reîncărcarea
+      set({ _lastQueryParams: undefined });
       // După salvare, reîmprospătăm lista de tranzacții
-      get().fetchTransactions();
+      await get().fetchTransactions();
       return result;
     } catch (err) {
       console.error(MESAJE.LOG_EROARE_SALVARE, err);
-      set({ error: err instanceof Error ? err.message : MESAJE.EROARE_NECUNOSCUTA });
+      set({ error: MESAJE.EROARE_SALVARE_TRANZACTIE });
       throw err; // Propagăm eroarea pentru a o putea gestiona în componente
     }
   },
@@ -153,11 +167,13 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     
     try {
       await transactionService.removeTransaction(id);
+      // Resetăm cache-ul pentru a forța reîncărcarea
+      set({ _lastQueryParams: undefined });
       // După ștergere, reîmprospătăm lista de tranzacții
-      get().fetchTransactions();
+      await get().fetchTransactions();
     } catch (err) {
       console.error(MESAJE.LOG_EROARE_STERGERE, err);
-      set({ error: err instanceof Error ? err.message : MESAJE.EROARE_NECUNOSCUTA });
+      set({ error: MESAJE.EROARE_STERGERE_TRANZACTIE });
       throw err; // Propagăm eroarea pentru a o putea gestiona în componente
     }
   },
@@ -173,6 +189,7 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     },
     loading: false,
     error: null,
+    _lastQueryParams: undefined,
     // Nu resetăm transactionService pentru a păstra dependency injection
   }),
 });
