@@ -199,3 +199,83 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
   - Compatibilitate 100% cu toolchain-ul existent
 - Toate testele rulează și trec fără erori.
 
+### [2025-04-25] Refactorizare App.tsx cu Custom Hooks și Pattern-ul Service
+
+#### Arhitectură modulară și separarea responsabilităților
+- Finalizată refactorizarea `App.tsx` utilizând arhitectura cu custom hooks și servicii:
+  - `useTransactionForm`: Gestionează starea formularului, validarea datelor, reset după submit și mesaje de eroare/succes
+  - `useTransactionFilters`: Encapsulează toată logica de filtrare, paginare și sortare
+  - `useTransactionData`: Gestionează fetch-ul datelor de la API, caching, loading și erori
+  - `TransactionService`: Serviciu pentru logica de business, transformare date și caching optimizat
+  - `TransactionApiClient`: Client pentru comunicația cu API-ul, gestionarea erorilor și serializarea datelor
+
+#### Rescrierea testelor pentru App.tsx folosind pattern-ul de hooks și servicii mockate
+- Rescrise complet testele pentru `App.tsx` conform cu noua arhitectură:
+  - Folosirea mock-urilor pentru hook-uri și servicii în loc de a mocka direct fetch
+  - Testarea comportamentului în loc de implementare
+  - Consolidarea testelor de recurentă din `App.recur.test.tsx` în suita principală `App.test.tsx`
+- Avantaje ale noii abordări de testare:
+  - Teste mai robuste, mai reziliente la refactorizări viitoare
+  - Izolarea perfectă a componentelor și dependențelor
+  - Testabilitate mult mai bună pentru cazurile de eroare și edge cases
+  - Acoperire completă a funcționalităților de formulare recurente
+  - Respectarea pattern-ului arhitectural de separare a responsabilităților
+
+#### Implemementarea hook-urilor și serviciilor
+- Toate hook-urile implementate cu API consistent, folosind `useState`, `useCallback` și `useEffect`
+- Dependency injection la toate nivelurile pentru testabilitate maximă 
+- Tipuri TypeScript complete pentru toate componentele, hook-urile și serviciile
+- Respectarea pattern-ului de barrel exports prin fișiere `index.ts` pentru simplificarea importurilor
+
+#### Teste complete pentru toate componentele noi
+- Implementate teste pentru toate hook-urile și serviciile create  
+- Corectată problema cu URL constructor pentru a suporta atât URL-uri absolute cât și relative
+- Utilizare metode avansate de mockare pentru clase cu proprietăți private 
+- Testing pentru scenarii de edge case și eroare
+- Executate și verificate peste 30 de teste pentru hooks și servicii
+
+#### Optimizări de cache pentru performanță
+- Implementat mecanism de cache LRU (Least Recently Used) în `TransactionService`
+- Invalidare selectivă a cache-ului în funcție de tipul operațiunii (create, update, delete)
+- Limitare a dimensiunii cache-ului pentru a preveni consumul excesiv de memorie
+- Statistici de performanță (cache hits, misses, ratio) pentru monitorizare
+- Configurabilitate completă (timp expirare cache, limită maximă intrări)
+
+#### Lecții învățate:
+
+1. **Importuri și Barrel Exports**: La utilizarea pattern-ului de "barrel exports" (export centralizat prin `index.ts`), e important să evităm importurile circulare. Soluția a fost restructurarea importurilor și utilizarea ierarhiei clare de dependențe între hook-uri.
+
+2. **Mockuri pentru Clase**: Pentru testarea serviciilor cu proprietăți private, metoda optimală este folosirea `jest.mock()` la nivel de modul cu implementare de mock pentru metodele publice, nu încercarea de a mocka proprietățile private direct.
+
+3. **URL Constructor în Node/Jest**: Clasa URL din JavaScript necesită o bază absolută validă pentru a funcționa. Pentru a suporta atât URL-uri relative cât și absolute, am implementat o soluție hibridă care detectează tipul URL-ului și aplică logica adecvată.
+
+4. **Testare Async cu Promisiuni**: Pentru testele asincrone, controlul direct al rezolvării promisiunilor din teste oferă rezultate mai predictibile decât a ne baza exclusiv pe mecanismul `async/await` al Jest. Am implementat rezolvarea explicită a promisiunilor pentru teste mai robuste.
+
+5. **Cache Invalidation Selectivă**: În loc să invalidăm tot cache-ul la fiecare operațiune de scriere, am descoperit că invalidarea selectivă bazată pe conținut și ID-uri reduce dramatic numărul de apeluri API redundante.
+
+#### Pași următori:
+
+1. Implementarea testelor pentru App.tsx refactorizat
+2. Integrarea completă a tuturor componentelor în aplicație
+3. Verificarea coerentei și consistenței UI/UX în urma refactorizării
+
+### [2025-04-25] Refactorizare cu Custom Hooks și Pattern-ul Service
+
+- Finalizată refactorizarea `App.tsx` utilizând pattern-ul de custom hooks și servicii:
+  - `useTransactionForm`: Gestionează starea formularului, validarea și reset la submit
+  - `useTransactionFilters`: Gestionează filtrarea și paginarea rezultatelor
+  - `useTransactionData`: Encapsulează logica de fetch și interacțiune cu API-ul
+  - `TransactionService`: Serviciu pentru operațiuni de business logic/API
+  - `TransactionApiClient`: Client pentru comunicație directă cu API-ul backend
+
+- Lecții învățate:
+  - **Importuri Circulare**: La utilizarea pattern-ului de "barrel exports" cu index.ts, trebuie avut grijă la referințele circulare între hook-uri. Este recomandat ca fiecare hook să fie independent sau să utilizeze un sistem ierarhic clar de dependențe.
+  - **Mock-uri pentru Clase cu Proprietăți Private**: Pentru testele care necesită servicii cu proprietăți private, este mai bine să folosim `jest.mock()` la nivel de modul și să mock-uim metode publice, nu proprietățile private direct.
+  - **URL Constructor în Context Node/Jest**: Clasa URL din JavaScript necesită o bază validă (protocol + domeniu) pentru a funcționa corect. Pentru URL-uri relative, este necesară implementarea unei alternative robuste care să poată gestiona atât URL-uri absolute cât și relative.
+  - **Testing Async cu Promise Mocking**: Pentru testarea codului asincron, este mai robust să controlăm direct rezolvarea promisiunilor din teste, în loc să ne bazăm pe mecanismul `async/await` al Jest care poate fi imprevizibil în anumite scenarii.
+
+- Pași următori:
+  - Implementarea testelor pentru App.tsx refactorizat
+  - Optimizare performance pentru cache-ul din TransactionService
+  - Documentare completă în BEST_PRACTICES.md a pattern-ului de hook-uri+servicii
+

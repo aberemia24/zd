@@ -1,129 +1,89 @@
-// Componenta principală a aplicației
+// Componenta principală a aplicației - refactorizată cu Custom Hooks și Servicii
 import React from 'react';
-import TransactionForm, { TransactionFormData } from './components/features/TransactionForm/TransactionForm';
+import TransactionForm from './components/features/TransactionForm/TransactionForm';
 import TransactionTable from './components/features/TransactionTable/TransactionTable';
-import { Transaction } from './types/Transaction';
-
-import { API_URL, PAGINATION, FORM_DEFAULTS, INITIAL_FORM_STATE } from './constants/index';
-import { TransactionType, CategoryType } from './constants/enums';
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
-import { MESAJE } from './constants/messages';
-import { TITLES, OPTIONS } from './constants/ui';
-import { buildTransactionQueryParams } from './utils/transactions';
+import { OPTIONS, TITLES } from './constants/ui';
 
-// Folosim clase Tailwind în loc de stiluri inline
+// Import custom hooks
+import { useTransactionForm, useTransactionFilters, useTransactionData, TransactionFormWithNumberAmount } from './hooks';
 
-export 
-const App: React.FC = () => {
-  console.log('App loaded');
-  const [transactions, setTransactions] = React.useState<Transaction[]>([]);
-  // Starea formularului de tranzacție (fără câmpul 'currency')
-const [form, setForm] = React.useState<TransactionFormData>({ ...INITIAL_FORM_STATE });
-  const [formError, setFormError] = React.useState('');
-  const [formSuccess, setFormSuccess] = React.useState('');
-  // State for filtering/pagination
-  const [filterType, setFilterType] = React.useState<TransactionType | '' | undefined>(undefined);
-  const [filterCategory, setFilterCategory] = React.useState<CategoryType | '' | undefined>(undefined);
-  const [limit, setLimit] = React.useState<number>(PAGINATION.DEFAULT_LIMIT);
-  const [offset, setOffset] = React.useState<number>(PAGINATION.DEFAULT_OFFSET);
-  const [sort, setSort] = React.useState<string>(PAGINATION.DEFAULT_SORT); // default sort
-  const [total, setTotal] = React.useState<number>(0);
-  const [loadingFetch, setLoadingFetch] = React.useState(false);
-  const [loadingSubmit, setLoadingSubmit] = React.useState(false);
-  // Trigger suplimentar pentru reîncărcare tranzacții
-  const [reloadTransactions, setReloadTransactions] = React.useState(0);
+// Import servicii
+import { TransactionService } from './services';
 
-  React.useEffect(() => {
-    console.log("App loaded", { filterType, filterCategory, limit, offset, sort });
-    setLoadingFetch(true);
-    const queryString = buildTransactionQueryParams({ type: filterType, category: filterCategory, limit, offset, sort });
-    fetch(`${API_URL}?${queryString}`)
-      .then(res => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        if (data && typeof data === 'object') {
-          setTransactions(Array.isArray(data.data) ? data.data : []);
-          setTotal(typeof data.total === 'number' ? data.total : 0);
-          setLimit(typeof data.limit === 'number' ? data.limit : 10); // Use default if invalid
-          setOffset(typeof data.offset === 'number' ? data.offset : 0); // Use default if invalid
-        } else {
-          console.error("Received unexpected data structure:", data);
-          setTransactions([]);
-          setTotal(0);
-        }
-      })
-      .catch(error => {
-        console.error("Fetch error:", error);
-        setTransactions([]);
-        setTotal(0);
-      })
-      .finally(() => setLoadingFetch(false));
-  }, [filterType, filterCategory, limit, offset, sort, reloadTransactions]);
+/**
+ * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
+ * 
+ * Structura:
+ * - useTransactionForm: gestionează starea și validarea formularului
+ * - useTransactionFilters: gestionează filtrele, paginarea și sortarea
+ * - useTransactionData: gestionează datele despre tranzacții și comunică cu API-ul
+ * 
+ * Această structură separă clar logica de business de UI, crescând testabilitatea, 
+ * mentenabilitatea și facilitând extinderea ulterioară.
+ */
+export const App: React.FC = () => {
+  // Initializăm serviciile
+  const transactionService = React.useMemo(() => new TransactionService(), []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    // La orice modificare, resetăm mesajele de succes/eroare pentru UX și teste stabile
-    setFormSuccess('');
-    setFormError('');
-    const { name, value, type: inputType } = e.target;
-    const isCheckbox = e.target instanceof HTMLInputElement && inputType === 'checkbox';
-    const checkedValue = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
+  // Folosim hook-ul pentru filtre și paginare
+  const {
+    filterType,
+    filterCategory,
+    limit,
+    offset,
+    currentPage,
+    setFilterType,
+    setFilterCategory,
+    nextPage,
+    prevPage,
+    goToPage,
+    queryParams
+  } = useTransactionFilters();
 
-    setForm(prev => ({
-      ...prev,
-      [name]: isCheckbox ? checkedValue : value,
-      // Reset frequency la orice schimbare a recurenței (bifat sau debifat)
-      ...(name === 'recurring' && isCheckbox && { frequency: '' })
-    }));
-  };
+  // Folosim hook-ul pentru date
+  const {
+    transactions,
+    total,
+    loading: loadingFetch,
+    error: fetchError,
+    refresh: refreshTransactions
+  } = useTransactionData({
+    queryParams,
+    transactionService
+  });
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.type || !form.amount || !form.category || !form.date) {
-      setFormError(MESAJE.CAMPURI_OBLIGATORII);
-      setFormSuccess('');
-      return;
-    }
-    if (form.recurring && !form.frequency) {
-      setFormError(MESAJE.FRECV_RECURENTA);
-      setFormSuccess('');
-      return;
-    }
-    setFormError('');
-    setLoadingSubmit(true); // Indicate loading during submit
-    // La submit, adaugăm manual 'currency: "RON"' în payload
-const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.CURRENCY };
+  // Callback pentru trimiterea formularului
+  const handleFormSubmit = React.useCallback(async (formData: TransactionFormWithNumberAmount) => {
     try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error(MESAJE.EROARE_ADAUGARE);
-      setFormSuccess(MESAJE.SUCCES_ADAUGARE);
-      setFormError('');
-      // Resetare completă a formularului după submit reușit
-      setForm({ type: '', amount: '', category: '', subcategory: '', date: '', recurring: false, frequency: '' });
-      // Nu ștergem mesajul de succes imediat pentru a permite testelor să-l detecteze
-      setOffset(0); // Reîncarcă tranzacțiile de la pagina 1
-      setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții
-    } catch (err) {
-      console.error("Submit error:", err);
-      setFormError(MESAJE.EROARE_ADAUGARE);
-      setReloadTransactions(rt => rt + 1); // Forțează fetch tranzacții și la POST eșuat
-    } finally {
-      // Resetăm loading specific pentru submit, independent de useEffect
-      setLoadingSubmit(false);
+      // Salvăm tranzacția folosind serviciul
+      await transactionService.saveTransaction(formData);
+      // Forțăm reîncărcarea listei de tranzacții
+      refreshTransactions();
+      return true;
+    } catch (error) {
+      console.error('Eroare la salvarea tranzacției:', error);
+      return false;
     }
-  };
+  }, [transactionService, refreshTransactions]);
 
+  // Folosim hook-ul pentru formular
+  const {
+    form,
+    error: formError,
+    success: formSuccess,
+    loading: loadingSubmit,
+    handleChange,
+    handleSubmit,
+    resetForm
+  } = useTransactionForm({
+    onSubmit: handleFormSubmit
+  });
 
-  const handlePageChange = (newOffset: number) => {
-    setOffset(newOffset);
-  };
+  // Callback pentru schimbarea paginii
+  const handlePageChange = React.useCallback((newOffset: number) => {
+    goToPage(Math.floor(newOffset / limit) + 1);
+  }, [goToPage, limit]);
 
   return (
     <div className="max-w-[900px] mx-auto my-8 font-sans">
@@ -135,7 +95,7 @@ const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.
         formError={formError}
         formSuccess={formSuccess}
         onChange={handleChange}
-        onSubmit={handleFormSubmit}
+        onSubmit={handleSubmit}
         loading={loadingSubmit}
       />
 
@@ -158,6 +118,13 @@ const payload = { ...form, amount: Number(form.amount), currency: FORM_DEFAULTS.
         limit={limit}
         onPageChange={handlePageChange}
       />
+
+      {/* Afișare erori de la API */}
+      {fetchError && (
+        <div className="mt-4 p-2 bg-red-100 text-red-700 rounded">
+          {fetchError}
+        </div>
+      )}
     </div>
   );
 };

@@ -234,4 +234,62 @@ import { LABELS, BUTTONS } from '../../constants/ui';
 - Orice componentă nouă trebuie să utilizeze clasele Tailwind, nu stiluri inline sau CSS separat
 - Respectarea convenției claselor utility-first cu extragerea componentelor comune în utils.css
 
-_Actualizat la: 2025-04-24_
+_Actualizat la: 2025-04-25_
+
+### [2025-04-25] Optimizări cache pentru servicii
+
+#### Pattern-ul service cu invalidare inteligentă a cache-ului
+- **Principii de design**
+  - Caching optimizat cu invalidare selectivă a cache-ului în funcție de operațiuni (create, update, delete)
+  - Politica LRU (Least Recently Used) pentru limitarea memoriei consumate și eliminarea automată a intrărilor vechi
+  - Monitorizare performanță prin statistici (hits, misses, ratio) în cadrul serviciilor
+
+- **Implementare TransactionService**
+  - La creare de tranzacții: Invalidare doar a paginilor afectate (prima pagină din fiecare categorie de sortare)
+  - La actualizare/ștergere: Invalidare doar a paginilor care conțin tranzacția modificată
+  - Limită configurabilă a mărimii totale a cache-ului (parametrul `maxCacheEntries`)
+  - Timp de expirare configurabil pentru intrările din cache (`cacheTimeMs`)
+
+### [2025-04-25] Testarea componentelor React cu hooks și servicii
+
+#### Pattern de testare pentru componente cu hooks și servicii
+
+- **Principii de testare**
+  - Mock-uri pentru hooks și servicii în locul mock-urilor directe pentru APIs (fetch)
+  - Testarea comportamentului componentelor, nu a implementării interne
+  - Separarea clară a test fixtures, mock-uri și expects pentru a crește lizibilitatea și mentenabilitatea
+  - Utilizarea `beforeEach` pentru a reseta mock-urile între teste și pentru a evita interferențele
+
+- **Implementare mock-uri pentru hooks și servicii**
+  - Mockați hook-urile direct prin `jest.mock('./cale/la/hooks')` cu implementarea mock a comportamentului
+  - Pentru evenimente de form, implementați funcțiile de callback care simulează comportamentul real
+  - Definiți tipurile corecte pentru parametrii cum ar fi `onSubmit` pentru a evita erorile TypeScript
+  - Izolați testele folosind mock-uri granulare care pot fi configurate pentru fiecare test în parte
+
+- **Exemple de bune practici**
+  - Mockați hook-urile pentru a primi parametri și a returna valori controlate în test, nu hardcodate
+  - Testează comportamentul general, cum ar fi: afișarea corectă a datelor, comportamentul la încărcare și erori
+  - Pentru teste de interacțiune, verificați că handler-ele pentru evenimente sunt apelate cu parametrii corecți
+  - Testează starea initială, după acțiuni, și fluxul complet pentru cazurile critice (tranzacții recurente)
+
+- **Pentru componente cu tranzacții recurente**
+  - Verificați dacă toggleul de recurentă dezactivează/activează corect selectorul de frecvență
+  - Testează validarea: submitul nu ar trebui să funcționeze pentru tranzacții recurente fără frecvență selectată
+  - Verificați salvarea corectă a unei tranzacții recurente complete și apelul la funcția de refresh
+
+- **Testare cache**
+  - Teste pentru toate scenariile de invalidare (creare, actualizare, ștergere)
+  - Teste pentru limită maximă și algoritm LRU
+  - Teste pentru expirare cache și statistici
+  - Mock-uri adecvate pentru controlul condițiilor de testare
+
+- **Beneficii dovedite**
+  - Reducere dramatică a numărului de cereri API pentru scenarii comune (navigare între pagini, filtrare, sortare)
+  - Consum controlat de memorie chiar și pentru aplicații cu multe date
+  - Scalare naturală pentru aplicații complexe
+  - Debugging ușor prin metode de monitorizare (getCacheStats)
+
+- **Caching și testabilitate**
+  - Dependency injection completă (apiClient, cacheTimeMs, maxCacheEntries) pentru testare
+  - Toate deciziile de cache sunt testabile și configurabile
+  - Pattern-ul poate fi aplicat pentru orice serviciu care interacționează cu API-ul

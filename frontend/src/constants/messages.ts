@@ -6,6 +6,7 @@ export const MESAJE = {
   SUCCES_ADAUGARE: 'Tranzacție adăugată cu succes',
   EROARE_GENERALA: 'A apărut o eroare neașteptată. Încearcă din nou sau contactează suportul.',
   EROARE_TITLU: 'Eroare neașteptată',
+  EROARE_FORMAT_DATE: 'Format de date invalid sau neașteptat de la server.',
   SUCCES_EDITARE: 'Tranzacție editată cu succes',
   SUCCES_STERGERE: 'Tranzacție ștearsă cu succes',
   CONFIRMARE_STERGERE: 'Sigur vrei să ștergi această tranzacție? Această acțiune nu poate fi anulată.',
