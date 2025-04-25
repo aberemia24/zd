@@ -293,3 +293,73 @@ _Actualizat la: 2025-04-25_
   - Dependency injection completă (apiClient, cacheTimeMs, maxCacheEntries) pentru testare
   - Toate deciziile de cache sunt testabile și configurabile
   - Pattern-ul poate fi aplicat pentru orice serviciu care interacționează cu API-ul
+
+### [2025-04-25] State Management cu Zustand
+
+#### Principii generale pentru store-uri Zustand
+
+- **Organizare și nomenclatură**
+  - Store-urile se definesc în fișiere dedicate în directorul `frontend/src/stores/`
+  - Numele store-urilor urmează formatul `use[DomeniuFuncțional]Store` (ex: `useTransactionStore`)
+  - Fiecare store are propriul său fișier de test colocat (ex: `transactionStore.test.ts`)
+  - Interfețele store-urilor sunt exportate pentru a permite reutilizarea și extensia tipurilor
+
+- **Structura store-urilor**
+  - Fiecare store trebuie să aibă secțiuni clar delimitate pentru:
+    - Stare (data și metadate)
+    - Stare UI (loading, error, etc)
+    - Setteri simpli (pentru actualizări atomice)
+    - Acțiuni complexe (operațiuni asincrone, efecte secundare)
+    - Utilități (reset, selectors, etc)
+  - Valori implicite pentru state importate din `constants/defaults.ts`
+  - Toate enum-urile importate din sursa unică de adevăr (shared via constants/enums.ts)
+
+- **Dependency Injection**
+  - Serviciile (ex: TransactionService) sunt injectate în store pentru testabilitate
+  - O metodă dedicată `setService` este expusă pentru înlocuirea serviciilor în teste
+  - Stores nu instanțiază direct alte store-uri pentru a evita dependențe circulare
+
+- **Anti-patterns de evitat**
+  - Aglomerarea unui singur store cu prea multă logică (preferă store-uri mici, dedicate)
+  - Definirea tipurilor serviciilor direct în store (importă din sursa originală)
+  - Hardcodarea valorilor default (folosește constants/defaults.ts)
+  - Accesul direct la store din alt store (poate duce la dependențe circulare)
+  - Mutarea logicii de business din servicii în store-uri
+
+#### Pattern-uri pentru testarea store-urilor Zustand
+
+- **Setup test**
+  - Folosește `jest.mock()` la nivel de modul pentru servicii
+  - Izolează fiecare test cu `beforeEach(() => store.reset())`
+  - Injectează servicii mock prin `store.setService(mockService)`
+  - Învelește acțiunile care modifică state în `act(() => ...)` pentru teste React
+
+- **Testare acțiuni asincrone**
+  - Învelește toate acțiunile asincrone în `await act(async () => { await store.action() })`
+  - Mockează serviciile pentru a returna date controlate sau a arunca erori specifice
+  - Testează întregul ciclu de viață: loading → success/error → state final
+
+- **Testare selectors**
+  - Utilizează `mockState` cu date controlate pentru a testa selectors izolat
+  - Verifică comportamentul corect cu date variate (limite, cazuri extreme)
+  - Testează memoizarea pentru a confirma re-calcularea doar când se schimbă dependențele
+
+#### Migrare incrementală de la hooks la store-uri
+
+- **Abordare graduală**
+  - Menține compatibilitatea cu hooks existente în perioada de tranziție
+  - Începe cu migrarea hook-urilor pentru date (useTransactionData) care sunt cel mai apropiate de conceptul de store
+  - Continuă cu hook-uri pentru filtre și sortare, apoi formulare
+  - Rulează teste pentru ambele implementări în paralel
+
+- **Refactorizare componente**
+  - Înlocuiește prop drilling cu accesul direct la store unde are sens
+  - Pentru componente pure, continuă să folosești props pentru a menține testabilitatea
+  - Împarte componentele complexe în containere (cu acces la store) și componente prezentaționale
+
+- **Performanță**
+  - Folosește selectors pentru acces la state pentru a preveni re-renderizări inutile
+  - Actualizează doar părțile de state care s-au schimbat efectiv
+  - Utilizează devtools Zustand pentru a inspecta actualizările de state
+
+_Actualizat la: 2025-04-25_

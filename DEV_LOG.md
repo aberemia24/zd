@@ -259,6 +259,42 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 2. Integrarea completă a tuturor componentelor în aplicație
 3. Verificarea coerentei și consistenței UI/UX în urma refactorizării
 
+### [2025-04-25] Implementare Zustand pentru state management centralizat
+
+#### Arhitectură implementată
+- Implementată soluția Zustand pentru gestionarea centralizată a stării aplicației
+- Creat directorul dedicat pentru store-uri: `frontend/src/stores/`
+- Implementat primul store pentru tranzacții: `transactionStore.ts`
+- Definit tipuri complete TypeScript pentru interfața store-ului
+- Test complet TDD pentru store-ul de tranzacții
+- Abordare incrementală pentru migrarea de la custom hooks la Zustand
+
+#### Pattern-uri implementate pentru Zustand
+- Dependency injection pentru `TransactionService` în store pentru testabilitate
+- Valori implicite pentru parametrii de query, respectând convențiile existente de constante
+- Acțiuni asincrone encapsulate în store cu gestionarea corectă a stărilor loading/error
+- Separare clară între setteri simpli și acțiuni complexe în store
+- Metoda `reset` pentru reinițializarea store-ului în scopuri de testare
+
+#### Lecții învățate
+- **Importul tipurilor enum**: Zustand trebuie să utilizeze enum-urile din sursa unică de adevăr (shared)
+- **Mock-uri pentru servicii în teste Zustand**: Cea mai bună abordare este mock-ul la nivel de modul cu implementare pentru fiecare metodă, nu mock-ul clasei întregi
+- **Problema importurilor circulare**: La testare, importul direct al store-ului poate cauza erori; soluția e importul întregului modul și extragerea store-ului din el
+- **Sincronizare cu valori default**: Toate valorile implicite trebuie sincronizate cu cele din `constants/defaults.ts`
+
+#### Beneficii identificate ale Zustand
+- Sintaxă simplă și directă, mai apropiată de React hooks decât Redux
+- Nu necesită Provider la nivel înalt, ceea ce simplifică integrarea
+- Middleware modular pentru devtools, persist și alte funcționalități
+- Selectors performante pentru optimizare re-renderizări
+- Compatibilitate excelentă cu TypeScript și arhitectura existentă
+
+#### Pași următori
+1. Migrarea treptată a state-ului din `useTransactionData` în store-ul Zustand
+2. Implementarea persistenței pentru store cu localStorage
+3. Adăugarea middleware-ului de devtools pentru debugging
+4. Extinderea cu selectors optimizate pentru filtrare și sortare
+
 ### [2025-04-25] Refactorizare cu Custom Hooks și Pattern-ul Service
 
 - Finalizată refactorizarea `App.tsx` utilizând pattern-ul de custom hooks și servicii:
