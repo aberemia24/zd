@@ -199,16 +199,6 @@ describe('scenarii complexe de utilizare', () => {
 - ✅ Migrare și testare useTransactionFilters în Zustand (store dedicat)
 - ⏹ Finalizare cu useTransactionForm
 
-#### Lecții și pattern-uri extrase din migrarea useTransactionFilters la Zustand
-- Am folosit TDD strict: întâi test, apoi implementare, cu teste colocate și robuste.
-- Toate valorile implicite și enums au fost importate din sursa de adevăr (`constants/defaults.ts`, `constants/enums.ts`).
-- Store-ul folosește selectors (ca funcții) pentru performanță și testabilitate.
-- Testele acoperă cazuri de inițializare, setare, paginare, reset și edge cases.
-- Pentru mock-uri și testare, am respectat workaround-ul pentru Jest cu TypeScript (doar metode publice, nu proprietăți private, vezi memorii).
-- A fost necesară configurarea corectă Jest/ts-jest pentru a permite testarea TypeScript modern (inclusiv tipuri avansate).
-- Pattern-ul hooks→store Zustand permite eliminarea props drilling și centralizarea logicii de filtrare/paginare.
-
-
 ### Refactorizare componente pentru utilizarea store-ului ⏹
 - ⏹ Adaptare App.tsx pentru utilizarea noului store
 - ⏹ Refactorizare componentelor copil pentru a citi din store

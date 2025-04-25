@@ -337,6 +337,13 @@ Acest fișier conține toate modificările, deciziile și pașii importanți din
 
 
 ### [2025-04-25] Migrare și testare useTransactionFilters la Zustand
+
+#### [LESSON] Testele pentru store-uri Zustand se scriu de la zero, nu se adaptează direct din cele pentru hook-uri
+- La migrarea de la hook custom la store Zustand, testele vechi (pentru hook) se folosesc ca sursă de cazuri/scenarii, dar se rescriu complet pentru noul API și paradigmă (Zustand).
+- Nu se adaptează direct testele pentru hook (care folosesc renderHook, evenimente React etc.), ci se rescriu pentru a testa direct acțiunile și selectors store-ului.
+- Motive: claritate, mentenanță, eliminarea dependențelor de UI/React, respectarea TDD și best practices.
+- Astfel, acoperirea funcțională rămâne completă, dar testele devin mai simple, robuste și ușor de întreținut.
+
 - Implementat store Zustand pentru filtre tranzacții cu selectors ca funcții, acțiuni și reset.
 - Teste TDD, colocate, robuste, fără hardcodări (import sursă de adevăr).
 - Am folosit workaround pentru mock-uri Jest/TypeScript (doar metode publice).
