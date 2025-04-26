@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -117,7 +118,7 @@ jest.mock('./stores/transactionFormStore', () => {
   });
 
   // Cream mock-ul pentru useTransactionFormStore
-  const mockUseFormStore = jest.fn();
+  const mockUseFormStore = jest.fn() as any;
   // Adăugăm metoda getState pentru acces direct
   mockUseFormStore.getState = jest.fn(() => getBaseFormState());
   
@@ -161,7 +162,7 @@ jest.mock('./stores/transactionStore', () => {
   });
 
   // Cream mock-ul pentru useTransactionStore
-  const mockUseTransactionStore = jest.fn();
+  const mockUseTransactionStore = jest.fn() as any;
   // Adăugăm metoda getState pentru acces direct
   mockUseTransactionStore.getState = jest.fn(() => getBaseTransactionState());
   
@@ -189,7 +190,7 @@ jest.mock('./stores/transactionFiltersStore', () => {
   });
 
   // Cream mock-ul pentru useTransactionFiltersStore
-  const mockUseFiltersStore = jest.fn();
+  const mockUseFiltersStore = jest.fn() as any;
   // Adăugăm metoda getState pentru acces direct
   mockUseFiltersStore.getState = jest.fn(() => getBaseFilterState());
   
@@ -202,9 +203,9 @@ jest.mock('./stores/transactionFiltersStore', () => {
 
 describe('App component', () => {
   // Importăm funcțiile mock din modulele mock-uite
-  const { useTransactionFormStore, mockHandleChange, mockHandleSubmit, mockResetForm } = require('./stores/transactionFormStore');
-  const { useTransactionStore, mockSetQueryParams, mockFetchTransactions, defaultQueryParams } = require('./stores/transactionStore');
-  const { useTransactionFiltersStore, mockSetFilterType, mockSetFilterCategory } = require('./stores/transactionFiltersStore');
+  const { useTransactionFormStore, mockHandleChange, mockHandleSubmit, mockResetForm, mockSetSubmitHandler } = require('./stores/transactionFormStore') as any;
+  const { useTransactionStore, mockSetQueryParams, mockFetchTransactions, defaultQueryParams } = require('./stores/transactionStore') as any;
+  const { useTransactionFiltersStore, mockSetFilterType, mockSetFilterCategory } = require('./stores/transactionFiltersStore') as any;
   
   beforeEach(() => {
     // Resetăm toate mock-urile înainte de fiecare test
