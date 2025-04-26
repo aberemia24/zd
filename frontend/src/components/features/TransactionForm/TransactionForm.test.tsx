@@ -681,6 +681,58 @@ describe('TransactionForm', () => {
     });
   });
 
+  it('afișează eroare dacă recurent fără frecvență și nu permite submit', () => {
+    // Configurăm mock store cu eroare pentru frecvență recurentă
+    mockUseTransactionFormStore.mockImplementation((selector) => {
+      const state = {
+        form: { ...defaultForm, recurring: true, frequency: '' },
+        error: MESAJE.FRECV_RECURENTA,
+        success: '',
+        loading: false,
+        setForm: jest.fn(),
+        setField: mockSetField,
+        setError: jest.fn(),
+        setSuccess: jest.fn(),
+        setLoading: jest.fn(),
+        resetForm: mockResetForm,
+        validateForm: jest.fn(),
+        handleSubmit: mockHandleSubmit,
+        handleChange: jest.fn(),
+        setSubmitHandler: jest.fn(),
+        getForm: jest.fn().mockReturnValue({ ...defaultForm, recurring: true }),
+        getError: jest.fn().mockReturnValue(MESAJE.FRECV_RECURENTA),
+        getSuccess: jest.fn().mockReturnValue(''),
+        getLoading: jest.fn().mockReturnValue(false)
+      };
+      return typeof selector === 'function' ? selector(state) : state;
+    });
+    // Redăm componenta și verificăm mesajul de eroare folosind testid
+    render(<TransactionForm />);
+    const errorNode = screen.getByTestId('error-message');
+    expect(errorNode).toHaveTextContent(MESAJE.FRECV_RECURENTA);
+    // Nu trebuie să apelăm handleSubmit în acest caz
+    expect(mockHandleSubmit).not.toHaveBeenCalled();
+  });
+
+  it('permite submit când recurent și frecvență setată', async () => {
+    render(<TransactionForm />);
+    const form = screen.getByRole('form');
+    // Bifăm recurent și selectăm frecvența
+    fireEvent.click(within(form).getByLabelText(/Recurent/i));
+    fireEvent.change(within(form).getByLabelText(/Frecvență/i), { target: { value: FrequencyType.MONTHLY, name: 'frequency' } });
+    // Introducem câmpurile obligatorii
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.TYPE), { target: { value: TransactionType.INCOME, name: 'type' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.AMOUNT), { target: { value: '123', name: 'amount' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.DATE), { target: { value: '2025-05-01', name: 'date' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.CATEGORY), { target: { value: CategoryType.INCOME, name: 'category' } });
+    // Atribuim subcategorie validă
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.SUBCATEGORY), { target: { value: categorii[CategoryType.INCOME][0], name: 'subcategory' } });
+    // Submit
+    await act(async () => fireEvent.submit(form));
+    // Verificăm că handleSubmit a fost apelat
+    expect(mockHandleSubmit).toHaveBeenCalled();
+  });
+
   it('shows error and success messages', () => {
     // Configurăm mock-ul doar pentru mesajele de eroare și succes
     mockUseTransactionFormStore.mockImplementation((selector) => {

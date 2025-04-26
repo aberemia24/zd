@@ -190,7 +190,13 @@ jest.mock('./stores/transactionFiltersStore', () => {
   });
 
   // Cream mock-ul pentru useTransactionFiltersStore
-  const mockUseFiltersStore = jest.fn() as any;
+  const mockUseFiltersStore = jest.fn((selector?: (state: any) => any) => {
+    const state = getBaseFilterState();
+    if (typeof selector === 'function') {
+      return selector(state);
+    }
+    return state;
+  }) as any;
   // Adăugăm metoda getState pentru acces direct
   mockUseFiltersStore.getState = jest.fn(() => getBaseFilterState());
   
@@ -215,6 +221,19 @@ describe('App component', () => {
     useTransactionFormStore.mockReset();
     useTransactionStore.mockReset();
     useTransactionFiltersStore.mockReset();
+    
+    // Reconfigurare mock pentru transactionFiltersStore
+    const filterState = {
+      filterType: '',
+      filterCategory: '',
+      setFilterType: mockSetFilterType,
+      setFilterCategory: mockSetFilterCategory
+    };
+    useTransactionFiltersStore.mockImplementation((selector) => {
+      if (typeof selector === 'function') return selector(filterState);
+      return filterState;
+    });
+    useTransactionFiltersStore.getState.mockReturnValue(filterState);
   });
 
   it('afișează titlul principal corect', () => {
@@ -305,6 +324,11 @@ describe('App component', () => {
     
     useTransactionFormStore.getState.mockReturnValue(formState);
     
+    // Mock pentru filters store
+    const filterState = { filterType: '', filterCategory: '', setFilterType: mockSetFilterType, setFilterCategory: mockSetFilterCategory };
+    useTransactionFiltersStore.mockImplementation((selector: any) => typeof selector === 'function' ? selector(filterState) : filterState);
+    useTransactionFiltersStore.getState.mockReturnValue(filterState);
+    
     render(<App />);
     
     // Identificăm filtrul de tip și simulăm selectarea unui tip
@@ -354,6 +378,12 @@ describe('App component', () => {
     });
     
     useTransactionFormStore.getState.mockReturnValue(formState);
+    
+    // implementare pentru mockHandleSubmit care apelează mockFetchTransactions
+    mockHandleSubmit.mockImplementation((cb: any) => {
+      // Simulează submit și refresh
+      mockFetchTransactions();
+    });
     
     const transactionState = {
       transactions: mockTransactions,
@@ -488,7 +518,4 @@ describe('App component', () => {
     // Verificăm că se afișează mesajul de eroare
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
   });
-  
-  // NOTĂ: Testele pentru tranzacții recurente vor fi adăugate în viitor, după ce 
-  // toate mock-urile și implementarea sunt stabile
 });

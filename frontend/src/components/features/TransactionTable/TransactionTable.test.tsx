@@ -232,6 +232,32 @@ describe('TransactionTable', () => {
     expect(noTexts.length).toBeGreaterThanOrEqual(1);
   });
 
+  it('afișează corect coloanele Recurring și Frequency pentru tranzacții', () => {
+    const { useTransactionStore } = require('../../../stores/transactionStore');
+    useTransactionStore.mockImplementation((selector: any) => {
+      const state = {
+        transactions,
+        loading: false,
+        total: transactions.length,
+        error: '',
+        queryParams: { limit: baseProps.limit, offset: baseProps.offset },
+        service: null
+      };
+      if (typeof selector === 'function') return selector(state);
+      return state;
+    });
+    render(<TransactionTable {...baseProps} />);
+    const rows = screen.getAllByRole('row');
+    // Verificăm tranzacția recurentă
+    const firstCells = within(rows[1]).getAllByRole('cell');
+    expect(firstCells[6].textContent).toBe(MOCK_TABLE.BOOL.YES);
+    expect(firstCells[7].textContent).toBe(FrequencyType.MONTHLY);
+    // Verificăm tranzacția nerecurentă
+    const secondCells = within(rows[2]).getAllByRole('cell');
+    expect(secondCells[6].textContent).toBe(MOCK_TABLE.BOOL.NO);
+    expect(secondCells[7].textContent).toBe('');
+  });
+
   it('apelează onPageChange când se face click pe butoanele de paginare', () => {
     const mockSetQueryParams = jest.fn();
     
