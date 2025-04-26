@@ -18,5 +18,6 @@ export const INITIAL_FORM_STATE = {
   date: '',
   recurring: false,
   frequency: '',
+  // currency nu este vizibilă în formular, se adaugă în store la transformarea în TransactionFormWithNumberAmount
 };
 

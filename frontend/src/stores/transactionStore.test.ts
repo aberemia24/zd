@@ -4,9 +4,7 @@
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
 import { PAGINATION } from '../constants/defaults';
-import { TransactionQueryParams } from '../hooks/useTransactionFilters';
-import { TransactionFormWithNumberAmount } from '../hooks/useTransactionForm';
-import { Transaction } from '../types/Transaction';
+import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PaginatedResponse } from '../services/transactionApiClient';
 import { TransactionType, CategoryType } from '../constants/enums';
 import { TransactionService } from '../services/transactionService';
@@ -182,6 +180,7 @@ describe('transactionStore', () => {
         subcategory: 'haine',
         recurring: false,
         frequency: '',
+        currency: 'RON',
       };
       
       // Act
@@ -206,6 +205,7 @@ describe('transactionStore', () => {
         subcategory: 'energie',
         recurring: false,
         frequency: '',
+        currency: 'RON',
       };
       
       // Act

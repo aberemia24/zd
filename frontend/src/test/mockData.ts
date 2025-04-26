@@ -1,5 +1,5 @@
 // Date de test centralizate pentru toate testele
-import { Transaction } from '../types/Transaction';
+import { Transaction, TransactionFormWithNumberAmount } from '../types/transaction';
 import { FORM_DEFAULTS } from '../constants/defaults';
 import { TransactionType, FrequencyType } from '../constants/enums';
 
@@ -84,5 +84,29 @@ export const MOCK_STATUS = {
   SUCCESS: 'success',
   ERROR: 'error',
   LOADING: 'loading',
+};
+
+// Mock pentru TransactionFormWithNumberAmount (folosit în teste pentru form și servicii)
+export const MOCK_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount = {
+  type: TransactionType.EXPENSE,
+  amount: 100, // Notă: în formular folosim number
+  currency: FORM_DEFAULTS.CURRENCY, // Folosim sursa de adevăr pentru monedă
+  date: '2025-04-25',
+  category: 'UTILITĂȚI',
+  subcategory: 'Electricitate',
+  recurring: false,
+  frequency: ''
+};
+
+// Mock pentru TransactionFormWithNumberAmount recurent
+export const MOCK_RECURRING_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount = {
+  type: TransactionType.EXPENSE,
+  amount: 200,
+  currency: FORM_DEFAULTS.CURRENCY,
+  date: '2025-04-23',
+  category: 'abonament',
+  subcategory: 'Taxe școlare | universitare',
+  recurring: true,
+  frequency: FrequencyType.MONTHLY
 };
 

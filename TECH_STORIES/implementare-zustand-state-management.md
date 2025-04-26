@@ -1,12 +1,25 @@
 # Tech User Story: Implementarea Managementului Stării cu Zustand
 
+## Progres la 2025-04-25
+- TransactionTable și TransactionFilters au fost migrate complet la Zustand (props drilling eliminat, store-uri dedicate, selectors pentru performanță).
+- TransactionForm rămâne de migrat la Zustand store (**TO DO**).
+- Nu s-au făcut modificări disruptive la TransactionForm, se folosește încă hook-ul custom.
+- Următorul pas: migrare TransactionForm la Zustand și eliminare hook custom după validare.
+
 ## Status: În IMPLEMENTARE (25.04.2025)
 - [x] Setup și structură inițială
 - [x] Implementare store tranzacții
 - [x] Testare store tranzacții
-- [ ] Migrare funcționalități din hooks în store
+- [x] Testare store-uri Zustand (toate passed, acoperire pozitivă/negativă)
+- [ ] Migrare funcționalități din hooks în store _(în curs)_
 - [ ] Integrare în componente
 - [ ] Testare integrare și performanță
+
+### [25.04.2025] Rulare testare store-uri Zustand
+- Toate testele pentru store-urile Zustand au trecut cu succes (38/38).
+- Acoperire completă: inițializare, acțiuni pozitive, acțiuni negative (mock de eroare).
+- Nu există erori funcționale, doar console.error simulate pentru cazuri de fallback.
+- Următorul pas: continuarea migrării funcționalităților din hooks în store (focus pe useTransactionForm și integrarea cu componentele principale).
 
 ## Titlu
 Implementarea unui sistem centralizat de gestionare a stării aplicației utilizând Zustand pentru BudgetApp

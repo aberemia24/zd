@@ -1,9 +1,8 @@
 import { createTransactionFormStore } from './transactionFormStore';
-import { INITIAL_FORM_STATE } from '../../constants/defaults';
-import { MESAJE } from '../../constants/messages';
+import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../constants';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
-import type { TransactionFormWithNumberAmount } from './transactionFormStore';
+import type { TransactionFormWithNumberAmount } from '../types/transaction';
 
 describe('transactionFormStore Zustand', () => {
   let store: ReturnType<typeof createTransactionFormStore>;
@@ -73,7 +72,11 @@ describe('transactionFormStore Zustand', () => {
     it('apelează callback și setează succes pentru date valide', () => {
       store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
       store.handleSubmit(onSubmitMock);
-      expect(onSubmitMock).toHaveBeenCalledWith({ ...store.getForm(), amount: 100 });
+      expect(onSubmitMock).toHaveBeenCalledWith({ 
+        ...store.getForm(), 
+        amount: 100, 
+        currency: FORM_DEFAULTS.CURRENCY // Verificăm că currency este adăugat din constante
+      });
       expect(store.getSuccess()).toBe(MESAJE.SUCCES_ADAUGARE);
       expect(store.getLoading()).toBe(false);
     });

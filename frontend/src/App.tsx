@@ -5,8 +5,12 @@ import TransactionTable from './components/features/TransactionTable/Transaction
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
 import { OPTIONS, TITLES } from './constants/ui';
 
-// Import custom hooks
-import { useTransactionForm, useTransactionFilters, useTransactionData, TransactionFormWithNumberAmount } from './hooks';
+// Import tipuri
+import { TransactionFormWithNumberAmount } from './types/transaction';
+
+// Import store Zustand pentru tranzacții
+import { useTransactionStore } from './stores/transactionStore';
+import { useTransactionFormStore } from './stores/transactionFormStore';
 
 // Import servicii
 import { TransactionService } from './services';
@@ -15,9 +19,6 @@ import { TransactionService } from './services';
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
  * 
  * Structura:
- * - useTransactionForm: gestionează starea și validarea formularului
- * - useTransactionFilters: gestionează filtrele, paginarea și sortarea
- * - useTransactionData: gestionează datele despre tranzacții și comunică cu API-ul
  * 
  * Această structură separă clar logica de business de UI, crescând testabilitatea, 
  * mentenabilitatea și facilitând extinderea ulterioară.
@@ -26,32 +27,69 @@ export const App: React.FC = () => {
   // Initializăm serviciile
   const transactionService = React.useMemo(() => new TransactionService(), []);
 
-  // Folosim hook-ul pentru filtre și paginare
+  // Folosim store-ul Zustand pentru filtre și paginare
   const {
-    filterType,
-    filterCategory,
-    limit,
-    offset,
-    currentPage,
-    setFilterType,
-    setFilterCategory,
-    nextPage,
-    prevPage,
-    goToPage,
-    queryParams
-  } = useTransactionFilters();
+    currentQueryParams,
+    setQueryParams
+  } = useTransactionStore(state => ({
+    currentQueryParams: state.currentQueryParams,
+    setQueryParams: state.setQueryParams
+  }));
+  
+  // Extragem valorile din query params pentru a le folosi în UI
+  const limit: number = currentQueryParams.limit || 10;
+  const offset: number = currentQueryParams.offset || 0;
+  const filterType: string | undefined = currentQueryParams.type;
+  const filterCategory: string | undefined = currentQueryParams.category;
+  const currentPage: number = Math.floor(offset / limit) + 1;
+  
+  // Funcții pentru navigare
+  const nextPage = React.useCallback(() => {
+    setQueryParams({
+      ...currentQueryParams,
+      offset: offset + limit
+    });
+  }, [currentQueryParams, offset, limit, setQueryParams]);
+  
+  const prevPage = React.useCallback(() => {
+    if (offset - limit >= 0) {
+      setQueryParams({
+        ...currentQueryParams,
+        offset: offset - limit
+      });
+    }
+  }, [currentQueryParams, offset, limit, setQueryParams]);
+  
+  const goToPage = React.useCallback((page: number) => {
+    setQueryParams({
+      ...currentQueryParams,
+      offset: (page - 1) * limit
+    });
+  }, [currentQueryParams, limit, setQueryParams]);
+  
+  const setFilterType = React.useCallback((type: string) => {
+    setQueryParams({
+      ...currentQueryParams,
+      type,
+      offset: 0 // Reset la prima pagină când schimbăm filtrul
+    });
+  }, [currentQueryParams, setQueryParams]);
+  
+  const setFilterCategory = React.useCallback((category: string) => {
+    setQueryParams({
+      ...currentQueryParams,
+      category,
+      offset: 0 // Reset la prima pagină când schimbăm filtrul
+    });
+  }, [currentQueryParams, setQueryParams]);
 
-  // Folosim hook-ul pentru date
-  const {
-    transactions,
-    total,
-    loading: loadingFetch,
-    error: fetchError,
-    refresh: refreshTransactions
-  } = useTransactionData({
-    queryParams,
-    transactionService
-  });
+  // Folosim store-ul Zustand pentru date tranzacții
+  const transactions = useTransactionStore(s => s.transactions);
+  const total = useTransactionStore(s => s.total);
+  const loadingFetch = useTransactionStore(s => s.loading);
+  const fetchError = useTransactionStore(s => s.error);
+  const refreshTransactions = useTransactionStore(s => s.refresh);
+  // TODO: adaptare queryParams și transactionService dacă este nevoie (acum store-ul le gestionează intern)
 
   // Callback pentru trimiterea formularului
   const handleFormSubmit = React.useCallback(async (formData: TransactionFormWithNumberAmount) => {
@@ -67,7 +105,7 @@ export const App: React.FC = () => {
     }
   }, [transactionService, refreshTransactions]);
 
-  // Folosim hook-ul pentru formular
+  // Folosim store-ul Zustand pentru formular
   const {
     form,
     error: formError,
@@ -76,9 +114,30 @@ export const App: React.FC = () => {
     handleChange,
     handleSubmit,
     resetForm
-  } = useTransactionForm({
-    onSubmit: handleFormSubmit
-  });
+  } = useTransactionFormStore(state => ({
+    form: state.form,
+    error: state.error,
+    success: state.success,
+    loading: state.loading,
+    handleChange: state.handleChange,
+    handleSubmit: state.handleSubmit,
+    resetForm: state.resetForm
+  }));
+  
+  // Conectăm handleFormSubmit la store-ul de formular
+  React.useEffect(() => {
+    const formSubmitHandler = (formData: TransactionFormWithNumberAmount) => {
+      return handleFormSubmit(formData);
+    };
+    
+    // Înregistrăm handler-ul pentru submit
+    useTransactionFormStore.getState().setSubmitHandler(formSubmitHandler);
+    
+    return () => {
+      // Curățăm handler-ul la unmount
+      useTransactionFormStore.getState().setSubmitHandler(null);
+    };
+  }, [handleFormSubmit]);
 
   // Callback pentru schimbarea paginii
   const handlePageChange = React.useCallback((newOffset: number) => {
@@ -90,30 +149,14 @@ export const App: React.FC = () => {
       <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
 
       {/* Render Transaction Form */}
-      <TransactionForm
-        form={form}
-        formError={formError}
-        formSuccess={formSuccess}
-        onChange={handleChange}
-        onSubmit={handleSubmit}
-        loading={loadingSubmit}
-      />
+      {/* TransactionForm nu mai primește props, folosește direct Zustand store */}
+      <TransactionForm />
 
       {/* Filtrare tranzacții după tip și categorie */}
-      <TransactionFilters
-        type={filterType}
-        category={filterCategory}
-        onTypeChange={setFilterType}
-        onCategoryChange={setFilterCategory}
-        types={OPTIONS.TYPE}
-        categories={OPTIONS.CATEGORY}
-      />
+      <TransactionFilters />
 
       {/* Render Transaction Table */}
       <TransactionTable
-        transactions={transactions}
-        loading={loadingFetch}
-        total={total}
         offset={offset}
         limit={limit}
         onPageChange={handlePageChange}

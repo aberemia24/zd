@@ -13,3 +13,30 @@ export type Transaction = {
   recurring?: boolean;
   frequency?: string;
 };
+
+/**
+ * Parametrii pentru filtrarea și paginarea tranzacțiilor
+ * Folosit pentru comunicarea cu API și stocarea stării filtrelor
+ */
+export type TransactionQueryParams = {
+  limit?: number;
+  offset?: number;
+  sort?: string;
+  order?: 'asc' | 'desc';
+  startDate?: string;
+  endDate?: string;
+  type?: string;
+  category?: string;
+  subcategory?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  search?: string;
+};
+
+/**
+ * Versiunea formularului de tranzacție cu amount ca număr
+ * Folosit intern pentru validare și calcule înainte de a fi transformat în Transaction
+ */
+export type TransactionFormWithNumberAmount = Omit<Transaction, 'amount'> & {
+  amount: number; // amount ca număr pentru calcule și validare
+};

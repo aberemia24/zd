@@ -1,7 +1,5 @@
-import { Transaction } from '../types/Transaction';
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
-import { TransactionQueryParams } from '../hooks/useTransactionFilters';
-import { TransactionFormWithNumberAmount } from '../hooks/useTransactionForm';
+import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { FORM_DEFAULTS } from '../constants/defaults';
 
 /**

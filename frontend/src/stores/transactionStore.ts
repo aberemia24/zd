@@ -1,10 +1,8 @@
 import { create, StateCreator } from 'zustand';
 import { persist, createJSONStorage, PersistOptions } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
-import { Transaction } from '../types/Transaction';
 import { TransactionService } from '../services/transactionService';
-import { TransactionQueryParams } from '../hooks/useTransactionFilters';
-import { TransactionFormWithNumberAmount } from '../hooks/useTransactionForm';
+import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PAGINATION } from '../constants/defaults';
 import { MESAJE } from '../constants/messages';
 

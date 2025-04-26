@@ -1,10 +1,8 @@
 import { create } from 'zustand';
-import { INITIAL_FORM_STATE } from '../../constants/defaults';
-import { MESAJE } from '../../constants/messages';
+import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../constants';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
-// Tip local pentru amount numeric
-export type TransactionFormWithNumberAmount = Omit<TransactionFormData, 'amount'> & { amount: number };
+import type { TransactionFormWithNumberAmount } from '../types/transaction';
 
 interface TransactionFormStoreState {
   form: TransactionFormData;
@@ -19,6 +17,8 @@ interface TransactionFormStoreState {
   resetForm: () => void;
   validateForm: () => boolean;
   handleSubmit: (cb: (data: TransactionFormWithNumberAmount) => void) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  setSubmitHandler: (handler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null) => void;
   // Selectors ca funcții pentru testabilitate
   getForm: () => TransactionFormData;
   getError: () => string;
@@ -31,6 +31,7 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
   let error = '';
   let success = '';
   let loading = false;
+  let submitHandler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null = null;
 
   const setForm = (newForm: TransactionFormData) => { form = { ...newForm }; };
   const setField = (name: keyof TransactionFormData, value: any) => { form = { ...form, [name]: value }; };
@@ -38,6 +39,19 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
   const setSuccess = (msg: string) => { success = msg; };
   const setLoading = (val: boolean) => { loading = val; };
   const resetForm = () => { form = { ...INITIAL_FORM_STATE }; error = ''; success = ''; };
+  const setSubmitHandler = (handler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null) => {
+    submitHandler = handler;
+  };
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setField(name as keyof TransactionFormData, checked);
+    } else {
+      setField(name as keyof TransactionFormData, value);
+    }
+  };
 
   const validateForm = (): boolean => {
     if (!form.type || !form.amount || !form.category || !form.date) {
@@ -60,12 +74,36 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
     loading = true;
     error = '';
     try {
+      // Transformăm datele formularului în TransactionFormWithNumberAmount adăugând currency din constante
       const formWithNumberAmount: TransactionFormWithNumberAmount = {
         ...form,
-        amount: Number(form.amount)
+        amount: Number(form.amount),
+        currency: FORM_DEFAULTS.CURRENCY // Adăugăm currency obligatoriu din constante
       };
-      cb(formWithNumberAmount);
-      success = MESAJE.SUCCES_ADAUGARE;
+      
+      // Folosim submitHandler dacă există, altfel cb
+      if (submitHandler) {
+        const result = submitHandler(formWithNumberAmount);
+        if (result instanceof Promise) {
+          result.then(success => {
+            if (success) {
+              setSuccess(MESAJE.SUCCES_ADAUGARE);
+            }
+            setLoading(false);
+          }).catch(() => {
+            setError(MESAJE.EROARE_ADAUGARE);
+            setLoading(false);
+          });
+          return;
+        } else if (result) {
+          success = MESAJE.SUCCES_ADAUGARE;
+        } else {
+          error = MESAJE.EROARE_ADAUGARE;
+        }
+      } else {
+        cb(formWithNumberAmount);
+        success = MESAJE.SUCCES_ADAUGARE;
+      }
     } catch {
       error = MESAJE.EROARE_ADAUGARE;
     } finally {
@@ -92,6 +130,8 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
     resetForm,
     validateForm,
     handleSubmit,
+    handleChange,
+    setSubmitHandler,
     getForm,
     getError,
     getSuccess,

@@ -1,10 +1,9 @@
 import { TransactionService } from './transactionService';
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
-import { Transaction } from '../types/Transaction';
-import { TransactionQueryParams } from '../hooks/useTransactionFilters';
-import { TransactionFormWithNumberAmount } from '../hooks/useTransactionForm';
-import { FORM_DEFAULTS } from '../constants/defaults';
+import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
+import { MOCK_TRANSACTION, MOCK_TRANSACTION_FORM_WITH_NUMBER } from '../test/mockData';
 import { TransactionType } from '../constants/enums';
+import { FORM_DEFAULTS } from '../constants/defaults';
 
 // Mock complet pentru TransactionApiClient
 jest.mock('./transactionApiClient');
@@ -14,17 +13,8 @@ describe('TransactionService', () => {
   let service: TransactionService;
   let mockApiClient: jest.Mocked<TransactionApiClient>;
 
-  // Date mock pentru teste
-  const mockTransaction: Transaction = {
-    _id: '1',
-    id: '1',
-    type: 'income',
-    amount: '100',
-    currency: 'RON',
-    date: '2025-04-25',
-    category: 'VENITURI',
-    subcategory: 'Salariu',
-  };
+  // Date mock pentru teste - folosim mock-urile centralizate din mockData.ts
+  const mockTransaction: Transaction = MOCK_TRANSACTION;
 
   const mockPaginatedResponse: PaginatedResponse<Transaction> = {
     data: [mockTransaction],
@@ -39,17 +29,8 @@ describe('TransactionService', () => {
     sort: 'date'
   };
 
-  const mockFormData: TransactionFormWithNumberAmount = {
-    type: 'income',
-    amount: 100, // Notă: în formular folosim number
-    date: '2025-04-25',
-    category: 'VENITURI',
-    subcategory: 'Salariu',
-    // Proprietăți obligatorii conform tipului TransactionFormWithNumberAmount
-    recurring: false,
-    frequency: '',
-    // currency este adăugat automat de TransactionService din FORM_DEFAULTS
-  };
+  // Folosim mock-ul centralizat pentru TransactionFormWithNumberAmount
+  const mockFormData: TransactionFormWithNumberAmount = MOCK_TRANSACTION_FORM_WITH_NUMBER;
 
   beforeEach(() => {
     // Reset mock-uri între teste
@@ -193,8 +174,10 @@ describe('TransactionService', () => {
         date: '2025-04-25',
         category: 'VENITURI',
         subcategory: 'Salariu',
-        // Lipsește currency
-      } as TransactionFormWithNumberAmount;
+        recurring: false,
+        frequency: '',
+        // Lipsește currency intenționat pentru a testa comportamentul implicit
+      } as unknown as TransactionFormWithNumberAmount; // Folosim cast dublu pentru a evita eroarea de tipare
       
       await service.saveTransaction(incompleteFormData);
       
@@ -324,30 +307,67 @@ describe('TransactionService', () => {
     });
     
     it('invalidează selectiv cache-ul pentru operațiunea de actualizare', async () => {
-      // Creăm un serviciu nou
-      const service = new TransactionService(mockApiClient);
-      
-      // Populăm cache-ul cu 2 pagini de date diferite
-      // Prima pagină conține tranzacția cu ID-ul 1
-      mockApiClient.getTransactions.mockResolvedValueOnce({
-        data: [mockTransaction], // conține tranzacția cu ID 1
-        total: 1,
-        limit: 10,
-        offset: 0
-      });
-      
-      // A doua pagină nu conține tranzacția cu ID-ul 1
-      const secondPageTransaction = { ...mockTransaction, id: '2', _id: '2' };
-      mockApiClient.getTransactions.mockResolvedValueOnce({
-        data: [secondPageTransaction],
-        total: 2,
-        limit: 10,
-        offset: 10
+      // Configurăm mock-ul pentru a returna date diferite pe pagini
+      // Este important să includem tranzacția cu ID-ul 1 pe prima pagină
+      mockApiClient.getTransactions.mockImplementation((params?: TransactionQueryParams) => {
+        // Demo tranzacții complete cu toate proprietățile necesare pentru tipul Transaction
+        const transaction1: Transaction = { 
+          id: '1', 
+          type: 'income', 
+          amount: '500', 
+          currency: 'RON',
+          date: '2023-01-01',
+          category: 'Salariu',
+          subcategory: 'Job principal',
+          recurring: false,
+          frequency: ''
+        };
+        
+        const transaction2: Transaction = { 
+          id: '2', 
+          type: 'expense', 
+          amount: '200', 
+          currency: 'RON',
+          date: '2023-01-02',
+          category: 'Mâncare',
+          subcategory: 'Supermarket',
+          recurring: false,
+          frequency: ''
+        };
+        
+        const transaction3: Transaction = { 
+          id: '3', 
+          type: 'income', 
+          amount: '1000', 
+          currency: 'RON',
+          date: '2023-01-03',
+          category: 'Salariu',
+          subcategory: 'Job secundar',
+          recurring: false,
+          frequency: ''
+        };
+        
+        if (params?.offset === 0) {
+          return Promise.resolve({
+            data: [transaction1, transaction2],
+            total: 3,
+            limit: 10,
+            offset: 0
+          });
+        }
+        
+        return Promise.resolve({
+          data: [transaction3],
+          total: 3,
+          limit: 10,
+          offset: 10
+        });
       });
       
       const firstPageParams = { ...mockQueryParams, offset: 0 };
       const secondPageParams = { ...mockQueryParams, offset: 10 };
       
+      // Populăm cache-ul pentru ambele pagini
       await service.getFilteredTransactions(firstPageParams);
       await service.getFilteredTransactions(secondPageParams);
       
@@ -355,7 +375,7 @@ describe('TransactionService', () => {
       mockApiClient.getTransactions.mockClear();
       await service.saveTransaction(mockFormData, '1');
       
-      // Prima pagină ar trebui să fie revalidată (conține tranzacția cu ID 1)
+      // Prima pagină ar trebui să fie revalidată (conține tranzacția cu ID 1 care a fost actualizată)
       await service.getFilteredTransactions(firstPageParams);
       expect(mockApiClient.getTransactions).toHaveBeenCalledTimes(1);
       mockApiClient.getTransactions.mockClear();

@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Button from '../../primitives/Button';
 import Input from '../../primitives/Input';
 import Select from '../../primitives/Select';
 import Checkbox from '../../primitives/Checkbox';
-import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
+import { TransactionType, CategoryType } from '../../../constants/enums';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '../../../constants/ui';
 import { MESAJE } from '../../../constants/messages';
+import { useTransactionFormStore } from '../../../stores/transactionFormStore';
+import { useTransactionStore } from '../../../stores/transactionStore';
+import { TransactionService } from '../../../services';
 
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
@@ -16,16 +19,10 @@ export type TransactionFormData = {
   date: string;
   recurring: boolean;
   frequency: string;
+  // currency nu este vizibilă în formular, se folosește valoarea implicită RON în store
 };
 
-export type TransactionFormProps = {
-  form: TransactionFormData;
-  formError: string;
-  formSuccess: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  loading?: boolean;
-};
+// Nu mai folosim props pentru form, error, success, onChange, onSubmit, loading. Totul vine din store Zustand.
 
 // Structura completă pentru categorii și subcategorii, conform listei primite
 // TODO: Centralizează structura completă categorii/subcategorii în constants/categories.ts pentru a elimina orice hardcodare rămasă
@@ -72,10 +69,48 @@ export const categorii: Record<string, any> = {
   ]
 };
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, formError, formSuccess, onChange, onSubmit, loading }) => {
-  // Clonăm formularul pentru a putea face validări interne fără a afecta props-ul original
-  const form = { ...initialForm };
+// Componentă conectată la store Zustand, fără props de stare/handler
+const TransactionForm: React.FC = () => {
+  // Selectăm starea și acțiunile relevante din store
+  const form = useTransactionFormStore((s) => s.form);
+  const error = useTransactionFormStore((s) => s.error);
+  const success = useTransactionFormStore((s) => s.success);
+  const loading = useTransactionFormStore((s) => s.loading);
+  const setField = useTransactionFormStore((s) => s.setField);
+  const resetForm = useTransactionFormStore((s) => s.resetForm);
+  const handleSubmitStore = useTransactionFormStore((s) => s.handleSubmit);
   
+  // Instanță de serviciu pentru submit
+  // Pentru submit folosim serviciul din store-ul global Zustand (dependency injection)
+  const transactionService = useTransactionStore((s) => s.transactionService);
+  const refreshTransactions = useTransactionStore((s) => s.refresh);
+
+  // Handler pentru schimbare câmp
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const isCheckbox = type === 'checkbox';
+    const checkedValue = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
+    setField(name as keyof typeof form, isCheckbox ? checkedValue : value);
+    // Resetăm frequency dacă debifăm recurring
+    if (name === 'recurring' && isCheckbox && checkedValue === false) {
+      setField('frequency', '');
+    }
+  }, [setField, form]); // form e folosit doar pentru tipizare, nu ca dependență reală
+
+  // Handler pentru submit
+  const handleSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmitStore(async (formWithNumberAmount: any) => {
+      try {
+        await transactionService.saveTransaction(formWithNumberAmount);
+        refreshTransactions();
+        resetForm();
+      } catch (err) {
+        // Eroarea va fi gestionată de store (setError)
+      }
+    });
+  }, [handleSubmitStore, transactionService, refreshTransactions, resetForm]);
+
   // Filtrare categorii în funcție de tip
   let categoriiFiltrate: string[] = [];
   if (form.type === TransactionType.INCOME) {
@@ -139,16 +174,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
 
   return (
     <form
-  role="form"
-  aria-label="adăugare tranzacție"
-  onSubmit={onSubmit}
-  className="flex flex-wrap gap-3 mb-6 items-end"
->
+      role="form"
+      aria-label={LABELS.FORM}
+      onSubmit={handleSubmit}
+      className="flex flex-wrap gap-3 mb-6 items-end"
+    >
       <Select
         name="type"
         label={LABELS.TYPE + '*:'}
         value={form.type}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.TYPE}
         options={OPTIONS.TYPE}
         className="ml-2"
@@ -159,7 +194,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         type="number"
         label={LABELS.AMOUNT + '*:'}
         value={form.amount}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.AMOUNT}
         placeholder={PLACEHOLDERS.AMOUNT}
         className="ml-2"
@@ -168,7 +203,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         name="category"
         label={LABELS.CATEGORY + '*:'}
         value={form.category}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.CATEGORY}
         options={categoriiFiltrate
   .filter((cat): cat is string => typeof cat === 'string')
@@ -181,7 +216,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         name="subcategory"
         label={LABELS.SUBCATEGORY}
         value={form.subcategory}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.SUBCATEGORY}
         options={listaSubcategorii.flatMap(subcat => {
           if (typeof subcat === 'string') {
@@ -201,7 +236,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         type="date"
         label={LABELS.DATE + '*:'}
         value={form.date}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.DATE}
         placeholder={PLACEHOLDERS.DATE}
         className="ml-2"
@@ -210,14 +245,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         name="recurring"
         label={LABELS.RECURRING + '?'}
         checked={form.recurring}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.RECURRING}
       />
       <Select
         name="frequency"
         label={LABELS.FREQUENCY}
         value={form.frequency}
-        onChange={onChange}
+        onChange={handleChange}
         aria-label={LABELS.FREQUENCY}
         options={OPTIONS.FREQUENCY}
         className="ml-2"
@@ -225,14 +260,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ form: initialForm, fo
         placeholder={PLACEHOLDERS.SELECT}
       />
       <Button type="submit" disabled={!!loading} className="ml-2">{BUTTONS.ADD}</Button>
-      {formError && (
-        <span data-testid="error-message" className="text-error block mt-2">
-          {MESAJE[formError as keyof typeof MESAJE] || formError}
+      {error && (
+        <span data-testid="error-message" role="alert" aria-label="error message" className="text-error block mt-2">
+          {MESAJE[error as keyof typeof MESAJE] || error}
         </span>
       )}
-      {formSuccess && (
-        <span data-testid="success-message" className="text-success block mt-2">
-          {MESAJE[formSuccess as keyof typeof MESAJE] || formSuccess}
+      {success && (
+        <span data-testid="success-message" role="alert" aria-label="success message" className="text-success block mt-2">
+          {MESAJE[success as keyof typeof MESAJE] || success}
         </span>
       )}
     </form>

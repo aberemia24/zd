@@ -1,5 +1,5 @@
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
-import { Transaction } from '../types/Transaction';
+import { Transaction } from '../types/transaction';
 import { API_URL } from '../constants/api';
 import { MESAJE } from '../constants/messages';
 import { TransactionType, CategoryType } from '../constants/enums';

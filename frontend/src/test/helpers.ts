@@ -1,5 +1,5 @@
 // Funcții utilitare pentru testare
-import { Transaction } from '../types/Transaction';
+import { Transaction } from '../types/transaction';
 import { MOCK_USER_ID } from './mockData';
 
 import { render, fireEvent, within } from '@testing-library/react';

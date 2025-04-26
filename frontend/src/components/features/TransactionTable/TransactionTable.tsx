@@ -17,16 +17,18 @@ export type Transaction = {
   frequency?: string;
 };
 
+import { useTransactionStore } from '../../../stores/transactionStore';
+
 export type TransactionTableProps = {
-  transactions: Transaction[];
-  loading: boolean;
-  total: number;
   offset: number;
   limit: number;
   onPageChange: (newOffset: number) => void;
 };
 
-const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loading, total, offset, limit, onPageChange }) => {
+const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPageChange }) => {
+  const transactions = useTransactionStore(s => s.transactions);
+  const loading = useTransactionStore(s => s.loading);
+  const total = useTransactionStore(s => s.total);
   return (
     <div className="mt-6">
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white">
@@ -45,7 +47,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ transactions, loadi
         <tbody>
           {loading ? (
             <tr><td colSpan={8} className="text-center py-6 text-gray-500">{TABLE.LOADING}</td></tr>
-          ) : (transactions.length === 0 ? (
+          ) : (!transactions || transactions.length === 0 ? (
             <tr><td colSpan={8} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
           ) : (
             transactions.map((t, idx) => (

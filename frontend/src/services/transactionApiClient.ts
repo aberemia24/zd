@@ -1,6 +1,5 @@
-import { Transaction } from '../types/Transaction';
 import { API_URL } from '../constants/api';
-import { TransactionQueryParams } from '../hooks/useTransactionFilters';
+import { Transaction, TransactionQueryParams } from '../types/transaction';
 import { MESAJE } from '../constants/messages';
 
 /**
