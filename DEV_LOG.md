@@ -60,3 +60,11 @@
 ---
 
 _Actualizat la: 2025-04-26_
+
+## 2025-04-27 - Finalizare migrare Zustand pentru tranzacții și recurență
+- Toate funcționalitățile de tranzacții (inclusiv recurență) folosesc exclusiv Zustand store-uri, fără hooks custom legacy.
+- Testare exhaustivă pentru toate edge cases, validare și fluxuri negative/pozitive, inclusiv recurență.
+- Nu mai există props drilling sau duplicare logică între hooks și store-uri.
+- Toate textele UI, mesajele și enums sunt centralizate și importate doar din barrel (`constants/index.ts`).
+- Convențiile și best practices au fost actualizate și respectate (vezi BEST_PRACTICES.md).
+- Documentarea și refactorizările minore rămase sunt în curs.

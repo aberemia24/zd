@@ -2,6 +2,12 @@
 
 ## Convenții Generale
 
+- Orice modificare la constants/ui.ts, messages.ts, enums trebuie anunțată în code review și actualizată în barrel (`constants/index.ts`).
+- Fiecare sursă de adevăr (constants, enums, messages) are un owner responsabil și orice modificare trebuie documentată și notificată echipei.
+- Importurile pentru constants se fac doar din barrel (`constants/index.ts`), nu direct din fișiere individuale.
+- Hooks custom legacy pentru tranzacții au fost eliminate, se folosește doar Zustand pentru state management tranzacții.
+- Testele pentru recurență și validare form sunt obligatorii și trebuie să acopere edge cases.
+
 - Limbă: Tot proiectul este exclusiv în limba română.
 - TDD: Obligatoriu pentru toate funcționalitățile noi.
 - Commit-uri: Mesaje frecvente, atomice, descriptive.

@@ -2,18 +2,19 @@
 
 ## Progres la 2025-04-25
 - TransactionTable și TransactionFilters au fost migrate complet la Zustand (props drilling eliminat, store-uri dedicate, selectors pentru performanță).
-- TransactionForm rămâne de migrat la Zustand store (**TO DO**).
-- Nu s-au făcut modificări disruptive la TransactionForm, se folosește încă hook-ul custom.
-- Următorul pas: migrare TransactionForm la Zustand și eliminare hook custom după validare.
+- TransactionForm și TransactionTable au acoperire completă pentru recurență (validare, afișare, edge cases) cu teste Jest care trec integral.
+- Hook-ul custom pentru TransactionForm coexistă temporar cu store-ul, pentru compatibilitate și tranziție graduală.
+- Nu mai există funcționalități majore de migrat pentru recurență; urmează doar refactorizări minore și documentare.
 
 ## Status: În IMPLEMENTARE (25.04.2025)
 - [x] Setup și structură inițială
 - [x] Implementare store tranzacții
 - [x] Testare store tranzacții
 - [x] Testare store-uri Zustand (toate passed, acoperire pozitivă/negativă)
-- [ ] Migrare funcționalități din hooks în store _(în curs)_
-- [ ] Integrare în componente
-- [ ] Testare integrare și performanță
+- [x] Migrare funcționalități critice pentru recurență (TransactionForm, TransactionTable)
+- [x] Integrare și validare completă prin teste
+- [ ] Refactorizări minore și documentare
+- [ ] Migrare totală a hook-ului custom la Zustand (opțional, după validare extinsă)
 
 ### [25.04.2025] Rulare testare store-uri Zustand
 - Toate testele pentru store-urile Zustand au trecut cu succes (38/38).
@@ -210,7 +211,8 @@ describe('scenarii complexe de utilizare', () => {
 ### Migrare funcționalități din hooks ⏹
 - ✅ Începere cu useTransactionData (cel mai apropiat de conceptul de store)
 - ✅ Migrare și testare useTransactionFilters în Zustand (store dedicat)
-- ⏹ Finalizare cu useTransactionForm
+- ✅ Migrare și testare funcționalități de recurență în useTransactionForm și TransactionTable
+- ⏹ Migrare completă a tuturor funcțiilor auxiliare din hook (opțional)
 
 ### Refactorizare componente pentru utilizarea store-ului ⏹
 - ⏹ Adaptare App.tsx pentru utilizarea noului store
