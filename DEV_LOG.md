@@ -68,3 +68,10 @@ _Actualizat la: 2025-04-26_
 - Toate textele UI, mesajele și enums sunt centralizate și importate doar din barrel (`constants/index.ts`).
 - Convențiile și best practices au fost actualizate și respectate (vezi BEST_PRACTICES.md).
 - Documentarea și refactorizările minore rămase sunt în curs.
+
+## 2025-04-27 - Migrare enums/constants la shared-constants și audit automat importuri
+- Finalizată migrarea enums/constants la sursa unică `shared-constants/`.
+- Toate importurile din frontend și backend folosesc doar `@shared-constants`.
+- Eliminare completă a importurilor legacy (direct din constants/enums sau shared).
+- Scriptul `tools/validate-constants.js` validează automat corectitudinea importurilor și sincronizarea.
+- Actualizate documentația și best practices pentru această strategie.

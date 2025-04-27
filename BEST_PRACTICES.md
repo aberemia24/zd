@@ -68,12 +68,19 @@
 
 ## Constants și Importuri
 
-### Organizare și Barrel Exports
+### Organizare și Importuri Partajate
 
-- Toate constantele (`ui.ts`, `messages.ts`, `defaults.ts`, `api.ts`) trebuie re-exportate prin barrel (`constants/index.ts`).
-- Importurile în codul principal și teste trebuie să fie doar prin barrel, nu direct din fișiere.
-- Barrel-ul (`constants/index.ts`) trebuie actualizat imediat după orice adăugare sau ștergere de constante.
-- Fără path mapping custom (`@constants/...`) decât dacă se adoptă o arhitectură de monorepo extins.
+- Sursa unică de adevăr pentru enums/constants partajate este `shared-constants/` la rădăcina proiectului.
+- Importurile pentru enums/constants partajate se fac DOAR prin path mapping `@shared-constants`, nu direct din fișiere sau barrel local.
+- Orice import legacy (ex: din `constants/enums.ts`, `shared/`, barrel local) este interzis și va fi blocat automat de scriptul `npm run validate:constants`.
+- Barrel-ul `shared-constants/index.ts` trebuie actualizat imediat după orice modificare.
+- Orice modificare la enums/constants partajate trebuie anunțată și documentată în `DEV_LOG.md`.
+- Exemplu corect de import:
+  ```typescript
+  import { TransactionType, CategoryType } from '@shared-constants';
+  ```
+- Auditarea automată a importurilor se face cu `npm run validate:constants` și este obligatorie înainte de orice commit major.
+
 
 ## Management Memorii Critice și Deprecated
 

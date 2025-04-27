@@ -2,7 +2,7 @@ import { TransactionService } from './transactionService';
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { MOCK_TRANSACTION, MOCK_TRANSACTION_FORM_WITH_NUMBER } from '../test/mockData';
-import { TransactionType } from '../constants/enums';
+import { TransactionType } from '@shared-constants';
 import { FORM_DEFAULTS } from '../constants/defaults';
 
 // Mock complet pentru TransactionApiClient

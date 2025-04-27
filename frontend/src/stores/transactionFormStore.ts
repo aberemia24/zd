@@ -1,8 +1,9 @@
 import { create } from 'zustand';
-import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../constants';
+import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../../../shared-constants';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
+import { TransactionType } from '../../../shared-constants/enums';
 
 interface TransactionFormStoreState {
   form: TransactionFormData;

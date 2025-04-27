@@ -17,8 +17,10 @@
     "baseUrl": "src",
     "types": ["jest", "node", "@testing-library/jest-dom"],
     "paths": {
-      "@shared/*": ["../../shared/*"]
+      "@shared/*": ["../../shared/*"],
+      "@shared-constants/*": ["../../shared-constants/*"],
+      "@shared-constants": ["../../shared-constants/index"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../shared-constants"]
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import TransactionForm from './';
 import { TransactionFormData, categorii } from './TransactionForm';
-import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
+import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
 import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../../test/mockData';
 import { MESAJE } from '../../../constants/messages';
 import { act } from 'react';

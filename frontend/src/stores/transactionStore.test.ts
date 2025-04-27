@@ -6,7 +6,7 @@ import { act, waitFor } from '@testing-library/react';
 import { PAGINATION } from '../constants/defaults';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PaginatedResponse } from '../services/transactionApiClient';
-import { TransactionType, CategoryType } from '../constants/enums';
+import { TransactionType, CategoryType } from '../../../shared-constants';
 import { TransactionService } from '../services/transactionService';
 
 // Mock pentru middleware Zustand (dezactivează persist și devtools în teste)

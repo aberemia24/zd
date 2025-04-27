@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from '../../primitives/Button';
 import Select from '../../primitives/Select';
-import { TransactionType, CategoryType } from '../../../constants/enums';
+import { TransactionType, CategoryType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS } from '../../../constants/ui';
 
 import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';

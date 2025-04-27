@@ -68,7 +68,7 @@ export const EXCEL_GRID = {
 };
 
 // Opțiuni pentru dropdown-uri (folosite în TransactionForm)
-import { TransactionType, CategoryType } from './enums';
+import { TransactionType, CategoryType, FrequencyType } from './enums'; // proxy către shared-constants
 
 export const OPTIONS = {
   TYPE: [
@@ -82,9 +82,9 @@ export const OPTIONS = {
     { value: CategoryType.SAVING, label: 'Economii' },
   ],
   FREQUENCY: [
-    { value: 'zilnic', label: 'Zilnic' },
-    { value: 'săptămânal', label: 'Săptămânal' },
-    { value: 'lunar', label: 'Lunar' },
-    { value: 'anual', label: 'Anual' },
+    { value: FrequencyType.DAILY, label: 'Zilnic' },
+    { value: FrequencyType.WEEKLY, label: 'Săptămânal' },
+    { value: FrequencyType.MONTHLY, label: 'Lunar' },
+    { value: FrequencyType.YEARLY, label: 'Anual' },
   ],
 };

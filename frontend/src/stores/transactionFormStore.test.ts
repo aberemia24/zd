@@ -1,5 +1,5 @@
 import { createTransactionFormStore } from './transactionFormStore';
-import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../constants';
+import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '../../../shared-constants';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';

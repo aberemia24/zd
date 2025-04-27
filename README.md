@@ -10,7 +10,7 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 
 - `frontend/` - React + Zustand + TailwindCSS + Testing Library
 - `backend/` - NestJS + MongoDB + Firebase Auth
-- `shared/` - Tipuri comune (TypeScript), enums, validări runtime (Zod)
+- `shared-constants/` - Sursa unică pentru enums/constants partajate (TypeScript, Zod, barrel index.ts)
 
 ---
 
@@ -115,3 +115,20 @@ Structură răspuns:
 
 _Actualizat la: 2025-04-26_
 
+---
+
+## 🛡️ Audit automat importuri enums/constants
+
+Toate importurile pentru enums/constants partajate trebuie să folosească doar `@shared-constants`.
+
+Verifică automat corectitudinea cu:
+
+```sh
+npm run validate:constants
+```
+
+Dacă există importuri greșite, scriptul va afișa eroarea și va opri execuția. Exemplu:
+```
+❌ Wrong/legacy imports found:
+  frontend/src/test/mockData.ts → from '../constants/enums'
+```

@@ -3,7 +3,7 @@ import Button from '../../primitives/Button';
 import Input from '../../primitives/Input';
 import Select from '../../primitives/Select';
 import Checkbox from '../../primitives/Checkbox';
-import { TransactionType, CategoryType } from '../../../constants/enums';
+import { TransactionType, CategoryType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '../../../constants/ui';
 import { MESAJE } from '../../../constants/messages';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';

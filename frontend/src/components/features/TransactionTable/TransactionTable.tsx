@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../../primitives/Button';
-import { TransactionType, CategoryType, FrequencyType } from '../../../constants/enums';
+import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
 import { TABLE, BUTTONS } from '../../../constants/ui';
 
 export type Transaction = {

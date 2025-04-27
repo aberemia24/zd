@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { TransactionType, CategoryType } from '../constants/enums';
+import { TransactionType, CategoryType } from '../../../shared-constants';
 import { PAGINATION } from '../constants/defaults';
 import { createTransactionFiltersStore } from './transactionFiltersStore';
 

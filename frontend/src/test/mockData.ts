@@ -1,7 +1,7 @@
 // Date de test centralizate pentru toate testele
 import { Transaction, TransactionFormWithNumberAmount } from '../types/transaction';
 import { FORM_DEFAULTS } from '../constants/defaults';
-import { TransactionType, FrequencyType } from '../constants/enums';
+import { TransactionType, FrequencyType } from '@shared-constants';
 
 export const MOCK_USER_ID = 'u1';
 
