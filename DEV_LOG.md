@@ -75,3 +75,12 @@ _Actualizat la: 2025-04-26_
 - Eliminare completă a importurilor legacy (direct din constants/enums sau shared).
 - Scriptul `tools/validate-constants.js` validează automat corectitudinea importurilor și sincronizarea.
 - Actualizate documentația și best practices pentru această strategie.
+
+## 2025-04-28 - Configurare rezolvare alias și îmbunătățiri testare
+- Adăugat alias `@shared-constants` în `craco.config.js` pentru Jest (moduleNameMapper).
+- Actualizat `tsconfig.json` (frontend) cu `paths` către `src/shared-constants` pentru TypeScript.
+- Modificat `package.json` pentru a folosi `craco test` și pretest copy-shared-constants.
+- Re-exportat `enums` din `shared-constants/index.ts` și aliniat importurile (`@shared-constants`).
+- Actualizat fișiere (`App.tsx`, `transactionFormStore.ts`, teste) pentru a importa din `@shared-constants`.
+- Protejat apelurile DI din `App.tsx` (`setTransactionService`, `setRefreshCallback`) prin verificarea tipului.
+- Extins mock-urile din `App.test.tsx` pentru noile metode ale store-ului.

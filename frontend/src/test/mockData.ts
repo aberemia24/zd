@@ -1,7 +1,7 @@
 // Date de test centralizate pentru toate testele
 import { Transaction, TransactionFormWithNumberAmount } from '../types/transaction';
-import { FORM_DEFAULTS } from '../constants/defaults';
-import { TransactionType, FrequencyType } from '@shared-constants';
+import { FORM_DEFAULTS } from 'shared-constants';
+import { TransactionType, FrequencyType } from 'shared-constants';
 
 export const MOCK_USER_ID = 'u1';
 
@@ -62,7 +62,7 @@ export const MOCK_TRANSACTIONS_LIST: Transaction[] = [
 ];
 
 // Pattern: importă structura de opțiuni pentru dropdown-uri controlate (sursă de adevăr)
-import { OPTIONS, LABELS, BUTTONS, TABLE, PLACEHOLDERS } from '../constants/ui';
+import { OPTIONS, LABELS, BUTTONS, TABLE, PLACEHOLDERS } from 'shared-constants';
 export { OPTIONS as MOCK_OPTIONS, LABELS as MOCK_LABELS, BUTTONS as MOCK_BUTTONS, TABLE as MOCK_TABLE, PLACEHOLDERS as MOCK_PLACEHOLDERS };
 
 // Pattern: user minimal pentru testare (dacă există tipul User)

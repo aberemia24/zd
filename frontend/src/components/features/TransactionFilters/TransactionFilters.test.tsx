@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TransactionFilters from './';
-import { TransactionType, CategoryType } from '@shared-constants';
+import { TransactionType, CategoryType } from 'shared-constants';
 import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
 
 // Mock pentru store-ul Zustand - folosim string-uri pentru enum valori

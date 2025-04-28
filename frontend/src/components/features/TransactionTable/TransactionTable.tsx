@@ -1,7 +1,8 @@
 import React from 'react';
 import Button from '../../primitives/Button';
-import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
-import { TABLE, BUTTONS } from '../../../constants/ui';
+import { TransactionType, CategoryType } from '@shared-constants';
+import { TABLE, BUTTONS } from '@shared-constants';
+import { useTransactionStore } from '../../../stores/transactionStore';
 
 export type Transaction = {
   _id?: string;
@@ -17,8 +18,6 @@ export type Transaction = {
   frequency?: string;
 };
 
-import { useTransactionStore } from '../../../stores/transactionStore';
-
 export type TransactionTableProps = {
   offset: number;
   limit: number;
@@ -26,9 +25,7 @@ export type TransactionTableProps = {
 };
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPageChange }) => {
-  const transactions = useTransactionStore(s => s.transactions);
-  const loading = useTransactionStore(s => s.loading);
-  const total = useTransactionStore(s => s.total);
+  const { transactions, loading, total } = useTransactionStore(s => ({ transactions: s.transactions, loading: s.loading, total: s.total }));
   return (
     <div className="mt-6">
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white">

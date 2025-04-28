@@ -81,6 +81,30 @@
   ```
 - Auditarea automată a importurilor se face cu `npm run validate:constants` și este obligatorie înainte de orice commit major.
 
+#### Configurare Path Mapping pentru Shared Constants
+
+- Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, CRACO):
+  - În `tsconfig.json` adaugă la `compilerOptions.paths`:
+    ```json
+    "@shared-constants": ["../shared-constants/index.ts"],
+    "@shared-constants/*": ["../shared-constants/*"]
+    ```
+  - În `jest.config.js`:
+    ```js
+    moduleNameMapper: {
+      '^@shared-constants$': '<rootDir>/../shared-constants/index.ts',
+      '^@shared-constants/(.*)$': '<rootDir>/../shared-constants/$1',
+    }
+    ```
+  - În `craco.config.js` (sau echivalent webpack):
+    ```js
+    alias: {
+      '@shared-constants': path.resolve(__dirname, '../shared-constants'),
+    }
+    ```
+- Verifică periodic ca toate aceste configurații să fie sincronizate și testele să ruleze fără erori de path mapping.
+- Orice discrepanță între configurări trebuie remediată imediat și documentată în `DEV_LOG.md`.
+
 
 ## Management Memorii Critice și Deprecated
 
@@ -159,6 +183,23 @@
 - Invalidarea selectivă a cache-ului reduce semnificativ apelurile API.
 - Migrarea de la hooks custom la Zustand necesită rescriere completă a testelor.
 
+### Pattern arhitectural: hooks + servicii + caching pentru React CRUD
+
+- Recomandat pentru aplicații cu operațiuni CRUD frecvente:
+  - Custom hooks pentru gestionare UI/state (ex: `useTransactionForm`, `useTransactionFilters`, `useTransactionData`)
+  - Servicii dedicate pentru business logic și API (ex: `TransactionService`, `TransactionApiClient`)
+  - Optimizare cache cu invalidare selectivă, LRU, monitorizare performanță
+- Avantaje: separare clară a responsabilităților, testabilitate crescută, performanță mai bună.
+- Status: pattern recomandat, nu obligatoriu (vezi și secțiunea 3 din `global_rules.md`).
+
+### Testare valori inițiale în formulare complexe (React)
+
+- Lecție: Asertarea simultană a tuturor valorilor inițiale poate duce la instabilitate în JSDOM/RTL.
+- Recomandare:
+  - Împarte verificarea în teste focalizate, fiecare testând un singur câmp sau grup mic de câmpuri.
+  - Folosește `await waitFor` pentru câmpuri cu timing problematic (date, number, checkbox).
+- Status: pattern recomandat pentru stabilitate, nu regulă obligatorie.
+
 ---
 
-_Actualizat la: 2025-04-26_
+_Actualizat la: 2025-04-28_

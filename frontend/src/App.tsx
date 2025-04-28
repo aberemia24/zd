@@ -3,7 +3,7 @@ import React from 'react';
 import TransactionForm from './components/features/TransactionForm/TransactionForm';
 import TransactionTable from './components/features/TransactionTable/TransactionTable';
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
-import { OPTIONS, TITLES } from './constants/ui';
+import { OPTIONS, TITLES } from '@shared-constants';
 
 // Import tipuri
 import { TransactionFormWithNumberAmount } from './types/transaction';
@@ -91,19 +91,19 @@ export const App: React.FC = () => {
   const refreshTransactions = useTransactionStore(s => s.refresh);
   // TODO: adaptare queryParams și transactionService dacă este nevoie (acum store-ul le gestionează intern)
 
-  // Callback pentru trimiterea formularului
-  const handleFormSubmit = React.useCallback(async (formData: TransactionFormWithNumberAmount) => {
-    try {
-      // Salvăm tranzacția folosind serviciul
-      await transactionService.saveTransaction(formData);
-      // Forțăm reîncărcarea listei de tranzacții
-      refreshTransactions();
-      return true;
-    } catch (error) {
-      console.error('Eroare la salvarea tranzacției:', error);
-      return false;
+  // Înregistrăm serviciile direct în componenta de nivel superior
+  // Această metodă este mult mai sigură și previne bucle infinite
+  React.useEffect(() => {
+    const storeApi = useTransactionFormStore.getState();
+    if (typeof storeApi.setTransactionService === 'function') {
+      storeApi.setTransactionService(transactionService);
     }
-  }, [transactionService, refreshTransactions]);
+    if (typeof storeApi.setRefreshCallback === 'function') {
+      storeApi.setRefreshCallback(refreshTransactions);
+    }
+
+    // Utilizăm un array gol de dependențe pentru a executa efectul doar la montare
+  }, []); // Array gol pentru a preveni bucla infinită
 
   // Folosim store-ul Zustand pentru formular
   const {
@@ -124,20 +124,7 @@ export const App: React.FC = () => {
     resetForm: state.resetForm
   }));
   
-  // Conectăm handleFormSubmit la store-ul de formular
-  React.useEffect(() => {
-    const formSubmitHandler = (formData: TransactionFormWithNumberAmount) => {
-      return handleFormSubmit(formData);
-    };
-    
-    // Înregistrăm handler-ul pentru submit
-    useTransactionFormStore.getState().setSubmitHandler(formSubmitHandler);
-    
-    return () => {
-      // Curățăm handler-ul la unmount
-      useTransactionFormStore.getState().setSubmitHandler(null);
-    };
-  }, [handleFormSubmit]);
+  // Nu mai folosim handler-ul explicit, ci ne bazăm pe serviciile înregistrate direct în store
 
   // Callback pentru schimbarea paginii
   const handlePageChange = React.useCallback((newOffset: number) => {

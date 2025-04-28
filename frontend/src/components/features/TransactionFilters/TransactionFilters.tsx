@@ -1,11 +1,11 @@
 import React from 'react';
 import Button from '../../primitives/Button';
 import Select from '../../primitives/Select';
-import { TransactionType, CategoryType } from '@shared-constants';
-import { LABELS, PLACEHOLDERS } from '../../../constants/ui';
+import { TransactionType, CategoryType } from 'shared-constants';
+import { LABELS, PLACEHOLDERS } from 'shared-constants';
 
 import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';
-import { OPTIONS } from '../../../constants/ui';
+import { OPTIONS } from 'shared-constants';
 
 const TransactionFilters: React.FC = () => {
   const type = useTransactionFiltersStore(s => s.filterType);

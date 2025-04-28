@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ErrorBoundary from './ErrorBoundary';
-import { MESAJE } from '../constants/messages';
+import { MESAJE } from 'shared-constants';
 
 // Componentă cu eroare pentru a testa ErrorBoundary
 function ComponentCuEroare({ shouldThrow = false }: { shouldThrow?: boolean }) {

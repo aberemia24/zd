@@ -1,19 +1,26 @@
 import React from 'react';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
-import TransactionForm from './';
-import { TransactionFormData, categorii } from './TransactionForm';
-import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
-import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../../test/mockData';
-import { MESAJE } from '../../../constants/messages';
 import { act } from 'react';
-import { FORM_DEFAULTS } from '../../../constants/defaults';
+
+// Import pentru date de test și tipuri
+import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_PLACEHOLDERS, MOCK_ERROR_MESSAGES } from '../../../test/mockData';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../../../types/transaction';
 import { PaginatedResponse } from '../../../services/transactionApiClient';
 
-// Mock-uri pentru store-urile Zustand
+// Import-uri din @shared-constants conform regulilor globale (sursa unică de adevăr)
+import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
+import { MESAJE } from '@shared-constants';
+import { FORM_DEFAULTS } from '@shared-constants';
+
+// Mock-uri doar pentru servicii și store-uri
 jest.mock('../../../stores/transactionFormStore');
 jest.mock('../../../stores/transactionStore');
 
+// Import pentru componenta testată și dependințele sale
+import TransactionForm from './';
+import { TransactionFormData, categorii } from './TransactionForm';
+
+// Import-uri pentru servicii și store-uri care au fost mock-uite
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { TransactionService } from '../../../services/transactionService';
@@ -101,33 +108,111 @@ const mockResetForm = jest.fn();
 const mockHandleSubmit = jest.fn();
 const mockRefreshTransactions = jest.fn();
 
+// Definim tipul pentru mock-ul nostru de store, conform arhitecturii aplicației și principiilor din memoria [pattern]
+// Adaptăm interfața pentru a suporta atât proprietățile formularului cât și proprietățile store-ului
+type MockFormState = {
+  // Proprietățile formularului pot fi specificate direct pentru simplitate
+  form?: TransactionFormData;
+  type?: TransactionType | string; 
+  amount?: string;
+  category?: CategoryType | string;
+  subcategory?: string;
+  date?: string;
+  recurring?: boolean;
+  frequency?: string | FrequencyType;
+  
+  // Proprietăți de stare
+  error?: string;
+  success?: string;
+  loading?: boolean;
+  
+  // Metode
+  setForm?: jest.Mock;
+  setField?: jest.Mock;
+  setError?: jest.Mock;
+  setSuccess?: jest.Mock;
+  setLoading?: jest.Mock;
+  resetForm?: jest.Mock;
+  validateForm?: jest.Mock;
+  handleSubmit?: jest.Mock;
+  handleChange?: jest.Mock;
+  setSubmitHandler?: jest.Mock;
+  
+  // Proprietăți adăugate pentru a rezolva eroarea de bucle infinite
+  setTransactionService?: jest.Mock;
+  setRefreshCallback?: jest.Mock;
+  
+  // Selectors
+  getForm?: jest.Mock;
+  getError?: jest.Mock;
+  getSuccess?: jest.Mock;
+  getLoading?: jest.Mock;
+};
+
+// Helper pentru a crea un mock complet pentru TransactionFormStoreState
+// Pentru a evita duplicarea codului și asigura compatibilitatea cu orice modificări viitoare
+// Helper pentru crearea unui mock de store Zustand complet și flexibil
+function createMockTransactionFormState(customState: Partial<MockFormState> = {}) {
+  // Extragem proprietățile formularului direct din customState și din form dacă există
+  const { 
+    type, amount, category, subcategory, date, recurring, frequency, form: customForm, 
+    ...restCustomState 
+  } = customState;
+  
+  // Preiau valori directe din customState pentru formularul, prioritizându-le față de cele din customForm
+  const formData = {
+    ...(customForm || {}),
+    ...(type !== undefined && { type }),
+    ...(amount !== undefined && { amount }),
+    ...(category !== undefined && { category }),
+    ...(subcategory !== undefined && { subcategory }),
+    ...(date !== undefined && { date }),
+    ...(recurring !== undefined && { recurring }),
+    ...(frequency !== undefined && { frequency }),
+  };
+  
+  // Creăm formular final combinând default cu cele specificate
+  const finalForm = { ...defaultForm, ...formData };
+  
+  // Creăm state-ul standard cu toate proprietățile necesare
+  const baseState = {
+    form: finalForm,
+    error: '',
+    success: '',
+    loading: false,
+    setForm: jest.fn(),
+    setField: mockSetField,
+    setError: jest.fn(),
+    setSuccess: jest.fn(),
+    setLoading: jest.fn(),
+    resetForm: mockResetForm,
+    validateForm: jest.fn().mockReturnValue(true),
+    handleSubmit: mockHandleSubmit,
+    handleChange: jest.fn(),
+    setSubmitHandler: jest.fn(),
+    // Proprietățile adăugate pentru a rezolva eroarea de bucle infinite
+    setTransactionService: jest.fn(),
+    setRefreshCallback: jest.fn(),
+    // Getteri impliciți
+    getForm: jest.fn().mockImplementation(() => finalForm),
+    getError: jest.fn().mockReturnValue(''),
+    getSuccess: jest.fn().mockReturnValue(''),
+    getLoading: jest.fn().mockReturnValue(false)
+  };
+  
+  // Suprascrie cu proprietățile personalizate rămase
+  return { ...baseState, ...restCustomState };
+}
+
 // Setup pentru mock-uri înainte de fiecare test
 beforeEach(() => {
   jest.clearAllMocks();
   
-  // Mock complet pentru useTransactionFormStore
+  // Mock complet pentru useTransactionFormStore folosind helper-ul
+  // Implementare standard pentru toate testele
   mockUseTransactionFormStore.mockImplementation((selector) => {
-    // Simulăm comportamentul selectorului Zustand cu toate proprietățile necesare
-    const state = {
-      form: defaultForm,
-      error: '',
-      success: '',
-      loading: false,
-      setForm: jest.fn(),
-      setField: mockSetField,
-      setError: jest.fn(),
-      setSuccess: jest.fn(),
-      setLoading: jest.fn(),
-      resetForm: mockResetForm,
-      validateForm: jest.fn().mockReturnValue(true),
-      handleSubmit: mockHandleSubmit,
-      handleChange: jest.fn(),
-      setSubmitHandler: jest.fn(),
-      getForm: jest.fn().mockReturnValue(defaultForm),
-      getError: jest.fn().mockReturnValue(''),
-      getSuccess: jest.fn().mockReturnValue(''),
-      getLoading: jest.fn().mockReturnValue(false)
-    };
+    // Folosim helper-ul care conține TOATE proprietățile necesare
+    const state = createMockTransactionFormState();
     
     // Dacă este apelat cu un selector, returnăm rezultatul selectorului
     if (typeof selector === 'function') {
@@ -233,26 +318,15 @@ describe('TransactionForm', () => {
   it('nu permite alegerea categoriei dacă tipul nu este selectat', () => {
     // Configurăm mock-ul pentru a returna un formular fără tip selectat
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: { ...defaultForm, type: '' },
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue({ ...defaultForm, type: '' }),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: '',
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -270,29 +344,16 @@ describe('TransactionForm', () => {
 
   it('afișează doar VENITURI la categorie dacă tipul este Venit', () => {
     // Configurăm mock-ul pentru a returna un formular cu tip Venit
-    const formVenit = { ...defaultForm, type: TransactionType.INCOME };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formVenit,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formVenit),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.INCOME,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -310,29 +371,16 @@ describe('TransactionForm', () => {
 
   it('afișează doar CHELTUIELI la categorie dacă tipul este Cheltuială', () => {
     // Configurăm mock-ul pentru a returna un formular cu tip Cheltuială
-    const formChelt = { ...defaultForm, type: TransactionType.EXPENSE };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formChelt,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formChelt),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.EXPENSE,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -350,29 +398,16 @@ describe('TransactionForm', () => {
 
   it('afișează doar ECONOMII la categorie dacă tipul este Economisire', () => {
     // Configurăm mock-ul pentru a returna un formular cu tip Economisire
-    const formEcon = { ...defaultForm, type: TransactionType.SAVING };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formEcon,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formEcon),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.SAVING,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -390,32 +425,16 @@ describe('TransactionForm', () => {
 
   it('nu permite alegerea subcategoriei dacă categoria nu este selectată', () => {
     // Configurăm mock-ul pentru a returna un formular cu tip selectat dar fără categorie
-    const formCuTip = {
-      ...defaultForm,
-      type: TransactionType.INCOME
-    };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formCuTip,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formCuTip),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.INCOME,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -433,29 +452,17 @@ describe('TransactionForm', () => {
 
   it('afișează TOATE subcategoriile corecte pentru VENITURI', async () => {
     // Configurăm mock-ul pentru a returna un formular cu tip și categorie pentru venituri
-    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formVenit,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formVenit),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.INCOME, 
+        category: CategoryType.INCOME,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -491,29 +498,17 @@ describe('TransactionForm', () => {
 
   it('afișează TOATE subcategoriile corecte pentru ECONOMII', async () => {
     // Configurăm mock-ul pentru a returna un formular cu tip și categorie pentru economii
-    const formEcon = { ...defaultForm, type: TransactionType.SAVING, category: CategoryType.SAVING };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formEcon,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formEcon),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.SAVING, 
+        category: CategoryType.SAVING,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -544,29 +539,17 @@ describe('TransactionForm', () => {
 
   it('afișează TOATE subcategoriile corecte pentru CHELTUIELI', async () => {
     // Configurăm mock-ul pentru a returna un formular cu tip și categorie pentru cheltuieli
-    const formChelt = { ...defaultForm, type: TransactionType.EXPENSE, category: CategoryType.EXPENSE };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formChelt,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formChelt),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.EXPENSE, 
+        category: CategoryType.EXPENSE,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -597,29 +580,17 @@ describe('TransactionForm', () => {
 
   it('nu permite selectarea unei categorii incompatibile cu tipul', async () => {
     // Configurăm mock-ul pentru a returna un formular cu tip și categorie incompatibile
-    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.EXPENSE };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formVenit,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formVenit),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.INCOME, 
+        category: CategoryType.EXPENSE,
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -640,29 +611,18 @@ describe('TransactionForm', () => {
 
   it('nu permite selectarea unei subcategorii incompatibile cu categoria', async () => {
     // Configurăm mock-ul pentru a returna un formular cu categorie și subcategorie incompatibile
-    const formVenit = { ...defaultForm, type: TransactionType.INCOME, category: CategoryType.INCOME, subcategory: 'Îmbrăcăminte, încălțăminte și accesorii' };
-    
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: formVenit,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(formVenit),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Proprietățile formularului direct
+        type: TransactionType.INCOME, 
+        category: CategoryType.INCOME, 
+        subcategory: 'Îmbrăcăminte, încălțăminte și accesorii',
+        // Putem suprascrie și alte proprietăți dacă e nevoie
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -684,8 +644,10 @@ describe('TransactionForm', () => {
   it('afișează eroare dacă recurent fără frecvență și nu permite submit', () => {
     // Configurăm mock store cu eroare pentru frecvență recurentă
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: { ...defaultForm, recurring: true, frequency: '' },
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        recurring: true, 
+        frequency: '',
         error: MESAJE.FRECV_RECURENTA,
         success: '',
         loading: false,
@@ -703,7 +665,7 @@ describe('TransactionForm', () => {
         getError: jest.fn().mockReturnValue(MESAJE.FRECV_RECURENTA),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       return typeof selector === 'function' ? selector(state) : state;
     });
     // Redăm componenta și verificăm mesajul de eroare folosind testid
@@ -736,6 +698,7 @@ describe('TransactionForm', () => {
   it('shows error and success messages', () => {
     // Configurăm mock-ul doar pentru mesajele de eroare și succes
     mockUseTransactionFormStore.mockImplementation((selector) => {
+      // Mock complet cu toate proprietățile necesare, inclusiv cele noi adăugate
       const baseState = {
         form: defaultForm,
         error: MOCK_ERROR_MESSAGES.TEST_ERROR,
@@ -751,6 +714,10 @@ describe('TransactionForm', () => {
         handleSubmit: mockHandleSubmit,
         handleChange: jest.fn(),
         setSubmitHandler: jest.fn(),
+        // Proprietățile noi adăugate pentru a rezolva eroarea de bucle infinite
+        setTransactionService: jest.fn(),
+        setRefreshCallback: jest.fn(),
+        // Selectori
         getForm: jest.fn().mockReturnValue(defaultForm),
         getError: jest.fn().mockReturnValue(MOCK_ERROR_MESSAGES.TEST_ERROR),
         getSuccess: jest.fn().mockReturnValue(MOCK_ERROR_MESSAGES.TEST_SUCCESS),
@@ -797,26 +764,14 @@ describe('TransactionForm', () => {
   it('afișează valoarea inițială pentru tip din store', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -839,26 +794,14 @@ describe('TransactionForm', () => {
   it('redă valorile inițiale pentru categorie și subcategorie din store', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -885,26 +828,14 @@ describe('TransactionForm', () => {
   it('afișează valoarea inițială pentru sumă din store', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -926,26 +857,14 @@ describe('TransactionForm', () => {
   it('afișează valoarea inițială pentru dată din store', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -967,26 +886,14 @@ describe('TransactionForm', () => {
   it('afișează starea inițială pentru recurent din store', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -1007,26 +914,14 @@ describe('TransactionForm', () => {
   it('afișează valoarea inițială pentru frecvență din store când recurent este bifat', async () => {
     // Configurăm mock-ul pentru a returna un formular cu valori inițiale
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: initialForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        ...initialForm,
         getForm: jest.fn().mockReturnValue(initialForm),
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -1048,26 +943,8 @@ describe('TransactionForm', () => {
   it('afișează câmpul de frecvență doar când recurent este bifat', async () => {
     // Configurăm mock-ul pentru a returna un formular fără recurent bifat
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: defaultForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(defaultForm),
-        getError: jest.fn().mockReturnValue(''),
-        getSuccess: jest.fn().mockReturnValue(''),
-        getLoading: jest.fn().mockReturnValue(false)
-      };
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState();
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -1088,26 +965,15 @@ describe('TransactionForm', () => {
     // Simulăm bifarea câmpului recurent prin actualizarea mock-ului
     const recurringForm = { ...defaultForm, recurring: true };
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: recurringForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(recurringForm),
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState({
+        // Setăm direct câmpul recurring la true
+        recurring: true,
+        // Getteri personalizați
         getError: jest.fn().mockReturnValue(''),
         getSuccess: jest.fn().mockReturnValue(''),
         getLoading: jest.fn().mockReturnValue(false)
-      };
+      });
       
       if (typeof selector === 'function') {
         return selector(state);
@@ -1127,26 +993,8 @@ describe('TransactionForm', () => {
 
     // Simulăm debifarea câmpului recurent prin actualizarea mock-ului înapói la defaultForm
     mockUseTransactionFormStore.mockImplementation((selector) => {
-      const state = {
-        form: defaultForm,
-        error: '',
-        success: '',
-        loading: false,
-        setForm: jest.fn(),
-        setField: mockSetField,
-        setError: jest.fn(),
-        setSuccess: jest.fn(),
-        setLoading: jest.fn(),
-        resetForm: mockResetForm,
-        validateForm: jest.fn().mockReturnValue(true),
-        handleSubmit: mockHandleSubmit,
-        handleChange: jest.fn(),
-        setSubmitHandler: jest.fn(),
-        getForm: jest.fn().mockReturnValue(defaultForm),
-        getError: jest.fn().mockReturnValue(''),
-        getSuccess: jest.fn().mockReturnValue(''),
-        getLoading: jest.fn().mockReturnValue(false)
-      };
+      // Folosim helper-ul care include toate proprietățile (inclusiv cele noi)
+      const state = createMockTransactionFormState();
       
       if (typeof selector === 'function') {
         return selector(state);

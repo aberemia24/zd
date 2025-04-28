@@ -3,8 +3,8 @@ import { persist, createJSONStorage, PersistOptions } from 'zustand/middleware';
 import { devtools } from 'zustand/middleware';
 import { TransactionService } from '../services/transactionService';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
-import { PAGINATION } from '../constants/defaults';
-import { MESAJE } from '../constants/messages';
+import { PAGINATION } from 'shared-constants';
+import { MESAJE } from 'shared-constants';
 
 /**
  * Interfața pentru starea store-ului de tranzacții

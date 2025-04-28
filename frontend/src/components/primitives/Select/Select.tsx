@@ -15,9 +15,10 @@ const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassNa
     <select
       id={id || rest.name}
       className={classNames('input-field', error && 'border-red-500', className)}
+      value={options.some(opt => opt.value === rest.value) ? rest.value : ''}
       {...rest}
     >
-      {placeholder && !rest.value && <option value="">{placeholder}</option>}
+      {placeholder && <option value="">{placeholder}</option>}
       {options.map(opt => (
         <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}

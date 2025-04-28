@@ -1,6 +1,6 @@
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
-import { FORM_DEFAULTS } from '../constants/defaults';
+import { FORM_DEFAULTS } from 'shared-constants';
 
 /**
  * Serviciu pentru gestionarea tranzacțiilor

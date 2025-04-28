@@ -1,5 +1,5 @@
 import React from 'react';
-import { MESAJE } from '../constants/messages';
+import { MESAJE } from 'shared-constants';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

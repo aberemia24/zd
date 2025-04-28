@@ -1,8 +1,8 @@
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
 import { Transaction } from '../types/transaction';
 import { API_URL } from '../constants/api';
-import { MESAJE } from '../constants/messages';
-import { TransactionType, CategoryType } from '@shared-constants';
+import { MESAJE } from 'shared-constants';
+import { TransactionType, CategoryType } from 'shared-constants';
 
 // Mock pentru fetch global
 global.fetch = jest.fn(() => 

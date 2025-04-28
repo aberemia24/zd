@@ -3,7 +3,7 @@ import { render, screen, fireEvent, within, cleanup } from '@testing-library/rea
 import TransactionTable from '.';
 import { Transaction } from './TransactionTable';
 import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
-import { TransactionType, CategoryType, FrequencyType } from '@shared-constants';
+import { TransactionType, CategoryType, FrequencyType } from 'shared-constants';
 
 // Mock pentru store-ul Zustand
 jest.mock('../../../stores/transactionStore', () => {

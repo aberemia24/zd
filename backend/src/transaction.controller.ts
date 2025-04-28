@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, HttpException, HttpStatus, NotFoundException, BadRequestException, HttpCode, Query } from '@nestjs/common';
+import { TransactionSchema } from '@shared-constants/transaction.schema';
 import { TransactionService } from './transaction.service';
 import { z } from 'zod';
-import { TransactionSchema } from '../../shared/transaction.schema';
+
 
 @Controller('transactions')
 export class TransactionController {

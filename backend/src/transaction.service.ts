@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionValidated } from '../../shared/transaction.schema';
+import { TransactionValidated } from '@shared-constants/transaction.schema';
+
 
 @Injectable()
 export class TransactionService {

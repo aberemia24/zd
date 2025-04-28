@@ -1,6 +1,6 @@
 import { API_URL } from '../constants/api';
 import { Transaction, TransactionQueryParams } from '../types/transaction';
-import { MESAJE } from '../constants/messages';
+import { MESAJE } from 'shared-constants';
 
 /**
  * Răspuns paginat de la API

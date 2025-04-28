@@ -1,5 +1,5 @@
 import React from 'react';
-import { EXCEL_GRID } from '../../../constants/ui';
+import { EXCEL_GRID } from 'shared-constants';
 
 // Structura pentru datele lunare
 export type MonthlyData = {

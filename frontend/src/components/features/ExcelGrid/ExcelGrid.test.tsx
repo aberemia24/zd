@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import ExcelGrid, { MonthlyData } from './ExcelGrid';
-import { EXCEL_GRID } from '../../../constants/ui';
+import { EXCEL_GRID } from 'shared-constants';
 
 // Date de test
 const mockData: MonthlyData[] = [

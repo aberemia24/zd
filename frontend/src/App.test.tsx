@@ -4,9 +4,7 @@ import { render, screen, fireEvent, waitFor, within } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { App } from './App';
 import { Transaction, TransactionFormWithNumberAmount } from './types/transaction';
-import { TITLES } from './constants/ui';
-import { MESAJE } from './constants/messages';
-import { TransactionType, FrequencyType, CategoryType } from './constants/enums';
+import { TITLES, MESAJE, TransactionType, FrequencyType, CategoryType } from '@shared-constants';
 import { MOCK_TRANSACTIONS_LIST, MOCK_TRANSACTION, MOCK_RECURRING_TRANSACTION, MOCK_BUTTONS, MOCK_LABELS, MOCK_TABLE } from './test/mockData';
 
 // Date de test reutilizabile pentru toate testele
@@ -88,6 +86,8 @@ jest.mock('./stores/transactionFormStore', () => {
   const mockSetLoading = jest.fn();
   const mockSetField = jest.fn();
   const mockSetSubmitHandler = jest.fn();
+  const mockSetTransactionService = jest.fn();
+  const mockSetRefreshCallback = jest.fn();
   
     // Utilizăm valori predefinite pentru store-uri - este sigur pentru factory-ul jest.mock
   const mockFormStandardResult = {
@@ -97,7 +97,9 @@ jest.mock('./stores/transactionFormStore', () => {
     loading: false,
     handleChange: mockHandleChange,
     handleSubmit: mockHandleSubmit,
-    resetForm: mockResetForm
+    resetForm: mockResetForm,
+    setTransactionService: mockSetTransactionService,
+    setRefreshCallback: mockSetRefreshCallback
   };
   
   // Cream un obiect de state pentru a fi folosit în mock-uri
@@ -114,7 +116,9 @@ jest.mock('./stores/transactionFormStore', () => {
     setSuccess: mockSetSuccess,
     setLoading: mockSetLoading,
     setField: mockSetField,
-    setSubmitHandler: mockSetSubmitHandler
+    setSubmitHandler: mockSetSubmitHandler,
+    setTransactionService: mockSetTransactionService,
+    setRefreshCallback: mockSetRefreshCallback
   });
 
   // Cream mock-ul pentru useTransactionFormStore
@@ -132,7 +136,9 @@ jest.mock('./stores/transactionFormStore', () => {
     mockSetSuccess,
     mockSetLoading,
     mockSetField,
-    mockSetSubmitHandler
+    mockSetSubmitHandler,
+    mockSetTransactionService,
+    mockSetRefreshCallback
   };
 });
 
@@ -209,7 +215,7 @@ jest.mock('./stores/transactionFiltersStore', () => {
 
 describe('App component', () => {
   // Importăm funcțiile mock din modulele mock-uite
-  const { useTransactionFormStore, mockHandleChange, mockHandleSubmit, mockResetForm, mockSetSubmitHandler } = require('./stores/transactionFormStore') as any;
+  const { useTransactionFormStore, mockHandleChange, mockHandleSubmit, mockResetForm, mockSetSubmitHandler, mockSetTransactionService, mockSetRefreshCallback } = require('./stores/transactionFormStore') as any;
   const { useTransactionStore, mockSetQueryParams, mockFetchTransactions, defaultQueryParams } = require('./stores/transactionStore') as any;
   const { useTransactionFiltersStore, mockSetFilterType, mockSetFilterCategory } = require('./stores/transactionFiltersStore') as any;
   
@@ -266,7 +272,9 @@ describe('App component', () => {
       handleChange: mockHandleChange,
       handleSubmit: mockHandleSubmit,
       resetForm: mockResetForm,
-      setSubmitHandler: mockSetSubmitHandler
+      setSubmitHandler: mockSetSubmitHandler,
+      setTransactionService: mockSetTransactionService,
+      setRefreshCallback: mockSetRefreshCallback
     };
     
     useTransactionFormStore.mockImplementation((selector) => {
@@ -312,7 +320,9 @@ describe('App component', () => {
       handleChange: mockHandleChange,
       handleSubmit: mockHandleSubmit,
       resetForm: mockResetForm,
-      setSubmitHandler: mockSetSubmitHandler
+      setSubmitHandler: mockSetSubmitHandler,
+      setTransactionService: mockSetTransactionService,
+      setRefreshCallback: mockSetRefreshCallback
     };
     
     useTransactionFormStore.mockImplementation((selector) => {
@@ -367,7 +377,9 @@ describe('App component', () => {
       handleChange: mockHandleChange,
       handleSubmit: mockHandleSubmit,
       resetForm: mockResetForm,
-      setSubmitHandler: mockSetSubmitHandler
+      setSubmitHandler: mockSetSubmitHandler,
+      setTransactionService: mockSetTransactionService,
+      setRefreshCallback: mockSetRefreshCallback
     };
     
     useTransactionFormStore.mockImplementation((selector) => {
@@ -451,7 +463,9 @@ describe('App component', () => {
       handleChange: mockHandleChange,
       handleSubmit: mockHandleSubmit,
       resetForm: mockResetForm,
-      setSubmitHandler: mockSetSubmitHandler
+      setSubmitHandler: mockSetSubmitHandler,
+      setTransactionService: mockSetTransactionService,
+      setRefreshCallback: mockSetRefreshCallback
     };
     
     useTransactionFormStore.mockImplementation((selector) => {
@@ -501,7 +515,9 @@ describe('App component', () => {
       handleChange: mockHandleChange,
       handleSubmit: mockHandleSubmit,
       resetForm: mockResetForm,
-      setSubmitHandler: mockSetSubmitHandler
+      setSubmitHandler: mockSetSubmitHandler,
+      setTransactionService: mockSetTransactionService,
+      setRefreshCallback: mockSetRefreshCallback
     };
     
     useTransactionFormStore.mockImplementation((selector) => {

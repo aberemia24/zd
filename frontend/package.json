@@ -5,9 +5,14 @@
   "proxy": "http://localhost:3001",
   "main": "src/index.tsx",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "cross-env REACT_APP_API_URL=http://localhost:3000 react-scripts test --env=jsdom",
+    "copy-shared-constants-to-src": "node ./scripts/copy-shared-constants-to-src.js",
+    "prestart": "npm run copy-shared-constants-to-src",
+    "start": "craco start",
+    "prebuild": "npm run copy-shared-constants-to-src",
+    "build": "craco build",
+    "postinstall": "npm run copy-shared-constants-to-src",
+    "pretest": "npm run copy-shared-constants-to-src",
+    "test": "cross-env REACT_APP_API_URL=http://localhost:3000 craco test --env=jsdom",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src"
   },
@@ -20,6 +25,7 @@
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
@@ -31,6 +37,7 @@
     "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-html-reporter": "^4.1.0",

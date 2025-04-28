@@ -3,10 +3,10 @@
  */
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 import { act, waitFor } from '@testing-library/react';
-import { PAGINATION } from '../constants/defaults';
+import { PAGINATION } from 'shared-constants';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PaginatedResponse } from '../services/transactionApiClient';
-import { TransactionType, CategoryType } from '../../../shared-constants';
+import { TransactionType, CategoryType } from 'shared-constants';
 import { TransactionService } from '../services/transactionService';
 
 // Mock pentru middleware Zustand (dezactivează persist și devtools în teste)
@@ -156,7 +156,7 @@ describe('transactionStore', () => {
       // Arrange
       const errorMessage = 'Eroare de rețea';
       mockService.getFilteredTransactions.mockImplementationOnce(() => Promise.reject(new Error(errorMessage)));
-      const { MESAJE } = await import('../constants/messages');
+      const { MESAJE } = await import('shared-constants');
       // Act
       const store = useTransactionStore.getState();
       await act(async () => {
@@ -273,7 +273,7 @@ describe('transactionStore', () => {
       useTransactionStore.getState().setTransactionService(mockService); // Reinjectează mock-ul
       const errorMessage = 'Test error';
       mockService.getFilteredTransactions.mockRejectedValueOnce(new Error(errorMessage));
-      const { MESAJE } = await import('../constants/messages');
+      const { MESAJE } = await import('shared-constants');
       const store = useTransactionStore.getState();
       // Act
       await act(async () => {
