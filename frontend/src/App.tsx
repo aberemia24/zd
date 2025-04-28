@@ -3,17 +3,11 @@ import React from 'react';
 import TransactionForm from './components/features/TransactionForm/TransactionForm';
 import TransactionTable from './components/features/TransactionTable/TransactionTable';
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
-import { OPTIONS, TITLES } from '@shared-constants';
-
-// Import tipuri
-import { TransactionFormWithNumberAmount } from './types/transaction';
+import { TITLES } from '@shared-constants';
 
 // Import store Zustand pentru tranzacții
 import { useTransactionStore } from './stores/transactionStore';
-import { useTransactionFormStore } from './stores/transactionFormStore';
-
-// Import servicii
-import { TransactionService } from './services';
+import type { TransactionState } from './stores/transactionStore';
 
 /**
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
@@ -24,18 +18,14 @@ import { TransactionService } from './services';
  * mentenabilitatea și facilitând extinderea ulterioară.
  */
 export const App: React.FC = () => {
-  // Initializăm serviciile
-  const transactionService = React.useMemo(() => new TransactionService(), []);
+  console.log('🛜 App render');
 
-  // Folosim store-ul Zustand pentru filtre și paginare
-  const {
-    currentQueryParams,
-    setQueryParams
-  } = useTransactionStore(state => ({
-    currentQueryParams: state.currentQueryParams,
-    setQueryParams: state.setQueryParams
-  }));
-  
+  // Folosim store-ul Zustand pentru filtre și paginare și date
+  // transactionService și DI până acum inutile datorită noului flow
+
+const currentQueryParams = useTransactionStore((state: TransactionState) => state.currentQueryParams);
+const setQueryParams = useTransactionStore((state: TransactionState) => state.setQueryParams);
+
   // Extragem valorile din query params pentru a le folosi în UI
   const limit: number = currentQueryParams.limit || 10;
   const offset: number = currentQueryParams.offset || 0;
@@ -83,73 +73,32 @@ export const App: React.FC = () => {
     });
   }, [currentQueryParams, setQueryParams]);
 
-  // Folosim store-ul Zustand pentru date tranzacții
-  const transactions = useTransactionStore(s => s.transactions);
-  const total = useTransactionStore(s => s.total);
-  const loadingFetch = useTransactionStore(s => s.loading);
-  const fetchError = useTransactionStore(s => s.error);
-  const refreshTransactions = useTransactionStore(s => s.refresh);
-  // TODO: adaptare queryParams și transactionService dacă este nevoie (acum store-ul le gestionează intern)
-
-  // Înregistrăm serviciile direct în componenta de nivel superior
-  // Această metodă este mult mai sigură și previne bucle infinite
+  // Fetch transactions once on mount
   React.useEffect(() => {
-    const storeApi = useTransactionFormStore.getState();
-    if (typeof storeApi.setTransactionService === 'function') {
-      storeApi.setTransactionService(transactionService);
-    }
-    if (typeof storeApi.setRefreshCallback === 'function') {
-      storeApi.setRefreshCallback(refreshTransactions);
-    }
+    useTransactionStore.getState().fetchTransactions();
+  }, []);
 
-    // Utilizăm un array gol de dependențe pentru a executa efectul doar la montare
-  }, []); // Array gol pentru a preveni bucla infinită
-
-  // Folosim store-ul Zustand pentru formular
-  const {
-    form,
-    error: formError,
-    success: formSuccess,
-    loading: loadingSubmit,
-    handleChange,
-    handleSubmit,
-    resetForm
-  } = useTransactionFormStore(state => ({
-    form: state.form,
-    error: state.error,
-    success: state.success,
-    loading: state.loading,
-    handleChange: state.handleChange,
-    handleSubmit: state.handleSubmit,
-    resetForm: state.resetForm
-  }));
-  
-  // Nu mai folosim handler-ul explicit, ci ne bazăm pe serviciile înregistrate direct în store
+  // Preluăm doar eroarea pentru afișare
+  const fetchError = useTransactionStore((s: TransactionState) => s.error);
 
   // Callback pentru schimbarea paginii
-  const handlePageChange = React.useCallback((newOffset: number) => {
-    goToPage(Math.floor(newOffset / limit) + 1);
-  }, [goToPage, limit]);
+  const handlePageChange = React.useCallback((newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), [goToPage, limit]);
 
   return (
     <div className="max-w-[900px] mx-auto my-8 font-sans">
       <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
 
-      {/* Render Transaction Form */}
-      {/* TransactionForm nu mai primește props, folosește direct Zustand store */}
       <TransactionForm />
 
-      {/* Filtrare tranzacții după tip și categorie */}
-      <TransactionFilters />
-
-      {/* Render Transaction Table */}
-      <TransactionTable
-        offset={offset}
-        limit={limit}
-        onPageChange={handlePageChange}
+      <TransactionFilters
+        type={filterType}
+        category={filterCategory}
+        onTypeChange={setFilterType}
+        onCategoryChange={setFilterCategory}
       />
 
-      {/* Afișare erori de la API */}
+      <TransactionTable offset={offset} limit={limit} onPageChange={handlePageChange} />
+
       {fetchError && (
         <div className="mt-4 p-2 bg-red-100 text-red-700 rounded">
           {fetchError}

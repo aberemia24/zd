@@ -149,7 +149,35 @@
 
 - Servicii API folosind caching LRU și invalidare selectivă la operațiuni.
 - Configurabil cache time și max entries.
-- Statistici de caching disponibile pentru debugging.
+
+## ⚠️ Anti-pattern: useEffect cu fetchTransactions pe queryParams
+
+### Problemă
+
+Un pattern greșit care duce la infinite loop în React cu Zustand este folosirea:
+
+```tsx
+useEffect(() => {
+  useTransactionStore.getState().fetchTransactions();
+}, [currentQueryParams]);
+```
+
+Deoarece fetchTransactions poate actualiza queryParams (sau alte state-uri relevante), acest lucru duce la re-trigger continuu al efectului și la Maximum update depth exceeded.
+
+### Soluție corectă
+- Rulează fetchTransactions doar la mount (dep list `[]`) sau folosește debounce/guard explicit pentru a evita buclele.
+
+```tsx
+useEffect(() => {
+  useTransactionStore.getState().fetchTransactions();
+}, []); // Doar la mount
+```
+
+- Dacă ai nevoie de fetch la schimbare de parametri, folosește un guard intern în store (ex: comparație deep cu ultimii parametri, caching, etc).
+
+### Recomandare
+- Nu folosi niciodată direct useEffect cu dependență pe queryParams pentru fetch-uri din store-uri Zustand fără protecție suplimentară.
+- Documentează întotdeauna motivul în code review dacă ai nevoie de un pattern diferit.
 
 ## Debugging și Diagnosticare
 

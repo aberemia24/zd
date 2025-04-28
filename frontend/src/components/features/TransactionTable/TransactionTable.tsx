@@ -3,20 +3,10 @@ import Button from '../../primitives/Button';
 import { TransactionType, CategoryType } from '@shared-constants';
 import { TABLE, BUTTONS } from '@shared-constants';
 import { useTransactionStore } from '../../../stores/transactionStore';
+import type { TransactionState } from '../../../stores/transactionStore';
+import type { Transaction } from '../../../types/transaction';
 
-export type Transaction = {
-  _id?: string;
-  id?: string;
-  userId?: string;
-  type: TransactionType | string;
-  amount: string | number;
-  currency: string;
-  category: CategoryType | string;
-  subcategory: string;
-  date: string;
-  recurring?: boolean;
-  frequency?: string;
-};
+export type { Transaction };
 
 export type TransactionTableProps = {
   offset: number;
@@ -25,7 +15,11 @@ export type TransactionTableProps = {
 };
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPageChange }) => {
-  const { transactions, loading, total } = useTransactionStore(s => ({ transactions: s.transactions, loading: s.loading, total: s.total }));
+  console.log('🔃 TransactionTable render');
+  // Debug infinite loop: log renders
+  const transactions = useTransactionStore((s: TransactionState) => s.transactions);
+  const loading = useTransactionStore((s: TransactionState) => s.loading);
+  const total = useTransactionStore((s: TransactionState) => s.total);
   return (
     <div className="mt-6">
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white">
@@ -47,7 +41,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
           ) : (!transactions || transactions.length === 0 ? (
             <tr><td colSpan={8} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
           ) : (
-            transactions.map((t, idx) => (
+            transactions.map((t: Transaction, idx: number) => (
               <tr key={t._id || idx} className="border-b last:border-b-0 hover:bg-gray-50">
                 <td className="px-3 py-2">{t.type || ''}</td>
                 <td className="px-3 py-2">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
