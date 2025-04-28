@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Loader from './Loader';
-import { LOADER } from 'shared-constants';
+import { LOADER } from '@shared-constants';
 
 describe('Loader', () => {
   // Test pentru randarea de bază

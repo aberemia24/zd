@@ -2,8 +2,7 @@ import { TransactionService } from './transactionService';
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { MOCK_TRANSACTION, MOCK_TRANSACTION_FORM_WITH_NUMBER } from '../test/mockData';
-import { TransactionType } from 'shared-constants';
-import { FORM_DEFAULTS } from 'shared-constants';
+import { TransactionType, FORM_DEFAULTS } from '@shared-constants';
 
 // Mock complet pentru TransactionApiClient
 jest.mock('./transactionApiClient');

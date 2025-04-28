@@ -1,5 +1,5 @@
 import React from 'react';
-import { LOADER } from 'shared-constants';
+import { LOADER } from '@shared-constants';
 
 const Loader: React.FC = () => (
   <div className="flex justify-center items-center py-8">

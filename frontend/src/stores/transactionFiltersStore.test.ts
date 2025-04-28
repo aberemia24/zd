@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { TransactionType, CategoryType } from 'shared-constants';
-import { PAGINATION } from 'shared-constants';
+import { TransactionType, CategoryType, PAGINATION } from '@shared-constants';
 import { createTransactionFiltersStore } from './transactionFiltersStore';
 
 // Helper pentru inițializare store izolat la fiecare test

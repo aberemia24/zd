@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { TransactionType, CategoryType } from 'shared-constants';
-import { PAGINATION } from 'shared-constants';
+import { TransactionType, CategoryType, PAGINATION } from '@shared-constants';
 
 export interface TransactionFiltersState {
   filterType?: TransactionType | '';
