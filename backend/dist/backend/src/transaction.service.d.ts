@@ -1,4 +1,4 @@
-import { TransactionValidated } from '../../shared/transaction.schema';
+import { TransactionValidated } from '@shared-constants/transaction.schema';
 export declare class TransactionService {
     private transactions;
     getAll(params?: {
@@ -11,92 +11,47 @@ export declare class TransactionService {
         sort?: string;
     }): {
         data: {
-            type: "income" | "expense" | "saving" | "transfer";
-            date: string;
             id: string;
-            userId: string;
             amount: number;
-            currency: string;
-            category: string;
-            subcategory: string;
-            status?: "cleared" | "pending" | "scheduled" | undefined;
+            type: string;
+            date: string;
             description?: string | undefined;
-            recurring?: boolean | undefined;
-            recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-            accountId?: string | undefined;
-            createdAt?: string | undefined;
-            updatedAt?: string | undefined;
+            category?: string | undefined;
         }[];
         total: number;
         limit: number;
         offset: number;
     };
     getOne(id: string): {
-        type: "income" | "expense" | "saving" | "transfer";
-        date: string;
         id: string;
-        userId: string;
         amount: number;
-        currency: string;
-        category: string;
-        subcategory: string;
-        status?: "cleared" | "pending" | "scheduled" | undefined;
+        type: string;
+        date: string;
         description?: string | undefined;
-        recurring?: boolean | undefined;
-        recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-        accountId?: string | undefined;
-        createdAt?: string | undefined;
-        updatedAt?: string | undefined;
+        category?: string | undefined;
     } | undefined;
     create(transaction: TransactionValidated): {
-        type: "income" | "expense" | "saving" | "transfer";
-        date: string;
         id: string;
-        userId: string;
         amount: number;
-        currency: string;
-        category: string;
-        subcategory: string;
-        status?: "cleared" | "pending" | "scheduled" | undefined;
+        type: string;
+        date: string;
         description?: string | undefined;
-        recurring?: boolean | undefined;
-        recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-        accountId?: string | undefined;
-        createdAt?: string | undefined;
-        updatedAt?: string | undefined;
+        category?: string | undefined;
     };
     update(id: string, transaction: TransactionValidated): {
-        type: "income" | "expense" | "saving" | "transfer";
-        date: string;
         id: string;
-        userId: string;
         amount: number;
-        currency: string;
-        category: string;
-        subcategory: string;
-        status?: "cleared" | "pending" | "scheduled" | undefined;
+        type: string;
+        date: string;
         description?: string | undefined;
-        recurring?: boolean | undefined;
-        recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-        accountId?: string | undefined;
-        createdAt?: string | undefined;
-        updatedAt?: string | undefined;
+        category?: string | undefined;
     } | undefined;
     delete(id: string): {
-        type: "income" | "expense" | "saving" | "transfer";
-        date: string;
         id: string;
-        userId: string;
         amount: number;
-        currency: string;
-        category: string;
-        subcategory: string;
-        status?: "cleared" | "pending" | "scheduled" | undefined;
+        type: string;
+        date: string;
         description?: string | undefined;
-        recurring?: boolean | undefined;
-        recurrence?: "none" | "daily" | "weekly" | "monthly" | "yearly" | undefined;
-        accountId?: string | undefined;
-        createdAt?: string | undefined;
-        updatedAt?: string | undefined;
+        category?: string | undefined;
     } | undefined;
 }

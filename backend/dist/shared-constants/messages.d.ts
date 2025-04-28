@@ -1,0 +1,20 @@
+export declare const MESAJE: {
+    CAMPURI_OBLIGATORII: string;
+    FRECV_RECURENTA: string;
+    AVERTISMENT_DATE: string;
+    EROARE_ADAUGARE: string;
+    SUCCES_ADAUGARE: string;
+    SUCCES_EDITARE: string;
+    SUCCES_STERGERE: string;
+    CONFIRMARE_STERGERE: string;
+    EROARE_GENERALA: string;
+    EROARE_TITLU: string;
+    EROARE_FORMAT_DATE: string;
+    EROARE_NECUNOSCUTA: string;
+    EROARE_INCARCARE_TRANZACTII: string;
+    EROARE_SALVARE_TRANZACTIE: string;
+    EROARE_STERGERE_TRANZACTIE: string;
+    LOG_EROARE_INCARCARE: string;
+    LOG_EROARE_SALVARE: string;
+    LOG_EROARE_STERGERE: string;
+};

@@ -69,28 +69,28 @@ describe('transactionFormStore Zustand', () => {
   });
 
   describe('submit', () => {
-    it('apelează callback și setează succes pentru date valide', () => {
+    it('apelează serviciul și setează succes pentru date valide', async () => {
+      const mockService = { saveTransaction: jest.fn().mockResolvedValue({}) };
+      store.setTransactionService(mockService as any);
       store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
-      store.handleSubmit(onSubmitMock);
-      expect(onSubmitMock).toHaveBeenCalledWith({ 
-        ...store.getForm(), 
-        amount: 100, 
-        currency: FORM_DEFAULTS.CURRENCY // Verificăm că currency este adăugat din constante
+      await store.handleSubmit();
+      expect(mockService.saveTransaction).toHaveBeenCalledWith({
+        ...store.getForm(), amount: 100, currency: FORM_DEFAULTS.CURRENCY
       });
       expect(store.getSuccess()).toBe(MESAJE.SUCCES_ADAUGARE);
       expect(store.getLoading()).toBe(false);
     });
-    it('nu apelează callback și setează eroare pentru date invalide', () => {
+    it('setează eroare pentru date invalide', async () => {
       store.setForm({ ...INITIAL_FORM_STATE, type: '', amount: '', category: '', date: '' });
-      store.handleSubmit(onSubmitMock);
-      expect(onSubmitMock).not.toHaveBeenCalled();
+      await store.handleSubmit();
       expect(store.getError()).toBe(MESAJE.CAMPURI_OBLIGATORII);
       expect(store.getLoading()).toBe(false);
     });
-    it('setează mesaj de eroare dacă callback-ul aruncă excepție', () => {
+    it('setează eroare dacă serviciul aruncă excepție', async () => {
+      const mockService = { saveTransaction: jest.fn().mockRejectedValue(new Error('fail')) };
+      store.setTransactionService(mockService as any);
       store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
-      onSubmitMock.mockImplementation(() => { throw new Error('fail'); });
-      store.handleSubmit(onSubmitMock);
+      await store.handleSubmit();
       expect(store.getError()).toBe(MESAJE.EROARE_ADAUGARE);
       expect(store.getLoading()).toBe(false);
     });

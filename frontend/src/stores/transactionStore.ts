@@ -1,15 +1,13 @@
-import { create, StateCreator } from 'zustand';
-import { persist, createJSONStorage, PersistOptions } from 'zustand/middleware';
-import { devtools } from 'zustand/middleware';
+import { create } from 'zustand';
+import type { StateCreator } from 'zustand';
 import { TransactionService } from '../services/transactionService';
-import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
-import { PAGINATION } from 'shared-constants';
-import { MESAJE } from 'shared-constants';
+import type { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
+import { PAGINATION, MESAJE } from '@shared-constants';
 
 /**
  * Interfața pentru starea store-ului de tranzacții
  */
-interface TransactionState {
+export interface TransactionState {
   // Date
   transactions: Transaction[];
   total: number;
@@ -52,34 +50,12 @@ interface TransactionState {
  * - Actualizarea automată a datelor când se schimbă condițiile
  * - Persistența locală a stării între sesiuni
  */
-/**
- * Definim tipul pentru datele persistate (subset din TransactionState)
- */
-type PersistedState = {
-  transactions: Transaction[];
-  total: number;
-  currentQueryParams: TransactionQueryParams;
-};
-
-/**
- * Configurare pentru middleware-ul persist
- */
-const persistConfig: PersistOptions<TransactionState, PersistedState> = {
-  name: 'transaction-storage',
-  storage: createJSONStorage(() => localStorage),
-  partialize: (state) => ({
-    transactions: state.transactions,
-    total: state.total,
-    currentQueryParams: state.currentQueryParams,
-  }),
-};
 
 /**
  * Creăm store-ul fără middleware-uri pentru a putea fi testat ușor
  * Aceasta ajută și la tipare mai precise în teste
  */
 const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
-
   // Stare inițială
   transactions: [],
   total: 0,
@@ -93,12 +69,12 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   transactionService: new TransactionService(),
   
   // Setters
-  setTransactions: (transactions) => set({ transactions }),
-  setTotal: (total) => set({ total }),
-  setLoading: (loading) => set({ loading }),
-  setError: (error) => set({ error }),
-  setQueryParams: (params) => set({ currentQueryParams: params }),
-  setTransactionService: (service) => set({ transactionService: service }),
+  setTransactions: (transactions: Transaction[]) => set({ transactions }),
+  setTotal: (total: number) => set({ total }),
+  setLoading: (loading: boolean) => set({ loading }),
+  setError: (error: string | null) => set({ error }),
+  setQueryParams: (params: TransactionQueryParams) => set({ currentQueryParams: params }),
+  setTransactionService: (service: TransactionService) => set({ transactionService: service }),
   
   // Operațiuni asincrone
   // Referință internă pentru caching parametri
@@ -106,6 +82,7 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
 
   fetchTransactions: async (forceRefresh = false) => {
     const { transactionService, currentQueryParams, _lastQueryParams, setError } = get();
+    console.log('🔍 fetchTransactions called', { forceRefresh, params: currentQueryParams, lastParams: _lastQueryParams });
 
     // Caching: nu refetch dacă parametrii identici și fără forceRefresh
     if (!forceRefresh && _lastQueryParams && JSON.stringify(_lastQueryParams) === JSON.stringify(currentQueryParams)) {
@@ -116,18 +93,21 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     set({ loading: true, error: null });
 
     try {
+      console.log('🔄 fetchTransactions starting network call');
       // Actualizează referința
       set({ _lastQueryParams: { ...currentQueryParams } });
       const response = await transactionService.getFilteredTransactions(
         currentQueryParams,
         forceRefresh
       );
+      console.log('✅ fetchTransactions success', response);
       set({ 
         transactions: response.data,
         total: response.total,
         loading: false
       });
     } catch (err) {
+      console.log('❌ fetchTransactions failed', err);
       console.error(MESAJE.LOG_EROARE_INCARCARE, err);
       set({ 
         transactions: [],
@@ -139,14 +119,23 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   },
   
   refresh: async () => {
-    return get().fetchTransactions(true);
+    // Previne apeluri multiple care pot declanșa buclă infinită
+    if (get().loading) return;
+    console.log('🔄 transactionStore.refresh called');
+    set({ loading: true });
+    try {
+      await get().fetchTransactions(true);
+    } finally {
+      set({ loading: false });
+    }
   },
   
-  saveTransaction: async (data, id) => {
+  saveTransaction: async (data: TransactionFormWithNumberAmount, id?: string) => {
+    console.log('💾 saveTransaction called', { data, id });
     const { transactionService } = get();
-    let result: Transaction;
     
     try {
+      let result: Transaction;
       result = await transactionService.saveTransaction(data, id);
       // Resetăm cache-ul pentru a forța reîncărcarea
       set({ _lastQueryParams: undefined });
@@ -160,7 +149,7 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     }
   },
   
-  removeTransaction: async (id) => {
+  removeTransaction: async (id: string) => {
     const { transactionService } = get();
     
     try {
@@ -192,16 +181,5 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   }),
 });
 
-/**
- * Store Zustand pentru tranzacții, cu persist și devtools middleware
- * Exportăm versiunea cu middleware-uri pentru producție
- */
-export const useTransactionStore = create<TransactionState>()(  
-  devtools(
-    persist(
-      createTransactionStore,
-      persistConfig
-    ),
-    { name: 'TransactionStore' } // Numele pentru devtools
-  )
-);
+// Folosim doar store-ul simplu fără middleware-uri pentru a testa
+export const useTransactionStore = create<TransactionState>(createTransactionStore);

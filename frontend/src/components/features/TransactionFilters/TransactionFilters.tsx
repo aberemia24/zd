@@ -1,17 +1,21 @@
 import React from 'react';
 import Button from '../../primitives/Button';
 import Select from '../../primitives/Select';
-import { TransactionType, CategoryType } from 'shared-constants';
-import { LABELS, PLACEHOLDERS } from 'shared-constants';
+import { TransactionType, CategoryType, OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
 
-import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';
-import { OPTIONS } from 'shared-constants';
+export interface TransactionFiltersProps {
+  type?: string;
+  category?: string;
+  onTypeChange?: (type: string) => void;
+  onCategoryChange?: (category: string) => void;
+}
 
-const TransactionFilters: React.FC = () => {
-  const type = useTransactionFiltersStore(s => s.filterType);
-  const category = useTransactionFiltersStore(s => s.filterCategory);
-  const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
-  const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
+const TransactionFilters: React.FC<TransactionFiltersProps> = ({
+  type = '',
+  category = '',
+  onTypeChange = () => {},
+  onCategoryChange = () => {}
+}) => {
   const types = OPTIONS.TYPE;
   const categories = OPTIONS.CATEGORY;
 
@@ -21,7 +25,7 @@ const TransactionFilters: React.FC = () => {
         name="type-filter"
         label={LABELS.TYPE_FILTER}
         value={type || ''}
-        onChange={e => setFilterType((e.target as HTMLSelectElement).value as TransactionType | '')}
+        onChange={e => onTypeChange((e.target as HTMLSelectElement).value as TransactionType | '')}
         options={types}
         className="ml-2"
         placeholder={PLACEHOLDERS.SELECT + ' tipul'}
@@ -30,12 +34,12 @@ const TransactionFilters: React.FC = () => {
         name="category-filter"
         label={LABELS.CATEGORY_FILTER}
         value={category || ''}
-        onChange={e => setFilterCategory((e.target as HTMLSelectElement).value as CategoryType | '')}
+        onChange={e => onCategoryChange((e.target as HTMLSelectElement).value as CategoryType | '')}
         options={categories}
         className="ml-2"
         placeholder={PLACEHOLDERS.SELECT + ' categoria'}
       />
-      <Button variant="secondary" onClick={() => { setFilterType(''); setFilterCategory(''); }}>
+      <Button variant="secondary" onClick={() => { onTypeChange(''); onCategoryChange(''); }}>
         Resetează filtre
       </Button>
     </div>

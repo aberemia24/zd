@@ -5,6 +5,7 @@ import type { TransactionFormData } from '../components/features/TransactionForm
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
 import { TransactionType } from '@shared-constants';
 import { TransactionService } from '../services';
+import { useTransactionStore } from '../stores/transactionStore';
 
 interface TransactionFormStoreState {
   form: TransactionFormData;
@@ -18,17 +19,13 @@ interface TransactionFormStoreState {
   setLoading: (loading: boolean) => void;
   resetForm: () => void;
   validateForm: () => boolean;
-  handleSubmit: (cb: (data: TransactionFormWithNumberAmount) => void) => void;
+  handleSubmit: () => Promise<void>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  setSubmitHandler: (handler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null) => void;
-  // Metode pentru DI - permitând injectarea serviciilor și callback-urilor din componenta părinte
-  setTransactionService: (service: TransactionService | null) => void;
-  setRefreshCallback: (callback: (() => void) | null) => void;
-  // Selectors ca funcții pentru testabilitate
   getForm: () => TransactionFormData;
   getError: () => string;
   getSuccess: () => string;
   getLoading: () => boolean;
+  setTransactionService: (service: TransactionService) => void;
 }
 
 export const createTransactionFormStore = (initialForm: TransactionFormData = INITIAL_FORM_STATE): TransactionFormStoreState => {
@@ -36,10 +33,7 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
   let error = '';
   let success = '';
   let loading = false;
-  let submitHandler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null = null;
-  // Pentru injectare dependency din App.tsx
-  let transactionService: TransactionService | null = null;
-  let refreshCallback: (() => void) | null = null;
+  let transactionService: TransactionService = new TransactionService();
 
   const setForm = (newForm: TransactionFormData) => { form = { ...newForm }; };
   const setField = (name: keyof TransactionFormData, value: any) => { form = { ...form, [name]: value }; };
@@ -47,19 +41,10 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
   const setSuccess = (msg: string) => { success = msg; };
   const setLoading = (val: boolean) => { loading = val; };
   const resetForm = () => { form = { ...INITIAL_FORM_STATE }; error = ''; success = ''; };
-  const setSubmitHandler = (handler: ((data: TransactionFormWithNumberAmount) => Promise<boolean> | boolean) | null) => {
-    submitHandler = handler;
-  };
 
-  // Metode pentru injectarea dependențelor
-  const setTransactionService = (service: TransactionService | null) => {
-    transactionService = service;
-  };
+  // Setter pentru service (folosit în teste)
+  const setTransactionService = (service: TransactionService) => { transactionService = service; };
 
-  const setRefreshCallback = (callback: (() => void) | null) => {
-    refreshCallback = callback;
-  };
-  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     if (type === 'checkbox') {
@@ -83,7 +68,7 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
     return true;
   };
 
-  const handleSubmit = (cb: (data: TransactionFormWithNumberAmount) => void) => {
+  const handleSubmit = async () => {
     if (!validateForm()) {
       loading = false;
       return;
@@ -91,59 +76,22 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
     loading = true;
     error = '';
     try {
-      // Transformăm datele formularului în TransactionFormWithNumberAmount adăugând currency din constante
       const formWithNumberAmount: TransactionFormWithNumberAmount = {
         ...form,
         amount: Number(form.amount),
-        currency: FORM_DEFAULTS.CURRENCY // Adăugăm currency obligatoriu din constante
+        currency: FORM_DEFAULTS.CURRENCY
       };
-      
-      // Verificăm dacă avem serviciul injectat - noua metodă preferabilă
-      if (transactionService) {
-        transactionService.saveTransaction(formWithNumberAmount)
-          .then(() => {
-            setSuccess(MESAJE.SUCCES_ADAUGARE);
-            // Dacă avem și callback de refresh, îl apelăm
-            if (refreshCallback) refreshCallback();
-            setLoading(false);
-          })
-          .catch(() => {
-            setError(MESAJE.EROARE_ADAUGARE);
-            setLoading(false);
-          });
-        return;
-      }
-      // Folosim submitHandler dacă există (metoda anterioară), altfel cb
-      else if (submitHandler) {
-        const result = submitHandler(formWithNumberAmount);
-        if (result instanceof Promise) {
-          result.then(success => {
-            if (success) {
-              setSuccess(MESAJE.SUCCES_ADAUGARE);
-            }
-            setLoading(false);
-          }).catch(() => {
-            setError(MESAJE.EROARE_ADAUGARE);
-            setLoading(false);
-          });
-          return;
-        } else if (result) {
-          success = MESAJE.SUCCES_ADAUGARE;
-        } else {
-          error = MESAJE.EROARE_ADAUGARE;
-        }
-      } else {
-        cb(formWithNumberAmount);
-        success = MESAJE.SUCCES_ADAUGARE;
-      }
+      await transactionService.saveTransaction(formWithNumberAmount);
+      setSuccess(MESAJE.SUCCES_ADAUGARE);
+      const txStore = useTransactionStore.getState();
+      await txStore.refresh();
     } catch {
-      error = MESAJE.EROARE_ADAUGARE;
+      setError(MESAJE.EROARE_ADAUGARE);
     } finally {
-      loading = false;
+      setLoading(false);
     }
   };
 
-  // Selectors ca funcții
   const getForm = () => form;
   const getError = () => error;
   const getSuccess = () => success;
@@ -160,12 +108,10 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
     setSuccess,
     setLoading,
     resetForm,
+    setTransactionService,
     validateForm,
     handleSubmit,
     handleChange,
-    setSubmitHandler,
-    setTransactionService,
-    setRefreshCallback,
     getForm,
     getError,
     getSuccess,
@@ -173,5 +119,4 @@ export const createTransactionFormStore = (initialForm: TransactionFormData = IN
   };
 };
 
-// Instanță globală Zustand pentru UI
 export const useTransactionFormStore = create<TransactionFormStoreState>(() => createTransactionFormStore());

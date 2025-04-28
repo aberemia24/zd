@@ -14,8 +14,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransactionController = void 0;
 const common_1 = require("@nestjs/common");
+const transaction_schema_1 = require("@shared-constants/transaction.schema");
 const transaction_service_1 = require("./transaction.service");
-const transaction_schema_1 = require("../../shared/transaction.schema");
 let TransactionController = class TransactionController {
     constructor(transactionService) {
         this.transactionService = transactionService;

@@ -7,7 +7,6 @@ import { TransactionType, CategoryType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
-import { useTransactionStore } from '../../../stores/transactionStore';
 
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
@@ -71,18 +70,7 @@ export const categorii: Record<string, any> = {
 // Componentă conectată la store Zustand, fără props de stare/handler
 const TransactionForm: React.FC = () => {
   // Selectăm starea și acțiunile relevante din store
-  const form = useTransactionFormStore((s) => s.form);
-  const error = useTransactionFormStore((s) => s.error);
-  const success = useTransactionFormStore((s) => s.success);
-  const loading = useTransactionFormStore((s) => s.loading);
-  const setField = useTransactionFormStore((s) => s.setField);
-  const resetForm = useTransactionFormStore((s) => s.resetForm);
-  const handleSubmitStore = useTransactionFormStore((s) => s.handleSubmit);
-  
-  // Instanță de serviciu pentru submit
-  // Pentru submit folosim serviciul din store-ul global Zustand (dependency injection)
-  const transactionService = useTransactionStore((s) => s.transactionService);
-  const refreshTransactions = useTransactionStore((s) => s.refresh);
+  const { form, error, success, loading, setField, handleSubmit, resetForm } = useTransactionFormStore();
 
   // Handler pentru schimbare câmp
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -105,19 +93,12 @@ const TransactionForm: React.FC = () => {
     }
   }, [setField]);
 
-  // Handler pentru submit
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  // Handler pentru submit: folosește store.handleSubmit și resetForm
+  const onSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmitStore(async (formWithNumberAmount: any) => {
-      try {
-        await transactionService.saveTransaction(formWithNumberAmount);
-        refreshTransactions();
-        resetForm();
-      } catch (err) {
-        // Eroarea va fi gestionată de store (setError)
-      }
-    });
-  }, [handleSubmitStore, transactionService, refreshTransactions, resetForm]);
+    await handleSubmit();
+    resetForm();
+  }, [handleSubmit, resetForm]);
 
   // Filtrare categorii în funcție de tip
   const categoriiFiltrate = React.useMemo(() => {
@@ -137,7 +118,7 @@ const TransactionForm: React.FC = () => {
   return (
     <form
       aria-label={LABELS.FORM}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       className="flex flex-wrap gap-3 mb-6 items-end"
     >
       <Select
