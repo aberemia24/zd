@@ -3,7 +3,8 @@ import React from 'react';
 import TransactionForm from './components/features/TransactionForm/TransactionForm';
 import TransactionTable from './components/features/TransactionTable/TransactionTable';
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
-import { TITLES } from '@shared-constants';
+import { useTransactionFiltersStore } from './stores/transactionFiltersStore';
+import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 
 // Import store Zustand pentru tranzacții
 import { useTransactionStore } from './stores/transactionStore';
@@ -29,9 +30,13 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
   // Extragem valorile din query params pentru a le folosi în UI
   const limit: number = currentQueryParams.limit || 10;
   const offset: number = currentQueryParams.offset || 0;
-  const filterType: string | undefined = currentQueryParams.type;
-  const filterCategory: string | undefined = currentQueryParams.category;
   const currentPage: number = Math.floor(offset / limit) + 1;
+
+  // Folosim store-ul dedicat pentru filtre Zustand
+  const filterType = useTransactionFiltersStore(s => s.filterType) || '';
+  const filterCategory = useTransactionFiltersStore(s => s.filterCategory) || '';
+  const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
+  const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
   
   // Funcții pentru navigare
   const nextPage = React.useCallback(() => {
@@ -57,21 +62,7 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
     });
   }, [currentQueryParams, limit, setQueryParams]);
   
-  const setFilterType = React.useCallback((type: string) => {
-    setQueryParams({
-      ...currentQueryParams,
-      type,
-      offset: 0 // Reset la prima pagină când schimbăm filtrul
-    });
-  }, [currentQueryParams, setQueryParams]);
   
-  const setFilterCategory = React.useCallback((category: string) => {
-    setQueryParams({
-      ...currentQueryParams,
-      category,
-      offset: 0 // Reset la prima pagină când schimbăm filtrul
-    });
-  }, [currentQueryParams, setQueryParams]);
 
   // Fetch transactions once on mount
   React.useEffect(() => {
@@ -93,8 +84,8 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
       <TransactionFilters
         type={filterType}
         category={filterCategory}
-        onTypeChange={setFilterType}
-        onCategoryChange={setFilterCategory}
+        onTypeChange={t => setFilterType(t as TransactionType | '')}
+        onCategoryChange={c => setFilterCategory(c as CategoryType | '')}
       />
 
       <TransactionTable offset={offset} limit={limit} onPageChange={handlePageChange} />

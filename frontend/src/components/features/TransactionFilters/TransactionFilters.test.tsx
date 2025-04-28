@@ -58,13 +58,13 @@ describe('TransactionFilters', () => {
   });
 
   it('afișează opțiunile de tip și categorie', () => {
-    render(<TransactionFilters />);
+    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
     expect(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER)).toBeInTheDocument();
     expect(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER)).toBeInTheDocument();
   });
   
   it('apelează setFilterType când se schimbă tipul', () => {
-    render(<TransactionFilters />);
+    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
     
     // Selectează alt tip
     fireEvent.change(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER), { target: { value: TransactionType.EXPENSE } });
@@ -72,7 +72,7 @@ describe('TransactionFilters', () => {
   });
   
   it('apelează setFilterCategory când se schimbă categoria', () => {
-    render(<TransactionFilters />);
+    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
     
     // Selectează altă categorie
     fireEvent.change(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER), { target: { value: CategoryType.EXPENSE } });

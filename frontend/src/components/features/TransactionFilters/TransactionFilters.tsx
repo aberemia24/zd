@@ -1,13 +1,14 @@
 import React from 'react';
 import Button from '../../primitives/Button';
 import Select from '../../primitives/Select';
-import { TransactionType, CategoryType, OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
+import { OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
+import type { TransactionType, CategoryType } from '@shared-constants';
 
 export interface TransactionFiltersProps {
-  type?: string;
-  category?: string;
-  onTypeChange?: (type: string) => void;
-  onCategoryChange?: (category: string) => void;
+  type?: TransactionType | '' | string;
+  category?: CategoryType | '' | string;
+  onTypeChange?: (type: TransactionType | '' | string) => void;
+  onCategoryChange?: (category: CategoryType | '' | string) => void;
 }
 
 const TransactionFilters: React.FC<TransactionFiltersProps> = ({
@@ -25,7 +26,13 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         name="type-filter"
         label={LABELS.TYPE_FILTER}
         value={type || ''}
-        onChange={e => onTypeChange((e.target as HTMLSelectElement).value as TransactionType | '')}
+        onChange={e => {
+            const value = (e.target as HTMLSelectElement).value as TransactionType | '';
+            // DEBUG: check if handler is the same as the mock
+            
+            console.log('[TransactionFilters] onTypeChange fired with:', value);
+            onTypeChange(value);
+          }}
         options={types}
         className="ml-2"
         placeholder={PLACEHOLDERS.SELECT + ' tipul'}
