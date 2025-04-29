@@ -13,7 +13,8 @@
     "incremental": true,
     "strict": true,
     "paths": {
-      "@shared-constants/*": ["../../shared-constants/*"]
+      "@shared-constants/*": ["../../shared-constants/*"],
+      "@shared-constants/queryParams": ["../../shared-constants/queryParams.ts"]
     }
   },
   "include": ["src/**/*"],

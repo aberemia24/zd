@@ -19,6 +19,7 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 - **Frontend:** React, Zustand, Testing Library, Jest, TailwindCSS, i18next
 - **Backend:** NestJS, MongoDB, Firebase Auth, Jest
 - **Shared:** TypeScript, Zod
+  - **Chei query params tranzacții:** Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts` și se importă EXPLICIT din `@shared-constants/queryParams`.
 - **Tooling:** ESLint, Prettier, Husky, Commitlint, npm Workspaces
 
 ---

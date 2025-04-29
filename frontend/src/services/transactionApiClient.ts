@@ -1,4 +1,4 @@
-import { API_URL } from '../constants/api';
+import { API } from '../constants/api';
 import { Transaction, TransactionQueryParams } from '../types/transaction';
 import { MESAJE } from '@shared-constants';
 
@@ -24,7 +24,7 @@ export type PaginatedResponse<T> = {
 export class TransactionApiClient {
   private baseUrl: string;
   
-  constructor(baseUrl: string = API_URL) {
+  constructor(baseUrl: string = API.ROUTES.TRANSACTIONS) {
     this.baseUrl = baseUrl;
   }
   

@@ -1,15 +1,24 @@
-import { createTransactionFormStore } from './transactionFormStore';
+import { useTransactionFormStore } from './transactionFormStore';
 import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from 'shared-constants';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
 
 describe('transactionFormStore Zustand', () => {
-  let store: ReturnType<typeof createTransactionFormStore>;
+  let store: ReturnType<typeof useTransactionFormStore.getState>;
   let onSubmitMock: jest.Mock;
 
   beforeEach(() => {
-    store = createTransactionFormStore();
+    // Resetăm store-ul global înainte de fiecare test
+    const zustandStore = useTransactionFormStore;
+    // Resetăm complet state-ul store-ului
+    zustandStore.setState({
+      form: { ...INITIAL_FORM_STATE },
+      error: '',
+      success: '',
+      loading: false
+    });
+    store = zustandStore.getState();
     onSubmitMock = jest.fn();
   });
 

@@ -1,6 +1,6 @@
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
 import { Transaction } from '../types/transaction';
-import { API_URL } from '../constants/api';
+import { API } from '../constants/api';
 import { MESAJE } from 'shared-constants';
 import { TransactionType, CategoryType } from 'shared-constants';
 
@@ -33,7 +33,7 @@ describe('TransactionApiClient', () => {
     }));
     
     // Inițializăm clientul API pentru teste
-    apiClient = new TransactionApiClient();
+    apiClient = new TransactionApiClient(API.ROUTES.TRANSACTIONS);
   });
 
   afterAll(() => {

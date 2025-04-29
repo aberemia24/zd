@@ -1,6 +1,17 @@
 // Toate mesajele de utilizator
 // Mesaje de validare și succes/eroare pentru aplicație (localizabile)
 export const MESAJE = {
+  // Mesaje de validare backend
+  INVALID_TYPE: 'Tip de tranzacție invalid!',
+  INVALID_CATEGORY: 'Categorie invalidă!',
+  MISSING_REQUIRED_FIELD: 'Câmp obligatoriu lipsă!',
+  NOT_FOUND: 'Resursa nu a fost găsită!',
+  SERVER_ERROR: 'Eroare internă server!',
+
+  // Mesaje de succes backend
+  TRANSACTION_CREATED: 'Tranzacție adăugată cu succes!',
+  TRANSACTION_UPDATED: 'Tranzacție actualizată cu succes!',
+  TRANSACTION_DELETED: 'Tranzacție ștearsă cu succes!',
   // Mesaje formular
   CAMPURI_OBLIGATORII: 'Completează toate câmpurile obligatorii',
   FRECV_RECURENTA: 'Selectează frecvența pentru tranzacție recurentă',

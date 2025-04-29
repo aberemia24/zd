@@ -57,6 +57,16 @@
 
 ### API Integration
 
+#### Centralizare chei query params tranzacții
+- Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts`.
+- Importurile se fac EXPLICIT din `@shared-constants/queryParams` (nu din barrel și nu local).
+- Motiv: sincronizare automată între frontend și backend, fără duplicare sau risc de desincronizare la refactor.
+- Exemplu corect:
+  ```typescript
+  import { QUERY_PARAMS } from '@shared-constants/queryParams';
+  ```
+- Orice modificare la aceste chei se anunță și se documentează în `DEV_LOG.md`.
+
 - Endpointuri, parametri, headere definite în `constants/api.ts`.
 - Timeout și retry configurabile.
 

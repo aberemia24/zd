@@ -5,4 +5,3 @@ export * from './ui';
 export * from './transaction.schema';
 export * from './categories';
 export * from './queryParams';
-export * from './api';

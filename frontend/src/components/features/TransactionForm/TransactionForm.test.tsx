@@ -18,7 +18,8 @@ jest.mock('../../../stores/transactionStore');
 
 // Import pentru componenta testată și dependințele sale
 import TransactionForm from './';
-import { TransactionFormData, categorii } from './TransactionForm';
+import { TransactionFormData } from './TransactionForm';
+import { CATEGORIES } from '@shared-constants';
 
 // Import-uri pentru servicii și store-uri care au fost mock-uite
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
@@ -480,7 +481,7 @@ describe('TransactionForm', () => {
     });
     
     const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
-    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.INCOME]);
+    const expectedSubcategories = getAllSubcategories(Object.values(CATEGORIES.VENITURI).flat() as string[]);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== ''); // Excludem placeholderul 'Alege'
@@ -526,7 +527,7 @@ describe('TransactionForm', () => {
     });
     
     const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
-    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.SAVING]);
+    const expectedSubcategories = getAllSubcategories(Object.values(CATEGORIES.ECONOMII).flat() as string[]);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== '');
@@ -567,7 +568,11 @@ describe('TransactionForm', () => {
     });
     
     const subcatSelect = screen.getByLabelText(MOCK_LABELS.SUBCATEGORY);
-    const expectedSubcategories = getAllSubcategories(categorii[CategoryType.EXPENSE]);
+    const expectedSubcategories = getAllSubcategories(
+  Object.values(CATEGORIES)
+    .slice(2) // presupunem că primele două sunt VENITURI și ECONOMII
+    .flatMap((cat: any) => Object.values(cat).flat())
+);
     const renderedOptions = Array.from(subcatSelect.querySelectorAll('option'))
                                  .map(opt => opt.value)
                                  .filter(val => val !== '');
@@ -688,7 +693,7 @@ describe('TransactionForm', () => {
     fireEvent.change(within(form).getByLabelText(MOCK_LABELS.DATE), { target: { value: '2025-05-01', name: 'date' } });
     fireEvent.change(within(form).getByLabelText(MOCK_LABELS.CATEGORY), { target: { value: CategoryType.INCOME, name: 'category' } });
     // Atribuim subcategorie validă
-    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.SUBCATEGORY), { target: { value: categorii[CategoryType.INCOME][0], name: 'subcategory' } });
+    fireEvent.change(within(form).getByLabelText(MOCK_LABELS.SUBCATEGORY), { target: { value: CATEGORIES.VENITURI['Surse de venit'][0], name: 'subcategory' } });
     // Submit
     await act(async () => fireEvent.submit(form));
     // Verificăm că handleSubmit a fost apelat

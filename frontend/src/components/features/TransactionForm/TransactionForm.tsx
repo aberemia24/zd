@@ -3,7 +3,7 @@ import Button from '../../primitives/Button';
 import Input from '../../primitives/Input';
 import Select from '../../primitives/Select';
 import Checkbox from '../../primitives/Checkbox';
-import { TransactionType, CategoryType } from '@shared-constants';
+import { TransactionType, CategoryType, CATEGORIES } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
@@ -22,50 +22,7 @@ export type TransactionFormData = {
 
 // Nu mai folosim props pentru form, error, success, onChange, onSubmit, loading. Totul vine din store Zustand.
 
-// Structura completă pentru categorii și subcategorii, conform listei primite
-// TODO: Centralizează structura completă categorii/subcategorii în constants/categories.ts pentru a elimina orice hardcodare rămasă
-export const categorii: Record<string, any> = {
-  [CategoryType.INCOME]: [
-    'Salarii', 'Dividende', 'Chirii', 'Tichete de masă', 'Cadouri', 'Drepturi de autor', 'Pensii', 'Alocații (copil/de handicap etc.)', 'Alte venituri',
-    { label: 'Report', options: ['Venituri reportate din luna anterioară.'] }
-  ],
-  [CategoryType.SAVING]: [
-    'Fond de urgență', 'Fond de rezervă', 'Fond general',
-    { label: 'Total economii', options: ['Suma totală a economiilor din toate categoriile.'] }
-  ],
-  [CategoryType.EXPENSE]: [
-    { label: 'ÎNFĂȚIȘARE', options: [
-      'Îmbrăcăminte, încălțăminte și accesorii', 'Salon de înfrumusețare', 'Produse cosmetice', 'Operații estetice', 'Produse de igienă personală', 'Produse de igienă pentru animale de companie', 'Curățătorie, călcătorie, croitorie, cizmărie', 'Îmbrăcăminte și accesorii pentru animale de companie'
-    ] },
-    { label: 'EDUCAȚIE', options: [
-      'Taxe școlare | universitare', 'Grădiniță | Creșă | Afterschool | Bonă', 'Cursuri | Traininguri de specializare', 'Materiale de studiu | cărți', 'Licențe programe'
-    ] },
-    { label: 'CARIERĂ', options: [
-      'Taxe autorizare | Examene titularizare sau specializare', 'Servicii realizare CV', 'Consultanță juridică | financiară'
-    ] },
-    { label: 'SĂNĂTATE', options: [
-      'Medicamente | Suplimente alimentare | Vitamine', 'Servicii medicale pentru prevenție', 'Operații', 'Terapii de recuperare', 'Abonamente medicale', 'Asigurări de sănătate | medicale', 'Veterinar pentru animale de companie', 'Medicamente pentru animale de companie'
-    ] },
-    { label: 'NUTRIȚIE', options: [
-      'Alimente', 'Restaurante', 'La pachet', 'Comenzi', 'Cafea', 'Mâncare pentru animale de companie'
-    ] },
-    { label: 'LOCUINȚĂ', options: [
-      'Întreținere', 'Apă', 'Gaz', 'Energie electrică', 'Abonamente telefonie', 'Cablu TV', 'Internet', 'Reparații, montaj și amenajări interioare', 'Produse de curățenie și consumabile', 'Servicii de curățenie profesională', 'Mobilier | Decorațiuni', 'Electrice | Electrocasnice | Obiecte de iluminat', 'Asigurări de locuință', 'Impozit pe clădiri și terenuri', 'Chirie', 'Taxă gunoi'
-    ] },
-    { label: 'TIMP LIBER', options: [
-      'Cărți sau abonamente cărți', 'Muzică | Video sau abonamente', 'Reviste | Ziare sau abonamente', 'Filme sau abonamente (Netflix, HBO GO, Disney Plus etc.)', 'Abonamente sală de sport | înot', 'Abonamente servicii online (stocare cloud, MS Office etc.)', 'Cinema | Teatru | Concerte | Muzee', 'Piscine | Ștranduri | Parcuri de distracții | Locuri de joacă', 'Jocuri de societate | Jucării pentru copii', 'Cadouri pentru cei dragi', 'Materiale & cursuri pentru hobby-uri', 'Echipamente sportive | pescuit', 'Pariuri | Loto | Casino', 'Țigări | Vaping'
-    ] },
-    { label: 'CĂLĂTORII', options: [
-      'Acomodare', 'Bilete pentru mijloace de transport/combustibil', 'Taxe de drum | de pod | rovignete', 'Bilete pentru obiective turistice', 'Suveniruri', 'Asigurare de călătorie', 'Hotel pentru animale', 'Închiriere mașină', 'Închiriere echipamente (ski-uri, undițe, șezlonguri etc.)', 'Hrană'
-    ] },
-    { label: 'TRANSPORT', options: [
-      'Transport public', 'Revizii', 'Taxe drumuri', 'Parcare', 'Spălătorie auto', 'Asigurare RCA', 'Asigurare CASCO', 'Accesorii/Consumabile pentru mașină', 'Combustibil', 'Rovigneta', 'Impozit auto', 'Schimbat cauciucuri vară/iarnă', 'Hotel pentru anvelope', 'Reparații auto'
-    ] },
-    { label: 'INVESTIȚII', options: [
-      'Proiecte personalizabile (Completați denumirea exactă)', 'Investiție/Afacere 1', 'Investiție/Afacere 2', 'Investiție/Afacere 3', 'Investiție/Afacere 4', 'Investiție/Afacere 5', 'Investiție/Afacere 6', 'Investiție/Afacere 7', 'Investiție/Afacere 8', 'Investiție/Afacere 9', 'Investiție/Afacere 10', 'Investiție/Afacere 11', 'Investiție/Afacere 12', 'Investiție/Afacere 13'
-    ] }
-  ]
-};
+// Eliminat structura locală categorii/subcategorii. Folosește doar CATEGORIES din @shared-constants.
 
 // Componentă conectată la store Zustand, fără props de stare/handler
 const TransactionForm: React.FC = () => {
@@ -96,24 +53,36 @@ const TransactionForm: React.FC = () => {
   // Handler pentru submit: folosește store.handleSubmit și resetForm
   const onSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    // Fix: amount number, fără id
     await handleSubmit();
     resetForm();
-  }, [handleSubmit, resetForm]);
+  }, [handleSubmit, resetForm, form]);
 
-  // Filtrare categorii în funcție de tip
+  // Filtrare categorii principale în funcție de tip
   const categoriiFiltrate = React.useMemo(() => {
-    if (form.type === TransactionType.INCOME) return [CategoryType.INCOME];
-    if (form.type === TransactionType.EXPENSE) return [CategoryType.EXPENSE];
-    if (form.type === TransactionType.SAVING) return [CategoryType.SAVING];
-    return [];
+    if (form.type === TransactionType.INCOME) return { VENITURI: CATEGORIES.VENITURI };
+    if (form.type === TransactionType.SAVING) return { ECONOMII: CATEGORIES.ECONOMII };
+    if (form.type === TransactionType.EXPENSE) {
+      // Cheltuieli = toate celelalte categorii, fără VENITURI și ECONOMII
+      const { VENITURI, ECONOMII, ...rest } = CATEGORIES;
+      return rest;
+    }
+    return {};
   }, [form.type]);
 
-  const listaSubcategorii = React.useMemo(() => {
-    if (form.category && Object.values(CategoryType).includes(form.category as CategoryType)) {
-      return categorii[form.category as CategoryType];
-    }
-    return [];
-  }, [form.category]);
+  // Lista de opțiuni pentru dropdown-ul de categorie (grupuri mari)
+  const optiuniCategorie = React.useMemo(() => {
+    return Object.keys(categoriiFiltrate).map((cat) => ({ value: cat, label: cat.charAt(0) + cat.slice(1).toLowerCase().replace(/_/g, ' ') }));
+  }, [categoriiFiltrate]);
+
+  // Lista de opțiuni pentru subcategorie (grupuri mici)
+  const optiuniSubcategorie = React.useMemo(() => {
+    if (!form.category || !(categoriiFiltrate as Record<string, any>)[form.category]) return [];
+    // grupuri mici: (ex: "Surse de venit", "General", etc)
+    return Object.entries((categoriiFiltrate as Record<string, any>)[form.category] as Record<string, string[]>).flatMap(([grup, subcats]) =>
+      (subcats as string[]).map((subcat: string) => ({ value: subcat, label: subcat, group: grup }))
+    );
+  }, [form.category, categoriiFiltrate]);
 
   return (
     <form
@@ -147,11 +116,9 @@ const TransactionForm: React.FC = () => {
         value={form.category}
         onChange={handleChange}
         aria-label={LABELS.CATEGORY}
-        options={categoriiFiltrate
-  .filter(cat => typeof cat === 'string')
-  .map((cat: string) => ({ value: cat, label: cat }))} // asigură tipul explicit
+        options={optiuniCategorie}
         className="ml-2"
-        disabled={!form.type || categoriiFiltrate.length === 0}
+        disabled={!form.type || optiuniCategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
       />
       <Select
@@ -160,17 +127,9 @@ const TransactionForm: React.FC = () => {
         value={form.subcategory}
         onChange={handleChange}
         aria-label={LABELS.SUBCATEGORY}
-        options={listaSubcategorii.flatMap((subcat: string | { label: string; options: string[] }) => {
-          if (typeof subcat === 'string') {
-            return { value: subcat, label: subcat };
-          } else if (typeof subcat === 'object' && subcat.options && Array.isArray(subcat.options)) {
-            // Procesează subcategorie de tip grup/optgroup
-            return subcat.options.map((option: string) => ({ value: option, label: option }));
-          }
-          return [];
-        })}
+        options={optiuniSubcategorie}
         className="ml-2"
-        disabled={!form.category}
+        disabled={!form.category || optiuniSubcategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
       />
       <Input

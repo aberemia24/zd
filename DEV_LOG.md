@@ -48,6 +48,14 @@
 
 ---
 
+## 2025-04-28 - Centralizare chei query params tranzacții (QUERY_PARAMS)
+- Mutat toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) în `shared-constants/queryParams.ts`.
+- Eliminat duplicarea din `frontend/src/constants/api.ts` și `backend/src/constants/api.ts`.
+- Importurile se fac EXPLICIT din `@shared-constants/queryParams` (nu din barrel!).
+- Motiv: sincronizare automată FE/BE, fără risc de desincronizare la refactor.
+- Orice modificare la aceste chei trebuie anunțată și documentată.
+- Path mapping actualizat în ambele `tsconfig.json` pentru rezolvare corectă.
+
 # Lessons Learned
 
 - Barrel exports pot cauza importuri circulare - necesară organizare ierarhică clară.
@@ -68,6 +76,7 @@ _Actualizat la: 2025-04-26_
 - Toate textele UI, mesajele și enums sunt centralizate și importate doar din barrel (`constants/index.ts`).
 - Convențiile și best practices au fost actualizate și respectate (vezi BEST_PRACTICES.md).
 - Documentarea și refactorizările minore rămase sunt în curs.
+- Orice abatere de la aceste reguli trebuie justificată și documentată explicit în code review și DEV_LOG.md.
 
 ## 2025-04-27 - Migrare enums/constants la shared-constants și audit automat importuri
 - Finalizată migrarea enums/constants la sursa unică `shared-constants/`.
