@@ -5,13 +5,13 @@
   "proxy": "http://localhost:3001",
   "main": "src/index.tsx",
   "scripts": {
-    "copy-shared-constants-to-src": "node ./scripts/copy-shared-constants-to-src.js",
-    "prestart": "npm run copy-shared-constants-to-src",
+    "sync-shared-constants": "node ../scripts/sync-shared-constants.js",
+    "prestart": "npm run sync-shared-constants",
     "start": "craco start",
-    "prebuild": "npm run copy-shared-constants-to-src",
+    "prebuild": "npm run sync-shared-constants",
     "build": "craco build",
-    "postinstall": "npm run copy-shared-constants-to-src",
-    "pretest": "npm run copy-shared-constants-to-src",
+    "postinstall": "npm run sync-shared-constants",
+    "pretest": "npm run sync-shared-constants",
     "test": "cross-env REACT_APP_API_URL=http://localhost:3000 craco test --env=jsdom",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src"
