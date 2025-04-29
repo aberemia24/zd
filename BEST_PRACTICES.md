@@ -102,6 +102,24 @@
 
 #### Configurare Path Mapping pentru Shared Constants
 
+---
+
+### Best practices pentru testare automată UI (`data-testid`)
+
+- Folosește `data-testid` pe orice element funcțional relevant pentru testare (butoane, inputuri, itemi de listă, mesaje de feedback etc.).
+- Alege valori unice și stabile (ex: `save-btn`, `amount-input`, `transaction-item-<id>`).
+- Pentru componente custom, propagă prop-ul `data-testid` către elementul nativ.
+- Nu depinde de text, clasă sau structură pentru selecție în teste!
+- Evită `data-testid` pe elemente strict decorative.
+- Documentează excepțiile în code review.
+
+**Exemple:**
+```tsx
+<button data-testid="save-btn">Salvează</button>
+<input data-testid="amount-input" />
+<li data-testid={`transaction-item-${id}`}>...</li>
+```
+
 - Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, CRACO):
   - În `tsconfig.json` adaugă la `compilerOptions.paths`:
     ```json

@@ -89,6 +89,7 @@ const TransactionForm: React.FC = () => {
       aria-label={LABELS.FORM}
       onSubmit={onSubmit}
       className="flex flex-wrap gap-3 mb-6 items-end"
+      data-testid="transaction-form"
     >
       <Select
         name="type"
@@ -99,6 +100,7 @@ const TransactionForm: React.FC = () => {
         options={OPTIONS.TYPE}
         className="ml-2"
         placeholder={PLACEHOLDERS.SELECT}
+        data-testid="type-select"
       />
       <Input
         name="amount"
@@ -109,6 +111,7 @@ const TransactionForm: React.FC = () => {
         aria-label={LABELS.AMOUNT}
         placeholder={PLACEHOLDERS.AMOUNT}
         className="ml-2"
+        data-testid="amount-input"
       />
       <Select
         name="category"
@@ -120,6 +123,7 @@ const TransactionForm: React.FC = () => {
         className="ml-2"
         disabled={!form.type || optiuniCategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
+        data-testid="category-select"
       />
       <Select
         name="subcategory"
@@ -131,6 +135,7 @@ const TransactionForm: React.FC = () => {
         className="ml-2"
         disabled={!form.category || optiuniSubcategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
+        data-testid="subcategory-select"
       />
       <Input
         name="date"
@@ -141,6 +146,7 @@ const TransactionForm: React.FC = () => {
         aria-label={LABELS.DATE}
         placeholder={PLACEHOLDERS.DATE}
         className="ml-2"
+        data-testid="date-input"
       />
       <Checkbox
         name="recurring"
@@ -148,6 +154,7 @@ const TransactionForm: React.FC = () => {
         checked={form.recurring}
         onChange={handleChange}
         aria-label={LABELS.RECURRING}
+        data-testid="recurring-checkbox"
       />
       <Select
         name="frequency"
@@ -159,8 +166,16 @@ const TransactionForm: React.FC = () => {
         className="ml-2"
         disabled={!form.recurring}
         placeholder={PLACEHOLDERS.SELECT}
+        data-testid="frequency-select"
       />
-      <Button type="submit" disabled={!!loading} className="ml-2">{BUTTONS.ADD}</Button>
+      <Button
+        type="submit"
+        disabled={!!loading}
+        className="ml-2"
+        data-testid="add-transaction-btn"
+      >
+        {BUTTONS.ADD}
+      </Button>
       {error && (
         <span data-testid="error-message" role="alert" aria-label="error message" className="text-error block mt-2">
           {MESAJE[error as keyof typeof MESAJE] || error}

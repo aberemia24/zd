@@ -5,13 +5,15 @@ export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElemen
   label?: string;
   error?: string;
   wrapperClassName?: string;
-}
+  'data-testid'?: string;
+} // data-testid și orice alt prop HTML sunt permise
 
-const Checkbox: React.FC<CheckboxProps> = ({ label, error, className, wrapperClassName, ...rest }) => (
+const Checkbox: React.FC<CheckboxProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, ...rest }) => (
   <div className={classNames('flex items-center', wrapperClassName)}>
     <input
       type="checkbox"
       className={classNames('accent-primary', className)}
+      data-testid={dataTestId || 'checkbox-field'}
       {...rest}
     />
     {label && <label className="ml-2 form-label">{label}</label>}

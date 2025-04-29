@@ -22,7 +22,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
   const total = useTransactionStore((s: TransactionState) => s.total);
   return (
     <div className="mt-6">
-      <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white">
+      <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white" data-testid="transaction-table">
         <thead>
           <tr className="bg-gray-100 text-gray-700">
             <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.TYPE}</th>
@@ -37,12 +37,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan={8} className="text-center py-6 text-gray-500">{TABLE.LOADING}</td></tr>
+            <tr data-testid="transaction-table-loading"><td colSpan={8} className="text-center py-6 text-gray-500">{TABLE.LOADING}</td></tr>
           ) : (!transactions || transactions.length === 0 ? (
-            <tr><td colSpan={8} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
+            <tr data-testid="transaction-table-empty"><td colSpan={8} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
           ) : (
             transactions.map((t: Transaction, idx: number) => (
-              <tr key={t._id || idx} className="border-b last:border-b-0 hover:bg-gray-50">
+              <tr key={t._id || idx} className="border-b last:border-b-0 hover:bg-gray-50" data-testid={`transaction-item-${t._id || idx}`}>
                 <td className="px-3 py-2">{t.type || ''}</td>
                 <td className="px-3 py-2">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
                 <td className="px-3 py-2">{t.currency || ''}</td>

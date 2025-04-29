@@ -1,22 +1,17 @@
 import React from 'react';
 import classNames from 'classnames';
 
-export type ButtonProps = {
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary';
-  disabled?: boolean;
-  onClick?: () => void;
-  children: React.ReactNode;
-  className?: string;
-  type?: 'button' | 'submit' | 'reset';
 };
 
 const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   disabled = false,
-  onClick,
-  children,
   className,
-  type = 'button',
+  children,
+  'data-testid': dataTestId,
+  ...rest
 }) => {
   return (
     <button
@@ -27,8 +22,8 @@ const Button: React.FC<ButtonProps> = ({
         className
       )}
       disabled={disabled}
-      onClick={onClick}
-      type={type}
+      data-testid={dataTestId || 'button-field'}
+      {...rest}
     >
       {children}
     </button>

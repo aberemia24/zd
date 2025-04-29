@@ -1,5 +1,15 @@
 # Dev Log - Budget App
 
+## 2025-04-29 - Audit și refactorizare completă testabilitate (data-testid)
+- Refactorizat toate componentele primitive (Button, Input, Select, Checkbox, Textarea) pentru propagarea și setarea predictibilă a atributului `data-testid` (default sau explicit).
+- Refactorizat toate componentele de features (TransactionForm, TransactionTable, ExcelGrid etc.) pentru a avea `data-testid` pe toate elementele funcționale (butoane, inputuri, rânduri, feedback, etc.).
+- Toate testele relevante folosesc doar `data-testid` predictibil pentru selectarea elementelor.
+- Creat/îmbunătățit scriptul `check-data-testid.js` pentru audit automat al tuturor componentelor și testelor.
+- Efectuat audit complet pe tot frontend-ul (`src/`): nu există niciun element funcțional fără `data-testid`.
+- Regula și patternul au fost documentate și sunt obligatorii pentru orice cod nou (vezi regulile globale și BEST_PRACTICES.md).
+- Orice excepție trebuie justificată și notată aici și în code review.
+
+
 ## 2025-04-21 - Setup Inițial
 - Creat structură monorepo: frontend (React + TDD), backend (NestJS + TDD), shared.
 - Configurare testare automată cu Jest și Testing Library.

@@ -7,15 +7,17 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
   wrapperClassName?: string;
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
-}
+  'data-testid'?: string;
+} // data-testid și orice alt prop HTML sunt permise
 
-const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, id, ...rest }) => (
+const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, id, 'data-testid': dataTestId, ...rest }) => (
   <div className={classNames('flex flex-col', wrapperClassName)}>
     {label && <label htmlFor={id || rest.name} className="form-label mb-1">{label}</label>}
     <select
       id={id || rest.name}
       className={classNames('input-field', error && 'border-red-500', className)}
       value={options.some(opt => opt.value === rest.value) ? rest.value : ''}
+      data-testid={dataTestId || 'select-field'}
       {...rest}
     >
       {placeholder && <option value="">{placeholder}</option>}
