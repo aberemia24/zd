@@ -33,6 +33,15 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 - **Structură Modulară:** `primitives/`, `features/`, `stores/`, `constants/`.
 - **Documentare Continuă:** Toate convențiile și lecțiile în [BEST_PRACTICES.md](./BEST_PRACTICES.md) și [DEV_LOG.md](./DEV_LOG.md).
 
+### Checklist future-proof pentru constants shared
+- [ ] Orice constantă/enum/mesaj nou se adaugă DOAR în `shared-constants/`.
+- [ ] Toate importurile pentru constants shared se fac DOAR prin path mapping `@shared-constants`.
+- [ ] Barrel-ul `shared-constants/index.ts` se actualizează la orice modificare.
+- [ ] Nu există nicio valoare duplicată local în FE sau BE pentru constants partajate.
+- [ ] Orice modificare se anunță clar în code review și se documentează în `DEV_LOG.md`.
+- [ ] Se rulează periodic scriptul de audit pentru importuri (`npm run validate:constants`).
+- [ ] Orice excepție/abatere se aprobă și se justifică explicit.
+
 ---
 
 ## 🚀 Workflow de Dezvoltare

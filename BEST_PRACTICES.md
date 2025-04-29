@@ -91,6 +91,15 @@
   ```
 - Auditarea automată a importurilor se face cu `npm run validate:constants` și este obligatorie înainte de orice commit major.
 
+### Checklist future-proof pentru constants shared
+- [ ] Toate constantele/enumurile/mesajele partajate se definesc DOAR în `shared-constants/`.
+- [ ] Importurile pentru constants shared se fac DOAR prin path mapping `@shared-constants`.
+- [ ] Barrel-ul `shared-constants/index.ts` se actualizează la fiecare modificare.
+- [ ] Nu există duplicări locale în FE sau BE pentru constants partajate.
+- [ ] Orice modificare se documentează clar în code review și în `DEV_LOG.md`.
+- [ ] Se rulează periodic scriptul de audit pentru importuri (`npm run validate:constants`).
+- [ ] Orice abatere se aprobă și se justifică explicit.
+
 #### Configurare Path Mapping pentru Shared Constants
 
 - Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, CRACO):
