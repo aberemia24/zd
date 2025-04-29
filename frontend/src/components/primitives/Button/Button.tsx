@@ -1,8 +1,9 @@
 import React from 'react';
 import classNames from 'classnames';
 
-export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'data-testid'> & {
   variant?: 'primary' | 'secondary';
+  dataTestId?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -10,7 +11,7 @@ const Button: React.FC<ButtonProps> = ({
   disabled = false,
   className,
   children,
-  'data-testid': dataTestId,
+  dataTestId,
   ...rest
 }) => {
   return (

@@ -162,16 +162,19 @@ export class TransactionService {
    * Transformă datele de formular în formatul API
    */
   private transformFormToApi(formData: TransactionFormWithNumberAmount): Partial<Transaction> {
-    // Transformăm între formatul UI și API, cu o atenție specială pentru amount
-    // În UI folosim number pentru calcule, dar în API ar trebui să fie string conform tipului Transaction
-    return {
-      ...formData,
-      // Convertim amount la string pentru compatibilitate cu Transaction type
-      amount: String(formData.amount),
-      // Adăugăm valori implicite dacă lipsesc
-      currency: FORM_DEFAULTS.CURRENCY,
-    };
+  // Elimină id din payload (la create) și trimite amount ca number
+  const { id, ...rest } = formData as any;
+  const payload: Partial<Transaction> = {
+    ...rest,
+    amount: Number(formData.amount), // trimite amount ca number
+    currency: FORM_DEFAULTS.CURRENCY,
+  };
+  // Pentru update, includem id dacă există
+  if (typeof id === 'string' && id.length > 0) {
+    payload.id = id;
   }
+  return payload;
+}
   
   /**
    * Obține tranzacțiile filtrate, cu suport pentru cache

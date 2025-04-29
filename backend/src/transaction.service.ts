@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionValidated } from '@shared-constants/transaction.schema';
+import { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema';
+import { v4 as uuidv4 } from 'uuid';
 
 
 @Injectable()
@@ -70,9 +71,13 @@ export class TransactionService {
     return this.transactions.find(t => t.id === id);
   }
 
-  create(transaction: TransactionValidated) {
-    this.transactions.push(transaction);
-    return transaction;
+  create(transaction: CreateTransaction): TransactionValidated {
+    const newTransaction: TransactionValidated = {
+      ...transaction,
+      id: uuidv4(),
+    };
+    this.transactions.push(newTransaction);
+    return newTransaction;
   }
 
   update(id: string, transaction: TransactionValidated) {

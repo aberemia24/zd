@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, HttpException, HttpStatus, NotFoundException, BadRequestException, HttpCode, Query } from '@nestjs/common';
-import { TransactionSchema } from '@shared-constants/transaction.schema';
+import { TransactionSchema, CreateTransactionSchema } from '@shared-constants/transaction.schema';
 import { TransactionService } from './transaction.service';
 import { z } from 'zod';
 
@@ -32,7 +32,7 @@ export class TransactionController {
 
   @Post()
   async create(@Body() body: any) {
-    const parsed = TransactionSchema.safeParse(body);
+    const parsed = CreateTransactionSchema.safeParse(body);
     if (!parsed.success) {
       throw new BadRequestException({
         error: 'VALIDATION_ERROR',

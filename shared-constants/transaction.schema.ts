@@ -10,4 +10,8 @@ export const TransactionSchema = z.object({
   category: z.string().optional(),
 });
 
+// Schema pentru CREATE (fără id)
+export const CreateTransactionSchema = TransactionSchema.omit({ id: true });
+
 export type TransactionValidated = z.infer<typeof TransactionSchema>;
+export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
