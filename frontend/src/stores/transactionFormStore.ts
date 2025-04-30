@@ -4,8 +4,9 @@ import { VALIDATION, VALIDATION_MESSAGES } from '@shared-constants/validation';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
-import { TransactionType } from '@shared-constants';
-import { TransactionService } from '../services';
+import { TransactionType } from '../../../shared-constants/enums';
+import { FrequencyType } from '@shared-constants/enums';
+import { supabaseService } from '../services/supabaseService';
 import { useTransactionStore } from '../stores/transactionStore';
 
 interface TransactionFormStoreState {
@@ -26,11 +27,12 @@ interface TransactionFormStoreState {
   getError: () => string;
   getSuccess: () => string;
   getLoading: () => boolean;
-  setTransactionService: (service: TransactionService) => void;
+  setTransactionService: () => void; // compatibilitate UI/teste vechi
 }
 
 export const useTransactionFormStore = create<TransactionFormStoreState>((set, get) => {
-  let transactionService: TransactionService = new TransactionService();
+  // Eliminat transactionService: TransactionService
+
 
   return {
     form: { ...INITIAL_FORM_STATE },
@@ -43,7 +45,7 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
     setSuccess: (msg) => set({ success: msg }),
     setLoading: (val) => set({ loading: val }),
     resetForm: () => set({ form: { ...INITIAL_FORM_STATE }, error: '', success: '' }),
-    setTransactionService: (service) => { transactionService = service; },
+    setTransactionService: () => {}, // noop (pentru compatibilitate cu UI/teste vechi)
     handleChange: (e) => {
       const { name, value, type } = e.target;
       if (type === 'checkbox') {
@@ -87,10 +89,12 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
         const { form } = get();
         const formWithNumberAmount: TransactionFormWithNumberAmount = {
           ...form,
+          type: form.type as TransactionType,
           amount: Number(form.amount),
+          frequency: form.frequency ? form.frequency as FrequencyType : undefined,
           currency: FORM_DEFAULTS.CURRENCY
         };
-        await transactionService.saveTransaction(formWithNumberAmount);
+        await supabaseService.createTransaction(formWithNumberAmount);
         set({ success: MESAJE.SUCCES_ADAUGARE });
         const txStore = useTransactionStore.getState();
         await txStore.refresh();

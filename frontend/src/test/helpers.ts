@@ -5,18 +5,20 @@ import { MOCK_USER_ID } from './mockData';
 import { render, fireEvent, within } from '@testing-library/react';
 
 // Creează rapid o tranzacție mock cu override-uri
+import { TransactionType } from 'shared-constants';
+
 export function createMockTransaction(overrides: Partial<Transaction> = {}): Transaction {
   return {
     _id: 'mockId',
     userId: MOCK_USER_ID,
-    type: 'income',
+    type: TransactionType.INCOME,
     amount: '100',
     currency: 'RON',
     date: '2025-04-22',
     category: 'VENITURI',
     subcategory: '',
     recurring: false,
-    frequency: '',
+    frequency: undefined,
     ...overrides,
   };
 }

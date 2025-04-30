@@ -3,7 +3,7 @@ import { render, screen, fireEvent, within, cleanup } from '@testing-library/rea
 import TransactionTable from '.';
 import { Transaction } from './TransactionTable';
 import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
-import { TransactionType, CategoryType, FrequencyType } from 'shared-constants';
+import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 
 // Mock pentru store-ul Zustand
 jest.mock('../../../stores/transactionStore', () => {
@@ -58,7 +58,7 @@ describe('TransactionTable', () => {
       subcategory: 'Supermarket',
       date: '2025-04-02',
       recurring: false,
-      frequency: '',
+      frequency: undefined,
     },
   ];
 

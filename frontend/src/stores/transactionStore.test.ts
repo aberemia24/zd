@@ -6,7 +6,7 @@ import { act, waitFor } from '@testing-library/react';
 import { PAGINATION } from 'shared-constants';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PaginatedResponse } from '../services/transactionApiClient';
-import { TransactionType, CategoryType } from 'shared-constants';
+import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TransactionService } from '../services/transactionService';
 
 // Mock pentru middleware Zustand (dezactivează persist și devtools în teste)
@@ -36,7 +36,7 @@ const mockTransactions: Transaction[] = [
     category: CategoryType.EXPENSE,
     subcategory: 'Chirie',
     recurring: false,
-    frequency: '',
+    frequency: undefined,
     currency: 'RON'
   },
   { 
@@ -47,7 +47,7 @@ const mockTransactions: Transaction[] = [
     category: CategoryType.INCOME,
     subcategory: 'Salariu',
     recurring: true,
-    frequency: 'lunar',
+    frequency: FrequencyType.MONTHLY,
     currency: 'RON'
   }
 ];
@@ -66,7 +66,6 @@ import { useTransactionStore } from './transactionStore';
 // Utilitar pentru resetarea store-ului și injectarea serviciului mock
 function resetStoreWithMockService() {
   useTransactionStore.getState().reset();
-  useTransactionStore.getState().setTransactionService(mockService);
 }
 
 // Setup mock-uri înainte de fiecare test
@@ -82,7 +81,7 @@ beforeEach(() => {
         subcategory: formData.subcategory,
         date: formData.date,
         recurring: formData.recurring ?? false,
-        frequency: formData.frequency ?? '',
+        frequency: formData.frequency ?? undefined,
         currency: 'RON'
       })),
     removeTransaction: jest.fn(async (_id: string): Promise<void> => undefined),
@@ -179,7 +178,7 @@ describe('transactionStore', () => {
         category: 'shopping',
         subcategory: 'haine',
         recurring: false,
-        frequency: '',
+        frequency: undefined,
         currency: 'RON',
       };
       
@@ -204,7 +203,7 @@ describe('transactionStore', () => {
         category: 'utilities',
         subcategory: 'energie',
         recurring: false,
-        frequency: '',
+        frequency: undefined,
         currency: 'RON',
       };
       
@@ -270,8 +269,7 @@ describe('transactionStore', () => {
     it('gestionează corect erorile și setează mesajul de eroare din constants/messages.ts', async () => {
       // Arrange
       useTransactionStore.getState().reset(); // Reset explicit pentru izolare
-      useTransactionStore.getState().setTransactionService(mockService); // Reinjectează mock-ul
-      const errorMessage = 'Test error';
+          const errorMessage = 'Test error';
       mockService.getFilteredTransactions.mockRejectedValueOnce(new Error(errorMessage));
       const { MESAJE } = await import('shared-constants');
       const store = useTransactionStore.getState();
@@ -340,7 +338,30 @@ describe('transactionStore', () => {
   describe('resetare și setteri', () => {
     it('setează și resetează starea corect', () => {
       // Arrange
-      const testTransactions = mockPaginatedResponse.data;
+      const testTransactionsNumberAmount = [
+  {
+    id: '1',
+    amount: 100,
+    date: '2025-04-24',
+    type: TransactionType.EXPENSE,
+    category: CategoryType.EXPENSE,
+    subcategory: 'Chirie',
+    recurring: false,
+    frequency: undefined,
+    currency: 'RON'
+  },
+  {
+    id: '2',
+    amount: 200,
+    date: '2025-04-25',
+    type: TransactionType.INCOME,
+    category: CategoryType.INCOME,
+    subcategory: 'Salariu',
+    recurring: true,
+    frequency: FrequencyType.MONTHLY,
+    currency: 'RON'
+  }
+];
       const testParams: TransactionQueryParams = {
         type: TransactionType.EXPENSE,
         limit: 30,
@@ -350,15 +371,15 @@ describe('transactionStore', () => {
       
       // Act - setăm manual starea utilizând setterii
       const store = useTransactionStore.getState();
-      store.setTransactions(testTransactions);
-      store.setTotal(testTransactions.length);
+      store.setTransactions(testTransactionsNumberAmount);
+      store.setTotal(testTransactionsNumberAmount.length);
       store.setLoading(true);
       store.setError('Eroare test');
       store.setQueryParams(testParams);
       
       // Assert - verificăm modificarea
-      expect(useTransactionStore.getState().transactions).toEqual(testTransactions);
-      expect(useTransactionStore.getState().total).toBe(testTransactions.length);
+      expect(useTransactionStore.getState().transactions).toEqual(testTransactionsNumberAmount);
+      expect(useTransactionStore.getState().total).toBe(testTransactionsNumberAmount.length);
       expect(useTransactionStore.getState().loading).toBe(true);
       expect(useTransactionStore.getState().error).toBe('Eroare test');
       expect(useTransactionStore.getState().currentQueryParams).toEqual(testParams);

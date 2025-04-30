@@ -1,7 +1,14 @@
+// [2025-04] Store migrat pentru a folosi supabaseService (nu mai folosește TransactionService)
 import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
-import { TransactionService } from '../services/transactionService';
-import type { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
+import { supabaseService } from '../services/supabaseService';
+import type { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema';
+import { TransactionType } from '@shared-constants/enums';
+import type { TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
+// Patch rapid pentru recurring în query params
+export interface TransactionQueryParamsWithRecurring extends TransactionQueryParams {
+  recurring?: boolean;
+}
 import { PAGINATION, MESAJE } from '@shared-constants';
 
 /**
@@ -9,9 +16,9 @@ import { PAGINATION, MESAJE } from '@shared-constants';
  */
 export interface TransactionState {
   // Date
-  transactions: Transaction[];
+  transactions: TransactionValidated[];
   total: number;
-  currentQueryParams: TransactionQueryParams;
+  currentQueryParams: TransactionQueryParamsWithRecurring;
   // Intern: pentru caching parametri fetch
   _lastQueryParams?: TransactionQueryParams;
   
@@ -20,20 +27,22 @@ export interface TransactionState {
   error: string | null;
   
   // Servicii și dependențe
-  transactionService: TransactionService;
+  // Eliminat transactionService: TransactionService;
+
   
   // Acțiuni - setters
-  setTransactions: (transactions: Transaction[]) => void;
+  setTransactions: (transactions: TransactionValidated[]) => void;
   setTotal: (total: number) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  setQueryParams: (params: TransactionQueryParams) => void;
-  setTransactionService: (service: TransactionService) => void;
+  setQueryParams: (params: TransactionQueryParamsWithRecurring) => void;
+  // Eliminat setTransactionService
+
   
   // Acțiuni - operațiuni asincrone
   fetchTransactions: (forceRefresh?: boolean) => Promise<void>;
   refresh: () => Promise<void>;
-  saveTransaction: (data: TransactionFormWithNumberAmount, id?: string) => Promise<Transaction>;
+  saveTransaction: (data: TransactionFormWithNumberAmount, id?: string) => Promise<TransactionValidated>;
   removeTransaction: (id: string) => Promise<void>;
   
   // Acțiuni - utilități
@@ -66,50 +75,50 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   },
   loading: false,
   error: null,
-  transactionService: new TransactionService(),
+  // Eliminat transactionService
+
   
   // Setters
-  setTransactions: (transactions: Transaction[]) => set({ transactions }),
+  setTransactions: (transactions: TransactionValidated[]) => set({ transactions }),
   setTotal: (total: number) => set({ total }),
   setLoading: (loading: boolean) => set({ loading }),
   setError: (error: string | null) => set({ error }),
-  setQueryParams: (params: TransactionQueryParams) => set({ currentQueryParams: params }),
-  setTransactionService: (service: TransactionService) => set({ transactionService: service }),
+  setQueryParams: (params: TransactionQueryParamsWithRecurring) => set({ currentQueryParams: params }),
+  // Eliminat setTransactionService
+
   
   // Operațiuni asincrone
   // Referință internă pentru caching parametri
   _lastQueryParams: undefined as TransactionQueryParams | undefined,
 
   fetchTransactions: async (forceRefresh = false) => {
-    const { transactionService, currentQueryParams, _lastQueryParams, setError } = get();
-    console.log('🔍 fetchTransactions called', { forceRefresh, params: currentQueryParams, lastParams: _lastQueryParams });
-
+    const { currentQueryParams, _lastQueryParams, setError } = get();
     // Caching: nu refetch dacă parametrii identici și fără forceRefresh
     if (!forceRefresh && _lastQueryParams && JSON.stringify(_lastQueryParams) === JSON.stringify(currentQueryParams)) {
       set({ loading: false });
       return;
     }
-
     set({ loading: true, error: null });
-
     try {
-      console.log('🔄 fetchTransactions starting network call');
-      // Actualizează referința
       set({ _lastQueryParams: { ...currentQueryParams } });
-      const response = await transactionService.getFilteredTransactions(
-        currentQueryParams,
-        forceRefresh
-      );
-      console.log('✅ fetchTransactions success', response);
-      set({ 
-        transactions: response.data,
-        total: response.total,
+      // Adaptare la supabaseService
+      const { data, count } = await supabaseService.fetchTransactions('', {
+        limit: currentQueryParams.limit,
+        offset: currentQueryParams.offset,
+        sort: currentQueryParams.sort as any,
+        order: 'desc',
+      }, {
+        type: currentQueryParams.type as TransactionType,
+        category: currentQueryParams.category,
+        recurring: currentQueryParams.recurring,
+      });
+      set({
+        transactions: data,
+        total: count,
         loading: false
       });
     } catch (err) {
-      console.log('❌ fetchTransactions failed', err);
-      console.error(MESAJE.LOG_EROARE_INCARCARE, err);
-      set({ 
+      set({
         transactions: [],
         total: 0,
         loading: false,
@@ -131,37 +140,30 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   },
   
   saveTransaction: async (data: TransactionFormWithNumberAmount, id?: string) => {
-    console.log('💾 saveTransaction called', { data, id });
-    const { transactionService } = get();
-    
     try {
-      let result: Transaction;
-      result = await transactionService.saveTransaction(data, id);
-      // Resetăm cache-ul pentru a forța reîncărcarea
+      let result: TransactionValidated;
+      if (id) {
+        result = await supabaseService.updateTransaction(id, data as any);
+      } else {
+        result = await supabaseService.createTransaction(data as any);
+      }
       set({ _lastQueryParams: undefined });
-      // După salvare, reîmprospătăm lista de tranzacții
       await get().fetchTransactions();
       return result;
     } catch (err) {
-      console.error(MESAJE.LOG_EROARE_SALVARE, err);
       set({ error: MESAJE.EROARE_SALVARE_TRANZACTIE });
-      throw err; // Propagăm eroarea pentru a o putea gestiona în componente
+      throw err;
     }
   },
   
   removeTransaction: async (id: string) => {
-    const { transactionService } = get();
-    
     try {
-      await transactionService.removeTransaction(id);
-      // Resetăm cache-ul pentru a forța reîncărcarea
+      await supabaseService.deleteTransaction(id);
       set({ _lastQueryParams: undefined });
-      // După ștergere, reîmprospătăm lista de tranzacții
       await get().fetchTransactions();
     } catch (err) {
-      console.error(MESAJE.LOG_EROARE_STERGERE, err);
       set({ error: MESAJE.EROARE_STERGERE_TRANZACTIE });
-      throw err; // Propagăm eroarea pentru a o putea gestiona în componente
+      throw err;
     }
   },
   

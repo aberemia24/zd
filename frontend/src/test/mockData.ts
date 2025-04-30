@@ -14,7 +14,7 @@ export const MOCK_TRANSACTION: Transaction = {
   category: 'VENITURI',
   subcategory: '',
   recurring: false,
-  frequency: ''
+  frequency: undefined
 };
 
 export const MOCK_RECURRING_TRANSACTION: Transaction = {
@@ -44,7 +44,7 @@ export const MOCK_TRANSACTIONS_LIST: Transaction[] = [
     category: 'UTILITĂȚI',
     subcategory: 'Electricitate',
     recurring: false,
-    frequency: ''
+    frequency: undefined
   },
   {
     _id: 't4',
@@ -94,7 +94,7 @@ export const MOCK_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount 
   category: 'UTILITĂȚI',
   subcategory: 'Electricitate',
   recurring: false,
-  frequency: ''
+  frequency: undefined
 };
 
 // Mock pentru TransactionFormWithNumberAmount recurent

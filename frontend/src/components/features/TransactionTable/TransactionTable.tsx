@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '../../primitives/Button';
-import { TransactionType, CategoryType } from '@shared-constants';
+import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TABLE, BUTTONS } from '@shared-constants';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import type { TransactionState } from '../../../stores/transactionStore';
@@ -40,8 +40,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
           ) : (!transactions || transactions.length === 0 ? (
             <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
           ) : (
-            transactions.map((t: Transaction, idx: number) => (
-              <tr key={t._id || idx} className="border-b last:border-b-0 hover:bg-gray-50" data-testid={`transaction-item-${t._id || idx}`}>
+            transactions.map((t, idx) => (
+              <tr key={t.id || idx} className="border-b last:border-b-0 hover:bg-gray-50" data-testid={`transaction-item-${t.id || idx}`}>
                 <td className="px-3 py-2">{t.type || ''}</td>
                 <td className="px-3 py-2">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
                                 <td className="px-3 py-2">{t.category || ''}</td>

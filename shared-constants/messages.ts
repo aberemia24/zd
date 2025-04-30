@@ -1,6 +1,13 @@
 // Toate mesajele de utilizator
 // Mesaje de validare și succes/eroare pentru aplicație (localizabile)
 export const MESAJE = {
+  // Autentificare
+  LOGIN_SUCCES: 'Autentificare reușită! Bine ai revenit.',
+  LOGIN_ERROR: 'Eroare la autentificare. Verifică emailul și parola.',
+  LOGOUT_SUCCES: 'Te-ai delogat cu succes!',
+  REGISTER_SUCCES: 'Cont creat! Verifică emailul pentru confirmare.',
+  REGISTER_ERROR: 'Eroare la crearea contului. Încearcă din nou.',
+  PAROLE_NECORESPUNZATOARE: 'Parolele nu coincid!',
   // Mesaje de validare backend
   INVALID_TYPE: 'Tip de tranzacție invalid!',
   INVALID_CATEGORY: 'Categorie invalidă!',

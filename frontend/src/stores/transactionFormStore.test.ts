@@ -1,5 +1,6 @@
 import { useTransactionFormStore } from './transactionFormStore';
 import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from 'shared-constants';
+import { TransactionType } from '../../../shared-constants/enums';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
@@ -61,7 +62,7 @@ describe('transactionFormStore Zustand', () => {
 
   describe('validare', () => {
     it('returnează true pentru date valide', () => {
-      store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
+      store.setForm({ ...INITIAL_FORM_STATE, type: TransactionType.EXPENSE, amount: '100', category: 'food', date: '2025-04-25' });
       expect(store.validateForm()).toBe(true);
       expect(store.getError()).toBe('');
     });
@@ -71,7 +72,7 @@ describe('transactionFormStore Zustand', () => {
       expect(store.getError()).toBe(MESAJE.CAMPURI_OBLIGATORII);
     });
     it('returnează false și setează eroare pentru recurring fără frequency', () => {
-      store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '10', category: 'food', date: '2025-04-25', recurring: true, frequency: '' });
+      store.setForm({ ...INITIAL_FORM_STATE, type: TransactionType.EXPENSE, amount: '10', category: 'food', date: '2025-04-25', recurring: true, frequency: '' });
       expect(store.validateForm()).toBe(false);
       expect(store.getError()).toBe(MESAJE.FRECV_RECURENTA);
     });
@@ -80,8 +81,8 @@ describe('transactionFormStore Zustand', () => {
   describe('submit', () => {
     it('apelează serviciul și setează succes pentru date valide', async () => {
       const mockService = { saveTransaction: jest.fn().mockResolvedValue({}) };
-      store.setTransactionService(mockService as any);
-      store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
+      // store.setTransactionService eliminat (store actualizat)
+      store.setForm({ ...INITIAL_FORM_STATE, type: TransactionType.EXPENSE, amount: '100', category: 'food', date: '2025-04-25' });
       await store.handleSubmit();
       expect(mockService.saveTransaction).toHaveBeenCalledWith({
         ...store.getForm(), amount: 100, currency: FORM_DEFAULTS.CURRENCY
@@ -97,8 +98,8 @@ describe('transactionFormStore Zustand', () => {
     });
     it('setează eroare dacă serviciul aruncă excepție', async () => {
       const mockService = { saveTransaction: jest.fn().mockRejectedValue(new Error('fail')) };
-      store.setTransactionService(mockService as any);
-      store.setForm({ ...INITIAL_FORM_STATE, type: 'expense', amount: '100', category: 'food', date: '2025-04-25' });
+      // store.setTransactionService eliminat (store actualizat)
+      store.setForm({ ...INITIAL_FORM_STATE, type: TransactionType.EXPENSE, amount: '100', category: 'food', date: '2025-04-25' });
       await store.handleSubmit();
       expect(store.getError()).toBe(MESAJE.EROARE_ADAUGARE);
       expect(store.getLoading()).toBe(false);

@@ -54,7 +54,7 @@ jest.mock('./stores/transactionFormStore', () => ({
         category: '',
         subcategory: '',
         recurring: false,
-        frequency: ''
+        frequency: undefined
       },
       error: '',
       success: '',

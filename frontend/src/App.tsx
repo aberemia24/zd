@@ -3,6 +3,10 @@ import React from 'react';
 import TransactionForm from './components/features/TransactionForm/TransactionForm';
 import TransactionTable from './components/features/TransactionTable/TransactionTable';
 import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
+import LoginForm from './components/features/Auth/LoginForm';
+import RegisterForm from './components/features/Auth/RegisterForm';
+import { Toaster } from 'react-hot-toast';
+import Spinner from './components/primitives/Spinner';
 import { useTransactionFiltersStore } from './stores/transactionFiltersStore';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 
@@ -18,6 +22,8 @@ import type { TransactionState } from './stores/transactionStore';
  * Această structură separă clar logica de business de UI, crescând testabilitatea, 
  * mentenabilitatea și facilitând extinderea ulterioară.
  */
+import { useAuthStore } from './stores/authStore';
+
 export const App: React.FC = () => {
   console.log('🛜 App render');
 
@@ -64,10 +70,17 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
   
   
 
-  // Fetch transactions once on mount
+  // Sincronizare filtre + paginare cu store-ul de tranzacții
   React.useEffect(() => {
+    setQueryParams({
+      ...currentQueryParams,
+      type: filterType,
+      category: filterCategory,
+      offset,
+      limit
+    });
     useTransactionStore.getState().fetchTransactions();
-  }, []);
+  }, [filterType, filterCategory, offset, limit]);
 
   // Preluăm doar eroarea pentru afișare
   const fetchError = useTransactionStore((s: TransactionState) => s.error);
@@ -75,9 +88,29 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
   // Callback pentru schimbarea paginii
   const handlePageChange = React.useCallback((newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), [goToPage, limit]);
 
+  const { user, loading } = useAuthStore();
+  const [showRegister, setShowRegister] = React.useState(false);
+
+  if (!user && !loading) {
+    if (showRegister) {
+      return <RegisterForm onSwitchToLogin={() => setShowRegister(false)} />;
+    }
+    return <LoginForm onSwitchToRegister={() => setShowRegister(true)} />;
+  }
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-white/60 flex items-center justify-center z-50">
+        <Spinner size={60} />
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-[900px] mx-auto my-8 font-sans">
-      <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
+    <>
+      <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
+      <div className="max-w-[900px] mx-auto my-8 font-sans">
+        <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
 
       <TransactionForm />
 
@@ -95,7 +128,8 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
           {fetchError}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
 

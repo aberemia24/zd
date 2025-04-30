@@ -168,13 +168,13 @@ describe('TransactionService', () => {
 
     it('aplică valorile implicite pentru câmpurile lipsă', async () => {
       const incompleteFormData = {
-        type: 'income',
+        type: TransactionType.INCOME,
         amount: 100,
         date: '2025-04-25',
         category: 'VENITURI',
         subcategory: 'Salariu',
         recurring: false,
-        frequency: '',
+        frequency: undefined,
         // Lipsește currency intenționat pentru a testa comportamentul implicit
       } as unknown as TransactionFormWithNumberAmount; // Folosim cast dublu pentru a evita eroarea de tipare
       
@@ -312,38 +312,38 @@ describe('TransactionService', () => {
         // Demo tranzacții complete cu toate proprietățile necesare pentru tipul Transaction
         const transaction1: Transaction = { 
           id: '1', 
-          type: 'income', 
+          type: TransactionType.INCOME, 
           amount: '500', 
           currency: 'RON',
           date: '2023-01-01',
           category: 'Salariu',
           subcategory: 'Job principal',
           recurring: false,
-          frequency: ''
+          frequency: undefined
         };
         
         const transaction2: Transaction = { 
           id: '2', 
-          type: 'expense', 
+          type: TransactionType.EXPENSE, 
           amount: '200', 
           currency: 'RON',
           date: '2023-01-02',
           category: 'Mâncare',
           subcategory: 'Supermarket',
           recurring: false,
-          frequency: ''
+          frequency: undefined
         };
         
         const transaction3: Transaction = { 
           id: '3', 
-          type: 'income', 
+          type: TransactionType.INCOME, 
           amount: '1000', 
           currency: 'RON',
           date: '2023-01-03',
           category: 'Salariu',
           subcategory: 'Job secundar',
           recurring: false,
-          frequency: ''
+          frequency: undefined
         };
         
         if (params?.offset === 0) {
