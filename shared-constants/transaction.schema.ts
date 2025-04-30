@@ -8,6 +8,9 @@ export const TransactionSchema = z.object({
   date: z.string(),
   description: z.string().optional(),
   category: z.string().optional(),
+  subcategory: z.string().optional(),
+  recurring: z.boolean().optional(),
+  frequency: z.string().optional(),
 });
 
 // Schema pentru CREATE (fără id)
