@@ -68,13 +68,16 @@
 
 # Lessons Learned
 
-## 2025-04-30 - Securitate RLS, user_id și defense-in-depth
+## 2025-04-30 - Securitate RLS, user_id, persist auth și defense-in-depth
 - Am întâlnit eroare 403 la inserții/POST pe /transactions din cauza lipsei câmpului user_id în payload.
 - Politicile RLS pe Supabase impun ca orice operație să fie restricționată la userul logat (`user_id = auth.uid()`).
 - Soluție: la orice inserție (createTransaction), payload-ul include explicit user_id din store-ul de autentificare.
 - Pentru update și delete am adăugat filtrare suplimentară pe user_id direct în query, chiar dacă RLS asigură deja securitatea (defense in depth, UX și claritate mai bună).
 - Best practice: filtrarea pe user_id în client previne modificări/ștergeri accidentale și optimizează query-ul, dar securitatea rămâne garantată de RLS.
-- Lecție: la orice aplicație multi-user cu RLS, e critic să incluzi user_id la create și să filtrezi la update/delete, atât pentru UX cât și pentru siguranță.
+- Implementat store de autentificare (authStore) cu persist pentru user și integrare completă cu supabaseAuthService (login, register, logout, checkUser).
+- Asigurat persistenta login-ului între sesiuni și refresh automat al userului la pornirea aplicației.
+- Toate serviciile și store-urile relevante folosesc user-ul din authStore pentru orice operație sensibilă.
+- Lecție: persistarea și sincronizarea corectă a autentificării este critică pentru UX și siguranță, mai ales la aplicații cu date multi-user și politici RLS.
 
 - Barrel exports pot cauza importuri circulare - necesară organizare ierarhică clară.
 - Mock-urile pentru clase private trebuie să vizeze doar metodele publice.
