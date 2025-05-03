@@ -4,10 +4,13 @@
 import { create } from 'zustand';
 import { supabaseAuthService } from '../services/supabaseAuthService';
 
+import type { AuthUser, AuthErrorType } from '../services/supabaseAuthService';
+
 interface AuthState {
-  user: any | null;
+  user: AuthUser | null;
   loading: boolean;
   error: string | null;
+  errorType?: AuthErrorType;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -18,17 +21,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   error: null,
+  errorType: undefined,
 
   login: async (email, password) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, errorType: undefined });
     const result = await supabaseAuthService.login(email, password);
-    set({ user: result.user, error: result.error, loading: false });
+    set({ user: result.user, error: result.error, errorType: result.errorType, loading: false });
   },
 
   register: async (email, password) => {
-    set({ loading: true, error: null });
+    set({ loading: true, error: null, errorType: undefined });
     const result = await supabaseAuthService.register(email, password);
-    set({ user: result.user, error: result.error, loading: false });
+    set({ user: result.user, error: result.error, errorType: result.errorType, loading: false });
   },
 
   logout: async () => {

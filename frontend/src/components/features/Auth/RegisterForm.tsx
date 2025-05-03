@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../../stores/authStore';
+import type { AuthErrorType } from '../../../services/supabaseAuthService';
 import toast from 'react-hot-toast';
 import { MESAJE } from '@shared-constants';
 
@@ -7,7 +8,7 @@ const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLo
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
-  const { register, loading, error } = useAuthStore();
+  const { register, loading, error, errorType } = useAuthStore();
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +25,18 @@ const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLo
       setSuccess(MESAJE.REGISTER_SUCCES);
       toast.success(MESAJE.REGISTER_SUCCES);
     } else {
-      toast.error(error || MESAJE.REGISTER_ERROR);
+      let msg = error;
+      switch (errorType) {
+        case 'PASSWORD_WEAK':
+          msg = 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.';
+          break;
+        case 'NETWORK':
+          msg = 'Eroare de rețea. Încearcă din nou.';
+          break;
+        default:
+          msg = error || MESAJE.REGISTER_ERROR;
+      }
+      toast.error(msg);
     }
   };
 
@@ -67,7 +79,20 @@ const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLo
           data-testid="register-confirm"
         />
       </div>
-      {error && <div className="mb-2 text-red-600 text-center" data-testid="register-error">{error}</div>}
+      {error && (
+        <div className="mb-2 text-red-600 text-center" data-testid="register-error">
+          {(() => {
+            switch (errorType as AuthErrorType) {
+              case 'PASSWORD_WEAK':
+                return 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.';
+              case 'NETWORK':
+                return 'Eroare de rețea. Încearcă din nou.';
+              default:
+                return error;
+            }
+          })()}
+        </div>
+      )}
       {success && <div className="mb-2 text-green-600 text-center" data-testid="register-success">{success}</div>}
       <button
         type="submit"

@@ -10,7 +10,7 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, logout, loading, error, user } = useAuthStore();
+  const { login, logout, loading, error, errorType, user } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +19,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
     if (!error) {
       toast.success(MESAJE.LOGIN_SUCCES);
     } else {
-      toast.error(error || MESAJE.LOGIN_ERROR);
+      let msg = error;
+      switch (errorType) {
+        case 'INVALID_CREDENTIALS':
+          msg = 'Date de autentificare incorecte.';
+          break;
+        case 'RLS_DENIED':
+          msg = 'Acces interzis (RLS).';
+          break;
+        case 'NETWORK':
+          msg = 'Eroare de rețea. Încearcă din nou.';
+          break;
+        default:
+          msg = error || MESAJE.LOGIN_ERROR;
+      }
+      toast.error(msg);
     }
   };
 
@@ -50,7 +64,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
           data-testid="login-password"
         />
       </div>
-      {error && <div className="mb-2 text-red-600 text-center" data-testid="login-error">{error}</div>}
+      {error && (
+        <div className="mb-2 text-red-600 text-center" data-testid="login-error">
+          {(() => {
+            switch (errorType) {
+              case 'INVALID_CREDENTIALS':
+                return 'Date de autentificare incorecte.';
+              case 'RLS_DENIED':
+                return 'Acces interzis (RLS).';
+              case 'NETWORK':
+                return 'Eroare de rețea. Încearcă din nou.';
+              default:
+                return error;
+            }
+          })()}
+        </div>
+      )}
       <button
         type="submit"
         className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-60"
