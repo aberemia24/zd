@@ -20,8 +20,8 @@ Task Breakdown: Integrare Supabase în Budget App
 6. Testare & Validare
 [ ] Adaugă/migreză teste pentru noile servicii și store-uri (mock SupabaseService).
 [ ] Testează fluxurile principale (login, fetch, create, update, delete, pagination, edge cases).
-[ ] Rulează npm run validate:constants și asigură-te că importurile sunt conforme.
-7. Documentare & Knowledge Transfer
+[ ] Rulează npm run validate:constants 
+și asigură-te că importurile sunt conforme.-yuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu&ledge Transfer
 [ ] Actualizează [DEV_LOG.md] cu pașii de migrare și deciziile luate.
 [ ] Adaugă lecțiile relevante în [BEST_PRACTICES.md] după finalizare.
 

@@ -5,3 +5,9 @@ node_modules/
 /dist
 /build
 coverage/
+
+# Ignoră seed script și chei locale
+frontend/src/scripts/seedTransactions.ts
+frontend/src/scripts/seedTransactions.js
+.env*
+.env.local

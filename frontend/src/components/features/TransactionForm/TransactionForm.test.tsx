@@ -24,55 +24,11 @@ import { CATEGORIES } from '@shared-constants';
 // Import-uri pentru servicii și store-uri care au fost mock-uite
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useTransactionStore } from '../../../stores/transactionStore';
-import { TransactionService } from '../../../services/transactionService';
 
 // Tipizare pentru mock-uri
 const mockUseTransactionFormStore = useTransactionFormStore as jest.MockedFunction<typeof useTransactionFormStore>;
 const mockUseTransactionStore = useTransactionStore as jest.MockedFunction<typeof useTransactionStore>;
 
-// Clasă mock pentru TransactionService
-class MockTransactionService extends TransactionService {
-  constructor() {
-    super();
-  }
-  
-  // Override pentru metodele publice
-  async getFilteredTransactions(): Promise<PaginatedResponse<Transaction>> {
-    return { data: [], total: 0, limit: 10, offset: 0 };
-  }
-  
-  async saveTransaction(): Promise<Transaction> {
-    return { 
-      id: '1', 
-      type: TransactionType.INCOME, 
-      amount: '100', 
-      currency: FORM_DEFAULTS.CURRENCY,
-      date: '2023-01-01',
-      category: 'Test',
-      subcategory: 'Test'
-    };
-  }
-  
-  async removeTransaction(): Promise<void> {
-    return;
-  }
-  
-  async getTransactionById(): Promise<Transaction> {
-    return { 
-      id: '1', 
-      type: TransactionType.INCOME, 
-      amount: '100', 
-      currency: FORM_DEFAULTS.CURRENCY,
-      date: '2023-01-01',
-      category: 'Test',
-      subcategory: 'Test'
-    };
-  }
-  
-  getCacheStats() {
-    return { entries: 0, hits: 0, misses: 0, ratio: 0 };
-  }
-}
 
 // Helper pentru a selecta opțiuni în dropdownuri
 function selectOption(label: string, value: string) {
@@ -227,14 +183,15 @@ beforeEach(() => {
   // Mock complet pentru useTransactionStore
   mockUseTransactionStore.mockImplementation((selector) => {
     // Creăm un serviciu mock complet
-    const mockService = new MockTransactionService();
-    
-    // Spy pe metodele publice pentru a putea verifica apelurile
-    jest.spyOn(mockService, 'saveTransaction');
-    jest.spyOn(mockService, 'getFilteredTransactions');
-    jest.spyOn(mockService, 'removeTransaction');
-    
-    const state = {
+    const mockService = {
+  saveTransaction: jest.fn(),
+  getFilteredTransactions: jest.fn(),
+  removeTransaction: jest.fn(),
+  getTransactionById: jest.fn(),
+  getCacheStats: jest.fn()
+};
+
+const state = {
       // Date
       transactions: [],
       total: 0,

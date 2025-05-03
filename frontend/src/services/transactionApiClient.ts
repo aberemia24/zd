@@ -1,4 +1,4 @@
-import { API } from '../constants/api';
+import { API } from '@shared-constants/api';
 import { Transaction, TransactionQueryParams } from '../types/transaction';
 import { MESAJE } from '@shared-constants';
 

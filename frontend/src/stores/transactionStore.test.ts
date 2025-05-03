@@ -7,7 +7,6 @@ import { PAGINATION } from 'shared-constants';
 import { Transaction, TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PaginatedResponse } from '../services/transactionApiClient';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
-import { TransactionService } from '../services/transactionService';
 
 // Mock pentru middleware Zustand (dezactivează persist și devtools în teste)
 jest.mock('zustand/middleware', () => ({
@@ -20,11 +19,9 @@ jest.mock('zustand/middleware', () => ({
   })
 }));
 
-// Alias pentru tipurile TS ale TransactionService
-type TransactionServiceType = TransactionService;
 
 // Serviciu mock prin dependency injection
-let mockService: jest.Mocked<TransactionService>;
+let mockService: any;
 
 // Date de test pentru tranzacții
 const mockTransactions: Transaction[] = [
@@ -72,8 +69,8 @@ function resetStoreWithMockService() {
 beforeEach(() => {
   jest.clearAllMocks();
   mockService = {
-    getFilteredTransactions: jest.fn(async (...args: Parameters<TransactionService['getFilteredTransactions']>) => mockPaginatedResponse),
-    saveTransaction: jest.fn(async (formData: TransactionFormWithNumberAmount, id?: string): Promise<Transaction> => ({
+    getFilteredTransactions: jest.fn(async () => mockPaginatedResponse),
+    saveTransaction: jest.fn(async (formData: TransactionFormWithNumberAmount, id?: string) => ({
         id: id ?? '3',
         amount: String(formData.amount),
         type: formData.type,
@@ -84,11 +81,11 @@ beforeEach(() => {
         frequency: formData.frequency ?? undefined,
         currency: 'RON'
       })),
-    removeTransaction: jest.fn(async (_id: string): Promise<void> => undefined),
-    getTransactionById: jest.fn(async (id: string): Promise<Transaction> =>
+    removeTransaction: jest.fn(async () => undefined),
+    getTransactionById: jest.fn(async (id: string) =>
       mockTransactions.find(t => t.id === id) || mockTransactions[0]),
     getCacheStats: jest.fn(() => ({ entries: 0, hits: 0, misses: 0, ratio: 0 }))
-  } as unknown as jest.Mocked<TransactionService>;
+  };
   resetStoreWithMockService();
 });
 
