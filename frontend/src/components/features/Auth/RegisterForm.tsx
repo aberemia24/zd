@@ -28,7 +28,7 @@ const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLo
       let msg = error;
       switch (errorType) {
         case 'PASSWORD_WEAK':
-          msg = 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.';
+          msg = MESAJE.PAROLA_PREA_SLABA || 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.';
           break;
         case 'NETWORK':
           msg = 'Eroare de rețea. Încearcă din nou.';

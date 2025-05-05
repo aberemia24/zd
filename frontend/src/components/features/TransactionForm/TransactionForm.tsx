@@ -8,6 +8,10 @@ import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 
+function safeMessage(key: string): string {
+  return (MESAJE as Record<string, string>)[key] || key;
+}
+
 // Tipul datelor pentru formularul de tranzacție
 export type TransactionFormData = {
   type: string;
@@ -194,12 +198,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       </Button>
       {error && (
         <span data-testid="error-message" role="alert" aria-label="error message" className="text-error block mt-2">
-          {MESAJE[error as keyof typeof MESAJE] || error}
+          {safeMessage(error)}
         </span>
       )}
       {success && (
         <span data-testid="success-message" role="alert" aria-label="success message" className="text-success block mt-2">
-          {MESAJE[success as keyof typeof MESAJE] || success}
+          {safeMessage(success)}
         </span>
       )}
     </form>

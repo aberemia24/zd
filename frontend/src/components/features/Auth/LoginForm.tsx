@@ -22,13 +22,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       let msg = error;
       switch (errorType) {
         case 'INVALID_CREDENTIALS':
-          msg = 'Date de autentificare incorecte.';
+          msg = MESAJE.EROARE_AUTENTIFICARE || 'Date de autentificare incorecte.';
           break;
         case 'RLS_DENIED':
-          msg = 'Acces interzis (RLS).';
+          msg = MESAJE.EROARE_RLS || 'Acces interzis (RLS).';
           break;
         case 'NETWORK':
-          msg = 'Eroare de rețea. Încearcă din nou.';
+          msg = MESAJE.EROARE_RETEA || 'Eroare de rețea. Încearcă din nou.';
           break;
         default:
           msg = error || MESAJE.LOGIN_ERROR;

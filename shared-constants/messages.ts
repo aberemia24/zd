@@ -44,4 +44,9 @@ export const MESAJE = {
   LOG_EROARE_INCARCARE: 'Eroare la încărcarea tranzacțiilor:',
   LOG_EROARE_SALVARE: 'Eroare la salvarea tranzacției:',
   LOG_EROARE_STERGERE: 'Eroare la ștergerea tranzacției:',
+  // Mesaje suplimentare pentru autentificare
+  EROARE_AUTENTIFICARE: 'Date de autentificare incorecte.',
+  EROARE_RLS: 'Acces interzis (RLS).',
+  EROARE_RETEA: 'Eroare de rețea. Încearcă din nou.',
+  PAROLA_PREA_SLABA: 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.',
 };

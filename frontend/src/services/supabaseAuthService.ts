@@ -3,6 +3,7 @@
 // Orice modificare trebuie documentată în DEV_LOG.md
 
 import { supabase } from './supabase';
+import { MESAJE } from '@shared-constants/messages';
 
 // Tip user autenticat
 export interface AuthUser {
@@ -68,7 +69,7 @@ export const supabaseAuthService = {
     ) {
       return {
         user: null,
-        error: 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.',
+        error: MESAJE.PAROLA_PREA_SLABA,
         errorType: AuthErrorType.PASSWORD_WEAK,
       };
     }
