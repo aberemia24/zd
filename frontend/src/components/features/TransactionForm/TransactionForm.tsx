@@ -24,8 +24,12 @@ export type TransactionFormData = {
 
 // Eliminat structura locală categorii/subcategorii. Folosește doar CATEGORIES din @shared-constants.
 
-// Componentă conectată la store Zustand, fără props de stare/handler
-const TransactionForm: React.FC = () => {
+// Componentă cu props opționale onSave și onCancel
+interface TransactionFormProps {
+  onSave?: (form: TransactionFormData) => void;
+  onCancel?: () => void;
+}
+const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) => {
   // Selectăm starea și acțiunile relevante din store
   const { form, error, success, loading, setField, handleSubmit, resetForm } = useTransactionFormStore();
 
@@ -55,8 +59,9 @@ const TransactionForm: React.FC = () => {
     e.preventDefault();
     // Fix: amount number, fără id
     await handleSubmit();
+    onSave?.(form);
     resetForm();
-  }, [handleSubmit, resetForm, form]);
+  }, [handleSubmit, resetForm, form, onSave]);
 
   // Filtrare categorii principale în funcție de tip
   const categoriiFiltrate = React.useMemo(() => {
@@ -172,9 +177,20 @@ const TransactionForm: React.FC = () => {
         type="submit"
         disabled={!!loading}
         className="ml-2"
-        data-testid="add-transaction-btn"
+        data-testid="save-btn"
       >
         {BUTTONS.ADD}
+      </Button>
+      <Button
+        type="button"
+        className="ml-2"
+        data-testid="cancel-btn"
+        onClick={() => {
+          resetForm();
+          onCancel?.();
+        }}
+      >
+        {BUTTONS.CANCEL}
       </Button>
       {error && (
         <span data-testid="error-message" role="alert" aria-label="error message" className="text-error block mt-2">

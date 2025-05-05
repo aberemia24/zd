@@ -12,7 +12,7 @@
     "build": "craco build",
     "postinstall": "npm run sync-shared-constants",
     "pretest": "npm run sync-shared-constants",
-    "test": "cross-env REACT_APP_API_URL=http://localhost:3000 craco test --env=jsdom",
+    "test": "cross-env REACT_APP_API_URL=http://localhost:3000 REACT_APP_SUPABASE_URL=mock REACT_APP_SUPABASE_ANON_KEY=mock craco test --env=jsdom",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src"
   },

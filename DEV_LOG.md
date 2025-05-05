@@ -68,6 +68,45 @@
 
 # Lessons Learned
 
+## 2025-05-05 - Remediere teste unitare cu mock-uri Supabase și ajustare aserțiuni
+- Creat `__mocks__/supabase.ts` și `__mocks__/supabaseService.ts` ca mock-uri automate pentru Supabase în teste.
+- Implementat mock-uri pentru `supabaseAuthService` cu suport pentru tipurile definite (`AuthErrorType`, `AuthUser`).
+- Ajustat testele pentru a reflecta contractul actual al store-urilor (`""` vs `undefined`, aserțiuni corecte pentru errorType).
+- Actualizat testele pentru TransactionTable pentru a reflecta noua structură de UI (eliminare currency, coloană frecvență).
+- Utilizat valori statice pentru enum-uri în teste când mock-urile cauzează probleme de import circular.
+- Ajustat aserțiunile în filtersStore pentru a reflecta comportamentul real de paginare și filtrare.
+- Lecție: testele unitare trebuie actualizate când contractul serviciilor se schimbă, iar mock-urile trebuie să fie disponibile la același path ca modulele reale pentru a fi folosite automat de Jest.
+
+## 2025-05-05 - Rezolvare probleme App.test.tsx și infrastructură de testare cu mock-uri
+- Rezolvate erorile în `App.test.tsx` legate de `currentQueryParams.limit` (TypeError: Cannot read properties of undefined).
+- Implementat pattern robust pentru mockarea store-urilor Zustand cu selectors corect implementați.
+- Adăugat suport corect pentru `getState()` în mock-urile Zustand pentru a evita erorile în `useEffect`.
+- Creat o versiune simplificată a componentei App pentru teste, izolând dependențele problematice.
+- Implementat mock explicit pentru `useAuthStore` pentru a asigura returnarea unui user valid în toate testele.
+- Creat infrastructură robustă pentru mockarea Supabase în teste:
+  - Mock global în `jest.setup.js` cu override pentru constructor URL pentru a evita "Invalid URL: mock/auth/v1"
+  - Mock module-level în `src/__mocks__/@supabase/supabase-js.ts` conform pattern-ului Jest pentru module externe
+  - Mock pentru servicii în `src/services/__mocks__/supabase.ts` și `supabaseService.ts`
+- Implementat `src/jest-mocks.ts` cu helper functions reutilizabile pentru mockarea contextelor comune în teste:
+  - `setupAuthStoreMock()` - configurează un user autentificat valid pentru teste
+  - `setupSupabaseServiceMock()` - configurează serviciile Supabase cu răspunsuri consistente
+  - `MOCK_MESAJE` - asigură consistența textelor în assert-uri în teste
+- Optimizat testele async cu `waitFor` și timeouts adecvate pentru a asigura stabilitate în testare.
+- Lecție importantă: Mockarea serviciilor cu proprietăți private necesită abordarea prin module-level mocks (conform "WORKAROUND Mock-uri Jest" din memorie).
+
+## 2025-05-03 - Îmbunătățiri autentificare Supabase, UX & Security
+- Introducere tip `AuthUser` (id, email) și folosire typing strict în store și servicii pentru autentificare.
+- Definire enum `AuthErrorType` pentru categorii de erori autentificare (`INVALID_CREDENTIALS`, `PASSWORD_WEAK`, `NETWORK`, `RLS_DENIED` etc).
+- Mapping automat între erorile brute Supabase și mesaje prietenoase pentru utilizator, afișate contextual în LoginForm și RegisterForm.
+- Validare parolă la înregistrare (minim 8 caractere, literă mare, mică, cifră, simbol) cu feedback clar în UI.
+- Refactorizare store și servicii pentru a returna structuri de răspuns consistente (`AuthResult` cu `errorType` și mesaj).
+- UI-ul de login/register afișează mesaje clare, localizate, fără stringuri hardcodate.
+- Toate mesajele și constantele respectă sursa unică de adevăr din `@shared-constants` (vezi regulile globale FE/BE).
+- Respectare politici RLS: user-ul vede și poate modifica doar propriile tranzacții (user_id = auth.uid()).
+- Documentare și audit complet al pașilor în [TECH_STORIES/implementare Supabase.md].
+- Următorii pași posibili: refresh token/session timeout, rate limiting brute force, testare automată fluxuri edge-case.
+
+
 ## 2025-04-30 - Securitate RLS, user_id, persist auth și defense-in-depth
 - Am întâlnit eroare 403 la inserții/POST pe /transactions din cauza lipsei câmpului user_id în payload.
 - Politicile RLS pe Supabase impun ca orice operație să fie restricționată la userul logat (`user_id = auth.uid()`).
@@ -114,3 +153,64 @@ _Actualizat la: 2025-04-26_
 - Actualizat fișiere (`App.tsx`, `transactionFormStore.ts`, teste) pentru a importa din `@shared-constants`.
 - Protejat apelurile DI din `App.tsx` (`setTransactionService`, `setRefreshCallback`) prin verificarea tipului.
 - Extins mock-urile din `App.test.tsx` pentru noile metode ale store-ului.
+
+## 2025-05-05 - Refactorizare TransactionForm, mock-uri Zustand, sincronizare shared-constants, fix TypeScript
+
+**OWNER:** Echipa testare + FE
+
+**CONTEXT:**
+- Refactorizare completă a testelor pentru TransactionForm și store-uri asociate pentru a elimina erorile TypeScript, a asigura compatibilitatea cu noua structură Zustand și a îmbunătăți robustețea testării.
+- Actualizare și corectare mock-uri pentru Zustand (`__mocks__/stores/transactionFormStore.ts`, `transactionStore.ts`, `authStore.ts`) cu suport complet pentru `getState`, setters, acțiuni și validare tipuri.
+- Sincronizare și corectare enums/constants (FrequencyType, CategoryType, BUTTONS etc.) direct în sursa unică `shared-constants/` și propagare corectă către frontend prin scriptul de sync.
+- Eliminare stringuri hardcodate din teste și componente, folosire exclusivă a mesajelor și enum-urilor din `@shared-constants`.
+- Fix erori de tip "Property 'CANCEL' does not exist on type BUTTONS", "Property 'SAPTAMANAL' does not exist on type FrequencyType" etc. prin actualizare constants și refactorizare imports.
+- Actualizare UI copy și mesaje pentru validare/eroare în toate testele și componentele relevante.
+- Toate testele TransactionForm acoperă acum edge cases pentru validare, recurență, enum-uri și fluxuri negative/pozitive.
+
+**SCHIMBĂRI:**
+- Mock-uri dedicate pentru store-uri Zustand cu helpers `setMockFormState`, `setMockTransactionState` pentru manipulare predictibilă a stării în teste.
+- Tipare stricte pentru mock-uri și funcții de acțiune, eliminare tipuri implicite și any-uri nejustificate.
+- Refactorizare testare pentru a folosi patternul "test focalizat pe câmp/feature", nu assert global pe tot formularul (vezi lessons learned).
+- Sincronizare completă și validare constants cu scriptul `npm run sync:shared-constants`.
+- Fix imports pentru enums/constants doar din `@shared-constants` conform regulilor globale.
+- Adăugare buton CANCEL în sursa unică BUTTONS și corectare UI copy.
+
+**LECȚII ÎNVĂȚATE:**
+- Mock-urile Zustand trebuie să includă explicit `getState` și să folosească helpers pentru actualizare stări în teste.
+- Orice modificare la enums/constants trebuie făcută doar în sursa unică și sincronizată cu scriptul dedicat, nu direct în frontend.
+- Testele pe formulare complexe trebuie împărțite pe câmpuri pentru stabilitate (vezi [LESSON] Testare valori inițiale în formulare complexe).
+- Patternul de testare cu helpers pentru mock-uri crește claritatea și predictibilitatea testelor.
+
+**NEXT STEPS:**
+- Audit final al tuturor testelor pentru a elimina orice hardcodare sau import incorect.
+- Documentare patternuri noi în BEST_PRACTICES.md.
+- Refactorizare suplimentară pentru a reduce duplicarea codului de testare.
+
+
+**OWNER**: Echipa testare
+
+**CONTEXT**: Testele pentru componente și store-uri eșuau din cauza unor probleme fundamentale cu mock-urile pentru Supabase și store-urile Zustand. Principalele probleme erau:
+1. Eroarea "Invalid URL" în mock-urile Supabase
+2. Eroarea "Utilizatorul nu este autentificat!" în testele care depind de authStore
+3. Inconsistențe în abordarea de mock pentru store-uri (jest.mock vs mock direct)
+4. Probleme cu tipurile în mock-uri (Property 'getState' does not exist on type 'Mock')
+
+**SCHIMBĂRI**:
+- Am creat mock-uri dedicate pentru store-uri în directorul `__mocks__/stores/`:
+  - `authStore.ts` - asigură un user autentificat valid pentru toate testele
+  - `transactionFormStore.ts` - mockează starea formularului de tranzacții
+  - `transactionStore.ts` - mockează operațiile CRUD pentru tranzacții
+- Am adăugat funcții helper în mock-uri pentru a permite modificarea stării în teste (ex: `setMockFormState`)
+- Am rezolvat problema "Invalid URL" în `jest.setup.js` prin adăugarea unui URL override pentru mock-uri
+- Am adăugat tipuri explicite pentru parametrii funcțiilor de mock pentru a evita erorile TypeScript
+
+**LECȚII ÎNVĂȚATE**:
+- Abordarea cu `jest.mock()` și variabile din afara factory-ului poate duce la probleme de scoping
+- Este mai bine să folosim o abordare cu funcții helper pentru a modifica starea mock-urilor în teste
+- Tipurile pentru mock-uri trebuie să fie explicite și să includă toate proprietățile necesare
+- Mock-urile pentru store-uri Zustand trebuie să includă explicit `getState` pentru a funcționa corect
+
+**NEXT STEPS**:
+- Refactorizarea completă a testelor pentru a folosi noua abordare cu `setMockState` în loc de `mockImplementation`
+- Adăugarea de tipuri mai stricte pentru mock-uri pentru a evita erorile TypeScript
+- Documentarea abordării în BEST_PRACTICES.md pentru a asigura consistența în viitor

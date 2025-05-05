@@ -26,6 +26,7 @@ export const PLACEHOLDERS = {
 
 export const BUTTONS = {
   ADD: 'Adaugă',
+  CANCEL: 'Anulează',
   EDIT: 'Editează',
   DELETE: 'Șterge',
   NEXT_PAGE: 'Înainte',

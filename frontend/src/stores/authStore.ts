@@ -6,7 +6,7 @@ import { supabaseAuthService } from '../services/supabaseAuthService';
 
 import type { AuthUser, AuthErrorType } from '../services/supabaseAuthService';
 
-interface AuthState {
+export interface AuthState {
   user: AuthUser | null;
   loading: boolean;
   error: string | null;

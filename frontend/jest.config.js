@@ -10,6 +10,9 @@ module.exports = {
   },
 
   preset: 'ts-jest',
+  // Setup files care rulează înainte de toate testele - pentru mockuri globale Supabase
+  setupFiles: ['<rootDir>/jest.setup.js'],
+  // Setup files pentru extensii testing-library etc.
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
   testEnvironment: 'jsdom',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

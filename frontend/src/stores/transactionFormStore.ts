@@ -9,7 +9,7 @@ import { FrequencyType } from '@shared-constants/enums';
 import { supabaseService } from '../services/supabaseService';
 import { useTransactionStore } from '../stores/transactionStore';
 
-interface TransactionFormStoreState {
+export interface TransactionFormStoreState {
   form: TransactionFormData;
   error: string;
   success: string;
@@ -21,7 +21,7 @@ interface TransactionFormStoreState {
   setLoading: (loading: boolean) => void;
   resetForm: () => void;
   validateForm: () => boolean;
-  handleSubmit: () => Promise<void>;
+  handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   getForm: () => TransactionFormData;
   getError: () => string;
@@ -79,7 +79,8 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
       set({ error: '' });
       return true;
     },
-    handleSubmit: async () => {
+    handleSubmit: async (e) => {
+      e?.preventDefault();
       if (!get().validateForm()) {
         set({ loading: false });
         return;
@@ -110,4 +111,3 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
     getLoading: () => get().loading,
   };
 });
-
