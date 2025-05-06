@@ -267,4 +267,17 @@ useEffect(() => {
 
 ---
 
-_Actualizat la: 2025-04-28_
+## Reguli mock-uri (actualizat 2025-05-06)
+
+- Mock-uim **doar**:
+  - external services (API calls, fetch, etc.)
+  - time/date (ex: Date.now, timers)
+  - random values (ex: Math.random)
+  - browser APIs (ex: window.localStorage, navigator, clipboard, etc.)
+- **Nu** mock-uim stores, hooks Zustand, logică internă sau componente proprii.
+- Testele trebuie să reflecte comportamentul real al aplicației din perspectiva utilizatorului.
+- Orice excepție trebuie documentată clar în PR și BEST_PRACTICES.md.
+
+---
+
+_Actualizat la: 2025-05-06_

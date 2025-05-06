@@ -1,81 +1,94 @@
+/**
+ * Test pentru TransactionFilters - Abordare simplificată fără mockuri pentru stores
+ * Conform regulilor: mock doar pentru external services
+ */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { act } from 'react';
+import '@testing-library/jest-dom';
 import TransactionFilters from './';
 import { TransactionType, CategoryType } from '@shared-constants';
-import { MOCK_OPTIONS, MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE, MOCK_PLACEHOLDERS } from '../../../test/mockData';
+import { MOCK_LABELS } from '../../../test/mockData';
+import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';
 
-// Mock pentru store-ul Zustand - folosim string-uri pentru enum valori
-// Important: Trebuie să respectăm regula Jest care nu permite referințe externe în mock factory
-jest.mock('../../../stores/transactionFiltersStore', () => {
-  // Folosim prefix 'mock' pentru a evita eroarea Jest
-  const mockSetFilterType = jest.fn();
-  const mockSetFilterCategory = jest.fn();
-  
-  return {
-    useTransactionFiltersStore: jest.fn((selector: any) => {
-      const state = {
-        // Folosim valorile string direct în loc de enum-uri
-        filterType: 'income', // Echivalent cu TransactionType.INCOME
-        filterCategory: 'income', // Echivalent cu CategoryType.INCOME
-        setFilterType: mockSetFilterType,
-        setFilterCategory: mockSetFilterCategory
-      };
-      
-      if (typeof selector === 'function') {
-        return selector(state);
-      }
-      
-      return state;
-    })
-  };
+// Resetăm store-ul după fiecare test
+afterEach(() => {
+  act(() => {
+    // Resetăm filtrele la valorile implicite
+    useTransactionFiltersStore.getState().resetFilters();
+  });
 });
 
 describe('TransactionFilters', () => {
-  const mockSetFilterType = jest.fn();
-  const mockSetFilterCategory = jest.fn();
-  
-  beforeEach(() => {
-    // Reset mock-urile pentru fiecare test
-    jest.clearAllMocks();
-    
-    // Configurăm mock-ul pentru store-ul Zustand
-    const { useTransactionFiltersStore } = require('../../../stores/transactionFiltersStore');
-    useTransactionFiltersStore.mockImplementation((selector: any) => {
-      const state = {
-        // Folosim valori string în loc de enum-uri, pentru consistență cu mock-ul definit mai sus
-        filterType: 'income', // TransactionType.INCOME
-        filterCategory: 'income', // CategoryType.INCOME
-        setFilterType: mockSetFilterType,
-        setFilterCategory: mockSetFilterCategory
-      };
-      
-      if (typeof selector === 'function') {
-        return selector(state);
-      }
-      
-      return state;
-    });
-  });
-
   it('afișează opțiunile de tip și categorie', () => {
-    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
+    // Mock pentru callback-uri
+    const onTypeChange = jest.fn();
+    const onCategoryChange = jest.fn();
+    
+    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
+    
     expect(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER)).toBeInTheDocument();
     expect(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER)).toBeInTheDocument();
   });
   
-  it('apelează setFilterType când se schimbă tipul', () => {
-    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
+  it('actualizează store-ul când se schimbă tipul', () => {
+    // Mock pentru callback-uri
+    const onTypeChange = jest.fn();
+    const onCategoryChange = jest.fn();
+    
+    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
     
     // Selectează alt tip
-    fireEvent.change(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER), { target: { value: TransactionType.EXPENSE } });
-    expect(mockSetFilterType).toHaveBeenCalledWith(TransactionType.EXPENSE);
+    act(() => {
+      fireEvent.change(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER), 
+        { target: { value: TransactionType.EXPENSE } }
+      );
+    });
+    
+    // Verificăm că callback-ul a fost apelat
+    expect(onTypeChange).toHaveBeenCalledWith(TransactionType.EXPENSE);
+    
+    // Verificăm că store-ul a fost actualizat (opțional, testul se bazează doar pe comportamentul componentei)
+    expect(useTransactionFiltersStore.getState().filterType).toBe(TransactionType.EXPENSE);
   });
   
-  it('apelează setFilterCategory când se schimbă categoria', () => {
-    render(<TransactionFilters onTypeChange={mockSetFilterType} onCategoryChange={mockSetFilterCategory} />);
+  it('actualizează store-ul când se schimbă categoria', () => {
+    // Mock pentru callback-uri
+    const onTypeChange = jest.fn();
+    const onCategoryChange = jest.fn();
+    
+    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
     
     // Selectează altă categorie
-    fireEvent.change(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER), { target: { value: CategoryType.EXPENSE } });
-    expect(mockSetFilterCategory).toHaveBeenCalledWith(CategoryType.EXPENSE);
+    act(() => {
+      fireEvent.change(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER), 
+        { target: { value: CategoryType.EXPENSE } }
+      );
+    });
+    
+    // Verificăm că callback-ul a fost apelat
+    expect(onCategoryChange).toHaveBeenCalledWith(CategoryType.EXPENSE);
+    
+    // Verificăm că store-ul a fost actualizat (opțional, testul se bazează doar pe comportamentul componentei)
+    expect(useTransactionFiltersStore.getState().filterCategory).toBe(CategoryType.EXPENSE);
+  });
+  
+  it('reflectă corect schimbările de stare din store', () => {
+    // Setăm valori inițiale în store
+    act(() => {
+      useTransactionFiltersStore.getState().setFilterType(TransactionType.INCOME);
+      useTransactionFiltersStore.getState().setFilterCategory(CategoryType.INCOME);
+    });
+    
+    // Mock pentru callback-uri
+    const onTypeChange = jest.fn();
+    const onCategoryChange = jest.fn();
+    
+    // Renderăm componenta după ce am setat store-ul
+    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
+    
+    // Verificăm că dropdown-urile reflectă valorile din store
+    expect((screen.getByLabelText(MOCK_LABELS.TYPE_FILTER) as HTMLSelectElement).value).toBe(TransactionType.INCOME);
+    expect((screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER) as HTMLSelectElement).value).toBe(CategoryType.INCOME);
   });
 });

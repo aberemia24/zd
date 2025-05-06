@@ -1,5 +1,9 @@
+/**
+ * Test pentru Badge - Componentă primitivă fără dependințe de store
+ */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Badge from './Badge';
 
 describe('Badge', () => {

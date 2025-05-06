@@ -1,5 +1,9 @@
+/**
+ * Test pentru Loader - Componentă primitivă fără dependințe de store
+ */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Loader from './Loader';
 import { LOADER } from '@shared-constants';
 

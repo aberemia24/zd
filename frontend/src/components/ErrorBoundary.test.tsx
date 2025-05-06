@@ -1,7 +1,11 @@
+/**
+ * Test pentru ErrorBoundary - Componentă primitivă fără dependințe de store
+ */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import ErrorBoundary from './ErrorBoundary';
-import { MESAJE } from 'shared-constants';
+import { MESAJE } from '@shared-constants';
 
 // Componentă cu eroare pentru a testa ErrorBoundary
 function ComponentCuEroare({ shouldThrow = false }: { shouldThrow?: boolean }) {

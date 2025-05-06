@@ -1,7 +1,12 @@
+/**
+ * Test pentru ExcelGrid - Component primitiv fără dependințe de store-uri
+ */
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
+import { act } from 'react';
+import '@testing-library/jest-dom';
 import ExcelGrid, { MonthlyData } from './ExcelGrid';
-import { EXCEL_GRID } from 'shared-constants';
+import { EXCEL_GRID } from '@shared-constants';
 
 // Date de test
 const mockData: MonthlyData[] = [

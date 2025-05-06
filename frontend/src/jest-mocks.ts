@@ -6,6 +6,9 @@
  * Se poate include la începutul fiecărui fișier de test care necesită mock-uri comune.
  */
 
+import { MESAJE } from '@shared-constants/messages';
+import { FrequencyType, CategoryType } from '@shared-constants/enums';
+
 // Mock pentru user autentificat
 export const mockAuthUser = { id: 'mock-test-user-id', email: 'test@example.com' };
 
@@ -59,14 +62,98 @@ export const createMockTransactionFormState = (overrides = {}) => {
     deleteTransaction: jest.fn(),
     setLoading: jest.fn(),
     setError: jest.fn(),
-    setSuccess: jest.fn(),
-    loadSubcategories: jest.fn(),
-    getError: jest.fn().mockReturnValue(''),
-    getSuccess: jest.fn().mockReturnValue(''),
-    getLoading: jest.fn().mockReturnValue(false),
-    ...overrides
   };
 };
+
+// --- DRY MOCK SETUP HELPERS ---
+
+import { setMockFormState, useTransactionFormStore } from './__mocks__/stores/transactionFormStore';
+import { setMockTransactionState, useTransactionStore } from './__mocks__/stores/transactionStore';
+import { setMockAuthState, useAuthStore } from './__mocks__/stores/authStore';
+
+/**
+ * Setup mock pentru useTransactionFormStore hook + state, cu posibilitate de override și custom onSave/onCancel.
+ * Returnează { onSave, onCancel } pentru a fi folosite în teste.
+ */
+export function setupTransactionFormMocks({
+  formOverrides = {},
+  storeOverrides = {},
+  onSave = jest.fn(),
+  onCancel = jest.fn(),
+} = {}) {
+  jest.clearAllMocks();
+  const initialForm = {
+    type: '',
+    amount: '',
+    category: '',
+    subcategory: '',
+    date: new Date().toISOString().split('T')[0],
+    recurring: false,
+    frequency: FrequencyType.MONTHLY,
+    ...formOverrides
+  };
+  setMockFormState({
+    form: { ...initialForm },
+    error: '',
+    success: '',
+    loading: false,
+    setForm: jest.fn((newForm) => setMockFormState({ form: { ...useTransactionFormStore.getState().form, ...newForm } })),
+    setError: jest.fn((error) => setMockFormState({ error })),
+    setSuccess: jest.fn((success) => setMockFormState({ success })),
+    setLoading: jest.fn((loading) => setMockFormState({ loading })),
+    resetForm: jest.fn(() => setMockFormState({ form: { ...initialForm }, error: '', success: '', loading: false })),
+    validateForm: jest.fn((form: any) => true),
+    handleSubmit: jest.fn(async (e) => {
+      e?.preventDefault?.();
+      const state = useTransactionFormStore.getState();
+      state.setLoading(true);
+      if (state.validateForm(state.form)) {
+        await new Promise<void>(resolve => setTimeout(resolve, 10));
+        onSave(state.form);
+        state.setSuccess(MESAJE.SUCCES_ADAUGARE);
+      } else {
+        state.setError(MESAJE.EROARE_GENERALA);
+      }
+      state.setLoading(false);
+    }),
+    ...storeOverrides
+  });
+  return { onSave, onCancel };
+}
+
+/**
+ * Setup mock pentru useTransactionStore hook + state, cu override.
+ */
+export function setupTransactionStoreMocks({ storeOverrides = {} } = {}) {
+  setMockTransactionState({
+    transactions: [],
+    total: 0,
+    loading: false,
+    error: null,
+    getAllSubcategories: jest.fn((category) => {
+      if (!category) return [];
+      if (category === CategoryType.EXPENSE) return ['Supermarket', 'Haine'];
+      return ['Subcategorie Default'];
+    }),
+    ...storeOverrides
+  });
+}
+
+/**
+ * Setup mock pentru useAuthStore hook + state, cu override.
+ */
+export function setupAuthStoreMocks({ storeOverrides = {} } = {}) {
+  setMockAuthState({
+    user: { id: 'test-user-id', email: 'test@example.com' },
+    loading: false,
+    error: null,
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    checkUser: jest.fn(),
+    ...storeOverrides
+  });
+}
 
 // Mock pentru authStore - stare autentificată
 export const mockAuthState = {
@@ -102,3 +189,6 @@ export const mockSupabaseService = {
   }),
   deleteTransaction: jest.fn().mockResolvedValue({ data: { id: 'mock-id' }, error: null })
 };
+
+// Export hooks for tests
+export { useTransactionFormStore, useTransactionStore, useAuthStore };

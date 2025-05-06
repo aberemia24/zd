@@ -16,7 +16,11 @@ const mockState = {
 };
 
 // Exportăm un mock pentru useAuthStore hook
-export const useAuthStore = jest.fn().mockImplementation((selector: any) => {
+export const useAuthStore = jest.fn().mockImplementation((selector?: any) => {
+  // Când e apelat fără selector, returnează starea direct (cum face în componenta reală)
+  if (!selector) {
+    return mockState;
+  }
   if (typeof selector === 'function') {
     return selector(mockState);
   }

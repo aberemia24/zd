@@ -1,5 +1,9 @@
+/**
+ * Test pentru Button - Componentă primitivă fără dependințe de store
+ */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Button from './Button';
 
 describe('Button', () => {
