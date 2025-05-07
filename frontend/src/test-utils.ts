@@ -1,5 +1,5 @@
 /**
- * Utilități pentru testare conform noilor reguli
+ * Helperi oficiali pentru resetare și setup user în teste, conform regulilor globale (mock doar pentru servicii externe).
  * OWNER: echipa testare
  * 
  * Ajută la configurarea unui mediu consistent pentru teste:
