@@ -278,6 +278,11 @@ useEffect(() => {
 - Testele trebuie să reflecte comportamentul real al aplicației din perspectiva utilizatorului.
 - Orice excepție trebuie documentată clar în PR și BEST_PRACTICES.md.
 
+**TODO/PLAN:**
+- Eliminarea treptată a mock-urilor pentru store-uri Zustand (`__mocks__/stores/`).
+- Refactorizarea testelor pentru a folosi store-urile reale și doar mock-uri pentru servicii externe (Supabase, date, random, browser APIs).
+- Task planificat incremental, va fi documentat în DEV_LOG.md la fiecare etapă majoră.
+
 ---
 
-_Actualizat la: 2025-05-06_
+_Actualizat la: 2025-05-07_

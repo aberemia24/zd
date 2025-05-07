@@ -1,0 +1,105 @@
+# Epic: Refactorizare Teste Zustand – Eliminare Mock-uri Store
+
+**Status general:** IN PROGRESS  
+**Owner:** Echipa testare / QA  
+**Start:** 2025-05-07
+
+---
+
+## Checklist taskuri concrete
+
+- [x] **Task 1:** Cleanup și actualizare test-utils + jest-mocks [DONE 2025-05-07]
+    - Actualizare `frontend/src/test-utils.ts` cu funcții de reset store real
+    - Actualizare `frontend/src/jest-mocks.ts` – eliminare mock-uri store, păstrare doar mock-uri servicii externe
+- [x] **Task 2:** Refactorizare `transactionFormStore.test.ts` pentru store real [DONE 2025-05-07]
+- [x] **Task 3:** Refactorizare `transactionFiltersStore.test.ts` pentru store real [DONE 2025-05-07]
+- [ ] **Task 4:** Refactorizare `authStore.test.ts` pentru store real și mock doar servicii externe
+- [ ] **Task 5:** Refactorizare `TransactionFilters.test.tsx` pentru store real
+- [ ] **Task 6:** Verificare și refactorizare componente primitive (doar dacă e cazul)
+- [ ] **Task 7:** Refactorizare `TransactionForm.test.tsx` pentru store real
+- [ ] **Task 8:** Refactorizare `TransactionTable.test.tsx` pentru store real
+- [ ] **Task 9:** Refactorizare `App.test.tsx` pentru integrare store-uri reale
+- [ ] **Task 10:** Eliminare efectivă a mock-urilor din `__mocks__/stores/`
+    - `frontend/src/__mocks__/stores/transactionFormStore.ts`
+    - `frontend/src/__mocks__/stores/transactionStore.ts`
+    - `frontend/src/__mocks__/stores/authStore.ts`
+- [ ] **Task 11:** Cleanup final, actualizare `DEV_LOG.md` și `BEST_PRACTICES.md` cu lecții învățate
+
+---
+
+## Notițe & reguli
+- Fiecare task poate fi marcat `[IN PROGRESS]`, `[BLOCKED]`, `[DONE]`.
+- Adaugă lecții învățate și workaround-uri la finalul fiecărui task.
+- Updatează progresul incremental după fiecare PR/commit major.
+- Respectă regula: mock doar pentru servicii externe, nu stores Zustand.
+
+---
+
+**Ultima actualizare:** 2025-05-07 11:45
+
+
+## Sfaturi concrete de implementare pe task
+
+### Task 1: Cleanup și actualizare test-utils + jest-mocks
+- Creează funcții helper dedicate precum `resetAllStores()` și `setupTestUser()`
+- Păstrează funcționalitatea bună pentru mockarea serviciilor externe (Supabase, date, random, browser APIs)
+
+### Task 2-4: Refactorizare teste store
+- Folosește `act()` pentru toate modificările de state
+- Izolează testele cu `beforeEach` și `afterEach` pentru resetare completă
+
+### Task 5-9: Refactorizare teste componente
+- Nu modifica ID-urile de test (`data-testid`) pentru a evita ruperi masive
+- Folosește `waitFor()` pentru operațiuni asincrone
+- Verifică direct state-ul store-ului după interacțiuni utilizator
+
+### Task 10: Eliminare mock-uri
+- Fă acest pas doar după ce toate celelalte teste funcționează
+- Verifică dacă există importuri rămase în alte fișiere (cleanup total)
+
+### Task 11: Cleanup final
+- Asigură-te că toate lecțiile învățate sunt documentate în `DEV_LOG.md` și `BEST_PRACTICES.md`
+
+---
+
+## Modele de cod pentru implementare
+
+### 1. Reset store-uri în beforeEach
+```typescript
+beforeEach(() => {
+  jest.clearAllMocks(); // Pentru mock-uri de servicii externe
+  
+  // Resetează toate store-urile folosind act()
+  act(() => {
+    // Reset direct pentru store-uri cu metode dedicate
+    useTransactionStore.getState().reset();
+    useTransactionFormStore.getState().resetForm();
+    useTransactionFiltersStore.getState().resetFilters();
+    
+    // Pentru store-uri fără metode de reset dedicate
+    useAuthStore.setState({
+      user: null,
+      loading: false, 
+      error: null,
+      errorType: undefined
+    });
+  });
+});
+```
+
+### 2. Verificare efecte laterale ale interacțiunilor
+```typescript
+// Interacțiune utilizator
+fireEvent.click(screen.getByTestId('add-button'));
+
+// Verifică starea store-ului direct
+await waitFor(() => {
+  const state = useTransactionStore.getState();
+  expect(state.transactions.length).toBe(1);
+  expect(state.loading).toBe(false);
+});
+```
+
+---
+
+Planul tău este foarte bine structurat și cu aceste sfaturi suplimentare va duce la o implementare de succes!

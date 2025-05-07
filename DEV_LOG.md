@@ -127,7 +127,41 @@
 
 ---
 
-_Actualizat la: 2025-04-26_
+_Actualizat la: 2025-05-07_
+
+## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2 și 3
+
+- Task 1: Cleanup și actualizare test-utils + jest-mocks
+  - Helperii oficiali pentru resetare store-uri (`resetAllStores`) și setup user (`setupTestUser`) sunt documentați și recomandați în test-utils.
+  - Eliminare completă a mock-urilor de store-uri din jest-mocks.ts; păstrate doar mock-uri pentru servicii externe (Supabase, date, random, browser APIs).
+  - Comentariu clar privind regula globală: nu mock-uim store-uri Zustand.
+- Task 2: Refactorizare transactionFormStore.test.ts pentru store real
+  - Toate testele folosesc store-ul real și helperii oficiali (`resetAllStores`, `mockSupabaseService`).
+  - Toate modificările de state sunt încapsulate în act().
+  - Mock-urile serviciilor externe sunt făcute doar cu mockSupabaseService.
+- Task 3: Refactorizare transactionFiltersStore.test.ts pentru store real
+  - Toate testele folosesc store-ul real și helperii din test-utils.ts (`resetAllStores`).
+  - Refactorizare completă: toate modificările de state sunt încapsulate în act().
+  - Corecție a scenariilor de test pentru a reflecta comportamentul real al store-ului.
+  - Eliminare a comentariilor legate de mock-uri din fișier.
+  - Adăugare beforeEach și afterEach pentru a asigura un mediu consistent de testare.
+  - Toate testele trec, fără erori de lint.
+- Status actualizat în TECH_STORIES/epic-refactorizare-teste-zustand.md: Task 1 și 2 DONE.
+
+
+
+- Refactorizat toate mesajele de validare pentru a folosi exclusiv sursa unică de adevăr (`shared-constants/messages.ts`, alias `@shared-constants/messages`).
+- Eliminat toate scripturile temporare de corectare teste (`scripts/fix-description-field.js`, `fix-final-import.js`, `fix-transaction-currency.js`, etc.).
+- Aliniat toate testele și store-urile relevante la importurile corecte pentru mesaje și enums.
+- Corectat utilizarea Jest în factory-ul de mock pentru middleware Zustand (devtools) conform best practices Jest.
+- Actualizat metoda `setQueryParams` din `transactionStore` pentru a declanșa automat fetch-ul tranzacțiilor la schimbarea parametrilor (comportament corect business logic).
+- Toate testele pentru `transactionStore` și `transactionFormStore` trec cu succes.
+- **NOTĂ:** Mock-urile pentru store-urile Zustand (`__mocks__/stores/`) rămân temporar pentru compatibilitate cu testele existente, dar vor fi eliminate într-un task separat, conform noii reguli globale (mock doar pentru servicii externe, nu pentru stores/hooks Zustand). Task documentat și planificat pentru refactorizare incrementală.
+- Documentare și actualizare patternuri de testare în `BEST_PRACTICES.md` - nu există reguli noi, doar întărire a celor existente.
+
+**OWNER:** Echipa testare
+
+---
 
 ## 2025-04-27 - Finalizare migrare Zustand pentru tranzacții și recurență
 - Toate funcționalitățile de tranzacții (inclusiv recurență) folosesc exclusiv Zustand store-uri, fără hooks custom legacy.
