@@ -181,7 +181,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         type="submit"
         disabled={!!loading}
         className="ml-2"
-        data-testid="save-btn"
+        // Folosim doar un singur test id pentru a evita conflictele
+        data-testid="add-transaction-button"
+        aria-label={BUTTONS.ADD}
       >
         {BUTTONS.ADD}
       </Button>

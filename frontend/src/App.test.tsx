@@ -1,19 +1,50 @@
 /**
  * Test pentru App - Abordare simplificată fără mockuri pentru stores
  * Conform regulilor: mock doar pentru external services
+ * Owner: Echipa Frontend - Test
  */
+
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
+// Import utilities din test-utils (funcții helper pentru teste)
+import { 
+  render, // customRender din test-utils, nu cel din RTL direct
+  setupTestUser, 
+  setupTestTransactions,
+  resetAllStores,
+  getActualMessages,
+  screen // re-export din test-utils
+} from './test-utils';
+
+// Constants pentru mockuri folosite în teste (anterior erau importate din mockData)
+const MOCK_LABELS = {
+  TYPE_FILTER: 'Tip tranzacție',
+  CATEGORY_FILTER: 'Categorie'
+};
+
+const MOCK_BUTTONS = {
+  ADD: 'Adaugă tranzacție',
+  SAVE: 'Salvează',
+  CANCEL: 'Anulează'
+};
+
+const MOCK_TABLE = {
+  LOADING: 'Se încarcă tranzacțiile...'
+};
+
 import { App } from './App';
-import { TransactionType, CategoryType, TITLES } from '@shared-constants';
-import { MOCK_LABELS, MOCK_BUTTONS, MOCK_TABLE } from './test/mockData';
+import { TransactionType, CategoryType, TITLES, MESAJE } from '@shared-constants';
+
+// Stores reale (conform noilor reguli, nu le mock-uim)
 import { useTransactionStore } from './stores/transactionStore';
 import { useTransactionFormStore } from './stores/transactionFormStore';
 import { useTransactionFiltersStore } from './stores/transactionFiltersStore';
+import { useAuthStore } from './stores/authStore';
 
-// Mock pentru supabaseService (external service)
+// Mockăm supabaseService (singura componentă externă care trebuie mockată conform regulilor)
 jest.mock('./services/supabaseService', () => ({
   supabaseService: {
     fetchTransactions: jest.fn().mockResolvedValue({ data: [], count: 0 }),
@@ -27,125 +58,206 @@ jest.mock('./services/supabaseService', () => ({
 // Import serviciul după mock
 import { supabaseService } from './services/supabaseService';
 
+// Configurație globală pentru toate testele
+beforeEach(() => {
+  // Configurăm un utilizator autentificat pentru toate testele
+  // (Rezolvă problema "Utilizatorul nu este autentificat!")
+  setupTestUser();
+});
+
 // Resetăm store-urile și mock-urile după fiecare test
 afterEach(() => {
   jest.clearAllMocks();
-  act(() => {
-    // Reset stores la valori implicite pentru a evita efecte secundare între teste
-    useTransactionStore.getState().reset?.();
-    useTransactionFormStore.getState().resetForm?.();
-    useTransactionFiltersStore.getState().resetFilters?.();
-  });
+  // Folosim utility function pentru reset (mai sigur)
+  resetAllStores();
 });
 
 describe('App', () => {
+  // Testul pentru verificarea titlului principal
   it('afișează titlul principal corect', () => {
-    render(<App />);
+    // Definim utilizatorul autentificat înainte de render pentru a evita probleme de autentificare
+    // Folosim helper-ul creat în test-utils
+    setupTestUser();
+    
+    // Render cu customRender din test-utils
+    const { container } = render(<App />);
+    
+    // Verificăm că titlul apare în pagină
     expect(screen.getByText(TITLES.TRANZACTII)).toBeInTheDocument();
   });
 
-  it('afișează filtrele de tranzacții', () => {
+  // Testul pentru verificarea filtrelor de tranzacții
+  it('afișează filtrele de tranzacții', async () => {
+    // Configurăm starea inițială
+    setupTestUser();
+    
+    // Render componentei App
     render(<App />);
-    expect(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER, { exact: false })).toBeInTheDocument();
-    expect(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER, { exact: false })).toBeInTheDocument();
+    
+    // Folosim waitFor pentru a aștepta ca filtrele să fie disponibile (render asincron)
+    await waitFor(() => {
+      // Folosim data-testid pentru a selecta elementele specific
+      // Evităm folosirea textului "Categorie" care apare în mai multe elemente
+      const typeFilter = screen.getByTestId('type-filter');
+      const categoryFilter = screen.getByTestId('category-filter');
+      
+      expect(typeFilter).toBeInTheDocument();
+      expect(categoryFilter).toBeInTheDocument();
+    });
   });
   
-  it('actualizează filtrul de tip de tranzacție la schimbare', () => {
+  // Testul pentru actualizarea filtrului de tip tranzacție
+  it('actualizează filtrul de tip de tranzacție la schimbare', async () => {
+    // Configurăm starea inițială
+    setupTestUser();
+    
+    // Render componentei App
     render(<App />);
     
-    // Setter spy pentru a verifica apeluri
+    // Spionam metoda setFilterType din store pentru a verifica apelul
     const setFilterTypeSpy = jest.spyOn(useTransactionFiltersStore.getState(), 'setFilterType');
     
-    // Selectează alt tip prin UI
-    const typeFilter = screen.getByLabelText(MOCK_LABELS.TYPE_FILTER, { exact: false });
-    act(() => {
-      fireEvent.change(typeFilter, { target: { value: TransactionType.EXPENSE } });
+    // Așteptăm ca filtrul să fie disponibil în DOM
+    await waitFor(() => {
+      // Găsim filtrul folosind data-testid, care este mai sigur și specific
+      const typeFilter = screen.getByTestId('type-filter');
+      
+      // Schimbăm valoarea filtrului (ACȚIUNE UTILIZATOR)
+      act(() => {
+        fireEvent.change(typeFilter, { target: { value: TransactionType.EXPENSE } });
+      });
+      
+      // Verificăm că store-ul a fost actualizat corect
+      expect(setFilterTypeSpy).toHaveBeenCalledWith(TransactionType.EXPENSE);
     });
     
-    // Verifică că s-a apelat setter-ul cu valoarea corectă
-    expect(setFilterTypeSpy).toHaveBeenCalledWith(TransactionType.EXPENSE);
-    
-    // Curăță spy-ul
+    // Curățăm spy-ul
     setFilterTypeSpy.mockRestore();
   });
 
-  it('actualizează filtrul de categorie la schimbare', () => {
+  // Testul pentru actualizarea filtrului de categorie
+  it('actualizează filtrul de categorie la schimbare', async () => {
+    // Configurăm starea inițială
+    setupTestUser();
+    
+    // Render componentei App
     render(<App />);
     
-    // Setter spy pentru a verifica apeluri
+    // Spionam metoda setFilterCategory din store pentru a verifica apelul
     const setFilterCategorySpy = jest.spyOn(useTransactionFiltersStore.getState(), 'setFilterCategory');
     
-    // Selectează altă categorie prin UI
-    const categoryFilter = screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER, { exact: false });
-    act(() => {
-      fireEvent.change(categoryFilter, { target: { value: CategoryType.EXPENSE } });
+    // Așteptăm ca filtrul să fie disponibil în DOM
+    await waitFor(() => {
+      // Găsim filtrul folosind data-testid în loc de text pentru a evita ambiguitatea
+      const categoryFilter = screen.getByTestId('category-filter');
+      
+      // Schimbăm valoarea filtrului (ACȚIUNE UTILIZATOR)
+      act(() => {
+        fireEvent.change(categoryFilter, { target: { value: CategoryType.EXPENSE } });
+      });
+      
+      // Verificăm că store-ul a fost actualizat corect
+      expect(setFilterCategorySpy).toHaveBeenCalledWith(CategoryType.EXPENSE);
     });
     
-    // Verifică că s-a apelat setter-ul cu valoarea corectă
-    expect(setFilterCategorySpy).toHaveBeenCalledWith(CategoryType.EXPENSE);
-    
-    // Curăță spy-ul
+    // Curățăm spy-ul
     setFilterCategorySpy.mockRestore();
   });
   
+  // Testul pentru trimiterea formularului și crearea tranzacției
   it('apelează supabaseService la trimiterea unui formular valid', async () => {
-    render(<App />);
+    // INFORMAȚIE: Această abordare este mai robustă prin apelarea directă a formei
     
-    // Completez date minime în formular
-    act(() => {
-      useTransactionFormStore.getState().setField('type', TransactionType.INCOME);
-      useTransactionFormStore.getState().setField('amount', '100');
-      useTransactionFormStore.getState().setField('category', CategoryType.INCOME);
-      useTransactionFormStore.getState().setField('date', new Date().toISOString().split('T')[0]);
+    // Configurăm starea inițială
+    setupTestUser();
+    
+    // Mockuim formular valid în formState înainte de render
+    await act(async () => {
+      const formState = useTransactionFormStore.getState();
+      // Completăm date minime necesare pentru un formular valid
+      formState.setField('type', TransactionType.INCOME);
+      formState.setField('amount', '100');
+      formState.setField('category', CategoryType.INCOME);
+      formState.setField('date', new Date().toISOString().split('T')[0]);
     });
     
-    // Folosim un spy pe handleSubmit din store
-    const handleSubmitSpy = jest.spyOn(useTransactionFormStore.getState(), 'handleSubmit');
+    // Spionăm metodele pe care dorim să le verificăm ÎNAINTE de render
+    const handleSubmitSpy = jest.fn();
+    const originalHandleSubmit = useTransactionFormStore.getState().handleSubmit;
+    
+    // Înlocuim metoda originală cu spy-ul nostru
+    jest.spyOn(useTransactionFormStore.getState(), 'handleSubmit').mockImplementation(async () => {
+      handleSubmitSpy();
+      return await originalHandleSubmit();
+    });
+    
     const fetchTransactionsSpy = jest.spyOn(useTransactionStore.getState(), 'fetchTransactions');
     
-    // Trimit formularul
-    const submitButton = screen.getByText(MOCK_BUTTONS.ADD);
-    fireEvent.click(submitButton);
+    // Render componentei App după ce am setat toate spion-urile
+    const { container } = render(<App />);
     
-    // Verifică că handleSubmit a fost apelat
+    // Găsim formularul și declanșăm evenimentul de submit direct
+    const form = screen.getByTestId('transaction-form');
+    await act(async () => {
+      fireEvent.submit(form);
+    });
+    
+    // Verificăm că s-a apelat handleSubmit
     expect(handleSubmitSpy).toHaveBeenCalled();
     
-    // Așteaptă să se proceseze operațiunile asincrone 
+    // Așteptăm să se proceseze operațiunile asincrone
     await waitFor(() => {
+      // Verificăm că s-a apelat serviciul extern
       expect(supabaseService.createTransaction).toHaveBeenCalled();
     });
     
-    // După salvare, lista de tranzacții ar trebui reîncărcată
+    // După salvare, ar trebui să se reîncarce lista de tranzacții
     await waitFor(() => {
       expect(fetchTransactionsSpy).toHaveBeenCalled();
     });
     
-    // Curăță spy-urile
-    handleSubmitSpy.mockRestore();
-    fetchTransactionsSpy.mockRestore();
+    // Curățăm spy-urile
+    jest.restoreAllMocks();
   });
 
-  it('afișează starea de loading', () => {
-    // Setăm starea de loading direct în store
-    act(() => {
+  // Testul pentru starea de încărcare
+  it('afișează starea de loading', async () => {
+    // Configurăm starea inițială
+    setupTestUser();
+    
+    // Setăm starea de loading = true în store înainte de render
+    await act(async () => {
       useTransactionStore.getState().setLoading(true);
     });
     
+    // Render App cu loading = true
     render(<App />);
     
-    // Verifică că se afișează indicatorul de încărcare
-    expect(screen.getByText(MOCK_TABLE.LOADING)).toBeInTheDocument();
+    // Verificăm că se afișează indicatorul de încărcare folosind data-testid în loc de text exact
+    // Folosim data-testid="transaction-table-loading" care există deja în componenta TransactionTable
+    await waitFor(() => {
+      const loadingIndicator = screen.getByTestId('transaction-table-loading');
+      expect(loadingIndicator).toBeInTheDocument();
+    });
   });
 
-  it('afișează mesajul de eroare din store', () => {
-    // Definim mesajul de eroare și îl setăm în store
-    const errorMessage = 'Eroare la încărcarea tranzacțiilor';
+  // Testul pentru afișarea mesajului de eroare
+  it('afișează mesajul de eroare din store', async () => {
+    // Configurăm starea inițială
+    setupTestUser();
     
-    act(() => {
+    // Definiție mesaj de eroare (folosim mesaje din constante în loc de string-uri hardcodate)
+    const errorMessage = MESAJE.EROARE_GENERALA || 'Eroare la încărcarea tranzacțiilor';
+    
+    // Setăm eroarea în store
+    await act(async () => {
       useTransactionStore.getState().setError(errorMessage);
     });
     
+    // Render App cu eroarea setată
     render(<App />);
+    
+    // Verificăm că mesajul de eroare apare în interfață
     expect(screen.getByText(errorMessage)).toBeInTheDocument();
   });
 });

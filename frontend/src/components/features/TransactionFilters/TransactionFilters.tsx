@@ -26,6 +26,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         name="type-filter"
         label={LABELS.TYPE_FILTER}
         value={type || ''}
+        data-testid="type-filter"
         onChange={e => {
             const value = (e.target as HTMLSelectElement).value as TransactionType | '';
             // DEBUG: check if handler is the same as the mock
@@ -41,6 +42,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         name="category-filter"
         label={LABELS.CATEGORY_FILTER}
         value={category || ''}
+        data-testid="category-filter"
         onChange={e => onCategoryChange((e.target as HTMLSelectElement).value as CategoryType | '')}
         options={categories}
         className="ml-2"

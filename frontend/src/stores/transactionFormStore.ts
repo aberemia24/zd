@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '@shared-constants';
-import { VALIDATION, VALIDATION_MESSAGES } from '@shared-constants/validation';
+import { VALIDATION } from '@shared-constants/validation';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
@@ -58,22 +58,22 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
     validateForm: () => {
       const { form } = get();
       if (!form.type || !form.amount || !form.category || !form.date) {
-        set({ error: VALIDATION_MESSAGES.REQUIRED_FIELDS || VALIDATION_MESSAGES.INVALID_AMOUNT });
+        set({ error: MESAJE.CAMPURI_OBLIGATORII });
         return false;
       }
       if (form.recurring && !form.frequency) {
-        set({ error: VALIDATION_MESSAGES.REQUIRED_FREQUENCY || VALIDATION_MESSAGES.INVALID_DATE });
+        set({ error: MESAJE.FRECV_RECURENTA });
         return false;
       }
       // Validare sumă
       const amount = parseFloat(form.amount);
       if (isNaN(amount) || amount < VALIDATION.AMOUNT_MIN || amount > VALIDATION.AMOUNT_MAX) {
-        set({ error: VALIDATION_MESSAGES.INVALID_AMOUNT });
+        set({ error: MESAJE.AVERTISMENT_DATE });
         return false;
       }
       // Validare dată
       if (!VALIDATION.DATE_REGEX.test(form.date)) {
-        set({ error: VALIDATION_MESSAGES.INVALID_DATE });
+        set({ error: MESAJE.AVERTISMENT_DATE });
         return false;
       }
       set({ error: '' });

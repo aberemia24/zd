@@ -1,94 +1,172 @@
 /**
  * Test pentru TransactionFilters - Abordare simplificată fără mockuri pentru stores
  * Conform regulilor: mock doar pentru external services
+ * Owner: Echipa Frontend - Test
+ * 
+ * Test implementat folosind pattern-ul recomandat pentru testarea formularelor complexe
+ * cu valori inițiale, conform memoriei (împart verificarea în teste focalizate).
  */
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import { act } from 'react';
+import { fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
+
+// Import custom render și utilități de test
+import { 
+  render, 
+  screen, 
+  setupTestUser, 
+  resetAllStores 
+} from '../../../test-utils';
+
+// Import componenta și store real (nu mock-uim store-uri conform regulii)
 import TransactionFilters from './';
-import { TransactionType, CategoryType } from '@shared-constants';
-import { MOCK_LABELS } from '../../../test/mockData';
+import { TransactionType, CategoryType, LABELS } from '@shared-constants';
 import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';
 
-// Resetăm store-ul după fiecare test
-afterEach(() => {
-  act(() => {
-    // Resetăm filtrele la valorile implicite
-    useTransactionFiltersStore.getState().resetFilters();
-  });
+/**
+ * Setup și reset pentru fiecare test
+ * IMPORTANT: Reset înainte de fiecare test pentru a evita contaminații cross-test
+ */
+beforeEach(() => {
+  jest.clearAllMocks(); // Curățăm orice mock creat în teste anterioare
+  resetAllStores(); // Reset store-uri
+  setupTestUser(); // Setup utilizator de test
 });
 
+afterEach(() => {
+  resetAllStores();
+});
+
+// Implementăm testele folosind pattern-ul "verificare focalizată pe un singur câmp per test"
+// conform recomandării din memoria 3cb5254f-a08f-4ff1-8fcd-21e707c69101
 describe('TransactionFilters', () => {
-  it('afișează opțiunile de tip și categorie', () => {
-    // Mock pentru callback-uri
-    const onTypeChange = jest.fn();
-    const onCategoryChange = jest.fn();
+  /**
+   * Teste Simple - Verificare prezență elemente UI 
+   */
+  it('afișează filtrul de tip', async () => {
+    // ARRANGE
+    render(<TransactionFilters 
+      type="" 
+      category="" 
+      onTypeChange={jest.fn()} 
+      onCategoryChange={jest.fn()} 
+    />);
     
-    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
-    
-    expect(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER)).toBeInTheDocument();
-    expect(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER)).toBeInTheDocument();
+    // ACT & ASSERT - independent test pentru fiecare element
+    const typeFilterElement = await screen.findByTestId('type-filter');
+    expect(typeFilterElement).toBeInTheDocument();
   });
-  
-  it('actualizează store-ul când se schimbă tipul', () => {
-    // Mock pentru callback-uri
-    const onTypeChange = jest.fn();
-    const onCategoryChange = jest.fn();
+
+  it('afișează filtrul de categorie', async () => {
+    // ARRANGE
+    render(<TransactionFilters 
+      type="" 
+      category="" 
+      onTypeChange={jest.fn()} 
+      onCategoryChange={jest.fn()} 
+    />);
     
-    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
-    
-    // Selectează alt tip
-    act(() => {
-      fireEvent.change(screen.getByLabelText(MOCK_LABELS.TYPE_FILTER), 
-        { target: { value: TransactionType.EXPENSE } }
-      );
-    });
-    
-    // Verificăm că callback-ul a fost apelat
-    expect(onTypeChange).toHaveBeenCalledWith(TransactionType.EXPENSE);
-    
-    // Verificăm că store-ul a fost actualizat (opțional, testul se bazează doar pe comportamentul componentei)
-    expect(useTransactionFiltersStore.getState().filterType).toBe(TransactionType.EXPENSE);
+    // ACT & ASSERT
+    const categoryFilterElement = await screen.findByTestId('category-filter');
+    expect(categoryFilterElement).toBeInTheDocument();
   });
-  
-  it('actualizează store-ul când se schimbă categoria', () => {
-    // Mock pentru callback-uri
-    const onTypeChange = jest.fn();
-    const onCategoryChange = jest.fn();
+
+  /**
+   * Test pentru verificarea schimbării tipului de tranzacție 
+   */
+  it('apelează onTypeChange cu valoarea corectă când se schimbă tipul', async () => {
+    // ARRANGE - inițializăm un mock pentru callback-ul onTypeChange
+    const mockTypeChange = jest.fn();
     
-    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
+    // Render cu mock-ul nostru
+    render(<TransactionFilters 
+      type="" 
+      category="" 
+      onTypeChange={mockTypeChange} 
+      onCategoryChange={jest.fn()} 
+    />);
     
-    // Selectează altă categorie
-    act(() => {
-      fireEvent.change(screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER), 
-        { target: { value: CategoryType.EXPENSE } }
-      );
+    // ACT - găsim și modificăm selectorul
+    const typeSelector = await screen.findByTestId('type-filter');
+    
+    // Simulăm o modificare de valoare
+    await act(async () => {
+      fireEvent.change(typeSelector, { target: { value: TransactionType.EXPENSE } });
     });
-    
-    // Verificăm că callback-ul a fost apelat
-    expect(onCategoryChange).toHaveBeenCalledWith(CategoryType.EXPENSE);
-    
-    // Verificăm că store-ul a fost actualizat (opțional, testul se bazează doar pe comportamentul componentei)
-    expect(useTransactionFiltersStore.getState().filterCategory).toBe(CategoryType.EXPENSE);
+
+    // ASSERT - verificăm dacă callback-ul a fost apelat cu valoarea corectă
+    expect(mockTypeChange).toHaveBeenCalledWith(TransactionType.EXPENSE);
   });
-  
-  it('reflectă corect schimbările de stare din store', () => {
-    // Setăm valori inițiale în store
-    act(() => {
-      useTransactionFiltersStore.getState().setFilterType(TransactionType.INCOME);
-      useTransactionFiltersStore.getState().setFilterCategory(CategoryType.INCOME);
+
+  /**
+   * Test pentru verificarea schimbării categoriei
+   */
+  it('apelează onCategoryChange cu valoarea corectă când se schimbă categoria', async () => {
+    // ARRANGE - inițializăm un mock pentru callback-ul onCategoryChange
+    const mockCategoryChange = jest.fn();
+    
+    // Render cu mock-ul nostru
+    render(<TransactionFilters 
+      type="" 
+      category="" 
+      onTypeChange={jest.fn()} 
+      onCategoryChange={mockCategoryChange} 
+    />);
+    
+    // ACT - găsim și modificăm selectorul
+    const categorySelector = await screen.findByTestId('category-filter');
+    
+    // Simulăm o modificare de valoare - folosim o valoare validă din enum
+    await act(async () => {
+      fireEvent.change(categorySelector, { target: { value: CategoryType.EXPENSE } });
     });
+
+    // ASSERT - verificăm dacă callback-ul a fost apelat cu valoarea corectă
+    expect(mockCategoryChange).toHaveBeenCalledWith(CategoryType.EXPENSE);
+  });
+
+  /**
+   * Test pentru verificarea propagării valorilor din store spre UI - tip
+   * Primă parte a pattern-ului "testare focalizată pe un câmp"
+   */
+  it('reflectă valoarea tipului din props în UI', async () => {
+    // ARRANGE - setat tipul direct ca prop
+    render(<TransactionFilters 
+      type={TransactionType.INCOME} 
+      category="" 
+      onTypeChange={jest.fn()} 
+      onCategoryChange={jest.fn()} 
+    />);
     
-    // Mock pentru callback-uri
-    const onTypeChange = jest.fn();
-    const onCategoryChange = jest.fn();
+    // ACT - luăm referința la selector
+    const typeSelector = await screen.findByTestId('type-filter') as HTMLSelectElement;
     
-    // Renderăm componenta după ce am setat store-ul
-    render(<TransactionFilters onTypeChange={onTypeChange} onCategoryChange={onCategoryChange} />);
+    // ASSERT - verificăm valoarea selectată
+    await waitFor(() => {
+      expect(typeSelector.value).toBe(TransactionType.INCOME);
+    });
+  });
+
+  /**
+   * Test pentru verificarea propagării valorilor din store spre UI - categorie
+   * A doua parte a pattern-ului "testare focalizată pe un câmp"
+   */  
+  it('reflectă valoarea categoriei din props în UI', async () => {
+    // ARRANGE - setat categoria direct ca prop (folosim valoare validă din enum)
+    render(<TransactionFilters 
+      type="" 
+      category={CategoryType.EXPENSE} 
+      onTypeChange={jest.fn()} 
+      onCategoryChange={jest.fn()} 
+    />);
     
-    // Verificăm că dropdown-urile reflectă valorile din store
-    expect((screen.getByLabelText(MOCK_LABELS.TYPE_FILTER) as HTMLSelectElement).value).toBe(TransactionType.INCOME);
-    expect((screen.getByLabelText(MOCK_LABELS.CATEGORY_FILTER) as HTMLSelectElement).value).toBe(CategoryType.INCOME);
+    // ACT - luăm referința la selector
+    const categorySelector = await screen.findByTestId('category-filter') as HTMLSelectElement;
+    
+    // ASSERT - verificăm valoarea selectată
+    await waitFor(() => {
+      expect(categorySelector.value).toBe(CategoryType.EXPENSE);
+    });
   });
 });
