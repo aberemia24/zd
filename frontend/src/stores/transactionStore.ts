@@ -83,7 +83,11 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   setTotal: (total: number) => set({ total }),
   setLoading: (loading: boolean) => set({ loading }),
   setError: (error: string | null) => set({ error }),
-  setQueryParams: (params: TransactionQueryParamsWithRecurring) => set({ currentQueryParams: params }),
+  // Actualizat pentru a declanșa fetchTransactions automat după schimbarea parametrilor
+  setQueryParams: async (params: TransactionQueryParamsWithRecurring) => {
+    set({ currentQueryParams: params });
+    await get().fetchTransactions();
+  },
   // Eliminat setTransactionService
 
   

@@ -27,7 +27,8 @@ jest.mock('zustand/middleware', () => ({
     // execută factory-ul original, dar fără persist
     return config(set, get, api);
   },
-  devtools: jest.fn(fn => fn)
+  // Folosim numele prefixat cu 'mock' conform regulilor Jest
+  devtools: (fn: any) => fn
 }));
 
 // Date de test pentru tranzacții - adaptate la TransactionValidated
