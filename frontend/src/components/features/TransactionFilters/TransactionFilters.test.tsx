@@ -7,40 +7,40 @@
  * cu valori inițiale, conform memoriei (împart verificarea în teste focalizate).
  */
 import React from 'react';
-import { act } from 'react';
 import { fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-// Import custom render și utilități de test
+// Import custom render și utilități de test (STRUCTURĂ OFICIALĂ)
 import { 
   render, 
   screen, 
   setupTestUser, 
-  resetAllStores 
+  resetAllStores,
+  act // Folosim helper-ul act din test-utils pentru uniformitate
 } from '../../../test-utils';
 
-// Import componenta și store real (nu mock-uim store-uri conform regulii)
+// Import componenta și store real (CONFORM REGULII: NU MOCK-UIM STORE-URI ZUSTAND)
 import TransactionFilters from './';
 import { TransactionType, CategoryType, LABELS } from '@shared-constants';
 import { useTransactionFiltersStore } from '../../../stores/transactionFiltersStore';
 
-/**
- * Setup și reset pentru fiecare test
- * IMPORTANT: Reset înainte de fiecare test pentru a evita contaminații cross-test
- */
-beforeEach(() => {
-  jest.clearAllMocks(); // Curățăm orice mock creat în teste anterioare
-  resetAllStores(); // Reset store-uri
-  setupTestUser(); // Setup utilizator de test
-});
-
-afterEach(() => {
-  resetAllStores();
-});
-
-// Implementăm testele folosind pattern-ul "verificare focalizată pe un singur câmp per test"
-// conform recomandării din memoria 3cb5254f-a08f-4ff1-8fcd-21e707c69101
 describe('TransactionFilters', () => {
+  /**
+   * Setup și reset pentru fiecare test
+   * IMPORTANT: Reset înainte de fiecare test pentru a evita contaminații cross-test
+   */
+  beforeEach(() => {
+    jest.clearAllMocks(); // Curățăm orice mock creat în teste anterioare
+    resetAllStores(); // Reset store-uri folosind helper-ul oficial
+    setupTestUser(); // Setup utilizator de test folosind helper-ul oficial
+  });
+  
+  afterEach(() => {
+    resetAllStores();
+  });
+  
+  // Implementăm testele folosind pattern-ul "verificare focalizată pe un singur câmp per test"
+  // conform recomandării din memoria 3cb5254f-a08f-4ff1-8fcd-21e707c69101
   /**
    * Teste Simple - Verificare prezență elemente UI 
    */

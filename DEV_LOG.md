@@ -129,11 +129,25 @@
 
 _Actualizat la: 2025-05-07_
 
-## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3 și 4
+## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3, 4, 5
+
+- Task 5: Refactorizare și validare TransactionFilters:
+    - Separare completă între teste unitare și de integrare.
+    - Testele de integrare restaurate după ștergere accidentală, validate cu succes.
+    - Toate testele rulează și trec (8/8).
+    - Structura este conformă cu regulile globale și BEST_PRACTICES.md.
+    - Status: DONE, progres actualizat și în TECH_STORIES/epic-refactorizare-teste-zustand.md.
+
 
 - Task 1: Cleanup și actualizare test-utils + jest-mocks
   - Helperii oficiali pentru resetare store-uri (`resetAllStores`) și setup user (`setupTestUser`) sunt documentați și recomandați în test-utils.
   - Eliminare completă a mock-urilor de store-uri din jest-mocks.ts; păstrate doar mock-uri pentru servicii externe (Supabase, date, random, browser APIs).
+
+- Task 5: Refactorizare `TransactionFilters.test.tsx` pentru store real
+  - Am verificat structura existentă a testelor și am constatat că deja respectă regulile globale (nu folosește mock store).
+  - Am creat teste suplimentare de integrare pentru interacțiunea cu store-ul real Zustand în `TransactionFilters.store.test.tsx`.
+  - Toate modificările de state sunt înfășurate în `act()` conform regulilor.
+  - Am implementat teste pentru butonul de resetare filtre și propagarea modificărilor UI → store.
   - Comentariu clar privind regula globală: nu mock-uim store-uri Zustand.
 - Task 2: Refactorizare transactionFormStore.test.ts pentru store real
   - Toate testele folosesc store-ul real și helperii oficiali (`resetAllStores`, `mockSupabaseService`).

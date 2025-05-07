@@ -14,7 +14,12 @@
 - [x] **Task 2:** Refactorizare `transactionFormStore.test.ts` pentru store real [DONE 2025-05-07]
 - [x] **Task 3:** Refactorizare `transactionFiltersStore.test.ts` pentru store real [DONE 2025-05-07]
 - [x] **Task 4:** Refactorizare `authStore.test.ts` pentru store real și mock doar servicii externe [DONE 2025-05-07]
-- [ ] **Task 5:** Refactorizare `TransactionFilters.test.tsx` pentru store real
+- [x] **Task 5:** Refactorizare `TransactionFilters.test.tsx` pentru store real [DONE 2025-05-07]
+    - Confirmat separarea corectă între teste unitare și de integrare pentru TransactionFilters.
+    - Testele de integrare au fost restaurate și rulează cu succes (8/8 passed).
+    - Structura respectă regulile globale și best practices (mock doar pentru servicii externe, store real folosit doar în integrare).
+    - Nu există dubluri între fișierele de test, setup/reset corect implementat.
+    - Status: validat manual și automat, task complet finalizat.
 - [ ] **Task 6:** Verificare și refactorizare componente primitive (doar dacă e cazul)
 - [ ] **Task 7:** Refactorizare `TransactionForm.test.tsx` pentru store real
 - [ ] **Task 8:** Refactorizare `TransactionTable.test.tsx` pentru store real
@@ -35,7 +40,7 @@
 
 ---
 
-**Ultima actualizare:** 2025-05-07 11:55
+**Ultima actualizare:** 2025-05-07 12:19
 
 
 ## Sfaturi concrete de implementare pe task
