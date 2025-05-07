@@ -13,7 +13,7 @@
     - Actualizare `frontend/src/jest-mocks.ts` – eliminare mock-uri store, păstrare doar mock-uri servicii externe
 - [x] **Task 2:** Refactorizare `transactionFormStore.test.ts` pentru store real [DONE 2025-05-07]
 - [x] **Task 3:** Refactorizare `transactionFiltersStore.test.ts` pentru store real [DONE 2025-05-07]
-- [ ] **Task 4:** Refactorizare `authStore.test.ts` pentru store real și mock doar servicii externe
+- [x] **Task 4:** Refactorizare `authStore.test.ts` pentru store real și mock doar servicii externe [DONE 2025-05-07]
 - [ ] **Task 5:** Refactorizare `TransactionFilters.test.tsx` pentru store real
 - [ ] **Task 6:** Verificare și refactorizare componente primitive (doar dacă e cazul)
 - [ ] **Task 7:** Refactorizare `TransactionForm.test.tsx` pentru store real
@@ -35,7 +35,7 @@
 
 ---
 
-**Ultima actualizare:** 2025-05-07 11:45
+**Ultima actualizare:** 2025-05-07 11:55
 
 
 ## Sfaturi concrete de implementare pe task

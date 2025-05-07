@@ -129,7 +129,7 @@
 
 _Actualizat la: 2025-05-07_
 
-## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2 și 3
+## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3 și 4
 
 - Task 1: Cleanup și actualizare test-utils + jest-mocks
   - Helperii oficiali pentru resetare store-uri (`resetAllStores`) și setup user (`setupTestUser`) sunt documentați și recomandați în test-utils.
@@ -145,6 +145,13 @@ _Actualizat la: 2025-05-07_
   - Corecție a scenariilor de test pentru a reflecta comportamentul real al store-ului.
   - Eliminare a comentariilor legate de mock-uri din fișier.
   - Adăugare beforeEach și afterEach pentru a asigura un mediu consistent de testare.
+- Task 4: Refactorizare authStore.test.ts pentru store real și mock doar servicii externe
+  - Înlocuit reset manual cu functia oficiala `resetAllStores()` din test-utils.
+  - Adăugat reset în afterEach pentru prevenirea side effects între teste.
+  - Înlocuit string-urile hardcodate cu constante din `MESAJE` conform regulilor globale.
+  - Mock-uri exclusiv pentru servicii externe (supabaseAuthService), păstrând enum-urile relevante.
+  - Adăugat un test nou pentru metoda `checkUser()` pentru a crește acoperirea cod.
+  - Toate modificările de store sunt încapsulate în `act()`, inclusiv cele din setup.
   - Toate testele trec, fără erori de lint.
 - Status actualizat în TECH_STORIES/epic-refactorizare-teste-zustand.md: Task 1 și 2 DONE.
 
