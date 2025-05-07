@@ -20,15 +20,21 @@
     - Structura respectă regulile globale și best practices (mock doar pentru servicii externe, store real folosit doar în integrare).
     - Nu există dubluri între fișierele de test, setup/reset corect implementat.
     - Status: validat manual și automat, task complet finalizat.
-- [ ] **Task 6:** Verificare și refactorizare componente primitive (doar dacă e cazul)
-- [ ] **Task 7:** Refactorizare `TransactionForm.test.tsx` pentru store real
-- [ ] **Task 8:** Refactorizare `TransactionTable.test.tsx` pentru store real
-- [ ] **Task 9:** Refactorizare `App.test.tsx` pentru integrare store-uri reale
-- [ ] **Task 10:** Eliminare efectivă a mock-urilor din `__mocks__/stores/`
+- [x] **Task 6:** Verificare și refactorizare componente primitive (doar dacă e cazul) [DONE 2025-05-07]
+    - Toate testele pentru primitive respectă regulile globale, nu folosesc store-uri, nu necesită refactorizare suplimentară.
+- [x] **Task 7:** Refactorizare `TransactionForm.test.tsx` pentru store real ([DONE 2025-05-07])
+    - Testele folosesc store-ul real Zustand, mock doar pentru servicii externe, granularizare pe câmpuri și scenarii complete, totul conform regulilor globale. Validat manual și automat.
+- [x] **Task 8:** Refactorizare `TransactionTable.test.tsx` pentru store real ([DONE 2025-05-07])
+    - Testele folosesc store real Zustand, mock doar pentru servicii externe, acoperire edge-case-uri, validare manuală și automată, totul conform regulilor globale și best practices.
+- [x] **Task 9:** Refactorizare `App.test.tsx` pentru integrare store-uri reale ([DONE 2025-05-07])
+    - Testele folosesc store-uri reale, mock doar pentru servicii externe, acoperire fluxuri de integrare, validare manuală și automată, respectă regulile globale și best practices.
+- [x] **Task 10:** Eliminare efectivă a mock-urilor din `__mocks__/stores/` ([DONE 2025-05-07])
+    - Mock-urile pentru store-uri au fost eliminate complet. Testele folosesc doar store-uri reale, fără workaround-uri sau excepții.
     - `frontend/src/__mocks__/stores/transactionFormStore.ts`
     - `frontend/src/__mocks__/stores/transactionStore.ts`
     - `frontend/src/__mocks__/stores/authStore.ts`
-- [ ] **Task 11:** Cleanup final, actualizare `DEV_LOG.md` și `BEST_PRACTICES.md` cu lecții învățate
+- [x] **Task 11:** Cleanup final, actualizare `DEV_LOG.md` și `BEST_PRACTICES.md` cu lecții învățate ([DONE 2025-05-07])
+    - Documentația și logul au fost actualizate cu lecțiile învățate, nu există workaround-uri sau excepții rămase. Codul și testele respectă toate regulile globale.
 
 ---
 

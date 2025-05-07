@@ -131,6 +131,33 @@ _Actualizat la: 2025-05-07_
 
 ## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3, 4, 5
 
+### Task 6: Primitive
+- Verificare/refactorizare teste pentru componente primitive (Alert, Badge, Button, Checkbox, Input, Loader, Select, Textarea).
+- Toate testele sunt conforme cu regulile globale (doar unitare, fără dependințe de store, folosesc data-testid unde e relevant).
+- Nu a fost nevoie de modificări.
+
+### Task 7: TransactionForm
+- Refactorizare test pentru TransactionForm: store real Zustand, mock doar pentru servicii externe.
+- Teste granularizate (câmpuri individuale, interacțiuni, scenarii complete de submit/validare).
+- Respectă toate regulile globale și pattern-ul recomandat pentru formulare complexe.
+- Validat manual și automat.
+
+### Task 8: TransactionTable
+- Refactorizare test pentru TransactionTable: store real Zustand, mock doar pentru servicii externe.
+- Acoperire edge-case-uri, paginare, stări de loading/eroare, validare manuală și automată.
+- Respectă toate regulile globale și best practices.
+
+### Task 9: App
+- Refactorizare test pentru App: integrare completă cu store-uri reale, mock doar pentru servicii externe.
+- Teste de integrare pentru fluxuri critice (filtrare, creare, loading, error), validare manuală și automată.
+- Respectă toate regulile globale și best practices.
+
+### Task 10: Eliminare mock-uri store
+- Mock-urile pentru store-uri au fost eliminate complet. Testele folosesc doar store-uri reale, fără workaround-uri sau excepții.
+
+### Task 11: Cleanup final & lessons learned
+- Cleanup final, actualizare documentație și lessons learned. Nu există workaround-uri sau excepții rămase. Codul și testele respectă toate regulile globale.
+
 - Task 5: Refactorizare și validare TransactionFilters:
     - Separare completă între teste unitare și de integrare.
     - Testele de integrare restaurate după ștergere accidentală, validate cu succes.
