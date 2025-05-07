@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { TransactionSchema } from '../../shared/transaction.schema';
+import { AppModule } from '../../app.module';
+import { TransactionSchema } from '../../../../shared-constants/transaction.schema';
 
 const validTransaction = {
   id: 't1',
