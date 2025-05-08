@@ -1,5 +1,18 @@
 # Dev Log - Budget App
 
+## 2025-05-08 - Implementare sistem expandare/colapsare categorii în LunarGrid (DEV-12 Complet)
+- Implementat sistemul de expandare/colapsare pentru categoriile din LunarGrid conform AC-10.
+- Funcționalități implementate:
+  - Expandare/colapsare categorii principale prin click, cu iconuri intuitive (ChevronDown/ChevronRight)
+  - Persistența stării expandat/colapsate în localStorage (`budget-app-category-expand`)
+  - Calcul și afișarea sumei totale pentru categorii colapsate
+  - Formatare consistentă a sumelor cu prefix "RON" și 2 zecimale
+  - Design ierarhic pentru subcategorii cu indicator vizual (linii conectoare)
+  - Atribute `data-testid` pentru testare automată robustă
+- Instalat pachetul `lucide-react` pentru iconițe de expandare/colapsare.
+- Refactorizat structura tabelului pentru a folosi o singură coloană "Categorie / Subcategorie" cu afișare ierarhică.
+- Toate implementările respectă regulile pentru persistență, surse unice de adevăr și formatare.
+
 ## 2025-05-08 - Implementare calcul SOLD pentru LunarGrid (DEV-4 Complet)
 - Adăugat rândul SOLD la finalul tabelului LunarGrid, implementând criterii de acceptare AC-3.
 - Funcționalități implementate pentru rândul SOLD:

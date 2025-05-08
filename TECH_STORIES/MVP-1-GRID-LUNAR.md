@@ -56,7 +56,8 @@
 - [ ] **DEV-9**: Integrare TanStack Table pentru headers fixe (FE, 0.5d)
 - [ ] **DEV-10**: Implementare stilizare status și formatter sume (FE, 0.5d)
 - [ ] **DEV-11**: Implementare mecanisme cache pentru lunile anterioare (FE, 0.5d)
-- [ ] **DEV-12**: Implementare sistem expandare/colapsare categorii cu stare persistată în localStorage (FE, 1d)
+- [x] **DEV-12**: Implementare sistem expandare/colapsare categorii cu stare persistată în localStorage (FE, 1d)  
+    _Implementat expandare/colapsare cu UI ierarhic, persistență în localStorage, agregare sume pentru categorii colapsate și format RON._
 - [ ] **DEV-13**: UI pentru adăugare/editare categorie/subcategorie integrat cu constante existente (FE, 1d)
 - [ ] **DEV-14**: Calcul sumarizare categorii pentru vizualizare colapsată (FE, 0.5d)
 - [ ] **DEV-15**: Integrare cu modelul existent de categorii și detectare modificări (FE, 0.5d)
