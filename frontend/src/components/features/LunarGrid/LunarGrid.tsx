@@ -4,6 +4,7 @@ import { CATEGORIES } from '@shared-constants/categories';
 import { getCategoriesForTransactionType } from '@shared-constants/category-mapping';
 import { TransactionType, TransactionStatus } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
+import { EXCEL_GRID } from '@shared-constants/ui';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -35,6 +36,34 @@ function getSumForCell(transactions: TransactionValidated[], category: string, s
     }, 0);
 }
 
+// Calculează soldul zilnic - suma tuturor tranzacțiilor pentru o zi
+function calculateDailyBalance(transactions: TransactionValidated[], day: number): number {
+  return transactions
+    .filter(t => new Date(t.date).getDate() === day)
+    .reduce((acc, t) => {
+      const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number'
+        ? t.actualAmount
+        : t.amount;
+
+      // Pentru venituri adăugăm suma, pentru cheltuieli și economii scădem suma
+      if (t.type === TransactionType.INCOME) {
+        return acc + amount;
+      } else {
+        return acc - Math.abs(amount); // Asigurăm că scădem întotdeauna o valoare pozitivă
+      }
+    }, 0);
+}
+
+// Formatare valută pentru afișare (RON 0.00)
+function formatCurrency(amount: number): string {
+  if (amount === 0) return 'RON 0.00';
+  
+  return `RON ${Math.abs(amount).toLocaleString('ro-RO', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
+
 // --- Componenta principală ---
 export interface LunarGridProps {
   year: number;
@@ -46,6 +75,20 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   const transactions = useMonthlyTransactions(year, month);
 
   // TODO: Poți adăuga expand/collapse pe categorii principale dacă vrei
+  // Calculează soldurile zilnice pentru întreaga lună
+  const dailyBalances = React.useMemo(() => {
+    return days.reduce<Record<number, number>>((acc, day) => {
+      acc[day] = calculateDailyBalance(transactions, day);
+      return acc;
+    }, {});
+  }, [days, transactions]);
+
+  // Stil CSS condiționat pentru solduri (pozitiv/negativ)
+  const getBalanceStyle = (amount: number): string => {
+    if (amount === 0) return 'text-gray-500';
+    return amount > 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium';
+  };
+
   return (
     <div className="overflow-x-auto w-full">
       <table className="min-w-max table-auto border-collapse" data-testid="lunar-grid-table">
@@ -75,6 +118,29 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
               ))
             ))
           ))}
+          
+          {/* Rândul SOLD la finalul tabelului - conform DEV-4 */}
+          <tr className="bg-gray-100 font-bold border-t-2">
+            <td 
+              className="sticky left-0 bg-gray-100 z-10 px-4 py-2" 
+              colSpan={2} 
+              data-testid="sold-label"
+            >
+              {EXCEL_GRID.HEADERS.SOLD}
+            </td>
+            {days.map(day => {
+              const balance = dailyBalances[day];
+              return (
+                <td 
+                  key={day} 
+                  className={`px-4 py-2 text-right ${getBalanceStyle(balance)}`} 
+                  data-testid={`sold-day-${day}`}
+                >
+                  {formatCurrency(balance)}
+                </td>
+              );
+            })}
+          </tr>
         </tbody>
       </table>
     </div>

@@ -47,8 +47,8 @@
     _Implementat în `shared-constants/category-mapping.ts` și exportat în barrel. Folosit deja în TransactionForm._
 - [x] **DEV-3**: Utilitare mapping + validare (FE, 0.5d)  
     _Funcții `getCategoriesForTransactionType` și `getTransactionTypeForCategory` disponibile în constants. Import centralizat._
-- [>] **DEV-4**: Integrare date reale + calcul sold (FE, 0.5d)  
-    _Pregătit contextul pentru grid, mapping și constants validate. Urmează integrarea datelor reale și logica de calcul sold._
+- [x] **DEV-4**: Integrare date reale + calcul sold (FE, 0.5d)  
+    _Implementat rândul SOLD în LunarGrid, cu calcul corect al soldului zilnic, formatare RON și culori condiționale. Utilizează constants din EXCEL_GRID și respectă patterns/reguli globale._
 - [ ] **DEV-5**: Formular `TransactionModal` reutilizat (Add/Edit) (FE, 1d)
 - [ ] **DEV-6**: Hook navigare lună + URL sync (FE, 0.5d)
 - [ ] **DEV-7**: Stil responsive + scroll mobil (FE, 1d)

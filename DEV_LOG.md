@@ -1,5 +1,17 @@
 # Dev Log - Budget App
 
+## 2025-05-08 - Implementare calcul SOLD pentru LunarGrid (DEV-4 Complet)
+- Adăugat rândul SOLD la finalul tabelului LunarGrid, implementând criterii de acceptare AC-3.
+- Funcționalități implementate pentru rândul SOLD:
+  - Calcul corect al soldului zilnic (Σ venituri - Σ cheltuieli)
+  - Formatare clară cu prefix "RON", separatori de mii și 2 zecimale
+  - Vizualizare intuitivă: sold pozitiv (verde), negativ (roșu), zero (gri)
+  - Utilizarea constantelor din `@shared-constants/ui` (EXCEL_GRID.HEADERS.SOLD)
+  - Memoizare pentru performanță optimă cu React.useMemo
+  - Atribute `data-testid` pe toate elementele pentru testare automată robustă
+- Schimbarea respectă toate regulile globale (sursa unică de adevăr pentru constante, fără stringuri hardcodate, formatare RON).
+- DEV-4 este acum complet. Următoarele task-uri: DEV-5 (formular TransactionModal), DEV-6 (hook navigare lună).
+
 ## 2025-05-08 - Update major testare și best practices (LunarGrid & TransactionsPage)
 - Toate testele pentru LunarGridPage și TransactionsPage au fost refactorizate:
     - Fără stringuri hardcodate: folosesc exclusiv mesaje/constante din `@shared-constants/messages`.
