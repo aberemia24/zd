@@ -1,31 +1,32 @@
-# User Story – E1 „Grid lunar + tranzacții simple”
+# User Story – E1 „Grid lunar + tranzacții simple"
 
 ## 1. Identificare
 
-- **ID:** `MVP‑1‑GRID‑LUNAR`
-- **Epic:** `E‑1 – Grid lunar + tranzacții simple`
-- **Versiune vizată:** `v1.0‑alpha`
-- **Prioritate:** `Must‑Have`
-- **Ticket de referință:** [Link la task Jira/Trello]
+* **ID:** MVP‑1‑GRID‑LUNAR
+* **Epic:** E‑1 – Grid lunar + tranzacții simple
+* **Versiune vizată:** v1.0‑alpha
+* **Prioritate:** Must‑Have
+* **Ticket de referință:** [Link la task Jira/Trello]
 
 ## 2. Descriere (în limbajul utilizatorului)
 
-> **Ca utilizator final**, când deschid pagina _Planificare_, vreau să văd o grilă a lunii curente — cu zilele pe orizontală și categoriile/subcategoriile de buget pe verticală — astfel încât să‑mi pot urmări ușor veniturile, cheltuielile și soldul estimat zi de zi și să adaug rapid tranzacții noi.
+> *Ca utilizator final*, când deschid pagina **Planificare**, vreau să văd o grilă similară cu Excel-ul meu de buget personal - cu zilele pe orizontală (inclusiv sfârșit de lună anterioară și început de lună următoare) și categoriile/subcategoriile de buget pe verticală - astfel încât să‑mi pot urmări ușor veniturile, cheltuielile și soldul estimat zi de zi şi să adaug rapid tranzacții noi.
 
 ## 3. Criterii de acceptare (AC)
 
-- [ ] Randare rapidă: Grila se afișează complet în < **1 s** la maximum 200 tranzacții în luna curentă (test Lighthouse).
-- [ ] Structură ierarhică: Header fix cu zilele **1‑31** pe orizontală și categorii principale (Venituri, Cheltuieli, Economii) pe verticală. Subcategoriile sunt vizibile doar la expandare. Celulele fără tranzacții arată „—”.
-- [ ] Sold calculat corect: Soldul zilnic = Σ venituri ‑ Σ cheltuieli, rotunjit la 2 zecimale. Verificat prin test automat cu set fix de date.
-- [ ] CRUD simplu: Dublu‑click pe o celulă deschide un formular „Adaugă/Edit/Șterge”. Formularul include opțiuni pentru salvare, anulare și ștergere. După „Salvează”, tranzacția apare instant și soldul zilei se actualizează fără reload.
-- [ ] Navigare lună: Butoanele « Prev / Next » schimbă luna; URL include param `?month=YYYY‑MM`.
-- [ ] Mobile usability: Pe ecran <768 px se poate face scroll orizontal și pinch‑zoom; gridul nu iese din viewport. Categoriile/subcategoriile sunt colapsabile pentru a păstra claritatea UI pe ecrane mici.
-- [ ] Accesibilitate de bază: Celulele au `role="gridcell"`; headerul `role="columnheader"`; contrast WCAG AA pentru text.
-- [ ] Vizualizare status: Celulele cu tranzacții efectuate (status="COMPLETED") au un indicator vizual distinctiv (bifă verde sau border special). Celulele cu tranzacții planificate (status="PLANNED") au un stil diferit (border punctat sau culoare mai deschisă) și un indicator vizual adecvat (ex: iconiță ceas).
-- [ ] Formatare sume: Toate sumele sunt formatate cu separatori de mii și 2 zecimale (ex: "1.234,56 RON"). Soldurile negative apar în roșu, cele pozitive în verde.
-- [ ] Expandare/colapsare categorii: Fiecare categorie principală (Venituri, Cheltuieli, Economii) poate fi expandată pentru a arăta subcategoriile sau colapsată pentru a arăta doar suma totală pe categorie. Când e colapsată, arată suma agregată pentru toate subcategoriile din grupa respectivă.
-- [ ] Adăugare/editare categorii: Utilizatorul poate adăuga o nouă subcategorie într-o categorie existentă direct din interfață. Noua subcategorie apare instant în grid cu un rând nou.
-
+- [ ] **AC-1**: **Randare rapidă** - Grila se afișează complet în < **1 s** la maximum 200 tranzacții în luna curentă (test Lighthouse).
+- [ ] **AC-2**: **Structură ierarhică** - Header fix cu zilele **25-30/31** (luna anterioară) + **1-24/30/31** (luna curentă) pe orizontală și categorii principale (Venituri, Economii, Cheltuieli) pe verticală. Subcategoriile sunt vizibile doar la expandare. Celulele fără tranzacții arată „RON 0.00" sau „—".
+- [ ] **AC-3**: **Sold calculat corect** - Soldul zilnic = Σ venituri ‑ Σ cheltuieli, rotunjit la 2 zecimale. Sumele totale pentru fiecare categorie și subcategorie sunt calculate automat. Fiecare secțiune (VENITURI, ECONOMII, CHELTUIELI) și fiecare subcategorie are un rând de total. Verificat prin test automat cu set fix de date.
+- [ ] **AC-4**: **CRUD simplu** - Dublu‑click pe o celulă deschide un formular „Adaugă/Edit/Șterge". Formularul include opțiuni pentru salvare, anulare și ștergere. După „Salvează", tranzacția apare instant și soldul zilei se actualizează fără reload.
+- [ ] **AC-5**: **Navigare lună** - Butoanele « Prev / Next » schimbă luna; URL include param `?month=YYYY‑MM`. La schimbarea lunii se păstrează vizibilitatea totalurilor pentru fiecare categorie. Header-ul global arată clar luna curentă și sumele totale (TOTAL SURPLUS, LICHIDITĂȚI RĂMASE).
+- [ ] **AC-6**: **Mobile usability** - Pe ecran <768 px se poate face scroll orizontal și pinch‑zoom; gridul nu iese din viewport. Categoriile/subcategoriile sunt colapsabile pentru a păstra claritatea UI pe ecrane mici.
+- [ ] **AC-7**: **Accesibilitate de bază** - Celulele au `role="gridcell"`; headerul `role="columnheader"`; contrast WCAG AA pentru text.
+- [ ] **AC-8**: **Vizualizare status** - Celulele cu tranzacții efectuate (status="COMPLETED") au un indicator vizual distinctiv (bifă verde sau border special). Celulele cu tranzacții planificate (status="PLANNED") au un stil diferit (border punctat sau culoare mai deschisă) și un indicator vizual adecvat (ex: iconiță ceas).
+- [ ] **AC-9**: **Formatare sume** - Toate sumele sunt formatate cu prefix "RON", separatori de mii și 2 zecimale (ex: "RON 1.234,56"). Soldurile negative apar în roșu, cele pozitive în verde. Valorile zero sunt afișate explicit ca "RON 0.00".
+- [ ] **AC-10**: **Expandare/colapsare categorii** - Fiecare categorie principală (Venituri, Cheltuieli, Economii) poate fi expandată pentru a arăta subcategoriile sau colapsată pentru a arăta doar suma totală pe categorie. Când e colapsată, arată suma agregată pentru toate subcategoriile din grupa respectivă.
+- [ ] **AC-11**: **Adăugare/editare categorii** - Utilizatorul poate adăuga o nouă subcategorie într-o categorie existentă direct din interfață. Noua subcategorie apare instant în grid cu un rând nou.
+- [ ] **AC-12**: **Continuitate între luni** - Grid-ul arată ultimele zile ale lunii anterioare și primele zile ale lunii curente (similar cu Excel-ul original). Acest lucru oferă o viziune continuă asupra lichidităților și evoluției bugetului.
+- [ ] **AC-13**: **Layout multi-secțiune** - Structura grid-ului reflectă exact organizarea din Excel: header global cu totale, secțiuni distincte pentru VENITURI, ECONOMII, CHELTUIELI, fiecare cu propriile subcategorii detaliate și rânduri de totaluri.
 
 ## 4. Scop non‑funcțional
 
@@ -37,80 +38,93 @@
 
 ## 5. Task‑uri de dezvoltare
 
-- [ ] Analiza structurii actuale de categorii/subcategorii din `shared-constants/categories.ts`
-- [ ] Actualizează `Transaction` type cu `actualAmount?`, `status?`
-- [ ] Adaugă `dailyBalances` şi funcția `recalcMonthBalances()` în `transactionStore`
-- [ ] Prot. grid static cu `<table>` şi Tailwind
-- [ ] Integrare date reale + calcul sold
-- [ ] Formular `TransactionModal` reutilizat (Add/Edit)
-- [ ] Hook navigare lună + URL sync
-- [ ] Stil responsive + scroll mobil
-- [ ] Optimizare perf (profilare, memo)
-- [ ] Integrare TanStack Table pentru headers fixe
-- [ ] Implementare stilizare status și formatter sume
-- [ ] Implementare mecanisme cache pentru lunile anterioare
-- [ ] Implementare sistem expandare/colapsare categorii cu stare persistată în localStorage și opțiune de resetare preferințe
-- [ ] UI pentru adăugare/editare categorie/subcategorie integrat cu constante existente
-- [ ] Calcul sumarizare categorii pentru vizualizare colapsată
-- [ ] Integrare cu modelul existent de categorii și detectare modificări
+- [ ] **DEV-0**: Analiza structurii actuale de categorii/subcategorii din `shared-constants/categories.ts` (FE, 0.5d)
+- [ ] **DEV-1**: Actualizează `Transaction` type cu `actualAmount?`, `status?` (BE/FE, 0.5d)
+- [ ] **DEV-2**: Adaugă `dailyBalances` şi funcția `recalcMonthBalances()` în `transactionStore` (FE, 0.5d)
+- [ ] **DEV-3**: Prot. grid static cu `<table>` şi Tailwind (FE, 0.5d)
+- [ ] **DEV-4**: Integrare date reale + calcul sold (FE, 0.5d)
+- [ ] **DEV-5**: Formular `TransactionModal` reutilizat (Add/Edit) (FE, 1d)
+- [ ] **DEV-6**: Hook navigare lună + URL sync (FE, 0.5d)
+- [ ] **DEV-7**: Stil responsive + scroll mobil (FE, 1d)
+- [ ] **DEV-8**: Optimizare perf (profilare, memo) (FE, 0.5d)
+- [ ] **DEV-9**: Integrare TanStack Table pentru headers fixe (FE, 0.5d)
+- [ ] **DEV-10**: Implementare stilizare status și formatter sume (FE, 0.5d)
+- [ ] **DEV-11**: Implementare mecanisme cache pentru lunile anterioare (FE, 0.5d)
+- [ ] **DEV-12**: Implementare sistem expandare/colapsare categorii cu stare persistată în localStorage (FE, 1d)
+- [ ] **DEV-13**: UI pentru adăugare/editare categorie/subcategorie integrat cu constante existente (FE, 1d)
+- [ ] **DEV-14**: Calcul sumarizare categorii pentru vizualizare colapsată (FE, 0.5d)
+- [ ] **DEV-15**: Integrare cu modelul existent de categorii și detectare modificări (FE, 0.5d)
+- [ ] **DEV-16**: Implementare header global cu totaluri și navigare între luni (FE, 0.5d)
+- [ ] **DEV-17**: Implementare vizualizare continuă între luni (ultimele zile + primele zile) (FE, 1d)
+- [ ] **DEV-18**: Formatare sume cu prefix "RON" și handling special pentru valori zero (FE, 0.5d)
 
 ## 6. Test Scenarios – Unit Tests (Jest)
 
 > Folosim TDD: fiecare Acceptance Criterion primește cel puțin un test automat în Jest/React‑Testing‑Library.
 
-- [ ] Gridul afișează 31 coloane pentru lună de 31 zile (`MonthlyGrid.spec.tsx`): Montează componenta cu provider store mock (mai 2025) și numără elementele cu `role="columnheader"`.
-- [ ] Sold zilnic calcul corect (`balances.util.spec.ts`): Rulează `recalcMonthBalances()` pe un set fix de tranzacții -> expect ca `balances['2025‑05‑15']` să egaleze suma calculată manual.
-- [ ] Add tranzacție actualizează store + sold (`TransactionModal.spec.tsx`): Simulează submit; verifică `transactions.length` crește și `dailyBalances` ziua respectivă se modifică.
-- [ ] Navigarea lunii modifică URL și selector (`MonthlyGrid.spec.tsx`): Click pe buton « Prev » -> `window.location.search` include `month=2025-04`; store selector primește `2025-04`.
-- [ ] Performanță render < 1000 ms (`MonthlyGrid.perf.spec.tsx`, opțional): Montează cu 200 tranzacții și folosește `performance.now()` pentru timing.
-- [ ] Formatarea sumelor corectă (`moneyFormatter.spec.ts`): Testează formatter cu diverse valori (pozitive, negative, zero) și verifică formatarea corectă.
-- [ ] Stilizare status tranzacție corectă (`TransactionCell.spec.tsx`): Testează că celulele cu diferite statusuri (PLANNED, COMPLETED) au clasele CSS corecte.
-- [ ] Expandare/colapsare categorii (`CategoryRow.spec.tsx`): Verifică că click pe iconul expandare/colapsare schimbă starea și afișarea subcategoriilor.
-- [ ] Sumarizare corectă categorii (`categoryUtils.spec.ts`): Verifică că funcția de calcul sumă totală categorie funcționează corect pentru diverse scenarii.
-- [ ] Adăugare subcategorie nouă (`CategoryEditor.spec.tsx`): Testează că adăugarea unei noi subcategorii actualizează corect store-ul și UI-ul.
-- [ ] Tooltipuri la hover pe celule (`TransactionCell.spec.tsx`): Verifică că la hover pe celulele cu tranzacții apar tooltipuri cu informații complete și corecte.
-- [ ] Închidere corectă formulare de tranzacție (`TransactionModal.spec.tsx`): Verifică că formularele de tranzacție se închid corect după "Salvează" sau "Anulează" și că starea UI este consistentă.
+- [ ] **UT-1**: Gridul afișează 31 coloane pentru lună de 31 zile (`MonthlyGrid.spec.tsx`) - Montează componenta cu provider store mock (mai 2025) și numără elementele cu `role="columnheader"`.
+- [ ] **UT-2**: Sold zilnic calcul corect (`balances.util.spec.ts`) - Rulează `recalcMonthBalances()` pe un set fix de tranzacții -> expect ca `balances['2025‑05‑15']` să egaleze suma calculată manual.
+- [ ] **UT-3**: Add tranzacție actualizează store + sold (`TransactionModal.spec.tsx`) - Simulează submit; verifică `transactions.length` crește și `dailyBalances` ziua respectivă se modifică.
+- [ ] **UT-4**: Navigarea lunii modifică URL și selector (`MonthlyGrid.spec.tsx`) - Click pe buton « Prev » -> `window.location.search` include `month=2025-04`; store selector primește `2025-04`.
+- [ ] **UT-5**: Performanță render < 1000 ms (`MonthlyGrid.perf.spec.tsx`) - Montează cu 200 tranzacții și folosește `performance.now()` pentru timing.
+- [ ] **UT-6**: Formatarea sumelor corectă (`moneyFormatter.spec.ts`) - Testează formatter cu diverse valori (pozitive, negative, zero) și verifică formatarea corectă.
+- [ ] **UT-7**: Stilizare status tranzacție corectă (`TransactionCell.spec.tsx`) - Testează că celulele cu diferite statusuri (PLANNED, COMPLETED) au clasele CSS corecte.
+- [ ] **UT-8**: Expandare/colapsare categorii (`CategoryRow.spec.tsx`) - Verifică că click pe iconul expandare/colapsare schimbă starea și afișarea subcategoriilor.
+- [ ] **UT-9**: Sumarizare corectă categorii (`categoryUtils.spec.ts`) - Verifică că funcția de calcul sumă totală categorie funcționează corect pentru diverse scenarii.
+- [ ] **UT-10**: Adăugare subcategorie nouă (`CategoryEditor.spec.tsx`) - Testează că adăugarea unei noi subcategorii actualizează corect store-ul și UI-ul.
+- [ ] **UT-11**: Tooltipuri la hover pe celule (`TransactionCell.spec.tsx`) - Verifică că la hover pe celulele cu tranzacții apar tooltipuri cu informații complete și corecte.
+- [ ] **UT-12**: Închidere corectă formulare de tranzacție (`TransactionModal.spec.tsx`) - Verifică că formularele de tranzacție se închid corect după "Salvează" sau "Anulează" și că starea UI este consistentă.
+- [ ] **UT-13**: Formatare valori zero (`moneyFormatter.spec.ts`) - Verifică că valorile zero sunt formatate corect ca "RON 0.00" și au stilul vizual adecvat.
+- [ ] **UT-14**: Header global cu totale (`MonthlyGridHeader.spec.tsx`) - Verifică că header-ul global afișează corect totalurile pentru lună și se actualizează când se modifică tranzacțiile.
+- [ ] **UT-15**: Vizualizare continuă între luni (`MonthlyGrid.spec.tsx`) - Verifică că grid-ul afișează corect ultimele zile ale lunii anterioare și primele zile ale lunii următoare.
 
 ## 7. Test Scenarios - E2E (Cypress)
 
-- [ ] Flux complet adăugare și navigare: Deschide grid → navigare la luna anterioară → adăugare tranzacție → verificare sold
-- [ ] Persistență date la navigare: Adaugă tranzacție → navighează altă lună → revină la luna inițială → verifică prezența
-- [ ] Expandare/colapsare categorii: Expandează/colapsează fiecare categorie principală → verifică sumele agregate → verifică că subcategoriile apar/dispar corect
-- [ ] Adăugare nouă subcategorie: Adaugă subcategorie nouă → verifică că apare în grid → adaugă tranzacție în subcategoria nouă
+- [ ] **E2E-1**: Flux complet adăugare și navigare - Deschide grid → navigare la luna anterioară → adăugare tranzacție → verificare sold 
+- [ ] **E2E-2**: Persistență date la navigare - Adaugă tranzacție → navighează altă lună → revină la luna inițială → verifică prezența
+- [ ] **E2E-3**: Expandare/colapsare categorii - Expandează/colapsează fiecare categorie principală → verifică sumele agregate → verifică că subcategoriile apar/dispar corect
+- [ ] **E2E-4**: Adăugare nouă subcategorie - Adaugă subcategorie nouă → verifică că apare în grid → adaugă tranzacție în subcategoria nouă
+- [ ] **E2E-5**: Vizualizare și navigare între luni - Navigare înainte și înapoi între luni → verifică continuitatea datelor → verifică că soldurile și totalurile se mențin corect
 
 ## 8. Wireframe / Mockup
 
-```ascii
-┌─────────────────────────────────────────────────────────────────────────┐
-│ Planificare - Mai 2025                      < Prev  |  Next >           │
-├─────┬──────┬──────┬─────┬─────┬──────┬──────┬──────┬──────┬─────┬───────┤
-│     │   1  │   2  │  3  │  4  │  5   │  6   │  7   │  8   │ ... │  31   │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│ 📂 VENITURI │ 1000 │  —   │ —   │ —   │ 2500 │  —   │ 800  │  —   │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ Salarii │ 1000 │  —   │ —   │ —   │ 2500 │  —   │  —   │  —   │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ Dividende │ —  │  —   │ —   │ —   │  —   │  —   │ 800  │  —   │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ [+ Adaugă] │   │      │     │     │      │      │      │      │     │       │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│ 📂 CHELTUIELI │ 200 │ 50  │ 100 │ —   │ 300  │ 75   │  —   │ 400  │ ... │ 1200  │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ Utilități │ 200 │  —   │ —  │ —   │  —   │  —   │  —   │ 400  │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ Alimente │  —  │ 50   │ 100 │ —   │ 300  │ 75   │  —   │  —   │ ... │ 200   │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ [+ Adaugă] │   │      │     │     │      │      │      │      │     │       │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│ 📂 ECONOMII │  —   │  —   │ —   │ 500 │  —   │  —   │  —   │  —   │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ Rezervă │  —   │  —   │ —   │ 500 │  —   │  —   │  —   │  —   │ ... │  —    │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│  └ [+ Adaugă] │   │      │     │     │      │      │      │      │     │       │
-├─────┼──────┼──────┼─────┼─────┼──────┼──────┼──────┼──────┼─────┼───────┤
-│ SOLD│ 800  │ 750  │ 650 │ 150 │ 2350 │ 2275 │ 3075 │ 2675 │ ... │ 1475  │
-└─────┴──────┴──────┴─────┴─────┴──────┴──────┴──────┴──────┴─────┴───────┘
 ```
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                    TOTAL SURPLUS - GRILĂ PLANIFICARE LUNARĂ (EXEMPLU)                                                        │
+├──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ LICHIDITĂȚI RĂMASE (VENITURI-ECONOMII-CHELTUIELI) │  FEBRUARIE: RON 4,321.04 ... RON 13,779.70  │  MARTIE: RON 10,095.45 ... RON 8,040.34 │
+├───────┬──────┬──────┬──────┬──────┬──────┬───────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┬──────┐
+│       │ 25   │ 26   │ 27   │ 28   │ 29   │Total  │  1   │  2   │  3   │  4   │  5   │  6   │ ...  │      │
+├───────┼──────┼──────┼──────┼──────┼──────┼───────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┤
+│ 📂 VENITURI           │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
+│   └ Report anterioară │  —   │  —   │  —   │  —   │  —   │ RON 0 │RON 13,779│  —   │  —   │  —   │  —   │  —   │ ...  │      │
+│   └ Salarii           │  —   │  —   │  —   │  —   │RON 5,790│RON 5,790│  —   │  —   │  —   │RON 13,358│  —   │ ...  │      │
+│   └ Chirii            │  —   │  —   │  —   │RON 12,968│  —   │RON 12,968│  —   │  —   │  —   │  —   │  —   │ ...  │      │
+│   └ [+ Adaugă]        │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
+│  Total Venituri       │RON 4,546│RON 11,163│ RON 0 │RON 12,968│RON 5,790│RON 34,467│RON 13,779│ RON 0 │ RON 0 │RON 13,358│RON 600│ ... │      │
+├───────┼──────┼──────┼──────┼──────┼──────┼───────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┤
+│ 📂 CHELTUIELI          │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
+│   └ FINANCIAR         │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
+│     └ Asigurări de via│  —   │  —   │  —   │  —   │  —   │RON 0  │  —   │  —   │  —   │  —   │  —   │RON 1,120│ ...  │      │
+│     └ Rate credit1    │  —   │  —   │  —   │  —   │RON 5,730│RON 5,730│  —   │  —   │  —   │RON 2,250│  —   │ ...  │      │
+│     └ [+ Adaugă]      │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
+├───────┼──────┼──────┼──────┼──────┼──────┼───────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┤
+│ SOLD                  │RON 800│RON 750│RON 650│RON 150│RON 2,350│RON 13,780│RON 13,780│RON 13,500│RON 13,000│RON 12,000│RON 8,000│RON 7,500│ ... │      │
+└───────┴──────┴──────┴──────┴──────┴──────┴───────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┘
+```
+
+### ▶️ Preview interactiv (mock React)
+Pentru o demonstrație rapidă a comportamentului gridului lunar, vezi componenta:
+`frontend/src/components/MonthlyGridPreview.tsx`
+
+```tsx
+import MonthlyGridPreview from "@components/MonthlyGridPreview";
+
+// ... în Storybook sau orice pagină demo:
+<MonthlyGridPreview />
+```
+
+> Recomandare: Rulează local sau în Storybook pentru a explora interactiv gridul (expand/collapse, sumarizare, stilizare sume etc). Poți adapta rapid acest mock pentru demo-uri sau validare UX cu PO/QA.
 
 ## 9. Interacțiuni utilizator detaliate
 
@@ -123,55 +137,53 @@
 
 ## 10. Comportament state management
 
-- Când se schimbă luna, store-ul încarcă și memorează datele pentru luna respectivă
+- Când se schimbă luna, store-ul încarcă și memorează datele pentru luna respectivă, plus ultimele zile din luna anterioară și primele zile din luna următoare
 - Datele pentru lunile vizualizate anterior sunt păstrate în cache pentru navigare rapidă
 - După adăugare/editare tranzacție, se recalculează doar soldurile afectate prin funcția specializată `recalcAffectedDailyBalances()`
 - Starea expandare/colapsare categorii este persistată în localStorage pentru a menține preferințele utilizatorului între sesiuni
 - Când o categorie este colapsată, se calculează automat suma totală pentru toate subcategoriile incluse folosind funcția `calculateCategoryTotal()`
+- Header-ul global cu solduri totale (TOTAL SURPLUS, LICHIDITĂȚI RĂMASE) se actualizează automat când se modifică orice tranzacție
+- Toate sumele sunt formatate consistent cu prefix "RON", două zecimale și separatori de mii
 
 ## 11. Dependențe & note
 
 * Refolosește **create‑react‑app** actual; nu introducem încă Vite.
-* Pentru categorii și subcategorii, folosește ca sursă de adevăr structura din `shared-constants/categories.ts` care conține deja ierarhia completă:
-  ```typescript
-  CATEGORIES = {
-    VENITURI: {
-      "Surse de venit": ["Salarii", "Dividende", "Chirii", "Tichete de masă", ...],
-      "Report": ["Venituri reportate din luna anterioară"]
-    },
-    ECONOMII: {
-      "Categorii de economii": ["Fond de urgență", "Fond de rezervă", "Fond general"]
-    },
-    // Cheltuieli cu subcategoriile lor
-    INFATISARE: { ... },
-    EDUCATIE: { ... },
-    CARIERA: { ... },
-    // ... restul categoriilor
-  }
-  ```
-* Dacă se adaugă/modifică categorii sau subcategorii, acestea vor fi sincronizate cu această structură pentru a menține consistența în toată aplicația
-* Orice modificare la structura de categorii trebuie să fie persistată pentru a fi disponibilă în toate componentele aplicației
-* Valorile enum TransactionType (INCOME, EXPENSE, SAVING) trebuie mapate corect la categoriile principale (VENITURI, CHELTUIELI, ECONOMII)
-* TanStack Table se integrează în DEV-9 pentru headers fixe și scroll performant
-* TanStack Virtual se va activa ulterior, dacă AC-1 nu este atins cu implementarea inițială
-* Dinero.js se va introduce în Epic E-5, dar formatterele de sume se pregătesc pentru integrare
+* Pentru categorii și subcategorii, folosește ca sursă de adevăr structura din `shared-constants/categories.ts` care conține deja ierarhia completă cu toate categoriile principale și subcategoriile lor.
+
+* **Mapping între TransactionType și categorii principale:**
+  * `TransactionType.INCOME` → map la categoria "VENITURI"
+  * `TransactionType.EXPENSE` → map la categoriile: INFATISARE, EDUCATIE, CARIERA, SANATATE, NUTRITIE, LOCUINTA, TIMP_LIBER, CALATORII, TRANSPORT
+  * `TransactionType.SAVING` → map la categoriile: ECONOMII, INVESTITII
+  * Acest mapping trebuie implementat explicit într-un util (`getCategoryForTransactionType` și `getTransactionTypeForCategory`) pentru a asigura consistența în toată aplicația
+
+* **Reguli pentru UI de editare categorii:**
+  * Orice modificare la structura de categorii trebuie să fie persistată pentru a fi disponibilă în toate componentele aplicației
+  * Când se adaugă/editează o subcategorie din UI, se actualizează atât store-ul local cât și sursa de adevăr din `shared-constants/categories.ts`
+  * Sincronizarea BE-FE pentru categorii trebuie să fie bidirecțională
+
+* **Validări necesare:**
+  * Verificarea că toate categoriile și subcategoriile cerute de business sunt prezente
+  * Consistența mapping-ului TransactionType → categorie principală
+  * Păstrarea sursei unice de adevăr pentru categorii/subcategorii
+
+* **TanStack Table** se integrează în DEV-9 pentru headers fixe și scroll performant
+* **TanStack Virtual** se va activa ulterior, dacă AC-1 nu este atins cu implementarea inițială
+* **Dinero.js** se va introduce în Epic E-5, dar formatterele de sume se pregătesc pentru integrare
 * **Dependențe BE**:
   * Endpoint `/api/transactions?month=YYYY-MM` trebuie să accepte parameterul month
   * Schema Transaction trebuie actualizată cu câmpurile `status` și `actualAmount`
   * API pentru adăugare/editare categorii și subcategorii trebuie să actualizeze `shared-constants/categories.ts` sau să ofere un endpoint dedicat pentru sincronizare
 
----
+## 12. Definition of Done
 
-### Definition of Done
-
-- [ ] Toate AC‑urile trec manual & automat
-- [ ] Teste jest + Cypress verzi pe CI
-- [ ] Code review aprobat de alt dev (sau de tine cu checklist)
-- [ ] Fără regression pe fluxurile existente (login, listă tranzacții veche)
-- [ ] Documentație actualizată în README.md cu nouă funcționalitate
-- [ ] Performance budget respectat (timp de încărcare și calcul)
-- [ ] Structura de categorii/subcategorii funcționează corect cu expandare/colapsare
-- [ ] UI pentru adăugare subcategorii noi funcționează fără erori
-- [ ] Compatibilitate completă cu modelul existent de categorii din `shared-constants/categories.ts`
-- [ ] Orice modificare la categorii este reflectată corect în alte componente ale aplicației care folosesc aceste categorii
-- [ ] Gridul este complet funcțional și fără bug-uri pe toate platformele specificate în secțiunea "Compatibilitate browsere" (Chrome ≥ 110, Firefox ≥ 110, Safari ≥ 16)
+- [ ] Toate AC‑urile trec manual & automat.
+- [ ] Teste jest + Cypress verzi pe CI.
+- [ ] Code review aprobat de alt dev (sau de tine cu checklist).
+- [ ] Fără regression pe fluxurile existente (login, listă tranzacții veche).
+- [ ] Documentație actualizată în README.md cu nouă funcționalitate.
+- [ ] Performance budget respectat (timp de încărcare și calcul).
+- [ ] Structura de categorii/subcategorii funcționează corect cu expandare/colapsare.
+- [ ] UI pentru adăugare subcategorii noi funcționează fără erori.
+- [ ] Compatibilitate completă cu modelul existent de categorii din `shared-constants/categories.ts`.
+- [ ] Orice modificare la categorii este reflectată corect în alte componente ale aplicației care folosesc aceste categorii.
+- [ ] Gridul este complet funcțional și fără bug-uri pe toate platformele specificate în secțiunea "Compatibilitate browsere".
