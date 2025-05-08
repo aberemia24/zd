@@ -40,6 +40,13 @@
 ## 5. Task‑uri de dezvoltare
 
 - [x] **DEV-0**: Analiza structurii actuale de categorii/subcategorii din `shared-constants/categories.ts` (FE, 0.5d)
+- [x] **DEV-13**: Persistență sesiune utilizator cu Zustand + persist (FE, 0.5d)
+    _Utilizatorul rămâne logat după refresh, sesiunea este salvată în localStorage, verificare automată la pornirea aplicației._
+- [x] **DEV-14**: Validare categorii/subcategorii la nivel de service și trigger DB (FE/BE, 0.5d)
+    _Nu se mai pot salva categorii sau subcategorii invalide, sursa unică rămâne `shared-constants/categories.ts`._
+- [x] **DEV-15**: Refactorizare fetch tranzacții cu guard intern (FE, 0.5d)
+    _Eliminat complet anti-patternul useEffect(fetch, [queryParams]) cu Zustand; fetch-ul este controlat și nu mai apar bucle infinite sau bug-uri de vizibilitate tranzacții._
+
     _Structura este completă și corectă, sursa unică de adevăr pentru grid și mapping._
 - [x] **DEV-1**: Actualizează `Transaction` type cu `actualAmount?`, `status?` (BE/FE, 0.5d)
     _Câmpuri adăugate în schema Zod și enum TransactionStatus creat pentru workflow planificat/actualizat._
@@ -200,6 +207,11 @@ import MonthlyGridPreview from "@components/MonthlyGridPreview";
   * API pentru adăugare/editare categorii și subcategorii trebuie să actualizeze `shared-constants/categories.ts` sau să ofere un endpoint dedicat pentru sincronizare
 
 ## 12. Definition of Done
+
+- [ ] Persistența autentificării funcționează: utilizatorul rămâne logat după refresh (test manual și automat).
+- [ ] Nu se pot salva categorii/subcategorii invalide (test manual și automat).
+- [ ] Toate fetch-urile asincrone cu Zustand respectă regula anti-pattern (nu există bucle infinite sau fetch la fiecare schimbare de parametru fără guard).
+
 
 - [ ] Toate AC‑urile trec manual & automat.
 - [ ] Teste jest + Cypress verzi pe CI, folosind doar mesaje/constante din `@shared-constants/messages` și `@shared-constants/api` (fără stringuri hardcodate în assertions).

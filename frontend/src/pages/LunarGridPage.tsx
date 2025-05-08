@@ -13,15 +13,58 @@ const LunarGridPage: React.FC = () => {
   const [year, setYear] = React.useState(() => new Date().getFullYear());
   const [month, setMonth] = React.useState(() => new Date().getMonth() + 1);
   
-  // Asigurăm că avem tranzacțiile încărcate
+  // Extragem funcțiile și state-ul necesar din store
+  const setQueryParams = useTransactionStore(state => state.setQueryParams);
   const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
   const loading = useTransactionStore(state => state.loading);
   
-  // Încărcăm tranzacțiile la montarea componentei
+  // Referimță pentru a ține minte ultima combinație an/lună procesată
+  // Acest pattern previne buclele infinite prin evitarea re-executării efectului în situații identice
+  const lastProcessedRef = React.useRef<{year: number, month: number} | null>(null);
+  
+  // Încărcăm tranzacțiile pentru luna/anul selectat
   // Folosim un guard pentru a preveni buclele infinite (conform memoriei d7b6eb4b-0702-4b0a-b074-3915547a2544)
   React.useEffect(() => {
-    // Fetch doar la montare, nu la fiecare schimbare de parametri
-    fetchTransactions();
+    // Guard pentru a preveni fetch duplicat pentru aceeași lună
+    if (lastProcessedRef.current?.year === year && lastProcessedRef.current?.month === month) {
+      return; // Skip dacă luna/anul nu s-au schimbat
+    }
+    
+    // Actualizăm referimța
+    lastProcessedRef.current = { year, month };
+    
+    // Important: Folosim getState() pentru a accesa starea curentă fără subscribe
+    // Aceasta evită bucle infinite cauzate de dependțe ciclice cu re-render
+    const store = useTransactionStore.getState();
+    
+    // 1. Mai întâi setăm parametrii (ân conformitate cu anti-pattern memoriei critice)
+    store.setQueryParams({
+      ...store.currentQueryParams,
+      year,
+      month,
+      includeAdjacentDays: true // Pentru a include zilele din lunile adiacente (conform AC-12)
+    });
+    
+    // 2. Apoi facem fetch explicit (respectând regula din memorie d7b6eb4b-0702-4b0a-b074-3915547a2544)
+    store.fetchTransactions(true);  // forceRefresh=true pentru a ignora cache-ul pentru anul/luna proaspăt setată
+    
+    // Actualizăm URL-ul cu parametrul month=YYYY-MM (conform AC-5)
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('month', `${year}-${month.toString().padStart(2, '0')}`);
+    const newUrl = `${window.location.pathname}?${urlParams}`;
+    window.history.replaceState({}, '', newUrl);
+    
+    console.log(`LunarGridPage: Set query params for ${year}-${month}`);
+    
+  }, [year, month]);
+  
+  // La prima montare, facem fetch pentru tranzacții dacă e nevoie
+  React.useEffect(() => {
+    const hasTransactions = useTransactionStore.getState().transactions.length > 0;
+    if (!hasTransactions) {
+      console.log('LunarGridPage: Initial fetch - no transactions found');
+      fetchTransactions();
+    }
   }, [fetchTransactions]);
   
   // Funcții pentru navigare între luni

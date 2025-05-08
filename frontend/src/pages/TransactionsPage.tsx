@@ -35,17 +35,62 @@ const TransactionsPage: React.FC = () => {
     });
   }, [currentQueryParams, limit, setQueryParams]);
   
+  // Referimță pentru a ține minte ultimele filtre aplicate și a preveni fetchTransactions inutil
+  const lastFiltersRef = React.useRef({ type: '', category: '', offset: 0, limit: 10 });
+  
   // Sincronizare filtre + paginare cu store-ul de tranzacții
+  // IMPORTANT: Prevenim anti-pattern-ul cu useEffect + queryParams menționat în memoria critică d7b6eb4b-0702-4b0a-b074-3915547a2544
   React.useEffect(() => {
-    setQueryParams({
-      ...currentQueryParams,
-      type: filterType,
-      category: filterCategory,
-      offset,
-      limit
-    });
-    useTransactionStore.getState().fetchTransactions();
+    const hasFilterChanged = 
+      lastFiltersRef.current.type !== filterType ||
+      lastFiltersRef.current.category !== filterCategory ||
+      lastFiltersRef.current.offset !== offset ||
+      lastFiltersRef.current.limit !== limit;
+    
+    // Actualizăm parametrii doar dacă s-au schimbat pentru a preveni bucla infinită
+    if (hasFilterChanged) {
+      console.log(`Filters changed, fetching transactions with: type=${filterType}, category=${filterCategory}, offset=${offset}, limit=${limit}`);
+      
+      // Actualizăm referimța cu noile valori
+      lastFiltersRef.current = { type: filterType, category: filterCategory, offset, limit };
+      
+      // 1. Mai întâi setăm parametrii
+      const store = useTransactionStore.getState();
+      store.setQueryParams({
+        ...store.currentQueryParams,
+        type: filterType,
+        category: filterCategory,
+        offset,
+        limit,
+        // Resetăm parametrii de lună/an pentru a preveni conflicte cu pagina LunarGrid
+        month: undefined,
+        year: undefined,
+        includeAdjacentDays: undefined
+      });
+      
+      // 2. Apoi facem fetch explicit (evităm bucla infinită)
+      store.fetchTransactions(true);
+    }
   }, [filterType, filterCategory, offset, limit]);
+  
+  // Fetch inițial la montarea componentei, doar dacă nu există tranzacții în store
+  React.useEffect(() => {
+    const store = useTransactionStore.getState();
+    // Notifcăm că suntem la pagina de tranzacții prin resetarea parametrilor specifici paginii de grid
+    if (store.currentQueryParams.month || store.currentQueryParams.year) {
+      console.log('Resetting LunarGrid specific params');
+      store.setQueryParams({
+        ...store.currentQueryParams,
+        month: undefined,
+        year: undefined,
+        includeAdjacentDays: undefined
+      });
+      store.fetchTransactions(true);
+    } else if (store.transactions.length === 0 && !store.loading) {
+      console.log('Initial fetch for TransactionsPage - no transactions found');
+      store.fetchTransactions();
+    }
+  }, []);
 
   // Preluăm doar eroarea pentru afișare
   const fetchError = useTransactionStore((s: TransactionState) => s.error);

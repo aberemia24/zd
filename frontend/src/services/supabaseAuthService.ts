@@ -4,6 +4,7 @@
 
 import { supabase } from './supabase';
 import { MESAJE } from '@shared-constants/messages';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 // Tip user autenticat
 export interface AuthUser {
@@ -118,5 +119,24 @@ export const supabaseAuthService = {
       }
       return null;
     });
+  },
+  
+  /**
+   * Îndică Supabase să asculte schimbările de autentificare
+   * Returnează un cleanup pentru a opri ascultarea când nu mai e nevoie
+   */
+  onAuthStateChange(callback: (event: AuthChangeEvent, session: Session | null) => void) {
+    // Supabase.auth.onAuthStateChange ascultă schimbările de sesiune
+    const { data } = supabase.auth.onAuthStateChange(callback);
+    
+    // Verificăm imediat sesiunea curentă pentru a actualiza starea la refresh
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        callback('SIGNED_IN', session);
+      }
+    });
+    
+    // Funcția de unsibscribe
+    return data.subscription.unsubscribe;
   },
 };

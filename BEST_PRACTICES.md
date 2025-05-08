@@ -81,6 +81,27 @@ useEffect(() => {
 
 ### Practici Zustand
 
+#### Persistență autentificare cu Zustand + persist
+
+- Pentru orice state de autentificare, folosiți middleware-ul `persist` din Zustand, cu partialize pentru a salva doar datele relevante (ex: user, nu loading/error).
+- Verificați sesiunea la pornirea aplicației cu un efect global (`App.tsx` sau entrypoint).
+- Exemplu corect:
+  ```ts
+  export const useAuthStore = create(
+    persist(
+      (set) => ({ ... }),
+      {
+        name: 'auth-storage',
+        partialize: (state) => ({ user: state.user }),
+      }
+    )
+  );
+  ```
+- Nu mock-uiți store-urile Zustand la testare (vezi politica de mocking).
+- Orice fetch asincron cu Zustand trebuie să respecte regula anti-pattern (NU folosiți useEffect(fetch, [queryParams]) fără guard intern/caching).
+- Sursa unică pentru categorii/subcategorii: doar `shared-constants/categories.ts`, validare la nivel de service și trigger DB.
+
+
 - Teste pentru inițializare, setters, acțiuni asincrone și selectors.
 - Mock-uri izolate pentru servicii injectate.
 - Resetarea store-ului înainte de fiecare test.

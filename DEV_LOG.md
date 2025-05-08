@@ -1,5 +1,17 @@
 # Dev Log - Budget App
 
+## 2025-05-08 - Persistență autentificare, validare categorii și bugfix fetch Zustand
+
+- Implementat persistență sesiune utilizator cu Zustand + persist (localStorage), store `authStore.ts` refactorizat.
+- Adăugat verificare automată a sesiunii la pornirea aplicației (în `App.tsx`).
+- Fixat bug major: utilizatorul nu mai este delogat la refresh și sesiunea se păstrează corect.
+- Refactorizat complet pattern fetch tranzacții cu Zustand: eliminat anti-patternul `useEffect(fetch, [queryParams])` (vezi regula critică din global_rules.md 8.2).
+- Adăugat validare strictă pentru categorii și subcategorii la nivel de service și trigger Supabase; nu se mai pot salva date invalide.
+- Toate mesajele de validare/eroare provin din `@shared-constants/messages`, fără stringuri hardcodate.
+- Documentat patternuri și reguli noi în `BEST_PRACTICES.md` și `TECH_STORIES/MVP-1-GRID-LUNAR.md`.
+- Toate modificările conforme cu regulile globale, fără excepții.
+
+
 ## 2025-05-08 - Implementare sistem expandare/colapsare categorii în LunarGrid (DEV-12 Complet)
 - Implementat sistemul de expandare/colapsare pentru categoriile din LunarGrid conform AC-10.
 - Funcționalități implementate:

@@ -49,4 +49,7 @@ export const MESAJE = {
   EROARE_RLS: 'Acces interzis (RLS).',
   EROARE_RETEA: 'Eroare de rețea. Încearcă din nou.',
   PAROLA_PREA_SLABA: 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.',
+  
+  // Validare categorii și subcategorii
+  EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: 'Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.',
 };

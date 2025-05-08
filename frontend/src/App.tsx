@@ -23,7 +23,14 @@ import type { TransactionState } from './stores/transactionStore';
 import { useAuthStore } from './stores/authStore';
 
 export const App: React.FC = () => {
-  console.log('🛜 App render');
+  console.log('🔜 App render');
+  
+  // Verificăm sesiunea la pornirea aplicației pentru a menține utilizatorul autentificat la refresh
+  React.useEffect(() => {
+    // Verificăm dacă există o sesiune activă
+    useAuthStore.getState().checkUser();
+  }, []);
+  
 
   // State pentru pagina activă (tranzacții sau grid lunar)
   const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid'>('transactions');
