@@ -1,4 +1,5 @@
 import React from 'react';
+import { EXCEL_GRID } from '@shared-constants/ui';
 import LunarGrid from '../components/features/LunarGrid';
 import { TITLES } from '@shared-constants';
 import { useTransactionStore } from '../stores/transactionStore';
@@ -82,7 +83,7 @@ const LunarGridPage: React.FC = () => {
       </div>
       
       {loading ? (
-        <div className="text-center py-8" data-testid="loading-indicator">Se încarcă datele...</div>
+        <div className="text-center py-8" data-testid="loading-indicator">{EXCEL_GRID.LOADING}</div>
       ) : (
         <LunarGrid year={year} month={month} />
       )}

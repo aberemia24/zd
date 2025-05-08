@@ -7,6 +7,7 @@
 import React from 'react';
 import { act } from 'react';
 import { fireEvent, waitFor } from '@testing-library/react';
+import { EXCEL_GRID } from '@shared-constants/ui';
 import '@testing-library/jest-dom';
 
 // Import utilities din test-utils
@@ -153,27 +154,22 @@ describe('LunarGridPage', () => {
   });
 
   it('afișează indicator de încărcare când loading=true', async () => {
-    // Setăm loading=true în store înainte de render
-    // Folosim setState pentru a modifica starea store-ului
-    await act(async () => {
-      // Important: folosim setState pentru update complet al store-ului 
-      // în loc de setLoading care poate fi suprascris de alte operații
-      useTransactionStore.setState({
-        ...useTransactionStore.getState(),
-        loading: true
-      });
-    });
-    
+    // Mockăm fetchTransactions ca să nu schimbe loading=false automat
+    const fetchPromise = new Promise(() => {}); // never resolves
+    const fetchSpy = jest.spyOn(useTransactionStore.getState(), 'fetchTransactions').mockImplementation(() => fetchPromise as any);
+
+    // Setăm loading=true în store chiar înainte de render
+    useTransactionStore.setState({ ...useTransactionStore.getState(), loading: true });
+
     await act(async () => {
       render(<LunarGridPage />);
     });
-    
-    // Verificăm că se afișează textul de încărcare
-    await waitFor(() => {
-      // Verificăm după text în loc de data-testid pentru robustețe
-      const loadingText = screen.getByText('Se încarcă datele...');
-      expect(loadingText).toBeInTheDocument();
-    });
+
+    // Verificăm că indicatorul de loading este vizibil imediat după render
+    const loadingDiv = screen.getByTestId('loading-indicator');
+    expect(loadingDiv).toHaveTextContent(EXCEL_GRID.LOADING);
+
+    fetchSpy.mockRestore();
   });
 
   it('apelează fetchTransactions la montare', async () => {
