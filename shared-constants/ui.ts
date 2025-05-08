@@ -16,6 +16,7 @@ export const LABELS = {
 
 export const TITLES = {
   TRANZACTII: 'Tranzacții',
+  GRID_LUNAR: 'Grid Lunar',
 };
 
 export const PLACEHOLDERS = {

@@ -1,14 +1,12 @@
-// Componenta principală a aplicației - refactorizată cu Custom Hooks și Servicii
+// Componenta principală a aplicației - orchestrator pentru rutare între pagini
 import React from 'react';
-import TransactionForm from './components/features/TransactionForm/TransactionForm';
-import TransactionTable from './components/features/TransactionTable/TransactionTable';
-import TransactionFilters from './components/features/TransactionFilters/TransactionFilters';
+import TransactionsPage from './pages/TransactionsPage';
+import LunarGridPage from './pages/LunarGridPage';
 import LoginForm from './components/features/Auth/LoginForm';
 import RegisterForm from './components/features/Auth/RegisterForm';
 import { Toaster } from 'react-hot-toast';
 import Spinner from './components/primitives/Spinner';
-import { useTransactionFiltersStore } from './stores/transactionFiltersStore';
-import { TITLES, TransactionType, CategoryType } from '@shared-constants';
+import { TITLES } from '@shared-constants';
 
 // Import store Zustand pentru tranzacții
 import { useTransactionStore } from './stores/transactionStore';
@@ -27,66 +25,8 @@ import { useAuthStore } from './stores/authStore';
 export const App: React.FC = () => {
   console.log('🛜 App render');
 
-  // Folosim store-ul Zustand pentru filtre și paginare și date
-  // transactionService și DI până acum inutile datorită noului flow
-
-const currentQueryParams = useTransactionStore((state: TransactionState) => state.currentQueryParams);
-const setQueryParams = useTransactionStore((state: TransactionState) => state.setQueryParams);
-
-  // Extragem valorile din query params pentru a le folosi în UI
-  const limit: number = currentQueryParams.limit || 10;
-  const offset: number = currentQueryParams.offset || 0;
-  const currentPage: number = Math.floor(offset / limit) + 1;
-
-  // Folosim store-ul dedicat pentru filtre Zustand
-  const filterType = useTransactionFiltersStore(s => s.filterType) || '';
-  const filterCategory = useTransactionFiltersStore(s => s.filterCategory) || '';
-  const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
-  const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
-  
-  // Funcții pentru navigare
-  const nextPage = React.useCallback(() => {
-    setQueryParams({
-      ...currentQueryParams,
-      offset: offset + limit
-    });
-  }, [currentQueryParams, offset, limit, setQueryParams]);
-  
-  const prevPage = React.useCallback(() => {
-    if (offset - limit >= 0) {
-      setQueryParams({
-        ...currentQueryParams,
-        offset: offset - limit
-      });
-    }
-  }, [currentQueryParams, offset, limit, setQueryParams]);
-  
-  const goToPage = React.useCallback((page: number) => {
-    setQueryParams({
-      ...currentQueryParams,
-      offset: (page - 1) * limit
-    });
-  }, [currentQueryParams, limit, setQueryParams]);
-  
-  
-
-  // Sincronizare filtre + paginare cu store-ul de tranzacții
-  React.useEffect(() => {
-    setQueryParams({
-      ...currentQueryParams,
-      type: filterType,
-      category: filterCategory,
-      offset,
-      limit
-    });
-    useTransactionStore.getState().fetchTransactions();
-  }, [filterType, filterCategory, offset, limit]);
-
-  // Preluăm doar eroarea pentru afișare
-  const fetchError = useTransactionStore((s: TransactionState) => s.error);
-
-  // Callback pentru schimbarea paginii
-  const handlePageChange = React.useCallback((newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), [goToPage, limit]);
+  // State pentru pagina activă (tranzacții sau grid lunar)
+  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid'>('transactions');
 
   const { user, loading } = useAuthStore();
   const [showRegister, setShowRegister] = React.useState(false);
@@ -109,25 +49,27 @@ const setQueryParams = useTransactionStore((state: TransactionState) => state.se
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className="max-w-[900px] mx-auto my-8 font-sans">
-        <h1 className="text-2xl font-bold mb-6">{TITLES.TRANZACTII}</h1>
-
-      <TransactionForm />
-
-      <TransactionFilters
-        type={filterType}
-        category={filterCategory}
-        onTypeChange={t => setFilterType(t as TransactionType | '')}
-        onCategoryChange={c => setFilterCategory(c as CategoryType | '')}
-      />
-
-      <TransactionTable offset={offset} limit={limit} onPageChange={handlePageChange} />
-
-      {fetchError && (
-        <div className="mt-4 p-2 bg-red-100 text-red-700 rounded">
-          {fetchError}
+      <div className="max-w-[1200px] mx-auto my-8 font-sans">
+        {/* Tabs pentru navigare între pagini */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button 
+            className={`py-2 px-4 font-medium ${activePage === 'transactions' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActivePage('transactions')}
+            data-testid="transactions-tab"
+          >
+            {TITLES.TRANZACTII}
+          </button>
+          <button 
+            className={`py-2 px-4 font-medium ${activePage === 'lunar-grid' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActivePage('lunar-grid')}
+            data-testid="lunar-grid-tab"
+          >
+            {TITLES.GRID_LUNAR}
+          </button>
         </div>
-      )}
+        
+        {/* Afișăm pagina activă */}
+        {activePage === 'transactions' ? <TransactionsPage /> : <LunarGridPage />}
       </div>
     </>
   );

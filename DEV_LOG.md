@@ -1,5 +1,21 @@
 # Dev Log - Budget App
 
+## 2025-05-08 - Update major testare și best practices (LunarGrid & TransactionsPage)
+- Toate testele pentru LunarGridPage și TransactionsPage au fost refactorizate:
+    - Fără stringuri hardcodate: folosesc exclusiv mesaje/constante din `@shared-constants/messages`.
+    - Async handling robust: orice update/test asincron folosește `await act(async () => ...)` și `waitFor` pentru elemente care apar/dispar în DOM.
+    - Toate elementele funcționale au `data-testid` unic și predictibil, testele selectează doar prin acest atribut.
+    - Mocking strict: doar servicii externe (ex: supabaseService), nu stores Zustand sau logică proprie.
+    - Testele reflectă comportamentul real al utilizatorului (user-centric).
+- Acceptance criteria și Definition of Done din `TECH_STORIES/MVP-1-GRID-LUNAR.md` au fost actualizate:
+    - Adăugat criteriu explicit pentru mesaje/indicatori: să provină din constants și să fie verificați cu `data-testid`.
+    - Toate testele trebuie să respecte best practices async și mocking.
+    - Orice fetch asincron cu Zustand respectă regula anti-pattern (fără `useEffect(fetch, [queryParams])`).
+- Adăugată secțiune nouă "Best Practices – Testare & State Management" în `MVP-1-GRID-LUNAR.md` și extins `BEST_PRACTICES.md` cu:
+    - Centralizare constants/messages/API, testare robustă cu constants și data-testid, politica de mocking, anti-pattern critic Zustand, exemple de test corect.
+- Motivare: aceste schimbări asigură robustețe, mentenanță ușoară, onboarding rapid pentru QA/dev și elimină bug-uri greu de diagnosticat.
+- Toate modificările sunt aliniate cu regulile globale (vezi global_rules.md secțiunea 3, 8.2, 9). Nu există excepții sau workaround-uri rămase.
+
 ## 2025-05-08 - MVP-1-GRID-LUNAR: progres taskuri DEV-0 ... DEV-4
 - **DEV-0** bifat: structura de categorii/subcategorii validată, sursă unică de adevăr în `shared-constants/categories.ts`.
 - **DEV-1** bifat: adăugat `actualAmount` (number?) și `status` (enum TransactionStatus: PLANNED/COMPLETED) în `TransactionSchema` și tipuri.

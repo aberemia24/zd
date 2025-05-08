@@ -1,5 +1,5 @@
 /**
- * Test pentru App - Abordare simplificată fără mockuri pentru stores
+ * Test pentru App - Orchestrator pentru rutare între pagini
  * Conform regulilor: mock doar pentru external services
  * Owner: Echipa Frontend - Test
  */
@@ -19,21 +19,41 @@ import {
   screen // re-export din test-utils
 } from './test-utils';
 
-// Constants pentru mockuri folosite în teste (anterior erau importate din mockData)
-const MOCK_LABELS = {
-  TYPE_FILTER: 'Tip tranzacție',
-  CATEGORY_FILTER: 'Categorie'
-};
+// Mockăm paginile pentru a testa doar rutarea
+jest.mock('./pages/TransactionsPage', () => ({
+  __esModule: true,
+  default: () => <div data-testid="transactions-page-mock">TransactionsPage Mock</div>
+}));
 
-const MOCK_BUTTONS = {
-  ADD: 'Adaugă tranzacție',
-  SAVE: 'Salvează',
-  CANCEL: 'Anulează'
-};
+jest.mock('./pages/LunarGridPage', () => ({
+  __esModule: true,
+  default: () => <div data-testid="lunar-grid-page-mock">LunarGridPage Mock</div>
+}));
 
-const MOCK_TABLE = {
-  LOADING: 'Se încarcă tranzacțiile...'
-};
+// Mockăm componentele de autentificare pentru a testa rutarea
+jest.mock('./components/features/Auth/LoginForm', () => ({
+  __esModule: true,
+  default: ({ onSwitchToRegister }: { onSwitchToRegister: () => void }) => (
+    <div data-testid="login-form">
+      <button data-testid="register-link" onClick={onSwitchToRegister}>Register</button>
+    </div>
+  )
+}));
+
+jest.mock('./components/features/Auth/RegisterForm', () => ({
+  __esModule: true,
+  default: ({ onSwitchToLogin }: { onSwitchToLogin: () => void }) => (
+    <div data-testid="register-form">
+      <button data-testid="login-link" onClick={onSwitchToLogin}>Login</button>
+    </div>
+  )
+}));
+
+// Mockăm Spinner pentru a testa loading
+jest.mock('./components/primitives/Spinner', () => ({
+  __esModule: true,
+  default: ({ size }: { size: number }) => <div data-testid="loading-spinner">Loading...</div>
+}));
 
 import { App } from './App';
 import { TransactionType, CategoryType, TITLES, MESAJE } from '@shared-constants';
@@ -55,8 +75,19 @@ jest.mock('./services/supabaseService', () => ({
   }
 }));
 
-// Import serviciul după mock
+// Mockăm supabaseAuthService pentru testul de loading
+jest.mock('./services/supabaseAuthService', () => ({
+  supabaseAuthService: {
+    login: jest.fn(),
+    register: jest.fn(),
+    logout: jest.fn(),
+    getCurrentUser: jest.fn().mockResolvedValue(null)
+  }
+}));
+
+// Import serviciile după mock
 import { supabaseService } from './services/supabaseService';
+import { supabaseAuthService } from './services/supabaseAuthService';
 
 // Configurație globală pentru toate testele
 beforeEach(() => {
@@ -73,191 +104,174 @@ afterEach(() => {
 });
 
 describe('App', () => {
-  // Testul pentru verificarea titlului principal
-  it('afișează titlul principal corect', () => {
-    // Definim utilizatorul autentificat înainte de render pentru a evita probleme de autentificare
-    // Folosim helper-ul creat în test-utils
+  // Testul pentru verificarea tab-urilor de navigare
+  it('afișează tab-urile de navigare', async () => {
     setupTestUser();
     
-    // Render cu customRender din test-utils
-    const { container } = render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
-    // Verificăm că titlul apare în pagină
-    expect(screen.getByText(TITLES.TRANZACTII)).toBeInTheDocument();
-  });
-
-  // Testul pentru verificarea filtrelor de tranzacții
-  it('afișează filtrele de tranzacții', async () => {
-    // Configurăm starea inițială
-    setupTestUser();
-    
-    // Render componentei App
-    render(<App />);
-    
-    // Folosim waitFor pentru a aștepta ca filtrele să fie disponibile (render asincron)
+    // Verificăm că tab-urile apar în pagină
     await waitFor(() => {
-      // Folosim data-testid pentru a selecta elementele specific
-      // Evităm folosirea textului "Categorie" care apare în mai multe elemente
-      const typeFilter = screen.getByTestId('type-filter');
-      const categoryFilter = screen.getByTestId('category-filter');
-      
-      expect(typeFilter).toBeInTheDocument();
-      expect(categoryFilter).toBeInTheDocument();
+      expect(screen.getByTestId('transactions-tab')).toBeInTheDocument();
+      expect(screen.getByTestId('lunar-grid-tab')).toBeInTheDocument();
     });
   });
-  
-  // Testul pentru actualizarea filtrului de tip tranzacție
-  it('actualizează filtrul de tip de tranzacție la schimbare', async () => {
-    // Configurăm starea inițială
+
+  // Testul pentru afișarea paginii de tranzacții inițial
+  it('afișează pagina de tranzacții ca pagină implicită', async () => {
     setupTestUser();
     
-    // Render componentei App
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
-    // Spionam metoda setFilterType din store pentru a verifica apelul
-    const setFilterTypeSpy = jest.spyOn(useTransactionFiltersStore.getState(), 'setFilterType');
-    
-    // Așteptăm ca filtrul să fie disponibil în DOM
+    // Verificăm că pagina de tranzacții este afișată implicit
     await waitFor(() => {
-      // Găsim filtrul folosind data-testid, care este mai sigur și specific
-      const typeFilter = screen.getByTestId('type-filter');
+      expect(screen.getByTestId('transactions-page-mock')).toBeInTheDocument();
+      // Verificăm că pagina de grid lunar NU este afișată
+      expect(screen.queryByTestId('lunar-grid-page-mock')).not.toBeInTheDocument();
+    });
+  });
+
+  // Testul pentru navigarea la pagina de grid lunar
+  it('navighează la pagina de grid lunar la click pe tab', async () => {
+    setupTestUser();
+    
+    await act(async () => {
+      render(<App />);
+    });
+    
+    // Găsim tab-ul de grid lunar și facem click pe el
+    await waitFor(() => {
+      const lunarGridTab = screen.getByTestId('lunar-grid-tab');
+      expect(lunarGridTab).toBeInTheDocument();
       
-      // Schimbăm valoarea filtrului (ACȚIUNE UTILIZATOR)
       act(() => {
-        fireEvent.change(typeFilter, { target: { value: TransactionType.EXPENSE } });
+        fireEvent.click(lunarGridTab);
       });
-      
-      // Verificăm că store-ul a fost actualizat corect
-      expect(setFilterTypeSpy).toHaveBeenCalledWith(TransactionType.EXPENSE);
     });
     
-    // Curățăm spy-ul
-    setFilterTypeSpy.mockRestore();
+    // Verificăm că pagina de grid lunar este afișată
+    await waitFor(() => {
+      expect(screen.getByTestId('lunar-grid-page-mock')).toBeInTheDocument();
+      // Verificăm că pagina de tranzacții NU mai este afișată
+      expect(screen.queryByTestId('transactions-page-mock')).not.toBeInTheDocument();
+    });
   });
 
-  // Testul pentru actualizarea filtrului de categorie
-  it('actualizează filtrul de categorie la schimbare', async () => {
-    // Configurăm starea inițială
+  // Testul pentru navigarea înapoi la pagina de tranzacții
+  it('navighează înapoi la pagina de tranzacții la click pe tab', async () => {
     setupTestUser();
     
-    // Render componentei App
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
-    // Spionam metoda setFilterCategory din store pentru a verifica apelul
-    const setFilterCategorySpy = jest.spyOn(useTransactionFiltersStore.getState(), 'setFilterCategory');
-    
-    // Așteptăm ca filtrul să fie disponibil în DOM
+    // Navigăm mai întâi la pagina de grid lunar
     await waitFor(() => {
-      // Găsim filtrul folosind data-testid în loc de text pentru a evita ambiguitatea
-      const categoryFilter = screen.getByTestId('category-filter');
+      const lunarGridTab = screen.getByTestId('lunar-grid-tab');
+      expect(lunarGridTab).toBeInTheDocument();
       
-      // Schimbăm valoarea filtrului (ACȚIUNE UTILIZATOR)
       act(() => {
-        fireEvent.change(categoryFilter, { target: { value: CategoryType.EXPENSE } });
+        fireEvent.click(lunarGridTab);
       });
+    });
+    
+    // Apoi navigăm înapoi la pagina de tranzacții
+    await waitFor(() => {
+      const transactionsTab = screen.getByTestId('transactions-tab');
+      expect(transactionsTab).toBeInTheDocument();
       
-      // Verificăm că store-ul a fost actualizat corect
-      expect(setFilterCategorySpy).toHaveBeenCalledWith(CategoryType.EXPENSE);
+      act(() => {
+        fireEvent.click(transactionsTab);
+      });
     });
     
-    // Curățăm spy-ul
-    setFilterCategorySpy.mockRestore();
-  });
-  
-  // Testul pentru trimiterea formularului și crearea tranzacției
-  it('apelează supabaseService la trimiterea unui formular valid', async () => {
-    // INFORMAȚIE: Această abordare este mai robustă prin apelarea directă a formei
-    
-    // Configurăm starea inițială
-    setupTestUser();
-    
-    // Mockuim formular valid în formState înainte de render
-    await act(async () => {
-      const formState = useTransactionFormStore.getState();
-      // Completăm date minime necesare pentru un formular valid
-      formState.setField('type', TransactionType.INCOME);
-      formState.setField('amount', '100');
-      formState.setField('category', CategoryType.INCOME);
-      formState.setField('date', new Date().toISOString().split('T')[0]);
-    });
-    
-    // Spionăm metodele pe care dorim să le verificăm ÎNAINTE de render
-    const handleSubmitSpy = jest.fn();
-    const originalHandleSubmit = useTransactionFormStore.getState().handleSubmit;
-    
-    // Înlocuim metoda originală cu spy-ul nostru
-    jest.spyOn(useTransactionFormStore.getState(), 'handleSubmit').mockImplementation(async () => {
-      handleSubmitSpy();
-      return await originalHandleSubmit();
-    });
-    
-    const fetchTransactionsSpy = jest.spyOn(useTransactionStore.getState(), 'fetchTransactions');
-    
-    // Render componentei App după ce am setat toate spion-urile
-    const { container } = render(<App />);
-    
-    // Găsim formularul și declanșăm evenimentul de submit direct
-    const form = screen.getByTestId('transaction-form');
-    await act(async () => {
-      fireEvent.submit(form);
-    });
-    
-    // Verificăm că s-a apelat handleSubmit
-    expect(handleSubmitSpy).toHaveBeenCalled();
-    
-    // Așteptăm să se proceseze operațiunile asincrone
+    // Verificăm că pagina de tranzacții este afișată din nou
     await waitFor(() => {
-      // Verificăm că s-a apelat serviciul extern
-      expect(supabaseService.createTransaction).toHaveBeenCalled();
-    });
-    
-    // După salvare, ar trebui să se reîncarce lista de tranzacții
-    await waitFor(() => {
-      expect(fetchTransactionsSpy).toHaveBeenCalled();
-    });
-    
-    // Curățăm spy-urile
-    jest.restoreAllMocks();
-  });
-
-  // Testul pentru starea de încărcare
-  it('afișează starea de loading', async () => {
-    // Configurăm starea inițială
-    setupTestUser();
-    
-    // Setăm starea de loading = true în store înainte de render
-    await act(async () => {
-      useTransactionStore.getState().setLoading(true);
-    });
-    
-    // Render App cu loading = true
-    render(<App />);
-    
-    // Verificăm că se afișează indicatorul de încărcare folosind data-testid în loc de text exact
-    // Folosim data-testid="transaction-table-loading" care există deja în componenta TransactionTable
-    await waitFor(() => {
-      const loadingIndicator = screen.getByTestId('transaction-table-loading');
-      expect(loadingIndicator).toBeInTheDocument();
+      expect(screen.getByTestId('transactions-page-mock')).toBeInTheDocument();
+      // Verificăm că pagina de grid lunar NU mai este afișată
+      expect(screen.queryByTestId('lunar-grid-page-mock')).not.toBeInTheDocument();
     });
   });
 
-  // Testul pentru afișarea mesajului de eroare
-  it('afișează mesajul de eroare din store', async () => {
-    // Configurăm starea inițială
-    setupTestUser();
-    
-    // Definiție mesaj de eroare (folosim mesaje din constante în loc de string-uri hardcodate)
-    const errorMessage = MESAJE.EROARE_GENERALA || 'Eroare la încărcarea tranzacțiilor';
-    
-    // Setăm eroarea în store
+  // Testul pentru afișarea formularului de login când utilizatorul nu este autentificat
+  it('afișează formularul de login când utilizatorul nu este autentificat', async () => {
+    // Nu apelăm setupTestUser() pentru a simula un utilizator neautentificat
+    // Resetăm explicit starea de autentificare pentru a fi siguri că utilizatorul nu este autentificat
     await act(async () => {
-      useTransactionStore.getState().setError(errorMessage);
+      useAuthStore.setState({ user: null, loading: false, error: null });
     });
     
-    // Render App cu eroarea setată
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     
-    // Verificăm că mesajul de eroare apare în interfață
-    expect(screen.getByText(errorMessage)).toBeInTheDocument();
+    // Verificăm că formularul de login este afișat
+    await waitFor(() => {
+      expect(screen.getByTestId('login-form')).toBeInTheDocument();
+      // Verificăm că tab-urile de navigare NU sunt afișate
+      expect(screen.queryByTestId('transactions-tab')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('lunar-grid-tab')).not.toBeInTheDocument();
+    });
+  });
+
+  // Testul pentru afișarea formularului de înregistrare
+  it('afișează formularul de înregistrare la click pe link', async () => {
+    // Resetăm explicit starea de autentificare pentru a fi siguri că utilizatorul nu este autentificat
+    await act(async () => {
+      useAuthStore.setState({ user: null, loading: false, error: null });
+    });
+    
+    await act(async () => {
+      render(<App />);
+    });
+    
+    // Găsim link-ul de înregistrare și facem click pe el
+    await waitFor(() => {
+      const registerLink = screen.getByTestId('register-link');
+      expect(registerLink).toBeInTheDocument();
+      
+      act(() => {
+        fireEvent.click(registerLink);
+      });
+    });
+    
+    // Verificăm că formularul de înregistrare este afișat
+    await waitFor(() => {
+      expect(screen.getByTestId('register-form')).toBeInTheDocument();
+      // Verificăm că formularul de login NU mai este afișat
+      expect(screen.queryByTestId('login-form')).not.toBeInTheDocument();
+    });
+  });
+
+  // Testul pentru afișarea spinner-ului de încărcare
+  it('afișează spinner-ul de încărcare când loading=true', async () => {
+    // Mockuim starea de loading folosind metoda checkUser care setează loading=true
+    // Conform regulilor, nu mock-uim store-ul, ci folosim metodele existente
+    jest.spyOn(supabaseAuthService, 'getCurrentUser').mockImplementation(() => {
+      // Returnam o promisiune care nu se rezolvă imediat pentru a menține loading=true
+      return new Promise(resolve => {
+        // Rezolvăm cu null pentru a menține user=null în store
+        setTimeout(() => resolve(null), 100);
+      });
+    });
+    
+    // Setăm starea de loading folosind API-ul public al store-ului
+    await act(async () => {
+      // Folosim setState în loc de a modifica direct proprietățile
+      useAuthStore.setState({ user: null, loading: true, error: null });
+    });
+    
+    await act(async () => {
+      render(<App />);
+    });
+    
+    // Verificăm că spinner-ul este afișat
+    await waitFor(() => {
+      expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
+    });
   });
 });

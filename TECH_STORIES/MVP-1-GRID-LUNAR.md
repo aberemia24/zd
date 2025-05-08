@@ -26,6 +26,7 @@
 - [ ] **AC-10**: **Expandare/colapsare categorii** - Fiecare categorie principală (Venituri, Cheltuieli, Economii) poate fi expandată pentru a arăta subcategoriile sau colapsată pentru a arăta doar suma totală pe categorie. Când e colapsată, arată suma agregată pentru toate subcategoriile din grupa respectivă.
 - [ ] **AC-11**: **Adăugare/editare categorii** - Utilizatorul poate adăuga o nouă subcategorie într-o categorie existentă direct din interfață. Noua subcategorie apare instant în grid cu un rând nou.
 - [ ] **AC-12**: **Continuitate între luni** - Grid-ul arată ultimele zile ale lunii anterioare și primele zile ale lunii curente (similar cu Excel-ul original). Acest lucru oferă o viziune continuă asupra lichidităților și evoluției bugetului.
+- [ ] **AC-13**: **Mesaje și indicatori** - Orice mesaj de eroare, loading sau feedback din UI și din teste trebuie să provină din constants (`@shared-constants/messages`) și să fie verificat în teste cu `data-testid` predictibil, nu cu stringuri hardcodate.
 - [ ] **AC-13**: **Layout multi-secțiune** - Structura grid-ului reflectă exact organizarea din Excel: header global cu totale, secțiuni distincte pentru VENITURI, ECONOMII, CHELTUIELI, fiecare cu propriile subcategorii detaliate și rânduri de totaluri.
 
 ## 4. Scop non‑funcțional
@@ -90,6 +91,24 @@
 - [ ] **E2E-3**: Expandare/colapsare categorii - Expandează/colapsează fiecare categorie principală → verifică sumele agregate → verifică că subcategoriile apar/dispar corect
 - [ ] **E2E-4**: Adăugare nouă subcategorie - Adaugă subcategorie nouă → verifică că apare în grid → adaugă tranzacție în subcategoria nouă
 - [ ] **E2E-5**: Vizualizare și navigare între luni - Navigare înainte și înapoi între luni → verifică continuitatea datelor → verifică că soldurile și totalurile se mențin corect
+
+## 7. Best Practices – Testare & State Management
+
+- **Mesaje și UI copy**: Orice mesaj de eroare, feedback sau text UI provine EXCLUSIV din `shared-constants/messages.ts` și se importă prin `@shared-constants/messages` (fără string‑uri hardcodate în componente sau teste).
+- **Testare async și user-centrică**:
+    - Folosește `await act(async () => ...)` și `waitFor` pentru orice update asincron sau element care apare/dispare din DOM.
+    - Toate elementele funcționale (butoane, inputuri, itemi listă, feedback) au `data-testid` unic și predictibil (vezi regula globală 3.1).
+    - Testele verifică mesaje/indicatori folosind valorile din constants, nu stringuri hardcodate.
+    - Pentru formulare complexe, verifică valorile inițiale pe câmpuri individuale cu `waitFor` (pattern recomandat, vezi lessons learned).
+- **Mocking**:
+    - Se mock-uiesc DOAR serviciile externe (API/fetch, date/time, random, browser APIs). Nu se mock-uiesc stores Zustand sau logica proprie (vezi regula globală mock-uri testare).
+- **Zustand & fetch**:
+    - Este INTERZIS fetch-ul direct pe `[queryParams]` cu `useEffect(fetch, [queryParams])` (anti-pattern critic, vezi regula 8.2 din global_rules.md). Se folosește caching intern sau guard logică pentru a preveni bucle infinite.
+    - Orice abatere se documentează explicit în code review și DEV_LOG.md.
+- **Centralizare API/constants**:
+    - Toate rutele, headerele și time-out-urile API sunt definite în `shared-constants/api.ts` și importate DOAR prin `@shared-constants/api`.
+    - Este interzisă folosirea sau exportul de `API_URL` (deprecated).
+- **Motivație**: Aceste reguli asigură testare robustă, mentenanță ușoară, onboarding rapid și QA predictibil. Orice excepție se documentează și justifică în PR și DEV_LOG.md.
 
 ## 8. Wireframe / Mockup
 
@@ -182,10 +201,12 @@ import MonthlyGridPreview from "@components/MonthlyGridPreview";
 ## 12. Definition of Done
 
 - [ ] Toate AC‑urile trec manual & automat.
-- [ ] Teste jest + Cypress verzi pe CI.
+- [ ] Teste jest + Cypress verzi pe CI, folosind doar mesaje/constante din `@shared-constants/messages` și `@shared-constants/api` (fără stringuri hardcodate în assertions).
+- [ ] Toate testele respectă best practices async (`act`, `waitFor`), folosesc `data-testid` și nu mock-uiesc stores Zustand sau logica proprie.
+- [ ] Orice fetch asincron cu Zustand respectă regula anti-pattern (fără `useEffect(fetch, [queryParams])`).
 - [ ] Code review aprobat de alt dev (sau de tine cu checklist).
 - [ ] Fără regression pe fluxurile existente (login, listă tranzacții veche).
-- [ ] Documentație actualizată în README.md cu nouă funcționalitate.
+- [ ] Documentație actualizată în README.md cu nouă funcționalitate și referință la noile reguli de testare/state management.
 - [ ] Performance budget respectat (timp de încărcare și calcul).
 - [ ] Structura de categorii/subcategorii funcționează corect cu expandare/colapsare.
 - [ ] UI pentru adăugare subcategorii noi funcționează fără erori.

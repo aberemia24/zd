@@ -33,6 +33,52 @@
 - Teste colocate în același folder cu componentele.
 - Minimizarea console noise în teste.
 
+#### Testare robustă cu constants și data-testid
+- Orice mesaj de eroare, loading sau feedback din UI și din teste trebuie să provină din constants (`@shared-constants/messages`), nu stringuri hardcodate.
+- Toate elementele funcționale (butoane, inputuri, itemi listă, feedback) au `data-testid` unic, stabil și predictibil (vezi regula globală 3.1 și exemplul de mai jos).
+- Testele verifică mesaje/indicatori folosind valorile din constants și selectează elementele prin `data-testid`, nu prin text hardcodat.
+- Exemplu corect:
+```tsx
+import { MESAJE } from '@shared-constants/messages';
+expect(screen.getByTestId('error-msg')).toHaveTextContent(MESAJE.EROARE_INCARCARE_TRANZACTII);
+expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
+```
+- Pentru formulare complexe, verifică valorile inițiale pe câmpuri individuale cu `waitFor` (vezi lessons learned).
+
+#### Politica de mocking
+- Se mock-uiesc **doar** serviciile externe (API/fetch, date/time, random, browser APIs).
+- **Nu** se mock-uiesc stores Zustand, hooks custom sau logică proprie (vezi regula globală mock-uri testare și DEV_LOG.md).
+- Orice excepție se documentează clar în PR și BEST_PRACTICES.md.
+
+#### Anti-pattern critic: useEffect(fetch, [queryParams]) cu Zustand
+- Este **interzis** să folosești direct `useEffect(() => fetchTransactions(), [queryParams])` cu Zustand, deoarece duce la infinite loop și Maximum update depth exceeded.
+- Regula critică este documentată în global_rules.md secțiunea 8.2 și trebuie respectată strict.
+- Exemplu greșit (NU folosiți!):
+```tsx
+useEffect(() => {
+  useTransactionStore.getState().fetchTransactions();
+}, [queryParams]);
+```
+- Exemplu corect:
+```tsx
+useEffect(() => {
+  useTransactionStore.getState().fetchTransactions();
+}, []); // Doar la mount
+```
+- Dacă fetch-ul depinde de parametri, folosește un guard intern/caching în store pentru a preveni buclele.
+- Orice abatere se documentează explicit în code review și DEV_LOG.md.
+
+#### Motivare
+- Aceste reguli asigură testare robustă, mentenanță ușoară, onboarding rapid și QA predictibil.
+- Centralizarea mesajelor și constantelor elimină bug-uri și inconsistențe între FE/BE/teste.
+- Interzicerea mock-ului pe stores/hooks asigură teste care reflectă comportamentul real al aplicației.
+- Respectarea anti-patternului Zustand previne bug-uri greu de diagnosticat și regresii ascunse.
+
+#### Referințe
+- [global_rules.md] secțiunea 3, 8.2, 9
+- [DEV_LOG.md] pentru schimbări și excepții
+- [LESSON] Testare valori inițiale în formulare complexe
+
 ### Practici Zustand
 
 - Teste pentru inițializare, setters, acțiuni asincrone și selectors.
@@ -285,4 +331,4 @@ useEffect(() => {
 
 ---
 
-_Actualizat la: 2025-05-07_
+_Actualizat la: 2025-05-08_
