@@ -1,5 +1,17 @@
 # Dev Log - Budget App
 
+## 2025-05-09 - Implementare editare/adăugare tranzacții direct din LunarGrid (DEV-5 Complet)
+
+- Implementat mecanism excel-like pentru editare rapidă direct în celulele LunarGrid:
+  - La single click: popover cu input sumă + opțiune recurentă/frecvență
+  - La double click: prompt rapid pentru sumă, creare instantă tranzacție
+  - UX smart: tastare automată în input (ca în Excel), Enter pentru submit, Escape pentru anulare
+- Adăugat autorefresh (forțare actualizări după adăugare/editare) pentru a vedea imediat tranzacțiile în grid fără reload
+- Integrare cu form/store/service existente pentru validare tranzacții
+- Toate textele și mesajele provin din `shared-constants/ui.ts`
+- Respectare reguli globale și constante: enum-uri tipate, fără text hardcodat, `data-testid` predictibil
+- Implementare conform pattern hooks + servicii + caching din memorie 49dcd68b-c9f7-4142-92ef-aca6ff06fe52
+
 ## 2025-05-08 - Persistență autentificare, validare categorii și bugfix fetch Zustand
 
 - Implementat persistență sesiune utilizator cu Zustand + persist (localStorage), store `authStore.ts` refactorizat.

@@ -42,6 +42,7 @@ export interface TransactionState {
     dateFrom: string;
     dateTo: string;
   };
+  _invalidateMonthCache: (year: number, month: number) => void;
   
   // Stare UI
   loading: boolean;
@@ -123,6 +124,26 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   // Helper pentru a genera cheia de cache pentru luna/anul specific
   _getCacheKey: (year: number, month: number) => {
     return `${year}-${month.toString().padStart(2, '0')}`;
+  },
+  
+  // Helper pentru invalidarea subtilă a cache-ului pentru o anumită lună/an (fără loading UI)
+  _invalidateMonthCache: (year: number, month: number) => {
+    const cacheKey = get()._getCacheKey(year, month);
+    // Actualizăm lastFetched = 0 pentru a forța re-fetch fără a șterge datele existente
+    // Acest lucru menține UI-ul stabil și previne "flickers" sau loading states bruste
+    const currentCache = { ...get().monthlyCache };
+    if (currentCache[cacheKey]) {
+      set({
+        monthlyCache: {
+          ...currentCache,
+          [cacheKey]: {
+            ...currentCache[cacheKey],
+            lastFetched: 0 // Forțează refresh la următorul fetch, dar păstrează datele vechi până atunci
+          }
+        }
+      });
+      console.log(`🔄 Cache invalidated for ${cacheKey}, will refresh on next access`);
+    }
   },
   
   // Helper pentru a genera intervalul de date pentru luna specifică (inclusiv zile adiacente)

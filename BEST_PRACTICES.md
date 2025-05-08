@@ -81,6 +81,86 @@ useEffect(() => {
 
 ### Practici Zustand
 
+#### Prevenirea buclelor infinite în React + Zustand
+
+Pentru a preveni eroarea "Maximum update depth exceeded" în aplicații cu Zustand, următoarele practici sunt esențiale:
+
+1. **Separă setarea parametrilor de fetch-ul de date**:
+   ```typescript
+   // INCORECT - poate crea buclă infinită
+   React.useEffect(() => {
+     store.setQueryParams({ month, year });
+     store.fetchTransactions(); // Poate declanșa un update care re-declanșează efectul
+   }, [month, year, store]);
+   
+   // CORECT - verifică schimbările reale înainte de a actualiza
+   const paramsRef = React.useRef({ month, year });
+   React.useEffect(() => {
+     if (paramsRef.current.month !== month || paramsRef.current.year !== year) {
+       paramsRef.current = { month, year };
+       store.setQueryParams({ month, year });
+       store.fetchTransactions();
+     }
+   }, [month, year, store]);
+   ```
+
+2. **Evită apelurile directe la store.getState() în efecte**:
+   ```typescript
+   // INCORECT - poate crea buclă infinită
+   setTimeout(() => {
+     useStore.getState().setQueryParams({...});
+     useStore.getState().fetchTransactions();
+   }, 300);
+   
+   // CORECT - folosește instanta de store din context
+   setTimeout(() => {
+     transactionStore.refresh(); // Metodă atomică care nu declanșează alte efecte
+   }, 300);
+   ```
+
+3. **Folosește useRef pentru a evita re-render-uri inutile**:
+   ```typescript
+   // INCORECT - poate crea buclă infinită
+   const [lastUpdate, setLastUpdate] = useState(Date.now());
+   // ... în alt efect sau handler
+   setLastUpdate(Date.now()); // Poate declanșa re-render care re-declanșează efecte
+   
+   // CORECT - useRef nu declanșează re-render
+   const lastUpdateRef = useRef(Date.now());
+   // ... în alt efect sau handler
+   lastUpdateRef.current = Date.now(); // Nu declanșează re-render
+   ```
+
+4. **Adaugă setTimeout pentru a preveni actualizările în cascadă**:
+   ```typescript
+   // INCORECT - poate crea buclă infinită dacă refresh() modifică starea
+   await transactionStore.saveTransaction(data);
+   transactionStore.refresh(); // Poate declanșa un update imediat
+   
+   // CORECT - întârzie refresh-ul pentru a permite finalizarea update-ului curent
+   await transactionStore.saveTransaction(data);
+   setTimeout(() => {
+     transactionStore.refresh();
+   }, 300); // Întârziere mică pentru a preveni actualizările în cascadă
+   ```
+
+Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-b074-3915547a2544 și previn bug-urile greu de diagnosticat cauzate de buclele infinite.
+
+#### UX rapid pentru Lunar Grid (Excel-like)
+
+- Implementat conform DEV-5, tranzacțiile pot fi adăugate/editate direct din grid-ul lunar:
+  - **Single click** pe celulă: deschide popover cu sumă + recurentă/frecvență
+  - **Double click** pe celulă: prompt rapid pentru sumă (editare instantă)
+  - **Tastare directă**: cifre tastate merg automat în input, fără a pierde focus (Excel-like)
+  - **Keyboard shortcuts**: Enter pentru salvare, Escape pentru anulare
+- Best practices obligatorii pentru acest pattern:
+  - Forțează refresh cu `transactionStore.refresh()` după operare pentru actualizare instantă
+  - Toate textele din `@shared-constants/ui.ts` (zero hardcoded strings)
+  - Toate date-testid-urile predictibile pentru celule/popover/butoane
+  - Validare strictă pentru tipuri: `as TransactionType`, `as FrequencyType`
+  - Try/catch pentru operații asincrone cu handling de erori și logging adecvat
+  - Preluare automată context (zi, categorie, subcategorie) din celula editată
+
 #### Persistență autentificare cu Zustand + persist
 
 - Pentru orice state de autentificare, folosiți middleware-ul `persist` din Zustand, cu partialize pentru a salva doar datele relevante (ex: user, nu loading/error).

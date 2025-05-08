@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTransactionStore } from '../../../stores/transactionStore';
+import { useAuthStore } from '../../../stores/authStore';
 import { CATEGORIES } from '@shared-constants/categories';
-import { getCategoriesForTransactionType } from '@shared-constants/category-mapping';
-import { TransactionType, TransactionStatus } from '@shared-constants/enums';
+// import { getCategoriesForTransactionType } from '@shared-constants/category-mapping'; // Nefolosit
+import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import CellTransactionPopover from './CellTransactionPopover';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -13,11 +15,47 @@ const getDaysInMonth = (year: number, month: number) => {
   return Array.from({ length: date.getDate() }, (_, i) => i + 1);
 };
 
-// Selector performant: tranzacțiile din luna/anul curent + zile adiacente
-function useMonthlyTransactions(year: number, month: number): TransactionValidated[] {
-  const transactions = useTransactionStore(s => s.transactions);
+// Hook pentru încărcarea tranzacțiilor pentru o lună/an specific, cu caching și refresh agresiv
+function useMonthlyTransactions(year: number, month: number) {
+  const transactionStore = useTransactionStore();
+  const storeTransactions = transactionStore.transactions;
   
-  return React.useMemo(() => {
+  // IMPORTANT: Folosim un ref pentru a stoca parametrii anteriori și a preveni bucle infinite
+  const paramsRef = React.useRef({ year, month });
+  
+  // Funcție de refresh expusă pentru componentele care folosesc hook-ul
+  const forceRefresh = React.useCallback(() => {
+    console.log('🔄 Forcing aggressive data refresh...');
+    // IMPORTANT: Pentru a preveni buclele infinite, folosim direct refresh() din store
+    // fără a modifica alte state-uri care ar putea declanșa efecte
+    transactionStore.refresh(); 
+  }, [transactionStore]);
+  
+  // IMPORTANT: Un singur effect pentru setarea parametrilor și fetch
+  // Acest model respectă regula critică din memoria d7b6eb4b-0702-4b0a-b074-3915547a2544
+  React.useEffect(() => {
+    // Verificăm dacă parametrii s-au schimbat cu adevărat pentru a preveni bucle
+    if (paramsRef.current.year !== year || paramsRef.current.month !== month) {
+      console.log(`Parameters changed: ${paramsRef.current.year}-${paramsRef.current.month} -> ${year}-${month}`);
+      
+      // Actualizăm referinta pentru a ști ce parametri am folosit ultima dată
+      paramsRef.current = { year, month };
+      
+      // Setăm parametrii și facem fetch într-un singur effect
+      console.log(`Setting query params and fetching for ${year}-${month}`);
+      transactionStore.setQueryParams({
+        month,
+        year,
+        includeAdjacentDays: true, // Include zile din lunile adiacente pentru o experiență mai bună
+      });
+      
+      // Fetch-ul se face doar la prima montare și la schimbarea anului/lunii
+      transactionStore.fetchTransactions();
+    }
+  }, [month, year, transactionStore]); // Dependențe minimale
+
+  // Filtrează tranzacțiile pentru luna curentă + zile adiacente
+  const transactions = React.useMemo(() => {
     // Date pentru luna curentă
     const currentMonthStart = new Date(year, month - 1, 1);
     const currentMonthEnd = new Date(year, month, 0);
@@ -34,9 +72,9 @@ function useMonthlyTransactions(year: number, month: number): TransactionValidat
     const nextMonthFirstDays = 6; // Primele 6 zile
     
     console.log(`Filtering transactions for ${year}-${month} + adjacent days`);
-    console.log(`Total transactions before filtering: ${transactions.length}`);
+    console.log(`Total transactions before filtering: ${storeTransactions.length}`);
     
-    const filteredTransactions = transactions.filter(t => {
+    const filteredTransactions = storeTransactions.filter(t => {
       try {
         // Asigurăm-ne că data este validă și în formatul așteptat
         // Format ISO: YYYY-MM-DD
@@ -80,7 +118,9 @@ function useMonthlyTransactions(year: number, month: number): TransactionValidat
     
     console.log(`Filtered transactions: ${filteredTransactions.length}`);
     return filteredTransactions;
-  }, [transactions, year, month]);
+  }, [storeTransactions, year, month]); // Eliminăm refreshTrigger care nu mai există
+  
+  return { transactions, forceRefresh };
 }
 
 // Agregare sumă pentru o zi, categorie, subcategorie
@@ -163,7 +203,7 @@ const LOCALSTORAGE_CATEGORY_EXPAND_KEY = 'budget-app-category-expand';
 
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   const days = getDaysInMonth(year, month);
-  const transactions = useMonthlyTransactions(year, month);
+  const { transactions, forceRefresh } = useMonthlyTransactions(year, month);
   
   // Stare pentru categorii expandate/colapsate - persistentă în localStorage
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
@@ -204,6 +244,54 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     return result;
   }, [transactions]);
   
+  // Referință pentru a ține evidența ultimei tranzacții adăugate
+  const lastAddedTransactionRef = React.useRef<{ timestamp: number; processed: boolean } | null>(null);
+
+  // Efectul pentru a sincroniza starea când se adaugă tranzacții noi
+  React.useEffect(() => {
+    // Dacă nu am adăugat recent o tranzacție, nu facem nimic
+    if (!lastAddedTransactionRef.current) return;
+
+    // Invalidăm cache-ul și cerem date noi automat, dar fără să reîmprospătăm UI-ul brusc
+    const timeElapsed = Date.now() - lastAddedTransactionRef.current.timestamp;
+    if (timeElapsed < 2000) { // Dacă a trecut mai puțin de 2 secunde, facem refresh subtil
+      // IMPORTANT: Folosim direct refresh() din store pentru a evita bucla infinită (d7b6eb4b)
+      // UN setTimeout previne "Maximum update depth exceeded"
+      setTimeout(() => {
+        console.log('🔄 Force refreshing data directly from store after popover save...');
+        useTransactionStore.getState().refresh();
+      }, 300); // delay mic pentru a permite commit în backend
+      useTransactionStore.getState()._invalidateMonthCache(year, month);
+      // Cerem date noi, dar nu forțăm refresh complet (loading state = false)
+      useTransactionStore.getState().fetchTransactions(true);
+    }
+    
+    // Resetăm starea
+    lastAddedTransactionRef.current = null;
+  }, [year, month, transactions]);
+
+  // Funcție ajutătoare pentru a marca adăugarea unei tranzacții noi (trigger refresh automat)
+  const markTransactionAdded = React.useCallback(() => {
+    console.log('🔄 Marking transaction added for subtle refresh...');
+    // Inițializăm referința cu valori noi
+    lastAddedTransactionRef.current = {
+      timestamp: Date.now(),
+      processed: false,
+    };
+    
+    // Invalidare cache și refresh subtil după o scurtă întârziere
+    // Folosim direct transactionStore pentru a evita bucla infinită
+    setTimeout(() => {
+      // Verificăm dacă referința există înainte de a o accesa (rezolvă avertismentul TS)
+      if (lastAddedTransactionRef.current) {
+        // Marcăm ca procesată pentru a evita refresh-uri multiple
+        lastAddedTransactionRef.current.processed = true;
+      }
+      // Folosim direct forceRefresh care acum e sigur
+      forceRefresh();
+    }, 500);
+  }, [forceRefresh]);
+
   // Calculează soldurile zilnice pentru întreaga lună
   const dailyBalances = React.useMemo(() => {
     return days.reduce<Record<number, number>>((acc, day) => {
@@ -218,8 +306,161 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     return amount > 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium';
   };
 
+  // Orice request către backend are nevoie de user ID pentru politicile RLS Supabase
+  const { user } = useAuthStore();
+  
+  // Popover state: ce celulă e activă și unde plasăm popoverul
+  const [popover, setPopover] = React.useState<null | {
+    category: string;
+    subcategory: string;
+    day: number;
+    anchorRect: DOMRect | null;
+    initialAmount: string;
+    type: string;
+  }>(null);
+
+  // Helper pentru a determina tipul tranzacției în funcție de categorie
+  const getTransactionTypeForCategory = (category: string): TransactionType => {
+    // Mapăm categoriile la tipurile corespunzătoare conform business logic și regulilor
+    if (category === 'VENITURI') return TransactionType.INCOME;
+    if (category === 'ECONOMII') return TransactionType.SAVING;
+    // Toate celelalte categorii (NUTRITIE, LOCUINTA, etc.) sunt de tip EXPENSE
+    return TransactionType.EXPENSE;
+  };
+
+  // Handler pentru single click pe celulă: deschide popover
+  const handleCellClick = (
+    e: React.MouseEvent<HTMLTableCellElement>,
+    category: string,
+    subcategory: string,
+    day: number,
+    amount: string,
+    type: string
+  ) => {
+    // Prevent double popover
+    if (popover && popover.category === category && popover.subcategory === subcategory && popover.day === day) return;
+    
+    // Determinăm tipul corect de tranzacție bazat pe categorie
+    const correctType = getTransactionTypeForCategory(category);
+    
+    setPopover({
+      category,
+      subcategory,
+      day,
+      anchorRect: e.currentTarget.getBoundingClientRect(),
+      initialAmount: amount,
+      type: correctType, // Folosim tipul corect determinat automat
+    });
+  };
+  // Accesăm store-ul o singură dată pentru întreaga componentă
+  const transactionStore = useTransactionStore();
+
+  // Handler pentru double click: editare inline direct
+  const handleCellDoubleClick = React.useCallback(
+    (
+      e: React.MouseEvent<HTMLTableCellElement>,
+      category: string,
+      subcategory: string,
+      day: number,
+      currentAmount: string
+    ) => {
+      e.preventDefault(); // Previne propagarea click-ului
+
+      // Determinare automată tip tranzacție în funcție de categorie
+      const type = getTransactionTypeForCategory(category);
+      
+      // Prompt pentru valoare nouă
+      const newAmount = window.prompt(
+        EXCEL_GRID.PROMPTS.ENTER_AMOUNT, // Folosește textul definit în constantă
+        currentAmount.replace(/[^0-9.-]/g, '') // Curăță formatul pentru editare
+      );
+
+      if (!newAmount) return; // Anulează dacă nu s-a introdus nimic
+
+      // Verifică dacă valoarea este un număr valid
+      if (isNaN(Number(newAmount))) {
+        // Nu avem ERRORS definit în EXCEL_GRID, folosim un mesaj simplu
+        alert('Suma introdusă nu este validă!');
+        return;
+      }
+
+      // Calculează data pentru ziua din calendar
+      const date = new Date(year, month - 1, day);
+
+      // Salvează tranzacția și triggerează refresh automat
+      transactionStore.saveTransaction({
+        amount: Number(newAmount),
+        category,
+        subcategory,
+        type,
+        date: date.toISOString().slice(0, 10),
+        recurring: false, // Implicit: nu e recurentă la editare rapidă
+        frequency: undefined,
+        currency: 'RON', // Default currency
+        // NOTĂ: user_id este adăugat de supabaseService.createTransaction, nu trebuie trimis de noi
+      }).then(() => {
+        console.log(`Tranzacție salvată cu success: ${category} / ${subcategory} / ${day} = ${newAmount} RON`);
+        // IMPORTANT: Folosim direct refresh() din store, nu forceRefresh (anti-pattern d7b6eb4b)
+        // previne bucla infinită "Maximum update depth exceeded"
+        setTimeout(() => {
+          console.log('🔄 Force refreshing data directly from store...');
+          transactionStore.refresh();
+        }, 300); // delay mic pentru a permite commit în backend
+      }).catch(error => {
+        console.error('Eroare la salvare tranzacție:', error);
+      });
+    },
+    [month, year, transactionStore]
+  );
+  // Handler pentru salvare tranzacție
+  const handleSavePopover = async (data: { amount: string; recurring: boolean; frequency: string }) => {
+    if (!popover) return;
+    
+    // Debug
+    console.log('Saving transaction with data:', data);
+    
+    try {
+      // Construim tranzacția cu date implicite din contextul celulei
+      const { category, subcategory, day, type } = popover;
+      const { amount, recurring, frequency } = data;
+      const date = new Date(year, month - 1, day);
+      
+      // Creăm obiectul tranzacție complet conform tipului așteptat
+      const transactionData = {
+        amount: Number(amount),
+        category,
+        subcategory,
+        type: type as TransactionType,
+        date: date.toISOString().slice(0, 10),
+        recurring,
+        frequency: (frequency ? frequency : undefined) as FrequencyType | undefined,
+        currency: 'RON', // default, conform shared-constants
+        // NOTĂ: user_id este adăugat de supabaseService.createTransaction, nu trebuie trimis de noi
+        // conform arhitecturii din memoria 49dcd68b-c9f7-4142-92ef-aca6ff06fe52 (separare responsabilități)
+      };
+      
+      console.log('Sending transaction data:', transactionData);
+      
+      // Save & refresh
+      await transactionStore.saveTransaction(transactionData);
+      
+      // IMPORTANT: Folosim direct refresh() din store pentru a evita bucla infinită (d7b6eb4b)
+      setTimeout(() => {
+        console.log('🔄 Force refreshing data directly from store...');
+        // Apel direct la store pentru a evita bucla infinită
+        transactionStore.refresh();
+      }, 300); // delay mic pentru a permite commit în backend
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+    } finally {
+      setPopover(null);
+    }
+  };
+  // Handler pentru închidere popover
+  const handleClosePopover = () => setPopover(null);
+
   return (
-    <div className="overflow-x-auto w-full">
+    <div className="overflow-x-auto w-full" style={{ position: 'relative' }}>
       <table className="min-w-max table-auto border-collapse" data-testid="lunar-grid-table">
         <thead>
           <tr>
@@ -293,8 +534,35 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
                             key={day} 
                             className={`px-4 py-2 text-right ${sum !== 0 ? getBalanceStyle(sum) : ''}`}
                             data-testid={`cell-${categoryKey}-${subcat}-${day}`}
+                            tabIndex={0}
+                            onClick={e => handleCellClick(e, categoryKey, subcat, day, sum !== 0 ? String(sum) : '', /*determinat automat*/ getTransactionTypeForCategory(categoryKey))}
+                            onDoubleClick={e => handleCellDoubleClick(e, categoryKey, subcat, day, sum !== 0 ? String(sum) : '')}
                           >
                             {sum !== 0 ? formatCurrency(sum) : '—'}
+                            {/* Popover doar dacă e celula activă */}
+                            {popover && popover.category === categoryKey && popover.subcategory === subcat && popover.day === day && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  left: popover.anchorRect ? popover.anchorRect.left - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().left || 0) : 0,
+                                  top: popover.anchorRect ? popover.anchorRect.top - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().top || 0) + 40 : 0,
+                                  zIndex: 100,
+                                }}
+                                data-testid={`popover-cell-${categoryKey}-${subcat}-${day}`}
+                              >
+                                <CellTransactionPopover
+                                  initialAmount={popover.initialAmount}
+                                  day={popover.day}
+                                  month={month}
+                                  year={year}
+                                  category={popover.category}
+                                  subcategory={popover.subcategory}
+                                  type={popover.type}
+                                  onSave={handleSavePopover}
+                                  onCancel={handleClosePopover}
+                                />
+                              </div>
+                            )}
                           </td>
                         );
                       })}

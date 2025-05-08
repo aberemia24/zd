@@ -69,7 +69,10 @@ export const EXCEL_GRID = {
     SOLD: 'Sold',
   },
   NO_DATA: 'Nu există date disponibile',
-  LOADING: 'Se încarcă datele...'
+  LOADING: 'Se încarcă datele...',
+  PROMPTS: {
+    ENTER_AMOUNT: 'Introduceți suma:'
+  }
 };
 
 

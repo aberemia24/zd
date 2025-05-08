@@ -8,10 +8,19 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   'data-testid'?: string;
 } // data-testid și orice alt prop HTML sunt permise
 
-const Input: React.FC<InputProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, ...rest }) => (
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  wrapperClassName?: string;
+  'data-testid'?: string;
+  inputRef?: React.RefObject<HTMLInputElement>;
+}
+
+const Input: React.FC<InputProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, inputRef, ...rest }) => (
   <div className={classNames('flex flex-col', wrapperClassName)}>
     {label && <label className="form-label mb-1">{label}</label>}
     <input
+      ref={inputRef}
       className={classNames('input-field', error && 'border-red-500', className)}
       data-testid={dataTestId || 'input-field'}
       {...rest}
