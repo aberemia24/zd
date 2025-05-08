@@ -1,11 +1,13 @@
 # Dev Log - Budget App
 
-## 2025-05-08 - MVP-1-GRID-LUNAR: DEV-0 și DEV-1 bifate
-- DEV-0 bifat: structura de categorii/subcategorii validată, sursă unică de adevăr în `shared-constants/categories.ts`.
-- DEV-1 bifat: adăugat `actualAmount` (number?) și `status` (enum TransactionStatus: PLANNED/COMPLETED) în `TransactionSchema` și tipuri.
-- Mapping TransactionType <-> categorie principală implementat și exportat centralizat.
+## 2025-05-08 - MVP-1-GRID-LUNAR: progres taskuri DEV-0 ... DEV-4
+- **DEV-0** bifat: structura de categorii/subcategorii validată, sursă unică de adevăr în `shared-constants/categories.ts`.
+- **DEV-1** bifat: adăugat `actualAmount` (number?) și `status` (enum TransactionStatus: PLANNED/COMPLETED) în `TransactionSchema` și tipuri.
+- **DEV-2** bifat: mapping TransactionType <-> categorie principală implementat în `shared-constants/category-mapping.ts`, exportat în barrel, folosit deja în TransactionForm.
+- **DEV-3** bifat: utilitare mapping + validare (`getCategoriesForTransactionType`, `getTransactionTypeForCategory`) disponibile și importate centralizat.
+- **DEV-4** în progres: setup grid lunar, mapping și constants validate, urmează integrarea datelor reale și logica de calcul sold.
 - Barrel și enums actualizate pentru import predictibil.
-- Toate modificările documentate și validate conform regulilor globale.
+- Toate modificările documentate și validate conform regulilor globale și user story-ului.
 
 
 ## 2025-04-29 - Audit și refactorizare completă testabilitate (data-testid)

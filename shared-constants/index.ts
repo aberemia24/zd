@@ -7,5 +7,7 @@ export * from './messages';
 export { LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS } from './ui';
 export * from './transaction.schema';
 export * from './categories';
+export * from './category-mapping';
+export { getCategoriesForTransactionType } from './category-mapping';
 export * from './queryParams';
 export * from './api';

@@ -3,7 +3,7 @@ import Button from '../../primitives/Button';
 import Input from '../../primitives/Input';
 import Select from '../../primitives/Select';
 import Checkbox from '../../primitives/Checkbox';
-import { TransactionType, CategoryType, CATEGORIES } from '@shared-constants';
+import { TransactionType, CategoryType, CATEGORIES, getCategoriesForTransactionType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
@@ -67,16 +67,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     resetForm();
   }, [handleSubmit, resetForm, form, onSave]);
 
-  // Filtrare categorii principale în funcție de tip
+  // Filtrare categorii principale în funcție de tip (folosind mapping centralizat)
   const categoriiFiltrate = React.useMemo(() => {
-    if (form.type === TransactionType.INCOME) return { VENITURI: CATEGORIES.VENITURI };
-    if (form.type === TransactionType.SAVING) return { ECONOMII: CATEGORIES.ECONOMII };
-    if (form.type === TransactionType.EXPENSE) {
-      // Cheltuieli = toate celelalte categorii, fără VENITURI și ECONOMII
-      const { VENITURI, ECONOMII, ...rest } = CATEGORIES;
-      return rest;
-    }
-    return {};
+    const allowed = getCategoriesForTransactionType(form.type as TransactionType);
+    if (!allowed.length) return {};
+    // Extragem doar categoriile permise din CATEGORIES
+    return Object.fromEntries(
+      Object.entries(CATEGORIES).filter(([cat]) => allowed.includes(cat))
+    );
   }, [form.type]);
 
   // Lista de opțiuni pentru dropdown-ul de categorie (grupuri mari)
