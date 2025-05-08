@@ -1,5 +1,13 @@
 # Dev Log - Budget App
 
+## 2025-05-08 - MVP-1-GRID-LUNAR: DEV-0 și DEV-1 bifate
+- DEV-0 bifat: structura de categorii/subcategorii validată, sursă unică de adevăr în `shared-constants/categories.ts`.
+- DEV-1 bifat: adăugat `actualAmount` (number?) și `status` (enum TransactionStatus: PLANNED/COMPLETED) în `TransactionSchema` și tipuri.
+- Mapping TransactionType <-> categorie principală implementat și exportat centralizat.
+- Barrel și enums actualizate pentru import predictibil.
+- Toate modificările documentate și validate conform regulilor globale.
+
+
 ## 2025-04-29 - Audit și refactorizare completă testabilitate (data-testid)
 - Refactorizat toate componentele primitive (Button, Input, Select, Checkbox, Textarea) pentru propagarea și setarea predictibilă a atributului `data-testid` (default sau explicit).
 - Refactorizat toate componentele de features (TransactionForm, TransactionTable, ExcelGrid etc.) pentru a avea `data-testid` pe toate elementele funcționale (butoane, inputuri, rânduri, feedback, etc.).

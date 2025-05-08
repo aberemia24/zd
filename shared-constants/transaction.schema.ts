@@ -1,6 +1,6 @@
 // Schemă și tipuri partajate pentru tranzacții
 import { z } from 'zod';
-import { TransactionType, FrequencyType } from './enums';
+import { TransactionType, FrequencyType, TransactionStatus } from './enums';
 
 // Diferențe față de structura SQL:
 // - currency NU este folosit în FE (intenționat, vezi discuție cu owner)
@@ -18,6 +18,10 @@ export const TransactionSchema = z.object({
   subcategory: z.string().optional(),
   recurring: z.boolean().optional(),
   frequency: z.nativeEnum(FrequencyType).optional(), // Enum strict pentru frecvență
+  // --- câmpuri pentru workflow planificat/actual ---
+  actualAmount: z.number().optional(), // Suma efectivă cheltuită (dacă diferă de estimat)
+  status: z.nativeEnum(TransactionStatus).optional(), // 'PLANNED' sau 'COMPLETED'
+  // --- meta ---
   created_at: z.string().optional(), // ISO date
   updated_at: z.string().optional(), // ISO date
 });

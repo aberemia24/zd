@@ -38,11 +38,16 @@
 
 ## 5. Task‑uri de dezvoltare
 
-- [ ] **DEV-0**: Analiza structurii actuale de categorii/subcategorii din `shared-constants/categories.ts` (FE, 0.5d)
-- [ ] **DEV-1**: Actualizează `Transaction` type cu `actualAmount?`, `status?` (BE/FE, 0.5d)
-- [ ] **DEV-2**: Adaugă `dailyBalances` şi funcția `recalcMonthBalances()` în `transactionStore` (FE, 0.5d)
-- [ ] **DEV-3**: Prot. grid static cu `<table>` şi Tailwind (FE, 0.5d)
-- [ ] **DEV-4**: Integrare date reale + calcul sold (FE, 0.5d)
+- [x] **DEV-0**: Analiza structurii actuale de categorii/subcategorii din `shared-constants/categories.ts` (FE, 0.5d)
+    _Structura este completă și corectă, sursa unică de adevăr pentru grid și mapping._
+- [x] **DEV-1**: Actualizează `Transaction` type cu `actualAmount?`, `status?` (BE/FE, 0.5d)
+    _Câmpuri adăugate în schema Zod și enum TransactionStatus creat pentru workflow planificat/actualizat._
+- [x] **DEV-2**: Mapping TransactionType <-> categorie principală (FE, 0.5d)  
+    _Implementat în `shared-constants/category-mapping.ts` și exportat în barrel. Folosit deja în TransactionForm._
+- [x] **DEV-3**: Utilitare mapping + validare (FE, 0.5d)  
+    _Funcții `getCategoriesForTransactionType` și `getTransactionTypeForCategory` disponibile în constants. Import centralizat._
+- [>] **DEV-4**: Integrare date reale + calcul sold (FE, 0.5d)  
+    _Pregătit contextul pentru grid, mapping și constants validate. Urmează integrarea datelor reale și logica de calcul sold._
 - [ ] **DEV-5**: Formular `TransactionModal` reutilizat (Add/Edit) (FE, 1d)
 - [ ] **DEV-6**: Hook navigare lună + URL sync (FE, 0.5d)
 - [ ] **DEV-7**: Stil responsive + scroll mobil (FE, 1d)

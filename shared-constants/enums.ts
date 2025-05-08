@@ -5,6 +5,11 @@ export enum TransactionType {
   SAVING = 'SAVING',
 }
 
+export enum TransactionStatus {
+  PLANNED = 'PLANNED',
+  COMPLETED = 'COMPLETED',
+}
+
 export enum FrequencyType {
   NONE = 'NONE',
   DAILY = 'DAILY',
