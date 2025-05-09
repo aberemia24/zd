@@ -2,12 +2,12 @@ import React from 'react';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { CATEGORIES } from '@shared-constants/categories';
-// import { getCategoriesForTransactionType } from '@shared-constants/category-mapping'; // Nefolosit
 import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import CellTransactionPopover from './CellTransactionPopover';
+import { CategoryEditor } from '../CategoryEditor';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -201,7 +201,21 @@ export interface LunarGridProps {
 // Constante pentru localStorage
 const LOCALSTORAGE_CATEGORY_EXPAND_KEY = 'budget-app-category-expand';
 
+// UI copy pentru CategoryEditor, fallback dacă nu există în shared-constants/ui
+const UI = {
+  MANAGE_CATEGORIES: 'Gestionare categorii',
+};
+
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
+  // State pentru modalul CategoryEditor si autentificare
+  const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
+  const { user } = useAuthStore();
+  
+  // UI copy pentru CategoryEditor (fallback dacă nu există în shared-constants/ui)
+  const UI = {
+    MANAGE_CATEGORIES: 'Gestionare categorii',
+  };
+
   const days = getDaysInMonth(year, month);
   const { transactions, forceRefresh } = useMonthlyTransactions(year, month);
   
@@ -306,9 +320,6 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     return amount > 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium';
   };
 
-  // Orice request către backend are nevoie de user ID pentru politicile RLS Supabase
-  const { user } = useAuthStore();
-  
   // Popover state: ce celulă e activă și unde plasăm popoverul
   const [popover, setPopover] = React.useState<null | {
     category: string;
@@ -460,15 +471,39 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   const handleClosePopover = () => setPopover(null);
 
   return (
-    <div className="overflow-x-auto w-full" style={{ position: 'relative' }}>
-      <table className="min-w-max table-auto border-collapse" data-testid="lunar-grid-table">
-        <thead>
-          <tr>
-            <th className="sticky left-0 bg-white z-10 px-4 py-2 w-64" data-testid="header-categorie">
-              Categorie / Subcategorie
-            </th>
+    <React.Fragment>
+      {/* Buton gestionare categorii - vizibil doar dacă există user autentificat */}
+      {user && (
+        <div className="mb-4 flex justify-end">
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded shadow"
+            onClick={() => setShowCategoryEditor(true)}
+            data-testid="manage-categories-btn"
+          >
+            {UI.MANAGE_CATEGORIES}
+          </button>
+        </div>
+      )}
+      
+      {/* Modal CategoryEditor */}
+      {user && showCategoryEditor && (
+        <CategoryEditor
+          open={showCategoryEditor}
+          onClose={() => setShowCategoryEditor(false)}
+          userId={user?.id || ''}
+        />
+      )}
+      
+      {/* Tabel principal LunarGrid */}
+      <div className="overflow-x-auto rounded-lg shadow bg-white">
+        <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
+          <thead>
+            <tr className="bg-gray-50">
+              <th className="sticky left-0 z-20 bg-gray-50 px-4 py-2 text-left" style={{ minWidth: 180 }}>
+                {EXCEL_GRID.HEADERS.LUNA}
+              </th>
             {days.map(day => (
-              <th key={day} className="px-4 py-2 text-center" data-testid={`header-day-${day}`}>
+              <th key={day} className="px-4 py-2 text-right">
                 {day}
               </th>
             ))}
@@ -597,6 +632,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
         </tbody>
       </table>
     </div>
+    </React.Fragment>
   );
 };
 

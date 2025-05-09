@@ -3,10 +3,11 @@ import Button from '../../primitives/Button';
 import Input from '../../primitives/Input';
 import Select from '../../primitives/Select';
 import Checkbox from '../../primitives/Checkbox';
-import { TransactionType, CategoryType, CATEGORIES, getCategoriesForTransactionType } from '@shared-constants';
+import { TransactionType, CategoryType, getCategoriesForTransactionType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
+import { useCategoryStore } from '../../../stores/categoryStore';
 
 function safeMessage(key: string): string {
   return (MESAJE as Record<string, string>)[key] || key;
@@ -67,29 +68,47 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     resetForm();
   }, [handleSubmit, resetForm, form, onSave]);
 
+  // Preluare categorii fuzionate din categoryStore (personalizate + predefinite)
+  const categories = useCategoryStore(state => state.categories);
+
   // Filtrare categorii principale în funcție de tip (folosind mapping centralizat)
   const categoriiFiltrate = React.useMemo(() => {
+    if (!form.type) return [];
+    
     const allowed = getCategoriesForTransactionType(form.type as TransactionType);
-    if (!allowed.length) return {};
-    // Extragem doar categoriile permise din CATEGORIES
-    return Object.fromEntries(
-      Object.entries(CATEGORIES).filter(([cat]) => allowed.includes(cat))
-    );
-  }, [form.type]);
+    if (!allowed.length) return [];
+    
+    // Filtrăm categoriile permise din categoriile fuzionate
+    return categories.filter(cat => allowed.includes(cat.name));
+  }, [form.type, categories]);
 
   // Lista de opțiuni pentru dropdown-ul de categorie (grupuri mari)
   const optiuniCategorie = React.useMemo(() => {
-    return Object.keys(categoriiFiltrate).map((cat) => ({ value: cat, label: cat.charAt(0) + cat.slice(1).toLowerCase().replace(/_/g, ' ') }));
+    return categoriiFiltrate.map(cat => ({
+      value: cat.name,
+      // Formatăm label-ul pentru display, adaugăm indicator custom dacă e nevoie
+      label: cat.name.charAt(0) + cat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
+             (cat.isCustom ? ' ➡️' : '') // Indicator pentru categorii personalizate
+    }));
   }, [categoriiFiltrate]);
 
-  // Lista de opțiuni pentru subcategorie (grupuri mici)
+  // Lista de opțiuni pentru subcategorie, acum cu suport pentru subcategorii personalizate
   const optiuniSubcategorie = React.useMemo(() => {
-    if (!form.category || !(categoriiFiltrate as Record<string, any>)[form.category]) return [];
-    // grupuri mici: (ex: "Surse de venit", "General", etc)
-    return Object.entries((categoriiFiltrate as Record<string, any>)[form.category] as Record<string, string[]>).flatMap(([grup, subcats]) =>
-      (subcats as string[]).map((subcat: string) => ({ value: subcat, label: subcat, group: grup }))
-    );
-  }, [form.category, categoriiFiltrate]);
+    if (!form.category) return [];
+    
+    // Găsim categoria selectată
+    const selectedCategory = categories.find(cat => cat.name === form.category);
+    if (!selectedCategory) return [];
+    
+    // Transformăm subcategoriile în opțiuni pentru dropdown
+    return selectedCategory.subcategories.map(subcat => ({
+      value: subcat.name,
+      // Adăugăm indicator pentru subcategorii personalizate
+      label: subcat.name + (subcat.isCustom ? ' ➡️' : ''),
+      customStyle: subcat.isCustom ? 'text-blue-600' : undefined, // Stil special pentru subcategorii personalizate
+      // Nu mai avem nevoie de group în noua structură
+    }));
+  }, [form.category, categories]);
 
   return (
     <form

@@ -1,6 +1,17 @@
 # Dev Log - Budget App
 
-# [2025-05-09] Subcategory Customization MVP
+# [2025-05-09] Subcategory Customization - Etapa 2: UI și Integrare
+
+- Branch: `feature/subcategory-customization`
+- UI nou `CategoryEditor`: modal pentru gestionare subcategorii personalizate (add/edit/delete)
+- Integrare `categoryStore` în `LunarGrid` cu buton și modal vizibile doar pentru user autentificat
+- Integrare `LunarGridPage`: încărcare categorii personalizate la prima montare și fuziune cu predefinite
+- Integrare `TransactionForm`: dropdown-uri actualizate pentru a folosi categoriile personalizate
+- Funcționalități MVP implementate: adăugare subcategorii noi, redenumire, ștergere, indicator vizual pentru subcategorii personalizate
+- Respect regulile globale: data-testid predictibil și stabil, pattern validat de store + UI, fără string-uri hardcodate, safe null-check
+- Optimizări performance: prevenire efecte redundante, flag-uri pentru cache, load o singură dată, memoizare categorii filtrate
+
+# [2025-05-09] Subcategory Customization - Etapa 1: Infrastructură
 
 - Branch: `feature/subcategory-customization`
 - Migrare DB aplicată: `backend/2025-05-09T1132_create_custom_categories.sql`
@@ -8,7 +19,6 @@
 - Service nou: `frontend/src/services/categoryService.ts` (CRUD, validare, migrare, duplicate)
 - Store nou Zustand: `frontend/src/stores/categoryStore.ts` (fuziune cu predefinite, persist, acțiuni CRUD)
 - Respectat reguli globale: persist, barrel, fără string-uri hardcodate, testabilitate (serviciile injectabile)
-- Următorii pași: integrare cu store tranzacții, CategoryEditor UI, testare E2E/QA
 
 
 ## 2025-05-09 - Implementare editare/adăugare tranzacții direct din LunarGrid (DEV-5 Complet)

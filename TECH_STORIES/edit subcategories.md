@@ -26,8 +26,10 @@
 - [x] Tipuri TypeScript definite (`frontend/src/types/Category.ts`)
 - [x] categoryService.ts implementat (CRUD + utilitare)
 - [x] categoryStore.ts Zustand implementat (fuziune, acțiuni CRUD)
-- [ ] Integrare cu store-ul de tranzacții
-- [ ] UI modal CategoryEditor (în lucru)
+- [x] UI modal CategoryEditor implementat (adăugare, redenumire, ștergere)
+- [x] Integrare cu store-ul de tranzacții - categorii încărcate și fuzionate în LunarGridPage
+- [x] Integrare TransactionForm - dropdown-uri actualizate pentru a folosi categoriile personalizate + predefinite
+- [ ] Integrare TransactionFilters și butoane acțiune în LunarGrid (în lucru)
 - [ ] Testare și QA
 
 ## Plan de Implementare

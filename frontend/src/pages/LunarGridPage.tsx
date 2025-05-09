@@ -2,7 +2,10 @@ import React from 'react';
 import { EXCEL_GRID } from '@shared-constants/ui';
 import LunarGrid from '../components/features/LunarGrid';
 import { TITLES } from '@shared-constants';
+import { CATEGORIES } from '@shared-constants/categories';
 import { useTransactionStore } from '../stores/transactionStore';
+import { useCategoryStore } from '../stores/categoryStore';
+import { useAuthStore } from '../stores/authStore';
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar
@@ -13,10 +16,62 @@ const LunarGridPage: React.FC = () => {
   const [year, setYear] = React.useState(() => new Date().getFullYear());
   const [month, setMonth] = React.useState(() => new Date().getMonth() + 1);
   
-  // Extragem funcțiile și state-ul necesar din store
+  // Extragem funcțiile și state-ul necesar din stores
   const setQueryParams = useTransactionStore(state => state.setQueryParams);
   const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
   const loading = useTransactionStore(state => state.loading);
+  const { user } = useAuthStore();
+  
+  // Funcționalitate pentru categorii personalizate
+  const loadCategories = useCategoryStore(state => state.loadUserCategories);
+  const mergeWithDefaults = useCategoryStore(state => state.mergeWithDefaults);
+  
+  // Inițializăm store-ul de categorii la prima încărcare
+  // Acest efect respectă regulile globale prin:
+  // 1. Operare o singură dată la montare ([] ca dependențe)
+  // 2. Folosirea useRef pentru a preveni efecte multiple
+  const categoriesLoadedRef = React.useRef(false);
+  
+  // Efect pentru încărcarea categoriilor personalizate și fuzionarea cu cele predefinite
+  React.useEffect(() => {
+    // Guard pentru a preveni încărcări multiple
+    if (categoriesLoadedRef.current) return;
+    
+    // Doar pentru utilizatorii autentificați
+    if (!user) return;
+    
+    const initializeCategories = async () => {
+      try {
+        console.log('LunarGridPage: Inițializare categorii personalizate');
+        
+        // 1. Mai întâi încărcăm categoriile personalizate din DB
+        await loadCategories(user.id);
+        
+        // 2. Apoi fuzionăm cu cele predefinite din CATEGORIES (shared-constants)
+        // Conversia e necesară pentru că CATEGORIES are un format ușor diferit de CustomCategory[]
+        const defaultCategories = Object.entries(CATEGORIES).map(([name, subcats]) => ({
+          name,
+          subcategories: Object.values(subcats).flat().map(subcatName => ({
+            name: subcatName,
+            isCustom: false
+          })),
+          isCustom: false
+        }));
+        
+        // 3. Fuziune - prioritate pentru cele personalizate
+        mergeWithDefaults(defaultCategories);
+        
+        // Marcăm ca încărcat pentru a preveni operații duplicate
+        categoriesLoadedRef.current = true;
+        
+        console.log('LunarGridPage: Categorii inițializate cu succes');
+      } catch (error) {
+        console.error('Eroare la inițializarea categoriilor:', error);
+      }
+    };
+    
+    initializeCategories();
+  }, [user, loadCategories, mergeWithDefaults]); // Dependențe minimale necesare
   
   // Referimță pentru a ține minte ultima combinație an/lună procesată
   // Acest pattern previne buclele infinite prin evitarea re-executării efectului în situații identice
