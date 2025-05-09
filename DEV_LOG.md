@@ -1,5 +1,18 @@
 # Dev Log - Budget App
 
+# [2025-05-09] Bug Fix și îmbunătățiri pentru CategoryEditor
+
+- Bug fix major: rezolvat eroarea "Cannot update a component while rendering a different component" în `CategoryEditor`
+- Implementat pattern corect pentru manipularea stării React în timpul render-ului folosind `useEffect` cu dependențe complete
+- Separat logic starea pentru editare (`editingSubcat`) de starea pentru ștergere (`deletingSubcat`) pentru a evita conflicte
+- Adăugat comentării complete în cod pentru a explica pattern-ul și evitarea buclelor infinite
+- Remediat bug-ul cu Supabase upsert pentru categorii personalizate: înlocuit upsert cu pattern select-then-insert/update
+- Documentat lecțiile învățate în `BEST_PRACTICES.md`, inclusiv:
+  - Pattern-ul corect pentru manipularea stării în componente complexe React
+  - Interacțiunea robustă cu Supabase pentru câmpuri jsonb și operațiuni upsert
+  - Gestionarea corectă a erorilor și logging standardizat pentru diagnostic
+- Toate modificările respectă regulile globale și memoria critică d7b6eb4b despre prevenirea buclelor infinite
+
 # [2025-05-09] Subcategory Customization - Etapa 2: UI și Integrare
 
 - Branch: `feature/subcategory-customization`

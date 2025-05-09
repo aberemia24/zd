@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CustomCategoriesPayload, CustomCategory } from '../types/Category';
 import { categoryService } from '../services/categoryService';
+import { useTransactionStore } from './transactionStore';
 
 interface CategoryStoreState {
   categories: CustomCategory[];
@@ -28,12 +29,41 @@ export const useCategoryStore = create<CategoryStoreState>()(
       error: null,
 
       async loadUserCategories(userId) {
+        if (!userId) {
+          console.warn('[categoryStore] loadUserCategories: utilizator neautentificat');
+          return;
+        }
+        
         set({ loading: true, error: null });
-        const data = await categoryService.getUserCategories(userId);
-        if (data) {
-          set({ categories: data.categories, version: data.version, loading: false });
-        } else {
-          set({ loading: false, error: 'Nu s-au putut încărca categoriile.' });
+        
+        try {
+          const data = await categoryService.getUserCategories(userId);
+          
+          // Validare - ne asigurăm că data.categories este întotdeauna un array
+          if (data && Array.isArray(data.categories)) {
+            set({ 
+              categories: data.categories, 
+              version: data.version || 1, 
+              loading: false,
+              error: null
+            });
+            console.log(`[categoryStore] ${data.categories.length} categorii încărcate cu succes`);
+          } else {
+            // Initializăm cu array gol dacă nu avem date valide
+            set({ 
+              categories: [], 
+              version: 1, 
+              loading: false,
+              error: null
+            });
+            console.log('[categoryStore] Nici o categorie nu a fost găsită, se începe cu lista goală');
+          }
+        } catch (err) {
+          console.error('[categoryStore] Eroare la încărcarea categoriilor:', err);
+          set({ 
+            loading: false, 
+            error: 'Nu s-au putut încărca categoriile. Verifică conexiunea.' 
+          });
         }
       },
 
@@ -108,9 +138,17 @@ export const useCategoryStore = create<CategoryStoreState>()(
       },
 
       getSubcategoryCount(category, subcategory) {
-        // Placeholder: va fi implementat cu fetch din store-ul de tranzacții
-        // sau via selector dacă tranzacțiile sunt deja în memorie
-        return 0;
+        // Obținem tranzacțiile din store-ul de tranzacții
+        // Folosim getState() pentru a evita re-render-uri inutile - acest pattern respectă regulile
+        // din memoria critică despre Maximum update depth exceeded
+        const transactions = useTransactionStore.getState().transactions;
+        
+        // Filtrăm și numărăm tranzacțiile care folosesc această subcategorie
+        const count = transactions.filter(
+          trx => trx.category === category && trx.subcategory === subcategory
+        ).length;
+        
+        return count;
       },
     }),
     {

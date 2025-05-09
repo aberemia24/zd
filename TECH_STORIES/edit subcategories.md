@@ -10,14 +10,14 @@
 
 ### Criterii de Acceptare
 
-- [ ] Pot adăuga subcategorii noi la categoriile principale existente
-- [ ] Pot redenumi subcategorii existente
-- [ ] Pot șterge subcategorii personalizate cu confirmare prealabilă
-- [ ] La ștergerea unei subcategorii, am opțiunea să migrez tranzacțiile existente sau să le șterg
-- [ ] Modificările sunt reflectate imediat în Grid-ul Lunar
-- [ ] Modificările sunt propagate în formularul de adăugare tranzacții
-- [ ] Categoriile principale rămân neschimbate
-- [ ] Subcategoriile personalizate persistă între sesiuni
+- [x] Pot adăuga subcategorii noi la categoriile principale existente
+- [x] Pot redenumi subcategorii existente
+- [x] Pot șterge subcategorii personalizate cu confirmare prealabilă
+- [x] La ștergerea unei subcategorii, am opțiunea să migrez tranzacțiile existente sau să le șterg
+- [x] Modificările sunt reflectate imediat în Grid-ul Lunar
+- [x] Modificările sunt propagate în formularul de adăugare tranzacții
+- [x] Categoriile principale rămân neschimbate
+- [x] Subcategoriile personalizate persistă între sesiuni
 
 ## Status Implementare
 
@@ -29,8 +29,54 @@
 - [x] UI modal CategoryEditor implementat (adăugare, redenumire, ștergere)
 - [x] Integrare cu store-ul de tranzacții - categorii încărcate și fuzionate în LunarGridPage
 - [x] Integrare TransactionForm - dropdown-uri actualizate pentru a folosi categoriile personalizate + predefinite
-- [ ] Integrare TransactionFilters și butoane acțiune în LunarGrid (în lucru)
-- [ ] Testare și QA
+- [x] Integrare TransactionFilters și butoane acțiune în LunarGrid
+- [x] Bug fix pentru "Cannot update a component while rendering a different component"
+- [x] Remediere problemă Supabase upsert pentru categorii personalizate
+- [x] Documentare lecții învățate în BEST_PRACTICES.md (interacțiune Supabase jsonb, manipulare state React)
+- [ ] Testare și QA (in progres)
+
+## Lecții învățate în timpul implementării
+
+### 1. Interacțiune robustă cu Supabase jsonb și upsert
+
+- **Context**: Implementare salvare/actualizare categorii personalizate în Supabase cu câmpuri jsonb
+- **Problemă**: Eroarea 400 Bad Request la upsert fără constrângere UNIQUE pe user_id
+- **Soluție**: Înlocuire upsert cu pattern robust select-then-insert/update
+  ```typescript
+  // Verificare dacă există înregistrare pentru user
+  const { data } = await supabase
+    .from(TABLE)
+    .select('id')
+    .eq('user_id', userId);
+  
+  // Alegere între INSERT sau UPDATE în funcție de rezultat
+  if (!data || data.length === 0) {
+    await supabase.from(TABLE).insert([payload]);
+  } else {
+    await supabase.from(TABLE).update(payload).eq('user_id', userId);
+  }
+  ```
+- **Documentat** în `BEST_PRACTICES.md` la secțiunea "Interacțiune robustă cu Supabase jsonb și upsert"
+
+### 2. Separarea stărilor pentru moduri de operare conflictuale în React
+
+- **Context**: Implementare UI pentru editare/ștergere subcategorii în componenta `CategoryEditor` 
+- **Problemă**: Eroarea "Cannot update a component while rendering a different component" când același state era modificat în componente diferite
+- **Soluție**: Implementare state separat pentru fiecare mod de operare + useEffect pentru manipularea stării
+  ```typescript
+  // State separat pentru operațiuni
+  const [editingSubcat, setEditingSubcat] = useState(null);
+  const [deletingSubcat, setDeletingSubcat] = useState(null);
+  const [deleteMode, setDeleteMode] = useState(false);
+  
+  // Manipulare de state în useEffect cu dependențe complete
+  React.useEffect(() => {
+    if (condition) {
+      setState(newValue);
+    }
+  }, [condition, otherDependencies]);
+  ```
+- **Documentat** în `BEST_PRACTICES.md` la secțiunea "Separarea stărilor pentru moduri de operare conflictuale în React"
 
 ## Plan de Implementare
 

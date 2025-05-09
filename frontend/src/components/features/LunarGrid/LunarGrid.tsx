@@ -1,11 +1,12 @@
 import React from 'react';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useAuthStore } from '../../../stores/authStore';
+import { useCategoryStore } from '../../../stores/categoryStore';
 import { CATEGORIES } from '@shared-constants/categories';
 import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants/ui';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Edit, Trash2 } from 'lucide-react';
 import CellTransactionPopover from './CellTransactionPopover';
 import { CategoryEditor } from '../CategoryEditor';
 
@@ -211,9 +212,17 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
   const { user } = useAuthStore();
   
+  // State pentru subcategoria în curs de editare (pentru editare direct din grid)
+  const [editingSubcategory, setEditingSubcategory] = React.useState<{category: string; subcategory: string; mode: 'edit' | 'delete'} | null>(null);
+  
+  // Acces la store-ul de categorii pentru a verifica dacă o subcategorie este personalizată
+  const categories = useCategoryStore(state => state.categories);
+  
   // UI copy pentru CategoryEditor (fallback dacă nu există în shared-constants/ui)
   const UI = {
     MANAGE_CATEGORIES: 'Gestionare categorii',
+    EDIT_SUBCATEGORY: 'Edită subcategoria',
+    DELETE_SUBCATEGORY: 'Șterge subcategoria',
   };
 
   const days = getDaysInMonth(year, month);
@@ -469,6 +478,28 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   };
   // Handler pentru închidere popover
   const handleClosePopover = () => setPopover(null);
+  
+  // Handler pentru editare subcategorie direct din grid
+  const handleEditSubcategory = (category: string, subcategory: string, mode: 'edit' | 'delete' = 'edit') => {
+    if (!user) return;
+    setEditingSubcategory({ category, subcategory, mode });
+    setShowCategoryEditor(true);
+  };
+  
+  // Handler pentru resetarea editării subcategoriei în momentul închiderii modalului
+  const handleCloseCategoryEditor = () => {
+    setShowCategoryEditor(false);
+    setEditingSubcategory(null);
+  };
+  
+  // Verifică dacă o subcategorie este personalizată (permite editare/ștergere)
+  const isCustomSubcategory = (category: string, subcategory: string): boolean => {
+    const foundCategory = categories.find(cat => cat.name === category);
+    if (!foundCategory) return false;
+    
+    const foundSubcategory = foundCategory.subcategories.find(subcat => subcat.name === subcategory);
+    return foundSubcategory?.isCustom || false;
+  };
 
   return (
     <React.Fragment>
@@ -485,12 +516,14 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
         </div>
       )}
       
-      {/* Modal CategoryEditor */}
+      {/* Modal CategoryEditor - pentru management general sau editare specifică subcategorie */}
       {user && showCategoryEditor && (
         <CategoryEditor
           open={showCategoryEditor}
-          onClose={() => setShowCategoryEditor(false)}
+          onClose={handleCloseCategoryEditor}
           userId={user?.id || ''}
+          initialCategory={editingSubcategory?.category}
+          initialSubcategory={editingSubcategory?.subcategory}
         />
       )}
       
@@ -556,11 +589,44 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
                       data-testid={`subcategory-row-${categoryKey}-${subcat}`}
                     > 
                       <td 
-                        className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 flex items-center"
+                        className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 flex items-center justify-between"
                         data-testid={`subcat-${subcat}`}
                       >
-                        <div className="w-4 h-0 border-t border-gray-400 mr-2"></div>
-                        {subcat}
+                        <div className="flex items-center">
+                          <div className="w-4 h-0 border-t border-gray-400 mr-2"></div>
+                          {/* Indicațor pentru subcategorii personalizate */}
+                          <span data-testid={`subcat-label-${subcat}`}>
+                            {subcat} {isCustomSubcategory(categoryKey, subcat) && <span className="text-blue-600 text-sm ml-1">➡️</span>}
+                          </span>
+                        </div>
+                        
+                        {/* Butoane acțiune pentru subcategorii personalizate, vizibile doar pentru autentificare */}
+                        {user && isCustomSubcategory(categoryKey, subcat) && (
+                          <div className="flex gap-2 ml-auto">
+                            <button 
+                              className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditSubcategory(categoryKey, subcat, 'edit');
+                              }}
+                              title={UI.EDIT_SUBCATEGORY}
+                              data-testid={`edit-subcat-${categoryKey}-${subcat}`}
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button 
+                              className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditSubcategory(categoryKey, subcat, 'delete');
+                              }}
+                              title={UI.DELETE_SUBCATEGORY}
+                              data-testid={`delete-subcat-${categoryKey}-${subcat}`}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        )}
                       </td>
                       {days.map(day => {
                         const sum = getSumForCell(transactions, categoryKey, subcat, day);

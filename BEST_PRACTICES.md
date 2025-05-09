@@ -404,6 +404,101 @@ useEffect(() => {
 - Avantaje: separare clară a responsabilităților, testabilitate crescută, performanță mai bună.
 - Status: pattern recomandat, nu obligatoriu (vezi și secțiunea 3 din `global_rules.md`).
 
+### Interacțiune robustă cu Supabase jsonb și upsert (2025-05-09)
+
+- **Context**: Implementarea salvare/actualizare de categorii personalizate în Supabase a relevat probleme cu formatarea jsonb și onConflict.
+- **Lecții învățate**:
+  1. **Structură jsonb corectă**:
+      - Pentru câmpuri de tip jsonb, Supabase acceptă obiectul direct (nu stringificat manual)
+      - Verificare în prealabil a schemei tabelului cu `MCP.list_tables()` sau SQL Editor
+      - Exemplu corect:
+      ```typescript
+      // CORECT: Se transmite direct obiectul pentru jsonb
+      const payload = {
+        user_id: userId,
+        category_data: {
+          categories: categories,
+          version: currentVersion
+        }
+      };
+      ```
+  2. **Pattern selectInsertUpdate în loc de upsert**:
+     - Folosirea `upsert({ onConflict: 'field' })` necesită constrângere UNIQUE pe field
+     - Când upsert eșuează cu "no unique or exclusion constraint matching ON CONFLICT specification", implementează un pattern select-then-insert/update:
+     ```typescript
+     // Verificare dacă există înregistrare pentru user
+     const { data } = await supabase
+       .from(TABLE)
+       .select('id')
+       .eq('user_id', userId);
+     
+     // Alegere între INSERT sau UPDATE în funcție de rezultat
+     if (!data || data.length === 0) {
+       await supabase.from(TABLE).insert([payload]);
+     } else {
+       await supabase.from(TABLE).update(payload).eq('user_id', userId);
+     }
+     ```
+  3. **Gestionare robustă erori**:
+     - Logging standardizat pentru diagnostic ușor (context + error specific)
+     - Returnare valori sigure (array gol, null) în caz de eroare
+     - try/catch în toate metodele pentru întrerupere grațioasă în caz de eșec
+
+- **Regulă** (**recomandată**): Verifică întotdeauna schema și constrângerile Supabase pentru tabele înainte de implementare; preferă pattern-ul robust select-then-insert/update pentru date user-specifice.
+
+### Separarea stărilor pentru moduri de operare conflictuale în React (2025-05-09)
+
+- **Context**: Implementarea UI pentru editare/ștergere subcategorii a relevat conflicte între modurile de operare când folosesc aceeași variabilă de stare.
+- **Problemă**: "Cannot update a component while rendering a different component" când același state e modificat în componente diferite.
+- **Lecții învățate**:
+  1. **Stare separată pentru fiecare mod de operare**:
+     ```typescript
+     // INCORECT: Reutilizarea aceleiași variabile pentru operațiuni diferite
+     const [editingItem, setEditingItem] = useState(null);
+     // folosit atât pentru editare cât și pentru ștergere
+     
+     // CORECT: State separat pentru fiecare operațiune
+     const [editingItem, setEditingItem] = useState(null);
+     const [deletingItem, setDeletingItem] = useState(null);
+     ```
+     
+  2. **useEffect pentru manipularea stării în timpul render-ului**:
+     ```typescript
+     // INCORECT: Manipulare de state direct în timpul render-ului
+     const Component = () => {
+       if (condition) {
+         setState(newValue); // Eroare: Cannot update during rendering
+         return null;
+       }
+     };
+     
+     // CORECT: Manipulare de state în useEffect
+     const Component = () => {
+       React.useEffect(() => {
+         if (condition) {
+           setState(newValue);
+         }
+       }, [condition]);
+     };
+     ```
+     
+  3. **Reset complet al stării la tranziția între moduri**:
+     ```typescript
+     // La activarea modului de editare
+     const handleEdit = (item) => {
+       setDeletingItem(null); // Dezactivează explicit modul de ștergere
+       setEditingItem(item);
+     };
+     
+     // La activarea modului de ștergere
+     const handleDelete = (item) => {
+       setEditingItem(null); // Dezactivează explicit modul de editare
+       setDeletingItem(item);
+     };
+     ```
+
+- **Regulă** (**obligatorie**): Pentru UI cu moduri de operare multiple (ex: edit/delete), folosește state separat pentru fiecare mod și nu modifica state-uri în timpul render-ului. Orice modificare de state din componente imbricate trebuie mutată în useEffect.
+
 ### Testare valori inițiale în formulare complexe (React)
 
 - Lecție: Asertarea simultană a tuturor valorilor inițiale poate duce la instabilitate în JSDOM/RTL.
