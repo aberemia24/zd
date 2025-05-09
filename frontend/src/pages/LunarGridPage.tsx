@@ -85,23 +85,25 @@ const LunarGridPage: React.FC = () => {
       return; // Skip dacă luna/anul nu s-au schimbat
     }
     
-    // Actualizăm referimța
+    // Actualizăm referința
     lastProcessedRef.current = { year, month };
     
     // Important: Folosim getState() pentru a accesa starea curentă fără subscribe
     // Aceasta evită bucle infinite cauzate de dependțe ciclice cu re-render
     const store = useTransactionStore.getState();
     
-    // 1. Mai întâi setăm parametrii (ân conformitate cu anti-pattern memoriei critice)
-    store.setQueryParams({
-      ...store.currentQueryParams,
-      year,
-      month,
-      includeAdjacentDays: true // Pentru a include zilele din lunile adiacente (conform AC-12)
-    });
-    
-    // 2. Apoi facem fetch explicit (respectând regula din memorie d7b6eb4b-0702-4b0a-b074-3915547a2544)
-    store.fetchTransactions(true);  // forceRefresh=true pentru a ignora cache-ul pentru anul/luna proaspăt setată
+    // 1. Setăm parametrii și fetch în setTimeout pentru a preveni actualizări în cascadă
+    setTimeout(() => {
+      store.setQueryParams({
+        ...store.currentQueryParams,
+        year,
+        month,
+        includeAdjacentDays: true
+      });
+      setTimeout(() => {
+        store.fetchTransactions(true);
+      }, 0);
+    }, 0);
     
     // Actualizăm URL-ul cu parametrul month=YYYY-MM (conform AC-5)
     const urlParams = new URLSearchParams(window.location.search);
