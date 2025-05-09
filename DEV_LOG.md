@@ -1,5 +1,16 @@
 # Dev Log - Budget App
 
+# [2025-05-09] Subcategory Customization MVP
+
+- Branch: `feature/subcategory-customization`
+- Migrare DB aplicată: `backend/2025-05-09T1132_create_custom_categories.sql`
+- Tipuri TS noi: `frontend/src/types/Category.ts`
+- Service nou: `frontend/src/services/categoryService.ts` (CRUD, validare, migrare, duplicate)
+- Store nou Zustand: `frontend/src/stores/categoryStore.ts` (fuziune cu predefinite, persist, acțiuni CRUD)
+- Respectat reguli globale: persist, barrel, fără string-uri hardcodate, testabilitate (serviciile injectabile)
+- Următorii pași: integrare cu store tranzacții, CategoryEditor UI, testare E2E/QA
+
+
 ## 2025-05-09 - Implementare editare/adăugare tranzacții direct din LunarGrid (DEV-5 Complet)
 
 - Implementat mecanism excel-like pentru editare rapidă direct în celulele LunarGrid:
