@@ -2,12 +2,10 @@ import React from 'react';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { CATEGORIES } from '@shared-constants/categories';
 import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants/ui';
-import { ChevronDown, ChevronRight, Edit, Trash2 } from 'lucide-react';
-import CellTransactionPopover from './CellTransactionPopover';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { CategoryEditor } from '../CategoryEditor';
 import { SubcategoryRows } from './SubcategoryRows';
 
@@ -194,6 +192,9 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   
   // Acces la store-ul de categorii pentru a verifica dacă o subcategorie este personalizată
   const categories = useCategoryStore(state => state.categories);
+  const loadCategories = useCategoryStore(state => state.loadUserCategories);
+  const mergeWithDefaults = useCategoryStore(state => state.mergeWithDefaults);
+  const deleteSubcategory = useCategoryStore(state => state.deleteSubcategory);
   
   // UI copy pentru CategoryEditor (fallback dacă nu există în shared-constants/ui)
   const UI = {
@@ -237,12 +238,12 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   const categoryTotals = React.useMemo(() => {
     const result: Record<string, Record<number, number>> = {};
     
-    Object.keys(CATEGORIES).forEach(category => {
-      result[category] = getCategoryTotalAllDays(transactions, category);
+    categories.forEach(category => {
+      result[category.name] = getCategoryTotalAllDays(transactions, category.name);
     });
     
     return result;
-  }, [transactions]);
+  }, [transactions, categories]);
   
   // Referință pentru a ține evidența ultimei tranzacții adăugate
   const lastAddedTransactionRef = React.useRef<{ timestamp: number; processed: boolean } | null>(null);
@@ -426,6 +427,12 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     setShowCategoryEditor(true);
   };
   
+  // Immediate delete without modal
+  const handleDeleteSubcategoryDirect = React.useCallback((category: string, subcategory: string) => {
+    if (!user) return;
+    deleteSubcategory(user.id, category, subcategory, 'delete');
+  }, [user, deleteSubcategory]);
+  
   // Handler pentru resetarea editării subcategoriei în momentul închiderii modalului
   const handleCloseCategoryEditor = () => {
     setShowCategoryEditor(false);
@@ -483,9 +490,11 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
           </tr>
         </thead>
         <tbody>
-          {Object.entries(CATEGORIES).map(([categoryKey, subcats]) => {
+          {categories.map(category => {
+            const categoryKey = category.name;
+            const subcategories = category.subcategories.map(s => s.name);
             const isExpanded = !!expandedCategories[categoryKey];
-            const categoryTotalsByDay = categoryTotals[categoryKey];
+            const categoryTotalsByDay = categoryTotals[categoryKey] || {};
             
             return (
               <React.Fragment key={categoryKey}>
@@ -524,7 +533,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
                 {isExpanded && (
                   <SubcategoryRows
                     categoryKey={categoryKey}
-                    subcats={subcats}
+                    subcategories={subcategories}
                     transactions={transactions}
                     days={days}
                     popover={popover}
@@ -532,7 +541,8 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
                     handleCellDoubleClick={handleCellDoubleClick}
                     handleSavePopover={handleSavePopover}
                     handleClosePopover={handleClosePopover}
-                    handleEditSubcategory={handleEditSubcategory}
+                    handleEditSubcategory={(cat: string, sub: string) => handleEditSubcategory(cat, sub, 'edit')}
+                    handleDeleteSubcategory={(cat: string, sub: string) => handleDeleteSubcategoryDirect(cat, sub)}
                     isCustomSubcategory={isCustomSubcategory}
                     user={user}
                   />
