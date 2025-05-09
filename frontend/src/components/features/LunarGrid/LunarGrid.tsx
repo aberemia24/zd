@@ -31,28 +31,17 @@ function useMonthlyTransactions(year: number, month: number) {
     transactionStore.refresh(); 
   }, [transactionStore]);
   
-  // IMPORTANT: Un singur effect pentru setarea parametrilor și fetch
-  // Acest model respectă regula critică din memoria d7b6eb4b-0702-4b0a-b074-3915547a2544
+    // IMPORTANT: S-a eliminat complet efectul care genera bucla infinită (anti-pattern useEffect + fetchTransactions)
+  // Conform memory d7b6eb4b-0702-4b0a-b074-3915547a2544 și analizei utilizatorului,
+  // logic de fetch a fost consolidată în LunarGridPage.tsx și nu mai este necesară aici
+  
+  // Actualizăm doar referința pentru a menține consistența
   React.useEffect(() => {
-    // Verificăm dacă parametrii s-au schimbat cu adevărat pentru a preveni bucle
     if (paramsRef.current.year !== year || paramsRef.current.month !== month) {
-      console.log(`Parameters changed: ${paramsRef.current.year}-${paramsRef.current.month} -> ${year}-${month}`);
-      
-      // Actualizăm referinta pentru a ști ce parametri am folosit ultima dată
+      console.log(`[LunarGrid] Sync params reference: ${year}-${month}`);
       paramsRef.current = { year, month };
-      
-      // Setăm parametrii și facem fetch într-un singur effect
-      console.log(`Setting query params and fetching for ${year}-${month}`);
-      transactionStore.setQueryParams({
-        month,
-        year,
-        includeAdjacentDays: true, // Include zile din lunile adiacente pentru o experiență mai bună
-      });
-      
-      // Fetch-ul se face doar la prima montare și la schimbarea anului/lunii
-      transactionStore.fetchTransactions();
     }
-  }, [month, year, transactionStore]); // Dependențe minimale
+  }, [year, month]); // Dependențe minimale
 
   // Filtrează tranzacțiile pentru luna curentă + zile adiacente
   const transactions = React.useMemo(() => {
@@ -229,64 +218,18 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   // Acesta nu creează bucle infinite deoarece nu combinăm operații de fetch cu setState
   const [refreshTrigger, setRefreshTrigger] = React.useState(0);
   
-  // SOLUȚIE DEFINITIVĂ PENTRU A ELIMINA BUCLA INFINITĂ
-  // În loc să folosim evenimente personalizate care pot cauza bucle infinite,
-  // vom verifica direct snapshot-uri ale categoriilor folosind localStorage
+  // Înlocuim soluția complexă cu o abordare mult mai simplă conform recomandărilor utilizatorului
+  // Soluția respectă strict memoria critică d7b6eb4b-0702-4b0a-b074-3915547a2544
   
-  // 1. Definim o cheie pentru localStorage pentru a stoca timestamp-ul ultimei modificări
-  const LAST_CATEGORY_UPDATE_KEY = 'budget-app-last-category-update';
+  // Stocăm categoriile în state-ul local al componentei pentru a evita re-fetch-uri inutile
+  const [localCategories, setLocalCategories] = React.useState<typeof categories>([]);
   
-  // 2. Ref pentru ultima dată când am verificat categoriile 
-  // pentru a evita operații duplicate sau inutile
-  const lastCategoryCheckRef = React.useRef<number>(0);
-  
-  // 3. Ref pentru timeout-ul de poll - pentru a putea face cleanup corect
-  const categoryPollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  
-  // 4. Use state pentru a forța re-render-ul când se detectează schimbări
-  const [refreshCounter, setRefreshCounter] = React.useState<number>(0);
-  
-  // 5. Implementarea unui polling sigur pentru a verifica modificările
-  // Fără a folosi evenimente care pot cauza bucle
+  // Un singur efect pentru sincronizarea categoriilor, fără a crea un ciclu de actualizare
   React.useEffect(() => {
-    console.log('[LunarGrid] Inițializarea mecanismului sigur de detectare a schimbărilor de categorii');
-    
-    // Verificare pentru modificări la categorii din localStorage
-    const checkForCategoryChanges = () => {
-      try {
-        const lastUpdateString = localStorage.getItem(LAST_CATEGORY_UPDATE_KEY);
-        const lastUpdate = lastUpdateString ? parseInt(lastUpdateString, 10) : 0;
-        
-        // Dacă timestamp-ul s-a schimbat, înseamnă că altcineva a modificat categoriile
-        if (lastUpdate > lastCategoryCheckRef.current) {
-          console.log('[LunarGrid] Detectată actualizare de categorii la', new Date(lastUpdate).toISOString());
-          lastCategoryCheckRef.current = lastUpdate;
-          
-          // Forțăm re-render-ul fără a declanșa efecte
-          // IMPORTANT: Folosim un setTimeout pentru a preveni bucle de actualizare
-          // conform recomandărilor din memoria e0d0698c
-          setTimeout(() => {
-            setRefreshCounter(prev => prev + 1);
-          }, 0);
-        }
-      } catch (error) {
-        console.error('[LunarGrid] Eroare la verificarea modificărilor de categorii', error);
-      }
-      
-      // Programăm următoarea verificare (polling la fiecare 2 secunde)
-      categoryPollTimeoutRef.current = setTimeout(checkForCategoryChanges, 2000);
-    };
-    
-    // Inițiem prima verificare
-    checkForCategoryChanges();
-    
-    // Cleanup la demontare
-    return () => {
-      if (categoryPollTimeoutRef.current) {
-        clearTimeout(categoryPollTimeoutRef.current);
-      }
-    };
-  }, []); // Fără dependențe - rulează doar la montare/demontare
+    console.log('[LunarGrid] Sincronizare categorii cu state-ul local');
+    // Facem o copie locală a categoriilor pentru a preveni referințe circulare
+    setLocalCategories([...categories]);
+  }, [categories.length]); // Dependem doar de numărul de categorii, nu de conținut
   
   // Debug
   React.useEffect(() => {
@@ -328,22 +271,20 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   };
   
   // Calcul pentru sume totale pe categorii (folosit la afișarea categoriilor colapsate)
-  // IMPORTANT: Eliminăm complet dependența circulară folosind useCategoryStore.getState()
+  // IMPORTANT: Simplificăm complet pentru a elimina dependențele circulare,
   // conform recomandărilor din memoria d7b6eb4b
   const categoryTotals = React.useMemo(() => {
     const result: Record<string, Record<number, number>> = {};
     
-    // Extragem toate numele de categorii din constante și store
-    // Această abordare asigură că include toate categoriile posibile
+    // Extragem toate numele de categorii din constante și categoriile locale
+    // Fără a folosi useCategoryStore.getState() care poate cauza bucle
     const categoryNames = new Set<string>();
     
     // Adăugăm mai întâi categoriile din constante
     Object.keys(CATEGORIES).forEach(cat => categoryNames.add(cat));
     
-    // Apoi adăugăm toate categoriile din store
-    // Folosim getState() pentru a accesa valorile curente fără a crea dependențe
-    const storeCategories = useCategoryStore.getState().categories;
-    storeCategories.forEach(cat => categoryNames.add(cat.name));
+    // Apoi adăugăm categoriile locale (sincronizate din categories)
+    localCategories.forEach(cat => categoryNames.add(cat.name));
     
     // Calculăm totaluri pentru fiecare categorie
     Array.from(categoryNames).forEach(category => {
@@ -351,7 +292,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     });
     
     return result;
-  }, [transactions, refreshCounter]); // Dependm doar de tranzacții și contorul de refresh de la localStorage
+  }, [transactions, localCategories]); // Dependm doar de tranzacții și categoriile locale
   
   // Referință pentru a ține evidența ultimei tranzacții adăugate
   const lastAddedTransactionRef = React.useRef<{ timestamp: number; processed: boolean } | null>(null);
