@@ -130,7 +130,7 @@
 ├───────┼──────┼──────┼──────┼──────┼──────┼───────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┤
 │ 📂 VENITURI           │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
 │   └ Report anterioară │  —   │  —   │  —   │  —   │  —   │ RON 0 │RON 13,779│  —   │  —   │  —   │  —   │  —   │ ...  │      │
-│   └ Salarii           │  —   │  —   │  —   │  —   │RON 5,790│RON 5,790│  —   │  —   │  —   │RON 13,358│  —   │ ...  │      │
+{{ ... }}
 │   └ Chirii            │  —   │  —   │  —   │RON 12,968│  —   │RON 12,968│  —   │  —   │  —   │  —   │  —   │ ...  │      │
 │   └ [+ Adaugă]        │      │      │      │      │      │       │      │      │      │      │      │      │ ...  │      │
 │  Total Venituri       │RON 4,546│RON 11,163│ RON 0 │RON 12,968│RON 5,790│RON 34,467│RON 13,779│ RON 0 │ RON 0 │RON 13,358│RON 600│ ... │      │
@@ -207,6 +207,27 @@ import MonthlyGridPreview from "@components/MonthlyGridPreview";
   * API pentru adăugare/editare categorii și subcategorii trebuie să actualizeze `shared-constants/categories.ts` sau să ofere un endpoint dedicat pentru sincronizare
 
 ## 12. Definition of Done
+
+---
+
+## 13. Lecții învățate & anti-patternuri (2025-05-09)
+
+- **Nu folosi polling cu interval-uri** pentru sincronizare între stores/UI (ineficient, bug-prone).
+- **Nu folosi localStorage** pentru comunicare între componente sau stores (fragil, greu de testat/debug).
+- **Evită over-engineering cu event-emitteri** pentru orice schimbare de stare. Folosește Zustand/core store pattern cu acțiuni clare.
+- **Preferă surse de adevăr unice** (ex: store-uri Zustand pentru state, `shared-constants/messages.ts` pentru UI copy).
+- **Confirmările destructive** (ex: ștergere subcategorie) se fac direct din grid, cu mesaj centralizat în shared-constants/messages.ts.
+- Orice workaround sau excepție se documentează explicit în BEST_PRACTICES.md și DEV_LOG.md.
+
+**Anti-patternuri observate:**
+- Efecte care ascultă pe localStorage sau polling pentru a detecta schimbări între tab-uri sau componente.
+- Folosirea de event-emitteri custom pentru propagarea modificărilor între stores sau UI.
+
+**Pattern corect:**
+- Store unic Zustand, acțiuni clare, confirmare la delete, fără side-effects ascunse.
+
+Toate aceste reguli au fost promovate și în BEST_PRACTICES.md și DEV_LOG.md pentru vizibilitate și consistență la nivel de echipă.
+
 
 - [ ] Persistența autentificării funcționează: utilizatorul rămâne logat după refresh (test manual și automat).
 - [ ] Nu se pot salva categorii/subcategorii invalide (test manual și automat).

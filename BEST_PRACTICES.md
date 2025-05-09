@@ -406,6 +406,27 @@ useEffect(() => {
 
 ### Interacțiune robustă cu Supabase jsonb și upsert (2025-05-09)
 
+---
+
+### Lecții și anti-patternuri – LunarGrid, stores și sincronizare (2025-05-09)
+
+- **Nu folosi polling cu interval-uri** pentru sincronizare între stores/UI (ineficient, bug-prone).
+- **Nu folosi localStorage** pentru comunicare între componente sau stores (fragil, greu de testat/debug).
+- **Evită over-engineering cu event-emitteri** pentru orice schimbare de stare. Folosește Zustand/core store pattern cu acțiuni clare.
+- **Preferă surse de adevăr unice** (ex: store-uri Zustand), sincronizare explicită, fără hack-uri side-channel.
+- **Confirmările destructive** (ex: ștergere subcategorie) se fac direct din grid, cu mesaj centralizat în shared-constants/messages.ts.
+- Orice workaround sau excepție se documentează aici și în DEV_LOG.md.
+
+**Anti-patternuri observate:**
+- Efecte care ascultă pe localStorage sau polling pentru a detecta schimbări între tab-uri sau componente.
+- Folosirea de event-emitteri custom pentru propagarea modificărilor între stores sau UI.
+
+**Pattern corect:**
+- Store unic Zustand, acțiuni clare, confirmare la delete, fără side-effects ascunse.
+
+Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
+
+
 - **Context**: Implementarea salvare/actualizare de categorii personalizate în Supabase a relevat probleme cu formatarea jsonb și onConflict.
 - **Lecții învățate**:
   1. **Structură jsonb corectă**:
