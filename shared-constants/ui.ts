@@ -17,6 +17,7 @@ export const LABELS = {
 export const TITLES = {
   TRANZACTII: 'Tranzacții',
   GRID_LUNAR: 'Grid Lunar',
+  OPTIUNI: 'Opțiuni',
 };
 
 export const PLACEHOLDERS = {
@@ -32,6 +33,8 @@ export const BUTTONS = {
   DELETE: 'Șterge',
   NEXT_PAGE: 'Înainte',
   PREV_PAGE: 'Înapoi',
+  ADD_SUBCATEGORY: 'Adaugă subcategorie',
+  MANAGE_CATEGORIES: 'Gestionare categorii',
 };
 
 export const TABLE = {
@@ -72,6 +75,11 @@ export const EXCEL_GRID = {
   LOADING: 'Se încarcă datele...',
   PROMPTS: {
     ENTER_AMOUNT: 'Introduceți suma:'
+  },
+  ACTIONS: {
+    ADD_SUBCATEGORY: 'Adaugă subcategorie',
+    EDIT_SUBCATEGORY: 'Editează subcategorie',
+    DELETE_SUBCATEGORY: 'Șterge subcategorie',
   }
 };
 
@@ -93,4 +101,19 @@ export const OPTIONS = {
     { value: FrequencyType.MONTHLY, label: 'Lunar' },
     { value: FrequencyType.YEARLY, label: 'Anual' },
   ],
+};
+
+// Texte pentru pagina de opțiuni și gestionare categorii
+export const UI = {
+  OPTIONS_PAGE_TITLE: 'Opțiuni',
+  CATEGORY_MANAGEMENT: 'Gestionare categorii',
+  CATEGORY_MANAGEMENT_DESCRIPTION: 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.',
+  MANAGE_CATEGORIES: 'Gestionare categorii',
+  DISPLAY_OPTIONS: 'Opțiuni de afișare',
+  DATA_EXPORT: 'Export date',
+  COMING_SOON: 'În curând',
+  LOGIN_REQUIRED: 'Trebuie să fiți autentificat pentru a accesa această pagină.',
+  ADD_SUBCATEGORY: 'Adaugă subcategorie',
+  DELETE_SUBCATEGORY: 'Șterge subcategorie',
+  EDIT_SUBCATEGORY: 'Editează subcategorie',
 };

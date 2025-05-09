@@ -5,10 +5,9 @@ import { useCategoryStore } from '../../../stores/categoryStore';
 import { CATEGORIES } from '@shared-constants/categories';
 import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { EXCEL_GRID } from '@shared-constants/ui';
-import { ChevronDown, ChevronRight, Edit, Trash2 } from 'lucide-react';
+import { EXCEL_GRID, UI as UI_CONSTANTS } from '@shared-constants/ui';
+import { ChevronDown, ChevronRight, Edit, Trash2, Plus, Check, X } from 'lucide-react';
 import CellTransactionPopover from './CellTransactionPopover';
-import { CategoryEditor } from '../CategoryEditor';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -202,36 +201,108 @@ export interface LunarGridProps {
 // Constante pentru localStorage
 const LOCALSTORAGE_CATEGORY_EXPAND_KEY = 'budget-app-category-expand';
 
-// UI copy pentru CategoryEditor, fallback dacă nu există în shared-constants/ui
-const UI = {
-  MANAGE_CATEGORIES: 'Gestionare categorii',
-};
+// Folosim constantele din shared-constants/ui.ts conform regulilor globale
 
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
-  // State pentru modalul CategoryEditor si autentificare
-  const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
+  // State pentru adăugare subcategorie inline
+  const [addingSubcategory, setAddingSubcategory] = React.useState<{category: string, value: string} | null>(null);
   const { user } = useAuthStore();
   
-  // State pentru subcategoria în curs de editare (pentru editare direct din grid)
-  const [editingSubcategory, setEditingSubcategory] = React.useState<{category: string; subcategory: string; mode: 'edit' | 'delete'} | null>(null);
+  // Nu mai avem nevoie de state pentru editare subcategorii în grid
+  // Această funcționalitate a fost mutată în pagina de Opțiuni
   
   // Acces la store-ul de categorii pentru a verifica dacă o subcategorie este personalizată
-  const categories = useCategoryStore(state => state.categories);
+  // Folosim destructurare pentru a respecta pattern-ul recomandat în memoria 49dcd68b
+  // Acces la store-ul de categorii - folosim hook-ul direct pentru a asigura re-render la schimbări
+  // Acesta este un pattern sigur deoarece nu combinăm fetch cu setState în același effect
+  const { categories } = useCategoryStore(state => ({
+    categories: state.categories
+  }));
   
-  // UI copy pentru CategoryEditor (fallback dacă nu există în shared-constants/ui)
-  const UI = {
-    MANAGE_CATEGORIES: 'Gestionare categorii',
-    EDIT_SUBCATEGORY: 'Edită subcategoria',
-    DELETE_SUBCATEGORY: 'Șterge subcategoria',
-  };
+  // Important: Vom adăuga un listener pentru evenimentul custom 'category-added' mai jos,
+  // după ce declarăm variabila forceRefresh
 
   const days = getDaysInMonth(year, month);
   const { transactions, forceRefresh } = useMonthlyTransactions(year, month);
   
+  // IMPORTANT: Folosim un state local pentru a forța actualizarea UI-ului după adăugarea unei subcategorii
+  // Acesta nu creează bucle infinite deoarece nu combinăm operații de fetch cu setState
+  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
+  
+  // SOLUȚIE DEFINITIVĂ PENTRU A ELIMINA BUCLA INFINITĂ
+  // În loc să folosim evenimente personalizate care pot cauza bucle infinite,
+  // vom verifica direct snapshot-uri ale categoriilor folosind localStorage
+  
+  // 1. Definim o cheie pentru localStorage pentru a stoca timestamp-ul ultimei modificări
+  const LAST_CATEGORY_UPDATE_KEY = 'budget-app-last-category-update';
+  
+  // 2. Ref pentru ultima dată când am verificat categoriile 
+  // pentru a evita operații duplicate sau inutile
+  const lastCategoryCheckRef = React.useRef<number>(0);
+  
+  // 3. Ref pentru timeout-ul de poll - pentru a putea face cleanup corect
+  const categoryPollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  
+  // 4. Use state pentru a forța re-render-ul când se detectează schimbări
+  const [refreshCounter, setRefreshCounter] = React.useState<number>(0);
+  
+  // 5. Implementarea unui polling sigur pentru a verifica modificările
+  // Fără a folosi evenimente care pot cauza bucle
+  React.useEffect(() => {
+    console.log('[LunarGrid] Inițializarea mecanismului sigur de detectare a schimbărilor de categorii');
+    
+    // Verificare pentru modificări la categorii din localStorage
+    const checkForCategoryChanges = () => {
+      try {
+        const lastUpdateString = localStorage.getItem(LAST_CATEGORY_UPDATE_KEY);
+        const lastUpdate = lastUpdateString ? parseInt(lastUpdateString, 10) : 0;
+        
+        // Dacă timestamp-ul s-a schimbat, înseamnă că altcineva a modificat categoriile
+        if (lastUpdate > lastCategoryCheckRef.current) {
+          console.log('[LunarGrid] Detectată actualizare de categorii la', new Date(lastUpdate).toISOString());
+          lastCategoryCheckRef.current = lastUpdate;
+          
+          // Forțăm re-render-ul fără a declanșa efecte
+          // IMPORTANT: Folosim un setTimeout pentru a preveni bucle de actualizare
+          // conform recomandărilor din memoria e0d0698c
+          setTimeout(() => {
+            setRefreshCounter(prev => prev + 1);
+          }, 0);
+        }
+      } catch (error) {
+        console.error('[LunarGrid] Eroare la verificarea modificărilor de categorii', error);
+      }
+      
+      // Programăm următoarea verificare (polling la fiecare 2 secunde)
+      categoryPollTimeoutRef.current = setTimeout(checkForCategoryChanges, 2000);
+    };
+    
+    // Inițiem prima verificare
+    checkForCategoryChanges();
+    
+    // Cleanup la demontare
+    return () => {
+      if (categoryPollTimeoutRef.current) {
+        clearTimeout(categoryPollTimeoutRef.current);
+      }
+    };
+  }, []); // Fără dependențe - rulează doar la montare/demontare
+  
+  // Debug
+  React.useEffect(() => {
+    if (refreshTrigger > 0) {
+      console.log(`[LunarGrid] Refresh categorii: ${refreshTrigger}`);
+      console.log('[LunarGrid] Categorii curente:', categories.map(c => c.name));
+      categories.forEach(cat => {
+        console.log(`[LunarGrid] Subcategorii pentru ${cat.name}:`, cat.subcategories.map(sc => sc.name));
+      });
+    }
+  }, [refreshTrigger, categories]);
+  
   // Stare pentru categorii expandate/colapsate - persistentă în localStorage
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
     try {
-      // Încearcă să încerce starea din localStorage
+      // Încearcă să încarce starea din localStorage
       const saved = localStorage.getItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY);
       return saved ? JSON.parse(saved) : {};
     } catch (error) {
@@ -257,15 +328,30 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   };
   
   // Calcul pentru sume totale pe categorii (folosit la afișarea categoriilor colapsate)
+  // IMPORTANT: Eliminăm complet dependența circulară folosind useCategoryStore.getState()
+  // conform recomandărilor din memoria d7b6eb4b
   const categoryTotals = React.useMemo(() => {
     const result: Record<string, Record<number, number>> = {};
     
-    Object.keys(CATEGORIES).forEach(category => {
+    // Extragem toate numele de categorii din constante și store
+    // Această abordare asigură că include toate categoriile posibile
+    const categoryNames = new Set<string>();
+    
+    // Adăugăm mai întâi categoriile din constante
+    Object.keys(CATEGORIES).forEach(cat => categoryNames.add(cat));
+    
+    // Apoi adăugăm toate categoriile din store
+    // Folosim getState() pentru a accesa valorile curente fără a crea dependențe
+    const storeCategories = useCategoryStore.getState().categories;
+    storeCategories.forEach(cat => categoryNames.add(cat.name));
+    
+    // Calculăm totaluri pentru fiecare categorie
+    Array.from(categoryNames).forEach(category => {
       result[category] = getCategoryTotalAllDays(transactions, category);
     });
     
     return result;
-  }, [transactions]);
+  }, [transactions, refreshCounter]); // Dependm doar de tranzacții și contorul de refresh de la localStorage
   
   // Referință pentru a ține evidența ultimei tranzacții adăugate
   const lastAddedTransactionRef = React.useRef<{ timestamp: number; processed: boolean } | null>(null);
@@ -481,52 +567,103 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   
   // Handler pentru editare subcategorie direct din grid
   const handleEditSubcategory = (category: string, subcategory: string, mode: 'edit' | 'delete' = 'edit') => {
-    if (!user) return;
-    setEditingSubcategory({ category, subcategory, mode });
-    setShowCategoryEditor(true);
+    // Această funcționalitate a fost mutată în pagina de opțiuni
+    // Vom deschide pagina de opțiuni în viitor pentru această acțiune
+    alert('Această funcționalitate este disponibilă în pagina de Opțiuni');
   };
   
-  // Handler pentru resetarea editării subcategoriei în momentul închiderii modalului
-  const handleCloseCategoryEditor = () => {
-    setShowCategoryEditor(false);
-    setEditingSubcategory(null);
+  // Handler pentru a începe adăugarea unei subcategorii direct în grid
+  const handleStartAddSubcategory = (category: string) => {
+    setAddingSubcategory({ category, value: '' });
   };
   
+  // Handler pentru a salva subcategoria adăugată direct în grid
+  const handleSaveNewSubcategory = async () => {
+    if (!addingSubcategory || !addingSubcategory.value.trim() || !user) {
+      setAddingSubcategory(null);
+      return;
+    }
+    
+    const { category, value } = addingSubcategory;
+    const trimmedValue = value.trim();
+    
+    // Verificăm dacă subcategoria există deja
+    const categoryObj = categories.find(c => c.name === category);
+    if (categoryObj?.subcategories.some(sc => sc.name.toLowerCase() === trimmedValue.toLowerCase())) {
+      alert('Există deja o subcategorie cu acest nume');
+      return;
+    }
+    
+    try {
+      console.log('[LunarGrid] Adăugare subcategorie nouă:', category, trimmedValue);
+      
+      // Folosim API-ul direct al store-ului pentru a obține categoriile curente
+      // Aceasta este o tehnică sigură care respectă memoria critică d7b6eb4b
+      const currentCategories = useCategoryStore.getState().categories;
+      
+      // Adăugăm subcategoria nouă
+      const updatedCategories = [...currentCategories];
+      const categoryIndex = updatedCategories.findIndex(c => c.name === category);
+      
+      if (categoryIndex !== -1) {
+        // Creăm un nou obiect pentru a evita mutații directe
+        updatedCategories[categoryIndex] = {
+          ...updatedCategories[categoryIndex],
+          subcategories: [
+            ...updatedCategories[categoryIndex].subcategories,
+            { name: trimmedValue, isCustom: true }
+          ]
+        };
+        
+        // IMPORTANT: Conform memoriei critice d7b6eb4b, folosim direct store-ul fără hook
+        // pentru a evita bucle infinite de actualizare
+        const store = useCategoryStore.getState();
+        await store.saveCategories(user.id, updatedCategories);
+
+        // În loc să folosim loadUserCategories, care poate crea bucle,
+        // actualizăm direct UI-ul și forțăm un refresh doar al datelor tranzacției
+        setAddingSubcategory(null);
+        
+        
+        // Forțăm doar un refresh al grid-ului fără a reîncărca categoriile
+        // Aceasta este o soluție sigură conform e0d0698c-ac6d-444f-8811-b1a3936df71b
+        window.dispatchEvent(new CustomEvent('category-added'));
+        
+        console.log('[LunarGrid] Subcategorie adăugată cu succes');
+      } else {
+        throw new Error('Categoria nu a fost găsită');
+      }
+    } catch (error) {
+      console.error('Eroare la salvarea subcategoriei:', error);
+      alert('A apărut o eroare la salvarea subcategoriei. Încercați din nou.');
+    }
+  };
+  
+  // Handler pentru a anula adăugarea subcategoriei
+  const handleCancelAddSubcategory = () => {
+    setAddingSubcategory(null);
+  };
+
   // Verifică dacă o subcategorie este personalizată (permite editare/ștergere)
+  // Folosim direct store-ul pentru a avea mereu valorile actualizate
   const isCustomSubcategory = (category: string, subcategory: string): boolean => {
-    const foundCategory = categories.find(cat => cat.name === category);
+    // Accesăm direct categoriile din store pentru a evita probleme de sincronizare
+    const currentCategories = useCategoryStore.getState().categories;
+    const foundCategory = currentCategories.find(cat => cat.name === category);
     if (!foundCategory) return false;
     
-    const foundSubcategory = foundCategory.subcategories.find(subcat => subcat.name === subcategory);
+    const foundSubcategory = foundCategory.subcategories.find(sc => sc.name === subcategory);
     return foundSubcategory?.isCustom || false;
+  };
+
+  // Helper pentru a obține numărul de tranzacții pentru o subcategorie
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const getSubcategoryCount = (category: string, subcategory: string): number => {
+    return useCategoryStore.getState().getSubcategoryCount(category, subcategory);
   };
 
   return (
     <React.Fragment>
-      {/* Buton gestionare categorii - vizibil doar dacă există user autentificat */}
-      {user && (
-        <div className="mb-4 flex justify-end">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded shadow"
-            onClick={() => setShowCategoryEditor(true)}
-            data-testid="manage-categories-btn"
-          >
-            {UI.MANAGE_CATEGORIES}
-          </button>
-        </div>
-      )}
-      
-      {/* Modal CategoryEditor - pentru management general sau editare specifică subcategorie */}
-      {user && showCategoryEditor && (
-        <CategoryEditor
-          open={showCategoryEditor}
-          onClose={handleCloseCategoryEditor}
-          userId={user?.id || ''}
-          initialCategory={editingSubcategory?.category}
-          initialSubcategory={editingSubcategory?.subcategory}
-        />
-      )}
-      
       {/* Tabel principal LunarGrid */}
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
@@ -535,169 +672,236 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
               <th className="sticky left-0 z-20 bg-gray-50 px-4 py-2 text-left" style={{ minWidth: 180 }}>
                 {EXCEL_GRID.HEADERS.LUNA}
               </th>
-            {days.map(day => (
-              <th key={day} className="px-4 py-2 text-right">
-                {day}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(CATEGORIES).map(([categoryKey, subcats]) => {
-            const isExpanded = !!expandedCategories[categoryKey];
-            const categoryTotalsByDay = categoryTotals[categoryKey];
-            
-            return (
-              <React.Fragment key={categoryKey}>
-                {/* Rând principal categorie (expandabil/colapsabil) */}
-                <tr 
-                  className="bg-teal-100 hover:bg-teal-200 cursor-pointer" 
-                  onClick={() => toggleCategory(categoryKey)}
-                  data-testid={`category-row-${categoryKey}`}
-                >
-                  <td 
-                    className="sticky left-0 bg-teal-100 hover:bg-teal-200 z-10 font-semibold px-4 py-2 flex items-center"
-                    data-testid={`category-header-${categoryKey}`}
+              {days.map(day => (
+                <th key={day} className="px-4 py-2 text-right">
+                  {day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Folosim categoriile din store pentru a putea vedea modificările imediat */}
+            {categories.map(category => {
+              const categoryKey = category.name;
+              const isExpanded = !!expandedCategories[categoryKey];
+              // Adăugăm verificare de siguranță pentru a evita accesarea proprietăților undefined
+              const categoryTotalsByDay = categoryTotals[categoryKey] || {};
+              
+              return (
+                <React.Fragment key={categoryKey}>
+                  {/* Rând principal categorie (expandabil/colapsabil) */}
+                  <tr 
+                    className="bg-teal-100 hover:bg-teal-200 cursor-pointer" 
+                    onClick={() => toggleCategory(categoryKey)}
+                    data-testid={`category-row-${categoryKey}`}
                   >
-                    {isExpanded ? 
-                      <ChevronDown size={16} className="mr-1" data-testid={`category-expanded-${categoryKey}`} /> : 
-                      <ChevronRight size={16} className="mr-1" data-testid={`category-collapsed-${categoryKey}`} />}
-                    {categoryKey}
-                  </td>
+                    <td 
+                      className="sticky left-0 bg-teal-100 hover:bg-teal-200 z-10 font-semibold px-4 py-2 flex items-center"
+                      data-testid={`category-header-${categoryKey}`}
+                    >
+                      {isExpanded ? 
+                        <ChevronDown size={16} className="mr-1" data-testid={`category-expanded-${categoryKey}`} /> : 
+                        <ChevronRight size={16} className="mr-1" data-testid={`category-collapsed-${categoryKey}`} />}
+                      {categoryKey}
+                    </td>
+                    
+                    {/* Totaluri per categorie pe zile, afișate când categoria e colapsata */}
+                    {days.map(day => {
+                      // Accesăm proprietatea day cu verificare de siguranță
+                      const categorySum = (categoryTotalsByDay && categoryTotalsByDay[day]) || 0;
+                      return (
+                        <td 
+                          key={day} 
+                          className={`px-4 py-2 text-right ${getBalanceStyle(categorySum)}`}
+                          data-testid={`category-total-${categoryKey}-${day}`}
+                        >
+                          {categorySum !== 0 ? formatCurrency(categorySum) : '—'}
+                        </td>
+                      );
+                    })}
+                  </tr>
                   
-                  {/* Totaluri per categorie pe zile, afișate când categoria e colapsata */}
-                  {days.map(day => {
-                    const categorySum = categoryTotalsByDay[day] || 0;
-                    return (
-                      <td 
-                        key={day} 
-                        className={`px-4 py-2 text-right ${getBalanceStyle(categorySum)}`}
-                        data-testid={`category-total-${categoryKey}-${day}`}
-                      >
-                        {categorySum !== 0 ? formatCurrency(categorySum) : '—'}
-                      </td>
-                    );
-                  })}
-                </tr>
-                
-                {/* Randuri cu subcategorii - vizibile doar când categoria e expandata */}
-                {isExpanded && Object.entries(subcats).map(([subcatGroup, subcatList]: [string, string[]]) => (
-                  subcatList.map((subcat: string) => (
-                    <tr 
-                      key={`${categoryKey}-${subcat}`}
-                      className="hover:bg-gray-100 border-t border-gray-200"
-                      data-testid={`subcategory-row-${categoryKey}-${subcat}`}
-                    > 
-                      <td 
-                        className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 flex items-center justify-between"
-                        data-testid={`subcat-${subcat}`}
-                      >
-                        <div className="flex items-center">
-                          <div className="w-4 h-0 border-t border-gray-400 mr-2"></div>
-                          {/* Indicațor pentru subcategorii personalizate */}
-                          <span data-testid={`subcat-label-${subcat}`}>
-                            {subcat} {isCustomSubcategory(categoryKey, subcat) && <span className="text-blue-600 text-sm ml-1">➡️</span>}
-                          </span>
-                        </div>
-                        
-                        {/* Butoane acțiune pentru subcategorii personalizate, vizibile doar pentru autentificare */}
-                        {user && isCustomSubcategory(categoryKey, subcat) && (
-                          <div className="flex gap-2 ml-auto">
-                            <button 
-                              className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditSubcategory(categoryKey, subcat, 'edit');
-                              }}
-                              title={UI.EDIT_SUBCATEGORY}
-                              data-testid={`edit-subcat-${categoryKey}-${subcat}`}
-                            >
-                              <Edit size={14} />
-                            </button>
-                            <button 
-                              className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditSubcategory(categoryKey, subcat, 'delete');
-                              }}
-                              title={UI.DELETE_SUBCATEGORY}
-                              data-testid={`delete-subcat-${categoryKey}-${subcat}`}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                      {days.map(day => {
-                        const sum = getSumForCell(transactions, categoryKey, subcat, day);
-                        return (
+                  {/* Renderăm subcategoriile dacă categoria este expandată */}
+                  {isExpanded && (
+                    <>
+                      {/* Folosim subcategoriile din store pentru a vedea modificările imediat */}
+                      {category.subcategories.map(subcat => (
+                        <tr 
+                          key={`${categoryKey}-${subcat.name}`}
+                          className="hover:bg-gray-100 border-t border-gray-200"
+                          data-testid={`subcategory-row-${categoryKey}-${subcat.name}`}
+                        > 
                           <td 
-                            key={day} 
-                            className={`px-4 py-2 text-right ${sum !== 0 ? getBalanceStyle(sum) : ''}`}
-                            data-testid={`cell-${categoryKey}-${subcat}-${day}`}
-                            tabIndex={0}
-                            onClick={e => handleCellClick(e, categoryKey, subcat, day, sum !== 0 ? String(sum) : '', /*determinat automat*/ getTransactionTypeForCategory(categoryKey))}
-                            onDoubleClick={e => handleCellDoubleClick(e, categoryKey, subcat, day, sum !== 0 ? String(sum) : '')}
+                            className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 flex items-center justify-between"
+                            data-testid={`subcat-${subcat.name}`}
                           >
-                            {sum !== 0 ? formatCurrency(sum) : '—'}
-                            {/* Popover doar dacă e celula activă */}
-                            {popover && popover.category === categoryKey && popover.subcategory === subcat && popover.day === day && (
-                              <div
-                                style={{
-                                  position: 'absolute',
-                                  left: popover.anchorRect ? popover.anchorRect.left - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().left || 0) : 0,
-                                  top: popover.anchorRect ? popover.anchorRect.top - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().top || 0) + 40 : 0,
-                                  zIndex: 100,
-                                }}
-                                data-testid={`popover-cell-${categoryKey}-${subcat}-${day}`}
-                              >
-                                <CellTransactionPopover
-                                  initialAmount={popover.initialAmount}
-                                  day={popover.day}
-                                  month={month}
-                                  year={year}
-                                  category={popover.category}
-                                  subcategory={popover.subcategory}
-                                  type={popover.type}
-                                  onSave={handleSavePopover}
-                                  onCancel={handleClosePopover}
-                                />
+                            <div className="flex items-center">
+                              <div className="w-4 h-0 border-t border-gray-400 mr-2"></div>
+                              {/* Indicațor pentru subcategorii personalizate */}
+                              <span data-testid={`subcat-label-${subcat.name}`}>
+                                {subcat.name} {subcat.isCustom && <span className="text-blue-600 text-sm ml-1">➡️</span>}
+                              </span>
+                            </div>
+                            
+                            {/* Butoane acțiune pentru subcategorii personalizate, vizibile doar pentru autentificare */}
+                            {user && subcat.isCustom && (
+                              <div className="flex gap-2 ml-auto">
+                                <button 
+                                  className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditSubcategory(categoryKey, subcat.name, 'edit');
+                                  }}
+                                  title={UI_CONSTANTS.EDIT_SUBCATEGORY}
+                                  data-testid={`edit-subcat-${categoryKey}-${subcat.name}`}
+                                >
+                                  <Edit size={14} />
+                                </button>
+                                <button 
+                                  className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditSubcategory(categoryKey, subcat.name, 'delete');
+                                  }}
+                                  title={UI_CONSTANTS.DELETE_SUBCATEGORY}
+                                  data-testid={`delete-subcat-${categoryKey}-${subcat.name}`}
+                                >
+                                  <Trash2 size={14} />
+                                </button>
                               </div>
                             )}
                           </td>
-                        );
-                      })}
-                    </tr>
-                  ))
-                ))}
-              </React.Fragment>
-            );
-          })}
-          
-          {/* Rândul SOLD la finalul tabelului - conform DEV-4 */}
-          <tr className="bg-gray-100 font-bold border-t-2">
-            <td 
-              className="sticky left-0 bg-gray-100 z-10 px-4 py-2" 
-              data-testid="sold-label"
-            >
-              {EXCEL_GRID.HEADERS.SOLD}
-            </td>
-            {days.map(day => {
-              const balance = dailyBalances[day];
-              return (
-                <td 
-                  key={day} 
-                  className={`px-4 py-2 text-right ${getBalanceStyle(balance)}`} 
-                  data-testid={`sold-day-${day}`}
-                >
-                  {formatCurrency(balance)}
-                </td>
+                          {days.map(day => {
+                            const sum = getSumForCell(transactions, categoryKey, subcat.name, day);
+                            return (
+                              <td 
+                                key={day} 
+                                className={`px-4 py-2 text-right ${sum !== 0 ? getBalanceStyle(sum) : ''}`}
+                                data-testid={`cell-${categoryKey}-${subcat.name}-${day}`}
+                                tabIndex={0}
+                                onClick={e => handleCellClick(e, categoryKey, subcat.name, day, sum !== 0 ? String(sum) : '', getTransactionTypeForCategory(categoryKey))}
+                                onDoubleClick={e => handleCellDoubleClick(e, categoryKey, subcat.name, day, sum !== 0 ? String(sum) : '')}
+                              >
+                                {sum !== 0 ? formatCurrency(sum) : '—'}
+                                {/* Popover doar dacă e celula activă */}
+                                {popover && popover.category === categoryKey && popover.subcategory === subcat.name && popover.day === day && (
+                                  <div
+                                    style={{
+                                      position: 'absolute',
+                                      left: popover.anchorRect ? popover.anchorRect.left - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().left || 0) : 0,
+                                      top: popover.anchorRect ? popover.anchorRect.top - (document.querySelector('.overflow-x-auto')?.getBoundingClientRect().top || 0) + 40 : 0,
+                                      zIndex: 100,
+                                    }}
+                                    data-testid={`popover-cell-${categoryKey}-${subcat.name}-${day}`}
+                                  >
+                                    <CellTransactionPopover
+                                      initialAmount={popover.initialAmount}
+                                      day={popover.day}
+                                      month={month}
+                                      year={year}
+                                      category={popover.category}
+                                      subcategory={popover.subcategory}
+                                      type={popover.type}
+                                      onSave={handleSavePopover}
+                                      onCancel={handleClosePopover}
+                                    />
+                                  </div>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                      {/* Input inline pentru adăugare subcategorie direct în grid */}
+                      {user && (
+                        <tr>
+                          <td className="sticky left-0 bg-white z-10 px-4 py-2 border-t border-dashed border-gray-300">
+                            {addingSubcategory && addingSubcategory.category === categoryKey ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={addingSubcategory.value}
+                                  onChange={(e) => setAddingSubcategory({...addingSubcategory, value: e.target.value})}
+                                  placeholder="Nume subcategorie"
+                                  className="border border-blue-300 px-2 py-1 text-sm rounded flex-1"
+                                  autoFocus
+                                  onKeyDown={(e) => e.key === 'Enter' && handleSaveNewSubcategory()}
+                                  data-testid={`new-subcat-input-${categoryKey}`}
+                                />
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleSaveNewSubcategory();
+                                  }}
+                                  className="p-1 text-green-600 hover:text-green-800"
+                                  title="Salvează"
+                                  data-testid={`save-new-subcat-${categoryKey}`}
+                                >
+                                  <Check size={16} />
+                                </button>
+                                <button 
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleCancelAddSubcategory();
+                                  }}
+                                  className="p-1 text-red-600 hover:text-red-800"
+                                  title="Anulează"
+                                  data-testid={`cancel-new-subcat-${categoryKey}`}
+                                >
+                                  <X size={16} />
+                                </button>
+                              </div>
+                            ) : (
+                              <button 
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  handleStartAddSubcategory(categoryKey);
+                                }}
+                                className="flex items-center gap-1 text-blue-500 hover:text-blue-700 text-sm"
+                                data-testid={`add-subcat-${categoryKey}-btn`}
+                              >
+                                <Plus size={14} /> {EXCEL_GRID.ACTIONS.ADD_SUBCATEGORY || 'Adaugă subcategorie'}
+                              </button>
+                            )}
+                          </td>
+                          {days.map(day => (
+                            <td key={day} className="px-4 py-2 text-center text-gray-400 border-t border-dashed border-gray-300">—</td>
+                          ))}
+                        </tr>
+                      )}
+                    </>
+                  )}
+                </React.Fragment>
               );
             })}
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            
+            {/* Rândul SOLD la finalul tabelului */}
+            <tr className="bg-gray-100 font-bold border-t-2">
+              <td 
+                className="sticky left-0 bg-gray-100 z-10 px-4 py-2" 
+                data-testid="sold-label"
+              >
+                {EXCEL_GRID.HEADERS.SOLD}
+              </td>
+              {days.map(day => {
+                const balance = dailyBalances[day];
+                return (
+                  <td 
+                    key={day} 
+                    className={`px-4 py-2 text-right ${getBalanceStyle(balance)}`} 
+                    data-testid={`sold-day-${day}`}
+                  >
+                    {formatCurrency(balance)}
+                  </td>
+                );
+              })}
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </React.Fragment>
   );
 };

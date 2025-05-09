@@ -2,6 +2,7 @@
 import React from 'react';
 import TransactionsPage from './pages/TransactionsPage';
 import LunarGridPage from './pages/LunarGridPage';
+import OptionsPage from './pages/OptionsPage';
 import LoginForm from './components/features/Auth/LoginForm';
 import RegisterForm from './components/features/Auth/RegisterForm';
 import { Toaster } from 'react-hot-toast';
@@ -32,8 +33,8 @@ export const App: React.FC = () => {
   }, []);
   
 
-  // State pentru pagina activă (tranzacții sau grid lunar)
-  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid'>('transactions');
+  // State pentru pagina activă (tranzacții, grid lunar sau opțiuni)
+  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid' | 'options'>('transactions');
 
   const { user, loading } = useAuthStore();
   const [showRegister, setShowRegister] = React.useState(false);
@@ -73,10 +74,19 @@ export const App: React.FC = () => {
           >
             {TITLES.GRID_LUNAR}
           </button>
+          <button 
+            className={`py-2 px-4 font-medium ${activePage === 'options' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+            onClick={() => setActivePage('options')}
+            data-testid="options-tab"
+          >
+            {TITLES.OPTIUNI || 'Opțiuni'}
+          </button>
         </div>
         
         {/* Afișăm pagina activă */}
-        {activePage === 'transactions' ? <TransactionsPage /> : <LunarGridPage />}
+        {activePage === 'transactions' && <TransactionsPage />}
+        {activePage === 'lunar-grid' && <LunarGridPage />}
+        {activePage === 'options' && <OptionsPage />}
       </div>
     </>
   );
