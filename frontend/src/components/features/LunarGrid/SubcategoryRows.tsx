@@ -111,14 +111,14 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
         ) : (
           <tr
             key={`${categoryKey}-${subcat}`}
-            className="hover:bg-gray-100 border-t border-gray-200"
+            className="group hover:bg-gray-100 border-t border-gray-200"
             data-testid={`subcategory-row-${categoryKey}-${subcat}`}
           >
             <td
-              className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 flex items-center justify-between"
+              className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 relative"
               data-testid={`subcat-${subcat}`}
             >
-              <div className="flex items-center">
+              <div className="flex items-center space-x-2">
                 <div className="w-4 h-0 border-t border-gray-400 mr-2" />
                 <span data-testid={`subcat-label-${subcat}`}>{subcat}{' '}
                   {isCustomSubcategory(categoryKey, subcat) && (
@@ -126,29 +126,37 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                   )}
                 </span>
               </div>
-              {user && isCustomSubcategory(categoryKey, subcat) && (
-                <div className="flex gap-2 ml-auto">
-                  <button
-                    className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
-                    onClick={e => { e.stopPropagation(); setEditingKey(subcat); setRenameValue(subcat); }}
-                    title="Editează subcategorie"
-                    data-testid={`edit-subcat-${categoryKey}-${subcat}`}
-                  >
-                    <Edit size={14} />
-                  </button>
-                  <button
-                    className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      if (window.confirm(MESAJE.CONFIRMARE_STERGERE)) {
-                        handleDeleteSubcategory(categoryKey, subcat);
-                      }
-                    }}
-                    title="Delete"
-                    data-testid={`delete-subcat-${categoryKey}-${subcat}`}
-                  >
-                    <Trash2 size={14} />
-                  </button>
+              {user && (
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 mr-2 hidden [.group:hover_&]:!flex gap-2">
+                  {isCustomSubcategory(categoryKey, subcat) ? (
+                    <>
+                      <button
+                        className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
+                        onClick={e => { e.stopPropagation(); setEditingKey(subcat); setRenameValue(subcat); }}
+                        title="Editează subcategorie"
+                        data-testid={`edit-subcat-${categoryKey}-${subcat}`}
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button
+                        className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
+                        onClick={e => { e.stopPropagation(); if (window.confirm(MESAJE.CONFIRMARE_STERGERE)) handleDeleteSubcategory(categoryKey, subcat); }}
+                        title="Șterge subcategorie"
+                        data-testid={`delete-subcat-${categoryKey}-${subcat}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className="p-1 text-gray-400 hover:text-blue-600 focus:outline-none"
+                      onClick={e => { e.stopPropagation(); setEditingKey(subcat); setRenameValue(subcat); }}
+                      title="Redenumește subcategoria"
+                      data-testid={`rename-subcat-${categoryKey}-${subcat}`}
+                    >
+                      <Edit size={14} />
+                    </button>
+                  )}
                 </div>
               )}
             </td>

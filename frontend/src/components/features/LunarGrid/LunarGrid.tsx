@@ -179,6 +179,10 @@ const LOCALSTORAGE_CATEGORY_EXPAND_KEY = 'budget-app-category-expand';
 // UI copy pentru CategoryEditor, fallback dacă nu există în shared-constants/ui
 const UI = {
   MANAGE_CATEGORIES: 'Gestionare categorii',
+  EDIT_SUBCATEGORY: 'Edită subcategoria',
+  DELETE_SUBCATEGORY: 'Șterge subcategoria',
+  EXPAND_ALL: 'Extinde toate categoriile',
+  COLLAPSE_ALL: 'Colapsează toate categoriile',
 };
 
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
@@ -196,6 +200,8 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     MANAGE_CATEGORIES: 'Gestionare categorii',
     EDIT_SUBCATEGORY: 'Edită subcategoria',
     DELETE_SUBCATEGORY: 'Șterge subcategoria',
+    EXPAND_ALL: 'Extinde toate categoriile',
+    COLLAPSE_ALL: 'Colapsează toate categoriile',
   };
 
   const days = getDaysInMonth(year, month);
@@ -212,6 +218,20 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
       return {};
     }
   });
+  
+  const expandAll = React.useCallback(() => {
+    const newState: Record<string, boolean> = {};
+    categories.forEach(c => { newState[c.name] = true; });
+    setExpandedCategories(newState);
+    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
+  }, [categories]);
+  
+  const collapseAll = React.useCallback(() => {
+    const newState: Record<string, boolean> = {};
+    categories.forEach(c => { newState[c.name] = false; });
+    setExpandedCategories(newState);
+    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
+  }, [categories]);
   
   // Handler pentru expandare/colapsare categorie
   const toggleCategory = (category: string) => {
@@ -245,7 +265,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
 
   // Ref și callback pentru refresh subtil după adăugare tranzacție
   const markTransactionAdded = React.useCallback(() => {
-    console.log('🔄 Marking transaction added for subtle refresh...');
+    console.log(' Marking transaction added for subtle refresh...');
     lastAddedTransactionRef.current = { timestamp: Date.now(), processed: false };
     setTimeout(() => {
       if (lastAddedTransactionRef.current) {
@@ -363,7 +383,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
         // NOTĂ: user_id este adăugat de supabaseService.createTransaction, nu trebuie trimis de noi
       }).then(() => {
         console.log(`Tranzacție salvată cu success: ${category} / ${subcategory} / ${day} = ${newAmount} RON`);
-        console.log('🔄 Invalidating cache after save (double click)...');
+        console.log(' Invalidating cache after save (double click)...');
         transactionStore._invalidateMonthCache(year, month);
         markTransactionAdded();
       }).catch(error => {
@@ -403,7 +423,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
       
       // Save & refresh
       await transactionStore.saveTransaction(transactionData);
-      console.log('🔄 Invalidating cache after save (popover)...');
+      console.log(' Invalidating cache after save (popover)...');
       transactionStore._invalidateMonthCache(year, month);
       markTransactionAdded();
     } catch (error) {
@@ -441,7 +461,14 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
 
   return (
     <React.Fragment>
-      {/* Tabel principal LunarGrid */}
+      <div className="flex justify-end space-x-2 mb-2">
+        <button onClick={expandAll} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" data-testid="expand-all-btn">
+          {UI.EXPAND_ALL}
+        </button>
+        <button onClick={collapseAll} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" data-testid="collapse-all-btn">
+          {UI.COLLAPSE_ALL}
+        </button>
+      </div>
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
           <thead>

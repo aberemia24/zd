@@ -275,7 +275,11 @@ export const CategoryEditor: React.FC<Props> = ({
                           <span>{sc.name}</span>
                           {sc.isCustom && <span className="ml-1 text-green-600 text-xs" data-testid={`custom-flag-${sc.name}`}>custom</span>}
                           {badge(selectedCategory, sc.name)}
-                          <button onClick={()=>setEditingSubcat({cat:selectedCategory,subcat:sc.name})} className="ml-2 text-blue-600 text-xs" data-testid={`edit-subcat-btn-${sc.name}`}>Redenumește</button>
+                          <button
+                            onClick={() => { setEditingSubcat({ cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
+                            className="ml-2 text-blue-600 text-xs"
+                            data-testid={`edit-subcat-btn-${sc.name}`}
+                          >Redenumește</button>
                           {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                           {sc.isCustom && (
                             <button 
