@@ -1,4 +1,23 @@
-# Dev Log - Budget App
+## [2025-05-11] Migrare la `react-router-dom` pentru Navigare
+
+- **Sumar:** S-a refactorizat sistemul de navigare al aplicației frontend pentru a utiliza `react-router-dom` (v6) în locul mecanismului anterior bazat pe `window.location.hash`. Această modificare aduce o structură de rutare mai robustă, standardizată și mentenabilă.
+- **Modificări cheie:**
+    - `index.tsx`: Aplicația a fost împachetată cu `<BrowserRouter>`.
+    - `App.tsx`: Logica de rutare a fost centralizată folosind `<Routes>`, `<Route>`, `<Link>`, și `<Navigate>`. S-au definit rute publice (login, register) și rute protejate (transactions, lunar-grid, options). Componenta gestionează redirecționarea automată către `/login` pentru rutele protejate dacă utilizatorul nu este autentificat, și către `/transactions` (sau ruta implicită) după login.
+    - `LoginForm.tsx` și `RegisterForm.tsx`: Butoanele de navigare către pagina opusă au fost înlocuite cu componente `<Link>` de la `react-router-dom`.
+    - `OptionsPage.tsx`: Funcționalitatea de logout care folosește `useNavigate()` pentru redirecționare este acum funcțională corect în contextul noului router.
+- **Beneficii:**
+    - Navigare declarativă și standard în React.
+    - URL-uri curate și SEO-friendly (deși nu e focusul principal pentru această aplicație).
+    - Gestionare mai bună a stării de navigare și a istoricului browser-ului.
+    - Cod mai curat și mai ușor de înțeles în `App.tsx` pentru gestionarea paginilor.
+- **Branch:** `feature/react-router-migration`
+- **Fișiere principale modificate:**
+    - `frontend/src/index.tsx`
+    - `frontend/src/App.tsx`
+    - `frontend/src/components/features/Auth/LoginForm.tsx`
+    - `frontend/src/components/features/Auth/RegisterForm.tsx`
+- **Notă:** S-au rezolvat și erorile de sintaxă (`Unexpected token`) din `App.tsx` care apăreau din cauza unui comentariu JSX formatat incorect. Testarea manuală completă a fluxurilor de login, register, navigare și logout a fost efectuată cu succes.
 
 ## [2025-05-11] Refactorizare extinsă pentru tema "Earthy" și aplicare token-uri de stil
 

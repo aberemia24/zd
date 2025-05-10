@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/authStore';
 import type { AuthErrorType } from '../../../services/supabaseAuthService';
 import toast from 'react-hot-toast';
 import { MESAJE } from '@shared-constants';
 
-const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLogin }) => {
+const RegisterForm: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -102,14 +103,15 @@ const RegisterForm: React.FC<{ onSwitchToLogin?: () => void }> = ({ onSwitchToLo
       >
         {loading ? 'Se creează...' : 'Creează cont'}
       </button>
-      {onSwitchToLogin && (
-        <button
-          type="button"
-          className="btn btn-link w-full mt-token text-sm text-accent hover:text-accent-hover"
-          onClick={onSwitchToLogin}
+      <div className="text-center mt-token">
+        <Link 
+          to="/login" 
+          className="btn btn-link text-sm text-accent hover:text-accent-hover"
           data-testid="switch-to-login"
-        >Ai deja cont? Autentifică-te!</button>
-      )}
+        >
+          Ai deja cont? Autentifică-te!
+        </Link>
+      </div>
     </form>
   );
 };

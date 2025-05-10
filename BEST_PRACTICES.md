@@ -38,7 +38,7 @@ Tailwind/PostCSS procesează directivelor în ordinea fizică a fișierului. @la
 - Pentru proiecte mari, folosește pluginuri Tailwind custom sau barrel-uri JS pentru tokens, nu fișiere CSS importate separat.
 
 **Consistență prin token-uri și utilitare centralizate (Actualizat Mai 2025):**
-Pentru a menține coerența vizuală și mentenabilitatea (așa cum s-a demonstrat în refactorizarea temei "earthy"):
+Pentru a menține coerența vizuală și mentenanță (așa cum s-a demonstrat în refactorizarea temei "earthy"):
 - Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
 - Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
 - Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
@@ -345,7 +345,6 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 - Verifică periodic ca toate aceste configurații să fie sincronizate și testele să ruleze fără erori de path mapping.
 - Orice discrepanță între configurări trebuie remediată imediat și documentată în `DEV_LOG.md`.
 
-
 ## Management Memorii Critice și Deprecated
 
 ### Reguli pentru Memorii
@@ -614,3 +613,105 @@ Pentru a menține coerența vizuală și mentenabilitatea (așa cum s-a demonstr
 **Data:** 2025-05-11
 
 _Actualizat la: 2025-05-11_
+
+---
+
+## Navigare cu `react-router-dom` (v6)
+
+Data: 2025-05-11
+
+Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și declarativă pentru gestionarea rutelor în aplicațiile React.
+
+### Principii Cheie și Configurare Inițială
+
+1.  **`<BrowserRouter>`**: Componenta rădăcină pentru activarea rutării. De obicei, se plasează în `index.tsx` pentru a împacheta întreaga aplicație:
+    ```tsx
+    // frontend/src/index.tsx
+    import React from 'react';
+    import ReactDOM from 'react-dom/client';
+    import { BrowserRouter } from 'react-router-dom';
+    import App from './App';
+    // ... alte importuri
+
+    const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+    root.render(
+      <React.StrictMode>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </React.StrictMode>
+    );
+    ```
+
+2.  **`<Routes>` și `<Route>`**: Definirea rutelor se face în interiorul unui component `<Routes>`. Fiecare `<Route>` mapează o cale (`path`) la un element (`element` - componenta React de randat).
+    ```tsx
+    // frontend/src/App.tsx
+    import { Routes, Route, Navigate } from 'react-router-dom';
+    import HomePage from './pages/HomePage'; // Exemplu
+    import LoginPage from './pages/LoginPage'; // Exemplu
+    import DashboardPage from './pages/DashboardPage'; // Exemplu
+    import { useAuthStore } from './stores/authStore'; // Exemplu de store de autentificare
+
+    const App: React.FC = () => {
+      const { user } = useAuthStore();
+
+      return (
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          
+          {/* Rută protejată */}
+          <Route 
+            path="/dashboard" 
+            element={user ? <DashboardPage /> : <Navigate to="/login" replace />}
+          />
+          
+          {/* Catch-all pentru rute nedefinite - ajustează la nevoie */}
+          <Route path="*" element={user ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />} /> 
+        </Routes>
+      );
+    };
+    ```
+
+### Navigare
+
+1.  **`<Link>`**: Pentru navigare declarativă (similar cu tag-ul `<a>` HTML), se folosește componenta `<Link to="/cale">
+    ```tsx
+    import { Link } from 'react-router-dom';
+
+    // ... în interiorul unui component
+    <Link to="/dashboard">Mergi la Dashboard</Link>
+    ```
+
+2.  **`useNavigate()`**: Pentru navigare programatică (de exemplu, după un submit de formular sau o acțiune asincronă).
+    ```tsx
+    import { useNavigate } from 'react-router-dom';
+
+    const MyComponent = () => {
+      const navigate = useNavigate();
+
+      const handleLoginSuccess = () => {
+        // ... logica de login
+        navigate('/dashboard'); // Redirecționează la dashboard
+      };
+      // ...
+    };
+    ```
+
+3.  **`useLocation()`**: Pentru a accesa obiectul `location` care conține informații despre URL-ul curent (ex: `pathname`, `search`, `hash`).
+    ```tsx
+    import { useLocation } from 'react-router-dom';
+
+    const ActiveTabIndicator = () => {
+      const location = useLocation();
+      // location.pathname va fi, de ex., '/dashboard'
+      // ...
+    };
+    ```
+
+### Important
+
+- Toate hook-urile `react-router-dom` (ex: `useNavigate`, `useLocation`, `useParams`) trebuie folosite în componente care sunt descendente ale unui component `<Router>` (ex: `<BrowserRouter>`). Altfel, vor genera erori la runtime.
+- Pentru rutele protejate, elementul randat condiționat ar trebui să includă `<Navigate to="/calea-de-redirect" replace />`. Props-ul `replace` asigură că pagina de login (sau altă pagină intermediară) nu este adăugată în istoricul de navigare, permițând butonului "back" să funcționeze intuitiv.
+
+---

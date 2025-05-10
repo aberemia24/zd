@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/authStore';
 import toast from 'react-hot-toast';
 import { MESAJE } from '@shared-constants';
 
 interface LoginFormProps {
-  onSwitchToRegister?: () => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
+const LoginForm: React.FC<LoginFormProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, logout, loading, error, errorType, user } = useAuthStore();
+  const { login, logout, loading, error, errorType } = useAuthStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,25 +88,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       >
         {loading ? 'Se autentifică...' : 'Autentificare'}
       </button>
-      {onSwitchToRegister && (
-        <button
-          type="button"
-          className="btn btn-link w-full mt-token text-sm text-accent hover:text-accent-hover"
-          onClick={onSwitchToRegister}
+      <div className="text-center mt-token">
+        <Link 
+          to="/register" 
+          className="btn btn-link text-sm text-accent hover:text-accent-hover"
           data-testid="switch-to-register"
-        >Nu ai cont? Creează unul!</button>
-      )}
-      {user && (
-        <button
-          type="button"
-          className="btn btn-link w-full mt-token text-sm text-error-600 hover:text-error-700"
-          onClick={async () => {
-            await logout();
-            toast.success(MESAJE.LOGOUT_SUCCES);
-          }}
-          data-testid="logout-btn"
-        >Logout</button>
-      )}
+        >
+          Nu ai cont? Creează unul!
+        </Link>
+      </div>
     </form>
   );
 };

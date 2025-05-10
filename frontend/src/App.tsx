@@ -1,5 +1,7 @@
 // Componenta principală a aplicației - orchestrator pentru rutare între pagini
 import React, { useEffect } from 'react';
+import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom'; // Importuri react-router-dom
+
 import TransactionsPage from './pages/TransactionsPage';
 import LunarGridPage from './pages/LunarGridPage';
 import OptionsPage from './pages/OptionsPage';
@@ -9,9 +11,8 @@ import { Toaster } from 'react-hot-toast';
 import Spinner from './components/primitives/Spinner';
 import { TITLES } from '@shared-constants';
 
-// Import store Zustand pentru tranzacții
-import { useTransactionStore } from './stores/transactionStore';
-import type { TransactionState } from './stores/transactionStore';
+// Import store Zustand pentru autentificare
+import { useAuthStore } from './stores/authStore';
 
 /**
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
@@ -21,45 +22,17 @@ import type { TransactionState } from './stores/transactionStore';
  * Această structură separă clar logica de business de UI, crescând testabilitatea, 
  * mentenabilitatea și facilitând extinderea ulterioară.
  */
-import { useAuthStore } from './stores/authStore';
-
 export const App: React.FC = () => {
-  console.log('🔜 App render');
+  console.log('🔜 App render using react-router-dom');
   
-  // Verificăm sesiunea la pornirea aplicației pentru a menține utilizatorul autentificat la refresh
-  React.useEffect(() => {
-    // Verificăm dacă există o sesiune activă
-    useAuthStore.getState().checkUser();
-  }, []);
-  
-
-  // State pentru pagina activă (tranzacții, grid lunar sau opțiuni)
-  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid' | 'options'>(() => {
-    const h = window.location.hash.replace('#','');
-    return (h === 'lunar-grid' || h === 'options') ? h : 'transactions';
-  });
+  const { user, loading, checkUser } = useAuthStore();
+  const location = useLocation(); // Hook pentru a obține locația curentă
 
   useEffect(() => {
-    const handleHashChange = () => {
-      const h = window.location.hash.replace('#','');
-      setActivePage((h === 'lunar-grid' || h === 'options') ? h : 'transactions');
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-    };
-  }, []);
-
-  const { user, loading } = useAuthStore();
-  const [showRegister, setShowRegister] = React.useState(false);
-
-  if (!user && !loading) {
-    if (showRegister) {
-      return <RegisterForm onSwitchToLogin={() => setShowRegister(false)} />;
-    }
-    return <LoginForm onSwitchToRegister={() => setShowRegister(true)} />;
-  }
-
+    checkUser();
+  }, [checkUser]);
+  
+  // Afișează spinner în timpul încărcării stării de autentificare
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white/60 flex items-center justify-center z-50">
@@ -68,39 +41,60 @@ export const App: React.FC = () => {
     );
   }
 
+  // Rute protejate și publice
+  // Dacă utilizatorul nu este autentificat, și încearcă să acceseze o rută protejată, va fi redirecționat
+  // la /login. Pagina de login va fi ruta implicită dacă nu e logat.
+
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
       <div className="max-w-[1200px] mx-auto my-8 font-sans">
-        {/* Tabs pentru navigare între pagini */}
-        <div className="flex border-b border-gray-200 mb-6">
-          <button 
-            className={`py-2 px-4 font-medium ${activePage === 'transactions' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => { setActivePage('transactions'); window.location.hash = 'transactions'; }}
-            data-testid="transactions-tab"
-          >
-            {TITLES.TRANZACTII}
-          </button>
-          <button 
-            className={`py-2 px-4 font-medium ${activePage === 'lunar-grid' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => { setActivePage('lunar-grid'); window.location.hash = 'lunar-grid'; }}
-            data-testid="lunar-grid-tab"
-          >
-            {TITLES.GRID_LUNAR}
-          </button>
-          <button 
-            className={`py-2 px-4 font-medium ${activePage === 'options' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => { setActivePage('options'); window.location.hash = 'options'; }}
-            data-testid="options-tab"
-          >
-            {TITLES.OPTIUNI || 'Opțiuni'}
-          </button>
-        </div>
+        {user && ( /* Afișează navigarea doar dacă utilizatorul este logat */ 
+          <div className="flex border-b border-gray-200 mb-6">
+            <Link 
+              to="/transactions"
+              className={`py-2 px-4 font-medium ${location.pathname === '/transactions' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              data-testid="transactions-tab"
+            >
+              {TITLES.TRANZACTII}
+            </Link>
+            <Link 
+              to="/lunar-grid"
+              className={`py-2 px-4 font-medium ${location.pathname === '/lunar-grid' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              data-testid="lunar-grid-tab"
+            >
+              {TITLES.GRID_LUNAR}
+            </Link>
+            <Link 
+              to="/options"
+              className={`py-2 px-4 font-medium ${location.pathname === '/options' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              data-testid="options-tab"
+            >
+              {TITLES.OPTIUNI || 'Opțiuni'}
+            </Link>
+          </div>
+        )}
         
-        {/* Afișăm pagina activă */}
-        {activePage === 'transactions' && <TransactionsPage />}
-        {activePage === 'lunar-grid' && <LunarGridPage />}
-        {activePage === 'options' && <OptionsPage />}
+        <Routes>
+          {user ? (
+            <>
+              <Route path="/" element={<Navigate to="/transactions" replace />} />
+              <Route path="/transactions" element={<TransactionsPage />} />
+              <Route path="/lunar-grid" element={<LunarGridPage />} />
+              <Route path="/options" element={<OptionsPage />} />
+              {/* Orice altă rută pentru utilizator logat, redirecționează la tranzacții */}
+              <Route path="*" element={<Navigate to="/transactions" replace />} />
+            </>
+          ) : (
+            <>
+              {/* Rute publice pentru login și register */}
+              <Route path="/login" element={<LoginForm />} /> {/* Simplificat: LoginForm va avea link către /register */}
+              <Route path="/register" element={<RegisterForm />} /> {/* Simplificat: RegisterForm va avea link către /login */}
+              {/* Orice altă rută, inclusiv rădăcina, redirecționează la login dacă nu e logat */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </>
+          )}
+        </Routes>
       </div>
     </>
   );
