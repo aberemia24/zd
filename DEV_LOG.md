@@ -1,5 +1,30 @@
 # Dev Log - Budget App
 
+## [2025-05-10] Îmbunătățiri UI și refactorizare subcategorii în LunarGrid
+
+- **Funcționalitate nouă:** Butoanele de editare și ștergere pentru subcategorii apar doar la hover în grid (UI mai curat, focus pe acțiuni relevante).
+- **Editare inline:** Câmpul de redenumire subcategorie este pre-populat cu valoarea originală pentru UX predictibil.
+- **Refactorizare:**
+  - Separare logică și UI pentru subcategorii în componenta dedicată `SubcategoryRows`.
+  - Eliminare polling/localStorage redundant pentru state management.
+  - Consolidare importuri și mesaje din sursa unică `@shared-constants` (fără stringuri hardcodate).
+- **Respectare reguli globale:**
+  - Toate acțiunile și textele folosesc enum-uri, mesaje și rute din sursa unică de adevăr.
+  - Testare cu `data-testid` predictibil pentru fiecare element funcțional (vezi regula 3.1 și exemplul din BEST_PRACTICES.md).
+- **Lecții învățate:**
+  - Separarea stărilor pentru moduri de operare conflictuale (edit/delete) previne bug-uri de tip "Cannot update a component while rendering a different component".
+  - Evitarea anti-patternului critic cu Zustand: fără `useEffect(fetch, [queryParams])` (vezi regula 8.2 și memoria [CRITIC] d7b6eb4b).
+  - Folosirea `useRef` pentru parametri și caching robust la fetch.
+- **Branch:** `feature/grid-subcategory-enhancements`
+- **Fișiere principale:**
+  - `frontend/src/components/features/LunarGrid/SubcategoryRows.tsx`
+  - `frontend/src/components/features/LunarGrid/LunarGrid.tsx`
+  - `frontend/src/pages/LunarGridPage.tsx`
+  - `frontend/src/App.tsx`
+- **Documentare suplimentară:** Best practice și patternuri noi adăugate în `BEST_PRACTICES.md`.
+
+
+
 # [2025-05-09] Bug Fix și îmbunătățiri pentru CategoryEditor
 
 - Bug fix major: rezolvat eroarea "Cannot update a component while rendering a different component" în `CategoryEditor`

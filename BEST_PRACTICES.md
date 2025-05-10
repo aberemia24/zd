@@ -27,6 +27,36 @@
 
 ### Practici React & Testing Library
 
+#### Pattern UI pentru grid-uri cu subcategorii (2025-05-10)
+
+- **Butoane de acțiune (edit/delete) vizibile doar la hover**: Reduce aglomerarea vizuală și crește focusul pe acțiuni relevante.
+- **Inputuri de redenumire pre-populate**: La editarea inline a subcategoriilor, inputul trebuie să afișeze valoarea originală pentru UX predictibil.
+- **Separarea stărilor pentru moduri conflictuale**: Folosește state separat pentru editare și ștergere (ex: `editingSubcat`, `deletingSubcat`). Nu modifica state direct în timpul render-ului; folosește `useEffect` pentru tranziții.
+- **Referință anti-pattern Zustand**: Nu folosi `useEffect(fetch, [queryParams])` cu Zustand (vezi regula critică și memoria d7b6eb4b-0702-4b0a-b074-3915547a2544).
+- **Testare robustă**: Toate elementele funcționale din grid trebuie să aibă `data-testid` unic și predictibil pentru testare automată.
+
+**Exemplu:**
+```tsx
+// Vizibilitate acțiuni doar la hover
+<div className="subcategory-row" onMouseEnter={...} onMouseLeave={...}>
+  <span>{subcategory.name}</span>
+  {isHovered && (
+    <>
+      <button data-testid={`edit-btn-${subcategory.id}`}>Edit</button>
+      <button data-testid={`delete-btn-${subcategory.id}`}>Delete</button>
+    </>
+  )}
+</div>
+
+// Input redenumire pre-populat
+<input data-testid="rename-input" value={currentName} ... />
+```
+
+**Lecții învățate:**
+- Separarea clară a stărilor previne bug-uri de tip "Cannot update a component while rendering a different component".
+- Respectarea regulilor globale și patternurilor documentate asigură mentenanță și testare predictibilă.
+
+
 - Controlled components testate cu wrapper cu stare locală.
 - Folosirea `await waitFor` sau `await act(async () => {...})` pentru actualizări asincrone.
 - Testare exhaustivă dropdown-uri (categorie, subcategorie, tip).
