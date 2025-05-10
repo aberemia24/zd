@@ -3,16 +3,16 @@ import theme from './theme';
 
 // Exemplu: tema pentru LunarGrid (folosește tokens semantic)
 export const lunarGridTheme = {
-  container: 'rounded-lg shadow-sm border border-gray-200 overflow-hidden',
+  container: 'rounded-lg shadow-md border border-gray-200 overflow-hidden',
   header: {
-    base: 'sticky top-0 z-20 bg-white shadow-sm',
-    cell: 'px-4 py-3 text-sm font-medium text-gray-600 border-b border-gray-200',
+    base: 'sticky top-0 z-20 bg-gradient-to-r from-primary-600 to-secondary-700 text-white shadow-sm',
+    cell: 'px-4 py-3 text-sm font-medium text-white/90 border-b border-white/10',
   },
   categoryRow: {
-    base: 'cursor-pointer transition-colors',
+    base: 'cursor-pointer transition-colors duration-200',
     expanded: 'bg-primary-50 hover:bg-primary-100',
     collapsed: 'bg-white hover:bg-gray-50',
-    text: 'text-primary-800 font-medium',
+    text: 'text-primary-700 font-medium',
   },
   subcategoryRow: {
     base: 'hover:bg-gray-50 border-t border-gray-100',
@@ -26,7 +26,7 @@ export const lunarGridTheme = {
     zero: 'text-gray-400',
   },
   balanceRow: {
-    base: 'bg-gray-100 border-t-2 border-gray-300 font-bold',
+    base: 'bg-gradient-to-r from-gray-100 to-gray-50 border-t-2 border-gray-300 font-bold',
     text: 'text-gray-800',
   },
 };
@@ -44,6 +44,7 @@ export const transactionFormTheme = {
     button: {
       primary: 'bg-primary-500 text-white hover:bg-primary-600',
       secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
+      accent: 'bg-warning-500 text-white hover:bg-warning-600', // Gold accent
     },
   },
 };

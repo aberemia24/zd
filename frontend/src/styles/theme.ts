@@ -5,78 +5,85 @@ import type { Theme } from './themeTypes';
 
 export const theme: Theme = {
   colors: {
+    // Primary - Forest Green (înlocuiește blue-ul actual)
     primary: {
-      50: '#f0f9ff',
-      100: '#e0f2fe',
-      200: '#bae6fd',
-      300: '#7dd3fc',
-      400: '#38bdf8',
-      500: '#0ea5e9', // Main
-      600: '#0284c7',
-      700: '#0369a1',
-      800: '#075985',
-      900: '#0c4a6e',
+      50: '#f0fdf4',
+      100: '#dcfce7',
+      200: '#bbf7d0',
+      300: '#86efac',
+      400: '#4ade80',
+      500: '#16a34a', // Main forest green
+      600: '#15803d',
+      700: '#166534',
+      800: '#14532d',
+      900: '#052e16',
     },
+    // Secondary - Navy Blue
     secondary: {
       50: '#f8fafc',
       100: '#f1f5f9',
       200: '#e2e8f0',
       300: '#cbd5e1',
       400: '#94a3b8',
-      500: '#64748b', // Main
-      600: '#475569',
-      700: '#334155',
-      800: '#1e293b',
-      900: '#0f172a',
+      500: '#334155', // Navy blue
+      600: '#1e293b',
+      700: '#0f172a',
+      800: '#020617',
+      900: '#020617',
     },
+    // Success - Păstrează verde pentru venituri
     success: {
-      50: '#f0fdf4',
-      100: '#dcfce7',
-      200: '#bbf7d0',
-      300: '#86efac',
-      400: '#4ade80',
-      500: '#22c55e', // Main
-      600: '#16a34a',
-      700: '#15803d',
-      800: '#166534',
-      900: '#14532d',
+      50: '#ecfdf5',
+      100: '#d1fae5',
+      200: '#a7f3d0',
+      300: '#6ee7b7',
+      400: '#34d399',
+      500: '#059669', // Darker green pentru contrast
+      600: '#047857',
+      700: '#065f46',
+      800: '#064e3b',
+      900: '#022c22',
     },
+    // Warning - Accent Gold (înlocuiește yellow)
     warning: {
-      50: '#fffbeb',
-      100: '#fef3c7',
-      200: '#fde68a',
-      300: '#fcd34d',
-      400: '#fbbf24',
-      500: '#f59e42', // Main
+      50: '#fffdf7',
+      100: '#fffaeb',
+      200: '#fef3c7',
+      300: '#fde68a',
+      400: '#fcd34d',
+      500: '#f59e0b', // Deep gold
       600: '#d97706',
       700: '#b45309',
       800: '#92400e',
       900: '#78350f',
     },
+    // Error - Earth Red (păstrat dar ajustat)
     error: {
       50: '#fef2f2',
       100: '#fee2e2',
-      200: '#fecaca',
+      200: '#fecdd3',
       300: '#fca5a5',
       400: '#f87171',
-      500: '#ef4444', // Main
-      600: '#dc2626',
-      700: '#b91c1c',
-      800: '#991b1b',
-      900: '#7f1d1d',
+      500: '#dc2626', // Earth red
+      600: '#991b1b',
+      700: '#7f1d1d',
+      800: '#650a0a',
+      900: '#450a0a',
     },
+    // Gray - Warm grays (înlocuiește cold grays)
     gray: {
-      50: '#f9fafb',
-      100: '#f3f4f6',
-      200: '#e5e7eb',
-      300: '#d1d5db',
-      400: '#9ca3af',
-      500: '#6b7280',
-      600: '#4b5563',
-      700: '#374151',
-      800: '#1f2937',
-      900: '#111827',
+      50: '#fafaf9',
+      100: '#f5f5f4',
+      200: '#e7e5e4',
+      300: '#d6d3d1',
+      400: '#a8a29e',
+      500: '#78716c',
+      600: '#57534e',
+      700: '#44403c',
+      800: '#292524',
+      900: '#1c1917',
     },
+    // Păstrează white și black
     white: '#ffffff',
     black: '#000000',
   },
@@ -137,4 +144,5 @@ export const theme: Theme = {
 
 // Export default pentru import simplu
 export default theme;
+
 
