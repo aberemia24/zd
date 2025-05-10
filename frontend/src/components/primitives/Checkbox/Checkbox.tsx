@@ -12,7 +12,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, error, className, wrapperCla
   <div className={classNames('flex items-center', wrapperClassName)}>
     <input
       type="checkbox"
-      className={classNames('accent-primary', className)}
+      className={classNames(error ? 'accent-warning' : 'accent-primary', className)}
       data-testid={dataTestId || `checkbox-field${error ? '-error' : ''}`}
       {...rest}
     />

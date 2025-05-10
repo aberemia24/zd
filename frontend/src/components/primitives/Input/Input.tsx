@@ -6,13 +6,6 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   error?: string;
   wrapperClassName?: string;
   'data-testid'?: string;
-} // data-testid și orice alt prop HTML sunt permise
-
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  wrapperClassName?: string;
-  'data-testid'?: string;
   inputRef?: React.RefObject<HTMLInputElement>;
 }
 

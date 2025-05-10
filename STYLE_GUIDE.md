@@ -35,6 +35,10 @@
 ```
 
 ### 5. Best practices
+
+- **Tailwind/PostCSS:** NU folosi @import pentru fișiere ce conțin @layer și @apply (ex: utils.css). Scrie utilitarele custom cu @layer components direct în index.css, după @tailwind components și înainte de @tailwind utilities. Dacă folosești @import pentru astfel de fișiere, buildul va eșua cu eroarea: `@layer components is used but no matching @tailwind components directive is present.`
+- @import e permis doar pentru reseturi simple sau variabile, nu pentru utilitare cu @apply/@layer.
+
 - Toate componentele primitive (Button, Input, Select, Checkbox, Alert, Badge, Textarea, Loader, Spinner) folosesc EXCLUSIV tokens din sistemul centralizat pentru stiluri.
 - Exemple de tokens: `input-field`, `border-error`, `text-error`, `bg-success-50`, `stroke-primary-500`, `accent-primary` etc.
 - Este INTERZISĂ folosirea stringurilor hardcodate pentru stiluri sau a claselor Tailwind generice (ex: border-red-500).

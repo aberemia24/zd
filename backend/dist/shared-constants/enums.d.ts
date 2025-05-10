@@ -3,6 +3,10 @@ export declare enum TransactionType {
     EXPENSE = "EXPENSE",
     SAVING = "SAVING"
 }
+export declare enum TransactionStatus {
+    PLANNED = "PLANNED",
+    COMPLETED = "COMPLETED"
+}
 export declare enum FrequencyType {
     NONE = "NONE",
     DAILY = "DAILY",

@@ -2,6 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MESAJE = void 0;
 exports.MESAJE = {
+    LOGIN_SUCCES: 'Autentificare reușită! Bine ai revenit.',
+    LOGIN_ERROR: 'Eroare la autentificare. Verifică emailul și parola.',
+    LOGOUT_SUCCES: 'Te-ai delogat cu succes!',
+    REGISTER_SUCCES: 'Cont creat! Verifică emailul pentru confirmare.',
+    REGISTER_ERROR: 'Eroare la crearea contului. Încearcă din nou.',
+    PAROLE_NECORESPUNZATOARE: 'Parolele nu coincid!',
+    INVALID_TYPE: 'Tip de tranzacție invalid!',
+    INVALID_CATEGORY: 'Categorie invalidă!',
+    MISSING_REQUIRED_FIELD: 'Câmp obligatoriu lipsă!',
+    NOT_FOUND: 'Resursa nu a fost găsită!',
+    SERVER_ERROR: 'Eroare internă server!',
+    TRANSACTION_CREATED: 'Tranzacție adăugată cu succes!',
+    TRANSACTION_UPDATED: 'Tranzacție actualizată cu succes!',
+    TRANSACTION_DELETED: 'Tranzacție ștearsă cu succes!',
     CAMPURI_OBLIGATORII: 'Completează toate câmpurile obligatorii',
     FRECV_RECURENTA: 'Selectează frecvența pentru tranzacție recurentă',
     AVERTISMENT_DATE: 'Datele introduse nu sunt valide sau complete.',
@@ -20,5 +34,10 @@ exports.MESAJE = {
     LOG_EROARE_INCARCARE: 'Eroare la încărcarea tranzacțiilor:',
     LOG_EROARE_SALVARE: 'Eroare la salvarea tranzacției:',
     LOG_EROARE_STERGERE: 'Eroare la ștergerea tranzacției:',
+    EROARE_AUTENTIFICARE: 'Date de autentificare incorecte.',
+    EROARE_RLS: 'Acces interzis (RLS).',
+    EROARE_RETEA: 'Eroare de rețea. Încearcă din nou.',
+    PAROLA_PREA_SLABA: 'Parola trebuie să aibă minim 8 caractere, literă mare, mică, cifră și simbol.',
+    EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: 'Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.',
 };
 //# sourceMappingURL=messages.js.map

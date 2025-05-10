@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
+exports.UI = exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
+const enums_1 = require("./enums");
 exports.LABELS = {
     TYPE: 'Tip',
     AMOUNT: 'Sumă',
@@ -15,6 +16,8 @@ exports.LABELS = {
 };
 exports.TITLES = {
     TRANZACTII: 'Tranzacții',
+    GRID_LUNAR: 'Grid Lunar',
+    OPTIUNI: 'Opțiuni',
 };
 exports.PLACEHOLDERS = {
     SELECT: 'Alege',
@@ -23,10 +26,14 @@ exports.PLACEHOLDERS = {
 };
 exports.BUTTONS = {
     ADD: 'Adaugă',
+    CANCEL: 'Anulează',
+    DONE: 'Gata',
     EDIT: 'Editează',
     DELETE: 'Șterge',
     NEXT_PAGE: 'Înainte',
     PREV_PAGE: 'Înapoi',
+    ADD_SUBCATEGORY: 'Adaugă subcategorie',
+    MANAGE_CATEGORIES: 'Gestionare categorii',
 };
 exports.TABLE = {
     HEADERS: {
@@ -59,9 +66,16 @@ exports.EXCEL_GRID = {
         SOLD: 'Sold',
     },
     NO_DATA: 'Nu există date disponibile',
-    LOADING: 'Se încarcă datele...'
+    LOADING: 'Se încarcă datele...',
+    PROMPTS: {
+        ENTER_AMOUNT: 'Introduceți suma:'
+    },
+    ACTIONS: {
+        ADD_SUBCATEGORY: 'Adaugă subcategorie',
+        EDIT_SUBCATEGORY: 'Editează subcategorie',
+        DELETE_SUBCATEGORY: 'Șterge subcategorie',
+    }
 };
-const enums_1 = require("./enums");
 exports.OPTIONS = {
     TYPE: [
         { value: enums_1.TransactionType.INCOME, label: 'Venit' },
@@ -79,5 +93,18 @@ exports.OPTIONS = {
         { value: enums_1.FrequencyType.MONTHLY, label: 'Lunar' },
         { value: enums_1.FrequencyType.YEARLY, label: 'Anual' },
     ],
+};
+exports.UI = {
+    OPTIONS_PAGE_TITLE: 'Opțiuni',
+    CATEGORY_MANAGEMENT: 'Gestionare categorii',
+    CATEGORY_MANAGEMENT_DESCRIPTION: 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.',
+    MANAGE_CATEGORIES: 'Gestionare categorii',
+    DISPLAY_OPTIONS: 'Opțiuni de afișare',
+    DATA_EXPORT: 'Export date',
+    COMING_SOON: 'În curând',
+    LOGIN_REQUIRED: 'Trebuie să fiți autentificat pentru a accesa această pagină.',
+    ADD_SUBCATEGORY: 'Adaugă subcategorie',
+    DELETE_SUBCATEGORY: 'Șterge subcategorie',
+    EDIT_SUBCATEGORY: 'Editează subcategorie',
 };
 //# sourceMappingURL=ui.js.map

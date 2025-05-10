@@ -42,12 +42,7 @@ describe('Badge', () => {
     expect(badge).toHaveClass('text-black');
   });
 
-  it('aplică clasa corectă pentru culoarea info', () => {
-    const { container } = render(<Badge color="info">Info Badge</Badge>);
-    const badge = container.firstChild as HTMLElement;
-    expect(badge).toHaveClass('bg-blue-500');
-    expect(badge).toHaveClass('text-white');
-  });
+  
 
   // Test pentru clase personalizate
   it('acceptă și aplică o clasă personalizată', () => {

@@ -24,7 +24,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
     <div className="mt-6">
       <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white" data-testid="transaction-table">
         <thead>
-          <tr className="bg-gray-100 text-gray-700">
+          <tr className="bg-secondary-50 text-secondary-700">
             <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.TYPE}</th>
             <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.AMOUNT}</th>
                         <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.CATEGORY}</th>
@@ -36,12 +36,12 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
         </thead>
         <tbody>
           {loading ? (
-            <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-6 text-gray-500">{TABLE.LOADING}</td></tr>
+            <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-6 text-secondary-500">{TABLE.LOADING}</td></tr>
           ) : (!transactions || transactions.length === 0 ? (
-            <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-6 text-gray-400">{TABLE.EMPTY}</td></tr>
+            <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-6 text-secondary-400">{TABLE.EMPTY}</td></tr>
           ) : (
             transactions.map((t, idx) => (
-              <tr key={t.id || idx} className="border-b last:border-b-0 hover:bg-gray-50" data-testid={`transaction-item-${t.id || idx}`}>
+              <tr key={t.id || idx} className="border-b last:border-b-0 hover:bg-secondary-100" data-testid={`transaction-item-${t.id || idx}`}>
                 <td className="px-3 py-2">{t.type || ''}</td>
                 <td className="px-3 py-2">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
                                 <td className="px-3 py-2">{t.category || ''}</td>
@@ -62,7 +62,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
         >
           {BUTTONS.PREV_PAGE}
         </Button>
-        <span className="text-sm text-gray-600">
+        <span className="text-sm text-secondary-600">
           {TABLE.PAGE_INFO.replace('{current}', String(Math.floor(offset / limit) + 1)).replace('{total}', String(Math.ceil(total / limit) || 1))}
         </span>
         <Button

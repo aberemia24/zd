@@ -1,13 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.APP_DEFAULTS = exports.PAGINATION = void 0;
-exports.PAGINATION = {
-    DEFAULT_LIMIT: 20,
-    DEFAULT_OFFSET: 0,
-    DEFAULT_SORT: 'date',
-};
-exports.APP_DEFAULTS = {
-    CURRENCY: 'RON',
-    DATE_FORMAT: 'YYYY-MM-DD',
-};
+exports.PAGINATION = void 0;
+var defaults_1 = require("@shared-constants/defaults");
+Object.defineProperty(exports, "PAGINATION", { enumerable: true, get: function () { return defaults_1.PAGINATION; } });
 //# sourceMappingURL=defaults.js.map

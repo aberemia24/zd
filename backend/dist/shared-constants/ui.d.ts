@@ -1,3 +1,4 @@
+import { TransactionType, CategoryType, FrequencyType } from './enums';
 export declare const LABELS: {
     TYPE: string;
     AMOUNT: string;
@@ -12,6 +13,8 @@ export declare const LABELS: {
 };
 export declare const TITLES: {
     TRANZACTII: string;
+    GRID_LUNAR: string;
+    OPTIUNI: string;
 };
 export declare const PLACEHOLDERS: {
     SELECT: string;
@@ -20,10 +23,14 @@ export declare const PLACEHOLDERS: {
 };
 export declare const BUTTONS: {
     ADD: string;
+    CANCEL: string;
+    DONE: string;
     EDIT: string;
     DELETE: string;
     NEXT_PAGE: string;
     PREV_PAGE: string;
+    ADD_SUBCATEGORY: string;
+    MANAGE_CATEGORIES: string;
 };
 export declare const TABLE: {
     HEADERS: {
@@ -57,8 +64,15 @@ export declare const EXCEL_GRID: {
     };
     NO_DATA: string;
     LOADING: string;
+    PROMPTS: {
+        ENTER_AMOUNT: string;
+    };
+    ACTIONS: {
+        ADD_SUBCATEGORY: string;
+        EDIT_SUBCATEGORY: string;
+        DELETE_SUBCATEGORY: string;
+    };
 };
-import { TransactionType, CategoryType, FrequencyType } from './enums';
 export declare const OPTIONS: {
     TYPE: {
         value: TransactionType;
@@ -72,4 +86,17 @@ export declare const OPTIONS: {
         value: FrequencyType;
         label: string;
     }[];
+};
+export declare const UI: {
+    OPTIONS_PAGE_TITLE: string;
+    CATEGORY_MANAGEMENT: string;
+    CATEGORY_MANAGEMENT_DESCRIPTION: string;
+    MANAGE_CATEGORIES: string;
+    DISPLAY_OPTIONS: string;
+    DATA_EXPORT: string;
+    COMING_SOON: string;
+    LOGIN_REQUIRED: string;
+    ADD_SUBCATEGORY: string;
+    DELETE_SUBCATEGORY: string;
+    EDIT_SUBCATEGORY: string;
 };

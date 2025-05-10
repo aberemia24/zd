@@ -1,4 +1,18 @@
 export declare const MESAJE: {
+    LOGIN_SUCCES: string;
+    LOGIN_ERROR: string;
+    LOGOUT_SUCCES: string;
+    REGISTER_SUCCES: string;
+    REGISTER_ERROR: string;
+    PAROLE_NECORESPUNZATOARE: string;
+    INVALID_TYPE: string;
+    INVALID_CATEGORY: string;
+    MISSING_REQUIRED_FIELD: string;
+    NOT_FOUND: string;
+    SERVER_ERROR: string;
+    TRANSACTION_CREATED: string;
+    TRANSACTION_UPDATED: string;
+    TRANSACTION_DELETED: string;
     CAMPURI_OBLIGATORII: string;
     FRECV_RECURENTA: string;
     AVERTISMENT_DATE: string;
@@ -17,4 +31,9 @@ export declare const MESAJE: {
     LOG_EROARE_INCARCARE: string;
     LOG_EROARE_SALVARE: string;
     LOG_EROARE_STERGERE: string;
+    EROARE_AUTENTIFICARE: string;
+    EROARE_RLS: string;
+    EROARE_RETEA: string;
+    PAROLA_PREA_SLABA: string;
+    EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: string;
 };

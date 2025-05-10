@@ -19,6 +19,29 @@
 
 ## Testing
 
+---
+
+## Best Practice: Tailwind/PostCSS - Utilitare custom cu @layer/@apply
+
+**NU folosi @import pentru fișiere ce conțin @layer și @apply (ex: utils.css) în fișierul principal de stiluri (index.css).**
+
+- Toate utilitarele custom cu @layer components trebuie scrise direct în index.css, după @tailwind components și înainte de @tailwind utilities.
+- Dacă folosești @import pentru astfel de fișiere, buildul va eșua cu eroarea:
+  > `@layer components is used but no matching @tailwind components directive is present.`
+- @import e permis doar pentru reseturi simple sau variabile, nu pentru utilitare cu @apply/@layer.
+
+**Motivație:**
+Tailwind/PostCSS procesează directivelor în ordinea fizică a fișierului. @layer trebuie să fie în același context cu directivele Tailwind.
+
+**Pattern recomandat:**
+- Modularizează utilitarele doar logic (comentarii, secțiuni), nu fizic (fișiere separate cu @layer).
+- Pentru proiecte mari, folosește pluginuri Tailwind custom sau barrel-uri JS pentru tokens, nu fișiere CSS importate separat.
+
+**Data:** 2025-05-10
+
+---
+
+
 ### Principii Generale
 
 - Teste unitare și de integrare pentru toate componentele și serviciile.
