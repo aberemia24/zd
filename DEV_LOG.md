@@ -267,7 +267,7 @@ _Actualizat la: 2025-05-07_
 
 ### Task 6: Primitive
 - Verificare/refactorizare teste pentru componente primitive (Alert, Badge, Button, Checkbox, Input, Loader, Select, Textarea).
-- Toate testele sunt conforme cu regulile globale (doar unitare, fără dependințe de store, folosesc data-testid unde e relevant).
+- Toate testele sunt conforme cu regulile globale (nu folosesc mock store).
 - Nu a fost nevoie de modificări.
 
 ### Task 7: TransactionForm

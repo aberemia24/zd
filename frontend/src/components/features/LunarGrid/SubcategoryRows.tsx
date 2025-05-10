@@ -115,7 +115,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
             data-testid={`subcategory-row-${categoryKey}-${subcat}`}
           >
             <td
-              className="sticky left-0 bg-white z-10 px-4 py-2 pl-8 relative"
+              className="sticky left-0 bg-white z-10 px-4 py-2 pl-8"
               data-testid={`subcat-${subcat}`}
             >
               <div className="flex items-center space-x-2">

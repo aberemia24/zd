@@ -35,6 +35,13 @@
 ```
 
 ### 5. Best practices
+- Toate componentele primitive (Button, Input, Select, Checkbox, Alert, Badge, Textarea, Loader, Spinner) folosesc EXCLUSIV tokens din sistemul centralizat pentru stiluri.
+- Exemple de tokens: `input-field`, `border-error`, `text-error`, `bg-success-50`, `stroke-primary-500`, `accent-primary` etc.
+- Este INTERZISĂ folosirea stringurilor hardcodate pentru stiluri sau a claselor Tailwind generice (ex: border-red-500).
+- data-testid trebuie să fie unic, predictibil și stabil pentru fiecare variantă/stare (ex: `input-field-error`, `alert-warning`, `badge-success`).
+- Loader/Spinner: animație și culoare din tokens, nu valori hardcodate SVG.
+- Orice excepție se documentează explicit în PR și DEV_LOG.md.
+
 - Folosește doar clase generate din tokens.
 - Nu modifica direct utility classes în JSX fără să actualizezi tokens.
 - Documentează orice excepție aici și în DEV_LOG.md.
