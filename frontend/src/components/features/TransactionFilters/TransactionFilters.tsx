@@ -36,7 +36,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   }, [customCategories]);
 
   return (
-    <div className="flex gap-4 mb-4">
+    <div className="flex items-end gap-token mb-token">
       <Select
         name="type-filter"
         label={LABELS.TYPE_FILTER}
@@ -50,7 +50,6 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             onTypeChange(value);
           }}
         options={types}
-        className="ml-2"
         placeholder={PLACEHOLDERS.SELECT + ' tipul'}
       />
       <Select
@@ -60,7 +59,6 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
         data-testid="category-filter"
         onChange={e => onCategoryChange((e.target as HTMLSelectElement).value as CategoryType | '')}
         options={categoryOptions}
-        className="ml-2"
         placeholder={PLACEHOLDERS.SELECT + ' categoria'}
       />
       <Button variant="secondary" onClick={() => { onTypeChange(''); onCategoryChange(''); }}>

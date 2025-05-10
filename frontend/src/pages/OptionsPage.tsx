@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { CategoryEditor } from '../components/features/CategoryEditor';
@@ -9,7 +10,8 @@ import { UI } from '@shared-constants/ui';
  * Conține setări și configurări pentru utilizator, inclusiv gestionarea categoriilor
  */
 const OptionsPage: React.FC = () => {
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const navigate = useNavigate();
   const categoryStore = useCategoryStore();
   const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
   
@@ -20,27 +22,38 @@ const OptionsPage: React.FC = () => {
   // Dacă utilizatorul nu este autentificat, afișăm un mesaj
   if (!user) {
     return (
-      <div className="container mx-auto px-4 py-8" data-testid="options-page-not-logged">
-        <h1 className="text-2xl font-bold mb-4">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
-        <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+      <div className="container mx-auto px-token py-token-xl" data-testid="options-page-not-logged">
+        <h1 className="text-2xl font-bold text-primary-700 mb-token">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
+        <div className="bg-warning-100 border-l-4 border-warning-500 text-warning-700 p-token mb-token" role="alert">
           <p>{UI.LOGIN_REQUIRED || 'Trebuie să fiți autentificat pentru a accesa această pagină.'}</p>
         </div>
       </div>
     );
   }
 
+  // Funcție pentru gestionarea logout-ului
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login'); // Redirecționare la pagina de login după logout
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Aici ai putea afișa un mesaj de eroare pentru utilizator, dacă este cazul
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8" data-testid="options-page">
-      <h1 className="text-2xl font-bold mb-4">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
+    <div className="container mx-auto px-token py-token-xl" data-testid="options-page">
+      <h1 className="text-2xl font-bold text-primary-700 mb-token">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
       
       {/* Secțiunea de gestionare categorii */}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">{UI.CATEGORY_MANAGEMENT || 'Gestionare categorii'}</h2>
-        <p className="mb-4">{UI.CATEGORY_MANAGEMENT_DESCRIPTION || 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.'}</p>
+      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
+        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.CATEGORY_MANAGEMENT || 'Gestionare categorii'}</h2>
+        <p className="mb-token">{UI.CATEGORY_MANAGEMENT_DESCRIPTION || 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.'}</p>
         
         <button
           onClick={() => setShowCategoryEditor(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
+          className="btn btn-primary"
           data-testid="open-category-editor-btn"
         >
           {UI.MANAGE_CATEGORIES || 'Gestionare categorii'}
@@ -48,14 +61,27 @@ const OptionsPage: React.FC = () => {
       </div>
 
       {/* Alte secțiuni de opțiuni pot fi adăugate aici */}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">{UI.DISPLAY_OPTIONS || 'Opțiuni de afișare'}</h2>
-        <p className="text-gray-500">{UI.COMING_SOON || 'În curând'}</p>
+      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
+        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.DISPLAY_OPTIONS || 'Opțiuni de afișare'}</h2>
+        <p className="text-secondary-600">{UI.COMING_SOON || 'În curând'}</p>
       </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">{UI.DATA_EXPORT || 'Export date'}</h2>
-        <p className="text-gray-500">{UI.COMING_SOON || 'În curând'}</p>
+      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
+        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.DATA_EXPORT || 'Export date'}</h2>
+        <p className="text-secondary-600">{UI.COMING_SOON || 'În curând'}</p>
+      </div>
+
+      {/* Secțiunea Cont Utilizator - NOU */}
+      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
+        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.ACCOUNT_SETTINGS || 'Setări Cont'}</h2>
+        <p className="mb-token text-neutral-600">{UI.ACCOUNT_LOGOUT_DESCRIPTION || 'Deconectează-te de la contul tău.'}</p>
+        <button
+          onClick={handleLogout}
+          className="btn btn-danger" // Stil pentru logout, asigură-te că .btn-danger este definit în index.css
+          data-testid="logout-btn"
+        >
+          {UI.LOGOUT_BUTTON || 'Logout'}
+        </button>
       </div>
 
       {/* Modal pentru editarea categoriilor */}

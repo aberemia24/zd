@@ -91,7 +91,7 @@ export const CategoryEditor: React.FC<Props> = ({
   // Helper pentru badge count
   const badge = (cat: string, subcat: string) => {
     const count = getSubcategoryCount(cat, subcat);
-    return count > 0 ? <span className="ml-2 px-2 py-0.5 bg-gray-200 text-xs rounded" data-testid={`subcat-count-${cat}-${subcat}`}>{count}</span> : null;
+    return count > 0 ? <span className="ml-2 px-2 py-0.5 bg-secondary-200 text-secondary-700 text-xs rounded-token" data-testid={`subcat-count-${cat}-${subcat}`}>{count}</span> : null;
   };
 
   // Adăugare subcategorie nouă
@@ -158,21 +158,21 @@ export const CategoryEditor: React.FC<Props> = ({
     };
     
     return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-4" data-testid={`delete-confirm-${cat}-${subcat}`}>
-        <h3 className="text-lg font-semibold text-red-700 mb-2">Confirmare ștergere</h3>
+      <div className="p-token bg-error-50 border border-error-200 rounded-token mb-token" data-testid={`delete-confirm-${cat}-${subcat}`}>
+        <h3 className="text-lg font-semibold text-error-700 mb-token">Confirmare ștergere</h3>
         <p className="mb-2">Ești sigur că vrei să ștergi subcategoria <strong>{subcat}</strong> din <strong>{cat}</strong>?</p>
         
         {count > 0 && (
-          <p className="mb-2 text-red-600" data-testid={`delete-warning-${cat}-${subcat}`}>
+          <p className="mb-2 text-error-600" data-testid={`delete-warning-${cat}-${subcat}`}>
             Atenție: Există <strong>{count}</strong> tranzacții care folosesc această subcategorie. 
             Acestea vor fi mutate în categoria principală.
           </p>
         )}
         
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-token">
           <button 
             onClick={handleConfirmDelete}
-            className="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
+            className="btn btn-error"
             data-testid={`confirm-delete-${cat}-${subcat}`}
           >
             Confirmă ștergerea
@@ -187,7 +187,7 @@ export const CategoryEditor: React.FC<Props> = ({
                 onClose();
               }
             }}
-            className="border border-gray-300 px-4 py-1 rounded hover:bg-gray-100"
+            className="btn btn-secondary"
             data-testid={`cancel-delete-${cat}-${subcat}`}
           >
             Anulează
@@ -217,17 +217,17 @@ export const CategoryEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" data-testid="category-editor-modal">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl relative">
-        <button className="absolute top-2 right-2" onClick={onClose} data-testid="close-editor">✕</button>
-        <h2 className="text-xl font-bold mb-4">Gestionare Subcategorii</h2>
-        {error && <div className="text-red-500 mb-2" data-testid="error-msg">{error}</div>}
+    <div className="fixed inset-0 bg-neutral-900 bg-opacity-40 flex items-center justify-center z-50" data-testid="category-editor-modal">
+      <div className="bg-secondary-50 rounded-token shadow-token p-token w-full max-w-2xl relative">
+        <button className="absolute top-2 right-2 btn-icon btn-ghost" onClick={onClose} data-testid="close-editor">✕</button>
+        <h2 className="text-xl font-bold mb-token text-headings">Gestionare Subcategorii</h2>
+        {error && <div className="text-error mb-token" data-testid="error-msg">{error}</div>}
         <div className="flex gap-6">
-          <div className="w-1/3 border-r pr-4">
-            <h3 className="font-semibold mb-2">Categorii</h3>
+          <div className="w-1/3 border-r border-secondary-200 pr-4">
+            <h3 className="font-semibold mb-token text-headings-secondary">Categorii</h3>
             <ul>
               {categories.map(cat => (
-                <li key={cat.name} className={"mb-2 "+(selectedCategory===cat.name?"font-bold text-blue-600":"")}>
+                <li key={cat.name} className={"mb-2 "+(selectedCategory===cat.name?"font-bold text-accent":"text-secondary-700 hover:text-accent")}>
                   <button onClick={()=>setSelectedCategory(cat.name)} data-testid={`cat-select-${cat.name}`}>{cat.name}</button>
                 </li>
               ))}
@@ -241,12 +241,12 @@ export const CategoryEditor: React.FC<Props> = ({
             
             {selectedCategory ? (
               <>
-                <h3 className="font-semibold mb-2">Subcategorii pentru <span className="text-blue-600">{selectedCategory}</span></h3>
+                <h3 className="font-semibold mb-token text-headings-secondary">Subcategorii pentru <span className="text-accent">{selectedCategory}</span></h3>
                 <ul>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className="flex items-center gap-2 mb-1">
                       {editingSubcat?.cat===selectedCategory && editingSubcat.subcat===sc.name ? (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 items-center">
                           <input
                             type="text"
                             value={renameValue}
@@ -255,36 +255,36 @@ export const CategoryEditor: React.FC<Props> = ({
                               if (e.key === 'Enter') { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }
                               if (e.key === 'Escape') setEditingSubcat(null);
                             }}
-                            className="border px-2 py-1 rounded"
+                            className="input-field input-sm"
                             autoFocus
                             data-testid={`edit-subcat-input-${sc.name}`}
                           />
                           <button
                             onClick={() => { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }}
-                            className="text-xs text-green-600"
+                            className="text-xs text-success-600 hover:text-success-700"
                             data-testid={`confirm-rename-${sc.name}`}
                           >{BUTTONS.DONE}</button>
                           <button
                             onClick={() => setEditingSubcat(null)}
-                            className="text-xs text-gray-500"
+                            className="text-xs text-secondary-500 hover:text-secondary-600"
                             data-testid={`cancel-rename-${sc.name}`}
                           >{BUTTONS.CANCEL}</button>
                         </div>
                       ) : (
                         <>
                           <span>{sc.name}</span>
-                          {sc.isCustom && <span className="ml-1 text-green-600 text-xs" data-testid={`custom-flag-${sc.name}`}>custom</span>}
+                          {sc.isCustom && <span className="ml-1 text-success-600 text-xs" data-testid={`custom-flag-${sc.name}`}>custom</span>}
                           {badge(selectedCategory, sc.name)}
                           <button
                             onClick={() => { setEditingSubcat({ cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
-                            className="ml-2 text-blue-600 text-xs"
+                            className="ml-2 text-accent text-xs hover:text-accent-hover"
                             data-testid={`edit-subcat-btn-${sc.name}`}
                           >Redenumește</button>
                           {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                           {sc.isCustom && (
                             <button 
                               onClick={()=>handleDelete(selectedCategory, sc.name)} 
-                              className="ml-1 text-red-600 text-xs" 
+                              className="ml-1 text-error-600 text-xs hover:text-error-700" 
                               data-testid={`delete-subcat-btn-${sc.name}`}
                             >
                               Șterge
@@ -295,7 +295,7 @@ export const CategoryEditor: React.FC<Props> = ({
                     </li>
                   ))}
                 </ul>
-                <div className="flex items-center gap-2 mt-4">
+                <div className="flex items-center gap-2 mt-token">
                   <input
                     type="text"
                     value={newSubcat}
@@ -305,14 +305,14 @@ export const CategoryEditor: React.FC<Props> = ({
                       if (e.key === 'Escape') setNewSubcat('');
                     }}
                     placeholder="Adaugă subcategorie nouă"
-                    className="border px-2 py-1 rounded flex-1"
+                    className="input-field flex-1"
                     data-testid="add-subcat-input"
                   />
-                  <button onClick={()=>handleAdd(categories.find(cat=>cat.name===selectedCategory)!)} className="bg-blue-600 text-white px-3 py-1 rounded" data-testid="add-subcat-btn">Adaugă</button>
+                  <button onClick={()=>handleAdd(categories.find(cat=>cat.name===selectedCategory)!)} className="btn btn-primary" data-testid="add-subcat-btn">Adaugă</button>
                 </div>
               </>
             ) : (
-              <div className="text-gray-500">Selectează o categorie pentru a vedea și edita subcategoriile.</div>
+              <div className="text-secondary-500">Selectează o categorie pentru a vedea și edita subcategoriile.</div>
             )}
           </div>
         </div>

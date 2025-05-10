@@ -72,11 +72,11 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
     <>
       {subcategories.map((subcat) => (
         editingKey === subcat ? (
-          <tr key={`edit-${subcat}`} className="border-t border-gray-200">
-            <td className="sticky left-0 bg-white z-10 px-4 py-2 pl-8">
+          <tr key={`edit-${subcat}`} className="border-t border-secondary-200">
+            <td className="sticky left-0 excel-header z-10 px-4 py-2 pl-8">
               <div className="flex items-center w-full">
                 <input
-                  className="w-full border border-gray-300 px-2 py-1 rounded"
+                  className="input-field w-full"
                   value={renameValue}
                   onChange={e => setRenameValue(e.target.value)}
                   onKeyDown={async e => {
@@ -90,7 +90,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                   data-testid={`edit-subcat-input-${subcat}`}
                 />
                 <button
-                  className="ml-2 text-green-600 hover:text-green-800"
+                  className="ml-2 btn btn-success"
                   onClick={async () => {
                     await renameSubcategory(user.id || user, categoryKey, subcat, renameValue.trim());
                     setEditingKey(null);
@@ -98,7 +98,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                   data-testid={`confirm-rename-${subcat}`}
                 >{BUTTONS.DONE}</button>
                 <button
-                  className="ml-2 text-red-600 hover:text-red-800"
+                  className="ml-2 btn btn-error"
                   onClick={() => setEditingKey(null)}
                   data-testid={`cancel-rename-${subcat}`}
                 >{BUTTONS.CANCEL}</button>
@@ -111,18 +111,18 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
         ) : (
           <tr
             key={`${categoryKey}-${subcat}`}
-            className="group hover:bg-gray-100 border-t border-gray-200"
+            className="group hover:bg-secondary-100 border-t border-secondary-200"
             data-testid={`subcategory-row-${categoryKey}-${subcat}`}
           >
             <td
-              className="sticky left-0 bg-white z-10 px-4 py-2 pl-8"
+              className="sticky left-0 excel-header z-10 px-4 py-2 pl-8"
               data-testid={`subcat-${subcat}`}
             >
               <div className="flex items-center space-x-2">
-                <div className="w-4 h-0 border-t border-gray-400 mr-2" />
+                <div className="w-4 h-0 border-t border-secondary-400 mr-2" />
                 <span data-testid={`subcat-label-${subcat}`}>{subcat}{' '}
                   {isCustomSubcategory(categoryKey, subcat) && (
-                    <span className="text-blue-600 text-sm ml-1">➡️</span>
+                    <span className="text-accent text-sm ml-1">➡️</span>
                   )}
                 </span>
               </div>
@@ -131,7 +131,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                   {isCustomSubcategory(categoryKey, subcat) ? (
                     <>
                       <button
-                        className="p-1 text-gray-500 hover:text-blue-600 focus:outline-none"
+                        className="p-1 text-secondary-500 hover:text-accent focus:outline-none"
                         onClick={e => { e.stopPropagation(); setEditingKey(subcat); setRenameValue(subcat); }}
                         title="Editează subcategorie"
                         data-testid={`edit-subcat-${categoryKey}-${subcat}`}
@@ -139,7 +139,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                         <Edit size={14} />
                       </button>
                       <button
-                        className="p-1 text-gray-500 hover:text-red-600 focus:outline-none"
+                        className="p-1 text-secondary-500 hover:text-error-600 focus:outline-none"
                         onClick={e => { e.stopPropagation(); if (window.confirm(MESAJE.CONFIRMARE_STERGERE)) handleDeleteSubcategory(categoryKey, subcat); }}
                         title="Șterge subcategorie"
                         data-testid={`delete-subcat-${categoryKey}-${subcat}`}
@@ -149,7 +149,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                     </>
                   ) : (
                     <button
-                      className="p-1 text-gray-400 hover:text-blue-600 focus:outline-none"
+                      className="p-1 text-secondary-400 hover:text-accent focus:outline-none"
                       onClick={e => { e.stopPropagation(); setEditingKey(subcat); setRenameValue(subcat); }}
                       title="Redenumește subcategoria"
                       data-testid={`rename-subcat-${categoryKey}-${subcat}`}
@@ -167,7 +167,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
               return (
                 <td
                   key={day}
-                  className={`px-4 py-2 text-right ${sum !== 0 ? (sum > 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium') : 'text-gray-500'}`}
+                  className={`excel-cell text-right ${sum !== 0 ? (sum > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium') : 'text-secondary-400'}`}
                   data-testid={`cell-${categoryKey}-${subcat}-${day}`}
                   tabIndex={0}
                   onClick={(e) => handleCellClick(e, categoryKey, subcat, day, sum !== 0 ? String(sum) : '', '')}
@@ -199,10 +199,10 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
         )
       ))}
       {!addingCategory && onStartAddSubcategory && (
-        <tr key="start-add-row" className="border-t border-gray-200">
+        <tr key="start-add-row" className="border-t border-secondary-200">
           <td className="sticky left-0 bg-white z-10 px-4 py-2 pl-8">
             <button
-              className="text-blue-600 hover:text-blue-800"
+              className="btn btn-accent"
               onClick={() => onStartAddSubcategory(categoryKey)}
               data-testid={`start-add-${categoryKey}`}
             >
@@ -210,16 +210,16 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
             </button>
           </td>
           {days.map((day) => (
-            <td key={`empty-${day}`} />
+            <td key={`empty-${day}`} className="excel-cell" />
           ))}
         </tr>
       )}
       {addingCategory === categoryKey && (
-        <tr key="add-row" className="border-t border-gray-200">
+        <tr key="add-row" className="border-t border-secondary-200">
           <td className="sticky left-0 bg-white z-10 px-4 py-2 pl-8">
             <div className="flex items-center w-full">
               <input
-                className="w-full border border-gray-300 px-2 py-1 rounded"
+                className="input-field w-full"
                 placeholder="Nume subcategorie"
                 data-testid="add-subcat-input"
                 value={newSubcatName}
@@ -230,14 +230,14 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
                 }}
               />
               <button
-                className="ml-2 text-green-600 hover:text-green-800"
+                className="ml-2 btn btn-success"
                 onClick={() => onAddSubcategory?.(categoryKey, newSubcatName)}
                 data-testid={`confirm-add-${categoryKey}`}
               >
                 Done
               </button>
               <button
-                className="ml-2 text-red-600 hover:text-red-800"
+                className="ml-2 btn btn-error"
                 onClick={() => onCancelAddSubcategory?.()}
                 data-testid={`cancel-add-${categoryKey}`}
               >
@@ -246,7 +246,7 @@ export const SubcategoryRows: React.FC<SubcategoryRowsProps> = ({
             </div>
           </td>
           {days.map((day) => (
-            <td key={day} />
+            <td key={day} className="excel-cell" />
           ))}
         </tr>
       )}

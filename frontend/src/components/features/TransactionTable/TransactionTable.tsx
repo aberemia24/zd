@@ -21,40 +21,40 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
   const loading = useTransactionStore((s: TransactionState) => s.loading);
   const total = useTransactionStore((s: TransactionState) => s.total);
   return (
-    <div className="mt-6">
-      <table className="w-full border-collapse rounded-lg overflow-hidden shadow-sm bg-white" data-testid="transaction-table">
+    <div className="mt-token">
+      <table className="w-full border-collapse rounded-token overflow-hidden shadow-token bg-secondary-50" data-testid="transaction-table">
         <thead>
-          <tr className="bg-secondary-50 text-secondary-700">
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.TYPE}</th>
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.AMOUNT}</th>
-                        <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.CATEGORY}</th>
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.SUBCATEGORY}</th>
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.DATE}</th>
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.RECURRING}</th>
-            <th className="px-3 py-2 text-left font-semibold">{TABLE.HEADERS.FREQUENCY}</th>
+          <tr className="bg-secondary-100 text-secondary-700">
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.TYPE}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.AMOUNT}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.CATEGORY}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.SUBCATEGORY}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.DATE}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.RECURRING}</th>
+            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.FREQUENCY}</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
-            <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-6 text-secondary-500">{TABLE.LOADING}</td></tr>
+            <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-token-lg text-secondary-500">{TABLE.LOADING}</td></tr>
           ) : (!transactions || transactions.length === 0 ? (
-            <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-6 text-secondary-400">{TABLE.EMPTY}</td></tr>
+            <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-token-lg text-secondary-400">{TABLE.EMPTY}</td></tr>
           ) : (
             transactions.map((t, idx) => (
-              <tr key={t.id || idx} className="border-b last:border-b-0 hover:bg-secondary-100" data-testid={`transaction-item-${t.id || idx}`}>
-                <td className="px-3 py-2">{t.type || ''}</td>
-                <td className="px-3 py-2">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
-                                <td className="px-3 py-2">{t.category || ''}</td>
-                <td className="px-3 py-2">{t.subcategory || ''}</td>
-                <td className="px-3 py-2">{t.date || ''}</td>
-                <td className="px-3 py-2">{t.recurring === true ? TABLE.BOOL.YES : TABLE.BOOL.NO}</td>
-                <td className="px-3 py-2">{t.recurring === true && t.frequency ? t.frequency : ''}</td>
+              <tr key={t.id || idx} className="border-b border-secondary-200 last:border-b-0 hover:bg-secondary-100" data-testid={`transaction-item-${t.id || idx}`}>
+                <td className="px-token-sm py-token-xs">{t.type || ''}</td>
+                <td className="px-token-sm py-token-xs">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
+                <td className="px-token-sm py-token-xs">{t.category || ''}</td>
+                <td className="px-token-sm py-token-xs">{t.subcategory || ''}</td>
+                <td className="px-token-sm py-token-xs">{t.date || ''}</td>
+                <td className="px-token-sm py-token-xs">{t.recurring === true ? TABLE.BOOL.YES : TABLE.BOOL.NO}</td>
+                <td className="px-token-sm py-token-xs">{t.recurring === true && t.frequency ? t.frequency : ''}</td>
               </tr>
             ))
           ))}
         </tbody>
       </table>
-      <div className="mt-4 flex gap-2 items-center justify-center">
+      <div className="mt-token flex gap-token items-center justify-center">
         <Button
           variant="secondary"
           onClick={() => onPageChange(Math.max(0, offset - limit))}

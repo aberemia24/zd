@@ -154,16 +154,16 @@ const LunarGridPage: React.FC = () => {
   
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold" data-testid="lunar-grid-title">
+      <div className="flex justify-between items-center mb-token">
+        <h1 className="text-2xl font-bold text-primary-700" data-testid="lunar-grid-title">
           {TITLES.GRID_LUNAR}
         </h1>
         
         {/* Link to Options for managing categories */}
-        <div className="mb-4">
+        <div className="mb-token">
           <a
             href="#options"
-            className="text-sm text-blue-600 underline"
+            className="text-sm text-accent-600 hover:text-accent-700 underline"
             data-testid="manage-categories-link"
             onClick={e => {
               e.preventDefault();
@@ -176,22 +176,22 @@ const LunarGridPage: React.FC = () => {
           </a>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center gap-token">
           <button 
             onClick={goToPreviousMonth}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            className="btn-icon bg-secondary-200 text-secondary-700 hover:bg-secondary-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
             data-testid="prev-month-btn"
           >
             &larr;
           </button>
           
-          <span className="text-lg font-medium" data-testid="current-month">
+          <span className="text-lg font-medium text-primary-700" data-testid="current-month">
             {getMonthName(month)} {year}
           </span>
           
           <button 
             onClick={goToNextMonth}
-            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            className="btn-icon bg-secondary-200 text-secondary-700 hover:bg-secondary-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
             data-testid="next-month-btn"
           >
             &rarr;
@@ -200,7 +200,7 @@ const LunarGridPage: React.FC = () => {
       </div>
       
       {loading ? (
-        <div className="text-center py-8" data-testid="loading-indicator">{EXCEL_GRID.LOADING}</div>
+        <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">{EXCEL_GRID.LOADING}</div>
       ) : (
         <LunarGrid year={year} month={month} />
       )}

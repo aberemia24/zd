@@ -37,10 +37,13 @@ Tailwind/PostCSS procesează directivelor în ordinea fizică a fișierului. @la
 - Modularizează utilitarele doar logic (comentarii, secțiuni), nu fizic (fișiere separate cu @layer).
 - Pentru proiecte mari, folosește pluginuri Tailwind custom sau barrel-uri JS pentru tokens, nu fișiere CSS importate separat.
 
-**Data:** 2025-05-10
+**Consistență prin token-uri și utilitare centralizate (Actualizat Mai 2025):**
+Pentru a menține coerența vizuală și mentenabilitatea (așa cum s-a demonstrat în refactorizarea temei "earthy"):
+- Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
+- Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
+- Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
 
----
-
+**Data:** 2025-05-11
 
 ### Principii Generale
 
@@ -601,4 +604,13 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
 
 ---
 
-_Actualizat la: 2025-05-08_
+### Consistență prin token-uri și utilitare centralizate
+
+Pentru a menține coerența vizuală și mentenabilitatea (așa cum s-a demonstrat în refactorizarea temei "earthy" din Mai 2025):
+- Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
+- Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
+- Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
+
+**Data:** 2025-05-11
+
+_Actualizat la: 2025-05-11_

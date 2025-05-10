@@ -100,7 +100,7 @@ const TransactionsPage: React.FC = () => {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-6" data-testid="transactions-title">{TITLES.TRANZACTII}</h1>
+      <h1 className="text-2xl font-bold text-primary-700 mb-token" data-testid="transactions-title">{TITLES.TRANZACTII}</h1>
 
       <TransactionForm />
 
@@ -114,7 +114,7 @@ const TransactionsPage: React.FC = () => {
       <TransactionTable offset={offset} limit={limit} onPageChange={handlePageChange} />
 
       {fetchError && (
-        <div className="mt-4 p-2 bg-red-100 text-red-700 rounded" data-testid="fetch-error">
+        <div className="mt-token p-token-sm bg-error-100 text-error-700 rounded-token" data-testid="fetch-error">
           {fetchError}
         </div>
       )}

@@ -105,7 +105,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       value: subcat.name,
       // Adăugăm indicator pentru subcategorii personalizate
       label: subcat.name + (subcat.isCustom ? ' ➡️' : ''),
-      customStyle: subcat.isCustom ? 'text-blue-600' : undefined, // Stil special pentru subcategorii personalizate
+      customStyle: subcat.isCustom ? 'text-accent' : undefined, // Stil special pentru subcategorii personalizate
       // Nu mai avem nevoie de group în noua structură
     }));
   }, [form.category, categories]);
@@ -114,7 +114,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     <form
       aria-label={LABELS.FORM}
       onSubmit={onSubmit}
-      className="flex flex-wrap gap-3 mb-6 items-end"
+      className="flex flex-wrap gap-token mb-token items-end"
       data-testid="transaction-form"
     >
       <Select
@@ -124,7 +124,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.TYPE}
         options={OPTIONS.TYPE}
-        className="ml-2"
         placeholder={PLACEHOLDERS.SELECT}
         data-testid="type-select"
       />
@@ -136,7 +135,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.AMOUNT}
         placeholder={PLACEHOLDERS.AMOUNT}
-        className="ml-2"
         data-testid="amount-input"
       />
       <Select
@@ -146,7 +144,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.CATEGORY}
         options={optiuniCategorie}
-        className="ml-2"
         disabled={!form.type || optiuniCategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
         data-testid="category-select"
@@ -158,7 +155,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.SUBCATEGORY}
         options={optiuniSubcategorie}
-        className="ml-2"
         disabled={!form.category || optiuniSubcategorie.length === 0}
         placeholder={PLACEHOLDERS.SELECT}
         data-testid="subcategory-select"
@@ -171,7 +167,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.DATE}
         placeholder={PLACEHOLDERS.DATE}
-        className="ml-2"
         data-testid="date-input"
       />
       <Checkbox
@@ -189,7 +184,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         onChange={handleChange}
         aria-label={LABELS.FREQUENCY}
         options={OPTIONS.FREQUENCY}
-        className="ml-2"
         disabled={!form.recurring}
         placeholder={PLACEHOLDERS.SELECT}
         data-testid="frequency-select"
@@ -197,8 +191,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       <Button
         type="submit"
         disabled={!!loading}
-        className="ml-2"
-        // Folosim doar un singur test id pentru a evita conflictele
         data-testid="add-transaction-button"
         aria-label={BUTTONS.ADD}
       >
@@ -206,7 +198,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       </Button>
       <Button
         type="button"
-        className="ml-2"
+        variant="secondary"
         data-testid="cancel-btn"
         onClick={() => {
           resetForm();
@@ -216,12 +208,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         {BUTTONS.CANCEL}
       </Button>
       {error && (
-        <span data-testid="error-message" role="alert" aria-label="error message" className="text-error block mt-2">
+        <span data-testid="error-message" role="alert" aria-label="error message" className="text-error-600 block mt-token w-full text-center">
           {safeMessage(error)}
         </span>
       )}
       {success && (
-        <span data-testid="success-message" role="alert" aria-label="success message" className="text-success block mt-2">
+        <span data-testid="success-message" role="alert" aria-label="success message" className="text-success-600 block mt-token w-full text-center">
           {safeMessage(success)}
         </span>
       )}

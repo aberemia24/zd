@@ -288,8 +288,8 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
 
   // Stil CSS condiționat pentru solduri (pozitiv/negativ)
   const getBalanceStyle = (amount: number): string => {
-    if (amount === 0) return 'text-gray-500';
-    return amount > 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium';
+    if (amount === 0) return 'text-secondary-400';
+    return amount > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium';
   };
 
   // Popover state: ce celulă e activă și unde plasăm popoverul
@@ -462,22 +462,22 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   return (
     <React.Fragment>
       <div className="flex justify-end space-x-2 mb-2">
-        <button onClick={expandAll} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" data-testid="expand-all-btn">
+        <button onClick={expandAll} className="btn btn-secondary" data-testid="expand-all-btn">
           {UI.EXPAND_ALL}
         </button>
-        <button onClick={collapseAll} className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300" data-testid="collapse-all-btn">
+        <button onClick={collapseAll} className="btn btn-secondary" data-testid="collapse-all-btn">
           {UI.COLLAPSE_ALL}
         </button>
       </div>
-      <div className="overflow-x-auto rounded-lg shadow bg-white">
+      <div className="overflow-x-auto rounded-lg shadow-token bg-secondary-50">
         <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
           <thead>
-            <tr className="bg-gray-50">
-              <th className="sticky left-0 z-20 bg-gray-50 px-4 py-2 text-left" style={{ minWidth: 180 }}>
+            <tr className="excel-header">
+              <th className="sticky left-0 z-20 excel-header px-4 py-2 text-left" style={{ minWidth: 180 }}>
                 {EXCEL_GRID.HEADERS.LUNA}
               </th>
             {days.map(day => (
-              <th key={day} className="px-4 py-2 text-right">
+              <th key={day} className="excel-cell text-right">
                 {day}
               </th>
             ))}
@@ -494,7 +494,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
               <React.Fragment key={categoryKey}>
                 {/* Rând principal categorie (expandabil/colapsabil) */}
                 <tr 
-                  className="bg-teal-100 hover:bg-teal-200 cursor-pointer" 
+                  className="bg-secondary-100 hover:bg-secondary-200 cursor-pointer" 
                   onClick={() => toggleCategory(categoryKey)}
                   data-testid={`category-row-${categoryKey}`}
                 >

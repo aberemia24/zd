@@ -73,7 +73,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
   }, [onCancel, handleSave]);
 
   return (
-    <div className="bg-white rounded shadow-lg p-4 flex flex-col gap-2 z-50" data-testid="cell-transaction-popover">
+    <div className="bg-secondary-50 rounded-token shadow-token p-token flex flex-col gap-2 z-50" data-testid="cell-transaction-popover">
       <label htmlFor="amount-input" className="font-medium">{LABELS.AMOUNT}*</label>
       <Input
         id="amount-input"
@@ -111,7 +111,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           type="button"
           onClick={handleSave}
           data-testid="cell-save-btn"
-          className="bg-primary text-white px-4 py-1 rounded"
+          className="btn btn-primary"
         >
           {BUTTONS.ADD}
         </Button>
@@ -119,7 +119,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           type="button"
           onClick={onCancel}
           data-testid="cell-cancel-btn"
-          className="bg-gray-200 px-4 py-1 rounded"
+          className="btn btn-secondary"
         >
           {BUTTONS.CANCEL}
         </Button>

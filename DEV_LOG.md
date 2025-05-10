@@ -1,5 +1,31 @@
 # Dev Log - Budget App
 
+## [2025-05-11] Refactorizare extinsă pentru tema "Earthy" și aplicare token-uri de stil
+
+- **Sumar:** S-a finalizat o refactorizare amplă a mai multor componente și pagini cheie din aplicație pentru a se alinia complet la noua temă "earthy". Acest proces a implicat eliminarea stilurilor hardcodate și înlocuirea lor cu token-uri de stil predefinite (`--color-primary-500`, `spacing-token`, `rounded-token` etc.) și clase utilitare custom din `index.css`. Scopul principal a fost asigurarea consistenței vizuale, îmbunătățirea mentenabilității și respectarea ghidului de stil al aplicației.
+- **Principalele zone afectate:**
+    - Componente de autentificare: `LoginForm`, `RegisterForm`.
+    - Componente de tranzacții: `TransactionFilters`, `TransactionForm`, `TransactionTable`.
+    - Pagini principale: `LunarGridPage`, `OptionsPage`, `TransactionsPage`.
+    - Ajustări minore în alte componente pentru a reflecta utilizarea token-urilor (ex: butoane, input-uri, carduri, alerte).
+- **Beneficii:**
+    - Aspect vizual unitar și modern în întreaga aplicație.
+    - Cod CSS mai curat și mai ușor de întreținut.
+    - Respectarea bunelelor practici de theming și design system.
+    - Facilitarea actualizărilor viitoare ale temei.
+- **Branch:** `feature/earthy-theme-refactor` 
+- **Fișiere principale modificate (selecție):**
+    - `frontend/src/components/features/Auth/LoginForm.tsx`
+    - `frontend/src/components/features/Auth/RegisterForm.tsx`
+    - `frontend/src/components/features/TransactionFilters/TransactionFilters.tsx`
+    - `frontend/src/components/features/TransactionForm/TransactionForm.tsx`
+    - `frontend/src/components/features/TransactionTable/TransactionTable.tsx`
+    - `frontend/src/pages/LunarGridPage.tsx`
+    - `frontend/src/pages/OptionsPage.tsx`
+    - `frontend/src/pages/TransactionsPage.tsx`
+    - `frontend/src/index.css` 
+- **Notă:** Toate modificările au respectat regulile globale, inclusiv utilizarea exclusivă a constantelor din `@shared-constants` pentru texte și `data-testid` pentru elementele interactive.
+
 ## [2025-05-10] Îmbunătățiri UI și refactorizare subcategorii în LunarGrid
 
 - **Funcționalitate nouă:** Butoanele de editare și ștergere pentru subcategorii apar doar la hover în grid (UI mai curat, focus pe acțiuni relevante).
@@ -79,7 +105,7 @@
 - Refactorizat complet pattern fetch tranzacții cu Zustand: eliminat anti-patternul `useEffect(fetch, [queryParams])` (vezi regula critică din global_rules.md 8.2).
 - Adăugat validare strictă pentru categorii și subcategorii la nivel de service și trigger Supabase; nu se mai pot salva date invalide.
 - Toate mesajele de validare/eroare provin din `@shared-constants/messages`, fără stringuri hardcodate.
-- Documentat patternuri și reguli noi în `BEST_PRACTICES.md` și `TECH_STORIES/MVP-1-GRID-LUNAR.md`.
+- Documentare și audit complet al pașilor în [TECH_STORIES/implementare Supabase.md].
 - Toate modificările conforme cu regulile globale, fără excepții.
 
 

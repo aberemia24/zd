@@ -12,7 +12,7 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 
 const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, id, 'data-testid': dataTestId, ...rest }) => (
   <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label htmlFor={id || rest.name} className="form-label mb-1">{label}</label>}
+    {label && <label htmlFor={id || rest.name} className="text-secondary-700 mb-1">{label}</label>}
     <select
       id={id || rest.name}
       className={classNames('input-field', error && 'border-error', className)}

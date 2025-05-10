@@ -11,7 +11,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 const Input: React.FC<InputProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, inputRef, ...rest }) => (
   <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label className="form-label mb-1">{label}</label>}
+    {label && <label className="text-secondary-700 mb-1">{label}</label>}
     <input
       ref={inputRef}
       className={classNames('input-field', error && 'border-error', className)}

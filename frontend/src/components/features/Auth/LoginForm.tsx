@@ -38,34 +38,34 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
   };
 
   return (
-    <form className="max-w-sm mx-auto mt-12 p-6 bg-white rounded shadow" onSubmit={handleSubmit} data-testid="login-form">
-      <h2 className="text-xl font-bold mb-4 text-center">Autentificare</h2>
-      <div className="mb-4">
-        <label htmlFor="email" className="block mb-1 font-medium">Email</label>
+    <form className="form-container max-w-sm mx-auto mt-12 p-token bg-secondary-50 rounded-token shadow-token" onSubmit={handleSubmit} data-testid="login-form">
+      <h2 className="text-xl font-bold mb-token text-center text-headings">Autentificare</h2>
+      <div className="mb-token">
+        <label htmlFor="email" className="block mb-token font-medium text-secondary-700">Email</label>
         <input
           id="email"
           type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="w-full border px-3 py-2 rounded"
+          className="input-field w-full"
           required
           data-testid="login-email"
         />
       </div>
-      <div className="mb-4">
-        <label htmlFor="password" className="block mb-1 font-medium">Parolă</label>
+      <div className="mb-token">
+        <label htmlFor="password" className="block mb-token font-medium text-secondary-700">Parolă</label>
         <input
           id="password"
           type="password"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="w-full border px-3 py-2 rounded"
+          className="input-field w-full"
           required
           data-testid="login-password"
         />
       </div>
       {error && (
-        <div className="mb-2 text-red-600 text-center" data-testid="login-error">
+        <div className="mb-token text-error-600 text-center" data-testid="login-error">
           {(() => {
             switch (errorType) {
               case 'INVALID_CREDENTIALS':
@@ -82,7 +82,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       )}
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-60"
+        className="btn btn-primary w-full transition disabled:opacity-60"
         disabled={loading}
         data-testid="login-submit"
       >
@@ -91,7 +91,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       {onSwitchToRegister && (
         <button
           type="button"
-          className="w-full mt-2 text-green-600 underline text-sm"
+          className="btn btn-link w-full mt-token text-sm text-accent hover:text-accent-hover"
           onClick={onSwitchToRegister}
           data-testid="switch-to-register"
         >Nu ai cont? Creează unul!</button>
@@ -99,7 +99,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
       {user && (
         <button
           type="button"
-          className="w-full mt-2 text-red-600 underline text-sm"
+          className="btn btn-link w-full mt-token text-sm text-error-600 hover:text-error-700"
           onClick={async () => {
             await logout();
             toast.success(MESAJE.LOGOUT_SUCCES);
