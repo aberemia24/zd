@@ -12,11 +12,11 @@ const Textarea: React.FC<TextareaProps> = ({ label, error, className, wrapperCla
   <div className={classNames('flex flex-col', wrapperClassName)}>
     {label && <label className="form-label mb-1">{label}</label>}
     <textarea
-      className={classNames('input-field', error && 'border-red-500', className)}
-      data-testid={dataTestId || 'textarea-field'}
+      className={classNames('input-field', error && 'border-error', className)}
+      data-testid={dataTestId || `textarea-field${error ? '-error' : ''}`}
       {...rest}
     />
-    {error && <span className="text-error text-xs mt-1">{error}</span>}
+    {error && <span className="text-error text-xs mt-1" data-testid="textarea-error">{error}</span>}
   </div>
 );
 

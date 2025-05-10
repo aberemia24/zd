@@ -1,13 +1,17 @@
 import React from 'react';
 import classNames from 'classnames';
+import { getComponentClasses } from '../../../styles/themeUtils';
+import type { ComponentVariant, ComponentSize } from '../../../styles/themeTypes';
 
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'data-testid'> & {
-  variant?: 'primary' | 'secondary';
+  variant?: ComponentVariant;
+  size?: ComponentSize;
   dataTestId?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
+  size = 'md',
   disabled = false,
   className,
   children,
@@ -17,13 +21,12 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classNames(
-        'btn',
-        variant === 'primary' ? 'btn-primary' : 'btn-secondary',
+        getComponentClasses('button', variant, size),
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}
       disabled={disabled}
-      data-testid={dataTestId || 'button-field'}
+      data-testid={dataTestId || `button-${variant}-${size}`}
       {...rest}
     >
       {children}

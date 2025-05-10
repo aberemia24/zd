@@ -14,14 +14,14 @@ const Spinner: React.FC<{ size?: number }> = ({ size = 40 }) => (
         cx="22"
         cy="22"
         r="20"
-        stroke="#2563eb"
+        className="stroke-primary-500"
         strokeWidth="4"
         fill="none"
         opacity="0.2"
       />
       <path
         d="M42 22c0-11.046-8.954-20-20-20"
-        stroke="#2563eb"
+        className="stroke-primary-500"
         strokeWidth="4"
         strokeLinecap="round"
       />

@@ -15,9 +15,9 @@ const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassNa
     {label && <label htmlFor={id || rest.name} className="form-label mb-1">{label}</label>}
     <select
       id={id || rest.name}
-      className={classNames('input-field', error && 'border-red-500', className)}
+      className={classNames('input-field', error && 'border-error', className)}
       value={options.some(opt => opt.value === rest.value) ? rest.value : ''}
-      data-testid={dataTestId || 'select-field'}
+      data-testid={dataTestId || `select-field${error ? '-error' : ''}`}
       {...rest}
     >
       {placeholder && <option value="">{placeholder}</option>}
@@ -25,7 +25,7 @@ const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassNa
         <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}
     </select>
-    {error && <span className="text-error text-xs mt-1">{error}</span>}
+    {error && <span className="text-error text-xs mt-1" data-testid="select-error">{error}</span>}
   </div>
 );
 

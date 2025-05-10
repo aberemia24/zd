@@ -21,11 +21,11 @@ const Input: React.FC<InputProps> = ({ label, error, className, wrapperClassName
     {label && <label className="form-label mb-1">{label}</label>}
     <input
       ref={inputRef}
-      className={classNames('input-field', error && 'border-red-500', className)}
-      data-testid={dataTestId || 'input-field'}
+      className={classNames('input-field', error && 'border-error', className)}
+      data-testid={dataTestId || `input-field${error ? '-error' : ''}`}
       {...rest}
     />
-    {error && <span className="text-error text-xs mt-1">{error}</span>}
+    {error && <span className="text-error text-xs mt-1" data-testid="input-error">{error}</span>}
   </div>
 );
 

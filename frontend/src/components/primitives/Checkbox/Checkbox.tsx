@@ -13,11 +13,11 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, error, className, wrapperCla
     <input
       type="checkbox"
       className={classNames('accent-primary', className)}
-      data-testid={dataTestId || 'checkbox-field'}
+      data-testid={dataTestId || `checkbox-field${error ? '-error' : ''}`}
       {...rest}
     />
     {label && <label className="ml-2 form-label">{label}</label>}
-    {error && <span className="text-error text-xs ml-2">{error}</span>}
+    {error && <span className="text-error text-xs ml-2" data-testid="checkbox-error">{error}</span>}
   </div>
 );
 

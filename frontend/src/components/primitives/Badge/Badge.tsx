@@ -8,15 +8,15 @@ export interface BadgeProps {
 }
 
 const colorStyles = {
-  primary: 'bg-primary text-white',
-  success: 'bg-green-500 text-white',
-  error: 'bg-red-500 text-white',
-  warning: 'bg-yellow-400 text-black',
-  info: 'bg-blue-500 text-white',
+  primary: 'bg-primary-500 text-white',
+  success: 'bg-success-500 text-white',
+  error: 'bg-error-500 text-white',
+  warning: 'bg-warning-400 text-black',
+  info: 'bg-info-500 text-white',
 };
 
 const Badge: React.FC<BadgeProps> = ({ color = 'primary', children, className }) => (
-  <span className={classNames('inline-block px-2 py-0.5 rounded text-xs font-semibold', colorStyles[color], className)}>
+  <span className={classNames('inline-block px-2 py-0.5 rounded text-xs font-semibold', colorStyles[color], className)} data-testid={`badge-${color}`}>
     {children}
   </span>
 );

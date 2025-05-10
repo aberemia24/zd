@@ -8,14 +8,14 @@ export interface AlertProps {
 }
 
 const typeStyles = {
-  success: 'bg-green-50 border-green-200 text-green-700',
-  error: 'bg-red-50 border-red-200 text-red-700',
-  warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-  info: 'bg-blue-50 border-blue-200 text-blue-700',
+  success: 'bg-success-50 border-success-200 text-success-700',
+  error: 'bg-error-50 border-error-200 text-error-700',
+  warning: 'bg-warning-50 border-warning-200 text-warning-700',
+  info: 'bg-info-50 border-info-200 text-info-700',
 };
 
 const Alert: React.FC<AlertProps> = ({ type = 'info', message, className }) => (
-  <div className={classNames('border rounded p-4 my-2 text-center', typeStyles[type], className)} role="alert">
+  <div className={classNames('border rounded p-4 my-2 text-center', typeStyles[type], className)} role="alert" data-testid={`alert-${type}`}>
     {message}
   </div>
 );
