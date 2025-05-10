@@ -6,7 +6,6 @@ import { TransactionType, TransactionStatus, FrequencyType } from '@shared-const
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { CategoryEditor } from '../CategoryEditor';
 import { SubcategoryRows } from './SubcategoryRows';
 
 // Helper pentru a genera array [1, 2, ..., n]
@@ -183,12 +182,8 @@ const UI = {
 };
 
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
-  // State pentru modalul CategoryEditor si autentificare
-  const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
-  const { user } = useAuthStore();
-  
   // State pentru subcategoria în curs de editare (pentru editare direct din grid)
-  const [editingSubcategory, setEditingSubcategory] = React.useState<{category: string; subcategory: string; mode: 'edit' | 'delete'} | null>(null);
+  const [editingSubcategory, setEditingSubcategory] = React.useState<{category: string; subcategory: string; mode: 'edit' | 'delete' | 'add'} | null>(null);
   
   // Acces la store-ul de categorii pentru a verifica dacă o subcategorie este personalizată
   const categories = useCategoryStore(state => state.categories);
@@ -422,22 +417,14 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   
   // Handler pentru editare subcategorie direct din grid
   const handleEditSubcategory = (category: string, subcategory: string, mode: 'edit' | 'delete' = 'edit') => {
-    if (!user) return;
     setEditingSubcategory({ category, subcategory, mode });
-    setShowCategoryEditor(true);
   };
   
-  // Immediate delete without modal
+  const { user } = useAuthStore();
   const handleDeleteSubcategoryDirect = React.useCallback((category: string, subcategory: string) => {
     if (!user) return;
     deleteSubcategory(user.id, category, subcategory, 'delete');
-  }, [user, deleteSubcategory]);
-  
-  // Handler pentru resetarea editării subcategoriei în momentul închiderii modalului
-  const handleCloseCategoryEditor = () => {
-    setShowCategoryEditor(false);
-    setEditingSubcategory(null);
-  };
+  }, [deleteSubcategory, user]);
   
   // Verifică dacă o subcategorie este personalizată (permite editare/ștergere)
   const isCustomSubcategory = (category: string, subcategory: string): boolean => {
@@ -448,32 +435,12 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
     return foundSubcategory?.isCustom || false;
   };
 
+  // State pentru inline adăugare subcategorie
+  const [addingCategory, setAddingCategory] = React.useState<string | null>(null);
+  const { categories: categoryList, saveCategories: saveCats } = useCategoryStore();
+
   return (
     <React.Fragment>
-      {/* Buton gestionare categorii - vizibil doar dacă există user autentificat */}
-      {user && (
-        <div className="mb-4 flex justify-end">
-          <button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded shadow"
-            onClick={() => setShowCategoryEditor(true)}
-            data-testid="manage-categories-btn"
-          >
-            {UI.MANAGE_CATEGORIES}
-          </button>
-        </div>
-      )}
-      
-      {/* Modal CategoryEditor - pentru management general sau editare specifică subcategorie */}
-      {user && showCategoryEditor && (
-        <CategoryEditor
-          open={showCategoryEditor}
-          onClose={handleCloseCategoryEditor}
-          userId={user?.id || ''}
-          initialCategory={editingSubcategory?.category}
-          initialSubcategory={editingSubcategory?.subcategory}
-        />
-      )}
-      
       {/* Tabel principal LunarGrid */}
       <div className="overflow-x-auto rounded-lg shadow bg-white">
         <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
@@ -541,10 +508,21 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
                     handleCellDoubleClick={handleCellDoubleClick}
                     handleSavePopover={handleSavePopover}
                     handleClosePopover={handleClosePopover}
-                    handleEditSubcategory={(cat: string, sub: string) => handleEditSubcategory(cat, sub, 'edit')}
-                    handleDeleteSubcategory={(cat: string, sub: string) => handleDeleteSubcategoryDirect(cat, sub)}
+                    handleEditSubcategory={(cat,sub) => { setEditingSubcategory({category:cat, subcategory:sub, mode:'edit'}); }}
+                    handleDeleteSubcategory={handleDeleteSubcategoryDirect}
                     isCustomSubcategory={isCustomSubcategory}
                     user={user}
+                    addingCategory={addingCategory}
+                    onAddSubcategory={async (cat: string, newName: string) => {
+                      if (!user || !newName.trim()) return;
+                      const catObj = categoryList.find(c => c.name === cat);
+                      if (!catObj || catObj.subcategories.some(sc => sc.name.toLowerCase() === newName.trim().toLowerCase())) return;
+                      const updated = categoryList.map(c => c.name === cat ? { ...c, subcategories: [...c.subcategories, { name: newName.trim(), isCustom: true }] } : c);
+                      await saveCats(user.id, updated);
+                      setAddingCategory(null);
+                    }}
+                    onCancelAddSubcategory={() => setAddingCategory(null)}
+                    onStartAddSubcategory={(cat: string) => setAddingCategory(cat)}
                   />
                 )}
               </React.Fragment>

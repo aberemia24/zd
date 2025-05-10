@@ -1,5 +1,5 @@
 import React from 'react';
-import { EXCEL_GRID } from '@shared-constants/ui';
+import { EXCEL_GRID, UI } from '@shared-constants/ui';
 import LunarGrid from '../components/features/LunarGrid';
 import { TITLES } from '@shared-constants';
 import { CATEGORIES } from '@shared-constants/categories';
@@ -17,7 +17,6 @@ const LunarGridPage: React.FC = () => {
   const [month, setMonth] = React.useState(() => new Date().getMonth() + 1);
   
   // Extragem funcțiile și state-ul necesar din stores
-  const setQueryParams = useTransactionStore(state => state.setQueryParams);
   const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
   const loading = useTransactionStore(state => state.loading);
   const { user } = useAuthStore();
@@ -105,10 +104,11 @@ const LunarGridPage: React.FC = () => {
       }, 0);
     }, 0);
     
-    // Actualizăm URL-ul cu parametrul month=YYYY-MM (conform AC-5)
+    // Actualizăm URL-ul cu parametrul month=YYYY-MM și păstrăm hash
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('month', `${year}-${month.toString().padStart(2, '0')}`);
-    const newUrl = `${window.location.pathname}?${urlParams}`;
+    const hash = window.location.hash;
+    const newUrl = `${window.location.pathname}?${urlParams}${hash}`;
     window.history.replaceState({}, '', newUrl);
     
     console.log(`LunarGridPage: Set query params for ${year}-${month}`);
@@ -158,6 +158,23 @@ const LunarGridPage: React.FC = () => {
         <h1 className="text-2xl font-bold" data-testid="lunar-grid-title">
           {TITLES.GRID_LUNAR}
         </h1>
+        
+        {/* Link to Options for managing categories */}
+        <div className="mb-4">
+          <a
+            href="#options"
+            className="text-sm text-blue-600 underline"
+            data-testid="manage-categories-link"
+            onClick={e => {
+              e.preventDefault();
+              const newUrl = `${window.location.pathname}#options`;
+              window.history.replaceState({}, '', newUrl);
+              window.dispatchEvent(new HashChangeEvent('hashchange'));
+            }}
+          >
+            {UI.MANAGE_CATEGORIES}
+          </a>
+        </div>
         
         <div className="flex items-center space-x-4">
           <button 

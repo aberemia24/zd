@@ -1,18 +1,19 @@
 // Modal pentru gestionarea subcategoriilor: add/edit/delete/migrare, badge count, validare
 // Owner: echipa FE
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
+import { BUTTONS } from '@shared-constants';
 
 interface Props {
   open: boolean;
   onClose: () => void;
   userId: string;
-  // Proprietăți noi pentru deschidere directă în modul editare sau ștergere
-  initialCategory?: string; 
+  // Proprietăți noi pentru deschidere directă în modul editare, ștergere sau adăugare
+  initialCategory?: string;
   initialSubcategory?: string;
-  // Mode pentru a deschide direct în modul de editare sau ștergere
-  initialMode?: 'edit' | 'delete';
+  // Mode pentru deschidere mod: edit, delete sau add
+  initialMode?: 'edit' | 'delete' | 'add';
 }
 
 export const CategoryEditor: React.FC<Props> = ({ 
@@ -21,7 +22,7 @@ export const CategoryEditor: React.FC<Props> = ({
   userId, 
   initialCategory, 
   initialSubcategory,
-  initialMode = 'edit' // Valoare implicită: mod de editare
+  initialMode = 'add' // Valoare implicită: mod de adăugare
 }) => {
   const { categories, saveCategories, renameSubcategory, deleteSubcategory, getSubcategoryCount } = useCategoryStore();
   
@@ -36,6 +37,7 @@ export const CategoryEditor: React.FC<Props> = ({
       { cat: initialCategory, subcat: initialSubcategory } : 
       null
   );
+  const [renameValue, setRenameValue] = useState<string>(initialSubcategory || '');
   
   // Stare SEPARATĂ pentru subcategoria care este în curs de ștergere
   // Această separare previne conflictul între dialog ștergere și input editare
@@ -54,7 +56,7 @@ export const CategoryEditor: React.FC<Props> = ({
   const [error, setError] = useState<string | null>(null);
   
   // Efect pentru inițializarea corectă a modului de editare sau ștergere
-  React.useEffect(() => {
+  useEffect(() => {
     if (open && initialCategory && initialSubcategory) {
       // Pre-selectăm categoria în orice caz
       setSelectedCategory(initialCategory);
@@ -62,13 +64,24 @@ export const CategoryEditor: React.FC<Props> = ({
       // Gestionăm modul în funcție de initialMode
       if (initialMode === 'edit') {
         setEditingSubcat({ cat: initialCategory, subcat: initialSubcategory });
+        setRenameValue(initialSubcategory);
         setDeletingSubcat(null);
         setDeleteMode(false);
       } else if (initialMode === 'delete') {
         setDeleteMode(true);
-        // IMPORTANT: Separație clară între modurile de editare și ștergere
-        setEditingSubcat(null); // Dezactivare mod editare
-        setDeletingSubcat({ cat: initialCategory, subcat: initialSubcategory }); // Activare mod ștergere
+        setEditingSubcat(null);
+        setDeletingSubcat({ cat: initialCategory, subcat: initialSubcategory });
+      } else if (initialMode === 'add') {
+        // Mod adăugare: focus pe input-ul de adăugare
+        setEditingSubcat(null);
+        setDeletingSubcat(null);
+        setDeleteMode(false);
+        setTimeout(() => {
+          const addInput = document.querySelector('[data-testid="add-subcat-input"]');
+          if (addInput instanceof HTMLInputElement) {
+            addInput.focus();
+          }
+        }, 100);
       }
     }
   }, [open, initialCategory, initialSubcategory, initialMode]);
@@ -108,7 +121,7 @@ export const CategoryEditor: React.FC<Props> = ({
     // Folosim useEffect pentru verificări și manipularea stării
     // Prevenim astfel eroarea "Cannot update a component while rendering a different component"
     // Acest pattern respectă memoria critică despre infinite loops și Maximum update depth exceeded
-    React.useEffect(() => {
+    useEffect(() => {
       // Verificare de siguranță: confirmăm că este o subcategorie personalizată
       const categoryObj = categories.find(c => c.name === cat);
       const subcatObj = categoryObj?.subcategories.find(sc => sc.name === subcat);
@@ -233,17 +246,30 @@ export const CategoryEditor: React.FC<Props> = ({
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className="flex items-center gap-2 mb-1">
                       {editingSubcat?.cat===selectedCategory && editingSubcat.subcat===sc.name ? (
-                        <>
+                        <div className="flex gap-2">
                           <input
                             type="text"
-                            defaultValue={sc.name}
-                            onBlur={e=>handleRename(selectedCategory, sc.name, e.target.value)}
+                            value={renameValue}
+                            onChange={e => setRenameValue(e.target.value)}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter') { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }
+                              if (e.key === 'Escape') setEditingSubcat(null);
+                            }}
                             className="border px-2 py-1 rounded"
                             autoFocus
                             data-testid={`edit-subcat-input-${sc.name}`}
                           />
-                          <button onClick={()=>setEditingSubcat(null)} className="text-xs text-gray-500">Anulează</button>
-                        </>
+                          <button
+                            onClick={() => { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }}
+                            className="text-xs text-green-600"
+                            data-testid={`confirm-rename-${sc.name}`}
+                          >{BUTTONS.DONE}</button>
+                          <button
+                            onClick={() => setEditingSubcat(null)}
+                            className="text-xs text-gray-500"
+                            data-testid={`cancel-rename-${sc.name}`}
+                          >{BUTTONS.CANCEL}</button>
+                        </div>
                       ) : (
                         <>
                           <span>{sc.name}</span>
@@ -270,6 +296,10 @@ export const CategoryEditor: React.FC<Props> = ({
                     type="text"
                     value={newSubcat}
                     onChange={e=>setNewSubcat(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') handleAdd(categories.find(cat => cat.name === selectedCategory)!);
+                      if (e.key === 'Escape') setNewSubcat('');
+                    }}
                     placeholder="Adaugă subcategorie nouă"
                     className="border px-2 py-1 rounded flex-1"
                     data-testid="add-subcat-input"

@@ -1,5 +1,5 @@
 // Componenta principală a aplicației - orchestrator pentru rutare între pagini
-import React from 'react';
+import React, { useEffect } from 'react';
 import TransactionsPage from './pages/TransactionsPage';
 import LunarGridPage from './pages/LunarGridPage';
 import OptionsPage from './pages/OptionsPage';
@@ -34,7 +34,21 @@ export const App: React.FC = () => {
   
 
   // State pentru pagina activă (tranzacții, grid lunar sau opțiuni)
-  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid' | 'options'>('transactions');
+  const [activePage, setActivePage] = React.useState<'transactions' | 'lunar-grid' | 'options'>(() => {
+    const h = window.location.hash.replace('#','');
+    return (h === 'lunar-grid' || h === 'options') ? h : 'transactions';
+  });
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const h = window.location.hash.replace('#','');
+      setActivePage((h === 'lunar-grid' || h === 'options') ? h : 'transactions');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, []);
 
   const { user, loading } = useAuthStore();
   const [showRegister, setShowRegister] = React.useState(false);
@@ -62,21 +76,21 @@ export const App: React.FC = () => {
         <div className="flex border-b border-gray-200 mb-6">
           <button 
             className={`py-2 px-4 font-medium ${activePage === 'transactions' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActivePage('transactions')}
+            onClick={() => { setActivePage('transactions'); window.location.hash = 'transactions'; }}
             data-testid="transactions-tab"
           >
             {TITLES.TRANZACTII}
           </button>
           <button 
             className={`py-2 px-4 font-medium ${activePage === 'lunar-grid' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActivePage('lunar-grid')}
+            onClick={() => { setActivePage('lunar-grid'); window.location.hash = 'lunar-grid'; }}
             data-testid="lunar-grid-tab"
           >
             {TITLES.GRID_LUNAR}
           </button>
           <button 
             className={`py-2 px-4 font-medium ${activePage === 'options' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-            onClick={() => setActivePage('options')}
+            onClick={() => { setActivePage('options'); window.location.hash = 'options'; }}
             data-testid="options-tab"
           >
             {TITLES.OPTIUNI || 'Opțiuni'}
