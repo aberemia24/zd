@@ -1,284 +1,216 @@
-// LunarGrid.tsx - Începutul refactorizării
-
-// PAS 1: Adăugare importuri TanStack Table și definire tipuri de bază
-
-import React, { useState, useMemo, useCallback } from 'react'; // Am adăugat useMemo, useCallback
-import {
-  useReactTable,
-  getCoreRowModel,
-  getExpandedRowModel, // Pentru expandare
-  getGroupedRowModel, // Poate util pentru gruparea categoriilor
-  ColumnDef, // Pentru definirea coloanelor
-  flexRender, // Pentru randarea headerelor și celulelor
-  // Row, // Dacă e nevoie de tipul Row explicit
-  // Table, // Dacă e nevoie de tipul Table explicit
-} from '@tanstack/react-table';
-
+import React from 'react';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useAuthStore } from '../../../stores/authStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { TransactionType, TransactionStatus, FrequencyType, Category } from '@shared-constants/enums'; // Am adăugat Category
+import { TransactionType, TransactionStatus, FrequencyType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { EXCEL_GRID, UI as SHARED_UI_TEXTS } from '@shared-constants/ui'; // Redenumit UI pentru a evita conflictul local
-import { ChevronDown, ChevronRight, Edit, Trash2 } from 'lucide-react'; // Am adăugat Edit, Trash2
-// import { SubcategoryRows } from './SubcategoryRows'; // Aceasta va fi eliminată
+import { EXCEL_GRID } from '@shared-constants/ui';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { SubcategoryRows } from './SubcategoryRows';
 
-// Definim tipurile pentru zilele afișate în grid
-export interface DisplayedDay {
-  date: Date; // Data completă
-  dayOfMonth: number; // Numărul zilei (1-31)
-  isCurrentMonth: boolean;
-  isPreviousMonth: boolean;
-  isNextMonth: boolean;
-  label: string; // Eticheta afișată în header (ex: "28", "1")
-  id: string; // Un ID unic, ex: "2024-12-25"
-}
-
-// Definim tipurile pentru rândurile din tabel
-// Un rând poate fi o categorie principală (colapsată sau expandată) sau o subcategorie
-export type LunarGridRowType = 'CATEGORY_COLLAPSED' | 'CATEGORY_EXPANDED_HEADER' | 'SUBCATEGORY' | 'ADD_SUBCATEGORY_BUTTON' | 'ADD_SUBCATEGORY_FORM';
-
-export interface BaseLunarGridRow {
-  id: string; // ID unic pentru rând (ex: "VENITURI", "VENITURI.Salariu")
-  rowType: LunarGridRowType;
-  name: string; // Numele afișat (ex: "VENITURI", "  Salariu")
-  depth: number; // Pentru indentare (0 pentru categorie, 1 pentru subcategorie)
-  // Datele pentru fiecare zi; cheia este id-ul zilei (YYYY-MM-DD)
-  dailyData?: { [dayId: string]: { sum: number; transactions: TransactionValidated[] } };
-}
-
-export interface CategoryHeaderRow extends BaseLunarGridRow {
-  rowType: 'CATEGORY_EXPANDED_HEADER';
-  isExpanded: true;
-  categoryName: string; // Numele original al categoriei
-}
-
-export interface CategoryCollapsedRow extends BaseLunarGridRow {
-  rowType: 'CATEGORY_COLLAPSED';
-  isExpanded: false;
-  categoryName: string; // Numele original al categoriei
-  // dailyData va conține sumele agregate pentru categorie
-}
-
-export interface SubcategoryRow extends BaseLunarGridRow {
-  rowType: 'SUBCATEGORY';
-  parentCategoryName: string; // Numele categoriei părinte
-  isCustom: boolean;
-  // dailyData va conține sumele specifice subcategoriei
-}
-
-// Tipul combinat pentru rândurile din tabel
-export type LunarGridRowData = CategoryHeaderRow | CategoryCollapsedRow | SubcategoryRow;
-
-
-// Funcție helper pentru a obține zilele din lună (existentă, o păstrăm)
-const getDaysInMonthArray = (year: number, month: number): number[] => {
+// Helper pentru a genera array [1, 2, ..., n]
+const getDaysInMonth = (year: number, month: number) => {
   const date = new Date(year, month, 0);
   return Array.from({ length: date.getDate() }, (_, i) => i + 1);
 };
 
-// NOU: Funcție helper pentru a genera array-ul de DisplayedDay objects
-// Aceasta va include zile din luna anterioară, curentă și următoare, similar cu logica din useMonthlyTransactions
-const getDisplayedDays = (year: number, month: number): DisplayedDay[] => {
-  const displayedDays: DisplayedDay[] = [];
-  const daysInCurrentMonth = new Date(year, month, 0).getDate();
-
-  // Zile din luna anterioară (ultimele 6 zile)
-  const prevMonthDate = new Date(year, month - 1, 0); // Ultimul zi din luna anterioară datei curente
-  const prevMonthYear = prevMonthDate.getFullYear();
-  const prevMonth = prevMonthDate.getMonth() + 1; // getMonth() e 0-indexed
-  const daysInPrevMonth = prevMonthDate.getDate();
-
-  for (let i = 5; i >= 0; i--) { // Ultimele 6 zile
-    const day = daysInPrevMonth - i;
-    if (day > 0) { // Asigură-te că nu mergem prea în urmă pentru luni scurte
-      const date = new Date(prevMonthYear, prevMonth - 1, day);
-      displayedDays.push({
-        date,
-        dayOfMonth: day,
-        isCurrentMonth: false,
-        isPreviousMonth: true,
-        isNextMonth: false,
-        label: String(day),
-        id: `${prevMonthYear}-${String(prevMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-      });
-    }
-  }
-
-  // Zile din luna curentă
-  for (let day = 1; day <= daysInCurrentMonth; day++) {
-    const date = new Date(year, month - 1, day);
-    displayedDays.push({
-      date,
-      dayOfMonth: day,
-      isCurrentMonth: true,
-      isPreviousMonth: false,
-      isNextMonth: false,
-      label: String(day),
-      id: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-    });
-  }
-
-  // Zile din luna următoare (primele 6 zile)
-  // Trebuie să ne asigurăm că avem suficiente zile pentru a umple până la un total de ~42-43 de coloane dacă e necesar,
-  // sau un număr fix (ex: 6)
-  const nextMonthDate = new Date(year, month, 1); // Prima zi din luna următoare
-  const nextMonthYear = nextMonthDate.getFullYear();
-  const nextMonth = nextMonthDate.getMonth() + 1;
-
-  for (let day = 1; day <= 6; day++) {
-    const date = new Date(nextMonthYear, nextMonth - 1, day);
-    displayedDays.push({
-      date,
-      dayOfMonth: day,
-      isCurrentMonth: false,
-      isPreviousMonth: false,
-      isNextMonth: true,
-      label: String(day),
-      id: `${nextMonthYear}-${String(nextMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-    });
-  }
-  // De ajustat numărul de zile din lunile adiacente dacă vrem un număr fix de coloane,
-  // de ex. pentru a umple un grid de 7 zile * 6 săptămâni = 42 coloane.
-  // Pentru moment, luăm 6 dinainte și 6 de după.
-  // Logica actuală din [useMonthlyTransactions](cci:1://file:///c:/windsurf%20repo/budget-app/frontend/src/components/features/LunarGrid/LunarGrid.tsx:16:0-98:1) filtrează tranzacțiile pentru ultimele 6 zile din luna anterioară
-  // și primele 6 din luna următoare. Vom alinia `getDisplayedDays` la aceasta.
-
-  // Refined logic for adjacent days to match useMonthlyTransactions
-  const refinedDisplayedDays: DisplayedDay[] = [];
-  const firstDayOfCurrentMonth = new Date(year, month - 1, 1);
-
-  // Add 6 days from previous month
-  for (let i = 6; i > 0; i--) {
-    const d = new Date(firstDayOfCurrentMonth);
-    d.setDate(d.getDate() - i);
-    refinedDisplayedDays.push({
-      date: d,
-      dayOfMonth: d.getDate(),
-      isCurrentMonth: false,
-      isPreviousMonth: true,
-      isNextMonth: false,
-      label: String(d.getDate()),
-      id: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-    });
-  }
-
-  // Add days of current month
-  for (let day = 1; day <= daysInCurrentMonth; day++) {
-    const d = new Date(year, month - 1, day);
-    refinedDisplayedDays.push({
-      date: d,
-      dayOfMonth: d.getDate(),
-      isCurrentMonth: true,
-      isPreviousMonth: false,
-      isNextMonth: false,
-      label: String(d.getDate()),
-      id: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-    });
-  }
-  
-  // Add 6 days from next month
-  const lastDayOfCurrentMonth = new Date(year, month -1, daysInCurrentMonth);
-   for (let i = 1; i <= 6; i++) {
-    const d = new Date(lastDayOfCurrentMonth);
-    d.setDate(d.getDate() + i);
-     refinedDisplayedDays.push({
-      date: d,
-      dayOfMonth: d.getDate(),
-      isCurrentMonth: false,
-      isPreviousMonth: false,
-      isNextMonth: true,
-      label: String(d.getDate()),
-      id: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-    });
-  }
-  
-  return refinedDisplayedDays;
-};
-
-
-// ... restul hook-urilor și funcțiilor existente (getSumForCell, getCategorySumForDay etc.)
-
-// Hook pentru încărcarea tranzacțiilor (existent, pare OK)
+// Hook pentru încărcarea tranzacțiilor pentru o lună/an specific, cu caching și refresh agresiv
 function useMonthlyTransactions(year: number, month: number) {
-  // ... implementarea existentă ...
-  // Asigură-te că `transactions` returnate sunt corect filtrate pentru `displayedDays`
-  // sau că `displayedDays` se aliniază cu perioada filtrată de hook.
-  // Momentan, hook-ul filtrează deja corect (+/- 6 zile), deci `getDisplayedDays` trebuie să reflecte asta.
   const transactionStore = useTransactionStore();
+  // IMPORTANT: Folosim un ref pentru a stoca parametrii anteriori și a preveni bucle infinite
   const paramsRef = React.useRef({ year, month });
-
+  
   React.useEffect(() => {
     if (paramsRef.current.year !== year || paramsRef.current.month !== month) {
+      console.log(`Parameters changed: ${paramsRef.current.year}-${paramsRef.current.month} -> ${year}-${month}`);
       paramsRef.current = { year, month };
-      transactionStore._invalidateMonthCache(year, month); // Consider making _invalidateMonthCache public if not already
+      console.log(`Invalidating cache for ${year}-${month}`);
+      transactionStore._invalidateMonthCache(year, month);
     }
   }, [month, year, transactionStore]);
 
+  // Filtrează tranzacțiile pentru luna curentă + zile adiacente
   const transactions = React.useMemo(() => {
-    // Logica de filtrare existentă din useMonthlyTransactions este bună
-    // Se bazează pe `transactionStore.transactions` care conține TOATE tranzacțiile încărcate (posibil din mai multe luni)
-    // și le filtrează pentru luna curentă +/- zilele adiacente
+    // Date pentru luna curentă
     const currentMonthStart = new Date(year, month - 1, 1);
-    const prevMonthLimit = new Date(currentMonthStart);
-    prevMonthLimit.setDate(currentMonthStart.getDate() - 7); // Include ultimele 6 zile, deci mergem 7 zile înapoi
-
     const currentMonthEnd = new Date(year, month, 0);
-    const nextMonthLimit = new Date(currentMonthEnd);
-    nextMonthLimit.setDate(currentMonthEnd.getDate() + 7); // Include primele 6 zile, deci mergem 7 zile înainte
-
-    return transactionStore.transactions.filter(t => {
+    
+    // Ultimele 6 zile din luna anterioară
+    const prevMonthYear = month === 1 ? year - 1 : year;
+    const prevMonth = month === 1 ? 12 : month - 1;
+    const prevMonthLastDay = new Date(prevMonthYear, prevMonth, 0).getDate();
+    const prevMonthLastDays = prevMonthLastDay - 5; // Ultimele 6 zile
+    
+    // Primele 6 zile din luna următoare
+    const nextMonthYear = month === 12 ? year + 1 : year;
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextMonthFirstDays = 6; // Primele 6 zile
+    
+    console.log(`Filtering transactions for ${year}-${month} + adjacent days`);
+    console.log(`Total transactions before filtering: ${transactionStore.transactions.length}`);
+    
+    const filteredTransactions = transactionStore.transactions.filter(t => {
       try {
+        // Asigurăm-ne că data este validă și în formatul așteptat
+        // Format ISO: YYYY-MM-DD
         if (!t.date || typeof t.date !== 'string') return false;
+        
         const d = new Date(t.date);
-        if (isNaN(d.getTime())) return false;
-        // Comparăm direct cu limitele, asigurându-ne că data tranzacției este în interval.
-        // Timpul este setat la miezul nopții pentru a compara corect datele.
-        d.setHours(0,0,0,0);
-        const lowerBound = new Date(prevMonthLimit);
-        lowerBound.setHours(0,0,0,0);
-        const upperBound = new Date(nextMonthLimit);
-        upperBound.setHours(0,0,0,0);
-
-        return d >= lowerBound && d < upperBound;
+        if (isNaN(d.getTime())) {
+          console.warn(`Invalid date found in transaction: ${t.id}, date: ${t.date}`);
+          return false;
+        }
+        
+        const transactionDay = d.getDate();
+        const transactionMonth = d.getMonth() + 1;
+        const transactionYear = d.getFullYear();
+        
+        // 1. Tranzacții din luna curentă
+        if (transactionYear === year && transactionMonth === month) {
+          return true;
+        }
+        
+        // 2. Ultimele zile din luna anterioară
+        if (transactionYear === prevMonthYear && 
+            transactionMonth === prevMonth && 
+            transactionDay >= prevMonthLastDays) {
+          return true;
+        }
+        
+        // 3. Primele zile din luna următoare
+        if (transactionYear === nextMonthYear && 
+            transactionMonth === nextMonth && 
+            transactionDay <= nextMonthFirstDays) {
+          return true;
+        }
+        
+        return false;
       } catch (err) {
-        console.error('Error filtering transaction in useMonthlyTransactions:', err, t);
+        console.error('Error filtering transaction:', err, t);
         return false;
       }
     });
-  }, [transactionStore.transactions, year, month]);
-
+    
+    console.log(`Filtered transactions: ${filteredTransactions.length}`);
+    return filteredTransactions;
+  }, [transactionStore.transactions, year, month]); // Eliminăm refreshTrigger care nu mai există
+  
   return { transactions };
 }
 
+// Agregare sumă pentru o zi, categorie, subcategorie
+function getSumForCell(transactions: TransactionValidated[], category: string, subcategory: string, day: number) {
+  return transactions
+    .filter(t => t.category === category && t.subcategory === subcategory && new Date(t.date).getDate() === day)
+    .reduce((acc, t) => {
+      if (t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number') {
+        return acc + t.actualAmount;
+      }
+      return acc + t.amount;
+    }, 0);
+}
 
-// ... (restul funcțiilor existente: getSumForCell, getCategorySumForDay, getCategoryTotalAllDays, calculateDailyBalance, formatCurrency)
+// Calculează suma totală pentru o categorie întreagă în ziua respectivă
+function getCategorySumForDay(transactions: TransactionValidated[], category: string, day: number): number {
+  return transactions
+    .filter(t => t.category === category && new Date(t.date).getDate() === day)
+    .reduce((acc, t) => {
+      const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number'
+        ? t.actualAmount
+        : t.amount;
+      return acc + amount;
+    }, 0);
+}
 
+// Calcul suma totală pentru o categorie, pe toate zilele - folosit pentru colapsare
+function getCategoryTotalAllDays(transactions: TransactionValidated[], category: string): Record<number, number> {
+  const result: Record<number, number> = {};
+  
+  transactions.forEach(t => {
+    if (t.category === category) {
+      const day = new Date(t.date).getDate();
+      const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number'
+        ? t.actualAmount
+        : t.amount;
+      result[day] = (result[day] || 0) + amount;
+    }
+  });
+  
+  return result;
+}
+
+// Calculează soldul zilnic - suma tuturor tranzacțiilor pentru o zi
+function calculateDailyBalance(transactions: TransactionValidated[], day: number): number {
+  return transactions
+    .filter(t => new Date(t.date).getDate() === day)
+    .reduce((acc, t) => {
+      const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number'
+        ? t.actualAmount
+        : t.amount;
+
+      // Pentru venituri adăugăm suma, pentru cheltuieli și economii scădem suma
+      if (t.type === TransactionType.INCOME) {
+        return acc + amount;
+      } else {
+        return acc - Math.abs(amount); // Asigurăm că scădem întotdeauna o valoare pozitivă
+      }
+    }, 0);
+}
+
+// Formatare valută pentru afișare (RON 0.00)
+function formatCurrency(amount: number): string {
+  if (amount === 0) return 'RON 0.00';
+  
+  return `RON ${Math.abs(amount).toLocaleString('ro-RO', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  })}`;
+}
+
+// --- Componenta principală ---
 export interface LunarGridProps {
   year: number;
   month: number;
 }
 
+// Constante pentru localStorage
 const LOCALSTORAGE_CATEGORY_EXPAND_KEY = 'budget-app-category-expand';
 
-// Am redenumit UI importat pentru a evita conflictul
-// const UI = { ... }; // Definiția locală UI existentă este OK aici, o vom folosi
-
+// UI copy pentru CategoryEditor, fallback dacă nu există în shared-constants/ui
+const UI = {
+  MANAGE_CATEGORIES: 'Gestionare categorii',
+  EDIT_SUBCATEGORY: 'Edită subcategoria',
+  DELETE_SUBCATEGORY: 'Șterge subcategoria',
+  EXPAND_ALL: 'Extinde toate categoriile',
+  COLLAPSE_ALL: 'Colapsează toate categoriile',
+};
 
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
-  // State-uri existente (editingSubcategory, expandedCategories, popover, addingCategory)
-  // ... majoritatea vor fi păstrate ...
+  // State pentru subcategoria în curs de editare (pentru editare direct din grid)
+  const [editingSubcategory, setEditingSubcategory] = React.useState<{category: string; subcategory: string; mode: 'edit' | 'delete' | 'add'} | null>(null);
+  
+  // Acces la store-ul de categorii pentru a verifica dacă o subcategorie este personalizată
+  const categories = useCategoryStore(state => state.categories);
+  const loadCategories = useCategoryStore(state => state.loadUserCategories);
+  const mergeWithDefaults = useCategoryStore(state => state.mergeWithDefaults);
+  const deleteSubcategory = useCategoryStore(state => state.deleteSubcategory);
+  
+  // UI copy pentru CategoryEditor (fallback dacă nu există în shared-constants/ui)
+  const UI = {
+    MANAGE_CATEGORIES: 'Gestionare categorii',
+    EDIT_SUBCATEGORY: 'Edită subcategoria',
+    DELETE_SUBCATEGORY: 'Șterge subcategoria',
+    EXPAND_ALL: 'Extinde toate categoriile',
+    COLLAPSE_ALL: 'Colapsează toate categoriile',
+  };
 
-  const { categories: allCategoriesFromStore } = useCategoryStore(); // Renumit pentru claritate
-  const daysOfMonthArray = getDaysInMonthArray(year, month); // Array de numere [1,2,...,31]
-  const displayedDays = useMemo(() => getDisplayedDays(year, month), [year, month]); // Array de obiecte DisplayedDay
-
+  const days = getDaysInMonth(year, month);
   const { transactions } = useMonthlyTransactions(year, month);
-
-  // State pentru categorii expandate/colapsate (existent, OK)
+  
+  // Stare pentru categorii expandate/colapsate - persistentă în localStorage
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
-    // ... logica existentă ...
     try {
+      // Încearcă să încarce starea din localStorage
       const saved = localStorage.getItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY);
       return saved ? JSON.parse(saved) : {};
     } catch (error) {
@@ -286,177 +218,370 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
       return {};
     }
   });
-
-  // Funcții expand/collapse (existente, OK)
-  const expandAll = useCallback(() => {
-    // ... logica existentă ...
-    const newState: Record<string, boolean> = {};
-    allCategoriesFromStore.forEach(c => { newState[c.name] = true; });
-    setExpandedCategories(newState);
-    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
-  }, [allCategoriesFromStore]);
-
-  const collapseAll = useCallback(() => {
-    // ... logica existentă ...
-    const newState: Record<string, boolean> = {};
-    allCategoriesFromStore.forEach(c => { newState[c.name] = false; });
-    setExpandedCategories(newState);
-    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
-  }, [allCategoriesFromStore]);
   
-  const toggleCategory = useCallback((categoryName: string) => { // Am schimbat param din category în categoryName
+  const expandAll = React.useCallback(() => {
+    const newState: Record<string, boolean> = {};
+    categories.forEach(c => { newState[c.name] = true; });
+    setExpandedCategories(newState);
+    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
+  }, [categories]);
+  
+  const collapseAll = React.useCallback(() => {
+    const newState: Record<string, boolean> = {};
+    categories.forEach(c => { newState[c.name] = false; });
+    setExpandedCategories(newState);
+    try { localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState)); } catch {};
+  }, [categories]);
+  
+  // Handler pentru expandare/colapsare categorie
+  const toggleCategory = (category: string) => {
     setExpandedCategories(prev => {
-      const newState = { ...prev, [categoryName]: !prev[categoryName] };
+      const newState = { ...prev, [category]: !prev[category] };
+      
+      // Salvează în localStorage pentru persistență între sesiuni
       try {
         localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState));
       } catch (error) {
         console.error('Error saving to localStorage:', error);
       }
+      
       return newState;
     });
-  }, []);
-
-
-  // Calcul pentru sume totale pe categorii (existent, va fi folosit pentru CategoryCollapsedRow)
-  const categoryTotals = useMemo(() => {
-    const result: Record<string, Record<string, number>> = {}; // Cheia internă va fi day.id (YYYY-MM-DD)
-    allCategoriesFromStore.forEach(category => {
-      // getCategoryTotalAllDays trebuie adaptat să returneze un Record<string, number> unde cheia e day.id
-      // și să folosească displayedDays pentru a ști ce zile să calculeze
-      result[category.name] = {}; // Inițializare
-      displayedDays.forEach(day => {
-        const sumForDay = transactions
-          .filter(t => t.category === category.name && new Date(t.date).toISOString().slice(0,10) === day.id)
-          .reduce((acc, t) => {
-            const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number'
-              ? t.actualAmount
-              : t.amount;
-            return acc + (t.type === TransactionType.INCOME ? amount : -Math.abs(amount)); // Ajustare pentru venit/cheltuială
-          }, 0);
-        result[category.name][day.id] = sumForDay;
-      });
+  };
+  
+  // Calcul pentru sume totale pe categorii (folosit la afișarea categoriilor colapsate)
+  const categoryTotals = React.useMemo(() => {
+    const result: Record<string, Record<number, number>> = {};
+    
+    categories.forEach(category => {
+      result[category.name] = getCategoryTotalAllDays(transactions, category.name);
     });
+    
     return result;
-  }, [transactions, allCategoriesFromStore, displayedDays]);
+  }, [transactions, categories]);
+  
+  // Referință pentru a ține evidența ultimei tranzacții adăugate
+  const lastAddedTransactionRef = React.useRef<{ timestamp: number; processed: boolean } | null>(null);
 
-  // NOU: Pregătirea datelor pentru TanStack Table (`data` prop)
-  const tableData = useMemo((): LunarGridRowData[] => {
-    const rows: LunarGridRowData[] = [];
-    allCategoriesFromStore.forEach(category => {
-      const isExpanded = !!expandedCategories[category.name];
-      if (isExpanded) {
-        // Rândul de header pentru categoria expandată
-        rows.push({
-          id: category.name,
-          rowType: 'CATEGORY_EXPANDED_HEADER',
-          name: category.name,
-          depth: 0,
-          isExpanded: true,
-          categoryName: category.name,
-        });
-        // Rânduri pentru fiecare subcategorie
-        category.subcategories.forEach(subcat => {
-          const subcategoryDailyData: { [dayId: string]: { sum: number; transactions: TransactionValidated[] } } = {};
-          displayedDays.forEach(day => {
-            const dayTransactions = transactions.filter(
-              t => t.category === category.name && t.subcategory === subcat.name && new Date(t.date).toISOString().slice(0,10) === day.id
-            );
-            const sum = dayTransactions.reduce((acc, t) => {
-               const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
-               // Aici suma trebuie să fie specifică tipului tranzacției, ex. pozitivă pentru venituri, negativă pentru cheltuieli
-               // Pentru afișare, nu e neapărat nevoie să fie negativă, dar pentru calcule de sold da.
-               // Momentan, pentru celulă, păstrăm suma absolută sau cum era calculată înainte.
-               // Funcția [getSumForCell](cci:1://file:///c:/windsurf%20repo/budget-app/frontend/src/components/features/LunarGrid/LunarGrid.tsx:100:0-110:1) existentă ar trebui să facă asta corect.
-               return acc + (t.type === TransactionType.INCOME ? amount : -Math.abs(amount));
-            },0);
-            subcategoryDailyData[day.id] = { sum, transactions: dayTransactions };
-          });
-          rows.push({
-            id: `${category.name}.${subcat.name}`,
-            rowType: 'SUBCATEGORY',
-            name: subcat.name, // Va trebui indentată la randare
-            depth: 1,
-            parentCategoryName: category.name,
-            isCustom: !!subcat.isCustom,
-            dailyData: subcategoryDailyData,
-          });
-        });
-      } else {
-        // Rândul pentru categoria colapsată
-        rows.push({
-          id: category.name,
-          rowType: 'CATEGORY_COLLAPSED',
-          name: category.name,
-          depth: 0,
-          isExpanded: false,
-          categoryName: category.name,
-          dailyData: Object.fromEntries(
-             displayedDays.map(day => [
-              day.id,
-              { sum: categoryTotals[category.name]?.[day.id] || 0, transactions: [] } // Tranzacțiile nu sunt necesare aici
-            ])
-          )
-        });
+  // Ref și callback pentru refresh subtil după adăugare tranzacție
+  const markTransactionAdded = React.useCallback(() => {
+    console.log(' Marking transaction added for subtle refresh...');
+    lastAddedTransactionRef.current = { timestamp: Date.now(), processed: false };
+    setTimeout(() => {
+      if (lastAddedTransactionRef.current) {
+        lastAddedTransactionRef.current.processed = true;
       }
+      setTimeout(() => {
+        useTransactionStore.getState()._invalidateMonthCache(year, month);
+        useTransactionStore.getState().fetchTransactions(true);
+      }, 100);
+    }, 100);
+  }, [year, month]);
+
+  // Calculează soldurile zilnice pentru întreaga lună
+  const dailyBalances = React.useMemo(() => {
+    return days.reduce<Record<number, number>>((acc, day) => {
+      acc[day] = calculateDailyBalance(transactions, day);
+      return acc;
+    }, {});
+  }, [days, transactions]);
+
+  // Stil CSS condiționat pentru solduri (pozitiv/negativ)
+  const getBalanceStyle = (amount: number): string => {
+    if (amount === 0) return 'text-secondary-400';
+    return amount > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium';
+  };
+
+  // Popover state: ce celulă e activă și unde plasăm popoverul
+  const [popover, setPopover] = React.useState<null | {
+    category: string;
+    subcategory: string;
+    day: number;
+    anchorRect: DOMRect | null;
+    initialAmount: string;
+    type: string;
+  }>(null);
+
+  // Helper pentru a determina tipul tranzacției în funcție de categorie
+  const getTransactionTypeForCategory = (category: string): TransactionType => {
+    // Mapăm categoriile la tipurile corespunzătoare conform business logic și regulilor
+    if (category === 'VENITURI') return TransactionType.INCOME;
+    if (category === 'ECONOMII') return TransactionType.SAVING;
+    // Toate celelalte categorii (NUTRITIE, LOCUINTA, etc.) sunt de tip EXPENSE
+    return TransactionType.EXPENSE;
+  };
+
+  // Handler pentru single click pe celulă: deschide popover
+  const handleCellClick = (
+    e: React.MouseEvent<HTMLTableCellElement>,
+    category: string,
+    subcategory: string,
+    day: number,
+    amount: string,
+    type: string
+  ) => {
+    // Prevent double popover
+    if (popover && popover.category === category && popover.subcategory === subcategory && popover.day === day) return;
+    
+    // Determinăm tipul corect de tranzacție bazat pe categorie
+    const correctType = getTransactionTypeForCategory(category);
+    
+    setPopover({
+      category,
+      subcategory,
+      day,
+      anchorRect: e.currentTarget.getBoundingClientRect(),
+      initialAmount: amount,
+      type: correctType, // Folosim tipul corect determinat automat
     });
-    return rows;
-  }, [allCategoriesFromStore, expandedCategories, transactions, displayedDays, categoryTotals]);
+  };
+  // Accesăm store-ul o singură dată pentru întreaga componentă
+  const transactionStore = useTransactionStore();
 
-  // NOU: Definirea coloanelor pentru TanStack Table (`columns` prop)
-  const tableColumns = useMemo((): ColumnDef<LunarGridRowData>[] => {
-    const nameColumn: ColumnDef<LunarGridRowData> = {
-      id: 'name',
-      header: () => <div className="text-left">{SHARED_UI_TEXTS.EXCEL_GRID.HEADERS.LUNA}</div>, // Folosim SHARED_UI_TEXTS
-      accessorKey: 'name', // Sau folosim accessorFn dacă e mai complex
-      // width: 250, // Tanstack Table v8 nu mai are width direct, se face prin CSS sau getComputedSize
-      meta: { // Custom meta data pentru stilizare sticky
-        isSticky: true,
-      },
-      cell: ({ row }) => {
-        const original = row.original;
-        const indent = original.depth > 0 ? `pl-${original.depth * 4}` : ''; // Tailwind class for indentation
-        
-        if (original.rowType === 'CATEGORY_EXPANDED_HEADER' || original.rowType === 'CATEGORY_COLLAPSED') {
-          return (
-            <div 
-              className={`flex items-center cursor-pointer ${indent}`}
-              onClick={() => toggleCategory(original.categoryName)}
-              data-testid={`category-toggle-${original.categoryName}`}
+  // Handler pentru double click: editare inline direct
+  const handleCellDoubleClick = React.useCallback(
+    (
+      e: React.MouseEvent<HTMLTableCellElement>,
+      category: string,
+      subcategory: string,
+      day: number,
+      currentAmount: string
+    ) => {
+      e.preventDefault(); // Previne propagarea click-ului
+
+      // Determinare automată tip tranzacție în funcție de categorie
+      const type = getTransactionTypeForCategory(category);
+      
+      // Prompt pentru valoare nouă
+      const newAmount = window.prompt(
+        EXCEL_GRID.PROMPTS.ENTER_AMOUNT, // Folosește textul definit în constantă
+        currentAmount.replace(/[^0-9.-]/g, '') // Curăță formatul pentru editare
+      );
+
+      if (!newAmount) return; // Anulează dacă nu s-a introdus nimic
+
+      // Verifică dacă valoarea este un număr valid
+      if (isNaN(Number(newAmount))) {
+        // Nu avem ERRORS definit în EXCEL_GRID, folosim un mesaj simplu
+        alert('Suma introdusă nu este validă!');
+        return;
+      }
+
+      // Calculează data pentru ziua din calendar
+      const date = new Date(year, month - 1, day);
+
+      // Salvează tranzacția și triggerează refresh automat
+      transactionStore.saveTransaction({
+        amount: Number(newAmount),
+        category,
+        subcategory,
+        type,
+        date: date.toISOString().slice(0, 10),
+        recurring: false, // Implicit: nu e recurentă la editare rapidă
+        frequency: undefined,
+        currency: 'RON', // Default currency
+        // NOTĂ: user_id este adăugat de supabaseService.createTransaction, nu trebuie trimis de noi
+      }).then(() => {
+        console.log(`Tranzacție salvată cu success: ${category} / ${subcategory} / ${day} = ${newAmount} RON`);
+        console.log(' Invalidating cache after save (double click)...');
+        transactionStore._invalidateMonthCache(year, month);
+        markTransactionAdded();
+      }).catch(error => {
+        console.error('Eroare la salvare tranzacție:', error);
+      });
+    },
+    [month, year, transactionStore]
+  );
+  // Handler pentru salvare tranzacție
+  const handleSavePopover = async (data: { amount: string; recurring: boolean; frequency: string }) => {
+    if (!popover) return;
+    
+    // Debug
+    console.log('Saving transaction with data:', data);
+    
+    try {
+      // Construim tranzacția cu date implicite din contextul celulei
+      const { category, subcategory, day, type } = popover;
+      const { amount, recurring, frequency } = data;
+      const date = new Date(year, month - 1, day);
+      
+      // Creăm obiectul tranzacție complet conform tipului așteptat
+      const transactionData = {
+        amount: Number(amount),
+        category,
+        subcategory,
+        type: type as TransactionType,
+        date: date.toISOString().slice(0, 10),
+        recurring,
+        frequency: (frequency ? frequency : undefined) as FrequencyType | undefined,
+        currency: 'RON', // default, conform shared-constants
+        // NOTĂ: user_id este adăugat de supabaseService.createTransaction, nu trebuie trimis de noi
+        // conform arhitecturii din memoria 49dcd68b-c9f7-4142-92ef-aca6ff06fe52 (separare responsabilități)
+      };
+      
+      console.log('Sending transaction data:', transactionData);
+      
+      // Save & refresh
+      await transactionStore.saveTransaction(transactionData);
+      console.log(' Invalidating cache after save (popover)...');
+      transactionStore._invalidateMonthCache(year, month);
+      markTransactionAdded();
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+    } finally {
+      setPopover(null);
+    }
+  };
+  // Handler pentru închidere popover
+  const handleClosePopover = () => setPopover(null);
+  
+  // Handler pentru editare subcategorie direct din grid
+  const handleEditSubcategory = (category: string, subcategory: string, mode: 'edit' | 'delete' = 'edit') => {
+    setEditingSubcategory({ category, subcategory, mode });
+  };
+  
+  const { user } = useAuthStore();
+  const handleDeleteSubcategoryDirect = React.useCallback((category: string, subcategory: string) => {
+    if (!user) return;
+    deleteSubcategory(user.id, category, subcategory, 'delete');
+  }, [deleteSubcategory, user]);
+  
+  // Verifică dacă o subcategorie este personalizată (permite editare/ștergere)
+  const isCustomSubcategory = (category: string, subcategory: string): boolean => {
+    const foundCategory = categories.find(cat => cat.name === category);
+    if (!foundCategory) return false;
+    
+    const foundSubcategory = foundCategory.subcategories.find(subcat => subcat.name === subcategory);
+    return foundSubcategory?.isCustom || false;
+  };
+
+  // State pentru inline adăugare subcategorie
+  const [addingCategory, setAddingCategory] = React.useState<string | null>(null);
+  const { categories: categoryList, saveCategories: saveCats } = useCategoryStore();
+
+  return (
+    <React.Fragment>
+      <div className="flex justify-end space-x-2 mb-2">
+        <button onClick={expandAll} className="btn btn-secondary" data-testid="expand-all-btn">
+          {UI.EXPAND_ALL}
+        </button>
+        <button onClick={collapseAll} className="btn btn-secondary" data-testid="collapse-all-btn">
+          {UI.COLLAPSE_ALL}
+        </button>
+      </div>
+      <div className="overflow-x-auto rounded-lg shadow-token bg-secondary-50">
+        <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
+          <thead>
+            <tr className="excel-header">
+              <th className="sticky left-0 z-20 excel-header px-4 py-2 text-left" style={{ minWidth: 180 }}>
+                {EXCEL_GRID.HEADERS.LUNA}
+              </th>
+            {days.map(day => (
+              <th key={day} className="excel-cell text-right">
+                {day}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map(category => {
+            const categoryKey = category.name;
+            const subcategories = category.subcategories.map(s => s.name);
+            const isExpanded = !!expandedCategories[categoryKey];
+            const categoryTotalsByDay = categoryTotals[categoryKey] || {};
+            
+            return (
+              <React.Fragment key={categoryKey}>
+                {/* Rând principal categorie (expandabil/colapsabil) */}
+                <tr 
+                  className="bg-secondary-100 hover:bg-secondary-200 cursor-pointer" 
+                  onClick={() => toggleCategory(categoryKey)}
+                  data-testid={`category-row-${categoryKey}`}
+                >
+                  <td 
+                    className="sticky left-0 bg-teal-100 hover:bg-teal-200 z-10 font-semibold px-4 py-2 flex items-center"
+                    data-testid={`category-header-${categoryKey}`}
+                  >
+                    {isExpanded ? 
+                      <ChevronDown size={16} className="mr-1" data-testid={`category-expanded-${categoryKey}`} /> : 
+                      <ChevronRight size={16} className="mr-1" data-testid={`category-collapsed-${categoryKey}`} />}
+                    {categoryKey}
+                  </td>
+                  
+                  {/* Totaluri per categorie pe zile, afișate când categoria e colapsata */}
+                  {days.map(day => {
+                    const categorySum = categoryTotalsByDay[day] || 0;
+                    return (
+                      <td 
+                        key={day} 
+                        className={`px-4 py-2 text-right ${getBalanceStyle(categorySum)}`}
+                        data-testid={`category-total-${categoryKey}-${day}`}
+                      >
+                        {categorySum !== 0 ? formatCurrency(categorySum) : '—'}
+                      </td>
+                    );
+                  })}
+                </tr>
+                
+                {/* Randuri cu subcategorii */}
+                {isExpanded && (
+                  <SubcategoryRows
+                    categoryKey={categoryKey}
+                    subcategories={subcategories}
+                    transactions={transactions}
+                    days={days}
+                    popover={popover}
+                    handleCellClick={handleCellClick}
+                    handleCellDoubleClick={handleCellDoubleClick}
+                    handleSavePopover={handleSavePopover}
+                    handleClosePopover={handleClosePopover}
+                    handleEditSubcategory={(cat,sub) => { setEditingSubcategory({category:cat, subcategory:sub, mode:'edit'}); }}
+                    handleDeleteSubcategory={handleDeleteSubcategoryDirect}
+                    isCustomSubcategory={isCustomSubcategory}
+                    user={user}
+                    addingCategory={addingCategory}
+                    onAddSubcategory={async (cat: string, newName: string) => {
+                      if (!user || !newName.trim()) return;
+                      const catObj = categoryList.find(c => c.name === cat);
+                      if (!catObj || catObj.subcategories.some(sc => sc.name.toLowerCase() === newName.trim().toLowerCase())) return;
+                      const updated = categoryList.map(c => c.name === cat ? { ...c, subcategories: [...c.subcategories, { name: newName.trim(), isCustom: true }] } : c);
+                      await saveCats(user.id, updated);
+                      setAddingCategory(null);
+                    }}
+                    onCancelAddSubcategory={() => setAddingCategory(null)}
+                    onStartAddSubcategory={(cat: string) => setAddingCategory(cat)}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
+          
+          {/* Rândul SOLD la finalul tabelului - conform DEV-4 */}
+          <tr className="bg-gray-100 font-bold border-t-2">
+            <td 
+              className="sticky left-0 bg-gray-100 z-10 px-4 py-2" 
+              data-testid="sold-label"
             >
-              {original.isExpanded ? <ChevronDown size={16} className="mr-1" /> : <ChevronRight size={16} className="mr-1" />}
-              <span className="font-semibold">{original.name}</span>
-            </div>
-          );
-        }
-        // Pentru SUBCATEGORY
-        return <div className={`flex items-center ${indent}`} data-testid={`subcategory-name-${original.id}`}>{original.name}</div>;
-        // Aici vom adăuga ulterior butoane edit/delete pentru subcategorii
-      },
-    };
-
-    const dayColumns: ColumnDef<LunarGridRowData>[] = displayedDays.map(day => ({
-      id: day.id, // ex: "2024-12-25"
-      header: () => <div className={`text-right ${!day.isCurrentMonth ? 'text-secondary-400' : ''}`}>{day.label}</div>,
-      accessorFn: (row) => row.dailyData?.[day.id]?.sum,
-      cell: ({ getValue, row }) => {
-        const sum = getValue() as number | undefined ?? 0;
-        // TODO: Adaugă handlerii de click/double-click
-        // TODO: Adaugă popover logic // const { category, subcategory } = parseRowId(row.original.id); // Va fi nevoie de o funcție parseRowId return ( <div className={text-right ${getBalanceStyle(sum)}} // getBalanceStyle e funcția existentă data-testid={cell-${row.original.id}-${day.id}} // onClick={(e) => handleCellClick(e, category, subcategory, day.dayOfMonth, String(sum), '')} // Va trebui adaptat // onDoubleClick={(e) => handleCellDoubleClick(e, category, subcategory, day.dayOfMonth, String(sum))} // Va trebui adaptat > {sum !== 0 ? formatCurrency(sum) : '—'} {/* formatCurrency e funcția existentă */} ); }, }));
-
-return [nameColumn, ...dayColumns];
-
-}, [displayedDays, toggleCategory /*, alte dependințe pentru handleri */]);
-
-// Calcul solduri zilnice (existent, dar adaptat pentru displayedDays) const dailyBalances = React.useMemo(() => { const balances: Record<string, number> = {}; // Cheia e day.id displayedDays.forEach(day => { // calculateDailyBalance trebuie adaptat să ia day.id sau data completă balances[day.id] = transactions .filter(t => new Date(t.date).toISOString().slice(0,10) === day.id) .reduce((acc, t) => { const amount = t.status === TransactionStatus.COMPLETED && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount; return acc + (t.type === TransactionType.INCOME ? amount : -Math.abs(amount)); }, 0); }); return balances; }, [displayedDays, transactions]);
-
-// NOU: Inițializare instanță tabel const table = useReactTable({ data: tableData, columns: tableColumns, getCoreRowModel: getCoreRowModel(), // getExpandedRowModel: getExpandedRowModel(), // Vom avea nevoie dacă folosim funcționalitatea nativă de expandare a TanStack Table // getGroupedRowModel: getGroupedRowModel(), // Similar // Alte opțiuni, ex: enableStickyHeader: true (nu e direct, se face prin CSS) });
-
-// Stil CSS condiționat pentru solduri (existent, OK) const getBalanceStyle = (amount: number): string => { if (amount === 0) return 'text-secondary-400'; return amount > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium'; };
-
-// Formatare valută (existent, OK) const formatCurrency = (amount: number): string => { if (amount === 0) return 'RON 0.00'; return RON ${Math.abs(amount).toLocaleString('ro-RO', {       minimumFractionDigits: 2,       maximumFractionDigits: 2     })}; };
-
-// ... restul handlerilor (handleCellClick, handleSavePopover etc.) vor fi adaptați ulterior // ... și state-urile (popover, editingSubcategory etc.)
-
-return ( <React.Fragment> {SHARED_UI_TEXTS.EXPAND_ALL} {/* Folosim SHARED_UI_TEXTS /} {SHARED_UI_TEXTS.COLLAPSE_ALL} {/ Folosim SHARED_UI_TEXTS /} {/ NOU: Randare tabel TanStack /} {/ Sticky header /} {table.getHeaderGroups().map(headerGroup => ( {headerGroup.headers.map(header => ( <th key={header.id} className={px-4 py-2 ${(header.column.columnDef.meta as any)?.isSticky ? 'sticky left-0 z-20 bg-secondary-100' : ''}} style={{ minWidth: (header.column.columnDef.meta as any)?.isSticky ? 180 : 'auto' }} // Exemplu de min-width data-testid={header-${header.id}} > {header.isPlaceholder ? null : flexRender( header.column.columnDef.header, header.getContext() )} ))} ))} {table.getRowModel().rows.map(row => ( <tr key={row.id} className="group hover:bg-secondary-100 border-t border-secondary-200" data-testid={row-${row.original.id}} > {row.getVisibleCells().map(cell => ( <td key={cell.id} className={px-4 py-2 ${(cell.column.columnDef.meta as any)?.isSticky ? 'sticky left-0 z-10 group-hover:bg-secondary-100 bg-secondary-50' : ''}} // Asigură-te că background-ul se potrivește data-testid={cell-render-${cell.id}} > {flexRender(cell.column.columnDef.cell, cell.getContext())} ))} ))} {/ Sticky footer /} {/ Momentan, TanStack Table nu are o metodă directă getFooterGroups ca v7. Va trebui să construim manual rândul de footer pe baza dailyBalances. Sau, dacă adăugăm un footer la ColumnDef, putem itera table.getFooterGroups() dacă e disponibil. Pentru simplitate acum, îl construim manual. /} {SHARED_UI_TEXTS.EXCEL_GRID.HEADERS.SOLD} {displayedDays.map(day => ( <td key={footer-sold-${day.id}} className={px-4 py-2 text-right ${getBalanceStyle(dailyBalances[day.id] || 0)}} data-testid={sold-day-footer-${day.id}} > {formatCurrency(dailyBalances[day.id] || 0)} ))} {/ Aici vom adăuga logica pentru popover, care va fi poziționat absolut /} {/ {popover && <CellTransactionPopover ... />} */} </React.Fragment> ); };
+              {EXCEL_GRID.HEADERS.SOLD}
+            </td>
+            {days.map(day => {
+              const balance = dailyBalances[day];
+              return (
+                <td 
+                  key={day} 
+                  className={`px-4 py-2 text-right ${getBalanceStyle(balance)}`} 
+                  data-testid={`sold-day-${day}`}
+                >
+                  {formatCurrency(balance)}
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </React.Fragment>
+  );
+};
 
 export default LunarGrid;
