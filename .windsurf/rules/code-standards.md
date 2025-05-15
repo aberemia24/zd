@@ -51,3 +51,19 @@ export function formatCurrency(amount: number, currency = 'RON'): string {
   // ...
 }
 </documentation>
+<jsx_extension>
+- Orice fișier care conține sintaxă JSX (inclusiv hooks sau utilitare) trebuie să folosească extensia `.tsx`.
+- NICIODATĂ nu folosiți extensia `.ts` pentru fișiere cu JSX, indiferent de tipul fișierului (componentă, hook etc).
+- La refactorizare, dacă adăugați JSX într-un fișier `.ts`, redenumiți-l imediat în `.tsx`.
+- Semne că trebuie `.tsx`: folosiți taguri JSX (`<div>`, `<Component>`) sau returnați JSX din funcții/hook-uri.
+</jsx_extension>
+<enum_casting>
+- Folosiți întotdeauna cast explicit cu `as EnumType` când convertiți între string și enum.
+- Pentru valori condiționale, partea de 'else' trebuie să returneze `undefined` dacă tipul permite.
+- Nu folosiți cast implicit sau `as string` pentru enum-uri.
+- Exemplu corect:
+  ```typescript
+  saveTransaction({
+    type: type as TransactionType,
+    frequency: recurring ? (frequency as FrequencyType) : undefined
+  });
