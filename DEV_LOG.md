@@ -1,3 +1,29 @@
+## [2025-05-15] Integrare TanStack Table în LunarGrid
+
+- **Sumar:** S-a finalizat integrarea TanStack Table în componenta `LunarGrid` pentru performanță și extensibilitate superioară.
+- **Modificări principale:**
+    - Creat componentă nouă: `LunarGridTanStack.tsx` (implementare grid cu TanStack Table)
+    - Creat hook custom: `useLunarGridTable.ts` pentru logica tabelului
+    - Creat componentă dedicată rândurilor de subcategorie: `TanStackSubcategoryRows.tsx`
+    - Definit tipuri noi și clarificate în `types.ts` pentru categorii, subcategorii, și popover
+    - Actualizat `tsconfig.json` pentru includerea tipurilor TanStack Table
+- **Design & Arhitectură:**
+    - Migrare incrementală, fără a rupe API-ul sau funcționalitatea existentă
+    - Păstrat pattern-urile de stare și props din `LunarGrid` original
+    - Toate importurile și constantele respectă regulile globale (`@shared-constants`)
+- **Testare & Next Steps:**
+    - Urmează commit + push pentru aceste modificări
+    - Pași următori: remediere erori lint/type, testare completă a noilor componente și integrarea cu restul aplicației
+- **Branch:** `feature/lunargrid-tanstack-migration`
+- **Fișiere principale modificate/adăugate:**
+    - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`
+    - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts`
+    - `frontend/src/components/features/LunarGrid/TanStackSubcategoryRows.tsx`
+    - `frontend/src/components/features/LunarGrid/types.ts`
+    - `frontend/tsconfig.json`
+
+---
+
 ## [2025-05-11] Migrare la `react-router-dom` pentru Navigare
 
 - **Sumar:** S-a refactorizat sistemul de navigare al aplicației frontend pentru a utiliza `react-router-dom` (v6) în locul mecanismului anterior bazat pe `window.location.hash`. Această modificare aduce o structură de rutare mai robustă, standardizată și mentenabilă.

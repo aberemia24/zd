@@ -15,7 +15,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
-    "types": ["jest", "node", "@testing-library/jest-dom"],
+    "types": ["jest", "node", "@testing-library/jest-dom", "@tanstack/react-table"],
     "paths": {
       "@shared-constants": ["shared-constants/index.ts"],
       "@shared-constants/*": ["shared-constants/*"],

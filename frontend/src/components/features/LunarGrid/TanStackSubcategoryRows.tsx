@@ -1,0 +1,138 @@
+import React from 'react';
+import { TanStackSubcategoryRowsProps } from './types';
+import { TransactionType } from '@shared-constants/enums';
+
+/**
+ * Componentă pentru afișarea rândurilor de subcategorii în cadrul grilei TanStack Table
+ * Această componentă este optimizată pentru re-render-uri independente de categoria părinte
+ */
+const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
+  categoryKey,
+  subcategories,
+  days,
+  transactions,
+  formatCurrency,
+  getBalanceStyle,
+  getSumForCell,
+  handleCellClick,
+  handleCellDoubleClick,
+  handleEditSubcategory,
+  handleDeleteSubcategory,
+  isCustomSubcategory,
+  getTransactionTypeForCategory,
+}) => {
+  return (
+    <>
+      {subcategories.map(subcategory => {
+        const isCustom = isCustomSubcategory(categoryKey, subcategory.name);
+        return (
+          <tr 
+            key={`${categoryKey}-${subcategory.name}`}
+            className="hover:bg-gray-50"
+            data-testid={`subcat-row-${categoryKey}-${subcategory.name}`}
+          >
+            {/* Prima celulă: numele subcategoriei */}
+            <td 
+              className="sticky left-0 bg-white z-10 pl-8 py-2 flex justify-between items-center"
+              data-testid={`subcategory-${categoryKey}-${subcategory.name}`}
+            >
+              <div className="flex items-center">
+                <span>{subcategory.name}</span>
+                {isCustom && (
+                  <span className="ml-2 text-xs text-teal-600 bg-teal-100 py-0.5 px-1.5 rounded">
+                    custom
+                  </span>
+                )}
+              </div>
+              
+              {/* Butoane acțiuni pentru subcategorii (doar afișate la hover) */}
+              <div className="hidden group-hover:flex space-x-1">
+                {handleEditSubcategory && (
+                  <button 
+                    onClick={() => handleEditSubcategory(categoryKey, subcategory.name)}
+                    className="text-gray-500 hover:text-gray-700"
+                    data-testid={`edit-subcategory-${categoryKey}-${subcategory.name}`}
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                )}
+                
+                {isCustom && handleDeleteSubcategory && (
+                  <button 
+                    onClick={() => handleDeleteSubcategory(categoryKey, subcategory.name)}
+                    className="text-gray-500 hover:text-red-600"
+                    data-testid={`delete-subcategory-${categoryKey}-${subcategory.name}`}
+                  >
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line>
+                      <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </td>
+            
+            {/* Celule pentru fiecare zi din lună */}
+            {days.map(day => {
+              const amount = getSumForCell(categoryKey, subcategory.name, day);
+              const formattedAmount = amount !== 0 ? formatCurrency(amount) : '—';
+              const type = getTransactionTypeForCategory(categoryKey);
+              
+              return (
+                <td 
+                  key={day} 
+                  className={`px-4 py-2 text-right cursor-pointer ${getBalanceStyle(amount)}`}
+                  onClick={(e) => handleCellClick(
+                    e, 
+                    categoryKey, 
+                    subcategory.name, 
+                    day, 
+                    formattedAmount, 
+                    type
+                  )}
+                  onDoubleClick={handleCellDoubleClick ? (e) => handleCellDoubleClick(
+                    e, 
+                    categoryKey, 
+                    subcategory.name, 
+                    day, 
+                    formattedAmount
+                  ) : undefined}
+                  data-testid={`cell-${categoryKey}-${subcategory.name}-${day}`}
+                >
+                  {formattedAmount}
+                </td>
+              );
+            })}
+          </tr>
+        );
+      })}
+    </>
+  );
+};
+
+export default TanStackSubcategoryRows;
