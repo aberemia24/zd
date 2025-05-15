@@ -52,4 +52,11 @@ export const MESAJE = {
   
   // Validare categorii și subcategorii
   EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: 'Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.',
+  
+  // Validare tranzacții și sume
+  VALIDARE: {
+    SUMA_INVALIDA: 'Suma introdusă nu este validă. Folosiți un format numeric corect (ex: 123.45).',
+    FORMAT_DATE: 'Data introdusă nu are un format valid.',
+    CAMP_LIPSA: 'Completați toate câmpurile obligatorii.',
+  },
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { EXCEL_GRID, UI } from '@shared-constants/ui';
 import LunarGrid from '../components/features/LunarGrid';
+import LunarGridTanStack from '../components/features/LunarGrid/LunarGridTanStack';
 import { TITLES } from '@shared-constants';
 import { CATEGORIES } from '@shared-constants/categories';
 import { useTransactionStore } from '../stores/transactionStore';
@@ -15,6 +16,13 @@ const LunarGridPage: React.FC = () => {
   // State pentru anul și luna curentă
   const [year, setYear] = React.useState(() => new Date().getFullYear());
   const [month, setMonth] = React.useState(() => new Date().getMonth() + 1);
+  
+  // State pentru a alege între implementarea clasică și cea TanStack
+  const [useTanStack, setUseTanStack] = React.useState(() => {
+    // Încercaăm să citim preferința din localStorage, default la true pentru versiunea nouă
+    const savedPreference = localStorage.getItem('lunarGrid-useTanStack');
+    return savedPreference !== null ? savedPreference === 'true' : true;
+  });
   
   // Extragem funcțiile și state-ul necesar din stores
   const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
@@ -152,6 +160,16 @@ const LunarGridPage: React.FC = () => {
     return monthNames[month - 1];
   };
   
+  // Salvăm preferința utilizatorului în localStorage pentru a o reține între sesiuni
+  React.useEffect(() => {
+    localStorage.setItem('lunarGrid-useTanStack', useTanStack.toString());
+  }, [useTanStack]);
+
+  // Toggle între implementarea clasică și implementarea TanStack
+  const toggleImplementation = () => {
+    setUseTanStack(prev => !prev);
+  };
+
   return (
     <>
       <div className="flex justify-between items-center mb-token">
@@ -159,21 +177,44 @@ const LunarGridPage: React.FC = () => {
           {TITLES.GRID_LUNAR}
         </h1>
         
-        {/* Link to Options for managing categories */}
-        <div className="mb-token">
-          <a
-            href="#options"
-            className="text-sm text-accent-600 hover:text-accent-700 underline"
-            data-testid="manage-categories-link"
-            onClick={e => {
-              e.preventDefault();
-              const newUrl = `${window.location.pathname}#options`;
-              window.history.replaceState({}, '', newUrl);
-              window.dispatchEvent(new HashChangeEvent('hashchange'));
-            }}
+        <div className="flex items-center space-x-token-sm">
+          {/* Toggle pentru implementare */}
+          <div 
+            className="flex items-center bg-secondary-100 rounded-lg p-1 shadow-sm" 
+            data-testid="implementation-toggle"
           >
-            {UI.MANAGE_CATEGORIES}
-          </a>
+            <button 
+              className={`px-3 py-1 text-sm rounded-md transition-all ${useTanStack ? 'bg-primary-500 text-white' : 'text-primary-600'}`}
+              onClick={toggleImplementation}
+              data-testid="tanstack-toggle-btn"
+            >
+              {EXCEL_GRID.TABLE_CONTROLS.VIRTUAL_TABLE}
+            </button>
+            <button 
+              className={`px-3 py-1 text-sm rounded-md transition-all ${!useTanStack ? 'bg-primary-500 text-white' : 'text-primary-600'}`}
+              onClick={toggleImplementation}
+              data-testid="legacy-toggle-btn"
+            >
+              {EXCEL_GRID.TABLE_CONTROLS.LEGACY_TABLE}
+            </button>
+          </div>
+
+          {/* Link to Options for managing categories */}
+          <div>
+            <a
+              href="#options"
+              className="text-sm text-accent-600 hover:text-accent-700 underline"
+              data-testid="manage-categories-link"
+              onClick={e => {
+                e.preventDefault();
+                const newUrl = `${window.location.pathname}#options`;
+                window.history.replaceState({}, '', newUrl);
+                window.dispatchEvent(new HashChangeEvent('hashchange'));
+              }}
+            >
+              {UI.MANAGE_CATEGORIES}
+            </a>
+          </div>
         </div>
         
         <div className="flex items-center gap-token">
@@ -199,10 +240,23 @@ const LunarGridPage: React.FC = () => {
         </div>
       </div>
       
+      {/* Afișăm o versiune diferită în funcție de preferința utilizatorului */}
       {loading ? (
         <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">{EXCEL_GRID.LOADING}</div>
+      ) : useTanStack ? (
+        <div data-testid="tanstack-implementation">
+          <LunarGridTanStack year={year} month={month} />
+          <div className="mt-token text-xs text-secondary-500 text-right">
+            {EXCEL_GRID.TABLE_CONTROLS.VERSION}: TanStack (optimizat pentru performanță)
+          </div>
+        </div>
       ) : (
-        <LunarGrid year={year} month={month} />
+        <div data-testid="legacy-implementation">
+          <LunarGrid year={year} month={month} />
+          <div className="mt-token text-xs text-secondary-500 text-right">
+            {EXCEL_GRID.TABLE_CONTROLS.VERSION}: Clasic
+          </div>
+        </div>
       )}
     </>
   );

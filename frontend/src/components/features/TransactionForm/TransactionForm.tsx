@@ -9,8 +9,37 @@ import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
 
+/**
+ * Returnează un mesaj bazat pe o cheie, suportând și acces la proprietăți imbricate.
+ * De exemplu: 'VALIDARE.SUMA_INVALIDA' sau 'LOGIN_ERROR'
+ */
 function safeMessage(key: string): string {
-  return (MESAJE as Record<string, string>)[key] || key;
+  try {
+    // Folosim tipizare sigură și descompunere structurată pentru acces ierarhic
+    const parts = key.split('.');
+    
+    if (parts.length === 1) {
+      // Acces direct la proprietate de prim nivel
+      const value = MESAJE[parts[0] as keyof typeof MESAJE];
+      if (typeof value === 'string') {
+        return value;
+      }
+    } else if (parts.length === 2 && parts[0] === 'VALIDARE') {
+      // Caz special pentru mesaje de validare (singura categorie imbricată acum)
+      const validare = MESAJE.VALIDARE;
+      const subKey = parts[1] as keyof typeof validare;
+      if (validare && subKey in validare) {
+        return validare[subKey];
+      }
+    }
+    
+    // Dacă nu s-a găsit nimic sau dacă valoarea nu e string, returnăm cheia originală
+    return key;
+  } catch (error) {
+    // În caz de eroare, returnăm cheia originală
+    console.error(`Eroare la accesarea mesajului cu cheia: ${key}`, error);
+    return key;
+  }
 }
 
 // Tipul datelor pentru formularul de tranzacție

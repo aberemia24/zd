@@ -1,3 +1,50 @@
+## [2025-05-15] Lecții învățate și probleme rezolvate în implementarea TanStack Table
+
+- **Sumar:** Implementarea TanStack Table a evidențiat mai multe probleme de tipizare și managementul constant-elor care au devenit lecții valoroase pentru echipă.
+
+- **Probleme întâlnite și rezolvate:**
+    - **Extensia fișierelor pentru componente React cu JSX**: Fișierele `.ts` care conțin sintaxă JSX generează erori. Soluție: Redenumirea la `.tsx`.
+    - **Structuri ierarhice în constante**: Adăugarea obiectului imbricat `MESAJE.VALIDARE` a cauzat erori de tipizare în `safeMessage`. Soluție: Refactorizarea funcției pentru a suporta acces ierarhic corect tipizat.
+    - **Cast corect pentru enum-uri**: Tipizarea explicită pentru proprietăți de tip enum precum `FrequencyType` este necesară pentru a evita problemele de conversie între `string` și enum.
+    - **Import și folosire corectă a constantelor**: Toate constantele trebuie importate exclusiv via alias-uri definite (`@shared-constants`).
+
+- **Lecții de arhitectură și reguli noi:**
+    - **Structuri imbricate în constante**: Când adăugăm structuri imbricate în sursa unică de adevăr (ex: `MESAJE.VALIDARE`), toate utilitarele care le folosesc trebuie adaptate (ex: `safeMessage`).
+    - **JSX necesită extensia .tsx**: Indiferent cât de simplă e logica unui fișier, dacă conține JSX => extensia trebuie să fie `.tsx`, nu `.ts`.
+    - **Tipizare explicită pentru cast-uri**: Folosiți întotdeauna cast-uri explicite (ex: `as FrequencyType`) pentru a converti între string și enum-uri.
+    - **Testarea modularizată**: Evitați testarea 'Big Bang' a întregii implementări; testați pe componente și funcționalități izolate.
+
+- **Beneficii aduse de această experiență:**
+    - Cod mai robust și mai tipizat pentru întreaga aplicație
+    - Funcția `safeMessage` îmbunătățită poate gestiona acum mesaje structurate ierarhic
+    - Dezvoltarea de pattern-uri clare pentru structurarea constantelor și mesajelor
+    - Detectarea timpurie a problemelor de tipizare înainte de compilare
+
+## [2025-05-15] Implementare completă TanStack Table în LunarGrid
+
+- **Sumar:** S-a finalizat implementarea completă a TanStack Table în componenta `LunarGrid` cu integrare în pagina existentă.
+- **Modificări principale:**
+    - Extindere `shared-constants/ui.ts` cu `EXCEL_GRID.TABLE_CONTROLS` pentru textele de interfață
+    - Implementare `useLunarGridTable` pentru management de date și stare optimizată
+    - Creare `LunarGridTanStack` cu folosirea exclusivă a constantelor și metodelor existente
+    - Integrare în `LunarGridPage` cu toggle pentru comutare între implementarea clasică și cea nouă
+    - Persistăm preferința utilizatorului în localStorage pentru a fi reținută între sesiuni
+- **Conformitate cu regulile globale:**
+    - **Zero texte hardcodate**: Toate mesajele provin din sursa unică de adevăr `@shared-constants`
+    - **Zero referințe la funcții inexistente**: Toată implementarea se bazează pe funcțiile existente din stores/servicii
+    - **Testabilitate**: Toate elementele interactive au atribute `data-testid` pentru testare automată
+    - **Anti-pattern useEffect evitat**: Fetch-urile sunt gestionate corect fără dep arrays problematice
+- **Beneficii principale:**
+    - **Performanță crescută**: Componenta TanStack poate gestiona mii de tranzacții fără probleme
+    - **UX păstrat**: Toate funcționalitățile din implementarea originală au fost menținute
+    - **Adaptabilitate**: Utilizatorii pot comuta ușor între implementarea clasică și cea nouă
+- **Fișiere create/modificate:**
+    - `shared-constants/ui.ts` - adăugare constante pentru controalele tabelului
+    - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts` - implementare hook pentru TanStack Table
+    - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx` - componenta principală TanStack
+    - `frontend/src/pages/LunarGridPage.tsx` - integrare cu toggle între implementarea clasică și cea nouă
+    - `tests/plans/LunarGridTanStack.test.plan.md` - plan detaliat de testare
+
 ## [2025-05-15] Pregătire implementare TanStack Table în LunarGrid
 
 - **Sumar:** S-au pregătit resursele necesare pentru implementarea TanStack Table în componenta `LunarGrid`.

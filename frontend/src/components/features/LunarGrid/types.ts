@@ -1,10 +1,27 @@
 import { TransactionType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
+import { ColumnDef } from '@tanstack/react-table';
 
 /**
  * Definirea tipurilor pentru LunarGrid cu TanStack Table
  * Aceste tipuri sunt folosite în hook-ul useLunarGridTable și componente
  */
+
+// Structura de bază pentru datele de rând în TanStack Table
+export interface LunarGridRowData {
+  id: string;
+  category: string;
+  subcategory?: string;
+  isCategory: boolean;
+  isExpanded?: boolean;
+  dailyAmounts: Record<number, number>;
+  transactions: TransactionValidated[];
+}
+
+// Definiție de coloană cu informații despre ziua asociată
+export type DayColumnDef = ColumnDef<LunarGridRowData> & {
+  day: number;
+};
 
 // Structura pentru date rând categorie
 export interface CategoryRow {
