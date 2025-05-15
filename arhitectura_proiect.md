@@ -28,6 +28,7 @@ Rol: Sursa unică de adevăr pentru toate constantele, enum-urile și tipurile p
 # Dependențe cheie:
 index.ts - Exportă toate constantele, folosit pentru importuri în frontend/backend
 Toate fișierele frontend/backend care folosesc constante trebuie să le importe prin @shared-constants
+Excel_grid.ts - Constante pentru vizualizarea tip grid a datelor financiare
 
 📁 frontend/
 
@@ -42,6 +43,12 @@ Rol: Aplicația web React cu state management Zustand și UI cu TailwindCSS
 ├── 📁 pages/                   # Pagini principale
 ├── 📁 stores/                  # State management Zustand
 ├── 📁 services/                # Servicii pentru API și operațiuni externe
+├── 📁 utils/                   # Utilitare și funcții de calcul reutilizabile
+├── 📁 lunarGrid/               # Module pentru funcționalitatea LunarGrid
+│   ├── 📄 index.ts           # Barrel export pentru toate utilitarele LunarGrid
+│   ├── 📄 calculations.ts     # Funcții de calcul pentru sume zilnice și solduri cu memorare
+│   ├── 📄 formatters.ts       # Funcții de formatare pentru valori monetare și date
+│   └── 📄 dataTransformers.ts # Transformări de date pentru structura tabelului
 ├── 📁 styles/                  # Stiluri, theme tokens și utilitare CSS
 └── 📁 types/                   # Tipuri TypeScript pentru aplicație
 📁 frontend/src/components/primitives/
@@ -77,6 +84,7 @@ Dependențe cheie:
 Toate folosesc @shared-constants pentru texte, token-uri de design
 Folosesc classNames pentru condiționare clase CSS
 Utilizează constante din styles/theme.ts și utilitare din styles/themeUtils.ts
+Componentele LunarGrid sunt optimizate cu React.memo și virtualizare TanStack
 
 📁 frontend/src/components/features/
 Rol: Componente specifice businessului
@@ -89,11 +97,14 @@ Rol: Componente specifice businessului
 │   └── 📄 index.ts
 ├── 📁 TransactionFilters/
 │   ├── 📄 TransactionFilters.tsx # Filtre pentru tranzacții
-│   └── 📄 index.ts
 ├── 📁 LunarGrid/
-│   ├── 📄 LunarGrid.tsx        # Grid Excel-like lunar, vizualizare matriceală
-│   ├── 📄 CellTransactionPopover.tsx # Popover editare tranzacție în grid
-│   ├── 📄 SubcategoryRows.tsx  # Componenta pentru randare rânduri subcategorii
+│   ├── 📄 LunarGridTanStack.tsx # Vizualizare grid lunară bazată pe TanStack Table
+│   ├── 📄 TanStackSubcategoryRows.tsx # Componente pentru afișarea subcategoriilor în grid (optimizate cu React.memo)
+│   ├── 📄 index.ts
+│   ├── 📁 hooks/
+│   │   └── 📄 useLunarGridTable.tsx # Hook pentru gestionarea stării și logicii tabelului virtualizat
+│   └── 📁 types/
+│       └── 📄 index.ts # Tipuri și interfețe pentru LunarGrid
 │   └── 📄 index.ts
 ├── 📁 CategoryEditor/
 │   ├── 📄 CategoryEditor.tsx   # Editor pentru categorii și subcategorii

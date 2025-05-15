@@ -29,53 +29,251 @@ type TransactionFormData = {
 type TransactionFormWithNumberAmount = Omit<Transaction, 'amount'> & {
   amount: number;        // Amount ca număr pentru calcule
 };
-1.2 LunarGrid
+1.2 LunarGrid (TanStack Table Implementation)
 Exemplu Utilizare:
 tsx// În LunarGridPage.tsx
-import LunarGrid from '../components/features/LunarGrid';
+import LunarGridTanStack from '../components/features/LunarGrid';
 
-// Exemplu basic
-<LunarGrid 
-  year={2025}
-  month={5}
-/>
-Exemplu Interacțiune cu Stores:
-tsx// În LunarGridPage.tsx
-import { useTransactionStore } from '../stores/transactionStore';
-import { useCategoryStore } from '../stores/categoryStore';
-
-const LunarGridWithStores = () => {
+// Exemplu basic cu hook-uri Zustand pentru date
+const MyLunarGrid = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const transactions = useTransactionStore(state => state.transactions);
+  const categories = useCategoryStore(state => state.categories);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   
-  // Încărcarea categoriilor personalizate la montare
-  const { loadCategories, mergeWithDefaults } = useCategoryStore();
-  const { user } = useAuthStore();
+  // Gestiune expandare/colapsare categorii
+  const toggleCategory = useCallback((categoryName: string) => {
+    setExpandedCategories(prev => ({
+      ...prev,
+      [categoryName]: !prev[categoryName]
+    }));
+  }, []);
   
-  useEffect(() => {
-    if (user?.id) {
-      // 1. Încarcă categoriile personalizate și
-      // 2. Fuzionează cu cele predefinite din CATEGORIES
-      loadCategories(user.id).then(() => {
-        const defaultCategories = convertCategoriesFormat(CATEGORIES);
-        mergeWithDefaults(defaultCategories);
-      });
-    }
-  }, [user?.id]);
+  // Handler click celulă
+  const handleCellClick = useCallback((category: string, day: number) => {
+    console.log(`Click pe ${category}, ziua ${day}`);
+  }, []);
   
-  // Componenta va prelua automat tranzacțiile din store
+  // Handler dublu-click pentru editare
+  const handleCellDoubleClick = useCallback((category: string, day: number) => {
+    console.log(`Editare pentru ${category}, ziua ${day}`);
+    // Aici se poate deschide un modal pentru editare/adăugare tranzacție
+  }, []);
+  
   return (
     <div>
       <div className="controls">
-        <button onClick={() => changeMonth(-1)}>Luna anterioară</button>
+        <button onClick={() => setMonth(prev => Math.max(1, prev - 1))}>Luna anterioară</button>
         <span>{`${getMonthName(month)} ${year}`}</span>
-        <button onClick={() => changeMonth(1)}>Luna următoare</button>
+        <button onClick={() => setMonth(prev => Math.min(12, prev + 1))}>Luna următoare</button>
       </div>
       
-      <LunarGrid year={year} month={month} />
+      <LunarGridTanStack 
+        transactions={transactions}
+        categories={categories}
+        expandedCategories={expandedCategories}
+        year={year}
+        month={month}
+        onCellClick={handleCellClick}
+        onCellDoubleClick={handleCellDoubleClick}
+        onCategoryToggle={toggleCategory}
+      />
     </div>
   );
 };
+
+// Arhitectură internă și utilizare hook
+tsx// Structura internă a LunarGridTanStack.tsx
+const LunarGridTanStack = ({
+  transactions,
+  categories,
+  expandedCategories,
+  year,
+  onCellClick,
+  onCellDoubleClick,
+  onCategoryToggle
+}) => {
+  // Utilizează hook-ul custom pentru toată logica
+  const {
+    table,
+    days,
+    rowVirtualizer,
+    dailyBalances,
+    getSumForCell,
+    updateTableData
+  } = useLunarGridTable(
+    transactions,
+    categories,
+    expandedCategories,
+    year,
+    month,
+    onCellClick,
+    onCellDoubleClick
+  );
+  
+  // Implementare UI cu tabel virtualizat pentru performanță
+  return (
+    <div className="lunarGridContainer">
+      <table>
+        <thead>...</thead>
+        <tbody>
+          {rowVirtualizer.getVirtualItems().map(virtualRow => {
+            // Obține rândul din tabelul TanStack în funcție de indexul virtual
+            const row = table.getRowModel().rows[virtualRow.index] as Row<LunarGridRowData>;
+            return (
+              <TanStackSubcategoryRows
+                key={row.id}
+                row={row}
+                table={table}
+                days={days}
+                getSumForCell={getSumForCell}
+                onCategoryToggle={onCategoryToggle}
+              />
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+1.2.1 Utilizare utils/lunarGrid
+
+Structura utilitarelor pentru LunarGrid:
+```
+frontend/src/utils/lunarGrid/
+├── calculations.ts     # Calcule pentru sume și transformări cu memorare
+├── formatters.ts       # Formatare valori monetare și date
+├── dataTransformers.ts # Transformă date pentru structura de tabel
+└── index.ts           # Export barrel al tuturor funcțiilor
+```
+
+Exemplu utilizare utilitare pentru date:
+```typescript
+import { 
+  calculateAmountsForCategory, 
+  calculateDailyBalance,
+  formatCurrency, 
+  transformTransactionsToRowData,
+  getBalanceStyleClass
+} from '../../utils/lunarGrid';
+
+// Calculează sumele zilnice pentru o categorie
+const dailyAmounts = calculateAmountsForCategory(
+  'Cheltuieli', 
+  transactions
+);
+
+// Formatează o sumă pentru afișare 
+const formattedAmount = formatCurrency(1234.56); // "1.234,56"
+
+// Obține clase CSS pentru stilizare sume pozitive/negative
+const amountClass = getBalanceStyleClass(-500); // "text-error-600 font-medium"
+
+// Transformă datele pentru tabel
+const rowData = transformTransactionsToRowData(
+  transactions,
+  categories,
+  expandedCategories
+);
+```
+
+1.2.2 Hook-ul useLunarGridTable
+Hook-ul central pentru gestiunea stării și logicii tabelului:
+
+```typescript
+const { 
+  // Instanța tabelului TanStack
+  table,
+  // Array zilele lunii: [1, 2, ..., 31]
+  days,
+  // Virtualizare pentru performanță
+  rowVirtualizer,
+  // Solduri zilnice calculate
+  dailyBalances,
+  // Utilitare pentru obținerea sumelor în celule
+  getSumForCell,
+  // Actualizare date externe
+  updateTableData
+} = useLunarGridTable(
+  transactions,    // Tranzacții de afișat
+  categories,      // Categorii și subcategorii
+  expandedCategories, // Ce categorii sunt expandate
+  year,            // Anul curent
+  month,           // Luna curentă (1-12)
+  onCellClick,     // Handler pentru click pe celulă
+  onCellDoubleClick // Handler pentru dublu-click (editare)
+);
+```
+
+Structura internă folosește memorare pentru prevenirea recalculării inutile:
+
+```typescript
+// Calculăm datele fără side effects
+const data = useMemo(() => 
+  transformTransactionsToRowData(transactions, categories, expandedCategories),
+  [transactions, categories, expandedCategories]
+);
+
+// Sincronizăm state-ul când datele se schimbă
+useEffect(() => {
+  setTableData(data);
+}, [data]);
+```
+
+1.2.3 Optimizări pentru performanță
+
+- **Memorare pentru calcule costisitoare**:
+```typescript
+// Cache pentru funcțiile de calcul din calculations.ts
+const categoryAmountsCache = new Map<string, Record<number, number>>();
+
+// Generare cheie cache
+const cacheKey = generateCacheKey(
+  categoryName, 
+  transactions.length,
+  transactions[0]?.date || ''
+);
+
+// Verificare cache
+if (categoryAmountsCache.has(cacheKey)) {
+  return categoryAmountsCache.get(cacheKey)!;
+}
+
+// ... calcul efectiv ...
+
+// Salvare în cache
+categoryAmountsCache.set(cacheKey, resultObj);
+```
+
+- **Virtualizare tabel pentru randare eficientă**:
+```typescript
+// Configurare virtualizare pentru scroll eficient
+const rowVirtualizer = useVirtualizer({
+  count: rows.length,
+  getScrollElement: () => tableContainerRef.current,
+  estimateSize: () => 35, // înălțimea estimată a unui rând
+  overscan: 5 // număr de rânduri în plus pentru scrolling fluid
+});
+
+// Utilizare în randare
+rowVirtualizer.getVirtualItems().map(virtualRow => {
+  const row = rows[virtualRow.index];
+  // Randează doar rândurile vizibile
+  return <Row key={row.id} row={row} />;
+});
+```
+
+- **Optimizare re-render cu React.memo**:
+```typescript
+// Componenta optimizată pentru rânduri subcategorii
+const TanStackSubcategoryRows = React.memo(({ 
+  row, table, days, getSumForCell, onCategoryToggle 
+}) => {
+  // ... implementare randare ...
+});
+```
 1.3 TransactionTable
 Exemplu Utilizare:
 tsx// În TransactionsPage.tsx
@@ -183,36 +381,54 @@ Flux:
 4. La încărcare, categoryStore.loadUserCategories() aduce categoriile personalizate
 5. categoryStore.mergeWithDefaults() fuzionează cu categoriile predefinite din CATEGORIES
 6. Componentele UI (LunarGrid, TransactionForm) folosesc categoriile fuzionate
-2.3 Flux Editare Tranzacție în LunarGrid
-┌─────────────────┐      ┌─────────────────┐     ┌─────────────────┐
-│  LunarGrid Cell │─1───▶│CellTransaction  │─2──▶│   handleSave    │
-│ (click/dblclick)│      │    Popover      │     │   (LunarGrid)   │
-└─────────────────┘      └─────────────────┘     └────────┬────────┘
-                                                          │3
-                                                          ▼
-┌─────────────────┐      ┌─────────────────┐     ┌─────────────────┐
-│Re-render LunarGrid◀─6──│transactionStore │◀─4──│ supabaseService │
-└─────────────────┘      │invalidateMonth  │     └────────┬────────┘
-                         │fetchTransactions│               │5
-                         └─────────────────┘               ▼
-                                                    ┌─────────────────┐
-                                                    │  Supabase DB    │
-                                                    └─────────────────┘
+2.3 Flux Editare Tranzacție în LunarGridTanStack (Nou)
+┌──────────────────┌      ┌──────────────────┌      ┌──────────────────┌
+│ Celulă TanStack   │┐1────→│ onCellClick/     │┐2────→│ useLunarGridTable │
+│ (getVirtualItems) │      │ onCellDoubleClick│      │  Event Handlers  │
+└──────────────────┘      └──────────────────┘      └──────────────────┘
+                                                           ⌄3
+                                                           ↓
+┌──────────────────┌      ┌──────────────────┌      ┌──────────────────┌
+│ TanStack Rerender │┐7────└─────────────│ Cache Reset +    │┐6────└─────────────│ transactionStore │
+│ + Virtualizare    │      │ updateTableData │      │ saveTransaction │
+└──────────────────┘      └──────────────────┘      └──────────────────┘
+                                                           ⌄4
+                                                           ↓
+                                                   ┌──────────────────┌
+                                                   │ supabaseService │
+                                                   └──────────────────┘
+                                                           ⌄5
+                                                           ↓
+                                                   ┌──────────────────┌
+                                                   │   Supabase DB    │
+                                                   └──────────────────┘
 
-Flux:
-1. User face click pe celulă -> deschide CellTransactionPopover, sau
-   User face double-click -> editare rapidă cu prompt
-2. După editare, handler-ul corespunzător este apelat cu datele noi
-3. handleSave creează un obiect Transaction și apelează transactionStore.saveTransaction()
-4. Tranzacția este salvată prin supabaseService
-5. Datele sunt actualizate în Supabase
-6. transactionStore invalidează cache-ul pentru luna curentă și reîncarcă datele
-7. LunarGrid se re-renderează automat cu datele actualizate
+Flux Optimizat:
+1. Utilizatorul interacționează cu o celulă din grid-ul virtualizat TanStack
+   - Click simpu -> onCellClick(category, day)
+   - Dublu-click -> onCellDoubleClick(category, day)
 
-Optimizări:
-- Invalidarea parțială a cache-ului (doar luna afectată)
-- Utilizarea localStorage pentru persistența stării de expandare categorii
-- Debounce pentru operații rapide consecutive
+2. Aceste handler-uri sunt transmise în useLunarGridTable și apelate cu datele celulei
+
+3. În handler-ul corespunzător (definit în LunarGridPage.tsx), se poate afișa un modal,
+   se poate executa logica de business sau se poate salva o tranzacție direct
+
+4. transactionStore.saveTransaction() este apelat cu datele noi/modificate
+   și comunică cu supabaseService pentru persistenta datelor
+
+5. Datele sunt salvate în Supabase DB
+
+6. După salvare, cache-ul de calcule este resetat prin resetCalculationsCache()
+   și funcția updateTableData() este apelată pentru actualizarea datelor
+
+7. React re-renderează componentele afectate folosind TanStack Table și virtualizare
+   pentru a optimiza performanța chiar și cu seturi mari de date
+
+Optimizări noi:
+- Memorare și cache pentru calculele intensive (calculateAmountsForCategory, etc.)
+- Virtualizare tabel pentru randare eficientă a mii de rânduri
+- Separarea clară a logicii de business în hook-ul useLunarGridTable
+- Schema ReactMemo pentru optimizarea re-render-ului componentelor
 3. Pattern-uri de Interacțiune UI
 3.1 Pattern: Editare în Grid (LunarGrid)
 tsx// LunarGrid.tsx implementează trei pattern-uri de editare:
