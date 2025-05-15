@@ -81,6 +81,14 @@ export const EXCEL_GRID = {
     ADD_SUBCATEGORY: 'Adaugă subcategorie',
     EDIT_SUBCATEGORY: 'Editează subcategorie',
     DELETE_SUBCATEGORY: 'Șterge subcategorie',
+  },
+  // Constante pentru controalele tabelului TanStack
+  TABLE_CONTROLS: {
+    EXPAND_ALL: 'Extinde toate categoriile',
+    COLLAPSE_ALL: 'Colapsează toate categoriile',
+    VIRTUAL_TABLE: 'Tabel optimizat',
+    LEGACY_TABLE: 'Tabel clasic',
+    VERSION: 'Versiune'
   }
 };
 

@@ -1,3 +1,21 @@
+## [2025-05-15] Pregătire implementare TanStack Table în LunarGrid
+
+- **Sumar:** S-au pregătit resursele necesare pentru implementarea TanStack Table în componenta `LunarGrid`.
+- **Modificări principale:**
+    - Adăugare constante necesare în `shared-constants/ui.ts` - secțiunea `EXCEL_GRID.TABLE_CONTROLS`
+    - Creare script de verificare funcții (`scripts/verify-functions.js`) pentru validarea API-urilor existente
+    - Creare plan detaliat de testare respectând regulile globale de testabilitate
+    - Pregătire documentație și setup pentru implementarea incrementală
+- **Design & Arhitectură:**
+    - Zero texte hardcodate: Toate textele necesare adăugate în `shared-constants/ui.ts`
+    - Zero referințe la funcții inexistente: Script de verificare pentru store-uri
+    - Respectarea strictă a regulilor globale pentru sursa unică de adevăr
+- **Next Steps:**
+    - Instalare dependențe TanStack Table necesare
+    - Implementare hook custom `useLunarGridTable.ts`
+    - Creare componentă `LunarGridTanStack.tsx`
+    - Implementare teste conform planului
+
 ## [2025-05-15] Integrare TanStack Table în LunarGrid
 
 - **Sumar:** S-a finalizat integrarea TanStack Table în componenta `LunarGrid` pentru performanță și extensibilitate superioară.
