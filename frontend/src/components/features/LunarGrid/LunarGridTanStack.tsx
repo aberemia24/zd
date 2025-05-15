@@ -1,6 +1,14 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import { flexRender } from '@tanstack/react-table';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
+import { 
+  flexRender, 
+  Header, 
+  Row as TableRow,
+  Cell,
+  RowModel
+} from '@tanstack/react-table';
+import { useVirtualizer, Virtualizer, VirtualItem } from '@tanstack/react-virtual';
 import { useLunarGridTable } from './hooks/useLunarGridTable';
+import type { LunarGridRowData } from './types';
 
 // Import DOAR stores și constante existente
 import { useTransactionStore } from '../../../stores/transactionStore';
@@ -183,16 +191,23 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const getBalanceStyle = (amount: number) => {
     return amount > 0 
       ? 'text-success-600 font-medium' 
-      : amount < 0 
-        ? 'text-error-600 font-medium' 
-        : 'text-secondary-400';
+      : 'text-error-600 font-medium';
   };
   
+  // Referință pentru container-ul de tabel (necesar pentru virtualizare)
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+  
   // Folosește hook-ul useLunarGridTable pentru logica tabelului
+  
   const { 
     table, 
-    tableContainerRef,
-    days
+    days,
+    rowVirtualizer,
+    dailyBalances,
+    getSumForCell,
+    updateTableData,
+    data,
+    columns
   } = useLunarGridTable(
     transactions,
     categories,
@@ -202,6 +217,19 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     handleCellClick,
     handleCellDoubleClick
   );
+
+  // Efect pentru a actualiza datele tabelului când se schimbă tranzacțiile
+  useEffect(() => {
+    updateTableData(transactions);
+  }, [transactions, updateTableData]);
+  
+  // Folosim tipul VirtualItem direct din @tanstack/react-virtual
+  type VirtualRow = VirtualItem;
+  
+  // Efect pentru actualizarea datelor atunci când se schimbă tranzacțiile
+  useEffect(() => {
+    updateTableData(transactions);
+  }, [transactions, updateTableData]);
   
   // Render cu constante și clase existente
   return (
@@ -226,7 +254,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
       {/* TanStack Table implementation */}
       <div 
         ref={tableContainerRef}
-        className="overflow-x-auto rounded-lg shadow-token bg-secondary-50"
+        className="overflow-x-auto rounded-lg shadow-token bg-secondary-50 relative h-[600px]"
+        style={{
+          overflowY: 'auto',
+          contain: 'strict',
+        }}
       >
         {loading ? (
           <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">
@@ -243,7 +275,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
           >
             <thead className="bg-secondary-100 sticky top-0">
               <tr>
-                {table.getFlatHeaders().map(header => (
+                {table.getFlatHeaders().map((header: Header<LunarGridRowData, unknown>) => (
                   <th 
                     key={header.id}
                     className="py-3 px-3 text-left font-medium text-secondary-700"
@@ -261,32 +293,48 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
               </tr>
             </thead>
             <tbody>
-              {table.getRowModel().rows.map(row => (
-                <tr 
-                  key={row.id}
-                  className={
-                    row.original.isCategory 
-                      ? 'bg-secondary-50 hover:bg-secondary-100 cursor-pointer' 
-                      : 'hover:bg-secondary-100'
-                  }
-                  onClick={() => {
-                    if (row.original.isCategory) {
-                      toggleCategory(row.original.category);
+              {rowVirtualizer?.getVirtualItems().map((virtualRow) => {
+                const row = table.getRowModel().rows[virtualRow.index] as TableRow<LunarGridRowData> | undefined;
+                if (!row) return null;
+                
+                return (
+                  <tr 
+                    key={row.id}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: `${virtualRow.size}px`,
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                    className={
+                      row.original.isCategory 
+                        ? 'bg-secondary-50 hover:bg-secondary-100 cursor-pointer' 
+                        : 'hover:bg-secondary-100'
                     }
-                  }}
-                  data-testid={`row-${row.original.isCategory ? 'category' : 'subcategory'}-${row.original.category}${row.original.subcategory ? `-${row.original.subcategory}` : ''}`}
-                >
-                  {row.getVisibleCells().map(cell => (
-                    <td 
-                      key={cell.id}
-                      className="border-t border-secondary-200 py-2 px-3 first:border-l last:border-r"
-                      data-testid={`cell-${cell.column.id}-${row.id}`}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                    onClick={() => {
+                      if (row.original.isCategory) {
+                        toggleCategory(row.original.category);
+                      }
+                    }}
+                    data-testid={`row-${row.original.isCategory ? 'category' : 'subcategory'}-${row.original.category}${row.original.subcategory ? `-${row.original.subcategory}` : ''}`}
+                  >
+                    {row.getVisibleCells().map((cell: Cell<LunarGridRowData, unknown>) => (
+                      <td 
+                        key={cell.id}
+                        className="border-t border-secondary-200 py-2 px-3 first:border-l last:border-r"
+                        data-testid={`cell-${cell.column.id}-${row.id}`}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+              {rowVirtualizer && (
+                <tr style={{ height: `${rowVirtualizer.getTotalSize() - (table.getRowModel().rows[rowVirtualizer.getVirtualItems().length - 1]?.index || 0) * 35}px` }} />
+              )}
             </tbody>
           </table>
         )}

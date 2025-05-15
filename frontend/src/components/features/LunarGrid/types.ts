@@ -1,6 +1,7 @@
 import { TransactionType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { ColumnDef, Row } from '@tanstack/react-table';
+import { ColumnDef, Row, Table } from '@tanstack/react-table';
+import { Virtualizer, VirtualizerOptions } from '@tanstack/react-virtual';
 import { ReactNode } from 'react';
 
 /**
@@ -166,16 +167,28 @@ export interface UseLunarGridTableOptions {
  * Rezultatul returnat de hook-ul useLunarGridTable
  */
 export interface UseLunarGridTableResult {
-  /** Instanța de tabel TanStack Table */
-  table: any; // TODO: Înlocuiește cu tipul corect din TanStack Table
+  /** Instanța de tabel TanStack */
+  table: any;
   
-  /** Lista de zile din lună */
+  /** Datele pentru tabel */
+  data: LunarGridRowData[];
+  
+  /** Coloanele tabelului */
+  columns: ColumnDef<LunarGridRowData>[];
+  
+  /** Zilele lunii */
   days: number[];
+  
+  /** Referință către container-ul de tabel */
+  tableContainerRef: React.RefObject<HTMLDivElement>;
+  
+  /** Virtualizatorul de rânduri */
+  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
   
   /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
   
-  /** Funcție pentru obținerea sumei pentru o celulă specifică */
+  /** Funcție pentru obținerea sumei unei celule specifice */
   getSumForCell: (category: string, subcategory: string, day: number) => number;
   
   /** Funcție pentru actualizarea datelor tabelului */

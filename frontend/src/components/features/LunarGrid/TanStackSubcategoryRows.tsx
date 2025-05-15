@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { TanStackSubcategoryRowsProps } from './types';
 import { TransactionType } from '@shared-constants/enums';
 
 /**
  * Componentă pentru afișarea rândurilor de subcategorii în cadrul grilei TanStack Table
  * Această componentă este optimizată pentru re-render-uri independente de categoria părinte
+ * Folosește memoizare pentru a preveni re-renderări inutile
  */
 const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
   categoryKey,
@@ -21,10 +22,18 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
   isCustomSubcategory,
   getTransactionTypeForCategory,
 }) => {
+  // Memoizarea subcategoriilor pentru a preveni re-renderări inutile
+  const memoizedSubcategories = useMemo(() => {
+    return subcategories.map(subcategory => {
+      const isCustom = isCustomSubcategory(categoryKey, subcategory.name);
+      return { subcategory, isCustom };
+    });
+  }, [subcategories, categoryKey, isCustomSubcategory]);
+
   return (
     <>
-      {subcategories.map(subcategory => {
-        const isCustom = isCustomSubcategory(categoryKey, subcategory.name);
+      {memoizedSubcategories.map(({ subcategory, isCustom }) => {
+        // isCustom este acum calculat în memoizedSubcategories
         return (
           <tr 
             key={`${categoryKey}-${subcategory.name}`}
@@ -135,4 +144,16 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
   );
 };
 
-export default TanStackSubcategoryRows;
+// Folosim React.memo pentru a optimiza și preveni re-renderări inutile când props nu se schimbă
+export default React.memo(TanStackSubcategoryRows, (prevProps, nextProps) => {
+  // Comparare custom pentru a determina dacă componenta trebuie re-renderată
+  // Returnăm true dacă props sunt identice (deci NU trebuie re-renderată)
+  return (
+    prevProps.categoryKey === nextProps.categoryKey &&
+    prevProps.subcategories.length === nextProps.subcategories.length &&
+    prevProps.days.length === nextProps.days.length &&
+    prevProps.transactions === nextProps.transactions && // Referință la același array
+    JSON.stringify(prevProps.subcategories) === JSON.stringify(nextProps.subcategories)
+    // Nu verificăm funcțiile deoarece sunt puse în referințe stabile deja prin useCallback în componenta părinte
+  );
+});
