@@ -5,7 +5,7 @@ trigger: always_on
 <structure>
 - Budget App folosește arhitectură monorepo: frontend/, backend/, shared-constants/
 - Frontend: React + Zustand + TailwindCSS
-- Backend: NestJS + MongoDB + Firebase Auth
+- Backend: NestJS + Supabase
 - Shared-constants: Sursa unică pentru constante, enums și mesaje
 </structure>
 <source_of_truth>

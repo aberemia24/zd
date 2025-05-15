@@ -1,64 +1,137 @@
 import { TransactionType } from '@shared-constants/enums';
 import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { ReactNode } from 'react';
 
 /**
  * Definirea tipurilor pentru LunarGrid cu TanStack Table
  * Aceste tipuri sunt folosite în hook-ul useLunarGridTable și componente
  */
 
-// Structura de bază pentru datele de rând în TanStack Table
+/**
+ * Structura de bază pentru datele de rând în TanStack Table
+ * Folosită pentru a reprezenta atât rândurile de categorie, cât și cele de subcategorie
+ */
 export interface LunarGridRowData {
+  /** ID unic pentru rând */
   id: string;
+  
+  /** Numele categoriei */
   category: string;
+  
+  /** Numele subcategoriei (doar pentru rândurile de subcategorie) */
   subcategory?: string;
+  
+  /** Dacă rândul reprezintă o categorie (true) sau o subcategorie (false) */
   isCategory: boolean;
+  
+  /** Dacă categoria este expandată (se aplică doar rândurilor de categorie) */
   isExpanded?: boolean;
+  
+  /** Sumele zilnice pentru acest rând, mapate după zi {1: suma, 2: suma, ...} */
   dailyAmounts: Record<number, number>;
+  
+  /** Lista de tranzacții asociate acestui rând */
   transactions: TransactionValidated[];
+  
+  /** Totalul sumelor zilnice (calculat automat) */
+  total?: number;
 }
 
-// Definiție de coloană cu informații despre ziua asociată
+/**
+ * Extensie a definiției de coloană TanStack Table cu informații specifice zilei
+ */
 export type DayColumnDef = ColumnDef<LunarGridRowData> & {
+  /** Ziua lunii asociată acestei coloane */
   day: number;
+  
+  /** Dacă coloana reprezintă o zi din weekend */
+  isWeekend?: boolean;
+  
+  /** Data completă (opțional) */
+  date?: Date;
 };
 
-// Structura pentru date rând categorie
+/**
+ * Configurație pentru rândurile de categorie
+ */
 export interface CategoryRow {
+  /** Cheia unică a categoriei */
   categoryKey: string;
+  
+  /** Dacă categoria este expandată */
   isExpanded: boolean;
+  
+  /** Lista de subcategorii */
   subcategories: Array<{
     name: string;
     isCustom: boolean;
   }>;
-  // Un obiect pentru sumele zilnice {1: suma, 2: suma, ...}
+  
+  /** Sumele zilnice pentru această categorie */
   dailySums: Record<number, number>;
+  
+  /** Totalul sumelor zilnice */
+  total?: number;
 }
 
-// Structura pentru rând subcategorie
+/**
+ * Configurație pentru rândurile de subcategorie
+ */
 export interface SubcategoryRow {
+  /** Cheia unică a subcategoriei */
   subcategoryKey: string;
+  
+  /** Cheia categoriei părinte */
   categoryKey: string;
+  
+  /** Dacă subcategoria este personalizată */
   isCustom: boolean;
-  // Un obiect pentru sumele zilnice {1: suma, 2: suma, ...}
+  
+  /** Sumele zilnice pentru această subcategorie */
   dailySums: Record<number, number>;
+  
+  /** Totalul sumelor zilnice */
+  total?: number;
 }
 
-// Popover pentru editare tranzacții
+/**
+ * Starea pentru popover-ul de editare a tranzacțiilor
+ */
 export interface TransactionPopoverState {
+  /** Dacă popover-ul este activ */
   active: boolean;
+  
+  /** Ziua lunii pentru care se editează tranzacția */
   day: number;
+  
+  /** Numele categoriei */
   category: string;
+  
+  /** Numele subcategoriei */
   subcategory: string;
-  anchorRect?: DOMRect;
-  initialAmount?: string;
+  
+  /** Suma curentă (ca string pentru afișare/editare) */
+  amount: string;
+  
+  /** Tipul tranzacției (venit/cheltuială) */
   type: string;
+  
+  /** Poziția popover-ului pe ecran */
+  position: { top: number; left: number } | null;
 }
 
-// State pentru editare subcategorii
+/**
+ * Starea pentru editarea ștergerii subcategoriilor
+ */
 export interface SubcategoryEditState {
+  /** Numele categoriei */
   category: string;
+  
+  /** Numele subcategoriei */
   subcategory: string;
+  
+  /** Modul de editare: 'edit' sau 'delete' */
   mode: 'edit' | 'delete';
 }
 
@@ -89,12 +162,70 @@ export interface UseLunarGridTableOptions {
   ) => void;
 }
 
-// Rezultatul returnat de hook-ul useLunarGridTable
+/**
+ * Rezultatul returnat de hook-ul useLunarGridTable
+ */
 export interface UseLunarGridTableResult {
-  table: any; // Tipul exact va fi din @tanstack/react-table
+  /** Instanța de tabel TanStack Table */
+  table: any; // TODO: Înlocuiește cu tipul corect din TanStack Table
+  
+  /** Lista de zile din lună */
   days: number[];
+  
+  /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
+  
+  /** Funcție pentru obținerea sumei pentru o celulă specifică */
   getSumForCell: (category: string, subcategory: string, day: number) => number;
+  
+  /** Funcție pentru actualizarea datelor tabelului */
+  updateTableData: (transactions: TransactionValidated[]) => void;
+}
+
+/**
+ * Props pentru funcția de randare personalizată a celulelor
+ */
+export type CellRendererProps = {
+  /** Valoarea celulei */
+  value: any;
+  
+  /** Rândul curent */
+  row: Row<LunarGridRowData>;
+  
+  /** Coloana curentă */
+  column: any; // TODO: Înlocuiește cu tipul corect din TanStack Table
+  
+  /** Funcție pentru actualizarea valorii */
+  updateData: (rowIndex: number, columnId: string, value: any) => void;
+  
+  /** Alte proprietăți */
+  [key: string]: any;
+};
+
+/**
+ * Configurație pentru coloanele tabelului
+ */
+export interface ColumnConfig {
+  /** ID-ul coloanei */
+  id: string;
+  
+  /** Header-ul coloanei */
+  header: string | ((info: any) => ReactNode);
+  
+  /** Accesorul datelor */
+  accessorKey?: string;
+  
+  /** Dacă este o coloană de zi */
+  isDayColumn?: boolean;
+  
+  /** Ziua (pentru coloanele de zi) */
+  day?: number;
+  
+  /** Dacă este o zi din weekend */
+  isWeekend?: boolean;
+  
+  /** Funcție de randare personalizată */
+  cell?: (props: CellRendererProps) => ReactNode;
 }
 
 // Props pentru componenta TanStackSubcategoryRows
@@ -128,4 +259,25 @@ export interface TanStackSubcategoryRowsProps {
   handleDeleteSubcategory?: (category: string, subcategory: string) => void;
   isCustomSubcategory: (category: string, subcategory: string) => boolean;
   getTransactionTypeForCategory: (category: string) => TransactionType;
+  
+  /** Opțiuni suplimentare pentru configurarea afișării */
+  options?: {
+    /** Dacă se afișează coloana cu acțiuni */
+    showActions?: boolean;
+    
+    /** Dacă se permit modificări */
+    isEditable?: boolean;
+    
+    /** Stiluri personalizate */
+    styles?: {
+      /** Stil pentru celulele cu sume pozitive */
+      positiveAmount?: string;
+      
+      /** Stil pentru celulele cu sume negative */
+      negativeAmount?: string;
+      
+      /** Stil pentru celulele cu sume zero */
+      zeroAmount?: string;
+    };
+  };
 }

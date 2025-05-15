@@ -71,16 +71,39 @@ export const EXCEL_GRID = {
     CHELTUIELI: 'Cheltuieli',
     ECONOMII: 'Economii',
     SOLD: 'Sold',
+    CATEGORII: 'Categorii',
+    TOTAL: 'Total',
+    ACTIUNI: 'Acțiuni',
+    ZI: 'Zi',
+    SUMA: 'Suma',
+    TIP: 'Tip',
+    DATA: 'Data',
+    DESCRIERE: 'Descriere',
+    RECURENT: 'Recurent',
+    FRECVENTA: 'Frecvență'
   },
   NO_DATA: 'Nu există date disponibile',
   LOADING: 'Se încarcă datele...',
   PROMPTS: {
-    ENTER_AMOUNT: 'Introduceți suma:'
+    ENTER_AMOUNT: 'Introduceți suma:',
+    SELECT_CATEGORY: 'Selectați o categorie',
+    SELECT_SUBCATEGORY: 'Selectați o subcategorie',
+    SELECT_DAY: 'Selectați ziua',
+    ENTER_DESCRIPTION: 'Introduceți o descriere (opțional)'
   },
   ACTIONS: {
     ADD_SUBCATEGORY: 'Adaugă subcategorie',
     EDIT_SUBCATEGORY: 'Editează subcategorie',
     DELETE_SUBCATEGORY: 'Șterge subcategorie',
+    ADD_TRANSACTION: 'Adaugă tranzacție',
+    EDIT_TRANSACTION: 'Editează tranzacție',
+    DELETE_TRANSACTION: 'Șterge tranzacție',
+    EXPAND_ALL: 'Extinde toate categoriile',
+    COLLAPSE_ALL: 'Restrânge toate categoriile',
+    SAVE_CHANGES: 'Salvează modificările',
+    CANCEL: 'Anulează',
+    CONFIRM: 'Confirmă',
+    CLOSE: 'Închide'
   },
   // Constante pentru controalele tabelului TanStack
   TABLE_CONTROLS: {

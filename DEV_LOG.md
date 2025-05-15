@@ -1,3 +1,22 @@
+## [2025-05-16] Actualizare constante și corecții pentru LunarGrid
+
+- **Sumar:** S-au actualizat constantele din `EXCEL_GRID` pentru a suporta toate câmpurile necesare în componenta LunarGrid.
+
+- **Modificări principale:**
+  - Adăugate noi câmpuri în `EXCEL_GRID.HEADERS`: `CATEGORII`, `TOTAL`, `ACTIUNI`, `ZI`, `SUMA`, `TIP`, `DATA`, `DESCRIERE`, `RECURENT`, `FRECVENTA`
+  - Adăugate mesaje noi în `EXCEL_GRID.PROMPTS` pentru interacțiunile cu utilizatorul
+  - Extins `EXCEL_GRID.ACTIONS` cu acțiuni specifice pentru gestionarea tranzacțiilor și subcategoriilor
+  - Corectate erorile de tip în `dataTransformers.ts` prin utilizarea corectă a constantelor actualizate
+
+- **Conformitate cu regulile globale:**
+  - Toate textele UI sunt centralizate în `shared-constants/ui.ts`
+  - Eliminate orice referințe la texte hardcodate
+  - Respectarea structurii de fișiere și a convențiilor de cod
+
+- **Fișiere afectate:**
+  - `shared-constants/ui.ts` - actualizare constante
+  - `frontend/src/utils/lunarGrid/dataTransformers.ts` - corecții de tip
+
 ## [2025-05-15] Lecții învățate și probleme rezolvate în implementarea TanStack Table
 
 - **Sumar:** Implementarea TanStack Table a evidențiat mai multe probleme de tipizare și managementul constant-elor care au devenit lecții valoroase pentru echipă.
