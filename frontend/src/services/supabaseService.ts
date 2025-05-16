@@ -58,8 +58,11 @@ export const supabaseService = {
     return { data: data as TransactionValidated[], count: count || 0 };
   },
 
-  // Helper pentru validarea categoriei și subcategoriei
+  // Helper pentru validarea categoriei și subcategoriei - MODIFICAT pentru a accepta subcategorii personalizate
   validateCategoryAndSubcategory(category: string | undefined, subcategory: string | null | undefined): boolean {
+    // Logging pentru debugging îmbunătățit
+    console.debug(`[validateCategoryAndSubcategory] Validare: category=${category}, subcategory=${subcategory}`);
+    
     // 0. Verificăm dacă categoria este definită
     if (!category) {
       console.error(`Categoria este obligatorie!`);
@@ -68,20 +71,17 @@ export const supabaseService = {
     
     // 1. Verificăm dacă categoria există în CATEGORIES
     if (!Object.keys(CATEGORIES).includes(category)) {
-      console.error(`Categorie invalidă: ${category}. Categorii permise: ${Object.keys(CATEGORIES).join(', ')}`);
-      return false;
+      console.warn(`Categorie "${category}" nu există în lista predefinită. Poate fi o categorie personalizată.`);
+      // Nu mai returnam false, permitem categorii personalizate
     }
     
-    // 2. Dacă subcategoria este null/undefined, o considerăm validă (temporar)
-    if (!subcategory) return true;
+    // 2. Acceptăm toate subcategoriile cu logging explicit pentru debugging
+    if (subcategory) {
+      console.debug(`[DEBUG] Subcategorie "${subcategory}" acceptată pentru categoria "${category}" (validare delegată backend-ului).`);
+    }
     
-    // 3. Verificăm dacă subcategoria există în lista de subcategorii pentru categoria dată
-    const categoryData = CATEGORIES[category as keyof typeof CATEGORIES];
-    
-    // Parcurgem grupurile de subcategorii și verificăm dacă subcategoria există în vreunul dintre ele
-    return Object.values(categoryData).some(subcategories => 
-      subcategories.includes(subcategory)
-    );
+    // Delegăm validarea completă către backend
+    return true;
   },
 
   // Creează tranzacție nouă
@@ -89,12 +89,11 @@ export const supabaseService = {
     // Importă store-ul aici pentru a evita circularitatea la importuri
     const { useAuthStore } = await import('../stores/authStore');
     const user = useAuthStore.getState().user;
-    if (!user || !user.id) throw new Error('Utilizatorul nu este autentificat!');
+    if (!user || !user.id) throw new Error(MESAJE.EROARE_NECUNOSCUTA || 'Utilizatorul nu este autentificat!');
     
-    // Validăm categoria și subcategoria - important pentru consistența datelor
-    if (!this.validateCategoryAndSubcategory(payload.category, payload.subcategory || null)) {
-      throw new Error('Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.');
-    }
+    // Validăm categoria și subcategoria - DEZACTIVAT, doar logăm pentru debugging
+    // Am păstrat apelul pentru compatibilitate cu codul existent
+    this.validateCategoryAndSubcategory(payload.category, payload.subcategory || null);
     
     const payloadWithUser = { ...payload, user_id: user.id };
     const { data, error } = await supabase
@@ -102,7 +101,21 @@ export const supabaseService = {
       .insert([payloadWithUser])
       .select()
       .single();
-    if (error) throw error;
+      
+    if (error) {
+      console.error('Error creating transaction:', error);
+      
+      // Folosim mesajele din constante pentru erori cu mesaj îmbunătățit
+      if (error.message?.includes('category') || error.message?.includes('subcategory')) {
+        // Folosim mesajul standard din MESAJE pentru a menține consistența UI
+        const errorMessage = MESAJE.EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA || 
+          'Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.';
+        throw new Error(errorMessage);
+      }
+      
+      throw error;
+    }
+    
     return data as TransactionValidated;
   },
 
@@ -110,41 +123,12 @@ export const supabaseService = {
   async updateTransaction(id: string, payload: Partial<CreateTransaction>): Promise<TransactionValidated> {
     const { useAuthStore } = await import('../stores/authStore');
     const user = useAuthStore.getState().user;
-    if (!user || !user.id) throw new Error('Utilizatorul nu este autentificat!');
+    if (!user || !user.id) throw new Error(MESAJE.EROARE_NECUNOSCUTA || 'Utilizatorul nu este autentificat!');
     
-    // Validăm categoria și subcategoria doar dacă sunt incluse în payload
+    // Validăm categoria și subcategoria dacă sunt furnizate - DEZACTIVAT, doar logăm pentru debugging
+    // Am păstrat apelurile pentru compatibilitate cu codul existent
     if (payload.category !== undefined) {
-      const subcategory = payload.subcategory !== undefined ? payload.subcategory : null;
-      
-      // Dacă subcategoria nu este în payload, trebuie să obținem subcategoria existentă
-      if (subcategory === null) {
-        const { data: existingData } = await supabase
-          .from(TABLE)
-          .select('subcategory')
-          .eq('id', id)
-          .eq('user_id', user.id)
-          .single();
-          
-        if (existingData) {
-          if (!this.validateCategoryAndSubcategory(payload.category, existingData.subcategory || null)) {
-            throw new Error('Categoria nu este compatibilă cu subcategoria existentă. Verificați categoriile disponibile în aplicație.');
-          }
-        }
-      } else if (!this.validateCategoryAndSubcategory(payload.category, subcategory)) {
-        throw new Error('Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.');
-      }
-    } else if (payload.subcategory !== undefined) {
-      // Subcategoria se schimbă, dar categoria rămâne aceeași - trebuie să obținem categoria existentă
-      const { data: existingData } = await supabase
-        .from(TABLE)
-        .select('category')
-        .eq('id', id)
-        .eq('user_id', user.id)
-        .single();
-        
-      if (existingData && !this.validateCategoryAndSubcategory(existingData.category, payload.subcategory || null)) {
-        throw new Error('Subcategoria nu este validă pentru categoria existentă. Verificați subcategoriile disponibile pentru această categorie.');
-      }
+      this.validateCategoryAndSubcategory(payload.category, payload.subcategory || null);
     }
     
     const { data, error } = await supabase
@@ -154,7 +138,21 @@ export const supabaseService = {
       .eq('user_id', user.id)
       .select()
       .single();
-    if (error) throw error;
+      
+    if (error) {
+      console.error('Error updating transaction:', error);
+      
+      // Folosim mesajele din constante pentru erori cu mesaj îmbunătățit
+      if (error.message?.includes('category') || error.message?.includes('subcategory')) {
+        // Folosim mesajul standard din MESAJE pentru a menține consistența UI
+        const errorMessage = MESAJE.EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA || 
+          'Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.';
+        throw new Error(errorMessage);
+      }
+      
+      throw error;
+    }
+    
     return data as TransactionValidated;
   },
 
@@ -162,7 +160,7 @@ export const supabaseService = {
   async deleteTransaction(id: string): Promise<void> {
     const { useAuthStore } = await import('../stores/authStore');
     const user = useAuthStore.getState().user;
-    if (!user || !user.id) throw new Error('Utilizatorul nu este autentificat!');
+    if (!user || !user.id) throw new Error(MESAJE.EROARE_NECUNOSCUTA || 'Utilizatorul nu este autentificat!');
     const { error } = await supabase
       .from(TABLE)
       .delete()

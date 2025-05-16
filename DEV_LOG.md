@@ -1,3 +1,63 @@
+## [2024-05-16] Dezactivare validare strictă la nivel de frontend pentru a permite subcategorii personalizate
+
+### Modificări:
+- Modificată funcția `validateCategoryAndSubcategory` din `supabaseService.ts` pentru a accepta toate combinațiile de categorie/subcategorie, delegând validarea completă către backend
+- Păstrat apelurile pentru compatibilitate cu codul existent, dar fără a bloca tranzacțiile
+- Adăugate loguri de debug detaliate pentru a facilita identificarea potențialelor probleme cu subcategoriile personalizate
+- Îmbunătățite mesajele de eroare pentru utilizator, cu referințe clare la verificarea categoriilor și subcategoriilor disponibile
+
+### Motivație:
+Validarea strictă a categoriilor și subcategoriilor direct în frontend era incompatibilă cu funcționalitatea de subcategorii personalizate. Utilizatorii nu puteau folosi subcategoriile personalizate pentru tranzacții noi. Delegarea validării către backend asigură o experiență consistentă.
+
+### Impactul modificării:
+- O singură sursă de adevăr pentru validarea categoriilor (backend-ul/baza de date)
+- Suport complet pentru subcategoriile personalizate create de utilizator
+- Fără schimbări în API-uri sau semnături de funcții existente
+- Îmbunătățită experiența de debugging și mesajele de eroare pentru utilizator
+
+## [2024-05-16] Actualizare trigger SQL pentru validarea categorii/subcategorii în Supabase
+
+### Modificări:
+- Am actualizat funcția `validate_transaction_categories()` din Supabase pentru a suporta subcategorii personalizate
+- Adăugat validare pentru trei tipuri de subcategorii:
+  1. Subcategorii predefinite originale (din lista hardcodată)
+  2. Subcategorii predefinite redenumite (din `custom_categories` cu `isCustom: false`)
+  3. Subcategorii complet personalizate (din `custom_categories` cu `isCustom: true`)
+- Adăugate indexuri pentru optimizarea performanței:
+  - Index pe `user_id` pentru filtrare rapidă
+  - Index GIN pe `category_data` pentru căutări rapide în structura JSON
+
+### Motivație:
+Triggerul SQL original valida strict categoriile și subcategoriile folosind liste hardcodate, ceea ce împiedica utilizarea subcategoriilor personalizate sau redenumite. Noua implementare consultă tabela `custom_categories` pentru a valida corespunzător toate tipurile de subcategorii.
+
+### Impactul modificării:
+- Utilizatorii pot acum crea tranzacții folosind atât subcategorii predefinite cât și personalizate
+- Validarea rămâne la nivel de backend, asigurând integritatea datelor
+- Performanță optimizată prin indexuri adecvate
+
+### Considerații tehnice și riscuri:
+
+#### Performanța
+- Interogarea jsonb_path_exists poate fi costisitoare pentru seturi mari de date
+- Indexul GIN pe `category_data` ar trebui să atenueze această problemă în majoritatea cazurilor
+- Recomandare: Monitorizează performanța pentru utilizatorii cu multe subcategorii personalizate
+
+#### Structura JSON
+- Calea JSON folosită (`$.categories[*].subcategories[*].name`) trebuie să corespundă exact cu structura din tabela `custom_categories`
+- Orice modificare viitoare a structurii JSON în frontend necesită actualizarea corespunzătoare a triggerului
+- Recomandare: Adaugă teste automate pentru a verifica sincronizarea dintre structura frontend și backend
+
+#### Case sensitivity
+- Verificările categoriilor și subcategoriilor sunt case-sensitive
+- Asigură-te că frontend-ul folosește exact aceeași scriere (majuscule/minuscule) ca în backend
+- Risc: Inconsistențe în caz pot duce la validare eșuată pentru subcategorii care par identice utilizatorului
+
+#### Testări necesare
+- Subcategorie predefinită (ex: "Salarii")
+- Subcategorie predefinită redenumită 
+- Subcategorie personalizată nouă
+- Tranzacție fără subcategorie
+
 ## [2025-05-16] Actualizare constante și corecții pentru LunarGrid
 
 - **Sumar:** S-au actualizat constantele din `EXCEL_GRID` pentru a suporta toate câmpurile necesare în componenta LunarGrid.
