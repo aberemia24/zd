@@ -36,17 +36,26 @@ export function useLunarGridTable(
 ): UseLunarGridTableResult {
   // Referință pentru container (necesar pentru virtualizare)
   const tableContainerRef = useRef<HTMLDivElement>(null);
-  const [tableData, setTableData] = useState<LunarGridRowData[]>([]);
-  
+
   // Calculăm zilele din lună folosind utilitar existent
   const days = useMemo(() => getDaysInMonth(year, month), [year, month]);
-  
-  // Funcție pentru actualizarea datelor tabelului
-  const updateTableData = useCallback((newTransactions: TransactionValidated[]) => {
-    const transformed = transformTransactionsToRowData(newTransactions, categories, expandedCategories);
+
+  // State pentru datele tabelului
+  const [tableData, setTableData] = useState<LunarGridRowData[]>([]);
+
+  // Adăugăm efect pentru debug
+  useEffect(() => {
+    console.log('Transactions count:', transactions.length);
+    console.log('Categories count:', categories.length);
+    console.log('Table data length:', tableData.length);
+  }, [transactions, categories, tableData]);
+
+  // Sincronizăm state-ul când datele se schimbă
+  useEffect(() => {
+    const transformed = transformTransactionsToRowData(transactions, categories, expandedCategories);
     setTableData(transformed);
-  }, [categories, expandedCategories]);
-  
+  }, [transactions, categories, expandedCategories]);
+
   // Generare coloane pentru tabel
   const columns = useMemo<ColumnDef<LunarGridRowData>[]>(() => {
     // Coloana pentru categorie
@@ -57,7 +66,7 @@ export function useLunarGridTable(
       cell: ({ row, getValue }: any) => {
         const value = getValue() as string;
         const isCategory = row.original.isCategory;
-        
+
         return (
           <div className="flex items-center">
             {isCategory ? (
@@ -80,7 +89,7 @@ export function useLunarGridTable(
       },
       size: 200,
     };
-    
+
     // Coloane pentru zilele lunii
     const dayColumns = days.map((day: number) => ({
       id: `day-${day}`,
@@ -89,7 +98,7 @@ export function useLunarGridTable(
       cell: ({ getValue, row }: any) => {
         const value = getValue() as number;
         const colorClass = getBalanceStyleClass(value);
-        
+
         return (
           <div
             className={`text-right ${colorClass}`}
@@ -115,35 +124,34 @@ export function useLunarGridTable(
       },
       size: 80,
     }));
-    
+
     return [categoryColumn, ...dayColumns];
   }, [days, expandedCategories, onCellClick, onCellDoubleClick]);
-  
-  // Transformare date pentru tabel folosind utilitar - fără efecte secundare
-  const data = useMemo(() => 
-    transformTransactionsToRowData(transactions, categories, expandedCategories),
-    [transactions, categories, expandedCategories]
-  );
-  
-  // Sincronizăm state-ul când datele se schimbă
-  useEffect(() => {
-    setTableData(data);
-  }, [data]);
-  
+
   // Inițializare tabel TanStack
   const table = useReactTable({
-    data: tableData.length > 0 ? tableData : data,
+    data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
   
-  // Configurare virtualizare pentru randuri
+  // Configurare virtualizare pentru randuri cu setări simplificate
   const rowVirtualizer = useVirtualizer({
     count: table.getRowModel().rows.length,
     getScrollElement: () => tableContainerRef.current,
     estimateSize: () => 35, // înălțimea estimată a unui rând
-    overscan: 10, // număr de rânduri adiționale
+    overscan: 5 // număr redus de rânduri adiționale 
   }) as Virtualizer<HTMLDivElement, Element>;
+  
+  // Adăugăm un effect pentru debug direct în hook
+  useEffect(() => {
+    console.log('Virtualizator:', {
+      count: table.getRowModel().rows.length,
+      virtualItems: rowVirtualizer?.getVirtualItems().length || 0,
+      element: tableContainerRef.current ? 'Referintă validă' : 'Referintă NULL',
+      height: tableContainerRef.current?.clientHeight
+    });
+  }, [rowVirtualizer, table, tableContainerRef]);
   
   // Actualizare dimensiuni virtualizator când se schimbă datele
   useLayoutEffect(() => {
@@ -154,24 +162,28 @@ export function useLunarGridTable(
   
   // Funcție utilitară pentru obținerea sumelor pentru celule
   const getSumForCell = useCallback((category: string, subcategory: string, day: number) => {
-    const currentData = tableData.length > 0 ? tableData : data;
-    const row = currentData.find((r: LunarGridRowData) => 
+    const row = tableData.find((r: LunarGridRowData) => 
       r.category === category && 
       (subcategory ? r.subcategory === subcategory : r.isCategory)
     );
     return row ? row.dailyAmounts[day] || 0 : 0;
-  }, [data, tableData]);
+  }, [tableData]);
   
   // Calculare solduri zilnice
   const dailyBalances = useMemo(() => {
-    const currentData = tableData.length > 0 ? tableData : data;
-    return currentData.find((r: LunarGridRowData) => r.category === EXCEL_GRID.HEADERS.SOLD)?.dailyAmounts || {};
-  }, [data, tableData]);
+    return tableData.find((r: LunarGridRowData) => r.category === EXCEL_GRID.HEADERS.SOLD)?.dailyAmounts || {};
+  }, [tableData]);
+
+  // Funcție pentru actualizarea datelor tabelului
+  const updateTableData = useCallback((newTransactions: TransactionValidated[]) => {
+    const transformed = transformTransactionsToRowData(newTransactions, categories, expandedCategories);
+    setTableData(transformed);
+  }, [categories, expandedCategories]);
 
   // Returnăm toate datele necesare pentru componenta principală
   return {
     table,
-    data: tableData.length > 0 ? tableData : data,
+    data: tableData,
     columns,
     days,
     tableContainerRef,

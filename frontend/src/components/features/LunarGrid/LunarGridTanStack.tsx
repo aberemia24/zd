@@ -223,13 +223,40 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     updateTableData(transactions);
   }, [transactions, updateTableData]);
   
+  // Efect pentru debugging
+  useEffect(() => {
+    console.log('Rows count:', table.getRowModel().rows.length);
+    console.log('Virtual items count:', rowVirtualizer?.getVirtualItems().length || 0);
+    console.log('Table data length:', data.length);
+    
+    // Verificăm datele din tabel
+    if (table.getRowModel().rows.length === 0 && transactions.length > 0) {
+      console.log('PROBLEMĂ: Nu sunt rânduri în tabel deși avem tranzacții');
+      console.log('Transactions:', transactions.length);
+      console.log('Categories:', categories.length);
+      console.log('Expanded categories:', Object.keys(expandedCategories).length);
+    }
+    
+    // Verificăm dacă containerul are dimensiuni
+    if (tableContainerRef.current) {
+      console.log('Container dimensions:', {
+        width: tableContainerRef.current.offsetWidth,
+        height: tableContainerRef.current.offsetHeight
+      });
+    } else {
+      console.log('Container ref nu este atașat!');
+    }
+  }, [table, rowVirtualizer, data, transactions, categories, expandedCategories]);
+  
   // Folosim tipul VirtualItem direct din @tanstack/react-virtual
   type VirtualRow = VirtualItem;
   
-  // Efect pentru actualizarea datelor atunci când se schimbă tranzacțiile
+  // Efect pentru a ne asigura că virtualizatorul este recalculat la schimbări
   useEffect(() => {
-    updateTableData(transactions);
-  }, [transactions, updateTableData]);
+    if (rowVirtualizer && data.length > 0) {
+      rowVirtualizer.measure();
+    }
+  }, [rowVirtualizer, data]);
   
   // Render cu constante și clase existente
   return (
@@ -254,11 +281,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
       {/* TanStack Table implementation */}
       <div 
         ref={tableContainerRef}
-        className="overflow-x-auto rounded-lg shadow-token bg-secondary-50 relative h-[600px]"
-        style={{
-          overflowY: 'auto',
-          contain: 'strict',
-        }}
+        className="overflow-auto rounded-lg shadow-token bg-secondary-50 h-[600px]"
       >
         {loading ? (
           <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">
@@ -270,7 +293,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
           </div>
         ) : (
           <table 
-            className="min-w-full text-sm align-middle border-separate border-spacing-0" 
+            className="w-full text-sm align-middle border-separate border-spacing-0"
             data-testid="lunar-grid-table"
           >
             <thead className="bg-secondary-100 sticky top-0">
@@ -293,21 +316,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
               </tr>
             </thead>
             <tbody>
-              {rowVirtualizer?.getVirtualItems().map((virtualRow) => {
-                const row = table.getRowModel().rows[virtualRow.index] as TableRow<LunarGridRowData> | undefined;
-                if (!row) return null;
-                
+              {/* Înlocuim virtualizarea care nu funcționează cu o afișare directă a rândurilor */}
+              {table.getRowModel().rows.map((row: TableRow<LunarGridRowData>) => {
                 return (
                   <tr 
                     key={row.id}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      width: '100%',
-                      height: `${virtualRow.size}px`,
-                      transform: `translateY(${virtualRow.start}px)`,
-                    }}
                     className={
                       row.original.isCategory 
                         ? 'bg-secondary-50 hover:bg-secondary-100 cursor-pointer' 
@@ -332,9 +345,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
                   </tr>
                 );
               })}
-              {rowVirtualizer && (
-                <tr style={{ height: `${rowVirtualizer.getTotalSize() - (table.getRowModel().rows[rowVirtualizer.getVirtualItems().length - 1]?.index || 0) * 35}px` }} />
-              )}
             </tbody>
           </table>
         )}
