@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import type { StateCreator } from 'zustand';
 import { supabaseService } from '../services/supabaseService';
-import type { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema';
+import type { TransactionValidated } from '@shared-constants/transaction.schema';
 import { TransactionType } from '@shared-constants/enums';
 import type { TransactionQueryParams, TransactionFormWithNumberAmount } from '../types/transaction';
 import { PAGINATION, MESAJE } from '@shared-constants';
@@ -126,23 +126,24 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     return `${year}-${month.toString().padStart(2, '0')}`;
   },
   
-  // Helper pentru invalidarea subtilă a cache-ului pentru o anumită lună/an (fără loading UI)
+  // Helper pentru invalidarea completă a cache-ului pentru o anumită lună/an
   _invalidateMonthCache: (year: number, month: number) => {
     const cacheKey = get()._getCacheKey(year, month);
-    // Actualizăm lastFetched = 0 pentru a forța re-fetch fără a șterge datele existente
-    // Acest lucru menține UI-ul stabil și previne "flickers" sau loading states bruste
-    const currentCache = { ...get().monthlyCache };
-    if (currentCache[cacheKey]) {
+    
+    // Ștergem complet intrarea din cache pentru a forța fetch nou
+    const newCache = { ...get().monthlyCache };
+    
+    // Verificăm dacă intrarea există în cache înainte de a șterge
+    if (newCache[cacheKey]) {
+      delete newCache[cacheKey];
+      
+      // Resetăm și parametrii anteriori pentru a evita blocajul la a doua verificare
       set({
-        monthlyCache: {
-          ...currentCache,
-          [cacheKey]: {
-            ...currentCache[cacheKey],
-            lastFetched: 0 // Forțează refresh la următorul fetch, dar păstrează datele vechi până atunci
-          }
-        }
+        monthlyCache: newCache,
+        _lastQueryParams: undefined
       });
-      console.log(`🔄 Cache invalidated for ${cacheKey}, will refresh on next access`);
+      
+      console.log(`🔄 Cache complet invalidat pentru ${cacheKey}, se va face fetch nou la următorul acces`);
     }
   },
   
@@ -176,7 +177,7 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   },
   
   fetchTransactions: async (forceRefresh = false) => {
-    const { currentQueryParams, _lastQueryParams, setError, monthlyCache, _getCacheKey, _getDateInterval } = get();
+    const { currentQueryParams, _lastQueryParams, monthlyCache, _getCacheKey, _getDateInterval } = get();
     
     // Verificăm mai întâi cache-ul pentru luna/anul specific (dacă sunt specificate)
     if (!forceRefresh && currentQueryParams.year && currentQueryParams.month) {
