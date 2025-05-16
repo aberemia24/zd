@@ -375,14 +375,40 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 
 - Sursa unică de adevăr pentru enums/constants partajate este `shared-constants/` la rădăcina proiectului.
 - Importurile pentru enums/constants partajate se fac DOAR prin path mapping `@shared-constants`, nu direct din fișiere sau barrel local.
-- Orice import legacy (ex: din `constants/enums.ts`, `shared/`, barrel local) este interzis și va fi blocat automat de scriptul `npm run validate:constants`.
+- Orice import legacy (ex: din `constants/enums.ts`, `shared/`, barrel local) este interzis și va fi blocat automat de scriptul `node tools/validate-constants.js`.
 - Barrel-ul `shared-constants/index.ts` trebuie actualizat imediat după orice modificare.
 - Orice modificare la enums/constants partajate trebuie anunțată și documentată în `DEV_LOG.md`.
 - Exemplu corect de import:
   ```typescript
   import { TransactionType, CategoryType } from '@shared-constants';
   ```
-- Auditarea automată a importurilor se face cu `npm run validate:constants` și este obligatorie înainte de orice commit major.
+- Auditarea automată a importurilor se face cu `node tools/validate-constants.js` și este obligatorie înainte de orice commit major.
+
+## Best practices: React Query (2025)
+
+### Pattern recomandat
+- Folosește hooks dedicate pentru fetch/mutații (ex: `useTransactions`, `useCategories`)
+- Separă UI state (filtre, formulare) de server state (date fetch-uite)
+- Toate fetch/mutații folosesc rutele centralizate din `@shared-constants/api`
+- Serviciile (ex: TransactionService) nu conțin string-uri hardcodate
+
+### Exemplu usage
+```tsx
+const { data, isLoading } = useTransactions({ year, month });
+const { mutate: addTransaction } = useTransactions().create;
+addTransaction({ ... });
+```
+
+### Anti-patternuri
+- ❌ Fetch în useEffect + Zustand store (vezi secțiunea anti-pattern)
+- ❌ String-uri hardcodate pentru endpoint-uri sau mesaje
+- ❌ Mutarea logicii de fetch în store-uri UI
+
+### Riscuri
+- Navigare rapidă → folosește debounce în hooks/componente grid
+- Orice schimbare la contractul API trebuie reflectată în tipuri/hooks
+
+---
 
 ### Checklist future-proof pentru constants shared
 - [ ] Toate constantele/enumurile/mesajele partajate se definesc DOAR în `shared-constants/`.
@@ -390,7 +416,7 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 - [ ] Barrel-ul `shared-constants/index.ts` se actualizează la fiecare modificare.
 - [ ] Nu există duplicări locale în FE sau BE pentru constants partajate.
 - [ ] Orice modificare se documentează clar în code review și în `DEV_LOG.md`.
-- [ ] Se rulează periodic scriptul de audit pentru importuri (`npm run validate:constants`).
+- [ ] Se rulează periodic scriptul de audit pentru importuri (`node tools/validate-constants.js`).
 - [ ] Orice abatere se aprobă și se justifică explicit.
 
 #### Configurare Path Mapping pentru Shared Constants

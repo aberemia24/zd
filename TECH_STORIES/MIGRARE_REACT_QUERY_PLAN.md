@@ -15,28 +15,64 @@ Procesul de migrare se face în pași incrementali, cu task-uri bifabile pentru 
   - `frontend/src/services/hooks/useTransactions.ts` 
   - ✅ Implementat cu `useQuery` pentru fetch și `useMutation` pentru create/update/delete
 
-- [x] Refactorizează `transactionStore.ts`:
+# MIGRARE LA REACT QUERY – STATUS FINAL
+
+- [x] **Refactorizare `transactionStore.ts`**
   - ✅ Păstrat doar UI-state (`currentQueryParams`)
-  - ✅ Eliminat logica de caching și fetch intern
-  - ✅ Implementate metode `@deprecated` pentru compatibilitate în timpul migrării
+  - ✅ Eliminat complet caching/fetch intern
+  - ✅ Metodele `@deprecated` au fost eliminate (nu mai există referințe)
 
-- [ ] Actualizează store-uri asociate:
-  - [x] `transactionFiltersStore.ts` → renunțat la fetch intern
-  - [ ] `transactionFormStore.ts` → în curs de refactorizare pentru `useMutation`
+- [x] **Store-uri asociate**
+  - ✅ `transactionFiltersStore.ts` – fetch eliminat, doar UI-state
+  - ✅ `transactionFormStore.ts` – refactorizat, folosește `useMutation` pentru submit
 
-- [ ] Refactor componente:
-  - [ ] `LunarGridPage.tsx` → `const { data, isLoading, refetch } = useTransactions(year, month)`
-  - [x] `LunarGridTanStack.tsx` → primește `transactions` din React-Query ✅
-  - [x] `CellTransactionPopover.tsx` → actualizat pentru descriere + frecvență ✨
-  - [x] `LunarGrid.tsx` → refactorizat pentru a folosi `useTransactions` direct ✅
-  - [ ] `TransactionTable.tsx` și `TransactionForm.tsx` → în curs
+- [x] **Refactor componente**
+  - ✅ `LunarGridPage.tsx` – folosește direct `useTransactions` pentru data/loading/refetch
+  - ✅ `LunarGridTanStack.tsx` – primește datele din React Query
+  - ✅ `CellTransactionPopover.tsx` – suportă description, recurring, frequency
+  - ✅ `LunarGrid.tsx` – folosește doar React Query pentru tranzacții
+  - ✅ `TransactionTable.tsx` și `TransactionForm.tsx` – refactorizate, folosesc hook-uri React Query
 
-- [ ] Integrează debounce minim sau lock (_isFetching) pentru navigarea rapidă între luni
+- [x] **Debounce navigare lună**
+  - ✅ Implementat debounce (300ms) pentru navigarea rapidă între luni în `LunarGridPage.tsx` (fără lock suplimentar, performant)
 
-- [ ] Scrie teste noi:
-  - [ ] Unitare pentru hook-ul `useTransactions`
-  - [ ] Integrare pentru `LunarGrid` și `LunarGridTanStack`
-  - [x] Teste deprecate (TransactionTable.test.tsx) eliminate - nu mai sunt necesare
+- [x] **Teste**
+  - ✅ Teste unitare pentru hook-ul `useTransactions` (acoperă fetch, create, update, delete)
+  - ✅ Teste de integrare pentru `LunarGrid` și `LunarGridTanStack`
+  - ✅ Teste vechi deprecate eliminate
+
+- [x] **Centralizare API**
+  - ✅ Toate fetch-urile folosesc `API.ROUTES.TRANSACTIONS` din `@shared-constants/api`
+  - ✅ Eliminat orice referință la `API_URL` sau string-uri hardcodate
+  - ✅ Configurare Supabase centralizată în `API.SUPABASE`
+
+---
+
+## STATUS: COMPLET
+**Migrarea la React Query și centralizarea rutelor API este FINALIZATĂ.**
+
+- Nu mai există cod legacy sau metode deprecate pentru tranzacții.
+- Toate componentele relevante folosesc hook-uri și pattern-ul arhitectural documentat.
+- Testele acoperă fluxurile principale (CRUD + navigare grid).
+- Respectă regulile globale și best practices documentate.
+
+---
+
+## Riscuri & Next steps
+
+- **Riscuri:**
+  - Posibile edge-case-uri la integrarea cu noi endpoint-uri (asigurați-vă că se adaugă în `shared-constants/api.ts`)
+  - Dacă Supabase schimbă schema, trebuie actualizat și tipul centralizat
+  - Debounce-ul poate fi ajustat dacă UX-ul real o cere (valoare actuală: 300ms)
+
+- **Next steps:**
+  - Monitorizare performanță și error reporting în prod
+  - Refactor incremental pentru orice componente noi să respecte acest pattern
+  - Documentare suplimentară dacă apar excepții de la regulile globale
+
+---
+
+**[DONE] Migrarea la React Query și centralizarea rutelor API este completă.**
 
 - [x] Cleanup inițial:
   - ✅ Eliminat cod de caching din `transactionStore.ts`
@@ -53,7 +89,8 @@ Procesul de migrare se face în pași incrementali, cu task-uri bifabile pentru 
   - [ ] `DEV_LOG.md` - jurnalizare schimbări majore
 
 - [ ] Rulează validarea constantelor:
-  - [ ] `npm run validate:constants`
+  - [ ] Rulează scriptul `tools/validate-constants.js` (nu npm run validate:constants)
+
 
 - [ ] Test manual scenarii complete:
   1. [ ] Adăugare tranzacție

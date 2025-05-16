@@ -9,7 +9,7 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 ## 📁 Structură Directoare
 
 - `frontend/` - React + Zustand + TailwindCSS + Testing Library
-- `backend/` - NestJS + MongoDB + Firebase Auth
+- `backend/` - NestJS + Supabase
 - `shared-constants/` - Sursa unică pentru enums/constants partajate (TypeScript, Zod, barrel index.ts)
 
 ---
@@ -39,7 +39,7 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 - [ ] Barrel-ul `shared-constants/index.ts` se actualizează la orice modificare.
 - [ ] Nu există nicio valoare duplicată local în FE sau BE pentru constants partajate.
 - [ ] Orice modificare se anunță clar în code review și se documentează în `DEV_LOG.md`.
-- [ ] Se rulează periodic scriptul de audit pentru importuri (`npm run validate:constants`).
+- [ ] Se rulează periodic scriptul de audit pentru importuri (`node tools/validate-constants.js`).
 - [ ] Orice excepție/abatere se aprobă și se justifică explicit.
 
 ---
@@ -113,6 +113,42 @@ Structură răspuns:
 
 ---
 
+## Migrare la React Query (2025-05)
+
+Aplicația folosește acum [React Query (TanStack Query)](https://tanstack.com/query/latest) pentru fetch și management state server-side (CRUD tranzacții, sincronizare, cache, optimistic updates).
+
+### Pattern adoptat
+- **Custom hooks** pentru fetch și mutații (`useTransactions`, `useCategories` etc.)
+- **Servicii dedicate** pentru business logic și apeluri API (ex: `TransactionService`)
+- **Centralizare rute și config API** în `@shared-constants/api`
+- **UI state** separat de server state (ex: store-uri Zustand doar pentru filtre, UI, fără fetch)
+
+### Exemplu de usage
+```tsx
+import { useTransactions } from 'src/services/hooks/useTransactions';
+import { API } from '@shared-constants/api';
+
+const { data, isLoading, refetch } = useTransactions({ year, month });
+
+// Pentru mutații:
+const { mutate: addTransaction } = useTransactions().create;
+addTransaction({ ... });
+```
+
+### Best practices
+- Folosește DOAR rutele din `API.ROUTES.*` pentru orice fetch/mutație.
+- Nu folosi string-uri hardcodate pentru endpoint-uri sau mesaje.
+- Nu apela direct store-uri pentru fetch de date – folosește hooks React Query.
+- Pentru orice nou API, adaugă ruta în `shared-constants/api.ts` și importă prin alias.
+- Rulează periodic `node tools/validate-constants.js` pentru audit.
+
+### Riscuri
+- Navigarea rapidă între luni → folosește debounce (300ms) în hooks/componente grid.
+- Orice schimbare de contract API necesită update la tipuri și hooks.
+- Nu lăsa cod legacy cu fetch paralel (Zustand + React Query) – folosește DOAR patternul nou.
+
+---
+
 ## 🔥 Status Actual
 
 - Eliminare completă hardcodări ✅
@@ -134,7 +170,7 @@ Toate importurile pentru enums/constants partajate trebuie să folosească doar 
 Verifică automat corectitudinea cu:
 
 ```sh
-npm run validate:constants
+node tools/validate-constants.js
 ```
 
 Dacă există importuri greșite, scriptul va afișa eroarea și va opri execuția. Exemplu:

@@ -417,6 +417,29 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 # Lessons Learned
 
+## 2025-05-17 - Migrare completă la React Query & centralizare API (milestone major)
+
+- Toate operațiunile CRUD pe tranzacții folosesc React Query (TanStack Query) cu hooks dedicate (`useTransactions`, `useCategories` etc.)
+- Eliminat complet fetch/caching din store-uri Zustand (acum doar UI-state)
+- Rutele și config-ul API sunt centralizate în `@shared-constants/api`
+- Toate fetch/mutații folosesc strict `API.ROUTES.*` (fără string-uri hardcodate)
+- Debounce implementat pentru navigarea rapidă între luni
+- Teste unitare și de integrare actualizate pentru noul pattern
+- Cod legacy/deprecated eliminat
+- Documentație și best practices actualizate pentru noul pattern
+
+**Riscuri:**
+- Orice fetch paralel (vechi + nou) poate duce la bug-uri – folosiți DOAR patternul React Query
+- Schimbările de contract API trebuie propagate rapid în hooks/tipuri
+
+**Lecții:**
+- Separarea clară între UI state și server state simplifică mentenanța
+- Centralizarea rutelor și mesajelor elimină bug-uri de sincronizare
+- Testele trebuie să reflecte mereu contractul actual al hooks/servicii
+
+---
+
+
 ## 2025-05-05 - Remediere teste unitare cu mock-uri Supabase și ajustare aserțiuni
 - Creat `__mocks__/supabase.ts` și `__mocks__/supabaseService.ts` ca mock-uri automate pentru Supabase în teste.
 - Implementat mock-uri pentru `supabaseAuthService` cu suport pentru tipurile definite (`AuthErrorType`, `AuthUser`).
@@ -575,40 +598,24 @@ _Actualizat la: 2025-05-07_
 - Eliminare completă a importurilor legacy (direct din constants/enums sau shared).
 - Scriptul `tools/validate-constants.js` validează automat corectitudinea importurilor și sincronizarea.
 - Actualizate documentația și best practices pentru această strategie.
+- **DEPRECATED**: Nu mai folosiți `npm run validate:constants` pentru validarea constantelor.
 
 ## 2025-04-28 - Configurare rezolvare alias și îmbunătățiri testare
 - Adăugat alias `@shared-constants` în `craco.config.js` pentru Jest (moduleNameMapper).
 - Actualizat `tsconfig.json` (frontend) cu `paths` către `src/shared-constants` pentru TypeScript.
-- Modificat `package.json` pentru a folosi `craco test` și pretest copy-shared-constants.
-- Re-exportat `enums` din `shared-constants/index.ts` și aliniat importurile (`@shared-constants`).
-- Actualizat fișiere (`App.tsx`, `transactionFormStore.ts`, teste) pentru a importa din `@shared-constants`.
-- Protejat apelurile DI din `App.tsx` (`setTransactionService`, `setRefreshCallback`) prin verificarea tipului.
-- Extins mock-urile din `App.test.tsx` pentru noile metode ale store-ului.
-
-## 2025-05-05 - Refactorizare TransactionForm, mock-uri Zustand, sincronizare shared-constants, fix TypeScript
-
-**OWNER:** Echipa testare + FE
-
-**CONTEXT:**
-- Refactorizare completă a testelor pentru TransactionForm și store-uri asociate pentru a elimina erorile TypeScript, a asigura compatibilitatea cu noua structură Zustand și a îmbunătăți robustețea testării.
-- Actualizare și corectare mock-uri pentru Zustand (`__mocks__/stores/transactionFormStore.ts`, `transactionStore.ts`, `authStore.ts`) cu suport complet pentru `getState`, setters, acțiuni și validare tipuri.
-- Sincronizare și corectare enums/constants (FrequencyType, CategoryType, BUTTONS etc.) direct în sursa unică `shared-constants/` și propagare corectă către frontend prin scriptul de sync.
-- Eliminare stringuri hardcodate din teste și componente, folosire exclusivă a mesajelor și enum-urilor din `@shared-constants`.
-- Fix erori de tip "Property 'CANCEL' does not exist on type BUTTONS", "Property 'SAPTAMANAL' does not exist on type FrequencyType" etc. prin actualizare constants și refactorizare imports.
-- Actualizare UI copy și mesaje pentru validare/eroare în toate testele și componentele relevante.
-- Toate testele TransactionForm acoperă acum edge cases pentru validare, recurență, enum-uri și fluxuri negative/pozitive.
+{{ ... }}
 
 **SCHIMBĂRI:**
 - Mock-uri dedicate pentru store-uri Zustand cu helpers `setMockFormState`, `setMockTransactionState` pentru manipulare predictibilă a stării în teste.
 - Tipare stricte pentru mock-uri și funcții de acțiune, eliminare tipuri implicite și any-uri nejustificate.
 - Refactorizare testare pentru a folosi patternul "test focalizat pe câmp/feature", nu assert global pe tot formularul (vezi lessons learned).
-- Sincronizare completă și validare constants cu scriptul `npm run sync:shared-constants`.
+- Sincronizare completă și validare cu scriptul `tools/validate-constants.js`.
 - Fix imports pentru enums/constants doar din `@shared-constants` conform regulilor globale.
 - Adăugare buton CANCEL în sursa unică BUTTONS și corectare UI copy.
 
 **LECȚII ÎNVĂȚATE:**
 - Mock-urile Zustand trebuie să includă explicit `getState` și să folosească helpers pentru actualizare stări în teste.
-- Orice modificare la enums/constants trebuie făcută doar în sursa unică și sincronizată cu scriptul dedicat, nu direct în frontend.
+{{ ... }}
 - Testele pe formulare complexe trebuie împărțite pe câmpuri pentru stabilitate (vezi [LESSON] Testare valori inițiale în formulare complexe).
 - Patternul de testare cu helpers pentru mock-uri crește claritatea și predictibilitatea testelor.
 
