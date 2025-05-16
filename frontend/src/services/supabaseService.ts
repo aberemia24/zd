@@ -24,7 +24,7 @@ const TABLE = 'transactions';
 export const supabaseService = {
   // Fetch tranzacții cu paginare și filtrare opțională
   async fetchTransactions(
-    userId: string,
+    userId: string | undefined, // Am actualizat tipul pentru a permite undefined
     pagination: Pagination = {},
     filters: Partial<Pick<TransactionValidated, 'type' | 'category' | 'recurring'>> & {
       dateFrom?: string; // Data de început pentru interval (format ISO: YYYY-MM-DD)

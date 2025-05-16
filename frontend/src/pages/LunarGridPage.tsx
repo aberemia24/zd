@@ -7,15 +7,24 @@ import { CATEGORIES } from '@shared-constants/categories';
 import { useTransactionStore } from '../stores/transactionStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { useAuthStore } from '../stores/authStore';
+import { useQueryClient } from '@tanstack/react-query';
+import { useTransactions } from '../services/hooks/useTransactions';
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar
  * Permite navigarea între luni și vizualizarea tranzacțiilor pe zile/categorii
+ * Cu debounce implementat pentru a evita prea multe cereri API la navigare rapidă
  */
 const LunarGridPage: React.FC = () => {
+  // Acces la queryClient pentru a gestiona invalidarea cache-ului în mod eficient
+  const queryClient = useQueryClient();
+  
   // State pentru anul și luna curentă
   const [year, setYear] = React.useState(() => new Date().getFullYear());
   const [month, setMonth] = React.useState(() => new Date().getMonth() + 1);
+  
+  // Timer pentru debounce - evităm cereri API multiple când utilizatorul schimbă rapid luna/anul
+  const debounceTimerRef = React.useRef<number | null>(null);
   
   // State pentru a alege între implementarea clasică și cea TanStack
   const [useTanStack, setUseTanStack] = React.useState(() => {
@@ -24,10 +33,15 @@ const LunarGridPage: React.FC = () => {
     return savedPreference !== null ? savedPreference === 'true' : true;
   });
   
-  // Extragem funcțiile și state-ul necesar din stores
-  const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
-  const loading = useTransactionStore(state => state.loading);
+  // Extragem user din AuthStore
   const { user } = useAuthStore();
+  
+  // Folosim React Query prin hook-ul useTransactions pentru verificarea stării de loading
+  // Aceasta înlocuiește vechile referințe la useTransactionStore.loading și fetchTransactions
+  const { isPending: loading } = useTransactions(
+    { year, month, includeAdjacentDays: true },
+    user?.id
+  );
   
   // Funcționalitate pentru categorii personalizate
   const loadCategories = useCategoryStore(state => state.loadUserCategories);
@@ -80,38 +94,9 @@ const LunarGridPage: React.FC = () => {
     initializeCategories();
   }, [user, loadCategories, mergeWithDefaults]); // Dependențe minimale necesare
   
-  // Referimță pentru a ține minte ultima combinație an/lună procesată
-  // Acest pattern previne buclele infinite prin evitarea re-executării efectului în situații identice
-  const lastProcessedRef = React.useRef<{year: number, month: number} | null>(null);
-  
-  // Încărcăm tranzacțiile pentru luna/anul selectat
-  // Folosim un guard pentru a preveni buclele infinite (conform memoriei d7b6eb4b-0702-4b0a-b074-3915547a2544)
+  // Actualizăm URL-ul când se schimbă luna/anul
+  // Nu mai avem nevoie de logica de fetch, este gestionată de React Query
   React.useEffect(() => {
-    // Guard pentru a preveni fetch duplicat pentru aceeași lună
-    if (lastProcessedRef.current?.year === year && lastProcessedRef.current?.month === month) {
-      return; // Skip dacă luna/anul nu s-au schimbat
-    }
-    
-    // Actualizăm referința
-    lastProcessedRef.current = { year, month };
-    
-    // Important: Folosim getState() pentru a accesa starea curentă fără subscribe
-    // Aceasta evită bucle infinite cauzate de dependțe ciclice cu re-render
-    const store = useTransactionStore.getState();
-    
-    // 1. Setăm parametrii și fetch în setTimeout pentru a preveni actualizări în cascadă
-    setTimeout(() => {
-      store.setQueryParams({
-        ...store.currentQueryParams,
-        year,
-        month,
-        includeAdjacentDays: true
-      });
-      setTimeout(() => {
-        store.fetchTransactions(true);
-      }, 0);
-    }, 0);
-    
     // Actualizăm URL-ul cu parametrul month=YYYY-MM și păstrăm hash
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('month', `${year}-${month.toString().padStart(2, '0')}`);
@@ -119,36 +104,73 @@ const LunarGridPage: React.FC = () => {
     const newUrl = `${window.location.pathname}?${urlParams}${hash}`;
     window.history.replaceState({}, '', newUrl);
     
-    console.log(`LunarGridPage: Set query params for ${year}-${month}`);
-    
+    console.log(`LunarGridPage: URL updated for ${year}-${month}`);
   }, [year, month]);
   
-  // La prima montare, facem fetch pentru tranzacții dacă e nevoie
-  React.useEffect(() => {
-    const hasTransactions = useTransactionStore.getState().transactions.length > 0;
-    if (!hasTransactions) {
-      console.log('LunarGridPage: Initial fetch - no transactions found');
-      fetchTransactions();
-    }
-  }, [fetchTransactions]);
+  // Nu mai avem nevoie de efectul pentru fetch inițial
+  // React Query se ocupă automat de aceasta în useTransactions
+  // Următorul comentariu este doar pentru documentare
+  /* 
+   * React Query gestionează automat starea pentru:
+   * - Fetch inițial (la montare)
+   * - Refetch la schimbarea dependențelor (year, month)
+   * - Cache și invalidare cache
+   * - Loading states & error handling
+   */
   
-  // Funcții pentru navigare între luni
-  const goToPreviousMonth = () => {
-    if (month === 1) {
-      setMonth(12);
-      setYear(year - 1);
-    } else {
-      setMonth(month - 1);
+  /**
+   * Funcție de debounce care actualizează luna/anul și invalidează cache-ul cu întârziere
+   * Evită multiple cereri API când utilizatorul navighează rapid între luni
+   */
+  const setDateWithDebounce = React.useCallback((newMonth: number, newYear: number) => {
+    // Actualizăm imediat UI pentru a oferi feedback utilizatorului
+    setMonth(newMonth);
+    setYear(newYear);
+    
+    // Anulăm orice timer de debounce în curs
+    if (debounceTimerRef.current !== null) {
+      window.clearTimeout(debounceTimerRef.current);
     }
+    
+    // Setăm un nou timer pentru invalidarea cache-ului după 300ms 
+    // de la ultima acțiune a utilizatorului
+    debounceTimerRef.current = window.setTimeout(() => {
+      console.log(`Invalidating cache for ${newYear}-${newMonth} after debounce`);
+      
+      // Folosim queryClient pentru a invalida doar query-ul specific pentru luna/anul selectat
+      // Această abordare este mai eficientă decât invalidarea tuturor query-urilor
+      queryClient.invalidateQueries({ 
+        queryKey: ['transactions', newYear, newMonth],
+        exact: true 
+      });
+      
+      debounceTimerRef.current = null;
+    }, 300); // 300ms întârziere - valoare optimă pentru UX + performanță
+  }, [queryClient]);
+  
+  // Funcții pentru navigare între luni, acum cu debounce
+  const goToPreviousMonth = () => {
+    let newMonth = month - 1;
+    let newYear = year;
+    
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear--;
+    }
+    
+    setDateWithDebounce(newMonth, newYear);
   };
   
   const goToNextMonth = () => {
-    if (month === 12) {
-      setMonth(1);
-      setYear(year + 1);
-    } else {
-      setMonth(month + 1);
+    let newMonth = month + 1;
+    let newYear = year;
+    
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear++;
     }
+    
+    setDateWithDebounce(newMonth, newYear);
   };
   
   // Formatare nume lună în română

@@ -3,100 +3,92 @@ import TransactionForm from '../components/features/TransactionForm/TransactionF
 import TransactionTable from '../components/features/TransactionTable/TransactionTable';
 import TransactionFilters from '../components/features/TransactionFilters/TransactionFilters';
 import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
-import { useTransactionStore } from '../stores/transactionStore';
-import type { TransactionState } from '../stores/transactionStore';
+import { useTransactions } from '../services/hooks/useTransactions';
+import { useQueryClient } from '@tanstack/react-query';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
+import { PAGINATION } from '@shared-constants';
 
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
  * Conține formularul de adăugare, filtrele și tabelul de tranzacții
+ * Refactorizat pentru React Query (TanStack Query)
  */
 const TransactionsPage: React.FC = () => {
-  // Folosim store-ul Zustand pentru filtre și paginare și date
-  const currentQueryParams = useTransactionStore((state: TransactionState) => state.currentQueryParams);
-  const setQueryParams = useTransactionStore((state: TransactionState) => state.setQueryParams);
-
-  // Extragem valorile din query params pentru a le folosi în UI
-  const limit: number = currentQueryParams.limit || 10;
-  const offset: number = currentQueryParams.offset || 0;
+  // Folosim React Query pentru state management și fetch
+  const queryClient = useQueryClient();
+  
+  // State pentru paginare și filtre
+  const [filters, setFilters] = React.useState({
+    limit: PAGINATION.DEFAULT_LIMIT,
+    offset: PAGINATION.DEFAULT_OFFSET, 
+    type: '',
+    category: ''
+  });
+  
+  // Extragem valorile din filters pentru a le folosi în UI
+  const { limit, offset, type: filterType, category: filterCategory } = filters;
   const currentPage: number = Math.floor(offset / limit) + 1;
-
-  // Folosim store-ul dedicat pentru filtre Zustand
-  const filterType = useTransactionFiltersStore(s => s.filterType) || '';
-  const filterCategory = useTransactionFiltersStore(s => s.filterCategory) || '';
+  
+  // Hook-ul useTransactionFiltersStore pentru UI/interfață folositor
   const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
   const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
   
-  // Funcții pentru navigare
+  // Folosim hook-ul useTransactions pentru a prelua datele - React Query se ocupă de caching
+  const { 
+    data, 
+    error: fetchError, 
+    isPending: isLoading 
+  } = useTransactions({
+    limit,
+    offset,
+    type: filterType as TransactionType || undefined,
+    category: filterCategory as string || undefined,
+    // Nu includem month/year pentru a asigura că nu avem conflicte cu LunarGrid
+    month: undefined,
+    year: undefined,
+  });
+  
+  // Funcții pentru navigare - actualizează direct state-ul local care declanșează refetch
   const goToPage = React.useCallback((page: number) => {
-    setQueryParams({
-      ...currentQueryParams,
+    setFilters(prev => ({
+      ...prev,
       offset: (page - 1) * limit
-    });
-  }, [currentQueryParams, limit, setQueryParams]);
+    }));
+  }, [limit]);
   
-  // Referimță pentru a ține minte ultimele filtre aplicate și a preveni fetchTransactions inutil
-  const lastFiltersRef = React.useRef({ type: '', category: '', offset: 0, limit: 10 });
-  
-  // Sincronizare filtre + paginare cu store-ul de tranzacții
-  // IMPORTANT: Prevenim anti-pattern-ul cu useEffect + queryParams menționat în memoria critică d7b6eb4b-0702-4b0a-b074-3915547a2544
-  React.useEffect(() => {
-    const hasFilterChanged = 
-      lastFiltersRef.current.type !== filterType ||
-      lastFiltersRef.current.category !== filterCategory ||
-      lastFiltersRef.current.offset !== offset ||
-      lastFiltersRef.current.limit !== limit;
+  // Callback pentru schimbarea filtrelor - declanșează refetch via React Query
+  const handleFilterChange = React.useCallback((newType?: string, newCategory?: string) => {
+    setFilters(prev => ({
+      ...prev,
+      // Resetăm offset la schimbarea filtrelor pentru a începe de la prima pagină
+      offset: 0,
+      type: newType !== undefined ? newType : prev.type,
+      category: newCategory !== undefined ? newCategory : prev.category
+    }));
     
-    // Actualizăm parametrii doar dacă s-au schimbat pentru a preveni bucla infinită
-    if (hasFilterChanged) {
-      console.log(`Filters changed, fetching transactions with: type=${filterType}, category=${filterCategory}, offset=${offset}, limit=${limit}`);
-      
-      // Actualizăm referimța cu noile valori
-      lastFiltersRef.current = { type: filterType, category: filterCategory, offset, limit };
-      
-      // 1. Mai întâi setăm parametrii
-      const store = useTransactionStore.getState();
-      store.setQueryParams({
-        ...store.currentQueryParams,
-        type: filterType,
-        category: filterCategory,
-        offset,
-        limit,
-        // Resetăm parametrii de lună/an pentru a preveni conflicte cu pagina LunarGrid
-        month: undefined,
-        year: undefined,
-        includeAdjacentDays: undefined
-      });
-      
-      // 2. Apoi facem fetch explicit (evităm bucla infinită)
-      store.fetchTransactions(true);
-    }
-  }, [filterType, filterCategory, offset, limit]);
+    // Pentru a menține sincronizarea cu filterStore pentru UI consistency
+    if (newType !== undefined) setFilterType(newType as TransactionType | '');
+    if (newCategory !== undefined) setFilterCategory(newCategory as CategoryType | '');
+  }, [setFilterType, setFilterCategory]);
   
-  // Fetch inițial la montarea componentei, doar dacă nu există tranzacții în store
+  // Sync cu filterStore la montare - doar pentru UI consistency
   React.useEffect(() => {
-    const store = useTransactionStore.getState();
-    // Notifcăm că suntem la pagina de tranzacții prin resetarea parametrilor specifici paginii de grid
-    if (store.currentQueryParams.month || store.currentQueryParams.year) {
-      console.log('Resetting LunarGrid specific params');
-      store.setQueryParams({
-        ...store.currentQueryParams,
-        month: undefined,
-        year: undefined,
-        includeAdjacentDays: undefined
-      });
-      store.fetchTransactions(true);
-    } else if (store.transactions.length === 0 && !store.loading) {
-      console.log('Initial fetch for TransactionsPage - no transactions found');
-      store.fetchTransactions();
-    }
+    const storeType = useTransactionFiltersStore.getState().filterType;
+    const storeCategory = useTransactionFiltersStore.getState().filterCategory;
+    
+    // Actualizăm state-ul local cu valorile din store doar la montare
+    setFilters(prev => ({
+      ...prev,
+      type: storeType || '',
+      category: storeCategory || ''
+    }));
   }, []);
 
-  // Preluăm doar eroarea pentru afișare
-  const fetchError = useTransactionStore((s: TransactionState) => s.error);
-
-  // Callback pentru schimbarea paginii
-  const handlePageChange = React.useCallback((newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), [goToPage, limit]);
+  // Callback pentru schimbarea paginii - utilizat de componenta TransactionTable
+  const handlePageChange = React.useCallback(
+    (newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), 
+    [goToPage, limit]
+  );
 
   return (
     <>
@@ -107,15 +99,23 @@ const TransactionsPage: React.FC = () => {
       <TransactionFilters
         type={filterType}
         category={filterCategory}
-        onTypeChange={t => setFilterType(t as TransactionType | '')}
-        onCategoryChange={c => setFilterCategory(c as CategoryType | '')}
+        onTypeChange={t => handleFilterChange(t as TransactionType | '', undefined)}
+        onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
       />
 
-      <TransactionTable offset={offset} limit={limit} onPageChange={handlePageChange} />
+      {/* Pasăm direct datele din React Query către tabel */}
+      <TransactionTable 
+        transactions={data?.data || []} 
+        total={data?.count || 0}
+        isLoading={isLoading}
+        offset={offset} 
+        limit={limit} 
+        onPageChange={handlePageChange} 
+      />
 
       {fetchError && (
         <div className="mt-token p-token-sm bg-error-100 text-error-700 rounded-token" data-testid="fetch-error">
-          {fetchError}
+          {fetchError.message || 'Eroare la încărcarea tranzacțiilor'}
         </div>
       )}
     </>

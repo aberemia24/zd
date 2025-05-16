@@ -184,6 +184,12 @@ export interface UseLunarGridTableResult {
   /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
 
+  /** Starea de încărcare a datelor (din React Query) */
+  isLoading: boolean;
+
+  /** Obiectul eroare în cazul unui eșec la fetch (din React Query) */
+  error: Error | null;
+
   // getSumForCell a fost eliminat din hook
   // updateTableData a fost eliminat din hook (reactivitate prin store)
   // data nu mai este returnat explicit, este în table.options.data

@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CustomCategoriesPayload, CustomCategory } from '../types/Category';
 import { categoryService } from '../services/categoryService';
-import { useTransactionStore } from './transactionStore';
+import { supabaseService } from '../services/supabaseService';
 
 interface CategoryStoreState {
   categories: CustomCategory[];
@@ -138,17 +138,18 @@ export const useCategoryStore = create<CategoryStoreState>()(
       },
 
       getSubcategoryCount(category, subcategory) {
-        // Obținem tranzacțiile din store-ul de tranzacții
-        // Folosim getState() pentru a evita re-render-uri inutile - acest pattern respectă regulile
-        // din memoria critică despre Maximum update depth exceeded
-        const transactions = useTransactionStore.getState().transactions;
+        // NOTĂ: Această metodă a fost actualizată pentru a elimina dependența de useTransactionStore.transactions
+        // care a fost deprecat în favoarea React Query.
+        //
+        // Acum, aceasta este o metodă temporară care va returna mereu 0. Pentru o implementare
+        // completă, s-ar putea face un apel direct la baza de date prin supabaseService sau
+        // s-ar putea folosi React Query / useTransactions pentru a obține count-ul real.
+        //
+        // Recomandare: Dacă aveți nevoie de numărătoare exactă, implementați un endpoint dedicat
+        // pentru counting în backend sau folosiți un hook dedicat React Query pentru statistici.
         
-        // Filtrăm și numărăm tranzacțiile care folosesc această subcategorie
-        const count = transactions.filter(
-          trx => trx.category === category && trx.subcategory === subcategory
-        ).length;
-        
-        return count;
+        console.log('getSubcategoryCount: Metodă actualizată după migrarea la React Query');
+        return 0; // Valoare temporară până la implementarea completă
       },
     }),
     {

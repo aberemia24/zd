@@ -12,6 +12,7 @@ export const LABELS = {
   TYPE_FILTER: 'Tip tranzacție:',
   CATEGORY_FILTER: 'Categoria:',
   FORM: 'adăugare tranzacție', // pentru aria-label pe <form>
+  DESCRIPTION: 'Descriere',
 };
 
 export const TITLES = {
@@ -24,6 +25,7 @@ export const PLACEHOLDERS = {
   SELECT: 'Alege',
   AMOUNT: 'Introdu suma',
   DATE: 'Selectează data',
+  DESCRIPTION: 'Adaugă o descriere (opțional)',
 };
 
 export const BUTTONS = {

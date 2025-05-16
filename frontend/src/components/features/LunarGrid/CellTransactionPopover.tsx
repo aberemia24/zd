@@ -4,6 +4,7 @@ import Checkbox from '../../primitives/Checkbox';
 import Select from '../../primitives/Select';
 import Button from '../../primitives/Button';
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from '@shared-constants';
+import { FrequencyType } from '@shared-constants/enums';
 
 interface CellTransactionPopoverProps {
   initialAmount: string;
@@ -15,9 +16,10 @@ interface CellTransactionPopoverProps {
   type: string;
   onSave: (data: {
     amount: string;
+    description: string; // Adăugat
     recurring: boolean;
-    frequency: string;
-  }) => void;
+    frequency?: FrequencyType; // Modificat
+  }) => Promise<void>; // Modificat
   onCancel: () => void;
   anchorRef?: React.RefObject<HTMLElement>;
 }
@@ -36,13 +38,14 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
 }) => {
   const [amount, setAmount] = React.useState(initialAmount || '');
   const [recurring, setRecurring] = React.useState(false);
-  const [frequency, setFrequency] = React.useState('');
+  const [frequency, setFrequency] = React.useState<FrequencyType | ''>(''); // Permite string gol inițial
+  const [description, setDescription] = React.useState(''); // Adăugat state pentru descriere
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Handler pentru salvare - definit înainte de a fi folosit în useEffect
   const handleSave = useCallback(() => {
     if (!amount || isNaN(Number(amount))) return;
-    onSave({ amount, recurring, frequency });
+    onSave({ amount, recurring, frequency: frequency || undefined, description }); // Adăugat description, asigură undefined pt frequency
   }, [amount, recurring, frequency, onSave]);
   
   // Autofocus input la deschidere
@@ -89,6 +92,17 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
         autoFocus
         inputRef={inputRef}
       />
+      <label htmlFor="description-input" className="font-medium mt-2">{LABELS.DESCRIPTION}</label>
+      <Input
+        id="description-input"
+        name="description"
+        type="text"
+        value={description}
+        onChange={e => setDescription(e.target.value)}
+        placeholder={PLACEHOLDERS.DESCRIPTION}
+        data-testid="cell-description-input"
+        maxLength={100} 
+      />
       <Checkbox
         name="recurring"
         checked={recurring}
@@ -100,7 +114,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
         <Select
           name="frequency"
           value={frequency}
-          onChange={e => setFrequency(e.target.value)}
+          onChange={e => setFrequency(e.target.value as FrequencyType)}
           options={OPTIONS.FREQUENCY}
           placeholder={PLACEHOLDERS.SELECT}
           data-testid="cell-frequency-select"

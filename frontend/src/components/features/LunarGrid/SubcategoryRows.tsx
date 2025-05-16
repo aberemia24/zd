@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Edit, Trash2 } from 'lucide-react';
 import CellTransactionPopover from './CellTransactionPopover';
 import { TransactionValidated, TransactionType, MESAJE, BUTTONS } from '@shared-constants';
+import { FrequencyType } from '@shared-constants/enums';
 import { useCategoryStore } from '../../../stores/categoryStore';
 
 export interface SubcategoryRowsProps {
@@ -32,7 +33,7 @@ export interface SubcategoryRowsProps {
     day: number,
     currentAmount: string
   ) => void;
-  handleSavePopover: (data: { amount: string; recurring: boolean; frequency: string }) => Promise<void>;
+  handleSavePopover: (data: { amount: string; description: string; recurring: boolean; frequency?: FrequencyType }) => Promise<void>;
   handleClosePopover: () => void;
   handleEditSubcategory: (category: string, subcategory: string) => void;
   handleDeleteSubcategory: (category: string, subcategory: string) => void;

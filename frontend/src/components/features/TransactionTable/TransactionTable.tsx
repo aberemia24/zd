@@ -2,24 +2,34 @@ import React from 'react';
 import Button from '../../primitives/Button';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TABLE, BUTTONS } from '@shared-constants';
-import { useTransactionStore } from '../../../stores/transactionStore';
-import type { TransactionState } from '../../../stores/transactionStore';
 import type { Transaction } from '../../../types/transaction';
 
 export type { Transaction };
 
 export type TransactionTableProps = {
+  /** Lista de tranzacții încărcate */
+  transactions: Transaction[];
+  /** Numărul total de tranzacții (pentru paginare) */
+  total: number;
+  /** Flag care indică dacă datele sunt în curs de încărcare */
+  isLoading?: boolean;
+  /** Offset-ul curent pentru paginare */
   offset: number;
+  /** Numărul de elemente per pagină */
   limit: number;
+  /** Callback pentru schimbarea paginii */
   onPageChange: (newOffset: number) => void;
 };
 
-const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPageChange }) => {
-  console.log('🔃 TransactionTable render');
-  // Debug infinite loop: log renders
-  const transactions = useTransactionStore((s: TransactionState) => s.transactions);
-  const loading = useTransactionStore((s: TransactionState) => s.loading);
-  const total = useTransactionStore((s: TransactionState) => s.total);
+const TransactionTable: React.FC<TransactionTableProps> = ({ 
+  transactions, 
+  total, 
+  isLoading = false, 
+  offset, 
+  limit, 
+  onPageChange 
+}) => {
+  // Acum toate datele vin direct ca props, nu mai avem nevoie de Zustand
   return (
     <div className="mt-token">
       <table className="w-full border-collapse rounded-token overflow-hidden shadow-token bg-secondary-50" data-testid="transaction-table">
@@ -35,7 +45,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({ offset, limit, onPa
           </tr>
         </thead>
         <tbody>
-          {loading ? (
+          {isLoading ? (
             <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-token-lg text-secondary-500">{TABLE.LOADING}</td></tr>
           ) : (!transactions || transactions.length === 0 ? (
             <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-token-lg text-secondary-400">{TABLE.EMPTY}</td></tr>

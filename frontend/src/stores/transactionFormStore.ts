@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import { INITIAL_FORM_STATE, MESAJE, FORM_DEFAULTS } from '@shared-constants';
 import { VALIDATION } from '@shared-constants/validation';
+import { API } from '@shared-constants/api';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
 import type { TransactionFormWithNumberAmount } from '../types/transaction';
-import { TransactionType } from '../../../shared-constants/enums';
+import { TransactionType, TransactionStatus } from '@shared-constants/enums';
 import { FrequencyType } from '@shared-constants/enums';
-import { supabaseService } from '../services/supabaseService';
-import { useTransactionStore } from '../stores/transactionStore';
+import type { CreateTransaction } from '@shared-constants/transaction.schema';
+// Import pentru React Query
+import { useQueryClient } from '@tanstack/react-query';
 
 export interface TransactionFormStoreState {
   form: TransactionFormData;
@@ -31,7 +33,8 @@ export interface TransactionFormStoreState {
 }
 
 export const useTransactionFormStore = create<TransactionFormStoreState>((set, get) => {
-  // Eliminat transactionService: TransactionService
+  // Utilizăm queryClient direct pentru a reuși invalidarea query-urilor
+  // Acest approach este recomandat pentru integrarea React Query cu Zustand
 
 
   return {
@@ -88,18 +91,46 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
       set({ loading: true, error: '' });
       try {
         const { form } = get();
-        const formWithNumberAmount: TransactionFormWithNumberAmount = {
-          ...form,
+        
+        // Construim payload-ul pentru React Query conform CreateTransaction
+        const transactionData: CreateTransaction = {
           type: form.type as TransactionType,
           amount: Number(form.amount),
+          date: form.date,
+          category: form.category,
+          subcategory: form.subcategory || '',
+          description: form.description || '',
+          recurring: form.recurring || false,
           frequency: form.frequency ? form.frequency as FrequencyType : undefined,
-          currency: FORM_DEFAULTS.CURRENCY
+          status: TransactionStatus.COMPLETED,
+          // Nu mai includem currency conform schema.ts unde nu este folosit în FE
         };
-        await supabaseService.createTransaction(formWithNumberAmount);
+        
+        // Accesăm queryClient direct și executăm mutația
+        const queryClient = useQueryClient();
+        
+        // Observație: userId NU trebuie inclus explicit în payload
+        // Conform notei din transaction.schema.ts: "user_id nu e expus în FE (doar pe backend)"
+        // AuthToken-ul din Supabase va fi folosit pentru identificarea user-ului în backend
+        
+        // Adăugăm tranzacția folosind hook API direct
+        // Această abordare poate fi îmbunătățită printr-un adapter dedicat pentru store+React Query
+        await fetch(API.ROUTES.TRANSACTIONS, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(transactionData),
+        });
+        
+        // Invalidăm query-urile pentru a reîncărca datele actualizate
+        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        
         set({ success: MESAJE.SUCCES_ADAUGARE });
-        const txStore = useTransactionStore.getState();
-        await txStore.refresh();
-      } catch {
+        // Resetăm formularul după adăugare reușită
+        get().resetForm();
+      } catch (error) {
+        console.error('Eroare la adăugarea tranzacției:', error);
         set({ error: MESAJE.EROARE_ADAUGARE });
       } finally {
         set({ loading: false });
