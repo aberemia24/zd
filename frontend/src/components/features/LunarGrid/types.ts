@@ -166,15 +166,14 @@ export interface UseLunarGridTableOptions {
 /**
  * Rezultatul returnat de hook-ul useLunarGridTable
  */
+import { TransformedTableDataRow } from './hooks/useLunarGridTable'; // Importăm tipul din hook
+
 export interface UseLunarGridTableResult {
   /** Instanța de tabel TanStack */
-  table: any;
+  table: Table<TransformedTableDataRow>; // Tipare mai specifică pentru tabel
   
-  /** Datele pentru tabel */
-  data: LunarGridRowData[];
-  
-  /** Coloanele tabelului */
-  columns: ColumnDef<LunarGridRowData>[];
+  /** Coloanele tabelului, acum bazate pe TransformedTableDataRow */
+  columns: ColumnDef<TransformedTableDataRow>[];
   
   /** Zilele lunii */
   days: number[];
@@ -182,16 +181,12 @@ export interface UseLunarGridTableResult {
   /** Referință către container-ul de tabel */
   tableContainerRef: React.RefObject<HTMLDivElement>;
   
-  // Virtualizare eliminată pentru a evita problemele de randare
-  
   /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
-  
-  /** Funcție pentru obținerea sumei unei celule specifice */
-  getSumForCell: (category: string, subcategory: string, day: number) => number;
-  
-  /** Funcție pentru actualizarea datelor tabelului */
-  updateTableData: (transactions: TransactionValidated[]) => void;
+
+  // getSumForCell a fost eliminat din hook
+  // updateTableData a fost eliminat din hook (reactivitate prin store)
+  // data nu mai este returnat explicit, este în table.options.data
 }
 
 /**

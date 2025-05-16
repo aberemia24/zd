@@ -177,29 +177,33 @@ export function generateTableColumns(
  * @param rowData Datele de intrare
  * @returns Datele transformate pentru tabel
  */
-export function transformToTableData(rowData: LunarGridRowData[]) {
+export function transformToTableData(rowData: LunarGridRowData[], year: number, month: number) {
   return rowData.map(row => {
-    const rowData: Record<string, any> = {
+    const daysInMonth = getDaysInMonth(year, month);
+    const rowDataForTable: Record<string, any> = {
       id: row.id,
       category: row.category,
       isCategory: row.isCategory,
       ...(row.subcategory && { subcategory: row.subcategory }),
     };
     
-    // Adăugăm sumele zilnice
+    // Inițializăm toate zilele cu 0 și apoi suprascriem cu valorile existente
+    daysInMonth.forEach(day => {
+      rowDataForTable[`day-${day}`] = 0;
+    });
+
+    // Adăugăm sumele zilnice existente
     Object.entries(row.dailyAmounts || {}).forEach(([day, amount]) => {
-      rowData[`day-${day}`] = amount;
+      rowDataForTable[`day-${day}`] = amount || 0; // Asigurăm că amount este un număr
     });
     
-    // Calculăm totalul
-    if (row.dailyAmounts) {
-      rowData.total = Object.values(row.dailyAmounts).reduce(
-        (sum, amount) => sum + amount, 0
-      );
-    } else {
-      rowData.total = 0;
-    }
+    // Calculăm totalul robust
+    let calculatedTotal = 0;
+    daysInMonth.forEach(day => {
+      calculatedTotal += (rowDataForTable[`day-${day}`] || 0) as number;
+    });
+    rowDataForTable.total = calculatedTotal;
     
-    return rowData;
+    return rowDataForTable;
   });
 }

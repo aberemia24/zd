@@ -1,18 +1,17 @@
-import React, { useCallback, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { 
   flexRender, 
   Header, 
   Row as TableRow,
   Cell
 } from '@tanstack/react-table';
-import { useLunarGridTable } from './hooks/useLunarGridTable';
-import type { LunarGridRowData } from './types';
+import { useLunarGridTable, TransformedTableDataRow } from './hooks/useLunarGridTable';
 
 // Import DOAR stores și constante existente
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { useAuthStore } from '../../../stores/authStore';
-import { EXCEL_GRID, TITLES } from '@shared-constants';
+import { useAuthStore } from '../../../stores/authStore'; // user from here is needed by transactionStore indirectly
+import { EXCEL_GRID } from '@shared-constants';
 import { MESAJE } from '@shared-constants/messages';
 import { TransactionType, FrequencyType } from '@shared-constants/enums';
 
@@ -26,14 +25,14 @@ export interface LunarGridTanStackProps {
 
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) => {
   // Folosim DOAR store-uri existente
-  const transactions = useTransactionStore(state => state.transactions);
+  // transactions is no longer directly used here, data comes from useLunarGridTable
   const fetchTransactions = useTransactionStore(state => state.fetchTransactions);
   const loading = useTransactionStore(state => state.loading);
   const invalidateMonthCache = useTransactionStore(state => state._invalidateMonthCache);
   const saveTransaction = useTransactionStore(state => state.saveTransaction);
   
   const categories = useCategoryStore(state => state.categories);
-  const user = useAuthStore(state => state.user);
+  const user = useAuthStore(state => state.user); // Kept as it's likely used by transactionStore (fetch/save)
   
   // State pentru expandare/colapsare categorii
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
@@ -75,7 +74,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const handleCellClick = useCallback((
     e: React.MouseEvent,
     category: string,
-    subcategory: string,
+    subcategory: string | undefined,
     day: number,
     amount: string,
     type: string
@@ -96,7 +95,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const handleCellDoubleClick = useCallback((
     e: React.MouseEvent,
     category: string,
-    subcategory: string,
+    subcategory: string | undefined,
     day: number,
     amount: string
   ) => {
@@ -121,7 +120,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     saveTransaction({
       amount: Number(newAmount),
       category,
-      subcategory,
+      // TODO: Verifică dacă backend-ul/store-ul gestionează corect '' ca absența subcategoriei sau dacă ar trebui să fie null/undefined.
+      subcategory: subcategory || '', 
       type: transactionType,
       date,
       recurring: false,
@@ -156,7 +156,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
       await saveTransaction({
         amount: Number(amount),
         category,
-        subcategory,
+        // TODO: Verifică dacă backend-ul/store-ul gestionează corect '' ca absența subcategoriei sau dacă ar trebui să fie null/undefined.
+        // Modificat: Se trimite `subcategory` direct. Dacă este `undefined` (ex: pentru VENITURI fără subcategorie specificată),
+        // va fi trimis ca atare, permițând backend-ului să interpreteze ca NULL dacă schema o permite.
+        subcategory: subcategory, 
         type: type as TransactionType,
         date,
         recurring,
@@ -177,50 +180,19 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     }
   }, [popover, year, month, saveTransaction, invalidateMonthCache, fetchTransactions]);
   
-  // Formatare monedă - funcție utilitară locală
-  const formatCurrency = (amount: number) => {
-    return amount.toLocaleString('ro-RO', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  };
-  
-  // Stil pentru solduri - funcție utilitară locală
-  const getBalanceStyle = (amount: number) => {
-    return amount > 0 
-      ? 'text-success-600 font-medium' 
-      : 'text-error-600 font-medium';
-  };
-  
-  // Referință pentru container-ul de tabel (necesar pentru virtualizare)
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  
   // Folosește hook-ul useLunarGridTable pentru logica tabelului
   
   const { 
-    table, 
-    days,
-    dailyBalances,
-    getSumForCell,
-    updateTableData,
-    data
+    table,
+    tableContainerRef 
   } = useLunarGridTable(
-    transactions,
-    categories,
-    expandedCategories,
-    year,
-    month,
-    handleCellClick,
+    year, 
+    month, 
+    expandedCategories, 
+    handleCellClick, 
     handleCellDoubleClick
   );
 
-  // Efect pentru a actualiza datele tabelului când se schimbă tranzacțiile
-  useEffect(() => {
-    updateTableData(transactions);
-  }, [transactions, updateTableData]);
-  
-  // Cod de debugging eliminat pentru producție
-  
   // Render cu constante și clase existente
   return (
     <div>
@@ -261,7 +233,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
           >
             <thead className="bg-secondary-100 sticky top-0">
               <tr>
-                {table.getFlatHeaders().map((header: Header<LunarGridRowData, unknown>) => (
+                {table.getFlatHeaders().map((header: Header<TransformedTableDataRow, unknown>) => (
                   <th 
                     key={header.id}
                     className="py-3 px-3 text-left font-medium text-secondary-700"
@@ -280,7 +252,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
             </thead>
             <tbody>
               {/* Înlocuim virtualizarea care nu funcționează cu o afișare directă a rândurilor */}
-              {table.getRowModel().rows.map((row: TableRow<LunarGridRowData>) => {
+              {table.getRowModel().rows.map((row: TableRow<TransformedTableDataRow>) => {
                 return (
                   <tr 
                     key={row.id}
@@ -296,7 +268,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
                     }}
                     data-testid={`row-${row.original.isCategory ? 'category' : 'subcategory'}-${row.original.category}${row.original.subcategory ? `-${row.original.subcategory}` : ''}`}
                   >
-                    {row.getVisibleCells().map((cell: Cell<LunarGridRowData, unknown>) => (
+                    {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>) => (
                       <td 
                         key={cell.id}
                         className="border-t border-secondary-200 py-2 px-3 first:border-l last:border-r"
