@@ -291,8 +291,24 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
       } else {
         result = await supabaseService.createTransaction(data as any);
       }
+      
+      // Invalidăm cache-ul explicit pentru luna și anul curent dacă sunt disponibile
+      const { year, month } = get().currentQueryParams;
+      if (year && month) {
+        console.log(`🔄 Invalidating cache after transaction save for ${year}-${month}`);
+        get()._invalidateMonthCache(year, month);
+      }
+      
+      // Resetăm parametrii de fetch pentru a forța un reload complet
       set({ _lastQueryParams: undefined });
-      await get().fetchTransactions();
+      
+      // Folosim setTimeout pentru a preveni actualizările în cascadă conform cu best practice
+      // din memoria e0d0698c-ac6d-444f-8811-b1a3936df71b
+      setTimeout(() => {
+        // Folosim explicit forceRefresh=true pentru a ignora cache-ul
+        get().fetchTransactions(true);
+      }, 100);
+      
       return result;
     } catch (err) {
       set({ error: MESAJE.EROARE_SALVARE_TRANZACTIE });
