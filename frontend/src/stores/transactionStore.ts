@@ -11,6 +11,10 @@ import { useAuthStore } from './authStore';
 // Timp pentru time-to-live al cache-ului (15 minute)
 const CACHE_TTL = 15 * 60 * 1000; // 15 minute în milisecunde
 
+// Constante pentru retry
+const MAX_RETRY_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 1000; // Bază pentru delay exponențial
+
 // Extindere parametri query pentru a include filtrare după lună și an
 export interface TransactionQueryParamsWithRecurring extends TransactionQueryParams {
   recurring?: boolean;
@@ -34,7 +38,19 @@ export interface TransactionState {
   monthlyCache: Record<string, {
     transactions: TransactionValidated[];
     lastFetched: number;
+    forceNextFetch?: boolean; // Flag pentru a forța ignorarea cache-ului la următorul fetch
   }>;
+
+  // State pentru optimistic updates și tracking operații
+  pendingTransactions: Record<string, {
+    id: string;
+    operation: 'add' | 'update' | 'delete';
+    timestamp: number;
+    status: 'pending' | 'success' | 'error';
+  }>;
+  
+  // Flags pentru prevenirea race conditions
+  _isRefreshing: boolean;
   
   // Helper methods pentru cache și interval de date
   _getCacheKey: (year: number, month: number) => string;
@@ -48,28 +64,87 @@ export interface TransactionState {
   loading: boolean;
   error: string | null;
   
-  // Servicii și dependențe
-  // Eliminat transactionService: TransactionService;
-
-  
   // Acțiuni - setters
   setTransactions: (transactions: TransactionValidated[]) => void;
   setTotal: (total: number) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setQueryParams: (params: TransactionQueryParamsWithRecurring) => void;
-  // Eliminat setTransactionService
-
   
   // Acțiuni - operațiuni asincrone
   fetchTransactions: (forceRefresh?: boolean) => Promise<void>;
+  fetchTransactionsWithLock: (forceRefresh?: boolean) => Promise<void>;
   refresh: () => Promise<void>;
   saveTransaction: (data: TransactionFormWithNumberAmount, id?: string) => Promise<TransactionValidated>;
   removeTransaction: (id: string) => Promise<void>;
+  reloadAfterTransaction: (year?: number, month?: number) => Promise<void>;
   
   // Acțiuni - utilități
   reset: () => void;
+  
+  // Utilități pentru persistență
+  savePendingState: () => void;
+  loadPendingState: () => void;
+  resumePendingOperations: () => Promise<void>;
 }
+
+/**
+ * Utilitar pentru operațiuni cu retry
+ */
+function getErrorMessage(error: unknown): string {
+  if (typeof error === 'string') return error;
+  if (error instanceof Error && error.message) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return String((error as any).message);
+  }
+  return 'Eroare necunoscută';
+}
+
+const withRetry = async <T>(
+  operation: () => Promise<T>,
+  isRetryable: (error: any) => boolean,
+  maxAttempts = MAX_RETRY_ATTEMPTS
+): Promise<T> => {
+  let lastError: any;
+  
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      // Verificăm dacă eroarea permite retry
+      if (!isRetryable(error)) {
+        console.log(`❌ Eroare nerecuperabilă, abandonăm: ${getErrorMessage(error)}`);
+        throw error;
+      }
+      if (attempt < maxAttempts) {
+        // Delay exponențial între încercări
+        const delay = RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+        console.log(`⚠️ Încercare ${attempt}/${maxAttempts} eșuată, reîncercăm în ${delay}ms: ${getErrorMessage(error)}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  throw lastError;
+};
+
+/**
+ * Identifică dacă o eroare este cauzată de probleme de rețea
+ */
+const isNetworkError = (error: any): boolean => {
+  return (
+    error?.message?.includes('network') ||
+    error?.message?.includes('timeout') ||
+    error?.message?.includes('connection') ||
+    error?.message?.toLowerCase().includes('offline') ||
+    error?.name === 'AbortError'
+  );
+};
+
+/**
+ * Chei pentru localStorage
+ */
+const PENDING_TRANSACTIONS_KEY = 'budget-app-pending-transactions';
 
 /**
  * Store Zustand pentru gestionarea stării tranzacțiilor
@@ -98,25 +173,20 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
   loading: false,
   error: null,
   monthlyCache: {},   // Cache gol inițial
-  // Eliminat transactionService
-
+  pendingTransactions: {},
+  _isRefreshing: false,
   
   // Setters
   setTransactions: (transactions: TransactionValidated[]) => set({ transactions }),
   setTotal: (total: number) => set({ total }),
   setLoading: (loading: boolean) => set({ loading }),
   setError: (error: string | null) => set({ error }),
-  // Setter pentru parametri query - atenție: NU face fetch automat
-  // Acest pattern respectă regula critică din memorie (anti-pattern useEffect + fetchTransactions)
-  setQueryParams: (params: TransactionQueryParamsWithRecurring) => {
-    // IMPORTANT: Doar setăm parametrii, NU declanșăm fetch automat!
-    // Acest lucru previne bucle infinite (vezi memorie d7b6eb4b-0702-4b0a-b074-3915547a2544)
-    set({ currentQueryParams: params });
-    // Cel care apelează setQueryParams trebuie să apeleze explicit fetchTransactions dacă dorește fetch
-  },
-  // Eliminat setTransactionService
-
   
+  // Setter pentru parametri query
+  setQueryParams: (params: TransactionQueryParamsWithRecurring) => {
+    set({ currentQueryParams: params });
+  },
+
   // Operațiuni asincrone
   // Referință internă pentru caching parametri
   _lastQueryParams: undefined as TransactionQueryParams | undefined,
@@ -176,7 +246,40 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     }
   },
   
+  fetchTransactionsWithLock: async (forceRefresh = false) => {
+    if (get()._isRefreshing) {
+      console.log('🔒 Operație de refresh deja în curs, așteptăm finalizarea');
+      return;
+    }
+    
+    set({ _isRefreshing: true });
+    try {
+      await get().fetchTransactions(forceRefresh);
+    } finally {
+      set({ _isRefreshing: false });
+    }
+  },
+  
+  // Reîncărcarea datelor după o operațiune pe tranzacții
+  reloadAfterTransaction: async (year?: number, month?: number) => {
+    // 1. Invalidează cache-ul pentru luna specificată dacă e furnizată
+    if (year && month) {
+      get()._invalidateMonthCache(year, month);
+    }
+    
+    // 2. Așteaptă puțin pentru stabilizarea stării
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    // 3. Execută fetch cu forceRefresh=true
+    try {
+      await get().fetchTransactionsWithLock(true);
+    } catch (error) {
+      console.error('Eroare la reîncărcarea datelor după tranzacție:', error);
+    }
+  },
+  
   fetchTransactions: async (forceRefresh = false) => {
+    console.log(`🔍 fetchTransactions called with forceRefresh=${forceRefresh}, month=${get().currentQueryParams.month}, year=${get().currentQueryParams.year}`);
     const { currentQueryParams, _lastQueryParams, monthlyCache, _getCacheKey, _getDateInterval } = get();
     
     // Verificăm mai întâi cache-ul pentru luna/anul specific (dacă sunt specificate)
@@ -185,8 +288,10 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
       const cacheEntry = monthlyCache[cacheKey];
       const now = Date.now();
       
-      // Dacă avem date în cache și nu sunt expirate, le folosim
-      if (cacheEntry && (now - cacheEntry.lastFetched < CACHE_TTL)) {
+      // Dacă avem date în cache, nu sunt expirate, ȘI nu trebuie forțat fetch nou
+      if (cacheEntry && 
+          (now - cacheEntry.lastFetched < CACHE_TTL) && 
+          !cacheEntry.forceNextFetch) { // Verifică dacă nu trebuie forțat fetch nou
         console.log(`🔄 Using cached data for ${cacheKey}`);
         set({ 
           transactions: cacheEntry.transactions, 
@@ -230,17 +335,23 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
       const user = useAuthStore.getState().user;
       const userId = user?.id || '';
       
-      // Fetch cu filtrele actualizate
-      const { data, count } = await supabaseService.fetchTransactions(userId, {
-        limit: currentQueryParams.limit,
-        offset: currentQueryParams.offset,
-        sort: currentQueryParams.sort as any,
-        order: 'desc',
-      }, filters);
+      // Fetch cu filtrele actualizate și retry pentru erori de rețea
+      const { data, count } = await withRetry(
+        () => supabaseService.fetchTransactions(userId, {
+          limit: currentQueryParams.limit,
+          offset: currentQueryParams.offset,
+          sort: currentQueryParams.sort as any,
+          order: 'desc',
+        }, filters),
+        isNetworkError
+      );
       
       // Actualizăm cache-ul dacă este specificată luna/anul
       if (currentQueryParams.year && currentQueryParams.month) {
         const cacheKey = _getCacheKey(currentQueryParams.year, currentQueryParams.month);
+        
+        // Se adaugă o proprietate nouă "forceNextFetch" temporar (expiră după 500ms)
+        // IMPORTANT: Trebuie să setăm și transactions, total și loading
         set({
           transactions: data,
           total: count,
@@ -249,10 +360,31 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
             ...get().monthlyCache,
             [cacheKey]: {
               transactions: data,
-              lastFetched: Date.now()
+              lastFetched: Date.now(),
+              forceNextFetch: forceRefresh // Marchează că următorul fetch trebuie să ignore cache-ul dacă acesta a fost forțat
             }
           }
         });
+        
+        // După 500ms, resetăm flag-ul
+        if (forceRefresh) {
+          setTimeout(() => {
+            // Resetăm flag-ul doar dacă cache-ul încă există
+            const currentCache = get().monthlyCache;
+            if (currentCache[cacheKey]) {
+              set({
+                monthlyCache: {
+                  ...currentCache,
+                  [cacheKey]: {
+                    ...currentCache[cacheKey],
+                    forceNextFetch: false
+                  }
+                }
+              });
+              console.log(`🔄 Cache reset forceNextFetch=false pentru ${cacheKey}`);
+            }
+          }, 500);
+        }
       } else {
         // Setăm doar datele fără a actualiza cache-ul
         set({
@@ -276,56 +408,180 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     // Previne apeluri multiple care pot declanșa buclă infinită
     if (get().loading) return;
     console.log('🔄 transactionStore.refresh called');
-    set({ loading: true });
-    try {
-      await get().fetchTransactions(true);
-    } finally {
-      set({ loading: false });
-    }
+    
+    // Folosim metoda cu lock pentru a preveni race conditions
+    await get().fetchTransactionsWithLock(true);
   },
   
   saveTransaction: async (data: TransactionFormWithNumberAmount, id?: string) => {
-    try {
-      let result: TransactionValidated;
-      if (id) {
-        result = await supabaseService.updateTransaction(id, data as any);
-      } else {
-        result = await supabaseService.createTransaction(data as any);
+    // Generăm un ID temporar pentru tranzacțiile noi
+    const tempId = id || `temp-${Date.now()}`;
+    
+    // Adăugăm la pendingTransactions
+    set(state => ({
+      pendingTransactions: {
+        ...state.pendingTransactions,
+        [tempId]: {
+          id: tempId,
+          operation: id ? 'update' : 'add',
+          timestamp: Date.now(),
+          status: 'pending'
+        }
       }
+    }));
+
+    // Salvăm starea pentru a putea relua operațiunile nefinalizate
+    get().savePendingState();
+    
+    try {
+      // Executăm operația reală cu retry pentru erori de rețea
+      let result: TransactionValidated = await withRetry(
+        () => id 
+          ? supabaseService.updateTransaction(id, data as any)
+          : supabaseService.createTransaction(data as any),
+        isNetworkError
+      );
       
-      // Invalidăm cache-ul explicit pentru luna și anul curent dacă sunt disponibile
+      // Actualizăm starea tranzacției în așteptare
+      set(state => {
+        const newPending = { ...state.pendingTransactions };
+        if (newPending[tempId]) {
+          newPending[tempId].status = 'success';
+        }
+        return { pendingTransactions: newPending };
+      });
+      
+      // Salvăm starea actualizată
+      get().savePendingState();
+      
+      // Invalidăm cache-ul și facem refresh
       const { year, month } = get().currentQueryParams;
       if (year && month) {
         console.log(`🔄 Invalidating cache after transaction save for ${year}-${month}`);
         get()._invalidateMonthCache(year, month);
       }
       
-      // Resetăm parametrii de fetch pentru a forța un reload complet
-      set({ _lastQueryParams: undefined });
-      
-      // Folosim setTimeout pentru a preveni actualizările în cascadă conform cu best practice
-      // din memoria e0d0698c-ac6d-444f-8811-b1a3936df71b
+      // Folosim setTimeout pentru a preveni actualizările în cascadă
       setTimeout(() => {
-        // Folosim explicit forceRefresh=true pentru a ignora cache-ul
-        get().fetchTransactions(true);
-      }, 100);
+        console.log('🔄 Executare fetchTransactions programat după 300ms');
+        get().fetchTransactionsWithLock(true);
+      }, 300);
       
       return result;
     } catch (err) {
-      set({ error: MESAJE.EROARE_SALVARE_TRANZACTIE });
+      // În caz de eroare, marcăm tranzacția ca eșuată
+      set(state => {
+        const newPending = { ...state.pendingTransactions };
+        if (newPending[tempId]) {
+          newPending[tempId].status = 'error';
+        }
+        return { 
+          pendingTransactions: newPending,
+          error: MESAJE.EROARE_SALVARE_TRANZACTIE 
+        };
+      });
+      
+      // Salvăm starea actualizată
+      get().savePendingState();
+      
       throw err;
     }
   },
   
   removeTransaction: async (id: string) => {
+    // Adăugăm la pendingTransactions
+    set(state => ({
+      pendingTransactions: {
+        ...state.pendingTransactions,
+        [id]: {
+          id,
+          operation: 'delete',
+          timestamp: Date.now(),
+          status: 'pending'
+        }
+      }
+    }));
+    
+    // Salvăm starea
+    get().savePendingState();
+    
     try {
-      await supabaseService.deleteTransaction(id);
+      // Executăm ștergerea cu retry pentru erori de rețea
+      await withRetry(
+        () => supabaseService.deleteTransaction(id),
+        isNetworkError
+      );
+      
+      // Actualizăm starea tranzacției în așteptare
+      set(state => {
+        const newPending = { ...state.pendingTransactions };
+        if (newPending[id]) {
+          newPending[id].status = 'success';
+        }
+        return { pendingTransactions: newPending };
+      });
+      
+      // Salvăm starea actualizată
+      get().savePendingState();
+      
+      // Invalidăm cache-ul și facem refresh
       set({ _lastQueryParams: undefined });
-      await get().fetchTransactions();
+      await get().fetchTransactionsWithLock(true);
     } catch (err) {
-      set({ error: MESAJE.EROARE_STERGERE_TRANZACTIE });
+      // În caz de eroare, marcăm tranzacția ca eșuată
+      set(state => {
+        const newPending = { ...state.pendingTransactions };
+        if (newPending[id]) {
+          newPending[id].status = 'error';
+        }
+        return { 
+          pendingTransactions: newPending,
+          error: MESAJE.EROARE_STERGERE_TRANZACTIE 
+        };
+      });
+      
+      // Salvăm starea actualizată
+      get().savePendingState();
+      
       throw err;
     }
+  },
+  
+  // Persistență pentru operațiuni nefinalizate
+  savePendingState: () => {
+    try {
+      const pendingTransactions = get().pendingTransactions;
+      localStorage.setItem(PENDING_TRANSACTIONS_KEY, JSON.stringify(pendingTransactions));
+    } catch (error) {
+      console.error('Eroare la salvarea tranzacțiilor în așteptare:', error);
+    }
+  },
+  
+  loadPendingState: () => {
+    try {
+      const stored = localStorage.getItem(PENDING_TRANSACTIONS_KEY);
+      if (stored) {
+        set({ pendingTransactions: JSON.parse(stored) });
+      }
+    } catch (error) {
+      console.error('Eroare la încărcarea tranzacțiilor în așteptare:', error);
+    }
+  },
+  
+  resumePendingOperations: async () => {
+    const pendingTransactions = get().pendingTransactions;
+    const now = Date.now();
+    
+    // Reluăm doar tranzacțiile mai noi de 24 de ore și cu status 'pending'
+    const recentTransactions = Object.entries(pendingTransactions)
+      .filter(([_, tx]) => tx.status === 'pending' && now - tx.timestamp < 24 * 60 * 60 * 1000);
+    
+    if (recentTransactions.length === 0) return;
+    
+    console.log(`🔄 Reluare ${recentTransactions.length} operațiuni nefinalizate...`);
+    
+    // Forțăm un refresh pentru a ne asigura că avem datele cele mai recente
+    await get().fetchTransactionsWithLock(true);
   },
   
   // Utilități
@@ -341,9 +597,16 @@ const createTransactionStore: StateCreator<TransactionState> = (set, get) => ({
     error: null,
     _lastQueryParams: undefined,
     monthlyCache: {}, // Resetăm și cache-ul lunar
-    // Nu resetăm transactionService pentru a păstra dependency injection
+    pendingTransactions: {},
+    _isRefreshing: false,
   }),
 });
 
 // Folosim doar store-ul simplu fără middleware-uri pentru a testa
 export const useTransactionStore = create<TransactionState>(createTransactionStore);
+
+// Inițializăm starea din localStorage la încărcarea aplicației
+useTransactionStore.getState().loadPendingState();
+
+// Reluăm operațiunile nefinalizate
+useTransactionStore.getState().resumePendingOperations();
