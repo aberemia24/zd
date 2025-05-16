@@ -3,10 +3,8 @@ import {
   flexRender, 
   Header, 
   Row as TableRow,
-  Cell,
-  RowModel
+  Cell
 } from '@tanstack/react-table';
-import { useVirtualizer, Virtualizer, VirtualItem } from '@tanstack/react-virtual';
 import { useLunarGridTable } from './hooks/useLunarGridTable';
 import type { LunarGridRowData } from './types';
 
@@ -202,12 +200,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const { 
     table, 
     days,
-    rowVirtualizer,
     dailyBalances,
     getSumForCell,
     updateTableData,
-    data,
-    columns
+    data
   } = useLunarGridTable(
     transactions,
     categories,
@@ -223,40 +219,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     updateTableData(transactions);
   }, [transactions, updateTableData]);
   
-  // Efect pentru debugging
-  useEffect(() => {
-    console.log('Rows count:', table.getRowModel().rows.length);
-    console.log('Virtual items count:', rowVirtualizer?.getVirtualItems().length || 0);
-    console.log('Table data length:', data.length);
-    
-    // Verificăm datele din tabel
-    if (table.getRowModel().rows.length === 0 && transactions.length > 0) {
-      console.log('PROBLEMĂ: Nu sunt rânduri în tabel deși avem tranzacții');
-      console.log('Transactions:', transactions.length);
-      console.log('Categories:', categories.length);
-      console.log('Expanded categories:', Object.keys(expandedCategories).length);
-    }
-    
-    // Verificăm dacă containerul are dimensiuni
-    if (tableContainerRef.current) {
-      console.log('Container dimensions:', {
-        width: tableContainerRef.current.offsetWidth,
-        height: tableContainerRef.current.offsetHeight
-      });
-    } else {
-      console.log('Container ref nu este atașat!');
-    }
-  }, [table, rowVirtualizer, data, transactions, categories, expandedCategories]);
-  
-  // Folosim tipul VirtualItem direct din @tanstack/react-virtual
-  type VirtualRow = VirtualItem;
-  
-  // Efect pentru a ne asigura că virtualizatorul este recalculat la schimbări
-  useEffect(() => {
-    if (rowVirtualizer && data.length > 0) {
-      rowVirtualizer.measure();
-    }
-  }, [rowVirtualizer, data]);
+  // Cod de debugging eliminat pentru producție
   
   // Render cu constante și clase existente
   return (

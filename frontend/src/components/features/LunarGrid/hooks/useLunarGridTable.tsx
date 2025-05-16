@@ -1,7 +1,6 @@
 
-import { useMemo, useRef, useCallback, useLayoutEffect, useState, useEffect } from 'react';
+import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import { useReactTable, getCoreRowModel, ColumnDef } from '@tanstack/react-table';
-import { useVirtualizer, Virtualizer } from '@tanstack/react-virtual';
 
 // Import-uri din bibliotecile externe
 import { TransactionValidated } from '@shared-constants/transaction.schema';
@@ -135,30 +134,7 @@ export function useLunarGridTable(
     getCoreRowModel: getCoreRowModel(),
   });
   
-  // Configurare virtualizare pentru randuri cu setări simplificate
-  const rowVirtualizer = useVirtualizer({
-    count: table.getRowModel().rows.length,
-    getScrollElement: () => tableContainerRef.current,
-    estimateSize: () => 35, // înălțimea estimată a unui rând
-    overscan: 5 // număr redus de rânduri adiționale 
-  }) as Virtualizer<HTMLDivElement, Element>;
-  
-  // Adăugăm un effect pentru debug direct în hook
-  useEffect(() => {
-    console.log('Virtualizator:', {
-      count: table.getRowModel().rows.length,
-      virtualItems: rowVirtualizer?.getVirtualItems().length || 0,
-      element: tableContainerRef.current ? 'Referintă validă' : 'Referintă NULL',
-      height: tableContainerRef.current?.clientHeight
-    });
-  }, [rowVirtualizer, table, tableContainerRef]);
-  
-  // Actualizare dimensiuni virtualizator când se schimbă datele
-  useLayoutEffect(() => {
-    if (rowVirtualizer) {
-      rowVirtualizer.measure();
-    }
-  }, [tableData, rowVirtualizer]);
+  // Efect de debugging eliminat pentru optimizare
   
   // Funcție utilitară pentru obținerea sumelor pentru celule
   const getSumForCell = useCallback((category: string, subcategory: string, day: number) => {
@@ -180,14 +156,13 @@ export function useLunarGridTable(
     setTableData(transformed);
   }, [categories, expandedCategories]);
 
-  // Returnăm toate datele necesare pentru componenta principală
+  // Returnăm toate datele necesare pentru componenta principală, fără referințe la virtualizare
   return {
     table,
     data: tableData,
     columns,
     days,
     tableContainerRef,
-    rowVirtualizer,
     dailyBalances,
     getSumForCell,
     updateTableData

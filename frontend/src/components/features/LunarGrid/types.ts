@@ -182,8 +182,7 @@ export interface UseLunarGridTableResult {
   /** Referință către container-ul de tabel */
   tableContainerRef: React.RefObject<HTMLDivElement>;
   
-  /** Virtualizatorul de rânduri */
-  rowVirtualizer: Virtualizer<HTMLDivElement, Element>;
+  // Virtualizare eliminată pentru a evita problemele de randare
   
   /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
