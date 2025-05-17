@@ -17,30 +17,30 @@ const TransactionsPage: React.FC = () => {
   // Folosim React Query pentru state management și fetch
   const queryClient = useQueryClient();
   
-  // State pentru paginare și filtre
+  // State pentru filtre - pentru paginare folosim useInfiniteQuery cu pageParam
   const [filters, setFilters] = React.useState({
     limit: PAGINATION.DEFAULT_LIMIT,
-    offset: PAGINATION.DEFAULT_OFFSET, 
     type: '',
     category: ''
   });
   
   // Extragem valorile din filters pentru a le folosi în UI
-  const { limit, offset, type: filterType, category: filterCategory } = filters;
-  const currentPage: number = Math.floor(offset / limit) + 1;
+  const { limit, type: filterType, category: filterCategory } = filters;
   
   // Hook-ul useTransactionFiltersStore pentru UI/interfață folositor
   const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
   const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
   
-  // Folosim hook-ul useTransactions pentru a prelua datele - React Query se ocupă de caching
+  // Folosim hook-ul useTransactions cu paginare infinită - React Query se ocupă de caching
   const { 
     data, 
     error: fetchError, 
-    isPending: isLoading 
+    isPending: isLoading,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage
   } = useTransactions({
     limit,
-    offset,
     type: filterType as TransactionType || undefined,
     category: filterCategory as string || undefined,
     // Nu includem month/year pentru a asigura că nu avem conflicte cu LunarGrid
@@ -48,20 +48,23 @@ const TransactionsPage: React.FC = () => {
     year: undefined,
   });
   
-  // Funcții pentru navigare - actualizează direct state-ul local care declanșează refetch
-  const goToPage = React.useCallback((page: number) => {
-    setFilters(prev => ({
-      ...prev,
-      offset: (page - 1) * limit
-    }));
-  }, [limit]);
+  // Extragem și combinam toate tranzacțiile din toate paginile pentru afișare
+  const transactions = React.useMemo(() => {
+    if (!data?.pages) return [];
+    return data.pages.flatMap(page => page.data);
+  }, [data]);
+  
+  // Calculam numărul total de tranzacții din rezultatele paginii
+  const totalTransactions = React.useMemo(() => {
+    if (!data?.pages || data.pages.length === 0) return 0;
+    // Folosim count din prima pagină care conține totalul
+    return data.pages[0].count;
+  }, [data]);
   
   // Callback pentru schimbarea filtrelor - declanșează refetch via React Query
   const handleFilterChange = React.useCallback((newType?: string, newCategory?: string) => {
     setFilters(prev => ({
       ...prev,
-      // Resetăm offset la schimbarea filtrelor pentru a începe de la prima pagină
-      offset: 0,
       type: newType !== undefined ? newType : prev.type,
       category: newCategory !== undefined ? newCategory : prev.category
     }));
@@ -84,12 +87,6 @@ const TransactionsPage: React.FC = () => {
     }));
   }, []);
 
-  // Callback pentru schimbarea paginii - utilizat de componenta TransactionTable
-  const handlePageChange = React.useCallback(
-    (newOffset: number) => goToPage(Math.floor(newOffset / limit) + 1), 
-    [goToPage, limit]
-  );
-
   return (
     <>
       <h1 className="text-2xl font-bold text-primary-700 mb-token" data-testid="transactions-title">{TITLES.TRANZACTII}</h1>
@@ -103,14 +100,14 @@ const TransactionsPage: React.FC = () => {
         onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
       />
 
-      {/* Pasăm direct datele din React Query către tabel */}
-      <TransactionTable 
-        transactions={data?.data || []} 
-        total={data?.count || 0}
+      {/* Aici folosim TransactionTable care acum suportă paginare infinită */}
+      <TransactionTable
+        transactions={transactions}
+        total={totalTransactions}
         isLoading={isLoading}
-        offset={offset} 
-        limit={limit} 
-        onPageChange={handlePageChange} 
+        isFetchingNextPage={isFetchingNextPage}
+        hasNextPage={hasNextPage}
+        fetchNextPage={fetchNextPage}
       />
 
       {fetchError && (

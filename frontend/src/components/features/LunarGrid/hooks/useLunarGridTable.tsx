@@ -8,7 +8,8 @@ import { EXCEL_GRID } from '@shared-constants';
 // Import stores (doar cele necesare, am eliminat useTransactionStore)
 import { useCategoryStore } from '../../../../stores/categoryStore';
 import { useAuthStore } from '../../../../stores/authStore';
-import { useTransactions } from '../../../../services/hooks/useTransactions';
+// Înlocuim useTransactions cu wrapper-ul dedicat pentru LunarGrid
+import { useLunarGridTransactions, LunarGridTransactionResult } from './useLunarGridTransactions';
 
 import type { LunarGridRowData } from '../types';
 
@@ -68,13 +69,14 @@ export function useLunarGridTable(
     includeAdjacentDays: true
   });
   
-  // React Query hook pentru tranzacții - acum folosim direct parametrii locali
-  const { data: resultFromUseTransactions, isPending: isLoadingTransactions, error: queryError } = 
-    useTransactions(queryParams, user?.id);
-
-  // Procesare date pentru tabel
-  const transactions = useMemo(() => resultFromUseTransactions?.data || [], [resultFromUseTransactions]);
-  const totalCount = useMemo(() => resultFromUseTransactions?.count || 0, [resultFromUseTransactions]);
+  // React Query hook pentru tranzacții - acum folosim wrapper-ul dedicat pentru LunarGrid
+  const lunarGridResult = useLunarGridTransactions(queryParams, user?.id);
+  
+  // Extragem datele din rezultat
+  const transactions = useMemo(() => lunarGridResult.data || [], [lunarGridResult.data]);
+  const totalCount = useMemo(() => lunarGridResult.count || 0, [lunarGridResult.count]);
+  const isLoadingTransactions = lunarGridResult.isLoading;
+  const queryError = lunarGridResult.error;
 
   // Gestionare erori de la React Query
   useEffect(() => {
@@ -97,9 +99,18 @@ export function useLunarGridTable(
   const days = useMemo(() => getDaysInMonth(year, month), [year, month]);
 
   // Pipeline de transformare a datelor
+  // Filtrăm tranzacțiile fără ID și facem cast la TransactionValidated pentru compatibilitate
+  const validTransactions = useMemo(() => 
+    transactions
+      .filter(t => t.id !== undefined)
+      .map(t => t as unknown as TransactionValidated),
+    [transactions]
+  );
+  
+  // Transformăm în formatul necesar pentru tabel
   const rawTableData = useMemo(() => 
-    transformTransactionsToRowData(transactions, categories, expandedCategories), 
-    [transactions, categories, expandedCategories]
+    transformTransactionsToRowData(validTransactions, categories, expandedCategories), 
+    [validTransactions, categories, expandedCategories]
   );
 
   const tableDataForTanStack = useMemo(() => 

@@ -7,29 +7,65 @@ import type { Transaction } from '../../../types/Transaction';
 export type { Transaction };
 
 export type TransactionTableProps = {
-  /** Lista de tranzacții încărcate */
+  /** Lista de tranzacții încărcate din toate paginile */
   transactions: Transaction[];
-  /** Numărul total de tranzacții (pentru paginare) */
+  /** Numărul total de tranzacții (pentru informații) */
   total: number;
-  /** Flag care indică dacă datele sunt în curs de încărcare */
+  /** Flag care indică dacă datele inițiale sunt în curs de încărcare */
   isLoading?: boolean;
-  /** Offset-ul curent pentru paginare */
-  offset: number;
-  /** Numărul de elemente per pagină */
-  limit: number;
-  /** Callback pentru schimbarea paginii */
-  onPageChange: (newOffset: number) => void;
+  /** Flag care indică dacă următoarea pagină este în curs de încărcare */
+  isFetchingNextPage?: boolean;
+  /** Flag care indică dacă mai există pagini disponibile pentru încărcare */
+  hasNextPage?: boolean;
+  /** Callback pentru încărcarea următoarei pagini */
+  fetchNextPage?: () => void;
 };
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ 
   transactions, 
   total, 
-  isLoading = false, 
-  offset, 
-  limit, 
-  onPageChange 
+  isLoading = false,
+  isFetchingNextPage = false,
+  hasNextPage = false,
+  fetchNextPage
 }) => {
-  // Acum toate datele vin direct ca props, nu mai avem nevoie de Zustand
+  // Referință către container pentru implementarea intersection observer
+  const bottomRef = React.useRef<HTMLDivElement>(null);
+
+  // Implementăm Intersection Observer pentru detecția scroll-ului
+  React.useEffect(() => {
+    // Evităm crearea observer-ului dacă nu avem fetchNextPage
+    if (!fetchNextPage) return;
+    
+    // Funcția callback pentru intersection observer
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      // Dacă elementul nostru este vizibil și avem pagini disponibile, și nu suntem deja în loading
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    };
+
+    // Creăm un nou observer care va detecta când elementul e vizibil
+    const observer = new IntersectionObserver(handleObserver, {
+      root: null, // viewport
+      rootMargin: '0px',
+      threshold: 0.1 // 10% vizibil
+    });
+
+    // Începem să observăm elementul nostru
+    if (bottomRef.current) {
+      observer.observe(bottomRef.current);
+    }
+
+    // Cleanup la unmount
+    return () => {
+      if (bottomRef.current) {
+        observer.unobserve(bottomRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  
   return (
     <div className="mt-token">
       <table className="w-full border-collapse rounded-token overflow-hidden shadow-token bg-secondary-50" data-testid="transaction-table">
@@ -62,27 +98,30 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               </tr>
             ))
           ))}
+          {/* Afișăm loading indicator pentru paginile următoare */}
+          {isFetchingNextPage && (
+            <tr data-testid="transaction-table-next-page-loading">
+              <td colSpan={7} className="text-center py-token text-secondary-500">
+                {TABLE.LOADING_MORE}
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-      <div className="mt-token flex gap-token items-center justify-center">
-        <Button
-          variant="secondary"
-          onClick={() => onPageChange(Math.max(0, offset - limit))}
-          disabled={offset === 0}
-        >
-          {BUTTONS.PREV_PAGE}
-        </Button>
-        <span className="text-sm text-secondary-600">
-          {TABLE.PAGE_INFO.replace('{current}', String(Math.floor(offset / limit) + 1)).replace('{total}', String(Math.ceil(total / limit) || 1))}
-        </span>
-        <Button
-          variant="secondary"
-          onClick={() => onPageChange(offset + limit)}
-          disabled={offset + limit >= total || offset >= total}
-        >
-          {BUTTONS.NEXT_PAGE}
-        </Button>
+
+      {/* Status și informații */}
+      <div className="mt-token flex justify-center text-sm text-secondary-600">
+        {!isLoading && transactions && transactions.length > 0 && (
+          <span data-testid="transaction-table-info">
+            {TABLE.SHOWING_INFO
+              .replace('{shown}', String(transactions.length))
+              .replace('{total}', String(total))}
+          </span>
+        )}
       </div>
+
+      {/* Element invizibil pentru intersection observer */}
+      <div ref={bottomRef} className="h-token opacity-0" data-testid="transaction-table-bottom-sentinel" />
     </div>
   );
 };

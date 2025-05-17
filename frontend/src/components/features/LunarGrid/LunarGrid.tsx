@@ -6,8 +6,9 @@ import { TransactionValidated, CreateTransaction } from '@shared-constants/trans
 import { EXCEL_GRID, LABELS, PLACEHOLDERS } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { SubcategoryRows } from './SubcategoryRows';
-import { useTransactions } from '../../../services/hooks/useTransactions';
 import { useQueryClient } from '@tanstack/react-query';
+// Înlocuim importul direct useTransactions cu hook-ul adaptat pentru LunarGrid
+import { useLunarGridTransactions } from './hooks/useLunarGridTransactions';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {

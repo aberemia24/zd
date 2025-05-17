@@ -1,10 +1,16 @@
-import { useQuery, useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query';
+import { 
+  useQuery, 
+  useMutation, 
+  useQueryClient, 
+  useInfiniteQuery,
+  type UseMutationResult, 
+  type InfiniteData
+} from '@tanstack/react-query';
 import { supabaseService } from '../supabaseService';
-import type { TransactionPage } from '../supabaseService'; // Corectat importul
+import type { TransactionPage, Pagination } from '../supabaseService'; // Corectat importul
 import type { TransactionQueryParamsWithRecurring } from '../../types/Transaction';
 import type { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema'; // Corectat și adăugat CreateTransaction
 import { useAuthStore } from '../../stores/authStore';
-import { keepPreviousData } from '@tanstack/react-query';
 
 // Tipuri pentru payload-urile mutațiilor (exemple, pot fi ajustate)
 // Tipul pentru payload-ul de creare trebuie să fie compatibil cu CreateTransaction din schema
@@ -13,10 +19,14 @@ export type CreateTransactionHookPayload = CreateTransaction;
 export type UpdateTransactionHookPayload = Partial<CreateTransaction>;
 
 export interface UseTransactionsResult {
-  // Query
-  data: TransactionPage | undefined;
+  // Infinite Query pentru paginare infinită
+  data: InfiniteData<TransactionPage> | undefined;
   isPending: boolean;
   error: Error | null;
+  isFetching: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
+  isFetchingNextPage: boolean;
   // Mutations
   createTransaction: UseMutationResult<TransactionValidated, Error, CreateTransactionHookPayload, unknown>;
   isCreating: boolean;
@@ -24,7 +34,6 @@ export interface UseTransactionsResult {
   isUpdating: boolean;
   deleteTransaction: UseMutationResult<void, Error, string, unknown>;
   isDeleting: boolean;
-  // Potențial refetch, etc.
 }
 
 /**
@@ -108,11 +117,16 @@ export function useTransactions(
 
   // Specificăm tipurile și folosim sintaxa cu obiect pentru useQuery.
   // Adăugăm un id unic pentru query pentru referințe mai ușoare în cache-uri
-  const queryId = `transactions-${user?.id}-${year || 'all'}-${month || 'all'}`;
+  const queryId = `transactions-infinite-${user?.id}-${year || 'all'}-${month || 'all'}`;
 
-  const query = useQuery<TransactionPage, Error, TransactionPage, readonly unknown[]>({
+  // Definim dimensiunea paginii pentru încărcarea pagini cu pagina
+  const PAGE_SIZE = queryParams.limit || 10;
+
+  // Folosim useInfiniteQuery pentru a implementa paginare infinită
+  const infiniteQuery = useInfiniteQuery<TransactionPage, Error>({
     queryKey: key,
-    queryFn: async () => {
+    initialPageParam: 0, // Parametrul inițial pentru prima pagină (offset 0)
+    queryFn: async ({ pageParam }) => {
       // Determinăm dacă suntem în modul de filtrare lunară sau în modul general
       const isMonthlyView = !!(year && month);
       
@@ -123,10 +137,11 @@ export function useTransactions(
         dateFrom = monthRange.from;
         dateTo = monthRange.to;
       }
-      
-      const pagination = {
-        limit: queryParams.limit,
-        offset: queryParams.offset,
+
+      // Actualizăm offset-ul bazat pe pageParam pentru paginare infinită
+      const pagination: Pagination = {
+        limit: PAGE_SIZE,
+        offset: pageParam as number, // Cast explicit spre number pentru a respecta tipul Pagination
         sort: queryParams.sort as 'date' | 'amount' | 'created_at' | undefined,
         order: queryParams.order,
       };
@@ -143,6 +158,25 @@ export function useTransactions(
       
       return supabaseService.fetchTransactions(user?.id, pagination, filters);
     },
+    // Funcția getNextPageParam determină dacă mai există pagini de încărcat și care este următorul pageParam
+    getNextPageParam: (lastPage, allPages) => {
+      // Calculăm offset-ul curent bazat pe paginile existente și dimensiunea paginii
+      const currentOffset = allPages.length * PAGE_SIZE;
+      
+      // Dacă numărul de rezultate din ultima pagină este mai mic decât dimensiunea paginii,
+      // atunci nu mai sunt pagini disponibile
+      if (lastPage.data.length < PAGE_SIZE) {
+        return undefined; // Nu mai sunt pagini disponibile
+      }
+
+      // Dacă am recuperat toate înregistrările conform count-ului total, nu mai sunt pagini disponibile
+      if (currentOffset >= lastPage.count) {
+        return undefined;
+      }
+
+      // Altfel, returnam următorul offset ca pageParam
+      return currentOffset;
+    },
     // Configurări explicite pentru comportamentul cache-ului
     gcTime: 5 * 60 * 1000, // 5 minute - cât timp rămân datele în cache după ce query-ul devine inactiv
     staleTime: 30 * 1000, // 30 secunde - cât timp sunt considerate datele "fresh" înainte de a fi marcate ca "stale"
@@ -151,16 +185,20 @@ export function useTransactions(
     refetchOnReconnect: true, // Reîmprospătează datele când conexiunea la internet este restabilită
     retry: 3, // Numărul de încercări în caz de eroare
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Timp de așteptare între reîncercări (exponential backoff)
-    placeholderData: keepPreviousData, // Menține datele precedente în UI în timpul încărcării noilor date
     enabled: !!user?.id, // Rulează query doar dacă user.id este disponibil, nu mai depindem de year și month
   });
+
+  // Definim tipul de context pentru mutații pentru a fi compatibil cu InfiniteData
+  type MutationContext = {
+    previousData: InfiniteData<TransactionPage> | undefined;
+  };
 
   // Create Transaction Mutation
   const createMutation = useMutation<
     TransactionValidated,
     Error,
     CreateTransactionHookPayload,
-    { previousData: TransactionPage | undefined }
+    MutationContext
   >({
     mutationFn: async (transactionData) => {
       // Folosim user-ul din closure pentru a evita useAuthStore.getState() care încalcă regulile de hooks
@@ -177,7 +215,7 @@ export function useTransactions(
       await queryClient.cancelQueries({ queryKey: key });
       
       // Salvăm starea anterioară
-      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      const previousData = queryClient.getQueryData<InfiniteData<TransactionPage>>(key);
       
       // Creăm un id temporar pentru tranzacția nouă
       const tempId = `temp-${Date.now()}`;
@@ -190,12 +228,23 @@ export function useTransactions(
         updated_at: new Date().toISOString()
       };
       
-      // Actualizăm cache-ul cu noua tranzacție
-      if (previousData) {
-        queryClient.setQueryData<TransactionPage>(key, {
+      // Actualizăm cache-ul cu noua tranzacție doar dacă avem date existente
+      if (previousData && previousData.pages.length > 0) {
+        // Clonam paginile existente
+        const updatedPages = [...previousData.pages];
+        
+        // Adaugăm tranzacția nouă în prima pagină
+        updatedPages[0] = {
+          ...updatedPages[0],
+          data: [optimisticTransaction, ...updatedPages[0].data],
+          // Incrementăm count pentru noua tranzacție
+          count: updatedPages[0].count + 1
+        };
+        
+        // Setăm datele actualizate în cache
+        queryClient.setQueryData<InfiniteData<TransactionPage>>(key, {
           ...previousData,
-          data: [optimisticTransaction, ...previousData.data],
-          // Notă: Ar trebui să actualizăm și count, dar este mai sigur să lăsăm serverul să o facă
+          pages: updatedPages
         });
       }
       
@@ -204,7 +253,7 @@ export function useTransactions(
     onError: (err, newTransaction, context) => {
       // Resetarea cache-ului la starea anterioară în caz de eroare
       if (context?.previousData) {
-        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+        queryClient.setQueryData<InfiniteData<TransactionPage>>(key, context.previousData);
       }
     },
     onSuccess: () => {
@@ -218,7 +267,7 @@ export function useTransactions(
     TransactionValidated,
     Error,
     { id: string; transactionData: UpdateTransactionHookPayload },
-    { previousData: TransactionPage | undefined }
+    MutationContext
   >({
     mutationFn: async ({ id, transactionData }) => {
       // supabaseService.updateTransaction așteaptă Partial<CreateTransaction>
@@ -229,23 +278,51 @@ export function useTransactions(
       await queryClient.cancelQueries({ queryKey: key });
       
       // Salvăm starea anterioară
-      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      const previousData = queryClient.getQueryData<InfiniteData<TransactionPage>>(key);
       
       // Dacă avem date în cache, actualizăm optimist
-      if (previousData) {
-        queryClient.setQueryData<TransactionPage>(key, {
-          ...previousData,
-          data: previousData.data.map(transaction => {
-            if (transaction.id === id) {
-              return {
-                ...transaction,
-                ...transactionData,
-                updated_at: new Date().toISOString()
-              };
-            }
-            return transaction;
-          })
+      if (previousData && previousData.pages.length > 0) {
+        // Clonăm paginile existente
+        const updatedPages = [...previousData.pages];
+        
+        // Căutăm tranzacția în toate paginile și o actualizăm
+        let found = false;
+        
+        // Parcurgem fiecare pagină și căutăm tranzacția de actualizat
+        const newPages = updatedPages.map(page => {
+          // Verificăm dacă tranzacția există în această pagină
+          const transactionIndex = page.data.findIndex(t => t.id === id);
+          
+          // Dacă nu am găsit tranzacția în această pagină, returnăm pagina nemodificată
+          if (transactionIndex === -1) return page;
+          
+          // Am găsit tranzacția, marcăm ca găsită
+          found = true;
+          
+          // Clonăm datele paginii
+          const newData = [...page.data];
+          
+          // Actualizăm tranzacția în array
+          newData[transactionIndex] = {
+            ...newData[transactionIndex],
+            ...transactionData,
+            updated_at: new Date().toISOString()
+          };
+          
+          // Returnăm pagina actualizată
+          return {
+            ...page,
+            data: newData
+          };
         });
+        
+        // Actualizăm cache-ul doar dacă am găsit tranzacția
+        if (found) {
+          queryClient.setQueryData<InfiniteData<TransactionPage>>(key, {
+            ...previousData,
+            pages: newPages
+          });
+        }
       }
       
       return { previousData };
@@ -253,7 +330,7 @@ export function useTransactions(
     onError: (err, updatePayload, context) => {
       // Resetarea cache-ului la starea anterioară în caz de eroare
       if (context?.previousData) {
-        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+        queryClient.setQueryData<InfiniteData<TransactionPage>>(key, context.previousData);
       }
     },
     onSuccess: () => {
@@ -267,7 +344,7 @@ export function useTransactions(
     void,
     Error,
     string, // transactionId
-    { previousData: TransactionPage | undefined }
+    MutationContext
   >({
     mutationFn: async (transactionId) => {
       return supabaseService.deleteTransaction(transactionId);
@@ -277,15 +354,47 @@ export function useTransactions(
       await queryClient.cancelQueries({ queryKey: key });
       
       // Salvăm starea anterioară
-      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      const previousData = queryClient.getQueryData<InfiniteData<TransactionPage>>(key);
       
       // Dacă avem date în cache, ștergem optimist tranzacția
-      if (previousData) {
-        queryClient.setQueryData<TransactionPage>(key, {
-          ...previousData,
-          data: previousData.data.filter(transaction => transaction.id !== transactionId),
-          // Notă: Ar trebui să actualizăm și count, dar lăsăm acest lucru backend-ului
+      if (previousData && previousData.pages.length > 0) {
+        // Clonăm paginile existente
+        const updatedPages = [...previousData.pages];
+        
+        // Căutăm tranzacția în toate paginile și o ștergem
+        let found = false;
+        let totalRemoved = 0;
+        
+        // Parcurgem fiecare pagină și căutăm tranzacția de șters
+        const newPages = updatedPages.map(page => {
+          // Verificăm dacă tranzacția există în această pagină
+          const initialLength = page.data.length;
+          
+          // Filtrez datele pentru a remove tranzacția cu ID-ul specificat
+          const newData = page.data.filter(t => t.id !== transactionId);
+          
+          // Dacă nu am găsit/șters tranzacția în această pagină, returnăm pagina nemodificată
+          if (newData.length === initialLength) return page;
+          
+          // Am găsit și șters tranzacția, marcăm ca găsită și incrementăm contorul
+          found = true;
+          totalRemoved += initialLength - newData.length;
+          
+          // Returnăm pagina actualizată cu count decrementat
+          return {
+            ...page,
+            data: newData,
+            count: page.count - (initialLength - newData.length)
+          };
         });
+        
+        // Actualizăm cache-ul doar dacă am găsit tranzacția
+        if (found) {
+          queryClient.setQueryData<InfiniteData<TransactionPage>>(key, {
+            ...previousData,
+            pages: newPages
+          });
+        }
       }
       
       return { previousData };
@@ -293,7 +402,7 @@ export function useTransactions(
     onError: (err, transactionId, context) => {
       // Resetarea cache-ului la starea anterioară în caz de eroare
       if (context?.previousData) {
-        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+        queryClient.setQueryData<InfiniteData<TransactionPage>>(key, context.previousData);
       }
     },
     onSuccess: () => {
@@ -303,9 +412,15 @@ export function useTransactions(
   });
 
   return {
-    data: query.data,
-    isPending: query.isPending,
-    error: query.error,
+    // Proprietăți Infinite Query
+    data: infiniteQuery.data,
+    isPending: infiniteQuery.isPending,
+    error: infiniteQuery.error,
+    isFetching: infiniteQuery.isFetching,
+    hasNextPage: infiniteQuery.hasNextPage,
+    fetchNextPage: infiniteQuery.fetchNextPage,
+    isFetchingNextPage: infiniteQuery.isFetchingNextPage,
+    // Mutații
     createTransaction: createMutation, // Returnează obiectul de mutație complet
     isCreating: createMutation.isPending,
     updateTransaction: updateMutation, // Returnează obiectul de mutație complet

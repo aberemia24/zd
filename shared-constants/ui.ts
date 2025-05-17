@@ -53,7 +53,9 @@ export const TABLE = {
   },
   EMPTY: 'Nicio tranzacție',
   LOADING: 'Se încarcă...',
+  LOADING_MORE: 'Se încarcă mai multe tranzacții...',
   PAGE_INFO: 'Pagina {current} din {total}',
+  SHOWING_INFO: 'Se afișează {shown} din {total} tranzacții',
   BOOL: {
     YES: 'Da',
     NO: 'Nu',
