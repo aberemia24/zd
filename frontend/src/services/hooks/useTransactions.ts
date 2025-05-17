@@ -60,7 +60,18 @@ export function useTransactions(
   const year = queryParams.year;
   const month = queryParams.month;
 
-  const key = [...TRANSACTIONS_KEY, year, month, user?.id] as const;
+  // Includem toți parametrii de paginare și filtrare în queryKey pentru a asigura reîncărcarea datelor la schimbarea acestora
+  const key = [
+    ...TRANSACTIONS_KEY, 
+    year, 
+    month, 
+    user?.id,
+    queryParams.limit,
+    queryParams.offset,
+    queryParams.type,
+    queryParams.category,
+    queryParams.recurring
+  ] as const;
   // getMonthRange va fi apelat doar dacă year și month sunt definite (gestionat de 'enabled')
   // const { from, to } = (year && month) ? getMonthRange(year, month) : { from: undefined, to: undefined };
 
@@ -119,7 +130,8 @@ export function useTransactions(
       return supabaseService.createTransaction(transactionData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', queryParams.year, queryParams.month, user?.id] });
+      // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
     },
   });
 
