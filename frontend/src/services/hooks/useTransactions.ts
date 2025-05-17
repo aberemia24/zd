@@ -107,14 +107,11 @@ export function useTransactions(
       // Folosim user-ul din closure pentru a evita useAuthStore.getState() care încalcă regulile de hooks
       if (!user?.id) throw new Error('User not authenticated for creating transaction.');
       
-      // Ne asigurăm că userId este setat în transacție
-      const transactionWithUserId = {
-        ...transactionData,
-        userId: user.id, // Adăugăm explicit userId pentru a respecta schema
-      };
+      // NOTĂ: Schema din backend are coloana user_id (nu userId), iar supabaseService va adăuga intern
+      // user_id în tranzacție din useAuthStore.getState().user.id
       
-      // supabaseService.createTransaction așteaptă CreateTransaction
-      return supabaseService.createTransaction(transactionWithUserId);
+      // Nu trebuie să adăugăm user_id în payload pentru că supabaseService face asta intern
+      return supabaseService.createTransaction(transactionData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions', queryParams.year, queryParams.month, user?.id] });
