@@ -37,6 +37,17 @@ export interface LunarGridTanStackProps {
   month: number;
 }
 
+// Interfață pentru celula în editare
+interface EditingCellState {
+  id: string;
+  category: string;
+  subcategory?: string;
+  day: number;
+  amount: string;
+  type: TransactionType;
+  inputRef?: React.RefObject<HTMLInputElement>;
+}
+
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) => {
   // User și autorizare
   const user = useAuthStore((state) => state.user);
@@ -50,6 +61,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   
   // State pentru expandare categorii - folosim Record<string, boolean> pentru compatibilitate cu useLunarGridTable
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  
+  // State pentru celula în curs de editare (editare inline)
+  const [editingCell, setEditingCell] = useState<EditingCellState | null>(null);
   
   // State pentru popover de editare
   const [popover, setPopover] = useState<{
@@ -108,71 +122,135 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     setExpandedCategories(allCollapsed);
   }, [categories]);
   
-  // Handler pentru double-click pe celulă (creare tranzacție) - adaptat pentru semnătura așteptată de useLunarGridTable
-  const handleCellDoubleClick = useCallback(
-    (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
-      const transactionType = determineTransactionType(category);
-      const newAmount = prompt(EXCEL_GRID.PROMPTS.ENTER_AMOUNT, amount);
-      
-      if (!newAmount || isNaN(Number(newAmount))) return;
-      
-      // Construim data
-      const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
-      
-      // Folosim React Query mutation în loc de Zustand conform memoriei [d7b6eb4b]
-      const createPayload: CreateTransactionHookPayload = {
-        amount: Number(newAmount),
-        category,
-        subcategory: subcategory || undefined,
-        type: transactionType,
-        date,
-        recurring: false,
-        description: '', // Câmp obligatoriu conform noii structuri
-        frequency: undefined
-      };
-      
-      createTransactionMutation.mutate(createPayload, {
-        onSuccess: () => {
-          console.log('Tranzacție creată cu succes!');
-          // Se poate adăuga notificare UI aici
-        },
-        onError: (error: Error) => {
-          console.error('Eroare la crearea tranzacției:', error);
-          // Se poate adăuga notificare eroare aici
-        }
-      });
-    }, 
-    [year, month, createTransactionMutation]
-  );
-  
   // Helper pentru a determina tipul tranzacției - funcție LOCALĂ, nu referință externă
-  const determineTransactionType = (category: string): TransactionType => {
+  const determineTransactionType = useCallback((category: string): TransactionType => {
     if (category === 'VENITURI') return TransactionType.INCOME;
     if (category === 'ECONOMII') return TransactionType.SAVING;
     return TransactionType.EXPENSE;
-  };
+  }, []);
+  
+  // Handler pentru double-click pe celulă - activează editarea inline
+  const handleCellDoubleClick = useCallback(
+    (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
+      // Prevenim propagarea și default behavior
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const transactionType = determineTransactionType(category);
+      
+      // Generăm un ID unic pentru celula editată
+      const cellId = `${category}-${subcategory || 'null'}-${day}`;
+      
+      // Creăm o referință pentru input pentru a-l putea focaliza
+      const inputRef = React.createRef<HTMLInputElement>();
+      
+      // Setăm starea de editare pentru această celulă
+      setEditingCell({
+        id: cellId,
+        category,
+        subcategory,
+        day,
+        amount,
+        type: transactionType,
+        inputRef
+      });
+      
+      // Focus pe input după render
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus();
+          inputRef.current.select();
+        }
+      }, 50);
+      
+      // Anulează și orice popover existent
+      setPopover(null);
+    }, 
+    [year, month, determineTransactionType]
+  );
+  
+  // Handler pentru salvarea valorii după editare inline
+  const handleInlineEditSave = useCallback((newAmount: string) => {
+    if (!editingCell) return;
+    
+    const { category, subcategory, day, type: transactionType } = editingCell;
+    
+    if (isNaN(Number(newAmount)) || !newAmount) {
+      setEditingCell(null);
+      return;
+    }
+    
+    // Construim data
+    const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
+    
+    // Folosim React Query mutation în loc de Zustand conform memoriei [d7b6eb4b]
+    // Nu trimitem userId, acesta este gestionat în hook-ul useTransactions
+    const createPayload: CreateTransactionHookPayload = {
+      amount: Number(newAmount),
+      category,
+      subcategory: subcategory || undefined,
+      type: transactionType,
+      date,
+      recurring: false,
+      // Fără description - eliminat complet
+      frequency: undefined
+    };
+    
+    createTransactionMutation.mutate(createPayload, {
+      onSuccess: () => {
+        setEditingCell(null);
+        // Se poate adăuga notificare UI aici
+      },
+      onError: (error: Error) => {
+        console.error('Eroare la crearea tranzacției:', error);
+        setEditingCell(null);
+        // Se poate adăuga notificare eroare aici
+      }
+    });
+  }, [editingCell, year, month, createTransactionMutation]);
+  
+  // Handler pentru anularea editării inline
+  const handleInlineEditCancel = useCallback(() => {
+    setEditingCell(null);
+  }, []);
+  
+  // Handler pentru keypress în inputul inline
+  const handleInlineKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleInlineEditSave((e.target as HTMLInputElement).value);
+    } else if (e.key === 'Escape') {
+      handleInlineEditCancel();
+    }
+  }, [handleInlineEditSave, handleInlineEditCancel]);
+  
+  // Notă: Funcția determineTransactionType a fost mutată mai sus
   
   // Handler pentru click pe celulă - adaptat pentru tipul așteptat de useLunarGridTable
   const handleCellClick = useCallback(
     (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string, type: string) => {
-      // Deschide popover pentru editare tranzacție
+      // Prevenim click-ul de la propagare pentru a evita conflicte cu expand/collapse
+      e.stopPropagation();
+      
+      // Dacă suntem deja în modul editare, nu deschidem popover
+      if (editingCell) return;
+      
+      // Deschide popover pentru editare tranzacție complexă (nu doar sumă)
       setPopover({
         category,
         subcategory,
         day,
-        type: type as TransactionType,
+        type: determineTransactionType(category), // forțăm tipul corect în loc de parametrul type care poate fi undefined
         amount,
         anchorEl: e.currentTarget as HTMLElement
       });
     }, 
-    []
+    [editingCell, determineTransactionType]
   );
   
   // Handler pentru salvarea tranzacției din popover
   const handleSavePopover = useCallback(
     async (formData: {
       amount: string;
-      description: string; 
       recurring: boolean;
       frequency?: FrequencyType;
     }) => {
@@ -192,7 +270,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
         subcategory: subcategory || undefined,
         type: transactionTypeFromPopover,
         date,
-        description: formData.description,
+        // Eliminăm complet câmpul description și nu mai adaugăm userId (gestionat în useTransactions)
         recurring: formData.recurring,
         frequency: formData.recurring ? formData.frequency : undefined,
       };
@@ -236,7 +314,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     table,
     tableContainerRef,
     isLoading, // Adăugat
-    error // Adăugat
+    error, // Adăugat
+    getCellId // Funcție utilă pentru a identifica celule
   } = useLunarGridTable(
     year, 
     month, 
@@ -331,7 +410,24 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
                         className="border-t border-secondary-200 py-2 px-3 first:border-l last:border-r"
                         data-testid={`cell-${cell.column.id}-${row.id}`}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {/* Renderizare condiționată pentru celule: Input în mod de editare */}
+                        {editingCell && 
+                         getCellId(cell.row.original.category, cell.row.original.subcategory, parseInt(cell.column.id)) === editingCell.id ? (
+                          <div className="relative w-full h-full">
+                            <input
+                              ref={editingCell.inputRef}
+                              type="number"
+                              className="w-full h-full p-1 focus:ring-2 focus:ring-primary-500 focus:outline-none"
+                              defaultValue={editingCell.amount || ''}
+                              onKeyDown={handleInlineKeyDown}
+                              onBlur={(e) => handleInlineEditSave(e.target.value)}
+                              autoFocus
+                              data-testid="inline-edit-input"
+                            />
+                          </div>
+                        ) : (
+                          flexRender(cell.column.columnDef.cell, cell.getContext())
+                        )}
                       </td>
                     ))}
                   </tr>
@@ -342,20 +438,26 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
         )}
       </div>
       
-      {/* Popover pentru editare tranzacție */}
-      {popover && (
-        <CellTransactionPopover
-          initialAmount={popover.amount || ''}
-          day={popover.day}
-          month={month}
-          year={year}
-          category={popover.category}
-          subcategory={popover.subcategory || ''} 
-          type={popover.type}
-          onSave={handleSavePopover}
-          onCancel={() => setPopover(null)}
-          anchorRef={{ current: popover.anchorEl }}
-        />
+      {/* Popover pentru editare tranzacție complexă */}
+      {popover && !editingCell && (
+        <div className="absolute top-0 left-0 z-50" style={{ 
+          position: 'absolute',
+          top: popover.anchorEl ? `${popover.anchorEl.getBoundingClientRect().bottom}px` : '0px',
+          left: popover.anchorEl ? `${popover.anchorEl.getBoundingClientRect().left}px` : '0px'
+        }}>
+          <CellTransactionPopover
+            initialAmount={popover.amount || ''}
+            day={popover.day}
+            month={month}
+            year={year}
+            category={popover.category}
+            subcategory={popover.subcategory || ''} 
+            type={popover.type}
+            onSave={handleSavePopover}
+            onCancel={() => setPopover(null)}
+            anchorRef={{ current: popover.anchorEl }}
+          />
+        </div>
       )}
     </div>
   );

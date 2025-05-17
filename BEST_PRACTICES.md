@@ -663,6 +663,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
          return null;
        }
      };
+
      
      // CORECT: Manipulare de state în useEffect
      const Component = () => {
@@ -681,6 +682,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
        setDeletingItem(null); // Dezactivează explicit modul de ștergere
        setEditingItem(item);
      };
+
      
      // La activarea modului de ștergere
      const handleDelete = (item) => {
@@ -829,5 +831,86 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
 
 - Toate hook-urile `react-router-dom` (ex: `useNavigate`, `useLocation`, `useParams`) trebuie folosite în componente care sunt descendente ale unui component `<Router>` (ex: `<BrowserRouter>`). Altfel, vor genera erori la runtime.
 - Pentru rutele protejate, elementul randat condiționat ar trebui să includă `<Navigate to="/calea-de-redirect" replace />`. Props-ul `replace` asigură că pagina de login (sau altă pagină intermediară) nu este adăugată în istoricul de navigare, permițând butonului "back" să funcționeze intuitiv.
+
+---
+
+## Sincronizarea schema DB și modelele frontend
+
+### Problemă și impact
+
+Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discrepanța între schema bazei de date și modelele/tipurile din frontend. Această problemă duce la:
+
+- Erori de tipul `Column not found` în API responses
+- Inconsistențe de date între frontend și backend
+- Bug-uri subtile și greu de diagnosticat
+- Timp pierdut în debugging și fix-uri de urgență
+
+### Exemple concrete de erori și soluții
+
+1. **Eroare**: `Could not find the 'userId' column of 'transactions' in the schema cache`
+   - **Cauza**: Frontend trimite `userId` în payload, dar schema DB are `user_id`
+   - **Soluție**: 
+     - Alinierea strictă a numelor de câmpuri între modelele TS și schema DB
+     - Transformare explicită în servicii (nu în componente UI)
+     ```typescript
+     // Corect - Transformare nume de câmpuri în serviciu
+     async createTransaction(data: TransactionDTO) {
+       // Convertim din camelCase (TS/JS) în snake_case (DB)
+       const payload = {
+         user_id: data.userId,
+         // ... alte câmpuri transformate similar
+       };
+       return this.api.post('/transactions', payload);
+     }
+     ```
+
+2. **Eroare**: `Could not find the 'description' column of the provided object`
+   - **Cauza**: Un câmp `description` trimis în payload deși nu există în schemă
+   - **Soluție**:
+     - Eliminarea tuturor câmpurilor care nu sunt în schemele DB și validare
+     - Validarea payload-urilor cu Zod sau TypeScript utility types
+     ```typescript
+     // Validare cu TypeScript
+     type DbColumnKeys = keyof DBTransaction; // Exact columns from schema
+     type SafePayload = Pick<TransactionForm, DbColumnKeys>;
+     
+     // Remove fields not in DB schema
+     const stripExtraFields = <T>(data: T, allowedKeys: string[]): Partial<T> => {
+       return Object.fromEntries(
+         Object.entries(data).filter(([key]) => allowedKeys.includes(key))
+       ) as Partial<T>;
+     };
+     ```
+
+### Best Practices pentru sincronizare schemă-model
+
+1. **Sursa unică de adevăr pentru scheme**
+   - Generează tipurile TS din schema DB folosind tools precum [prisma-typegen](https://github.com/prisma/prisma), [supabase-js-v2](https://supabase.com/docs/reference/javascript/typescript-support) sau [openapi-typescript](https://github.com/drwpow/openapi-typescript)
+   - Alternativ, definește tipurile într-un loc central (`shared-constants/schema.ts`)
+   - Actualizează simultan migrarea DB și tipurile asociate
+
+2. **Validare payload-uri**
+   - Validează toate payload-urile înainte de trimitere către API
+   - Folosește utilități de transformare pentru a asigura compatibilitatea (ex: `camelToSnake`, `stripExtraFields`)
+   - Folosește un middleware API care probează schema DB și detectează erori la runtime
+
+3. **Delegați transformarea în servicii**
+   - Serviciile trebuie să convertească între formatul UI și formatul DB
+   - Componentele UI nu ar trebui să știe detalii despre structura exactă a tabelelor
+   - Izolează cunostințele despre schemă în servicii specializate
+
+### Procedură recomandată pentru schimbări de schemă
+
+1. Actualizează schema DB prin migrări (SQL, Prisma, etc.)
+2. Actualizează tipurile/interfețele TS corespunzătoare
+3. Actualizează serviciile care interacționează cu noua schemă
+4. Actualizează validarea formularelor și componentelor UI
+5. Testează exhaustiv cu date reale
+
+### Riscuri și mitigații
+
+1. **Drepturi acces**: Asigură-te că serviciile au doar permisiunile minime necesare pentru operațiunile lor
+2. **Performanță**: Minimizează transformările complexe în timpul runtime-ului
+3. **Securitate**: Validează întotdeauna datele de intrare pentru a preveni SQLi sau alte vulnerabilități
 
 ---

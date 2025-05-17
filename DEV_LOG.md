@@ -417,23 +417,97 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 # Lessons Learned
 
-## 2025-05-17 - Migrare completă la React Query & centralizare API (milestone major)
+## 2025-05-16: Migrare completă la React Query
 
-- Toate operațiunile CRUD pe tranzacții folosesc React Query (TanStack Query) cu hooks dedicate (`useTransactions`, `useCategories` etc.)
-- Eliminat complet fetch/caching din store-uri Zustand (acum doar UI-state)
-- Rutele și config-ul API sunt centralizate în `@shared-constants/api`
-- Toate fetch/mutații folosesc strict `API.ROUTES.*` (fără string-uri hardcodate)
-- Debounce implementat pentru navigarea rapidă între luni
-- Teste unitare și de integrare actualizate pentru noul pattern
-- Cod legacy/deprecated eliminat
-- Documentație și best practices actualizate pentru noul pattern
+**Autor**: Team DevOps
 
-**Riscuri:**
-- Orice fetch paralel (vechi + nou) poate duce la bug-uri – folosiți DOAR patternul React Query
-- Schimbările de contract API trebuie propagate rapid în hooks/tipuri
+**Descriere**: Am finalizat migrarea completă de la Zustand la React Query pentru toate operațiunile de date. Această schimbare aduce îmbunătățiri semnificative în gestionarea stării server și operațiunile de cache.
 
-**Lecții:**
-- Separarea clară între UI state și server state simplifică mentenanța
+### Modificări majore:
+
+1. **Structura nouă pentru API calls**:
+   - Toate apelurile API sunt acum gestionate prin custom hooks React Query (`useQuery` și `useMutation`)
+   - Eliminare dependență directă de Zustand pentru operațiuni CRUD
+   - Mutare business logic din stores în hooks specializate
+
+2. **Centralizare API**:
+   - Toate rutele API sunt definite în `shared-constants/api.ts`
+   - Eliminare duplicare și inconsistențe între frontend și backend
+   - Depreciere `API_URL` și înlocuire cu `API.ROUTES.*`
+
+3. **Îmbunătățiri cache**:
+   - Implementare mecanisme avansate de cache și invalidare
+   - Reducere număr de request-uri redundante
+   - Optimizare performanță la navigarea între pagini
+
+### Riscuri și observații:
+
+1. **Schimbare de paradigmă**:
+   - Zustand rămâne util pentru UI state, dar nu mai este folosit pentru date de server
+   - Necesită familiarizare cu conceptele React Query (stale time, cache time, etc.)
+
+2. **Testare extinsă necesară**:
+   - Anumite edge cases și scenarii complexe pot necesita testare suplimentară
+   - Monitorizare atentă performanță în producție
+
+### Resurse:
+
+- Noi secțiuni în README.md și BEST_PRACTICES.md cu exemple și recomandări
+- Updated tests pentru noul pattern
+
+---
+
+## 2025-05-17: Refactorizare LunarGridTanStack pentru paritate funcțională cu tabelul clasic
+
+**Autor**: Team FE
+
+**Descriere**: Am restaurat funcționalitatea de editare inline și expand/collapse în tabelul TanStack, asigurând paritate funcțională cu tabelul clasic, după migrarea la React Query.
+
+### Probleme rezolvate:
+
+1. **Editare inline restaurată**:
+   - Înlocuit modal prompt() cu input direct în celulă la dublu-click
+   - Comportament consistent cu tabelul clasic (Enter/Escape pentru confirmare/anulare)
+   - Experiență utilizator îmbunătățită pentru editare rapidă sume
+
+2. **Corecție user_id în API**:
+   - Eliminat câmpul `userId` din payload-ul tranzacțiilor (nu exista în schema DB)
+   - Corectată implementarea care cauza eroarea `"Could not find the 'userId' column of 'transactions'"`
+   - Delegată gestionarea user_id către supabaseService în loc de includere în payload
+
+3. **Poziționare corectă popover**:
+   - Reparat poziționarea popover-ului pentru a apărea lângă celula pe care s-a făcut click
+   - Eliminat conflictul între evenimentele de click pentru editare și expand/collapse
+
+4. **Eliminate câmpuri inutile**:
+   - Eliminat câmpul `description` care cauza erori la backend (nu exista în schema DB)
+
+### Lecții învățate:
+
+1. **Schema DB vs. Frontend models**:
+   - Este critică sincronizarea perfectă între modelele din frontend și schema din backend
+   - Câmpurile trimise în payload trebuie să fie exact cele așteptate de DB
+
+2. **Conflict evenimente React**:
+   - Gestionarea corectă a propagării evenimentelor (stopPropagation) este esențială în componente complexe
+   - Separarea clară a responsabilităților între handleri evită comportamente neașteptate
+
+3. **Paritate funcțională vs. UI**:
+   - Se poate menține paritate funcțională chiar și cu implementări tehnice diferite
+   - Experiența utilizator trebuie să fie consistentă indiferent de implementarea tehnică
+
+### Riscuri reziduale:
+
+1. **Testarea complexă**:
+   - Necesită testare extinsă pentru a asigura funcționalitatea corectă în toate scenariile
+   - Risc de regresii la modificări viitoare în componenta TanStack sau în API
+
+2. **Dependență de structura DOM**:
+   - Poziționarea elementelor (ex: popover) depinde de structura DOM și poate fi fragilă
+   - Necesară atenție la schimbări de layout sau CSSanța
+
+
+
 - Centralizarea rutelor și mesajelor elimină bug-uri de sincronizare
 - Testele trebuie să reflecte mereu contractul actual al hooks/servicii
 

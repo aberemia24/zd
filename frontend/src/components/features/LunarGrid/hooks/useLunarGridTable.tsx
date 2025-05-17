@@ -1,6 +1,6 @@
 
 import { useMemo, useRef, useCallback, useEffect, useState } from 'react';
-import { useReactTable, getCoreRowModel, ColumnDef } from '@tanstack/react-table';
+import { useReactTable, getCoreRowModel, ColumnDef, Table } from '@tanstack/react-table';
 
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants';
@@ -10,7 +10,7 @@ import { useCategoryStore } from '../../../../stores/categoryStore';
 import { useAuthStore } from '../../../../stores/authStore';
 import { useTransactions } from '../../../../services/hooks/useTransactions';
 
-import type { LunarGridRowData, UseLunarGridTableResult } from '../types';
+import type { LunarGridRowData } from '../types';
 
 // Import-uri utilitare din @utils/lunarGrid (via barrel file)
 import {
@@ -36,6 +36,18 @@ export type TransformedTableDataRow = {
  * Hook pentru gestionarea datelor și stării pentru LunarGrid bazat pe TanStack Table.
  * Abstractizează logica de procesare a datelor și construcția tabelului.
  */
+// Interfață pentru rezultatul hook-ului useLunarGridTable
+export interface UseLunarGridTableResult {
+  table: Table<TransformedTableDataRow>;
+  tableContainerRef: React.RefObject<HTMLDivElement>;
+  isLoading: boolean;
+  error: Error | null;
+  getCellId: (category: string, subcategory: string | undefined, day: number) => string;
+  columns: ColumnDef<TransformedTableDataRow>[];
+  days: number[];
+  dailyBalances: Record<number, number>;
+}
+
 export function useLunarGridTable(
   year: number,
   month: number,
@@ -210,6 +222,11 @@ export function useLunarGridTable(
     return row ? row.dailyAmounts[day] || 0 : 0;
   }, [rawTableData]);
   */
+  
+  // Funcție pentru a genera un ID unic pentru celule (folosit pentru identificarea celulei în editare)
+  const getCellId = useCallback((category: string, subcategory: string | undefined, day: number): string => {
+    return `${category}-${subcategory || 'null'}-${day}`;
+  }, []);
 
   return {
     table,
@@ -217,7 +234,8 @@ export function useLunarGridTable(
     days,
     tableContainerRef,
     dailyBalances,
-    isLoading: isLoadingTransactions, // Adăugat
-    error: queryError, // Adăugat
+    isLoading: isLoadingTransactions,
+    error: queryError,
+    getCellId, // Adăugat pentru suport editare inline
   } as UseLunarGridTableResult;
 }
