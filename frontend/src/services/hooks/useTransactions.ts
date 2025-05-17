@@ -44,7 +44,8 @@ function getMonthRange(year: number, month: number): { from: string; to: string 
   return { from, to };
 }
 
-const TRANSACTIONS_KEY = ['transactions'] as const;
+// Definiția cheii de bază pentru tranzacții
+const TRANSACTIONS_BASE_KEY = 'transactions' as const;
 
 /**
  * Hook pentru fetch și operații CRUD pe tranzacții cu React-Query.
@@ -60,22 +61,55 @@ export function useTransactions(
   const year = queryParams.year;
   const month = queryParams.month;
 
-  // Includem toți parametrii de paginare și filtrare în queryKey pentru a asigura reîncărcarea datelor la schimbarea acestora
-  const key = [
-    ...TRANSACTIONS_KEY, 
-    year, 
-    month, 
-    user?.id,
-    queryParams.limit,
-    queryParams.offset,
-    queryParams.type,
-    queryParams.category,
-    queryParams.recurring
-  ] as const;
+  // Construim array-ul pentru queryKey în mod dinamic, incluzând doar parametrii definiți
+  // Acest lucru previne reîncărcarea inutilă când parametrii undefined se schimbă între undefined și undefined
+  // Folosim tuplu explicit pentru a rezolva probleme de tipare
+  const queryKey = [TRANSACTIONS_BASE_KEY] as const;
+  
+  // Creăm un obiect pentru restul parametrilor query
+  type QueryParams = {
+    userId?: string;
+    view: 'monthly' | 'all';
+    year?: number;
+    month?: number;
+    pagination: {
+      limit: number;
+      offset: number;
+    };
+    filters: {
+      type?: string;
+      category?: string;
+      recurring?: boolean;
+    };
+  };
+  
+  // Adaugăm parametrii de filtrare într-un singur obiect pentru a menține tipurile corecte
+  const isMonthlyView = !!(year && month);
+  const queryParams2: QueryParams = {
+    userId: user?.id,
+    view: isMonthlyView ? 'monthly' : 'all',
+    ...(isMonthlyView ? { year, month } : {}),
+    pagination: {
+      limit: queryParams.limit || 10,
+      offset: queryParams.offset || 0
+    },
+    filters: {
+      ...(queryParams.type ? { type: queryParams.type } : {}),
+      ...(queryParams.category ? { category: queryParams.category } : {}),
+      ...(queryParams.recurring !== undefined ? { recurring: queryParams.recurring } : {})
+    }
+  };
+  
+  // Folosim [baseKey, paramsObject] pattern pentru a evita problemele de tipare
+  // și a menține seria lizabilă în React DevTools
+  const key = [queryKey[0], queryParams2] as const;
   // getMonthRange va fi apelat doar dacă year și month sunt definite (gestionat de 'enabled')
   // const { from, to } = (year && month) ? getMonthRange(year, month) : { from: undefined, to: undefined };
 
   // Specificăm tipurile și folosim sintaxa cu obiect pentru useQuery.
+  // Adăugăm un id unic pentru query pentru referințe mai ușoare în cache-uri
+  const queryId = `transactions-${user?.id}-${year || 'all'}-${month || 'all'}`;
+
   const query = useQuery<TransactionPage, Error, TransactionPage, readonly unknown[]>({
     queryKey: key,
     queryFn: async () => {
@@ -109,7 +143,15 @@ export function useTransactions(
       
       return supabaseService.fetchTransactions(user?.id, pagination, filters);
     },
-    placeholderData: keepPreviousData,
+    // Configurări explicite pentru comportamentul cache-ului
+    gcTime: 5 * 60 * 1000, // 5 minute - cât timp rămân datele în cache după ce query-ul devine inactiv
+    staleTime: 30 * 1000, // 30 secunde - cât timp sunt considerate datele "fresh" înainte de a fi marcate ca "stale"
+    refetchOnWindowFocus: true, // Reîmprospătează datele când utilizatorul revine în aplicație
+    refetchOnMount: true, // Reîmprospătează datele când componenta este montată 
+    refetchOnReconnect: true, // Reîmprospătează datele când conexiunea la internet este restabilită
+    retry: 3, // Numărul de încercări în caz de eroare
+    retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Timp de așteptare între reîncercări (exponential backoff)
+    placeholderData: keepPreviousData, // Menține datele precedente în UI în timpul încărcării noilor date
     enabled: !!user?.id, // Rulează query doar dacă user.id este disponibil, nu mai depindem de year și month
   });
 
@@ -117,7 +159,8 @@ export function useTransactions(
   const createMutation = useMutation<
     TransactionValidated,
     Error,
-    CreateTransactionHookPayload 
+    CreateTransactionHookPayload,
+    { previousData: TransactionPage | undefined }
   >({
     mutationFn: async (transactionData) => {
       // Folosim user-ul din closure pentru a evita useAuthStore.getState() care încalcă regulile de hooks
@@ -129,9 +172,44 @@ export function useTransactions(
       // Nu trebuie să adăugăm user_id în payload pentru că supabaseService face asta intern
       return supabaseService.createTransaction(transactionData);
     },
+    onMutate: async (newTransaction) => {
+      // Anulăm orice query în curs pentru a evita suprascrierea update-urilor optimiste
+      await queryClient.cancelQueries({ queryKey: key });
+      
+      // Salvăm starea anterioară
+      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      
+      // Creăm un id temporar pentru tranzacția nouă
+      const tempId = `temp-${Date.now()}`;
+      
+      // Simulam o tranzacție validată completă
+      const optimisticTransaction: TransactionValidated = {
+        id: tempId,
+        ...newTransaction,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      // Actualizăm cache-ul cu noua tranzacție
+      if (previousData) {
+        queryClient.setQueryData<TransactionPage>(key, {
+          ...previousData,
+          data: [optimisticTransaction, ...previousData.data],
+          // Notă: Ar trebui să actualizăm și count, dar este mai sigur să lăsăm serverul să o facă
+        });
+      }
+      
+      return { previousData };
+    },
+    onError: (err, newTransaction, context) => {
+      // Resetarea cache-ului la starea anterioară în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+      }
+    },
     onSuccess: () => {
       // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: [TRANSACTIONS_BASE_KEY] });
     },
   });
 
@@ -139,15 +217,48 @@ export function useTransactions(
   const updateMutation = useMutation<
     TransactionValidated,
     Error,
-    { id: string; transactionData: UpdateTransactionHookPayload }
+    { id: string; transactionData: UpdateTransactionHookPayload },
+    { previousData: TransactionPage | undefined }
   >({
     mutationFn: async ({ id, transactionData }) => {
       // supabaseService.updateTransaction așteaptă Partial<CreateTransaction>
       return supabaseService.updateTransaction(id, transactionData);
     },
+    onMutate: async ({ id, transactionData }) => {
+      // Anulăm orice query în curs pentru a evita suprascrierea update-urilor optimiste
+      await queryClient.cancelQueries({ queryKey: key });
+      
+      // Salvăm starea anterioară
+      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      
+      // Dacă avem date în cache, actualizăm optimist
+      if (previousData) {
+        queryClient.setQueryData<TransactionPage>(key, {
+          ...previousData,
+          data: previousData.data.map(transaction => {
+            if (transaction.id === id) {
+              return {
+                ...transaction,
+                ...transactionData,
+                updated_at: new Date().toISOString()
+              };
+            }
+            return transaction;
+          })
+        });
+      }
+      
+      return { previousData };
+    },
+    onError: (err, updatePayload, context) => {
+      // Resetarea cache-ului la starea anterioară în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+      }
+    },
     onSuccess: () => {
       // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: [TRANSACTIONS_BASE_KEY] });
     },
   });
 
@@ -155,14 +266,39 @@ export function useTransactions(
   const deleteMutation = useMutation<
     void,
     Error,
-    string // transactionId
+    string, // transactionId
+    { previousData: TransactionPage | undefined }
   >({
     mutationFn: async (transactionId) => {
       return supabaseService.deleteTransaction(transactionId);
     },
+    onMutate: async (transactionId) => {
+      // Anulăm orice query în curs pentru a evita suprascrierea update-urilor optimiste
+      await queryClient.cancelQueries({ queryKey: key });
+      
+      // Salvăm starea anterioară
+      const previousData = queryClient.getQueryData<TransactionPage>(key);
+      
+      // Dacă avem date în cache, ștergem optimist tranzacția
+      if (previousData) {
+        queryClient.setQueryData<TransactionPage>(key, {
+          ...previousData,
+          data: previousData.data.filter(transaction => transaction.id !== transactionId),
+          // Notă: Ar trebui să actualizăm și count, dar lăsăm acest lucru backend-ului
+        });
+      }
+      
+      return { previousData };
+    },
+    onError: (err, transactionId, context) => {
+      // Resetarea cache-ului la starea anterioară în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData<TransactionPage>(key, context.previousData);
+      }
+    },
     onSuccess: () => {
       // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
+      queryClient.invalidateQueries({ queryKey: [TRANSACTIONS_BASE_KEY] });
     },
   });
 
