@@ -68,33 +68,38 @@ export function useTransactions(
   const query = useQuery<TransactionPage, Error, TransactionPage, readonly unknown[]>({
     queryKey: key,
     queryFn: async () => {
-      if (!year || !month) {
-        // Returnează o structură goală validă dacă year/month nu sunt setate, pentru a nu bloca enabled
-        // Dar query-ul nu ar trebui să ruleze oricum datorită condiției enabled de mai jos.
-        // Totuși, pentru siguranță și pentru a satisface tipul de retur al queryFn:
-        return { data: [], count: 0 }; 
+      // Determinăm dacă suntem în modul de filtrare lunară sau în modul general
+      const isMonthlyView = !!(year && month);
+      
+      // Pregătim filtrele de dată doar dacă suntem în modul lunar
+      let dateFrom, dateTo;
+      if (isMonthlyView) {
+        const monthRange = getMonthRange(year!, month!);
+        dateFrom = monthRange.from;
+        dateTo = monthRange.to;
       }
-      const { from, to } = getMonthRange(year, month);
+      
       const pagination = {
         limit: queryParams.limit,
         offset: queryParams.offset,
-        sort: queryParams.sort as 'date' | 'amount' | 'created_at' | undefined, // Cast explicit dacă e necesar
+        sort: queryParams.sort as 'date' | 'amount' | 'created_at' | undefined,
         order: queryParams.order,
       };
+      
       const filters = {
         type: queryParams.type,
         category: queryParams.category,
         recurring: queryParams.recurring,
         // Folosim datele din queryParams dacă sunt disponibile, altfel cele calculate din year/month
-        dateFrom: queryParams.startDate || from,
-        dateTo: queryParams.endDate || to,
-        // Adaugă alte filtre din queryParams dacă TransactionQueryParamsWithRecurring le include
-        // de ex. subcategory, minAmount, maxAmount, search
+        // dar doar dacă suntem în modul lunar
+        dateFrom: queryParams.startDate || (isMonthlyView ? dateFrom : undefined),
+        dateTo: queryParams.endDate || (isMonthlyView ? dateTo : undefined),
       };
+      
       return supabaseService.fetchTransactions(user?.id, pagination, filters);
     },
     placeholderData: keepPreviousData,
-    enabled: !!(year && month && user?.id), // Rulează query doar dacă year, month și user.id sunt disponibile
+    enabled: !!user?.id, // Rulează query doar dacă user.id este disponibil, nu mai depindem de year și month
   });
 
   // Create Transaction Mutation
