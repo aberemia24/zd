@@ -146,8 +146,8 @@ export function useTransactions(
       return supabaseService.updateTransaction(id, transactionData);
     },
     onSuccess: () => {
-      // Folosim user?.id din closure în loc de userId din parametru pentru consistență
-      queryClient.invalidateQueries({ queryKey: ['transactions', queryParams.year, queryParams.month, user?.id] });
+      // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
     },
   });
 
@@ -161,8 +161,8 @@ export function useTransactions(
       return supabaseService.deleteTransaction(transactionId);
     },
     onSuccess: () => {
-      // Folosim user?.id din closure în loc de userId din parametru pentru consistență
-      queryClient.invalidateQueries({ queryKey: ['transactions', queryParams.year, queryParams.month, user?.id] });
+      // Invalidăm toate query-urile de tranzacții pentru a asigura reîncărcarea datelor
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_KEY });
     },
   });
 
