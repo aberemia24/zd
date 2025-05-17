@@ -1,7 +1,7 @@
 // Store minimal pentru UI-state tranzacții
 // Majoritatea funcționalităților au fost mutate la hooks/useTransactions utilizand React Query
 import { create } from 'zustand';
-import type { TransactionQueryParamsWithRecurring } from '../types/transaction'; 
+import type { TransactionQueryParamsWithRecurring } from '../types/Transaction'; 
 import { PAGINATION } from '@shared-constants';
 
 /**

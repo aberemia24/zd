@@ -20,7 +20,7 @@ import {
 } from '../../../services/hooks/useTransactions';
 
 // Tipuri
-import type { Transaction } from '../../../types/transaction';
+import type { Transaction } from '../../../types/Transaction';
 import type { CustomCategory } from '../../../types/Category'; 
 
 // Importuri din shared-constants (sursa unică de adevăr) conform memoriei 886c7659

@@ -1,5 +1,5 @@
 // Date de test centralizate pentru toate testele
-import { Transaction, TransactionFormWithNumberAmount } from '../types/transaction';
+import { Transaction, TransactionFormWithNumberAmount } from '../types/Transaction';
 import { FORM_DEFAULTS, TransactionType, FrequencyType } from '@shared-constants';
 
 export const MOCK_USER_ID = 'u1';

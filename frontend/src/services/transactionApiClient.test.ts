@@ -1,5 +1,5 @@
 import { TransactionApiClient, PaginatedResponse } from './transactionApiClient';
-import { Transaction } from '../types/transaction';
+import { Transaction } from '../types/Transaction';
 import { API } from '@shared-constants/api';
 import { MESAJE } from 'shared-constants';
 import { TransactionType, CategoryType } from 'shared-constants';

@@ -4,12 +4,11 @@ import { VALIDATION } from '@shared-constants/validation';
 import { API } from '@shared-constants/api';
 
 import type { TransactionFormData } from '../components/features/TransactionForm/TransactionForm';
-import type { TransactionFormWithNumberAmount } from '../types/transaction';
+import type { TransactionFormWithNumberAmount } from '../types/Transaction';
 import { TransactionType, TransactionStatus } from '@shared-constants/enums';
 import { FrequencyType } from '@shared-constants/enums';
 import type { CreateTransaction } from '@shared-constants/transaction.schema';
-// Import pentru React Query
-import { useQueryClient } from '@tanstack/react-query';
+// Nu importăm useQueryClient direct în store pentru a evita încălcarea regulilor React Hooks
 
 export interface TransactionFormStoreState {
   form: TransactionFormData;
@@ -106,8 +105,8 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
           // Nu mai includem currency conform schema.ts unde nu este folosit în FE
         };
         
-        // Accesăm queryClient direct și executăm mutația
-        const queryClient = useQueryClient();
+        // Nu mai folosim queryClient direct în store pentru a evita încălcarea regulilor React Hooks
+        // Invalidarea cache-ului se va face în componenta care folosește acest store
         
         // Observație: userId NU trebuie inclus explicit în payload
         // Conform notei din transaction.schema.ts: "user_id nu e expus în FE (doar pe backend)"
@@ -124,7 +123,8 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
         });
         
         // Invalidăm query-urile pentru a reîncărca datele actualizate
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        // Această operație trebuie făcută în componenta care folosește acest store
+        // Conform regulilor anti-pattern din memoria d7b6eb4b-0702-4b0a-b074-3915547a2544
         
         set({ success: MESAJE.SUCCES_ADAUGARE });
         // Resetăm formularul după adăugare reușită

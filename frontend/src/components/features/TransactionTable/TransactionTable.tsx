@@ -2,7 +2,7 @@ import React from 'react';
 import Button from '../../primitives/Button';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TABLE, BUTTONS } from '@shared-constants';
-import type { Transaction } from '../../../types/transaction';
+import type { Transaction } from '../../../types/Transaction';
 
 export type { Transaction };
 

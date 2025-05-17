@@ -17,6 +17,7 @@
     "format": "prettier --write src"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.76.1",
     "@tanstack/react-table": "^8.21.3",
     "classnames": "^2.5.1",
     "i18next": "^23.10.0",

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type UseMutationResult } from '@tanstack/react-query';
 import { supabaseService } from '../supabaseService';
 import type { TransactionPage } from '../supabaseService'; // Corectat importul
-import type { TransactionQueryParamsWithRecurring } from '../../types/transaction';
+import type { TransactionQueryParamsWithRecurring } from '../../types/Transaction';
 import type { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema'; // Corectat și adăugat CreateTransaction
 import { useAuthStore } from '../../stores/authStore';
 import { keepPreviousData } from '@tanstack/react-query';
