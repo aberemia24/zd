@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { getComponentClasses } from '../../../styles/themeUtils';
 
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -10,15 +11,18 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 }
 
 const Input: React.FC<InputProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, inputRef, ...rest }) => (
-  <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label className="text-secondary-700 mb-1">{label}</label>}
+  <div className={classNames(getComponentClasses('form-group'), wrapperClassName)}>
+    {label && <label className={getComponentClasses('form-label')}>{label}</label>}
     <input
       ref={inputRef}
-      className={classNames('input-field', error && 'border-error', className)}
+      className={classNames(
+        getComponentClasses('input', error ? undefined : 'primary', undefined, error ? 'error' : undefined),
+        className
+      )}
       data-testid={dataTestId || `input-field${error ? '-error' : ''}`}
       {...rest}
     />
-    {error && <span className="text-error text-xs mt-1" data-testid="input-error">{error}</span>}
+    {error && <span className={getComponentClasses('form-error')} data-testid="input-error">{error}</span>}
   </div>
 );
 

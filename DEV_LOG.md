@@ -58,6 +58,23 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Subcategorie personalizată nouă
 - Tranzacție fără subcategorie
 
+## [2025-05-19] Implementare sistem complet de design tokens (WINDSURF-CSS-001)
+
+### Modificări:
+- Creat și integrat fișierul `frontend/src/styles/theme-variables.css` cu toate variabilele CSS generate automat din `theme.ts` (culori, spacing, shadow, radius, font, breakpoints, etc.)
+- Creat fișierul `frontend/src/styles/theme-components.css` cu clase CSS reutilizabile pentru butoane, inputuri, carduri, layout, tipografie etc., toate bazate pe tokens
+- Adăugat scriptul `frontend/src/styles/generate-css-variables.js` pentru generarea automată a variabilelor CSS din tokens
+- Modificat `frontend/src/index.css` pentru a importa la început variabilele și clasele centralizate
+- Eliminat orice dublare de config Tailwind; frontend-ul folosește o singură sursă de tokens
+
+### Reguli și pași de mentenanță:
+- Toate stilurile în componente trebuie să utilizeze exclusiv sistemul de design tokens (WINDSURF-CSS-001)
+- Clase Tailwind hardcodate sunt interzise (excepție doar cu comentariu @windsurf-exception și doar dacă nu există token)
+- Orice nevoie nouă de stil se rezolvă prin extinderea tokens și a claselor centralizate, nu prin hardcodare
+- Rulează scriptul de generare după orice modificare în `theme.ts`
+- Importă DOAR din `theme-components.css` și folosește tokens CSS în stiluri inline dacă e nevoie
+- Documentează orice excepție și remediază la primul refactor
+
 ## [2025-05-18] Refactorizare hooks tranzacții: infinite loading & caching
 
 ### Modificări:

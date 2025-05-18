@@ -21,8 +21,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={classNames(
-        getComponentClasses('button', variant, size),
-        disabled && 'opacity-50 cursor-not-allowed',
+        getComponentClasses('button', variant, size, disabled ? 'disabled' : undefined),
         className
       )}
       disabled={disabled}

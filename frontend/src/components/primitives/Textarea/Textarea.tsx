@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { getComponentClasses } from '../../../styles/themeUtils';
 
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -9,14 +10,17 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 const Textarea: React.FC<TextareaProps> = ({ label, error, className, wrapperClassName, 'data-testid': dataTestId, ...rest }) => (
-  <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label className="form-label mb-1">{label}</label>}
+  <div className={classNames(getComponentClasses('form-group'), wrapperClassName)}>
+    {label && <label className={getComponentClasses('form-label')}>{label}</label>}
     <textarea
-      className={classNames('input-field', error && 'border-error', className)}
+      className={classNames(
+        getComponentClasses('input', error ? undefined : 'primary', undefined, error ? 'error' : undefined),
+        className
+      )}
       data-testid={dataTestId || `textarea-field${error ? '-error' : ''}`}
       {...rest}
     />
-    {error && <span className="text-error text-xs mt-1" data-testid="textarea-error">{error}</span>}
+    {error && <span className={getComponentClasses('form-error')} data-testid="textarea-error">{error}</span>}
   </div>
 );
 

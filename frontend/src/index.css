@@ -1,3 +1,7 @@
+/* Importă variabilele CSS și stilurile de componente din sistemul de design tokens */
+@import './styles/theme-variables.css';
+@import './styles/theme-components.css';
+
 @tailwind base;
 @tailwind components;
 @layer components {

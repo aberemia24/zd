@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { getComponentClasses } from '../../../styles/themeUtils';
 
 export interface CheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -12,12 +13,15 @@ const Checkbox: React.FC<CheckboxProps> = ({ label, error, className, wrapperCla
   <div className={classNames('flex items-center', wrapperClassName)}>
     <input
       type="checkbox"
-      className={classNames(error ? 'accent-error' : 'accent-accent', className)}
+      className={classNames(
+        getComponentClasses('checkbox', undefined, undefined, error ? 'error' : undefined),
+        className
+      )}
       data-testid={dataTestId || `checkbox-field${error ? '-error' : ''}`}
       {...rest}
     />
-    {label && <label className="ml-2 text-secondary-700">{label}</label>}
-    {error && <span className="text-error text-xs ml-2" data-testid="checkbox-error">{error}</span>}
+    {label && <label className={getComponentClasses('checkbox-label')}>{label}</label>}
+    {error && <span className={getComponentClasses('form-error')} data-testid="checkbox-error">{error}</span>}
   </div>
 );
 

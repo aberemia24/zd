@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { getComponentClasses } from '../../../styles/themeUtils';
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -11,11 +12,14 @@ export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElemen
 } // data-testid și orice alt prop HTML sunt permise
 
 const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassName, options, placeholder, id, 'data-testid': dataTestId, ...rest }) => (
-  <div className={classNames('flex flex-col', wrapperClassName)}>
-    {label && <label htmlFor={id || rest.name} className="text-secondary-700 mb-1">{label}</label>}
+  <div className={classNames(getComponentClasses('form-group'), wrapperClassName)}>
+    {label && <label htmlFor={id || rest.name} className={getComponentClasses('form-label')}>{label}</label>}
     <select
       id={id || rest.name}
-      className={classNames('input-field', error && 'border-error', className)}
+      className={classNames(
+        getComponentClasses('input', error ? undefined : 'primary', undefined, error ? 'error' : undefined),
+        className
+      )}
       value={options.some(opt => opt.value === rest.value) ? rest.value : ''}
       data-testid={dataTestId || `select-field${error ? '-error' : ''}`}
       {...rest}
@@ -25,7 +29,7 @@ const Select: React.FC<SelectProps> = ({ label, error, className, wrapperClassNa
         <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}
     </select>
-    {error && <span className="text-error text-xs mt-1" data-testid="select-error">{error}</span>}
+    {error && <span className={getComponentClasses('form-error')} data-testid="select-error">{error}</span>}
   </div>
 );
 

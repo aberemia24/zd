@@ -4,6 +4,54 @@
 import type { Theme } from './themeTypes';
 
 export const theme: Theme = {
+  // --- COMPONENTE/STĂRI ---
+  components: {
+    button: {
+      disabled: 'opacity-50 cursor-not-allowed',
+      states: {
+        disabled: 'opacity-50 cursor-not-allowed',
+      },
+    },
+    input: {
+      error: 'border-error-500',
+      states: {
+        error: 'border-error-500',
+        disabled: 'bg-gray-100 cursor-not-allowed',
+      },
+    },
+    formGroup: 'flex flex-col mb-2',
+    formLabel: 'block mb-1 font-medium text-secondary-700',
+    formError: 'text-error-600 text-xs mt-1',
+    checkbox: {
+      base: 'accent-accent',
+      error: 'accent-error',
+      label: 'ml-2 text-secondary-700',
+    },
+    badge: {
+      base: 'inline-block px-2 py-0.5 rounded text-xs font-semibold',
+      variants: {
+        primary: 'bg-primary-500 text-white',
+        success: 'bg-success-500 text-white',
+        error: 'bg-error-500 text-white',
+        warning: 'bg-warning-500 text-white',
+      },
+    },
+    alert: {
+      base: 'border rounded p-4 my-2 text-center',
+      variants: {
+        success: 'bg-success-50 border-success-200 text-success-700',
+        error: 'bg-error-50 border-error-200 text-error-700',
+        warning: 'bg-warning-50 border-warning-200 text-warning-700',
+      },
+    },
+    loader: {
+      container: 'flex justify-center items-center py-8',
+      svg: 'animate-spin h-8 w-8 text-primary-500',
+      circle: 'opacity-25',
+      path: 'opacity-75',
+      text: 'ml-3 text-gray-700 text-sm',
+    },
+  },
   colors: {
     // Primary - Forest Green (înlocuiește blue-ul actual)
     primary: {

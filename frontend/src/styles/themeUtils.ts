@@ -3,59 +3,97 @@ import theme from './theme';
 import type { ComponentVariant, ComponentSize, ComponentClasses, Theme } from './themeTypes';
 
 // Obține valoare din theme folosind path (ex: 'colors.primary.500')
-export function getThemeValue(path: string): any {
-  return path.split('.').reduce((obj, key) => (obj && obj[key] !== undefined ? obj[key] : undefined), theme);
+// Acces ierarhic sigur la valori din theme (fără index signature pe Theme)
+export function getThemeValue(path: string): unknown {
+  const parts = path.split('.');
+  let value: unknown = theme;
+  for (const key of parts) {
+    if (value && typeof value === 'object' && key in value) {
+      // @ts-expect-error: acces nested controlat
+      value = value[key];
+    } else {
+      return undefined;
+    }
+  }
+  return value;
 }
 
 // Generează clase pentru componente (type-safe, semantic)
+// Suport extins pentru toate componentele și stările
 export function getComponentClasses(
-  componentType: 'button' | 'input',
-  variant: ComponentVariant = 'primary',
-  size: ComponentSize = 'md'
+  componentType: string,
+  variant?: string,
+  size?: string,
+  state?: string
 ): ComponentClasses {
-  const componentMap = {
-    button: {
-      base: 'font-medium rounded-md transition-colors duration-200 inline-flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed',
-      variants: {
-        primary: 'bg-primary-500 text-white hover:bg-primary-600 focus:ring-2 focus:ring-primary-300',
-        secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-2 focus:ring-primary-300',
-        success: 'bg-success-500 text-white hover:bg-success-600 focus:ring-2 focus:ring-success-300',
-        danger: 'bg-error-500 text-white hover:bg-error-600 focus:ring-2 focus:ring-error-300',
-        ghost: 'text-primary-600 hover:bg-primary-50 focus:ring-2 focus:ring-primary-300',
-      },
-      sizes: {
-        xs: 'px-2 py-1 text-xs',
-        sm: 'px-3 py-1.5 text-sm',
-        md: 'px-4 py-2 text-sm',
-        lg: 'px-5 py-2.5 text-base',
-        xl: 'px-6 py-3 text-lg',
-      },
-    },
-    input: {
-      base: 'w-full border rounded-md px-3 py-2 transition-colors duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed',
-      variants: {
-        primary: 'border-gray-300 focus:border-primary-500 focus:ring-1 focus:ring-primary-300',
-        success: 'border-success-300 focus:border-success-500 focus:ring-1 focus:ring-success-300',
-        danger: 'border-error-300 focus:border-error-500 focus:ring-1 focus:ring-error-300',
-      },
-      sizes: {
-        sm: 'px-2.5 py-1.5 text-sm',
-        md: 'px-3 py-2 text-sm',
-        lg: 'px-4 py-2.5 text-base',
-      },
-    },
-  };
-  const component = componentMap[componentType];
-  if (!component) return '';
-  const variantClass = (component.variants as Record<string, string>)[variant] || component.variants.primary;
-  const sizeClass = (component.sizes as Record<string, string>)[size] || component.sizes.md;
-  const classes = [
-    component.base,
-    variantClass,
-    sizeClass,
-  ];
-  return classes.filter(Boolean).join(' ');
+  const c = theme.components;
+  switch (componentType) {
+    case 'button':
+      return [
+        c.button?.base,
+        variant ? c.button?.variants?.[variant] : undefined,
+        size ? c.button?.sizes?.[size] : undefined,
+        state ? c.button?.states?.[state] : undefined,
+      ].filter(Boolean).join(' ') || '';
+    case 'input':
+      return [
+        c.input?.base,
+        variant && c.input?.variants?.[variant],
+        size && c.input?.sizes?.[size],
+        state && c.input?.states?.[state],
+      ].filter(Boolean).join(' ');
+    case 'textarea':
+      return [
+        c.input?.base,
+        variant && c.input?.variants?.[variant],
+        size && c.input?.sizes?.[size],
+        state && c.input?.states?.[state],
+      ].filter(Boolean).join(' ');
+    case 'select':
+      return [
+        c.input?.base,
+        variant && c.input?.variants?.[variant],
+        size && c.input?.sizes?.[size],
+        state && c.input?.states?.[state],
+      ].filter(Boolean).join(' ');
+    case 'checkbox':
+      return [
+        c.checkbox?.base,
+        state ? c.checkbox?.[state] : undefined,
+      ].filter(Boolean).join(' ') || '';
+    case 'checkbox-label':
+      return c.checkbox?.label || '';
+    case 'form-group':
+      return c.formGroup || '';
+    case 'form-label':
+      return c.formLabel || '';
+    case 'form-error':
+      return c.formError || '';
+    case 'badge':
+      return c.badge?.base || '';
+    case 'badge-variant':
+      return variant ? c.badge?.variants?.[variant] || '' : '';
+    case 'alert':
+      return c.alert?.base || '';
+    case 'alert-variant':
+      return variant ? c.alert?.variants?.[variant] || '' : '';
+    case 'loader-container':
+      return c.loader?.container || '';
+    case 'loader-svg':
+      return c.loader?.svg || '';
+    case 'loader-circle':
+      return c.loader?.circle || '';
+    case 'loader-path':
+      return c.loader?.path || '';
+    case 'loader-text':
+      return c.loader?.text || '';
+    default:
+      return '';
+  }
 }
+
+
+
 
 // Helper pentru clasa de culoare (folositor pentru sume, semantic)
 export function getColorClass(type: 'text' | 'bg' | 'border', color: keyof Theme['colors'], shade?: keyof typeof theme.colors['primary']): string {

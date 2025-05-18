@@ -91,8 +91,69 @@ export type Theme = {
   shadows: Shadows;
   borderRadius: BorderRadius;
   typography: Typography;
-  // Extensibil pentru viitor
-  [key: string]: any;
+  components: ThemeComponents;
+};
+
+// --- COMPONENTS TOKENS ---
+export type ThemeComponents = {
+  button: {
+    base?: string;
+    disabled?: string;
+    states?: {
+      disabled?: string;
+      [key: string]: string | undefined;
+    };
+    variants?: {
+      [key: string]: string | undefined;
+    };
+    sizes?: {
+      [key: string]: string | undefined;
+    };
+  };
+  input: {
+    base?: string;
+    error?: string;
+    states?: {
+      error?: string;
+      disabled?: string;
+      [key: string]: string | undefined;
+    };
+    variants?: {
+      [key: string]: string | undefined;
+    };
+    sizes?: {
+      [key: string]: string | undefined;
+    };
+  };
+  formGroup?: string;
+  formLabel?: string;
+  formError?: string;
+  checkbox: {
+    base?: string;
+    error?: string;
+    label?: string;
+    [key: string]: string | undefined;
+  };
+  badge: {
+    base?: string;
+    variants?: {
+      [key: string]: string | undefined;
+    };
+  };
+  alert: {
+    base?: string;
+    variants?: {
+      [key: string]: string | undefined;
+    };
+  };
+  loader: {
+    container?: string;
+    svg?: string;
+    circle?: string;
+    path?: string;
+    text?: string;
+    [key: string]: string | undefined;
+  };
 };
 
 // Tipuri pentru componente
