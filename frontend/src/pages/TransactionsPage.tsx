@@ -3,7 +3,9 @@ import TransactionForm from '../components/features/TransactionForm/TransactionF
 import TransactionTable from '../components/features/TransactionTable/TransactionTable';
 import TransactionFilters from '../components/features/TransactionFilters/TransactionFilters';
 import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
-import { useTransactions } from '../services/hooks/useTransactions';
+import { useAuthStore } from '../stores/authStore';
+import { useInfiniteTransactions } from '../services/hooks/useInfiniteTransactions';
+import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../services/hooks/transactionMutations';
 import { useQueryClient } from '@tanstack/react-query';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 import { PAGINATION } from '@shared-constants';
@@ -31,35 +33,41 @@ const TransactionsPage: React.FC = () => {
   const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
   const setFilterCategory = useTransactionFiltersStore(s => s.setFilterCategory);
   
-  // Folosim hook-ul useTransactions cu paginare infinită - React Query se ocupă de caching
+  // Extragem user din AuthStore pentru a-l folosi în query
+  const { user } = useAuthStore();
+  
+  // Folosim hook-ul useInfiniteTransactions pentru paginare infinită
+  // React Query se ocupă de caching și invalidare la mutații
   const { 
-    data, 
+    data: transactions,
     error: fetchError, 
-    isPending: isLoading,
+    isLoading,
     hasNextPage,
     fetchNextPage,
-    isFetchingNextPage
-  } = useTransactions({
-    limit,
+    isFetchingNextPage,
+    totalCount
+  } = useInfiniteTransactions({
+    limit: PAGINATION.DEFAULT_LIMIT,
     type: filterType as TransactionType || undefined,
     category: filterCategory as string || undefined,
-    // Nu includem month/year pentru a asigura că nu avem conflicte cu LunarGrid
-    month: undefined,
-    year: undefined,
+    // Nu includem month/year pentru a avea toate tranzacțiile
+    sort: 'date',
+    order: 'desc'
   });
   
-  // Extragem și combinam toate tranzacțiile din toate paginile pentru afișare
-  const transactions = React.useMemo(() => {
-    if (!data?.pages) return [];
-    return data.pages.flatMap(page => page.data);
-  }, [data]);
+  // Logging pentru debugging
+  console.log('TransactionsPage - user:', user);
+  console.log('TransactionsPage - transactions:', transactions);
+  console.log('TransactionsPage - totalCount:', totalCount);
   
-  // Calculam numărul total de tranzacții din rezultatele paginii
-  const totalTransactions = React.useMemo(() => {
-    if (!data?.pages || data.pages.length === 0) return 0;
-    // Folosim count din prima pagină care conține totalul
-    return data.pages[0].count;
-  }, [data]);
+  // Folosim hook-urile de mutații pentru operații CRUD
+  const createMutation = useCreateTransaction();
+  const updateMutation = useUpdateTransaction();
+  const deleteMutation = useDeleteTransaction();
+  
+  // Nu mai avem nevoie de filtrare locală deoarece filtrele sunt aplicate în query
+  // Numărul total de tranzacții vine direct din query
+  const totalTransactions = totalCount;
   
   // Callback pentru schimbarea filtrelor - declanșează refetch via React Query
   const handleFilterChange = React.useCallback((newType?: string, newCategory?: string) => {
@@ -100,7 +108,7 @@ const TransactionsPage: React.FC = () => {
         onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
       />
 
-      {/* Aici folosim TransactionTable care acum suportă paginare infinită */}
+      {/* Folosim TransactionTable cu paginare infinită */}
       <TransactionTable
         transactions={transactions}
         total={totalTransactions}

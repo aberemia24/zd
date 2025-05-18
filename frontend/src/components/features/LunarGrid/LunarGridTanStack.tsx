@@ -13,11 +13,14 @@ import { useAuthStore } from '../../../stores/authStore';
 
 // React Query și hooks pentru tranzacții
 import { useQueryClient } from '@tanstack/react-query';
-import { 
-  useTransactions, 
-  type CreateTransactionHookPayload, 
+// Import direct al hook-urilor specializate pentru mutații
+import {
+  useCreateTransaction,
+  useUpdateTransaction,
+  useDeleteTransaction,
+  type CreateTransactionHookPayload,
   type UpdateTransactionHookPayload
-} from '../../../services/hooks/useTransactions';
+} from '../../../services/hooks/transactionMutations';
 
 // Tipuri
 import type { Transaction } from '../../../types/Transaction';
@@ -86,15 +89,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     order: 'asc' as const
   }), [year, month]);
   
-  // Obținem mutațiile din hook-ul useTransactions
-  const {
-    createTransaction: createTransactionMutation,
-    isCreating,
-    updateTransaction: updateTransactionMutation,
-    isUpdating,
-    deleteTransaction: deleteTransactionMutation,
-    isDeleting
-  } = useTransactions(queryParams, userId);
+  // Obținem mutațiile din hook-urile specializate
+  const createTransactionMutation = useCreateTransaction();
+  const updateTransactionMutation = useUpdateTransaction();
+  const deleteTransactionMutation = useDeleteTransaction();
+  
+  // State de încărcare pentru mutații
+  const isCreating = createTransactionMutation.isPending;
+  const isUpdating = updateTransactionMutation.isPending;
+  const isDeleting = deleteTransactionMutation.isPending;
   
   // Funcții pentru gestionarea categoriilor
   const toggleCategory = useCallback((category: string) => {

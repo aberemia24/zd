@@ -19,6 +19,17 @@
 - Refactorizare: Incrementală, cu acoperire de teste.
 - Fără Breaking Changes fără documentare și consens.
 
+## Pattern hooks tranzacții: bulk vs. infinite loading
+
+- Pentru tranzacții, folosește două hooks specializate:
+  - `useMonthlyTransactions` (bulk, pentru grid lunar)
+  - `useInfiniteTransactions` (infinite loading, pentru tabel)
+- Cheia de cache trebuie să fie partajată (`['transactions']`) pentru a asigura invalidarea corectă la orice mutație (create/update/delete).
+- Fiecare hook are responsabilitate unică; este interzisă duplicarea logicii între ele sau cu alte hooks.
+- Orice extensie viitoare (filtre, sortări) trebuie să păstreze această separare și să folosească cache-ul partajat.
+- Refactorizările de hooks trebuie documentate în `DEV_LOG.md` și validate cu teste unitare înainte de integrare.
+- Exemplu canonical: vezi implementările actuale pentru `useMonthlyTransactions` și `useInfiniteTransactions` (frontend/src/services/hooks/).
+
 ## Testing
 
 ---

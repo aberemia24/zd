@@ -8,7 +8,7 @@ import { useTransactionStore } from '../stores/transactionStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryClient } from '@tanstack/react-query';
-import { useTransactions } from '../services/hooks/useTransactions';
+import { useMonthlyTransactions } from '../services/hooks/useMonthlyTransactions';
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar
@@ -36,11 +36,13 @@ const LunarGridPage: React.FC = () => {
   // Extragem user din AuthStore
   const { user } = useAuthStore();
   
-  // Folosim React Query prin hook-ul useTransactions pentru verificarea stării de loading
+  // Folosim React Query prin hook-ul useMonthlyTransactions pentru verificarea stării de loading
   // Aceasta înlocuiește vechile referințe la useTransactionStore.loading și fetchTransactions
-  const { isPending: loading } = useTransactions(
-    { year, month, includeAdjacentDays: true },
-    user?.id
+  const { isLoading: loading } = useMonthlyTransactions(
+    year, 
+    month, 
+    user?.id,
+    { includeAdjacentDays: true }
   );
   
   // Funcționalitate pentru categorii personalizate

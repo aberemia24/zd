@@ -169,7 +169,16 @@ Dependențe: categoryService, services/categoryService.ts
 
 📁 frontend/src/services/
 Rol: Servicii pentru comunicare API și operații externe
-📁 frontend/src/services/
+
+#### [2025-05] Pattern hooks tranzacții: bulk vs. infinite loading
+- Pentru tranzacții există două hooks specializate:
+  - `useMonthlyTransactions`: încarcă toate tranzacțiile pe lună (bulk, pentru grid lunar).
+  - `useInfiniteTransactions`: infinite loading cu paginare (pentru tabel).
+- Ambele folosesc aceeași cheie de cache (`['transactions']`) pentru invalidare globală la orice mutație (add/edit/delete).
+- Fiecare hook are responsabilitate unică; duplicarea logicii este interzisă (vezi și `BEST_PRACTICES.md`).
+- Orice extensie (filtre, sortări) trebuie să păstreze această separare și cache-ul partajat.
+- Exemplu canonical: vezi implementările actuale în `frontend/src/services/hooks/`.
+
 ├── 📄 supabase.ts              # Configurare client Supabase
 ├── 📄 supabaseService.ts       # Operații CRUD pentru tranzacții
 ├── 📄 supabaseAuthService.ts   # Autentificare prin Supabase

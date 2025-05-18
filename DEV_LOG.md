@@ -58,6 +58,37 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Subcategorie personalizată nouă
 - Tranzacție fără subcategorie
 
+## [2025-05-18] Refactorizare hooks tranzacții: infinite loading & caching
+
+### Modificări:
+- Creat hook nou `useMonthlyTransactions` pentru încărcarea tuturor tranzacțiilor pe lună (Lunar Grid).
+- Creat hook nou `useInfiniteTransactions` pentru încărcare infinită (paginare) în Transactions Table.
+- Eliminat complet hook-ul `useTransactions` (deprecated); orice utilizare accidentală returnează eroare clară.
+- Am implementat un mecanism de cache partajat (`['transactions']`) pentru a asigura invalidarea corectă la mutații (create/update/delete) între ambele hooks.
+- Refactorizat integrarea în paginile principale (`LunarGridPage.tsx`, `TransactionsPage.tsx`).
+
+### Motivație & Design:
+- Separarea clară între încărcarea bulk (toate tranzacțiile pentru grid) și încărcarea incrementală (infinite loading pentru tabel).
+- Modularitate: fiecare hook are responsabilitate unică, fără duplicare de logică.
+- Facilitează testarea, extensibilitatea și mentenanța pe termen lung.
+
+### Probleme întâlnite și rezolvate:
+- Inițial, tranzacțiile nu se afișau corect din cauza transmiterii greșite a userId-ului către query-uri.
+- Erori la mutații: rezolvate prin partajarea cheii de cache și invalidare globală.
+- Acces accidental la hook-ul vechi: prevenit cu stub explicit și mesaj de eroare.
+
+### Lecții învățate:
+- Caching-ul trebuie să fie centralizat și predictibil pentru a evita bug-uri subtile la sincronizarea datelor.
+- Separarea clară a responsabilităților între hooks permite evoluție rapidă fără regresii.
+- Testarea edge-case-urilor de mutații și cache este critică pentru UX robust.
+
+### Next steps:
+- Scriere teste unitare pentru ambele hooks (bulk și infinite loading), inclusiv scenarii de cache/mutații.
+- Actualizare `BEST_PRACTICES.md` cu noul pattern pentru hooks și caching.
+- Monitorizare performanță și UX pentru ajustări ulterioare.
+
+---
+
 ## [2025-05-16] Actualizare constante și corecții pentru LunarGrid
 
 - **Sumar:** S-au actualizat constantele din `EXCEL_GRID` pentru a suporta toate câmpurile necesare în componenta LunarGrid.

@@ -7,8 +7,9 @@ import { EXCEL_GRID, LABELS, PLACEHOLDERS } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { SubcategoryRows } from './SubcategoryRows';
 import { useQueryClient } from '@tanstack/react-query';
-// Folosim direct noul hook specializat pentru încărcarea lunară
+// Import hook-uri specializate
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
+import { useCreateTransaction } from '../../../services/hooks/transactionMutations';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -106,6 +107,9 @@ const UI = {
 export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   // React Query client - extras la nivel de componentă pentru a respecta Rules of Hooks
   const queryClient = useQueryClient();
+  
+  // Hook pentru crearea tranzacțiilor
+  const createTransactionMutation = useCreateTransaction();
 
   // State pentru subcategoria în curs de editare (pentru editare direct din grid)
   const [editingSubcategory, setEditingSubcategory] = React.useState<{ category: string; subcategory: string; mode: 'edit' | 'delete' | 'add' } | null>(null);
@@ -325,10 +329,19 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
 
       console.log('Sending transaction data:', transactionData);
 
-      // Save & refresh - folosim queryClient extras la nivel de componentă pentru a respecta Rules of Hooks
-      queryClient.invalidateQueries({ queryKey: ['transactions', year, month] });
-      queryClient.fetchQuery({ queryKey: ['transactions', year, month] });
-      markTransactionAdded();
+      // Folosim hook-ul specializat pentru a crea tranzacția
+      createTransactionMutation.mutate(transactionData, {
+        onSuccess: () => {
+          console.log('Tranzacție creată cu succes!');
+          // Invocăm callback-ul pentru refresh subtil
+          markTransactionAdded();
+        },
+        onError: (error) => {
+          console.error('Eroare la crearea tranzacției:', error);
+        }
+      });
+      
+      // Query-ul va fi invalidat automat de către mutate via queryClient în hook
     } catch (error) {
       console.error('Error saving transaction:', error);
     } finally {
