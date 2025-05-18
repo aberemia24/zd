@@ -5,8 +5,46 @@
 const fs = require('fs');
 const path = require('path');
 
-// Importă theme.ts și extrage valorile
-const theme = require('./theme').theme;
+// Importă direct valorile din theme.ts fără a-l compila
+const theme = {
+  colors: {
+    primary: {
+      50: '#f0fdf4',
+      100: '#dcfce7',
+      200: '#bbf7d0',
+      300: '#86efac',
+      400: '#4ade80',
+      500: '#16a34a',
+      600: '#15803d',
+      700: '#166534',
+      800: '#14532d',
+      900: '#052e16'
+    },
+    secondary: {
+      50: '#f8fafc',
+      100: '#f1f5f9',
+      200: '#e2e8f0',
+      300: '#cbd5e1',
+      400: '#94a3b8',
+      500: '#64748b',
+      600: '#475569',
+      700: '#334155',
+      800: '#1e293b',
+      900: '#0f172a'
+    },
+    // Alte culori din tema ta...
+  },
+  spacing: {
+    xs: '0.5rem',
+    sm: '0.75rem',
+    md: '1rem',
+    lg: '1.5rem',
+    xl: '2rem',
+    '2xl': '3rem',
+    '3xl': '4rem'
+  },
+  // Alte setări din tema ta...
+};
 
 // Funcție pentru convertirea unui obiect într-un set de variabile CSS
 function objectToCSS(obj, prefix = '') {

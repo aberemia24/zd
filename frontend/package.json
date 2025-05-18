@@ -6,9 +6,10 @@
   "main": "src/index.tsx",
   "scripts": {
     "sync-shared-constants": "node ../scripts/sync-shared-constants.js",
-    "prestart": "npm run sync-shared-constants",
+    "generate:theme": "node src/styles/generate-css-variables.js",
+    "prestart": "npm run sync-shared-constants && npm run generate:theme",
     "start": "craco start",
-    "prebuild": "npm run sync-shared-constants",
+    "prebuild": "npm run sync-shared-constants && npm run generate:theme",
     "build": "craco build",
     "postinstall": "npm run sync-shared-constants",
     "pretest": "npm run sync-shared-constants",
