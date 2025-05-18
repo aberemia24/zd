@@ -1,15 +1,15 @@
 
-import { useMemo, useRef, useCallback, useEffect, useState } from 'react';
+import { useMemo, useRef, useCallback, useEffect } from 'react';
 import { useReactTable, getCoreRowModel, ColumnDef, Table } from '@tanstack/react-table';
 
 import { TransactionValidated } from '@shared-constants/transaction.schema';
 import { EXCEL_GRID } from '@shared-constants';
 
-// Import stores (doar cele necesare, am eliminat useTransactionStore)
+// Import stores (doar cele necesare)
 import { useCategoryStore } from '../../../../stores/categoryStore';
 import { useAuthStore } from '../../../../stores/authStore';
-// Înlocuim useTransactions cu wrapper-ul dedicat pentru LunarGrid
-import { useLunarGridTransactions, LunarGridTransactionResult } from './useLunarGridTransactions';
+// Folosim direct noul hook specializat pentru încărcarea lunară
+import { useMonthlyTransactions } from '../../../../services/hooks/useMonthlyTransactions';
 
 import type { LunarGridRowData } from '../types';
 
@@ -58,26 +58,20 @@ export function useLunarGridTable(
 ): UseLunarGridTableResult {
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  // Store hooks (fără useTransactionStore)
+  // Store hooks
   const categories = useCategoryStore(state => state.categories);
   const user = useAuthStore(state => state.user);
   
-  // Parametri query gestionați local în loc de useTransactionStore
-  const [queryParams, setQueryParams] = useState({
-    year,
-    month,
-    includeAdjacentDays: true
+  // Folosim direct noul hook specializat pentru încărcarea lunară
+  const { 
+    transactions: validTransactions, 
+    isLoading: isLoadingTransactions, 
+    error: queryError,
+    totalCount
+  } = useMonthlyTransactions(year, month, user?.id, { 
+    includeAdjacentDays: true 
   });
   
-  // React Query hook pentru tranzacții - acum folosim wrapper-ul dedicat pentru LunarGrid
-  const lunarGridResult = useLunarGridTransactions(queryParams, user?.id);
-  
-  // Extragem datele din rezultat
-  const transactions = useMemo(() => lunarGridResult.data || [], [lunarGridResult.data]);
-  const totalCount = useMemo(() => lunarGridResult.count || 0, [lunarGridResult.count]);
-  const isLoadingTransactions = lunarGridResult.isLoading;
-  const queryError = lunarGridResult.error;
-
   // Gestionare erori de la React Query
   useEffect(() => {
     if (queryError) {
@@ -85,27 +79,9 @@ export function useLunarGridTable(
     }
   }, [queryError]);
 
-  // Gestionarea schimbării lunii/anului - acum cu state local
-  useEffect(() => {
-    // Actualizăm parametrii de query când se schimbă anul sau luna
-    setQueryParams(prev => ({
-      ...prev,
-      year,
-      month,
-      includeAdjacentDays: true
-    }));
-  }, [year, month]);
-
   const days = useMemo(() => getDaysInMonth(year, month), [year, month]);
 
   // Pipeline de transformare a datelor
-  // Filtrăm tranzacțiile fără ID și facem cast la TransactionValidated pentru compatibilitate
-  const validTransactions = useMemo(() => 
-    transactions
-      .filter(t => t.id !== undefined)
-      .map(t => t as unknown as TransactionValidated),
-    [transactions]
-  );
   
   // Transformăm în formatul necesar pentru tabel
   const rawTableData = useMemo(() => 

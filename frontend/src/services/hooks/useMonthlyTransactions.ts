@@ -1,0 +1,124 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabaseService } from '../supabaseService';
+import { PAGINATION } from '@shared-constants';
+import type { TransactionValidated } from '@shared-constants/transaction.schema';
+
+// Utilitar pentru formatarea datelor
+function pad2(n: number): string {
+  return n.toString().padStart(2, '0');
+}
+
+/**
+ * Generează intervalul de date pentru o lună specificată
+ * @param year Anul
+ * @param month Luna (1-12)
+ * @returns Obiect cu datele de început și sfârșit ale lunii
+ */
+export function getMonthRange(year: number, month: number): { from: string; to: string } {
+  const from = `${year}-${pad2(month)}-01`;
+  const days = new Date(year, month, 0).getDate();
+  const to = `${year}-${pad2(month)}-${pad2(days)}`;
+  return { from, to };
+}
+
+export interface UseMonthlyTransactionsOptions {
+  includeAdjacentDays?: boolean;
+  staleTime?: number;
+  gcTime?: number;
+}
+
+export interface UseMonthlyTransactionsResult {
+  transactions: TransactionValidated[];
+  isLoading: boolean;
+  error: Error | null;
+  totalCount: number;
+  refetch: () => Promise<any>;
+}
+
+/**
+ * Hook specializat pentru încărcarea tuturor tranzacțiilor dintr-o lună specifică
+ * Spre deosebire de useTransactions, acest hook încarcă toate datele într-o singură cerere
+ * și nu implementează paginare infinită.
+ * 
+ * @param year Anul pentru care încărcăm tranzacțiile
+ * @param month Luna pentru care încărcăm tranzacțiile (1-12)
+ * @param userId ID-ul utilizatorului curent (necesar pentru încărcare)
+ * @param options Opțiuni suplimentare pentru query
+ * @returns Rezultatul query-ului cu tranzacții, status și funcții de control
+ */
+export function useMonthlyTransactions(
+  year: number,
+  month: number, 
+  userId?: string,
+  options: UseMonthlyTransactionsOptions = {}
+): UseMonthlyTransactionsResult {
+  const {
+    includeAdjacentDays = false,
+    staleTime = 30 * 1000, // 30 secunde default cache (staleTime)
+    gcTime = 5 * 60 * 1000, // 5 minute default pentru garbage collection
+  } = options;
+  
+  // Cheie unică pentru query bazată pe parametri
+  const queryKey = ['transactions', 'monthly', year, month, userId, includeAdjacentDays];
+  
+  // Folosim useQuery standard (nu infinite) pentru a obține toate datele într-o cerere
+  const query = useQuery({
+    queryKey,
+    queryFn: async () => {
+      // Calculăm intervalul de date pentru luna specificată
+      const monthRange = getMonthRange(year, month);
+      
+      // Ajustăm intervalul dacă includeAdjacentDays este true
+      let dateFrom = monthRange.from;
+      let dateTo = monthRange.to;
+      
+      if (includeAdjacentDays) {
+        // Pentru zilele lunii anterioare (ultimele 6 zile)
+        const prevMonthYear = month === 1 ? year - 1 : year;
+        const prevMonth = month === 1 ? 12 : month - 1;
+        const prevMonthDays = new Date(prevMonthYear, prevMonth, 0).getDate();
+        const prevMonthStart = `${prevMonthYear}-${pad2(prevMonth)}-${pad2(Math.max(1, prevMonthDays - 5))}`;
+        
+        // Pentru zilele lunii următoare (primele 6 zile)
+        const nextMonthYear = month === 12 ? year + 1 : year;
+        const nextMonth = month === 12 ? 1 : month + 1;
+        const nextMonthEnd = `${nextMonthYear}-${pad2(nextMonth)}-${pad2(6)}`;
+        
+        // Ajustăm intervalul
+        dateFrom = prevMonthStart;
+        dateTo = nextMonthEnd;
+      }
+      
+      // Facem cererea pentru toate datele din interval
+      const result = await supabaseService.fetchTransactions(
+        userId,
+        { 
+          limit: 1000, // Limită mare pentru a obține toate tranzacțiile
+          sort: 'date'
+        },
+        {
+          dateFrom,
+          dateTo
+        }
+      );
+      
+      return {
+        data: result.data,
+        count: result.count
+      };
+    },
+    staleTime,
+    gcTime,
+    // Activăm query-ul doar dacă userId este disponibil (pentru autentificare)
+    enabled: !!userId,
+  });
+  
+  // Adaptăm rezultatul la interfața specificată
+  return {
+    transactions: query.data?.data || [],
+    isLoading: query.isLoading || query.isFetching,
+    error: query.error as Error | null,
+    totalCount: query.data?.count || 0,
+    refetch: query.refetch
+  };
+}
