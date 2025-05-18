@@ -8,6 +8,7 @@ import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
+import { getComponentClasses } from '../../../styles/themeUtils';
 
 /**
  * Returnează un mesaj bazat pe o cheie, suportând și acces la proprietăți imbricate.
@@ -66,7 +67,17 @@ interface TransactionFormProps {
 }
 const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) => {
   // Selectăm starea și acțiunile relevante din store
-  const { form, error, success, loading, setField, handleSubmit, resetForm } = useTransactionFormStore();
+  // Acceptă error ca string sau ca obiect (Record<string, string>) pentru validări pe câmpuri
+  const { form, error, success, loading, setField, handleSubmit, resetForm } = useTransactionFormStore() as {
+    form: TransactionFormData;
+    error: string | Record<string, string>;
+    success: string;
+    loading: boolean;
+    setField: (name: keyof TransactionFormData, value: any) => void;
+    handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>;
+    resetForm: () => void;
+  };
+
 
   // Handler pentru schimbare câmp
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -157,87 +168,90 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         placeholder={PLACEHOLDERS.SELECT}
         data-testid="type-select"
       />
-      <Input
-        name="amount"
-        type="number"
-        label={LABELS.AMOUNT + '*:'}
-        value={form.amount}
-        onChange={handleChange}
-        aria-label={LABELS.AMOUNT}
-        placeholder={PLACEHOLDERS.AMOUNT}
-        data-testid="amount-input"
-      />
-      <Select
-        name="category"
-        label={LABELS.CATEGORY + '*:'}
-        value={form.category}
-        onChange={handleChange}
-        aria-label={LABELS.CATEGORY}
-        options={optiuniCategorie}
-        disabled={!form.type || optiuniCategorie.length === 0}
-        placeholder={PLACEHOLDERS.SELECT}
-        data-testid="category-select"
-      />
-      <Select
-        name="subcategory"
-        label={LABELS.SUBCATEGORY}
-        value={form.subcategory}
-        onChange={handleChange}
-        aria-label={LABELS.SUBCATEGORY}
-        options={optiuniSubcategorie}
-        disabled={!form.category || optiuniSubcategorie.length === 0}
-        placeholder={PLACEHOLDERS.SELECT}
-        data-testid="subcategory-select"
-      />
-      <Input
-        name="date"
-        type="date"
-        label={LABELS.DATE + '*:'}
-        value={form.date}
-        onChange={handleChange}
-        aria-label={LABELS.DATE}
-        placeholder={PLACEHOLDERS.DATE}
-        data-testid="date-input"
-      />
-      <Checkbox
-        name="recurring"
-        label={LABELS.RECURRING + '?'}
-        checked={form.recurring}
-        onChange={handleChange}
-        aria-label={LABELS.RECURRING}
-        data-testid="recurring-checkbox"
-      />
-      <Select
-        name="frequency"
-        label={LABELS.FREQUENCY}
-        value={form.frequency}
-        onChange={handleChange}
-        aria-label={LABELS.FREQUENCY}
-        options={OPTIONS.FREQUENCY}
-        disabled={!form.recurring}
-        placeholder={PLACEHOLDERS.SELECT}
-        data-testid="frequency-select"
-      />
-      <Button
-        type="submit"
-        disabled={!!loading}
-        data-testid="add-transaction-button"
-        aria-label={BUTTONS.ADD}
-      >
-        {BUTTONS.ADD}
-      </Button>
-      <Button
-        type="button"
-        variant="secondary"
-        data-testid="cancel-btn"
-        onClick={() => {
-          resetForm();
-          onCancel?.();
-        }}
-      >
-        {BUTTONS.CANCEL}
-      </Button>
-      {error && (
+      <div className={getComponentClasses('formRow')}>
+        <Input
+          name="amount"
+          type="number"
+          label={LABELS.AMOUNT + '*:'}
+          value={form.amount}
+          onChange={handleChange}
+          aria-label={LABELS.AMOUNT}
+          error={typeof error === 'object' ? error.amount : undefined}
+          data-testid="amount-input"
+        />
+        <Select
+          name="category"
+          label={LABELS.CATEGORY + '*:'}
+          value={form.category}
+          onChange={handleChange}
+          aria-label={LABELS.CATEGORY}
+          options={optiuniCategorie}
+          disabled={!form.type || optiuniCategorie.length === 0}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="category-select"
+        />
+        <Select
+          name="subcategory"
+          label={LABELS.SUBCATEGORY}
+          value={form.subcategory}
+          onChange={handleChange}
+          aria-label={LABELS.SUBCATEGORY}
+          options={optiuniSubcategorie}
+          disabled={!form.category || optiuniSubcategorie.length === 0}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="subcategory-select"
+        />
+        <Input
+          name="date"
+          type="date"
+          label={LABELS.DATE + '*:'}
+          value={form.date}
+          onChange={handleChange}
+          aria-label={LABELS.DATE}
+          error={typeof error === 'object' ? error.date : undefined}
+          data-testid="date-input"
+        />
+        <Checkbox
+          name="recurring"
+          label={LABELS.RECURRING + '?'}
+          checked={form.recurring}
+          onChange={handleChange}
+          data-testid="recurring-checkbox"
+        />
+        <Select
+          name="frequency"
+          label={LABELS.FREQUENCY}
+          value={form.frequency}
+          onChange={handleChange}
+          aria-label={LABELS.FREQUENCY}
+          options={OPTIONS.FREQUENCY}
+          disabled={!form.recurring}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="frequency-select"
+        />
+      </div>
+      <div className={getComponentClasses('buttonGroup')}>
+        <Button
+          type="submit"
+          disabled={!!loading}
+          data-testid="add-transaction-button"
+          aria-label={BUTTONS.ADD}
+        >
+          {BUTTONS.ADD}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          data-testid="cancel-btn"
+          onClick={() => {
+            resetForm();
+            onCancel?.();
+          }}
+        >
+          {BUTTONS.CANCEL}
+        </Button>
+      </div>
+      {error && typeof error === 'string' && (
         <span data-testid="error-message" role="alert" aria-label="error message" className="text-error-600 block mt-token w-full text-center">
           {safeMessage(error)}
         </span>

@@ -5,6 +5,11 @@ import type { Theme } from './themeTypes';
 
 export const theme: Theme = {
   // --- COMPONENTE/STĂRI ---
+  // Layout semantic pentru spacing între elemente de formular și grupuri de butoane
+  layout: {
+    formRow: 'flex flex-wrap gap-4 mb-4', // Spațiere între inputuri pe rând
+    buttonGroup: 'flex gap-2 mt-4', // Spațiere între butoane de acțiune
+  },
   components: {
     button: {
       disabled: 'opacity-50 cursor-not-allowed',

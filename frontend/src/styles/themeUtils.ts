@@ -26,6 +26,9 @@ export function getComponentClasses(
   size?: string,
   state?: string
 ): ComponentClasses {
+  // Permite accesarea rapidă pentru layout semantic
+  if (componentType === 'formRow') return theme.layout.formRow;
+  if (componentType === 'buttonGroup') return theme.layout.buttonGroup;
   const c = theme.components;
   switch (componentType) {
     case 'button':

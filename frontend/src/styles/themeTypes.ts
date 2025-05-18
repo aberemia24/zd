@@ -91,6 +91,10 @@ export type Theme = {
   shadows: Shadows;
   borderRadius: BorderRadius;
   typography: Typography;
+  layout: {
+    formRow: string;
+    buttonGroup: string;
+  };
   components: ThemeComponents;
 };
 
