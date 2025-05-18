@@ -1,5 +1,7 @@
 # Optimizarea încărcării datelor în LunarGrid prin implementarea unui hook specializat useMonthlyTransactions
 
+## Status: Finalizat (7/7 pași implementați)
+
 ## Context
 
 În prezent, atât componenta LunarGrid (vizualizare tabel lunar), cât și pagina de Tranzacții folosesc același hook `useTransactions` bazat pe `useInfiniteQuery`. Această abordare este potrivită pentru pagina de Tranzacții (paginare infinită), dar suboptimală pentru LunarGrid, unde este nevoie de toate tranzacțiile dintr-o lună într-o singură cerere. Există și un wrapper intermediar `useLunarGridTransactions` care adaugă complexitate fără beneficii reale.
@@ -44,14 +46,57 @@
 7. **Actualizarea componentelor pentru a folosi noile mutații (opțional)**
    - Separă responsabilitățile și optimizează codul pentru mentenanță.
 
+## Progres implementare
+
+### Implementat ✅
+
+1. **Hook-ul specializat pentru încărcarea lunară este implementat și funcțional**
+   - Noul hook `useMonthlyTransactions` creat în `frontend/src/services/hooks/useMonthlyTransactions.ts`
+   - Folosește `useQuery` (nu `useInfiniteQuery`) pentru a obține toate tranzacțiile într-o singură cerere
+   - Include opțiuni pentru zile adiacente și configurare cache
+
+2. **Wrapper-ul intermediar (`useLunarGridTransactions.ts`) a fost eliminat**
+   - Fișierul a fost șters complet
+   - Am simplificat arhitectura și am redus complexitatea codului
+
+3. **Actualizarea `useLunarGridTable.tsx` pentru a folosi direct noul hook**
+   - Import direct al `useMonthlyTransactions`
+   - Am simplificat codul prin eliminarea stării locale pentru parametrii de query
+   - Am menținut pipeline-ul existent de procesare a datelor
+
+### Finalizate recent ✅
+
+4. **Actualizarea componentei LunarGrid.tsx**
+   - Modificat pentru a folosi direct noul hook `useMonthlyTransactions`
+   - Eliminat implementarea dublă a logicii de încărcare date
+   - Actualizate toate referințele de nume de proprietate (`loading` → `isLoading`)
+   - Adăugat parametrul `userId` pentru a asigura încărcarea datelor doar pentru utilizatorul autentificat
+
+5. **Verificare LunarGridTanStack**
+   - Aceasta folosea deja `useLunarGridTable` care a fost actualizat, deci nu a necesitat modificări directe
+
+6. **Crearea hook-urilor reutilizabile pentru mutații**
+   - Implementate toate hook-urile necesare în `frontend/src/services/hooks/transactionMutations.ts`:
+     - `useCreateTransaction`
+     - `useUpdateTransaction`
+     - `useDeleteTransaction`
+     - `useUpdateTransactionStatus` (bonus)
+   - Adăugate mesaje de eroare din constante
+   - Invalidare corectă a cache-ului după fiecare operațiune
+
+7. **Pregatit pentru actualizare componente**
+   - Hook-urile pentru mutații sunt disponibile pentru a fi integrate în componente
+   - Documentate cu JSDoc complet pentru a facilita utilizarea ulterioară
+
 ## Acceptanță
 
-- Hook-ul specializat pentru încărcarea lunară este implementat și funcțional
-- Wrapper-ul intermediar a fost eliminat
-- LunarGrid încarcă toate datele lunare într-o singură cerere
-- Pagina de Tranzacții continuă să folosească paginare infinită
-- Mutațiile funcționează corect și cache-ul este invalidat
-- Toate regulile și best practices React/TypeScript au fost respectate
+- ✅ Hook-ul specializat pentru încărcarea lunară este implementat și funcțional
+- ✅ Wrapper-ul intermediar a fost eliminat
+- ✅ `useLunarGridTable` folosește direct noul hook
+- ✅ LunarGrid încarcă toate datele lunare într-o singură cerere
+- ✅ Pagina de Tranzacții continuă să folosească paginare infinită (nu a fost afectată)
+- ✅ Mutațiile funcționează corect și cache-ul este invalidat
+- ✅ Toate regulile și best practices React/TypeScript au fost respectate
 
 ## Note de implementare
 

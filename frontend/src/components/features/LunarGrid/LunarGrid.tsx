@@ -7,102 +7,14 @@ import { EXCEL_GRID, LABELS, PLACEHOLDERS } from '@shared-constants/ui';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { SubcategoryRows } from './SubcategoryRows';
 import { useQueryClient } from '@tanstack/react-query';
-// Înlocuim importul direct useTransactions cu hook-ul adaptat pentru LunarGrid
-import { useLunarGridTransactions } from './hooks/useLunarGridTransactions';
+// Folosim direct noul hook specializat pentru încărcarea lunară
+import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
   const date = new Date(year, month, 0);
   return Array.from({ length: date.getDate() }, (_, i) => i + 1);
 };
-
-// Hook pentru încărcarea tranzacțiilor pentru o lună/an specific, cu caching și refresh agresiv
-function useMonthlyTransactions(year: number, month: number) {
-  const queryClient = useQueryClient();
-  // Definim parametrii pentru React Query
-  const queryParams = React.useMemo(() => ({
-    year,
-    month,
-    limit: 1000, // Valoare mare pentru a lua toate tranzacțiile lunii
-  }), [year, month]);
-
-  // Folosim hook-ul useTransactions din React Query
-  const { data, isPending, error } = useTransactions(queryParams);
-
-  // Filtrăm manual tranzacțiile pentru luna curentă + zile adiacente
-  const transactions = React.useMemo(() => {
-    // Nu avem date încă
-    if (!data?.data) return [];
-
-    // Date pentru luna curentă
-    const currentMonthStart = new Date(year, month - 1, 1);
-    const currentMonthEnd = new Date(year, month, 0);
-
-    // Ultimele 6 zile din luna anterioară
-    const prevMonthYear = month === 1 ? year - 1 : year;
-    const prevMonth = month === 1 ? 12 : month - 1;
-    const prevMonthLastDay = new Date(prevMonthYear, prevMonth, 0).getDate();
-    const prevMonthLastDays = prevMonthLastDay - 5; // Ultimele 6 zile
-
-    // Primele 6 zile din luna următoare
-    const nextMonthYear = month === 12 ? year + 1 : year;
-    const nextMonth = month === 12 ? 1 : month + 1;
-    const nextMonthFirstDays = 6; // Primele 6 zile
-
-    console.log(`Filtering transactions for ${year}-${month} + adjacent days`);
-    console.log(`Total transactions before filtering: ${data.data.length}`);
-
-    const filteredTransactions = data.data.filter(t => {
-      try {
-        // Asigurăm-ne că data este validă și în formatul așteptat
-        // Format ISO: YYYY-MM-DD
-        if (!t.date || typeof t.date !== 'string') return false;
-
-        const d = new Date(t.date);
-        if (isNaN(d.getTime())) {
-          console.warn(`Invalid date found in transaction: ${t.id}, date: ${t.date}`);
-          return false;
-        }
-
-        const transactionDay = d.getDate();
-        const transactionMonth = d.getMonth() + 1;
-        const transactionYear = d.getFullYear();
-
-        // 1. Tranzacții din luna curentă
-        if (transactionYear === year && transactionMonth === month) {
-          return true;
-        }
-
-        // 2. Ultimele zile din luna anterioară
-        if (transactionYear === prevMonthYear &&
-          transactionMonth === prevMonth &&
-          transactionDay >= prevMonthLastDays) {
-          return true;
-        }
-
-        // 3. Primele zile din luna următoare
-        if (transactionYear === nextMonthYear &&
-          transactionMonth === nextMonth &&
-          transactionDay <= nextMonthFirstDays) {
-          return true;
-        }
-
-        return false;
-      } catch (err) {
-        console.error('Error filtering transaction:', err, t);
-        return false;
-      }
-    });
-
-    console.log(`Filtered to ${filteredTransactions.length} transactions`);
-    return filteredTransactions;
-  }, [data, month, year]);
-
-  // Acum încărcarea este determinată de React Query
-  const loading = isPending;
-
-  return { transactions, loading, error };
-}
 
 // Agregare sumă pentru o zi, categorie, subcategorie
 function getSumForCell(transactions: TransactionValidated[], category: string, subcategory: string, day: number) {
@@ -214,7 +126,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   };
 
   const days = getDaysInMonth(year, month);
-  const { transactions, loading } = useMonthlyTransactions(year, month);
+  const { transactions, isLoading } = useMonthlyTransactions(year, month, useAuthStore(state => state.user)?.id, { includeAdjacentDays: true });
 
   // Stare pentru categorii expandate/colapsate - persistentă în localStorage
   const [expandedCategories, setExpandedCategories] = React.useState<Record<string, boolean>>(() => {
