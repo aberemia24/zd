@@ -51,6 +51,17 @@ export const feedbackComponents = {
     }
   },
 
+  // List containers and items
+  'list-container': {
+    base: 'space-y-2',
+  },
+  'list-item': {
+    base: 'px-4 py-2 hover:bg-secondary-50 flex items-center justify-between',
+    states: {
+      active: 'bg-secondary-100 font-semibold',
+    },
+  },
+
   toast: {
     base: `rounded-lg shadow-lg border-l-4 p-4 max-w-sm w-full 
            pointer-events-auto

@@ -1,6 +1,9 @@
 ## [2025-05-20] Începere refactorizare stiluri CategoryEditor
 
-### Modificări în lucru:
+### Modificări finalizate:
+- Înlocuite textele hardcodate cu constante din `shared-constants/ui.ts`, `PLACEHOLDERS`, `INFO`
+- Extins `ComponentType` în `themeTypes.ts` cu `card-section`, `list-container`, `list-item`
+- Adăugate configurații în `componentMap` pentru `card-section`, `list-container`, `list-item`
 - Aplicare `getEnhancedComponentClasses('modal', 'overlay', ...)` pentru container modal
 - Aplicare `getEnhancedComponentClasses('card', 'elevated', 'lg', ...)` pentru card principal
 - Aplicare `getEnhancedComponentClasses('button', 'ghost', 'sm', ...)` pentru buton închidere
@@ -8,7 +11,6 @@
 ### Impact așteptat:
 - Eliminarea claselor Tailwind hardcodate
 - UI consistent cu restul componentelor rafinate
-
 
 ## [2025-05-19] Refactorizare TransactionsPage cu stiluri rafinate
 
@@ -546,7 +548,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 ---
 
-## 2025-05-17: Refactorizare LunarGridTanStack pentru paritate funcțională cu tabelul clasic
+## 2025-05-17 - Refactorizare LunarGridTanStack pentru paritate funcțională cu tabelul clasic
 
 **Autor**: Team FE
 
@@ -780,3 +782,5 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Refactorizarea completă a testelor pentru a folosi noua abordare cu `setMockState` în loc de `mockImplementation`
 - Adăugarea de tipuri mai stricte pentru mock-uri pentru a evita erorile TypeScript
 - Documentarea abordării în BEST_PRACTICES.md pentru a asigura consistența în viitor
+
+```

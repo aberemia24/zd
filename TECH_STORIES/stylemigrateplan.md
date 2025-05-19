@@ -55,9 +55,9 @@ Am analizat alte componente recent refactorizate pentru a asigura consistența:
 - [ ] ⬜ Buton închidere: `getEnhancedComponentClasses('button', 'ghost', 'sm', ...)` (în curs)
 - [ ] ⬜ Alert eroare: `getEnhancedComponentClasses('alert', 'error', ... )`
 - [ ] ⬜ Container conținut: `getEnhancedComponentClasses('flex', ..., ['gap-6'])`
-- [ ] ⬜ Secțiune categorii: `getEnhancedComponentClasses('card-section', ..., ['w-1/3', 'border-r', 'pr-4'])`
-- [ ] ⬜ Secțiune subcategorii: `getEnhancedComponentClasses('card-section', ..., ['w-2/3', 'pl-4'])`
-- [ ] ⬜ Liste: `getEnhancedComponentClasses('list-container', ...)` și itemi: `getEnhancedComponentClasses('list-item', ...)`
+- [x] ✅ Secțiune categorii: `getEnhancedComponentClasses('card-section', ..., ['w-1/3', 'border-r', 'pr-4'])`
+- [x] ✅ Secțiune subcategorii: `getEnhancedComponentClasses('card-section', ..., ['w-2/3', 'pl-4'])`
+- [x] ✅ Liste: `getEnhancedComponentClasses('list-container', ...)` și itemi: `getEnhancedComponentClasses('list-item', ...)`
 - [ ] ⬜ Badge: `getEnhancedComponentClasses('badge', ...)` cu props `withPulse` pentru animație
 - [ ] ⬜ Toate butoanele: utilizare sistem variant (primary, secondary, danger, etc.)
 - [ ] ⬜ Inputuri: `getEnhancedComponentClasses('input', ...)` cu efecte vizuale

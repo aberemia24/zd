@@ -3,9 +3,9 @@
 import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
-import { BUTTONS } from '@shared-constants';
+import { BUTTONS, PLACEHOLDERS, UI, INFO } from '@shared-constants/ui';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
-import type { ComponentType, ComponentVariant, ComponentSize } from '../../../styles/themeTypes';
+import type { ComponentType, ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
 
 interface Props {
   open: boolean;
@@ -72,7 +72,14 @@ export const CategoryEditor: React.FC<Props> = ({
   // Helper pentru badge count
   const badge = (cat: string, subcat: string) => {
     const count = getSubcategoryCount(cat, subcat);
-    return count > 0 ? <span className="ml-2 px-2 py-0.5 bg-secondary-200 text-secondary-700 text-xs rounded-token" data-testid={`subcat-count-${cat}-${subcat}`}>{count}</span> : null;
+    return count > 0 ? (
+      <span
+        className={getEnhancedComponentClasses('badge', 'secondary', 'sm')}
+        data-testid={`subcat-count-${cat}-${subcat}`}
+      >
+        {count}
+      </span>
+    ) : null;
   };
 
   // Adăugare subcategorie nouă
@@ -126,7 +133,7 @@ export const CategoryEditor: React.FC<Props> = ({
     const count = getSubcategoryCount(cat, subcat);
     
     return (
-      <div className="p-token bg-error-50 border border-error-200 rounded-token mb-token" data-testid={`delete-confirm-${cat}-${subcat}`}>
+      <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid={`delete-confirm-${cat}-${subcat}`}>
         <h3 className="text-lg font-semibold text-error-700 mb-token">Confirmare ștergere</h3>
         <p className="mb-2">Ești sigur că vrei să ștergi subcategoria <strong>{subcat}</strong> din <strong>{cat}</strong>?</p>
         
@@ -137,17 +144,17 @@ export const CategoryEditor: React.FC<Props> = ({
           </p>
         )}
         
-        <div className="flex gap-2 mt-token">
-          <button 
+        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','mt-token'])}>
+          <button
             onClick={onConfirm}
-            className="btn btn-error"
+            className={getEnhancedComponentClasses('button', 'error', 'sm')}
             data-testid={`confirm-delete-${cat}-${subcat}`}
           >
             Confirmă ștergerea
           </button>
-          <button 
+          <button
             onClick={onCancel}
-            className="btn btn-secondary"
+            className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
             data-testid={`cancel-delete-${cat}-${subcat}`}
           >
             Anulează
@@ -175,23 +182,23 @@ export const CategoryEditor: React.FC<Props> = ({
   };
 
   return (
-    <div className={getEnhancedComponentClasses('modal' as ComponentType, 'overlay' as ComponentVariant)} data-testid="category-editor-modal">
-      <div className={getEnhancedComponentClasses('card' as ComponentType, 'elevated' as ComponentVariant, 'lg' as ComponentSize)}>
-        <button className={getEnhancedComponentClasses('button' as ComponentType, 'ghost' as ComponentVariant, 'sm' as ComponentSize)} onClick={onClose} data-testid="close-editor">✕</button>
-        <h2 className="text-xl font-bold mb-token text-headings">Gestionare Subcategorii</h2>
-        {error && <div className="text-error mb-token" data-testid="error-msg">{error}</div>}
-        <div className="flex gap-6">
-          <div className="w-1/3 border-r border-secondary-200 pr-4">
-            <h3 className="font-semibold mb-token text-headings-secondary">Categorii</h3>
-            <ul>
+    <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
+      <div className={getEnhancedComponentClasses('card', 'elevated', 'lg')}>
+        <button className={getEnhancedComponentClasses('button', 'ghost', 'sm')} onClick={onClose} data-testid="close-editor">✕</button>
+        <h2 className="text-xl font-bold mb-token text-headings">{UI.CATEGORY_EDITOR_TITLE}</h2>
+        {error && <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid="error-msg">{error}</div>}
+        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-6'])}>
+          <div className={getEnhancedComponentClasses('card-section' as unknown as ComponentType)} data-testid="categories-section">
+            <h3 className="font-semibold mb-token text-headings-secondary">{UI.CATEGORY_EDITOR_CATEGORIES}</h3>
+            <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
               {categories.map(cat => (
-                <li key={cat.name} className={"mb-2 "+(selectedCategory===cat.name?"font-bold text-accent":"text-secondary-700 hover:text-accent")}>
+                <li key={cat.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType, undefined, undefined, selectedCategory===cat.name ? 'active' as ComponentState : undefined)} data-testid={`category-item-${cat.name}`}>
                   <button onClick={()=>setSelectedCategory(cat.name)} data-testid={`cat-select-${cat.name}`}>{cat.name}</button>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="flex-1">
+          <div className={getEnhancedComponentClasses('card-section' as unknown as ComponentType)} data-testid="subcategories-section">
             {/* Dialog de confirmare ștergere, arată doar când deleteMode=true și avem deletingSubcat setat */}
             {subcatAction?.type === 'delete' && (
               <DeleteConfirmation
@@ -204,12 +211,12 @@ export const CategoryEditor: React.FC<Props> = ({
             
             {selectedCategory ? (
               <>
-                <h3 className="font-semibold mb-token text-headings-secondary">Subcategorii pentru <span className="text-accent">{selectedCategory}</span></h3>
-                <ul>
+                <h3 className="font-semibold mb-token text-headings-secondary">{UI.CATEGORY_EDITOR_SUBCATEGORIES_FOR} <span className="text-accent">{selectedCategory}</span></h3>
+                <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
-                    <li key={sc.name} className="flex items-center gap-2 mb-1">
+                    <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>
                       {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
-                        <div className="flex gap-2 items-center">
+                        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','items-center'])}>
                           <input
                             type="text"
                             value={renameValue}
@@ -218,36 +225,43 @@ export const CategoryEditor: React.FC<Props> = ({
                               if (e.key === 'Enter') { handleRename(selectedCategory, sc.name, renameValue.trim()); setSubcatAction(null); }
                               if (e.key === 'Escape') setSubcatAction(null);
                             }}
-                            className="input-field input-sm"
+                            className={getEnhancedComponentClasses('input' as ComponentType, undefined, 'sm' as ComponentSize)}
                             autoFocus
                             data-testid={`edit-subcat-input-${sc.name}`}
                           />
                           <button
                             onClick={() => { handleRename(selectedCategory, sc.name, renameValue.trim()); setSubcatAction(null); }}
-                            className="text-xs text-success-600 hover:text-success-700"
+                            className={getEnhancedComponentClasses('button' as ComponentType, 'success' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                             data-testid={`confirm-rename-${sc.name}`}
                           >{BUTTONS.DONE}</button>
                           <button
                             onClick={() => setSubcatAction(null)}
-                            className="text-xs text-secondary-500 hover:text-secondary-600"
+                            className={getEnhancedComponentClasses('button' as ComponentType, 'secondary' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                             data-testid={`cancel-rename-${sc.name}`}
                           >{BUTTONS.CANCEL}</button>
                         </div>
                       ) : (
                         <>
                           <span>{sc.name}</span>
-                          {sc.isCustom && <span className="ml-1 text-success-600 text-xs" data-testid={`custom-flag-${sc.name}`}>custom</span>}
+                          {sc.isCustom && (
+                            <span
+                              className={getEnhancedComponentClasses('badge', 'success', 'xs')}
+                              data-testid={`custom-flag-${sc.name}`}
+                            >
+                              custom
+                            </span>
+                          )}
                           {badge(selectedCategory, sc.name)}
                           <button
                             onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
-                            className="ml-2 text-accent text-xs hover:text-accent-hover"
+                            className={getEnhancedComponentClasses('button' as ComponentType, 'default' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState, ['ml-2','text-accent','hover:text-accent-hover'])}
                             data-testid={`edit-subcat-btn-${sc.name}`}
                           >Redenumește</button>
                           {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                           {sc.isCustom && (
                             <button 
                               onClick={()=>handleDelete(selectedCategory, sc.name)} 
-                              className="ml-1 text-error-600 text-xs hover:text-error-700" 
+                              className={getEnhancedComponentClasses('button' as ComponentType, 'error' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState, ['ml-1'])}
                               data-testid={`delete-subcat-btn-${sc.name}`}
                             >
                               Șterge
@@ -258,7 +272,7 @@ export const CategoryEditor: React.FC<Props> = ({
                     </li>
                   ))}
                 </ul>
-                <div className="flex items-center gap-2 mt-token">
+                <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','mt-token'])}>
                   <input
                     type="text"
                     value={newSubcat}
@@ -267,15 +281,15 @@ export const CategoryEditor: React.FC<Props> = ({
                       if (e.key === 'Enter') handleAdd(categories.find(cat => cat.name === selectedCategory)!);
                       if (e.key === 'Escape') setNewSubcat('');
                     }}
-                    placeholder="Adaugă subcategorie nouă"
-                    className="input-field flex-1"
+                    placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
+                    className={getEnhancedComponentClasses('input' as ComponentType, undefined, 'sm' as ComponentSize)}
                     data-testid="add-subcat-input"
                   />
-                  <button onClick={()=>handleAdd(categories.find(cat=>cat.name===selectedCategory)!)} className="btn btn-primary" data-testid="add-subcat-btn">Adaugă</button>
+                  <button onClick={()=>handleAdd(categories.find(cat=>cat.name===selectedCategory)!)} className={getEnhancedComponentClasses('button' as ComponentType, 'primary' as ComponentVariant, 'sm' as ComponentSize)} data-testid="add-subcat-btn">{BUTTONS.ADD}</button>
                 </div>
               </>
             ) : (
-              <div className="text-secondary-500">Selectează o categorie pentru a vedea și edita subcategoriile.</div>
+              <div className={getEnhancedComponentClasses('alert', 'info', 'sm')} data-testid="no-cat-msg">{INFO.CATEGORY_EDITOR_EMPTY}</div>
             )}
           </div>
         </div>

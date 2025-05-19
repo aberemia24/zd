@@ -47,6 +47,11 @@ export const layoutComponents = {
     base: 'px-5 py-4 border-t border-secondary-200 bg-gradient-to-r from-secondary-50 to-secondary-100/50',
   },
 
+  // Section within a card
+  'card-section': {
+    base: 'p-5',
+  },
+
   modal: {
     base: `fixed inset-0 z-50 flex items-center justify-center
            transition-opacity duration-300 ease-out`,

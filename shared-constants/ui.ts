@@ -170,6 +170,10 @@ export const UI = {
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   DELETE_SUBCATEGORY: 'Șterge subcategorie',
   EDIT_SUBCATEGORY: 'Editează subcategorie',
+  // Texte UI pentru CategoryEditor
+  CATEGORY_EDITOR_TITLE: 'Gestionare Subcategorii',
+  CATEGORY_EDITOR_CATEGORIES: 'Categorii',
+  CATEGORY_EDITOR_SUBCATEGORIES_FOR: 'Subcategorii pentru',
 };
 
 // Flag pentru subcategoriile custom
