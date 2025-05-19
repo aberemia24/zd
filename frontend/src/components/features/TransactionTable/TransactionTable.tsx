@@ -1,8 +1,11 @@
 import React from 'react';
 import Button from '../../primitives/Button';
+import Badge from '../../primitives/Badge/Badge';
+import Spinner from '../../primitives/Spinner';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TABLE, BUTTONS } from '@shared-constants';
 import type { Transaction } from '../../../types/Transaction';
+import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 
 export type { Transaction };
 
@@ -66,57 +69,176 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   
+  // Generam efectele pentru componente
+  const tableEffects = [
+    'responsive',        // Tabel responsive pe dispozitive mobile
+    'shadow-hover',      // Umbră la hover peste întregul tabel
+    'rounded-corners',   // Colțuri rotunjite pentru aspect modern
+    'fade-in'            // Apariție graduală la încărcare
+  ];
+  
+  // Efecte pentru rânduri
+  const rowEffects = [
+    'hover-highlight',   // Evidențiere la hover
+    'smooth-transition'  // Tranziție lină între stări
+  ];
+  
+  // Efecte pentru antetul tabelului
+  const headerEffects = [
+    'sticky-header',     // Header fix la scroll
+    'gradient-bg-subtle' // Gradient subtil pentru antet
+  ];
+
+  // Format pentru sumă cu semn și culoare pentru tipul tranzacției
+  const getAmountStyles = (amount: number | string | undefined, type?: string): React.CSSProperties => {
+    if (amount === undefined || amount === null) return {};
+    
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    
+    // Fără număr valid, returnăm stil normal
+    if (isNaN(numericAmount)) return {};
+    
+    // Dacă e EXPENSE (cheltuială), roșu, dacă e INCOME (venit), verde
+    if (type === TransactionType.EXPENSE) {
+      return { color: 'var(--color-error-600)' };
+    } else if (type === TransactionType.INCOME) {
+      return { color: 'var(--color-success-600)' };
+    }
+    
+    return {};
+  };
+  
+  // Formatter pentru valori monetare
+  const formatAmount = (amount: number | string | undefined): string => {
+    if (amount === undefined || amount === null) return '';
+    
+    const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    
+    if (isNaN(numericAmount)) return String(amount);
+    
+    // Adaugă simbolul RON și formatare cu 2 zecimale
+    return numericAmount.toFixed(2) + ' RON';
+  };
+
   return (
     <div className="mt-token">
-      <table className="w-full border-collapse rounded-token overflow-hidden shadow-token bg-secondary-50" data-testid="transaction-table">
-        <thead>
-          <tr className="bg-secondary-100 text-secondary-700">
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.TYPE}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.AMOUNT}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.CATEGORY}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.SUBCATEGORY}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.DATE}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.RECURRING}</th>
-            <th className="px-token-sm py-token-xs text-left font-semibold">{TABLE.HEADERS.FREQUENCY}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {isLoading ? (
-            <tr data-testid="transaction-table-loading"><td colSpan={7} className="text-center py-token-lg text-secondary-500">{TABLE.LOADING}</td></tr>
-          ) : (!transactions || transactions.length === 0 ? (
-            <tr data-testid="transaction-table-empty"><td colSpan={7} className="text-center py-token-lg text-secondary-400">{TABLE.EMPTY}</td></tr>
-          ) : (
-            transactions.map((t, idx) => (
-              <tr key={t.id || idx} className="border-b border-secondary-200 last:border-b-0 hover:bg-secondary-100" data-testid={`transaction-item-${t.id || idx}`}>
-                <td className="px-token-sm py-token-xs">{t.type || ''}</td>
-                <td className="px-token-sm py-token-xs">{t.amount !== undefined && t.amount !== null ? String(t.amount) : ''}</td>
-                <td className="px-token-sm py-token-xs">{t.category || ''}</td>
-                <td className="px-token-sm py-token-xs">{t.subcategory || ''}</td>
-                <td className="px-token-sm py-token-xs">{t.date || ''}</td>
-                <td className="px-token-sm py-token-xs">{t.recurring === true ? TABLE.BOOL.YES : TABLE.BOOL.NO}</td>
-                <td className="px-token-sm py-token-xs">{t.recurring === true && t.frequency ? t.frequency : ''}</td>
-              </tr>
-            ))
-          ))}
-          {/* Afișăm loading indicator pentru paginile următoare */}
-          {isFetchingNextPage && (
-            <tr data-testid="transaction-table-next-page-loading">
-              <td colSpan={7} className="text-center py-token text-secondary-500">
-                {TABLE.LOADING_MORE}
-              </td>
+      {/* Container pentru tabelul responsiv cu stiluri rafinate */}
+      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, [...tableEffects, 'mt-4'])}>
+        <table 
+          className={getEnhancedComponentClasses('table', 'striped')} 
+          data-testid="transaction-table"
+        >
+          <thead>
+            <tr className="bg-secondary-100 text-secondary-700">
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.TYPE}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.AMOUNT}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.CATEGORY}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.SUBCATEGORY}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.DATE}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.RECURRING}</th>
+              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.FREQUENCY}</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr data-testid="transaction-table-loading">
+                <td colSpan={7} className="text-center py-token-lg">
+                  <div className="flex items-center justify-center">
+                    <Spinner variant="primary" sizeVariant="sm" withFadeIn />
+                    <span className="ml-2">{TABLE.LOADING}</span>
+                  </div>
+                </td>
+              </tr>
+            ) : (!transactions || transactions.length === 0 ? (
+              <tr data-testid="transaction-table-empty">
+                <td colSpan={7} className="text-center py-token-lg text-secondary-500">
+                  {TABLE.EMPTY}
+                </td>
+              </tr>
+            ) : (
+              transactions.map((t, idx) => (
+                <tr 
+                  key={t.id || idx} 
+                  className="border-b border-secondary-200 last:border-b-0 hover:bg-secondary-100 transition-colors duration-150" 
+                  data-testid={`transaction-item-${t.id || idx}`}
+                >
+                  <td className="px-token-sm py-token-xs">
+                    <Badge 
+                      variant={t.type === TransactionType.EXPENSE ? 'error' : t.type === TransactionType.INCOME ? 'success' : 'secondary'}
+                      pill
+                      withShadow
+                    >
+                      {t.type || ''}
+                    </Badge>
+                  </td>
+                  <td 
+                    className="px-token-sm py-token-xs" 
+                    style={getAmountStyles(t.amount, t.type)}
+                  >
+                    <span className="font-medium">{formatAmount(t.amount)}</span>
+                  </td>
+                  <td className="px-token-sm py-token-xs">{t.category || ''}</td>
+                  <td className="px-token-sm py-token-xs">{t.subcategory || ''}</td>
+                  <td className="px-token-sm py-token-xs">{t.date || ''}</td>
+                  <td className="px-token-sm py-token-xs">
+                    {t.recurring === true ? 
+                      <Badge variant="primary" pill withPulse>{TABLE.BOOL.YES}</Badge> : 
+                      <Badge variant="secondary" pill>{TABLE.BOOL.NO}</Badge>
+                    }
+                  </td>
+                  <td className="px-token-sm py-token-xs">
+                    {t.recurring === true && t.frequency ? 
+                      <Badge variant="info" pill>{t.frequency}</Badge> : ''
+                    }
+                  </td>
+                </tr>
+              ))
+            ))}
+            {/* Afișăm loading indicator pentru paginile următoare */}
+            {isFetchingNextPage && (
+              <tr data-testid="transaction-table-next-page-loading">
+                <td colSpan={7} className="text-center py-token">
+                  <div className="flex items-center justify-center">
+                    <Spinner variant="primary" sizeVariant="xs" withPulse />
+                    <span className="ml-2">{TABLE.LOADING_MORE}</span>
+                  </div>
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Status și informații */}
-      <div className="mt-token flex justify-center text-sm text-secondary-600">
-        {!isLoading && transactions && transactions.length > 0 && (
-          <span data-testid="transaction-table-info">
-            {TABLE.SHOWING_INFO
-              .replace('{shown}', String(transactions.length))
-              .replace('{total}', String(total))}
-          </span>
+      {/* Status și informații cu stiluri rafinate */}
+      <div className="mt-token flex justify-between items-center">
+        {/* Informații despre numărul de tranzacții afișate */}
+        <div className="text-sm">
+          {!isLoading && transactions && transactions.length > 0 && (
+            <Badge 
+              variant="info" 
+              className="px-3 py-1.5"
+              withGradient
+              data-testid="transaction-table-info"
+            >
+              {TABLE.SHOWING_INFO
+                .replace('{shown}', String(transactions.length))
+                .replace('{total}', String(total))}
+            </Badge>
+          )}
+        </div>
+        
+        {/* Buton pentru încărcarea manuală a mai multor tranzacții */}
+        {hasNextPage && !isFetchingNextPage && (
+          <Button 
+            variant="primary" 
+            size="sm"
+            onClick={() => fetchNextPage?.()} 
+            disabled={isFetchingNextPage || !hasNextPage}
+            withShadow
+            withTranslate
+          >
+            {BUTTONS.NEXT_PAGE}
+          </Button>
         )}
       </div>
 
