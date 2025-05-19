@@ -2,15 +2,28 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/authStore';
 import toast from 'react-hot-toast';
-import { MESAJE } from '@shared-constants';
+import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
+import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import Input from '../../primitives/Input/Input';
+import Button from '../../primitives/Button/Button';
+import Alert from '../../primitives/Alert/Alert';
 
-interface LoginFormProps {
-}
+interface LoginFormProps {}
 
 const LoginForm: React.FC<LoginFormProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, logout, loading, error, errorType } = useAuthStore();
+  const { login, loading, error, errorType } = useAuthStore();
+  const [activatedField, setActivatedField] = useState<string | null>(null);
+
+  // Handleri pentru efecte de focus/blur
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    setActivatedField(e.target.id);
+  };
+
+  const handleBlur = () => {
+    setActivatedField(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,65 +50,99 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     }
   };
 
+  // Determinarea mesajului de eroare formatat
+  const getErrorMessage = () => {
+    switch (errorType) {
+      case 'INVALID_CREDENTIALS':
+        return MESAJE.EROARE_AUTENTIFICARE || 'Date de autentificare incorecte.';
+      case 'RLS_DENIED':
+        return MESAJE.EROARE_RLS || 'Acces interzis (RLS).';
+      case 'NETWORK':
+        return MESAJE.EROARE_RETEA || 'Eroare de rețea. Încearcă din nou.';
+      default:
+        return error;
+    }
+  };
+
   return (
-    <form className="form-container max-w-sm mx-auto mt-12 p-token bg-secondary-50 rounded-token shadow-token" onSubmit={handleSubmit} data-testid="login-form">
-      <h2 className="text-xl font-bold mb-token text-center text-headings">Autentificare</h2>
-      <div className="mb-token">
-        <label htmlFor="email" className="block mb-token font-medium text-secondary-700">Email</label>
-        <input
+    <form 
+      className={getEnhancedComponentClasses('form-container', 'primary', 'md', undefined, ['fade-in', 'shadow-md'])}
+      onSubmit={handleSubmit} 
+      data-testid="login-form"
+    >
+      <div className={getEnhancedComponentClasses('card-header', 'default', undefined, undefined, ['gradient-bg-subtle'])}>
+        <h2 className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'text-center'])}>Autentificare</h2>
+      </div>
+      
+      <div className={getEnhancedComponentClasses('card-body', undefined, undefined, undefined, ['space-y-token'])}>
+        {/* Email Input */}
+        <Input
           id="email"
           type="email"
+          label={`${LABELS.EMAIL}*`}
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="input-field w-full"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           required
           data-testid="login-email"
+          withGlowFocus={activatedField === 'email'}
+          withTransition
         />
-      </div>
-      <div className="mb-token">
-        <label htmlFor="password" className="block mb-token font-medium text-secondary-700">Parolă</label>
-        <input
+        
+        {/* Password Input */}
+        <Input
           id="password"
           type="password"
+          label={`${LABELS.PAROLA}*`}
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="input-field w-full"
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           required
           data-testid="login-password"
+          withGlowFocus={activatedField === 'password'}
+          withTransition
         />
-      </div>
-      {error && (
-        <div className="mb-token text-error-600 text-center" data-testid="login-error">
-          {(() => {
-            switch (errorType) {
-              case 'INVALID_CREDENTIALS':
-                return 'Date de autentificare incorecte.';
-              case 'RLS_DENIED':
-                return 'Acces interzis (RLS).';
-              case 'NETWORK':
-                return 'Eroare de rețea. Încearcă din nou.';
-              default:
-                return error;
-            }
-          })()}
-        </div>
-      )}
-      <button
-        type="submit"
-        className="btn btn-primary w-full transition disabled:opacity-60"
-        disabled={loading}
-        data-testid="login-submit"
-      >
-        {loading ? 'Se autentifică...' : 'Autentificare'}
-      </button>
-      <div className="text-center mt-token">
-        <Link 
-          to="/register" 
-          className="btn btn-link text-sm text-accent hover:text-accent-hover"
-          data-testid="switch-to-register"
+        
+        {/* Error Message */}
+        {error && (
+          <Alert
+            type="error"
+            message={getErrorMessage() || ''}
+            data-testid="login-error"
+            withIcon
+            withFadeIn
+            withAccentBorder
+          />
+        )}
+        
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="primary" 
+          size="md"
+          disabled={loading}
+          isLoading={loading}
+          data-testid="login-submit"
+          className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['w-full', 'justify-center'])}
+          withShadow
+          withGradient
+          withTranslate
         >
-          Nu ai cont? Creează unul!
-        </Link>
+          {loading ? BUTTONS.LOADING : BUTTONS.LOGIN}
+        </Button>
+        
+        {/* Register Link */}
+        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-center', 'mt-4'])}>
+          <Link 
+            to="/register" 
+            className={getEnhancedComponentClasses('button', 'link', 'sm', undefined, ['text-center'])}
+            data-testid="switch-to-register"
+          >
+            Nu ai cont? Crează unul!
+          </Link>
+        </div>
       </div>
     </form>
   );

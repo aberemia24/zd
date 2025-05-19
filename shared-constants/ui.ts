@@ -13,6 +13,11 @@ export const LABELS = {
   CATEGORY_FILTER: 'Categoria:',
   FORM: 'adăugare tranzacție', // pentru aria-label pe <form>
   DESCRIPTION: 'Descriere',
+  
+  // Constante pentru pagina de autentificare/înregistrare
+  EMAIL: 'Email',
+  PAROLA: 'Parolă',
+  CONFIRMA_PAROLA: 'Confirmă parola',
 };
 
 export const TITLES = {
@@ -38,6 +43,11 @@ export const BUTTONS = {
   PREV_PAGE: 'Înapoi',
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   MANAGE_CATEGORIES: 'Gestionare categorii',
+  
+  // Constante pentru autentificare/înregistrare
+  LOGIN: 'Autentificare',
+  REGISTER: 'Crează cont',
+  LOADING: 'Se încarcă...',
 };
 
 export const TABLE = {
