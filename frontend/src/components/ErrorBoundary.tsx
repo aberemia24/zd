@@ -1,5 +1,6 @@
 import React from 'react';
 import { MESAJE } from '@shared-constants';
+import Alert from './primitives/Alert/Alert';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -29,10 +30,16 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   render() {
     if (this.state.hasError) {
       return (
-        <div className="bg-red-50 border border-red-200 rounded p-6 my-8 text-center">
-          <h2 className="text-lg font-bold text-red-700 mb-2">{MESAJE.EROARE_TITLU}</h2>
-          <p className="text-red-600">{this.state.error?.message || MESAJE.EROARE_GENERALA}</p>
-        </div>
+        <Alert
+          type="error"
+          message={this.state.error?.message || MESAJE.EROARE_GENERALA}
+          className="my-8"
+          withIcon
+          withFadeIn
+          withAccentBorder
+          withShadow
+          data-testid="error-boundary-alert"
+        />
       );
     }
     return this.props.children;
