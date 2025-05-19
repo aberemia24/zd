@@ -949,7 +949,24 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
      };
      ```
 
-### Best Practices pentru sincronizare schemă-model
+### Best Practices
+
+## [IMPORTANT] Focus outline și efecte de focus la taburi/NavLink
+
+- Nu adăuga niciodată clase de focus vizual (ex: `focus:ring-*`, `focus:outline-*`) direct în stilurile de bază (`base`) ale componentelor de navigare sau taburi în `componentMap`.
+- Efectele de focus (outline, ring, shadow) se aplică DOAR dinamic, ca efect (ex: `fx-no-outline`), pentru a permite controlul complet și centralizat prin sistemul de stiluri rafinate.
+- Motiv: Dacă pui clasele de focus direct în `base`, acestea nu pot fi suprascrise de efecte sau variante, ceea ce duce la imposibilitatea eliminării chenarului de focus la nevoie (ex: design modern, UX, QA, accesibilitate controlată).
+- Exemplu corect:
+  ```ts
+  // navigationComponents.ts
+  tab: {
+    base: 'px-4 py-2 text-sm font-medium transition-all duration-200', // fără focus:ring sau outline aici!
+  }
+  // În componentă:
+  getEnhancedComponentClasses('tab', ..., ..., ..., ['fx-no-outline'])
+  ```
+- Documentează orice excepție explicit în PR și DEV_LOG.md.
+ pentru sincronizare schemă-model
 
 1. **Sursa unică de adevăr pentru scheme**
    - Generează tipurile TS din schema DB folosind tools precum [prisma-typegen](https://github.com/prisma/prisma), [supabase-js-v2](https://supabase.com/docs/reference/javascript/typescript-support) sau [openapi-typescript](https://github.com/drwpow/openapi-typescript)

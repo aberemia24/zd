@@ -5,6 +5,16 @@
 @tailwind base;
 @tailwind components;
 @layer components {
+  /* Utilitar global pentru eliminarea outline-ului la focus pe tab/NavLink */
+  .fx-no-outline {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+    --tw-ring-offset-shadow: 0 0 #0000 !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-offset-width: 0px !important;
+  }
+
     .btn {
       @apply px-4 py-2 rounded font-medium focus:outline-none focus:ring-2 focus:ring-opacity-50 transition-colors;
     }

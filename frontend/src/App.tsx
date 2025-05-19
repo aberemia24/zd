@@ -1,6 +1,6 @@
 // Componenta principală a aplicației - orchestrator pentru rutare între pagini
 import React, { useEffect } from 'react';
-import { Routes, Route, Link, Navigate, useLocation } from 'react-router-dom'; // Importuri react-router-dom
+import { Routes, Route, Navigate } from 'react-router-dom'; // Importuri react-router-dom
 
 import TransactionsPage from './pages/TransactionsPage';
 import LunarGridPage from './pages/LunarGridPage';
@@ -9,7 +9,9 @@ import LoginForm from './components/features/Auth/LoginForm';
 import RegisterForm from './components/features/Auth/RegisterForm';
 import { Toaster } from 'react-hot-toast';
 import Spinner from './components/primitives/Spinner';
+import NavLink from './components/primitives/NavLink';
 import { TITLES } from '@shared-constants';
+import { getEnhancedComponentClasses } from './styles/themeUtils';
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from './stores/authStore';
@@ -26,7 +28,6 @@ export const App: React.FC = () => {
   console.log('🔜 App render using react-router-dom');
   
   const { user, loading, checkUser } = useAuthStore();
-  const location = useLocation(); // Hook pentru a obține locația curentă
 
   useEffect(() => {
     checkUser();
@@ -35,7 +36,7 @@ export const App: React.FC = () => {
   // Afișează spinner în timpul încărcării stării de autentificare
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-white/60 flex items-center justify-center z-50">
+      <div className={getEnhancedComponentClasses('container', 'primary', undefined, 'loading', ['centered', 'fixed'])}>
         <Spinner sizeVariant="xl" />
       </div>
     );
@@ -48,30 +49,18 @@ export const App: React.FC = () => {
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className="max-w-[1200px] mx-auto my-8 font-sans">
+      <div className={getEnhancedComponentClasses('container', 'primary', 'lg')}>
         {user && ( /* Afișează navigarea doar dacă utilizatorul este logat */ 
-          <div className="flex border-b border-gray-200 mb-6">
-            <Link 
-              to="/transactions"
-              className={`py-2 px-4 font-medium ${location.pathname === '/transactions' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-              data-testid="transactions-tab"
-            >
+          <div className={getEnhancedComponentClasses('navbar-container', 'primary') + ' mb-6'}>
+            <NavLink to="/transactions" testId="transactions-tab">
               {TITLES.TRANZACTII}
-            </Link>
-            <Link 
-              to="/lunar-grid"
-              className={`py-2 px-4 font-medium ${location.pathname === '/lunar-grid' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-              data-testid="lunar-grid-tab"
-            >
+            </NavLink>
+            <NavLink to="/lunar-grid" testId="lunar-grid-tab">
               {TITLES.GRID_LUNAR}
-            </Link>
-            <Link 
-              to="/options"
-              className={`py-2 px-4 font-medium ${location.pathname === '/options' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-              data-testid="options-tab"
-            >
+            </NavLink>
+            <NavLink to="/options" testId="options-tab">
               {TITLES.OPTIUNI || 'Opțiuni'}
-            </Link>
+            </NavLink>
           </div>
         )}
         

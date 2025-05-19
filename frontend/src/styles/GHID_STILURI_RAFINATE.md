@@ -1,5 +1,22 @@
 # Ghid de Utilizare a Stilurilor Rafinate
 
+## [IMPORTANT] Focus outline și efecte de focus la taburi/NavLink
+
+- Nu adăuga niciodată clase de focus vizual (ex: `focus:ring-*`, `focus:outline-*`) direct în stilurile de bază (`base`) ale componentelor de navigare sau taburi în `componentMap`.
+- Efectele de focus (outline, ring, shadow) se aplică DOAR dinamic, ca efect (ex: `fx-no-outline`), pentru a permite controlul complet și centralizat prin sistemul de stiluri rafinate.
+- Motiv: Dacă pui clasele de focus direct în `base`, acestea nu pot fi suprascrise de efecte sau variante, ceea ce duce la imposibilitatea eliminării chenarului de focus la nevoie (ex: design modern, UX, QA, accesibilitate controlată).
+- Exemplu corect:
+  ```ts
+  // navigationComponents.ts
+  tab: {
+    base: 'px-4 py-2 text-sm font-medium transition-all duration-200', // fără focus:ring sau outline aici!
+  }
+  // În componentă:
+  getEnhancedComponentClasses('tab', ..., ..., ..., ['fx-no-outline'])
+  ```
+- Documentează orice excepție explicit în PR și BEST_PRACTICES.md.
+
+
 Acest document explică cum să utilizați sistemul de stiluri rafinate implementat în Budget App pentru a crea o interfață modernă, consistentă și accesibilă. Următorul ghid include toate componentele actualizate cu noile efecte vizuale și stiluri moderne.
 
 ## Concepte fundamentale

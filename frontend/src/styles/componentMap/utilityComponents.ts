@@ -94,6 +94,14 @@ export const utilityComponents = {
   },
 
   // Efecte și stiluri speciale comune
+  /**
+   * Efect vizual pentru eliminarea outline-ului de focus (folosit pentru taburi/NavLink etc.)
+   * Se aplică dinamic cu getEnhancedComponentClasses ca efect 'fx-no-outline'.
+   * Folosește !important pentru a suprascrie orice stil implicit de browser.
+   */
+  'fx-no-outline': {
+    base: 'outline-none !important shadow-none !important',
+  },
   'fx-gradient-text': {
     base: 'bg-clip-text text-transparent bg-gradient-to-r',
     variants: {

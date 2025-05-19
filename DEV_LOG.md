@@ -740,7 +740,7 @@ _Actualizat la: 2025-05-07_
 - Toate textele UI, mesajele și enums sunt centralizate și importate doar din barrel (`constants/index.ts`).
 - Convențiile și best practices au fost actualizate și respectate (vezi BEST_PRACTICES.md).
 - Documentarea și refactorizările minore rămase sunt în curs.
-- Orice abatere de la aceste reguli trebuie justificată și documentată explicit în code review și DEV_LOG.md.
+- Orice abatere de la aceste reguli trebuie justificată și documentată explicit în code review și# DEV LOG
 
 ## 2025-04-27 - Migrare enums/constants la shared-constants și audit automat importuri
 - Finalizată migrarea enums/constants la sursa unică `shared-constants/`.

@@ -3,11 +3,15 @@
  * Folosește sistemul de design tokens și respectă arhitectura aplicației
  */
 
+/**
+ * Componente de navigare cu stiluri rafinate
+ * Folosește sistemul de design tokens și respectă arhitectura aplicației
+ * Efectul vizual 'no-outline' se aplică dinamic via getEnhancedComponentClasses (vezi utilityComponents)
+ */
 export const navigationComponents = {
   tab: {
     base: `px-4 py-2 text-sm font-medium
-           transition-all duration-200
-           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`,
+           transition-all duration-200`,
     variants: {
       underline: `border-b-2 border-transparent hover:border-secondary-300 hover:text-secondary-700
                  active:border-primary-500 active:text-primary-600`,
