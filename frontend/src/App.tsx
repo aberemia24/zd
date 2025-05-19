@@ -36,7 +36,7 @@ export const App: React.FC = () => {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-white/60 flex items-center justify-center z-50">
-        <Spinner size={60} />
+        <Spinner sizeVariant="xl" />
       </div>
     );
   }

@@ -4,15 +4,23 @@ import { getComponentClasses } from '../../../styles/themeUtils';
 import type { ComponentState, ComponentVariant, ComponentSize } from '../../../styles/themeTypes';
 
 // Omitem proprietatea 'size' din props pentru a evita conflictul
+// Props custom pentru Select. Nu dublăm props native HTML (ex: value, label)!
 export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'size'> {
+  /** Eticheta de deasupra selectului */
   label?: string;
+  /** Mesaj de eroare sub select */
   error?: string;
+  /** Clasă suplimentară pentru wrapper */
   wrapperClassName?: string;
+  /** Opțiuni disponibile */
   options: Array<{ value: string; label: string }>;
+  /** Placeholder pentru select */
   placeholder?: string;
-  variant?: 'primary' | 'error' | 'success' | 'warning';
-  // Definim un custom size pentru componenta noastră Select
-  sizeVariant?: 'sm' | 'md' | 'lg' | 'xl';
+  /** Variantă de stilizare (folosește enum ComponentVariant) */
+  variant?: ComponentVariant;
+  /** Dimensiune custom (folosește enum ComponentSize) */
+  sizeVariant?: ComponentSize;
+  /** Pentru testare */
   'data-testid'?: string;
 } // data-testid și orice alt prop HTML sunt permise
 
