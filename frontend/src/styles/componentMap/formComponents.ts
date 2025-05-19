@@ -33,6 +33,8 @@ export const formComponents = {
       disabled: 'bg-secondary-50 cursor-not-allowed text-secondary-400 shadow-none border-secondary-200',
       readonly: 'bg-secondary-50 cursor-default shadow-none',
       error: 'border-error-500 focus:ring-error-200',
+      focus: 'ring-2 ring-primary-100 shadow-md',
+      hover: 'shadow-lg',
     }
   },
 

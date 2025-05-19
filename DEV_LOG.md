@@ -32,7 +32,7 @@
 
 ### Lecții învățate:
 - Extensibilitatea sistemului: când lipsesc componente sau efecte vizuale noi, acestea trebuie adăugate în directorul `componentMap/` (nu prin clase Tailwind hardcodate)
-- Importanța respectării tipurilor definite în `themeTypes.ts` (ComponentType, ComponentVariant, ComponentSize, ComponentState)
+- Importanța respectării tipurilor definite în `themeTypes.ts` (ComponentType, ComponentVariant, ComponentState)
 - Necesitatea înțelegerii relației între `componentMap`, `themeTypes.ts` și `getEnhancedComponentClasses`
 
 ### Impact:

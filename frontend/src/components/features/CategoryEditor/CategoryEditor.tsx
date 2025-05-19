@@ -134,11 +134,11 @@ export const CategoryEditor: React.FC<Props> = ({
     
     return (
       <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid={`delete-confirm-${cat}-${subcat}`}>
-        <h3 className="text-lg font-semibold text-error-700 mb-token">Confirmare ștergere</h3>
-        <p className="mb-2">Ești sigur că vrei să ștergi subcategoria <strong>{subcat}</strong> din <strong>{cat}</strong>?</p>
+        <h3 className={getEnhancedComponentClasses('section-header')}>Confirmare ștergere</h3>
+        <p className={getEnhancedComponentClasses('spacing','small')}>Ești sigur că vrei să ștergi subcategoria <strong>{subcat}</strong> din <strong>{cat}</strong>?</p>
         
         {count > 0 && (
-          <p className="mb-2 text-error-600" data-testid={`delete-warning-${cat}-${subcat}`}>
+          <p className={`${getEnhancedComponentClasses('spacing','small')} ${getEnhancedComponentClasses('form-error-message')}`} data-testid={`delete-warning-${cat}-${subcat}`}>
             Atenție: Există <strong>{count}</strong> tranzacții care folosesc această subcategorie. 
             Acestea vor fi mutate în categoria principală.
           </p>
@@ -185,11 +185,11 @@ export const CategoryEditor: React.FC<Props> = ({
     <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
       <div className={getEnhancedComponentClasses('card', 'elevated', 'lg')}>
         <button className={getEnhancedComponentClasses('button', 'ghost', 'sm')} onClick={onClose} data-testid="close-editor">✕</button>
-        <h2 className="text-xl font-bold mb-token text-headings">{UI.CATEGORY_EDITOR_TITLE}</h2>
+        <h2 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_TITLE}</h2>
         {error && <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid="error-msg">{error}</div>}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-6'])}>
           <div className={getEnhancedComponentClasses('card-section' as unknown as ComponentType)} data-testid="categories-section">
-            <h3 className="font-semibold mb-token text-headings-secondary">{UI.CATEGORY_EDITOR_CATEGORIES}</h3>
+            <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_CATEGORIES}</h3>
             <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
               {categories.map(cat => (
                 <li key={cat.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType, undefined, undefined, selectedCategory===cat.name ? 'active' as ComponentState : undefined)} data-testid={`category-item-${cat.name}`}>
@@ -211,7 +211,7 @@ export const CategoryEditor: React.FC<Props> = ({
             
             {selectedCategory ? (
               <>
-                <h3 className="font-semibold mb-token text-headings-secondary">{UI.CATEGORY_EDITOR_SUBCATEGORIES_FOR} <span className="text-accent">{selectedCategory}</span></h3>
+                <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_SUBCATEGORIES_FOR} <span className={getEnhancedComponentClasses('text','accent')}>{selectedCategory}</span></h3>
                 <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>
@@ -245,7 +245,7 @@ export const CategoryEditor: React.FC<Props> = ({
                           <span>{sc.name}</span>
                           {sc.isCustom && (
                             <span
-                              className={getEnhancedComponentClasses('badge', 'success', 'xs')}
+                              className={getEnhancedComponentClasses('badge', 'success', 'xs', 'pulse')}
                               data-testid={`custom-flag-${sc.name}`}
                             >
                               custom

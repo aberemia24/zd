@@ -117,4 +117,8 @@ export const layoutComponents = {
       gradient: 'h-px bg-gradient-to-r from-secondary-200 via-secondary-300 to-secondary-200 border-0',
     }
   },
+  
+  'section-header': {
+    base: 'font-semibold mb-token text-headings-secondary',
+  },
 };

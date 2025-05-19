@@ -50,19 +50,19 @@ Am analizat alte componente recent refactorizate pentru a asigura consistența:
 - [ ] ⬜ Tipizarea strictă a event handler-ilor
 
 ### 3.2. Refactorizare stiluri
-- [ ] ⬜ Container modal: `getEnhancedComponentClasses('modal', 'overlay', ...)` (în curs)
-- [ ] ⬜ Card principal: `getEnhancedComponentClasses('card', 'elevated', 'lg', ...)` (în curs)
-- [ ] ⬜ Buton închidere: `getEnhancedComponentClasses('button', 'ghost', 'sm', ...)` (în curs)
-- [ ] ⬜ Alert eroare: `getEnhancedComponentClasses('alert', 'error', ... )`
-- [ ] ⬜ Container conținut: `getEnhancedComponentClasses('flex', ..., ['gap-6'])`
+- [x] ✅ Container modal: `getEnhancedComponentClasses('modal', ...)`
+- [x] ✅ Card principal: `getEnhancedComponentClasses('card', 'elevated', 'lg')`
+- [x] ✅ Buton închidere: `getEnhancedComponentClasses('button', 'ghost', 'sm')`
+- [x] ✅ Alert eroare: `getEnhancedComponentClasses('alert', 'error', ... )`
+- [x] ✅ Container conținut: `getEnhancedComponentClasses('flex', ..., ['gap-6'])`
 - [x] ✅ Secțiune categorii: `getEnhancedComponentClasses('card-section', ..., ['w-1/3', 'border-r', 'pr-4'])`
 - [x] ✅ Secțiune subcategorii: `getEnhancedComponentClasses('card-section', ..., ['w-2/3', 'pl-4'])`
 - [x] ✅ Liste: `getEnhancedComponentClasses('list-container', ...)` și itemi: `getEnhancedComponentClasses('list-item', ...)`
-- [ ] ⬜ Badge: `getEnhancedComponentClasses('badge', ...)` cu props `withPulse` pentru animație
-- [ ] ⬜ Toate butoanele: utilizare sistem variant (primary, secondary, danger, etc.)
-- [ ] ⬜ Inputuri: `getEnhancedComponentClasses('input', ...)` cu efecte vizuale
+- [x] ✅ Badge: `getEnhancedComponentClasses('badge', ...)` cu props `withPulse` pentru animație
+- [x] ✅ Toate butoanele: utilizare sistem variant (primary, secondary, danger, etc.)
+- [x] ✅ Inputuri: `getEnhancedComponentClasses('input', ...)` cu efecte vizuale
 
-### 3.3. Extragere și centralizare texte
+### 3.3. Extragere și centralizare texte (În curs)
 - [ ] ⬜ Adaugă în `shared-constants/ui.ts` secțiunea `CATEGORY_EDITOR` cu toate textele UI:
 ```ts
 CATEGORY_EDITOR: {
@@ -82,6 +82,7 @@ CATEGORY_EDITOR: {
   CANCEL_BUTTON: 'Anulează'
 }
 ```
+- [ ] ⬜ Centralizare mesaje în `shared-constants/messages.ts` pentru textele de sistem din CategoryEditor
 - [ ] ⬜ Adaugă în `shared-constants/messages.ts` secțiunea `CATEGORII` cu toate mesajele de validare/eroare:
 ```ts
 CATEGORII: {
@@ -107,10 +108,6 @@ CATEGORII: {
 - [ ] ⬜ Refactorizează dialogul de confirmare pentru a folosi sistemul de design și mesaje centralizate
 
 ### 3.6. Testare & QA
-- [ ] ⬜ Testare vizuală (UI/UX) 
-- [ ] ⬜ Testare funcțională (adăugare, redenumire, ștergere subcategorie)
-- [ ] ⬜ Testare edge cases (validare, mesaje eroare, focus, accesibilitate)
-- [ ] ⬜ Testare responsive
 - [ ] ⬜ Verificarea performanței cu React DevTools
 
 ### 3.7. Îmbunătățiri avansate

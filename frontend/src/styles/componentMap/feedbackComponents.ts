@@ -21,6 +21,9 @@ export const feedbackComponents = {
       'success-gradient': 'bg-gradient-to-r from-success-50 to-success-100 text-success-800 border border-success-200',
       'error-gradient': 'bg-gradient-to-r from-error-50 to-error-100 text-error-800 border border-error-200',
     },
+    states: {
+      pulse: 'animate-pulse',
+    },
     sizes: {
       xs: 'px-1.5 py-0.5 text-[0.625rem]',
       sm: 'px-2 py-0.5 text-xs',

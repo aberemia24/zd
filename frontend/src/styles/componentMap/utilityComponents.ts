@@ -158,4 +158,15 @@ export const utilityComponents = {
       static: '',
     }
   },
+  'text': {
+    variants: {
+      accent: 'text-accent',
+    }
+  },
+  'spacing': {
+    variants: {
+      small: 'mb-2',
+      section: 'mb-token',
+    }
+  },
 };

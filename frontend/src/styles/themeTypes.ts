@@ -158,6 +158,12 @@ export type ThemeComponents = {
     text?: string;
     [key: string]: string | undefined;
   };
+  text?: {
+    variants?: { [key: string]: string | undefined };
+  };
+  spacing?: {
+    variants?: { [key: string]: string | undefined };
+  };
 };
 
 // Tipuri pentru componente
@@ -172,7 +178,8 @@ export type ComponentState =
   | 'error' 
   | 'success' 
   | 'required' 
-  | 'selected';
+  | 'selected' 
+  | 'pulse';
 
 export type ComponentType = 
   | 'button' 
@@ -240,7 +247,10 @@ export type ComponentType =
   | 'badge-variant' 
   | 'alert-variant' 
   | 'transaction-form'
-  | 'indicator';
+  | 'indicator' 
+  | 'section-header'
+  | 'text'
+  | 'spacing';
 
 export type ComponentVariant = 
   | 'primary' 
@@ -287,7 +297,10 @@ export type ComponentVariant =
   | 'pill' 
   | 'card' 
   | 'light' 
-  | 'dark';
+  | 'dark'
+  | 'accent'
+  | 'small'
+  | 'section';
 
 export type ComponentSize = 
   | 'xs' 
