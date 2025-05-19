@@ -58,6 +58,62 @@ Pentru a menține coerența vizuală și mentenanță (așa cum s-a demonstrat �
 
 **Data:** 2025-05-11
 
+## Sistemul de stiluri rafinate (2025-05-19)
+
+**Context**: Am implementat un sistem de stiluri rafinate pentru toate componentele din aplicație. Acest sistem înlocuiește utilizarea directă a claselor Tailwind în JSX cu o abordare sistematică bazată pe tokens și un API unificat.
+
+### Principii fundamentale
+
+1. **Sursă unică de adevăr**: Toate stilurile sunt definite în directorul `componentMap/` grupate pe categorii funcționale.
+2. **Tokens vs. clase**: Utilizăm tokens semantice (`primary`, `success`, `lg`, etc.) în loc de clase CSS specifice.
+3. **Extensibilitate**: Sistemul poate fi extins prin adăugarea de noi componente, variante, sau efecte vizuale.
+4. **Consistență**: Toate componentele au o structură unitară: bază, variante, mărimi, stări.
+
+### API-ul sistemului: `getEnhancedComponentClasses`
+
+Toate componentele trebuie să folosească funcția centrală pentru genera clasele CSS:
+
+```tsx
+import { getEnhancedComponentClasses } from '../styles/themeUtils';
+
+// Exemplu de utilizare
+<div className={getEnhancedComponentClasses(
+  'card',             // Tipul componentei (definit în themeTypes.ts)
+  'primary',          // Varianta (default, primary, secondary, etc.)
+  'md',               // Mărimea (sm, md, lg, etc.)
+  isActive ? 'active' : undefined,  // Starea (active, disabled, etc.)
+  ['shadow-md', 'gradient-bg-subtle'] // Efecte adiționale
+)}>...</div>
+```
+
+### Extinderea sistemului
+
+Când întru funcționalități noi trebuie să adăugăm componente sau efecte noi:
+
+1. **NU adăugați clase Tailwind hardcodate**: Este strict interzis să adăugați clase CSS direct în JSX.
+2. **Extindeți sistemul**:
+   - Adăugați noul tip de componentă în `themeTypes.ts` (dacă e necesar)
+   - Adăugați configurația componentei în fișierul corespunzător din `componentMap/`
+   - Demonstrați și documentați noua componentă/efect în `DEV_LOG.md`
+
+### Componentele primitive vs. construirea manuală
+
+Abordarea recomandată (în ordine de prioritate):
+
+1. **Folosiți componentele primitive** dacă există (Button, Alert, Card, etc.) cu props-uri pentru efecte (`withShadow`, `withGradient`, etc.)
+2. **Folosiți `getEnhancedComponentClasses`** pentru HTML direct (`div`, `span`, etc.)
+3. **DOAR în caz de excepție**: extensibilizați sistemul adăugând noi componente/efecte
+
+### Documentare și exemple
+
+Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
+- Explicații detaliate ale arhitecturii
+- Exemple pentru fiecare tip de componentă
+- Ghid de migrare pentru componente existente
+- Recomandări de performanță și accesibilitate
+
+**Pentru referință**: Modelele TransactionTable, TransactionForm și TransactionFilters au fost deja refactorizate și pot fi folosite ca exemplu.
+
 ### Principii Generale
 
 - Teste unitare și de integrare pentru toate componentele și serviciile.

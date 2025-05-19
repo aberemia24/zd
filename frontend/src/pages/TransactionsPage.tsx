@@ -9,6 +9,8 @@ import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from
 import { useQueryClient } from '@tanstack/react-query';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 import { PAGINATION } from '@shared-constants';
+import Alert from '../components/primitives/Alert/Alert';
+import { getEnhancedComponentClasses } from '../styles/themeUtils';
 
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
@@ -96,34 +98,61 @@ const TransactionsPage: React.FC = () => {
   }, []);
 
   return (
-    <>
-      <h1 className="text-2xl font-bold text-primary-700 mb-token" data-testid="transactions-title">{TITLES.TRANZACTII}</h1>
+    <div className={getEnhancedComponentClasses('container', 'primary', 'lg', undefined, ['fade-in', 'page-wrapper'])}>
+      {/* Titlu pagină cu efect de gradient subtil */}
+      <h1 
+        className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'mb-token'])}
+        data-testid="transactions-title"
+      >
+        {TITLES.TRANZACTII}
+      </h1>
 
-      <TransactionForm />
-
-      <TransactionFilters
-        type={filterType}
-        category={filterCategory}
-        onTypeChange={t => handleFilterChange(t as TransactionType | '', undefined)}
-        onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
-      />
-
-      {/* Folosim TransactionTable cu paginare infinită */}
-      <TransactionTable
-        transactions={transactions}
-        total={totalTransactions}
-        isLoading={isLoading}
-        isFetchingNextPage={isFetchingNextPage}
-        hasNextPage={hasNextPage}
-        fetchNextPage={fetchNextPage}
-      />
-
-      {fetchError && (
-        <div className="mt-token p-token-sm bg-error-100 text-error-700 rounded-token" data-testid="fetch-error">
-          {fetchError.message || 'Eroare la încărcarea tranzacțiilor'}
+      {/* Secțiune formular cu shadow și border rafinate */}
+      <div className={getEnhancedComponentClasses('card', 'default', 'lg', undefined, ['shadow-md', 'mb-token'])}>
+        <div className={getEnhancedComponentClasses('card-header', undefined, undefined, undefined, ['gradient-bg-subtle'])}>
+          <h2 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>Adaugă tranzacție nouă</h2>
         </div>
+        <div className={getEnhancedComponentClasses('card-body')}>
+          <TransactionForm />
+        </div>
+      </div>
+
+      {/* Secțiune filtre */}
+      <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['mb-token'])}>
+        <TransactionFilters
+          type={filterType}
+          category={filterCategory}
+          onTypeChange={t => handleFilterChange(t as TransactionType | '', undefined)}
+          onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
+        />
+      </div>
+
+      {/* Secțiune tabel cu efect de fade-in */}
+      <div className={getEnhancedComponentClasses('flex', undefined, 'lg', undefined, ['flex-col', 'fade-in'])}>
+        <TransactionTable
+          transactions={transactions}
+          total={totalTransactions}
+          isLoading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          hasNextPage={hasNextPage}
+          fetchNextPage={fetchNextPage}
+        />
+      </div>
+
+      {/* Alertă de eroare cu efecte moderne */}
+      {fetchError && (
+        <Alert
+          type="error"
+          message={fetchError.message || 'Eroare la încărcarea tranzacțiilor'}
+          data-testid="fetch-error"
+          className="mt-token"
+          withIcon
+          withFadeIn
+          withAccentBorder
+          withShadow
+        />
       )}
-    </>
+    </div>
   );
 };
 

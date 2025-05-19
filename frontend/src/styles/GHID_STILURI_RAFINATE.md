@@ -559,13 +559,95 @@ import { Loader, Spinner } from '../components/primitives/Loader';
    );
    ```
 
+## Arhitectura sistemului de stiluri rafinate
+
+Sistemul este structurat în următoarele componente cheie:
+
+### 1. Definirea tipurilor (`themeTypes.ts`)
+
+- `ComponentType`: Definește toate tipurile valide de componente (button, input, card, etc.)
+- `ComponentVariant`: Definește variantele posibile (primary, secondary, success, etc.)
+- `ComponentSize`: Definește dimensiunile acceptate (xs, sm, md, lg, xl, etc.)
+- `ComponentState`: Definește stările posibile (active, disabled, hover, etc.)
+
+### 2. Configurația componentelor (`componentMap/`)
+
+Directorul `componentMap/` conține fișiere separate pentru fiecare categorie de componente:
+
+- `actionComponents.ts`: Butoane și acțiuni (Button, IconButton, etc.)
+- `formComponents.ts`: Componente de formular (Input, Select, Checkbox, etc.)
+- `feedbackComponents.ts`: Alerte, notificări (Alert, Badge, Toast, etc.)
+- `layoutComponents.ts`: Structuri de layout (Card, Container, Grid, etc.)
+- `navigationComponents.ts`: Navigare (Tab, Sidebar, Navbar, etc.)
+- `dataComponents.ts`: Prezentare date (Table, etc.)
+- `utilityComponents.ts`: Efecte speciale și utilitare
+
+### 3. Integrarea în sistem (`themeUtils.ts`)
+
+Funcția `getEnhancedComponentClasses` face legătura între tipuri și configurație:
+
+```typescript
+export function getEnhancedComponentClasses(
+  componentType: ComponentType,  // Tipul componentei (button, card, etc.)
+  variant?: ComponentVariant,    // Varianta (primary, secondary, etc.)
+  size?: ComponentSize,          // Dimensiunea (sm, md, lg, etc.)
+  state?: ComponentState,        // Starea (disabled, active, etc.)
+  effects?: string[]            // Efecte speciale adiționale
+): string {
+  // Returnează clasele CSS concatenate
+}
+```
+
 ## Extinderea sistemului
 
-Pentru a adăuga noi stiluri sau componente:
+Pentru a adăuga noi stiluri sau componente, urmați aceast procedură standard:
 
-1. Identificați categoria potrivită (sau creați una nouă)
-2. Adăugați noua configurație în fișierul categoriei
-3. Verificați că noua componentă respectă modelul de bază/variante/mărimi/stări
+### A. Adăugarea unui tip nou de componentă
+
+1. Actualizați `themeTypes.ts` - adăugați noul tip în `ComponentType`
+2. Identificați categoria potrivită din `componentMap/` (sau creați una nouă)
+3. Adăugați configurația componentei cu următoarea structură:
+
+```typescript
+'component-name': {
+  base: `clase-tailwind de bază pentru componentă`,
+  variants: {
+    primary: `clase pentru varianta primary`,
+    secondary: `clase pentru varianta secondary`,
+    // alte variante
+  },
+  sizes: {
+    sm: `clase pentru dimensiunea sm`,
+    md: `clase pentru dimensiunea md`,
+    // alte dimensiuni
+  },
+  states: {
+    disabled: `clase pentru starea disabled`,
+    // alte stări
+  }
+},
+```
+
+### B. Adăugarea unui efect vizual nou
+
+1. Identificați dacă efectul este specific unei componente sau general
+2. Pentru efecte specifice, extindeți configurația componentei respective
+3. Pentru efecte generale, adăugați-le în `utilityComponents.ts`:
+
+```typescript
+'fx-effect-name': {
+  base: `clase-tailwind pentru efect`,
+  variants: {
+    // variante de efect dacă este cazul
+  }
+},
+```
+
+### C. Modificarea unei componente existente
+
+1. Localizați configurația componentei în fișierul corespunzător din `componentMap/`
+2. Extindeți/modificați configurația existentă păstrând structura
+3. Verificați că modificările nu afectează compat-itatea cu codul existent
 4. Actualizați documentația dacă e necesar
 
 ## Recomandări de performanță și bune practici
