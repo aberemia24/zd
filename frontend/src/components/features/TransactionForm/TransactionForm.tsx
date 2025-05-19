@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import Button from '../../primitives/Button/Button';
+import { ValidatedSubmitButton, Button } from '../../primitives/Button';
 import Input from '../../primitives/Input/Input';
 import Select from '../../primitives/Select/Select';
 import Checkbox from '../../primitives/Checkbox/Checkbox';
@@ -74,7 +74,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     form: TransactionFormData;
     error: string | Record<string, string>;
     success: string;
-    loading: boolean;
+    loading: any; // Poate fi string sau boolean în funcție de implementare API
     setField: (name: keyof TransactionFormData, value: any) => void;
     handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>;
     resetForm: () => void;
@@ -313,32 +313,31 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-between', 'mt-6'])}>
         {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
         {(() => {
-          const isFormValid = form.type && 
-                            form.amount && 
-                            form.category && 
-                            form.date && 
-                            (!form.recurring || (form.recurring && form.frequency));
+          // Asigurăm validarea strictă a formularului și conversia la boolean
+          const isFormValid: boolean = Boolean(
+            form.type && 
+            form.amount && 
+            form.category && 
+            form.date && 
+            (!form.recurring || (form.recurring && form.frequency))
+          );
           
           // Aplicăm efecte vizuale diferite în funcție de starea formularului
           
           // Buton cu stil subtil când e inactiv (ghost) și vizibil când e valid (success)
           return (
-            <Button
-              type="submit"
-              variant="success"
+            <ValidatedSubmitButton
+              isFormValid={isFormValid}
               size="md"
-              disabled={!isFormValid || !!loading}
+              isLoading={Boolean(loading)}
               data-testid="add-transaction-button"
               aria-label={BUTTONS.ADD}
-              withShadow={isFormValid === true}
-              withGradient={isFormValid === true}
-              withTranslate={isFormValid === true}
+              submitText={BUTTONS.ADD}
             >
               {isFormValid && (
                 <span className={getEnhancedComponentClasses('indicator', 'primary', 'md', 'active', ['mr-2'])}></span>
               )}
-              {BUTTONS.ADD}
-            </Button>
+            </ValidatedSubmitButton>
           );
         })()}
         <Button

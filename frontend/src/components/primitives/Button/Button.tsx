@@ -6,7 +6,11 @@ import type { ComponentVariant, ComponentSize, ComponentState } from '../../../s
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'data-testid'> & {
   variant?: ComponentVariant;
   size?: ComponentSize;
-  isLoading?: boolean;
+  /**
+   * Indică dacă butonul este în stare de încărcare
+   * Acceptă orice tip de valoare care poate fi convertită la boolean
+   */
+  isLoading?: boolean | string | number | null | undefined;
   dataTestId?: string;
   // Adăugăm suport pentru efecte vizuale rafinate
   withShadow?: boolean;
@@ -27,8 +31,9 @@ const Button: React.FC<ButtonProps> = ({
   withTranslate = false,
   ...rest
 }) => {
-  // Determinăm starea butonului
-  const state: ComponentState | undefined = isLoading 
+  // Determinăm starea butonului, convertind isLoading la boolean
+  const isLoadingBoolean = Boolean(isLoading);
+  const state: ComponentState | undefined = isLoadingBoolean 
     ? 'loading' 
     : disabled 
       ? 'disabled' 
@@ -53,11 +58,11 @@ const Button: React.FC<ButtonProps> = ({
         getEnhancedComponentClasses('button', variant, size, state, effects),
         className
       )}
-      disabled={disabled || isLoading}
-      data-testid={dataTestId || `button-${variant}-${size}${isLoading ? '-loading' : ''}`}
+      disabled={disabled || isLoadingBoolean}
+      data-testid={dataTestId || `button-${variant}-${size}${isLoadingBoolean ? '-loading' : ''}`}
       {...rest}
     >
-      {isLoading && (
+      {isLoadingBoolean && (
         <span className="mr-2">
           <svg className={getEnhancedComponentClasses('loader-svg', undefined, 'sm')} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className={getEnhancedComponentClasses('loader-circle')} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

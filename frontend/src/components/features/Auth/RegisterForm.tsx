@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import Input from '../../primitives/Input/Input';
-import Button from '../../primitives/Button/Button';
+import { ValidatedSubmitButton } from '../../primitives/Button';
 import Alert from '../../primitives/Alert/Alert';
 
 const RegisterForm: React.FC = () => {
@@ -16,6 +16,19 @@ const RegisterForm: React.FC = () => {
   const { register, loading, error, errorType } = useAuthStore();
   const [success, setSuccess] = useState<string | null>(null);
   const [activatedField, setActivatedField] = useState<string | null>(null);
+  
+  // Funcție pentru validarea formatului de email
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+  };
+  
+  // Verificare dacă parolele coincid și sunt suficient de lungi
+  const isPasswordValid = password.length >= 8;
+  const doPasswordsMatch = password === confirm && confirm !== '';
+  
+  // Verifică dacă formularul este valid
+  const isFormValid = isValidEmail(email) && isPasswordValid && doPasswordsMatch;
 
   // Handleri pentru efecte de focus/blur
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -148,20 +161,14 @@ const RegisterForm: React.FC = () => {
         )}
         
         {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="primary" 
+        <ValidatedSubmitButton
+          isFormValid={isFormValid}
           size="md"
-          disabled={loading}
           isLoading={loading}
           data-testid="register-submit"
           className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['w-full', 'justify-center'])}
-          withShadow
-          withGradient
-          withTranslate
-        >
-          {loading ? BUTTONS.LOADING : BUTTONS.REGISTER}
-        </Button>
+          submitText={BUTTONS.REGISTER}
+        />
         
         {/* Login Link */}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-center', 'mt-4'])}>

@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import Input from '../../primitives/Input/Input';
-import Button from '../../primitives/Button/Button';
+import { ValidatedSubmitButton } from '../../primitives/Button';
 import Alert from '../../primitives/Alert/Alert';
 
 interface LoginFormProps {}
@@ -15,6 +15,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [password, setPassword] = useState('');
   const { login, loading, error, errorType } = useAuthStore();
   const [activatedField, setActivatedField] = useState<string | null>(null);
+  
+  // Funcție pentru validarea formatului de email
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
+  };
+
+  // Verifică dacă formularul este valid (email corect și parolă introdusă)
+  const isFormValid = isValidEmail(email) && password.length >= 6;
 
   // Handleri pentru efecte de focus/blur
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -118,20 +127,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         )}
         
         {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="primary" 
+        <ValidatedSubmitButton
+          isFormValid={isFormValid}
           size="md"
-          disabled={loading}
           isLoading={loading}
           data-testid="login-submit"
           className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['w-full', 'justify-center'])}
-          withShadow
-          withGradient
-          withTranslate
-        >
-          {loading ? BUTTONS.LOADING : BUTTONS.LOGIN}
-        </Button>
+          submitText={BUTTONS.LOGIN}
+        />
         
         {/* Register Link */}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-center', 'mt-4'])}>
