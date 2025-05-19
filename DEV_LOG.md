@@ -1,4 +1,17 @@
+## [2025-05-20] Începere refactorizare stiluri CategoryEditor
+
+### Modificări în lucru:
+- Aplicare `getEnhancedComponentClasses('modal', 'overlay', ...)` pentru container modal
+- Aplicare `getEnhancedComponentClasses('card', 'elevated', 'lg', ...)` pentru card principal
+- Aplicare `getEnhancedComponentClasses('button', 'ghost', 'sm', ...)` pentru buton închidere
+
+### Impact așteptat:
+- Eliminarea claselor Tailwind hardcodate
+- UI consistent cu restul componentelor rafinate
+
+
 ## [2025-05-19] Refactorizare TransactionsPage cu stiluri rafinate
+
 
 ### Modificări:
 - Aplicat sistemul de stiluri rafinate la `TransactionsPage.tsx`
@@ -240,7 +253,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
     - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts`
     - `frontend/src/components/features/LunarGrid/TanStackSubcategoryRows.tsx`
     - `frontend/src/components/features/LunarGrid/types.ts`
-    - `frontend/tsconfig.json`
+    - `frontend/src/components/features/LunarGrid/tsconfig.json`
 
 ---
 
@@ -263,7 +276,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
     - `frontend/src/App.tsx`
     - `frontend/src/components/features/Auth/LoginForm.tsx`
     - `frontend/src/components/features/Auth/RegisterForm.tsx`
-- **Notă:** S-au rezolvat și erorile de sintaxă (`Unexpected token`) din `App.tsx` care apăreau din cauza unui comentariu JSX formatat incorect. Testarea manuală completă a fluxurilor de login, register, navigare și logout a fost efectuată cu succes.
+- **Notă:** S-au rezolvate și erorile de sintaxă (`Unexpected token`) din `App.tsx` care apăreau din cauza unui comentariu JSX formatat incorect. Testarea manuală completă a fluxurilor de login, register, navigare și logout a fost efectuată cu succes.
 
 ## [2025-05-11] Refactorizare extinsă pentru tema "Earthy" și aplicare token-uri de stil
 
@@ -301,7 +314,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
   - Consolidare importuri și mesaje din sursa unică `@shared-constants` (fără stringuri hardcodate).
 - **Respectare reguli globale:**
   - Toate acțiunile și textele folosesc enum-uri, mesaje și rute din sursa unică de adevăr.
-  - Testare cu `data-testid` predictibil pentru fiecare element funcțional (vezi regula 3.1 și exemplul din BEST_PRACTICES.md).
+  - Testare cu `data-testid` predictibil și stabil, pattern validat de store + UI, fără string-uri hardcodate, safe null-check
 - **Lecții învățate:**
   - Separarea stărilor pentru moduri de operare conflictuale (edit/delete) previne bug-uri de tip "Cannot update a component while rendering a different component".
   - Evitarea anti-patternului critic cu Zustand: fără `useEffect(fetch, [queryParams])` (vezi regula 8.2 și memoria [CRITIC] d7b6eb4b).
@@ -589,7 +602,6 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 ---
 
-
 ## 2025-05-05 - Remediere teste unitare cu mock-uri Supabase și ajustare aserțiuni
 - Creat `__mocks__/supabase.ts` și `__mocks__/supabaseService.ts` ca mock-uri automate pentru Supabase în teste.
 - Implementat mock-uri pentru `supabaseAuthService` cu suport pentru tipurile definite (`AuthErrorType`, `AuthUser`).
@@ -649,8 +661,6 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 ---
 
-_Actualizat la: 2025-05-07_
-
 ## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3, 4, 5
 
 ### Task 6: Primitive
@@ -686,38 +696,6 @@ _Actualizat la: 2025-05-07_
     - Toate testele rulează și trec (8/8).
     - Structura este conformă cu regulile globale și BEST_PRACTICES.md.
     - Status: DONE, progres actualizat și în TECH_STORIES/epic-refactorizare-teste-zustand.md.
-
-
-- Task 1: Cleanup și actualizare test-utils + jest-mocks
-  - Helperii oficiali pentru resetare store-uri (`resetAllStores`) și setup user (`setupTestUser`) sunt documentați și recomandați în test-utils.
-  - Eliminare completă a mock-urilor de store-uri din jest-mocks.ts; păstrate doar mock-uri pentru servicii externe (Supabase, date, random, browser APIs).
-
-- Task 5: Refactorizare `TransactionFilters.test.tsx` pentru store real
-  - Am verificat structura existentă a testelor și am constatat că deja respectă regulile globale (nu folosește mock store).
-  - Am creat teste suplimentare de integrare pentru interacțiunea cu store-ul real Zustand în `TransactionFilters.store.test.tsx`.
-  - Toate modificările de state sunt înfășurate în `act()` conform regulilor.
-  - Am implementat teste pentru butonul de resetare filtre și propagarea modificărilor UI → store.
-  - Comentariu clar privind regula globală: nu mock-uim store-uri Zustand.
-- Task 2: Refactorizare transactionFormStore.test.ts pentru store real
-  - Toate testele folosesc store-ul real și helperii oficiali (`resetAllStores`, `mockSupabaseService`).
-  - Toate modificările de state sunt încapsulate în act().
-  - Mock-urile serviciilor externe sunt făcute doar cu mockSupabaseService.
-- Task 3: Refactorizare transactionFiltersStore.test.ts pentru store real
-  - Toate testele folosesc store-ul real și helperii din test-utils.ts (`resetAllStores`).
-  - Refactorizare completă: toate modificările de state sunt încapsulate în act().
-  - Corecție a scenariilor de test pentru a reflecta comportamentul real al store-ului.
-  - Eliminare a comentariilor legate de mock-uri din fișier.
-  - Adăugare beforeEach și afterEach pentru a asigura un mediu consistent de testare.
-- Task 4: Refactorizare authStore.test.ts pentru store real și mock doar servicii externe
-  - Înlocuit reset manual cu functia oficiala `resetAllStores()` din test-utils.
-  - Adăugat reset în afterEach pentru prevenirea side effects între teste.
-  - Înlocuit string-urile hardcodate cu constante din `MESAJE` conform regulilor globale.
-  - Mock-uri exclusiv pentru servicii externe (supabaseAuthService), păstrând enum-urile relevante.
-  - Adăugat un test nou pentru metoda `checkUser()` pentru a crește acoperirea cod.
-  - Toate modificările de store sunt încapsulate în `act()`, inclusiv cele din setup.
-  - Toate testele trec, fără erori de lint.
-- Status actualizat în TECH_STORIES/epic-refactorizare-teste-zustand.md: Task 1 și 2 DONE.
-
 
 
 - Refactorizat toate mesajele de validare pentru a folosi exclusiv sursa unică de adevăr (`shared-constants/messages.ts`, alias `@shared-constants/messages`).

@@ -1,9 +1,11 @@
 // Modal pentru gestionarea subcategoriilor: add/edit/delete/migrare, badge count, validare
 // Owner: echipa FE
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
 import { BUTTONS } from '@shared-constants';
+import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import type { ComponentType, ComponentVariant, ComponentSize } from '../../../styles/themeTypes';
 
 interface Props {
   open: boolean;
@@ -31,26 +33,15 @@ export const CategoryEditor: React.FC<Props> = ({
     initialCategory || null
   );
   
-  // Stare pentru subcategoria care este în curs de editare/redenumire
-  const [editingSubcat, setEditingSubcat] = useState<{cat: string, subcat: string} | null>(
-    initialCategory && initialSubcategory && initialMode === 'edit' ? 
-      { cat: initialCategory, subcat: initialSubcategory } : 
-      null
+  // Stare unificată pentru acțiunea pe subcategorie (editare sau ștergere).
+  type SubcatActionType = 'edit' | 'delete';
+  interface SubcatAction { type: SubcatActionType; cat: string; subcat: string; }
+  const [subcatAction, setSubcatAction] = useState<SubcatAction | null>(
+    initialCategory && initialSubcategory
+      ? { type: initialMode as SubcatActionType, cat: initialCategory, subcat: initialSubcategory }
+      : null
   );
   const [renameValue, setRenameValue] = useState<string>(initialSubcategory || '');
-  
-  // Stare SEPARATĂ pentru subcategoria care este în curs de ștergere
-  // Această separare previne conflictul între dialog ștergere și input editare
-  const [deletingSubcat, setDeletingSubcat] = useState<{cat: string, subcat: string} | null>(
-    initialCategory && initialSubcategory && initialMode === 'delete' ? 
-      { cat: initialCategory, subcat: initialSubcategory } : 
-      null
-  );
-  
-  // State pentru modul de ștergere (pentru a arăta direct dialogul de confirmare ștergere)
-  const [deleteMode, setDeleteMode] = useState<boolean>(
-    initialMode === 'delete' && !!initialCategory && !!initialSubcategory
-  );
   
   const [newSubcat, setNewSubcat] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -58,24 +49,14 @@ export const CategoryEditor: React.FC<Props> = ({
   // Efect pentru inițializarea corectă a modului de editare sau ștergere
   useEffect(() => {
     if (open && initialCategory && initialSubcategory) {
-      // Pre-selectăm categoria în orice caz
+      // Preselecție categorie.
       setSelectedCategory(initialCategory);
-      
-      // Gestionăm modul în funcție de initialMode
-      if (initialMode === 'edit') {
-        setEditingSubcat({ cat: initialCategory, subcat: initialSubcategory });
-        setRenameValue(initialSubcategory);
-        setDeletingSubcat(null);
-        setDeleteMode(false);
-      } else if (initialMode === 'delete') {
-        setDeleteMode(true);
-        setEditingSubcat(null);
-        setDeletingSubcat({ cat: initialCategory, subcat: initialSubcategory });
+      // Inițializare stare unificată pe baza valorii initialMode.
+      if (initialMode === 'edit' || initialMode === 'delete') {
+        setSubcatAction({ type: initialMode as SubcatActionType, cat: initialCategory, subcat: initialSubcategory });
+        setRenameValue(initialMode === 'edit' ? initialSubcategory : '');
       } else if (initialMode === 'add') {
-        // Mod adăugare: focus pe input-ul de adăugare
-        setEditingSubcat(null);
-        setDeletingSubcat(null);
-        setDeleteMode(false);
+        setSubcatAction(null);
         setTimeout(() => {
           const addInput = document.querySelector('[data-testid="add-subcat-input"]');
           if (addInput instanceof HTMLInputElement) {
@@ -95,7 +76,7 @@ export const CategoryEditor: React.FC<Props> = ({
   };
 
   // Adăugare subcategorie nouă
-  const handleAdd = async (cat: CustomCategory) => {
+  const handleAdd = async (cat: CustomCategory): Promise<void> => {
     if (!newSubcat.trim()) return setError('Numele nu poate fi gol');
     if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError('Există deja o subcategorie cu acest nume');
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
@@ -108,16 +89,24 @@ export const CategoryEditor: React.FC<Props> = ({
   };
 
   // Redenumire subcategorie
-  const handleRename = async (cat: string, oldName: string, newName: string) => {
+  const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
     if (!newName.trim()) return setError('Numele nu poate fi gol');
     if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError('Există deja o subcategorie cu acest nume');
     await renameSubcategory(userId, cat, oldName, newName.trim());
-    setEditingSubcat(null);
+    setSubcatAction(null);
     setError(null);
   };
 
+  // Definirea interfeței explicite pentru proprietățile componentei DeleteConfirmation.
+  interface DeleteConfirmationProps {
+    cat: string;
+    subcat: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+  }
+
   // Componentă internă pentru confirmarea ștergerii subcategoriei
-  const DeleteConfirmation = ({ cat, subcat }: { cat: string, subcat: string }) => {
+  const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ cat, subcat, onConfirm, onCancel }) => {
     // Folosim useEffect pentru verificări și manipularea stării
     // Prevenim astfel eroarea "Cannot update a component while rendering a different component"
     // Acest pattern respectă memoria critică despre infinite loops și Maximum update depth exceeded
@@ -129,33 +118,12 @@ export const CategoryEditor: React.FC<Props> = ({
       // Dacă nu este custom, închide dialogul de ștergere și afișează eroare
       if (subcatObj && !subcatObj.isCustom) {
         setError('Nu se pot șterge subcategoriile predefinite, doar cele personalizate.');
-        setDeleteMode(false);
-        setDeletingSubcat(null);
+        onCancel();
       }
     }, [cat, subcat, categories]); // Dependăm de toate datele folosite în efect
     
     // Count pentru a arăta câte tranzacții vor fi afectate
     const count = getSubcategoryCount(cat, subcat);
-    
-    const handleConfirmDelete = async () => {
-      try {
-        await deleteSubcategory(userId, cat, subcat, 'delete');
-        // Resetăm starea după ștergere
-        setDeleteMode(false);
-        // Resetăm explicit starea de ștergere și editare pentru a preveni orice conflict
-        setDeletingSubcat(null);
-        setEditingSubcat(null);
-        
-        if (initialMode === 'delete') {
-          // Închide modalul complet dacă a fost deschis direct pentru ștergere
-          onClose();
-        }
-        setError(null);
-      } catch (err) {
-        setError('Eroare la ștergerea subcategoriei');
-        console.error('Error deleting subcategory:', err);
-      }
-    };
     
     return (
       <div className="p-token bg-error-50 border border-error-200 rounded-token mb-token" data-testid={`delete-confirm-${cat}-${subcat}`}>
@@ -171,22 +139,14 @@ export const CategoryEditor: React.FC<Props> = ({
         
         <div className="flex gap-2 mt-token">
           <button 
-            onClick={handleConfirmDelete}
+            onClick={onConfirm}
             className="btn btn-error"
             data-testid={`confirm-delete-${cat}-${subcat}`}
           >
             Confirmă ștergerea
           </button>
           <button 
-            onClick={() => {
-              // Resetare completă a stării de ștergere
-              setDeleteMode(false);
-              setDeletingSubcat(null);
-              
-              if (initialMode === 'delete') {
-                onClose();
-              }
-            }}
+            onClick={onCancel}
             className="btn btn-secondary"
             data-testid={`cancel-delete-${cat}-${subcat}`}
           >
@@ -196,9 +156,9 @@ export const CategoryEditor: React.FC<Props> = ({
       </div>
     );
   };
-  
+
   // Ștergere subcategorie cu confirmare modal în loc de window.confirm()
-  const handleDelete = async (cat: string, subcat: string) => {
+  const handleDelete = async (cat: string, subcat: string): Promise<void> => {
     // IMPORTANT: Setam subcategoria pentru ștergere în variabila separată
     // și ne asigurăm că modul de editare este dezactivat
     
@@ -211,15 +171,13 @@ export const CategoryEditor: React.FC<Props> = ({
       return;
     }
     
-    setEditingSubcat(null); // Dezactivăm explicit modul de editare
-    setDeletingSubcat({ cat, subcat }); // Setam subcategoria pentru dialog ștergere
-    setDeleteMode(true);
+    setSubcatAction({ type: 'delete', cat, subcat });
   };
 
   return (
-    <div className="fixed inset-0 bg-neutral-900 bg-opacity-40 flex items-center justify-center z-50" data-testid="category-editor-modal">
-      <div className="bg-secondary-50 rounded-token shadow-token p-token w-full max-w-2xl relative">
-        <button className="absolute top-2 right-2 btn-icon btn-ghost" onClick={onClose} data-testid="close-editor">✕</button>
+    <div className={getEnhancedComponentClasses('modal' as ComponentType, 'overlay' as ComponentVariant)} data-testid="category-editor-modal">
+      <div className={getEnhancedComponentClasses('card' as ComponentType, 'elevated' as ComponentVariant, 'lg' as ComponentSize)}>
+        <button className={getEnhancedComponentClasses('button' as ComponentType, 'ghost' as ComponentVariant, 'sm' as ComponentSize)} onClick={onClose} data-testid="close-editor">✕</button>
         <h2 className="text-xl font-bold mb-token text-headings">Gestionare Subcategorii</h2>
         {error && <div className="text-error mb-token" data-testid="error-msg">{error}</div>}
         <div className="flex gap-6">
@@ -235,8 +193,13 @@ export const CategoryEditor: React.FC<Props> = ({
           </div>
           <div className="flex-1">
             {/* Dialog de confirmare ștergere, arată doar când deleteMode=true și avem deletingSubcat setat */}
-            {deleteMode && deletingSubcat && (
-              <DeleteConfirmation cat={deletingSubcat.cat} subcat={deletingSubcat.subcat} />
+            {subcatAction?.type === 'delete' && (
+              <DeleteConfirmation
+                cat={subcatAction.cat}
+                subcat={subcatAction.subcat}
+                onConfirm={() => { handleDelete(subcatAction.cat, subcatAction.subcat); setSubcatAction(null); }}
+                onCancel={() => setSubcatAction(null)}
+              />
             )}
             
             {selectedCategory ? (
@@ -245,27 +208,27 @@ export const CategoryEditor: React.FC<Props> = ({
                 <ul>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className="flex items-center gap-2 mb-1">
-                      {editingSubcat?.cat===selectedCategory && editingSubcat.subcat===sc.name ? (
+                      {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
                         <div className="flex gap-2 items-center">
                           <input
                             type="text"
                             value={renameValue}
-                            onChange={e => setRenameValue(e.target.value)}
-                            onKeyDown={e => {
-                              if (e.key === 'Enter') { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }
-                              if (e.key === 'Escape') setEditingSubcat(null);
+                            onChange={(e: ChangeEvent<HTMLInputElement>) => setRenameValue(e.target.value)}
+                            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                              if (e.key === 'Enter') { handleRename(selectedCategory, sc.name, renameValue.trim()); setSubcatAction(null); }
+                              if (e.key === 'Escape') setSubcatAction(null);
                             }}
                             className="input-field input-sm"
                             autoFocus
                             data-testid={`edit-subcat-input-${sc.name}`}
                           />
                           <button
-                            onClick={() => { handleRename(selectedCategory, sc.name, renameValue.trim()); setEditingSubcat(null); }}
+                            onClick={() => { handleRename(selectedCategory, sc.name, renameValue.trim()); setSubcatAction(null); }}
                             className="text-xs text-success-600 hover:text-success-700"
                             data-testid={`confirm-rename-${sc.name}`}
                           >{BUTTONS.DONE}</button>
                           <button
-                            onClick={() => setEditingSubcat(null)}
+                            onClick={() => setSubcatAction(null)}
                             className="text-xs text-secondary-500 hover:text-secondary-600"
                             data-testid={`cancel-rename-${sc.name}`}
                           >{BUTTONS.CANCEL}</button>
@@ -276,7 +239,7 @@ export const CategoryEditor: React.FC<Props> = ({
                           {sc.isCustom && <span className="ml-1 text-success-600 text-xs" data-testid={`custom-flag-${sc.name}`}>custom</span>}
                           {badge(selectedCategory, sc.name)}
                           <button
-                            onClick={() => { setEditingSubcat({ cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
+                            onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
                             className="ml-2 text-accent text-xs hover:text-accent-hover"
                             data-testid={`edit-subcat-btn-${sc.name}`}
                           >Redenumește</button>
@@ -299,8 +262,8 @@ export const CategoryEditor: React.FC<Props> = ({
                   <input
                     type="text"
                     value={newSubcat}
-                    onChange={e=>setNewSubcat(e.target.value)}
-                    onKeyDown={e => {
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewSubcat(e.target.value)}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
                       if (e.key === 'Enter') handleAdd(categories.find(cat => cat.name === selectedCategory)!);
                       if (e.key === 'Escape') setNewSubcat('');
                     }}
