@@ -277,6 +277,11 @@ export type ComponentVariant =
   | 'bottomLeft' 
   | 'topCenter' 
   | 'bottomCenter'
+  | 'active' 
+  | 'disabled' 
+  | 'underline' 
+  | 'pill' 
+  | 'card' 
   | 'light' 
   | 'dark';
 
