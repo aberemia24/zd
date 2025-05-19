@@ -32,6 +32,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
       return (
         <Alert
           type="error"
+          title={MESAJE.EROARE_TITLU}
           message={this.state.error?.message || MESAJE.EROARE_GENERALA}
           className="my-8"
           withIcon

@@ -6,6 +6,8 @@ import type { ComponentVariant } from '../../../styles/themeTypes';
 export interface AlertProps {
   type?: 'success' | 'error' | 'warning' | 'info';
   message: string;
+  /** Titlu opțional pentru alertă (afișat mai proeminent deasupra mesajului) */
+  title?: string;
   className?: string;
   dismissible?: boolean;
   onDismiss?: () => void;
@@ -27,6 +29,7 @@ export interface AlertProps {
 const Alert: React.FC<AlertProps> = ({ 
   type = 'success', 
   message, 
+  title,
   className,
   dismissible = false,
   onDismiss,
@@ -78,12 +81,19 @@ const Alert: React.FC<AlertProps> = ({
       role="alert"
       data-testid={dataTestId || `alert-${type}`}
     >
-      <div className="flex justify-between items-center">
-        <div className="flex items-center">
+      <div className="flex justify-between items-start">
+        <div className="flex items-start">
           {alertIcon && (
-            <span className="mr-2">{alertIcon}</span>
+            <span className="mr-2 mt-1">{alertIcon}</span>
           )}
-          <div>{message}</div>
+          <div>
+            {title && (
+              <h3 className="font-semibold text-lg mb-1" style={{ color: `var(--color-${variant}-700)` }}>
+                {title}
+              </h3>
+            )}
+            <div className={title ? 'mt-1' : ''}>{message}</div>
+          </div>
         </div>
         {dismissible && (
           <button 
