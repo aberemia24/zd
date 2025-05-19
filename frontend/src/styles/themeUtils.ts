@@ -2,6 +2,12 @@
 import theme from './theme';
 import type { ComponentVariant, ComponentSize, ComponentClasses, ComponentState, ComponentType } from './themeTypes';
 
+// Import pentru stilurile rafinate
+import { getEnhancedComponentClasses, applyVisualEffects } from './componentMapIntegration';
+
+// Export pentru getEnhancedComponentClasses
+export { getEnhancedComponentClasses };
+
 // Actualizează themeTypes.ts pentru a include aceste tipuri
 // export type ComponentState = 'default' | 'hover' | 'active' | 'focus' | 'disabled' | 'readonly' | 'loading' | 'error' | 'success';
 // export type ComponentType = 'button' | 'input' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'badge' | 'alert' | 'loader' | 'card' | 'table' | 'form-group' | 'form-label' | 'form-error' | 'checkbox-group' | 'checkbox-label' | 'container' | 'grid' | 'flex' | 'form-container' | 'navbar' | 'sidebar' | 'modal' | 'toast' | 'tab' | 'dropdown' | 'pill' | 'button-group' | 'input-group';
