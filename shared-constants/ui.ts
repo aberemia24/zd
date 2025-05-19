@@ -27,13 +27,18 @@ export const TITLES = {
 };
 
 export const PLACEHOLDERS = {
+  // ...existing
+  ADD_SUBCATEGORY: 'Adaugă subcategorie nouă',
   SELECT: 'Alege',
   AMOUNT: 'Introdu suma',
   DATE: 'Selectează data',
   DESCRIPTION: 'Adaugă o descriere (opțional)',
+  CATEGORY_EDITOR_SUBCATEGORY: 'Adaugă subcategorie nouă', // added
 };
 
 export const BUTTONS = {
+  // ...existing
+  RENAME: 'Redenumește',
   ADD: 'Adaugă',
   CANCEL: 'Anulează',
   DONE: 'Gata',
@@ -165,4 +170,14 @@ export const UI = {
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   DELETE_SUBCATEGORY: 'Șterge subcategorie',
   EDIT_SUBCATEGORY: 'Editează subcategorie',
+};
+
+// Flag pentru subcategoriile custom
+export const FLAGS = {
+  CUSTOM: 'custom',
+};
+
+// Mesaj informativ pentru starea goală a editorului de categorii
+export const INFO = {
+  CATEGORY_EDITOR_EMPTY: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
 };

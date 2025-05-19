@@ -5,7 +5,7 @@ export * from './enums';
 export { TransactionType, CategoryType, FrequencyType } from './enums';
 export * from './messages';
 export { MESAJE } from './messages';
-export { LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS, UI } from './ui';
+export { LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS, UI, FLAGS, INFO } from './ui';
 export * from './transaction.schema';
 export * from './categories';
 export * from './category-mapping';
