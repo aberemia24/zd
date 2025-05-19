@@ -5,8 +5,10 @@ import TransactionFilters from '../components/features/TransactionFilters/Transa
 import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
 import { useAuthStore } from '../stores/authStore';
 import { useInfiniteTransactions } from '../services/hooks/useInfiniteTransactions';
-import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../services/hooks/transactionMutations';
-import { useQueryClient } from '@tanstack/react-query';
+// Următoarele importuri au fost eliminate deoarece mutațiile sunt gestionate în componente specializate
+// și nu direct în TransactionsPage
+// import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../services/hooks/transactionMutations';
+// import { useQueryClient } from '@tanstack/react-query';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 import { PAGINATION } from '@shared-constants';
 import Alert from '../components/primitives/Alert/Alert';
@@ -18,9 +20,6 @@ import { getEnhancedComponentClasses } from '../styles/themeUtils';
  * Refactorizat pentru React Query (TanStack Query)
  */
 const TransactionsPage: React.FC = () => {
-  // Folosim React Query pentru state management și fetch
-  const queryClient = useQueryClient();
-  
   // State pentru filtre - pentru paginare folosim useInfiniteQuery cu pageParam
   const [filters, setFilters] = React.useState({
     limit: PAGINATION.DEFAULT_LIMIT,
@@ -29,7 +28,7 @@ const TransactionsPage: React.FC = () => {
   });
   
   // Extragem valorile din filters pentru a le folosi în UI
-  const { limit, type: filterType, category: filterCategory } = filters;
+  const { type: filterType, category: filterCategory } = filters;
   
   // Hook-ul useTransactionFiltersStore pentru UI/interfață folositor
   const setFilterType = useTransactionFiltersStore(s => s.setFilterType);
@@ -62,10 +61,8 @@ const TransactionsPage: React.FC = () => {
   console.log('TransactionsPage - transactions:', transactions);
   console.log('TransactionsPage - totalCount:', totalCount);
   
-  // Folosim hook-urile de mutații pentru operații CRUD
-  const createMutation = useCreateTransaction();
-  const updateMutation = useUpdateTransaction();
-  const deleteMutation = useDeleteTransaction();
+  // Notă: Mutațiile de creare/actualizare/ștergere sunt gestionate în componentele specializate
+  // (TransactionForm) și nu direct în această pagină.
   
   // Nu mai avem nevoie de filtrare locală deoarece filtrele sunt aplicate în query
   // Numărul total de tranzacții vine direct din query

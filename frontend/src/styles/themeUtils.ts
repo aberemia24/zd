@@ -1,18 +1,28 @@
 // themeUtils.ts
 import theme from './theme';
+// Tipurile sunt folosite în JSDoc, deci trebuie să le păstrăm
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ComponentVariant, ComponentSize, ComponentClasses, ComponentState, ComponentType } from './themeTypes';
 
-// Import pentru stilurile rafinate
+// Import pentru stilurile rafinate - applyVisualEffects este exportat pentru utilizare viitoare
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { getEnhancedComponentClasses, applyVisualEffects } from './componentMapIntegration';
 
-// Export pentru getEnhancedComponentClasses
-export { getEnhancedComponentClasses };
+// Re-export pentru getEnhancedComponentClasses - ACEASTA ESTE FUNCȚIA RECOMANDATĂ DE UTILIZAT
+export { getEnhancedComponentClasses, applyVisualEffects };
 
-// Actualizează themeTypes.ts pentru a include aceste tipuri
-// export type ComponentState = 'default' | 'hover' | 'active' | 'focus' | 'disabled' | 'readonly' | 'loading' | 'error' | 'success';
-// export type ComponentType = 'button' | 'input' | 'select' | 'textarea' | 'checkbox' | 'radio' | 'badge' | 'alert' | 'loader' | 'card' | 'table' | 'form-group' | 'form-label' | 'form-error' | 'checkbox-group' | 'checkbox-label' | 'container' | 'grid' | 'flex' | 'form-container' | 'navbar' | 'sidebar' | 'modal' | 'toast' | 'tab' | 'dropdown' | 'pill' | 'button-group' | 'input-group';
+// NOTĂ IMPORTANTĂ: Noul sistem de stiluri rafinate folosește următoarele tipuri
+// definite în themeTypes.ts. Verificați că folosiți aceste tipuri în loc de string-uri!
+// - ComponentType: 'button' | 'input' | 'card' | etc.
+// - ComponentVariant: 'primary' | 'secondary' | 'success' | etc.
+// - ComponentSize: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+// - ComponentState: 'disabled' | 'active' | 'hover' | etc.
 
-// Completează componentMap cu toate componentele necesare
+/**
+ * @deprecated Acest obiect componentMap este păstrat doar pentru compatibilitate cu codul vechi.
+ * Pentru cod nou, folosiți configurațiile din directorul componentMap/ și getEnhancedComponentClasses().
+ * Va fi eliminat într-o versiune viitoare.
+ */
 const componentMap: Record<string, {
   base?: string;
   variants?: Record<string, string>;
@@ -583,6 +593,9 @@ const componentMap: Record<string, {
 };
 
 /**
+ * @deprecated Folosiți `getEnhancedComponentClasses` în loc de această funcție.
+ * Aceasta este păstrată doar pentru compatibilitate cu codul existent.
+ * 
  * Funcție extinsă pentru a genera clase CSS pentru componente bazate pe tipul, varianta, dimensiunea și starea lor
  * @param componentType - Tipul componentei (button, input, select, etc.)
  * @param variant - Varianta de stilizare (primary, secondary, success, etc.)
@@ -596,6 +609,14 @@ export function getComponentClasses(
   size?: string,
   state?: string
 ): ComponentClasses {
+  // Afișare avertisment despre funcția deprecată în development
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn(
+      '[DEPRECATED] getComponentClasses este o funcție deprecată și va fi eliminată în versiunile viitoare.'
+      + ' Folosiți `getEnhancedComponentClasses` din componentMapIntegration.ts în loc.'
+    );
+  }
+
   const config = componentMap[componentType];
   if (!config) {
     console.warn(`No configuration found for component type: ${componentType}`);
@@ -637,8 +658,6 @@ export function getComponentClasses(
   // Filtrăm valorile undefined sau goale și le unim cu spații
   return classes.filter(Boolean).join(' ');
 }
-
-// Adaugăm noile funcții utilitare
 
 /**
  * Convertește o valoare de culoare din temă într-o clasă Tailwind
