@@ -134,4 +134,28 @@ export const utilityComponents = {
            before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-1000
            before:z-10 before:pointer-events-none`,
   },
+  
+  /**
+   * Indicator vizual pentru starea unui buton sau altă componentă
+   * Folosit pentru a indica vizual că o componentă este activă/valabilă
+   * Se aplică dinamic cu getEnhancedComponentClasses
+   */
+  indicator: {
+    base: 'inline-block rounded-full',
+    variants: {
+      primary: 'bg-white',
+      success: 'bg-success-100',
+      warning: 'bg-warning-300',
+      error: 'bg-error-300',
+    },
+    sizes: {
+      sm: 'w-2 h-2',
+      md: 'w-3 h-3',
+      lg: 'w-4 h-4',
+    },
+    states: {
+      active: 'animate-pulse',
+      static: '',
+    }
+  },
 };

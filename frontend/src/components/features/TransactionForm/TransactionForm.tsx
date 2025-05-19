@@ -5,7 +5,7 @@ import Select from '../../primitives/Select/Select';
 import Checkbox from '../../primitives/Checkbox/Checkbox';
 import Badge from '../../primitives/Badge/Badge';
 import Alert from '../../primitives/Alert/Alert';
-import { TransactionType, CategoryType, getCategoriesForTransactionType } from '@shared-constants';
+import { TransactionType, getCategoriesForTransactionType } from '@shared-constants';
 import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
@@ -311,19 +311,36 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       
       {/* Butoane de acțiune cu efecte vizuale moderne */}
       <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-between', 'mt-6'])}>
-        <Button
-          type="submit"
-          variant="primary"
-          size="md"
-          disabled={!!loading}
-          data-testid="add-transaction-button"
-          aria-label={BUTTONS.ADD}
-          withShadow
-          withGradient
-          withTranslate
-        >
-          {BUTTONS.ADD}
-        </Button>
+        {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
+        {(() => {
+          const isFormValid = form.type && 
+                            form.amount && 
+                            form.category && 
+                            form.date && 
+                            (!form.recurring || (form.recurring && form.frequency));
+          
+          // Aplicăm efecte vizuale diferite în funcție de starea formularului
+          
+          // Buton cu stil subtil când e inactiv (ghost) și vizibil când e valid (success)
+          return (
+            <Button
+              type="submit"
+              variant="success"
+              size="md"
+              disabled={!isFormValid || !!loading}
+              data-testid="add-transaction-button"
+              aria-label={BUTTONS.ADD}
+              withShadow={isFormValid === true}
+              withGradient={isFormValid === true}
+              withTranslate={isFormValid === true}
+            >
+              {isFormValid && (
+                <span className={getEnhancedComponentClasses('indicator', 'primary', 'md', 'active', ['mr-2'])}></span>
+              )}
+              {BUTTONS.ADD}
+            </Button>
+          );
+        })()}
         <Button
           type="button"
           variant="secondary"

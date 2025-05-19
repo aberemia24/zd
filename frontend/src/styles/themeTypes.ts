@@ -236,7 +236,8 @@ export type ComponentType =
   | 'loader-container' 
   | 'badge-variant' 
   | 'alert-variant' 
-  | 'transaction-form';
+  | 'transaction-form'
+  | 'indicator';
 
 export type ComponentVariant = 
   | 'primary' 
