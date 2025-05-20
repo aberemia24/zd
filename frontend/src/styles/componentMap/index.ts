@@ -9,6 +9,8 @@ import { layoutComponents } from './layoutComponents';
 import { navigationComponents } from './navigationComponents';
 import { dataComponents } from './dataComponents';
 import { utilityComponents } from './utilityComponents';
+import { effectComponents } from './effectComponents';
+import { modalComponents } from './modalComponents';
 
 /**
  * Definiție pentru configurațiile de stiluri ale componentelor
@@ -51,7 +53,13 @@ export const componentMap: ComponentMap = {
   ...dataComponents,
   
   // Componente utilitare și efecte speciale
-  ...utilityComponents
+  ...utilityComponents,
+  
+  // Efecte vizuale și animații
+  ...effectComponents,
+  
+  // Componente modale
+  ...modalComponents
 };
 
 export default componentMap;

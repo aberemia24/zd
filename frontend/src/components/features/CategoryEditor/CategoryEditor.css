@@ -1,3 +1,17 @@
+/**
+ * [DEPRECATED] - Stilurile directe CSS sunt în proces de migrare
+ * Această componentă urmează standardele de stilizare cu sistemul de stiluri rafinate,
+ * folosind getEnhancedComponentClasses în locul CSS direct.
+ * 
+ * Conform STYLE_GUIDE.md și regulilor proiectului, aceste stiluri vor fi migrare către:
+ * 1. Efecte și animații în framework-ul de stiluri rafinate (/styles/componentMap)
+ * 2. Tranziții în utils (/styles/effects)
+ * 3. Media queries centralizate
+ * 
+ * Data marcării ca deprecated: 2025-05-20
+ * Responsabil migrare: echipa FE
+ */
+
 /* Stiluri pentru animații în CategoryEditor */
 
 /* Tranziții modale */

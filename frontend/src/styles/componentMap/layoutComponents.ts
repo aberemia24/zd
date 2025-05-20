@@ -107,6 +107,26 @@ export const layoutComponents = {
       auto: 'grid-cols-auto',
     }
   },
+
+  'flex-group': {
+    base: 'flex',
+    variants: {
+      default: 'items-center',
+      center: 'items-center justify-center',
+      start: 'items-start justify-start',
+      between: 'items-center justify-between',
+      around: 'items-center justify-around',
+      column: 'flex-col',
+      'column-start': 'flex-col items-start justify-start',
+      compact: 'items-center space-x-2',
+      loose: 'items-center space-x-4',
+    },
+    sizes: {
+      sm: 'gap-1',
+      md: 'gap-2',
+      lg: 'gap-4',
+    }
+  },
   
   divider: {
     base: 'border-t my-6',

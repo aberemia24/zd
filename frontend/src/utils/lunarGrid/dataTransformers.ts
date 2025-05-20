@@ -6,7 +6,6 @@ import {
   calculateAmountsForSubcategory, 
   calculateDailyBalance,
   getDaysInMonth,
-  calculateTotal,
   resetCalculationsCache
 } from './calculations'; 
 
