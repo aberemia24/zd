@@ -1,6 +1,6 @@
 // Modal pentru gestionarea subcategoriilor: add/edit/delete/migrare, badge count, validare
 // Owner: echipa FE
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useCallback, ChangeEvent, KeyboardEvent } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
 import { BUTTONS, PLACEHOLDERS, UI, INFO } from '@shared-constants/ui';
@@ -75,7 +75,7 @@ export const CategoryEditor: React.FC<Props> = ({
     const count = getSubcategoryCount(cat, subcat);
     return count > 0 ? (
       <span
-        className={getEnhancedComponentClasses('badge', 'secondary', 'sm')}
+        className={getEnhancedComponentClasses('badge' as ComponentType, 'secondary' as ComponentVariant, 'sm' as ComponentSize, undefined)}
         data-testid={`subcat-count-${cat}-${subcat}`}
       >
         {count}
@@ -134,27 +134,27 @@ export const CategoryEditor: React.FC<Props> = ({
     const count = getSubcategoryCount(cat, subcat);
     
     return (
-      <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid={`delete-confirm-${cat}-${subcat}`}>
-        <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TITLE}</h3>
-        <p className={getEnhancedComponentClasses('spacing','small')}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TEXT.replace('{subcat}', subcat).replace('{cat}', cat)}</p>
+      <div className={getEnhancedComponentClasses('alert' as ComponentType, 'error' as ComponentVariant, 'sm' as ComponentSize, undefined)} data-testid={`delete-confirm-${cat}-${subcat}`}>
+        <h3 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TITLE}</h3>
+        <p className={getEnhancedComponentClasses('spacing' as ComponentType, 'small' as ComponentVariant, undefined, undefined)}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TEXT.replace('{subcat}', subcat).replace('{cat}', cat)}</p>
         
         {count > 0 && (
-          <p className={`${getEnhancedComponentClasses('spacing','small')} ${getEnhancedComponentClasses('form-error-message')}`} data-testid={`delete-warning-${cat}-${subcat}`}>
+          <p className={`${getEnhancedComponentClasses('spacing' as ComponentType, 'small' as ComponentVariant, undefined, undefined)} ${getEnhancedComponentClasses('form-error-message' as ComponentType, undefined, undefined, undefined)}`} data-testid={`delete-warning-${cat}-${subcat}`}>
             {UI.CATEGORY_EDITOR.DELETE_WARNING.replace('{count}', count.toString())}
           </p>
         )}
         
-        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','mt-token'])}>
+        <div className={getEnhancedComponentClasses('flex-group' as ComponentType, 'compact' as ComponentVariant, 'md' as ComponentSize, undefined)}>
           <button
             onClick={onConfirm}
-            className={getEnhancedComponentClasses('button', 'error', 'sm')}
+            className={getEnhancedComponentClasses('button' as ComponentType, 'error' as ComponentVariant, 'sm' as ComponentSize, undefined)}
             data-testid={`confirm-delete-${cat}-${subcat}`}
           >
             {UI.CATEGORY_EDITOR.CONFIRM_DELETE_BUTTON}
           </button>
           <button
             onClick={onCancel}
-            className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
+            className={getEnhancedComponentClasses('button' as ComponentType, 'secondary' as ComponentVariant, 'sm' as ComponentSize, undefined)}
             data-testid={`cancel-delete-${cat}-${subcat}`}
           >
             {UI.CATEGORY_EDITOR.CANCEL_BUTTON}
@@ -165,7 +165,7 @@ export const CategoryEditor: React.FC<Props> = ({
   };
 
   // Ștergere subcategorie cu confirmare modal în loc de window.confirm()
-  const handleDelete = async (cat: string, subcat: string): Promise<void> => {
+  const handleDelete = useCallback(async (cat: string, subcat: string): Promise<void> => {
     // IMPORTANT: Setam subcategoria pentru ștergere în variabila separată
     // și ne asigurăm că modul de editare este dezactivat
     
@@ -179,14 +179,14 @@ export const CategoryEditor: React.FC<Props> = ({
     }
     
     setSubcatAction({ type: 'delete', cat, subcat });
-  };
+  }, [categories, setError, setSubcatAction]);
 
   return (
     <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
       <div className={getEnhancedComponentClasses('card', 'elevated', 'lg')}>
-        <button className={getEnhancedComponentClasses('button', 'ghost', 'sm')} onClick={onClose} data-testid="close-editor">✕</button>
-        <h2 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.TITLE}</h2>
-        {error && <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid="error-msg">{error}</div>}
+        <button className={getEnhancedComponentClasses('button' as ComponentType, 'ghost' as ComponentVariant, 'sm' as ComponentSize, undefined)} onClick={onClose} data-testid="close-editor">✕</button>
+        <h2 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.TITLE}</h2>
+        {error && <div className={getEnhancedComponentClasses('alert' as ComponentType, 'error' as ComponentVariant, 'sm' as ComponentSize, undefined)} data-testid="error-msg">{error}</div>}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-6'])}>
           <div className={getEnhancedComponentClasses('card-section' as unknown as ComponentType)} data-testid="categories-section">
             <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}</h3>
@@ -211,12 +211,12 @@ export const CategoryEditor: React.FC<Props> = ({
             
             {selectedCategory ? (
               <>
-                <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text','accent')}>{selectedCategory}</span></h3>
+                <h3 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text' as ComponentType, 'accent' as ComponentVariant, undefined, undefined)}>{selectedCategory}</span></h3>
                 <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>
                       {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
-                        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','items-center'])}>
+                        <div className={getEnhancedComponentClasses('input-group' as ComponentType, 'inline' as ComponentVariant, 'md' as ComponentSize, undefined)}>
                           <input
                             type="text"
                             value={renameValue}
@@ -245,7 +245,7 @@ export const CategoryEditor: React.FC<Props> = ({
                           <span>{sc.name}</span>
                           {sc.isCustom && (
                             <span
-                              className={getEnhancedComponentClasses('badge', 'success', 'xs', 'pulse')}
+                              className={getEnhancedComponentClasses('badge' as ComponentType, 'success' as ComponentVariant, 'xs' as ComponentSize, 'pulse' as ComponentState)}
                               data-testid={`custom-flag-${sc.name}`}
                             >
                               custom
@@ -254,14 +254,14 @@ export const CategoryEditor: React.FC<Props> = ({
                           {badge(selectedCategory, sc.name)}
                           <button
                             onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
-                            className={getEnhancedComponentClasses('button' as ComponentType, 'default' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState, ['ml-2','text-accent','hover:text-accent-hover'])}
+                            className={getEnhancedComponentClasses('button' as ComponentType, 'accent' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                             data-testid={`edit-subcat-btn-${sc.name}`}
                           >Redenumește</button>
                           {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                           {sc.isCustom && (
                             <button 
                               onClick={()=>handleDelete(selectedCategory, sc.name)} 
-                              className={getEnhancedComponentClasses('button' as ComponentType, 'error' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState, ['ml-1'])}
+                              className={getEnhancedComponentClasses('button' as ComponentType, 'error' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                               data-testid={`delete-subcat-btn-${sc.name}`}
                             >
                               Șterge
@@ -272,7 +272,7 @@ export const CategoryEditor: React.FC<Props> = ({
                     </li>
                   ))}
                 </ul>
-                <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2','mt-token'])}>
+                <div className={getEnhancedComponentClasses('flex-group' as ComponentType, 'compact' as ComponentVariant, 'md' as ComponentSize, undefined)}>
                   <input
                     type="text"
                     value={newSubcat}
@@ -289,7 +289,7 @@ export const CategoryEditor: React.FC<Props> = ({
                 </div>
               </>
             ) : (
-              <div className={getEnhancedComponentClasses('alert', 'info', 'sm')} data-testid="no-cat-msg">{INFO.CATEGORY_EDITOR_EMPTY}</div>
+              <div className={getEnhancedComponentClasses('alert' as ComponentType, 'info' as ComponentVariant, 'sm' as ComponentSize, undefined)} data-testid="no-cat-msg">{INFO.CATEGORY_EDITOR_EMPTY}</div>
             )}
           </div>
         </div>
