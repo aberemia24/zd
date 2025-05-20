@@ -12,14 +12,12 @@ interface Props {
   open: boolean;
   onClose: () => void;
   userId: string;
-  // Proprietăți noi pentru deschidere directă în modul editare, ștergere sau adăugare
   initialCategory?: string;
   initialSubcategory?: string;
-  // Mode pentru deschidere mod: edit, delete sau add
   initialMode?: 'edit' | 'delete' | 'add';
 }
 
-// Tip pentru acțiuni pe subcategorii (extras în afara componentei pentru lizibilitate)
+// Tipuri pentru acțiunile pe subcategorii
 type SubcatActionType = 'edit' | 'delete';
 interface SubcatAction { type: SubcatActionType; cat: string; subcat: string; }
 
@@ -29,47 +27,33 @@ export const CategoryEditor: React.FC<Props> = ({
   userId, 
   initialCategory, 
   initialSubcategory,
-  initialMode = 'add' // Valoare implicită: mod de adăugare
+  initialMode = 'add'
 }) => {
-  // *** STATE HOOKS - toate definite la începutul componentei, fără condiții ***
   const { categories, saveCategories, renameSubcategory, deleteSubcategory: _deleteSubcategory, getSubcategoryCount } = useCategoryStore();
   
-  // Preselectare categorie din proprietate inițială
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    initialCategory || null
-  );
-  
-  // Acțiunea curentă pe subcategorie (editare/ștergere)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(initialCategory || null);
   const [subcatAction, setSubcatAction] = useState<SubcatAction | null>(
     initialCategory && initialSubcategory && (initialMode === 'edit' || initialMode === 'delete')
       ? { type: initialMode as SubcatActionType, cat: initialCategory, subcat: initialSubcategory }
       : null
   );
-  
-  // Valoare temporară pentru redenumire
   const [renameValue, setRenameValue] = useState<string>(initialSubcategory || '');
-  
-  // Nume pentru subcategorie nouă
   const [newSubcat, setNewSubcat] = useState('');
-  
-  // Mesaj de eroare
   const [error, setError] = useState<string | null>(null);
   
-  // Efect pentru focusarea input-ului de adăugare în modul "add"
+  // Focus pe input în modul add
   useEffect(() => {
     if (open && initialMode === 'add') {
       setTimeout(() => {
         const addInput = document.querySelector('[data-testid="add-subcat-input"]');
-        if (addInput instanceof HTMLInputElement) {
-          addInput.focus();
-        }
+        if (addInput instanceof HTMLInputElement) addInput.focus();
       }, 100);
     }
   }, [open, initialMode]);
 
   if (!open) return null;
 
-  // Helper pentru badge count
+  // Badge pentru număr de tranzacții în subcategorie
   const badge = (cat: string, subcat: string) => {
     const count = getSubcategoryCount(cat, subcat);
     return count > 0 ? (
@@ -84,15 +68,19 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Adăugare subcategorie nouă
   const handleAdd = async (cat: CustomCategory): Promise<void> => {
-    // Resetarea stării de eroare când începe o acțiune nouă
     setError(null);
     
     if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    if (cat.subcategories.some((sc: CustomSubcategory) => 
+        sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) {
+      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    }
+    
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
       ...c,
       subcategories: [...c.subcategories, { name: newSubcat.trim(), isCustom: true }]
     } : c);
+    
     await saveCategories(userId, updated);
     setNewSubcat('');
     setError(null);
@@ -100,17 +88,19 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Redenumire subcategorie
   const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
-    // Resetarea stării de eroare la începutul unei noi operațiuni
     setError(null);
     
     if (!newName.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => 
+        sc.name.toLowerCase() === newName.trim().toLowerCase())) {
+      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    }
+    
     await renameSubcategory(userId, cat, oldName, newName.trim());
     setSubcatAction(null);
     setError(null);
   };
 
-  // Definirea interfeței pentru componenta de confirmare ștergere
   interface DeleteConfirmationProps {
     cat: string;
     subcat: string;
@@ -118,13 +108,8 @@ export const CategoryEditor: React.FC<Props> = ({
     onCancel: () => void;
   }
 
-  // Componentă simplă de confirmare, fără hook-uri
   const DeleteConfirmation = ({ cat, subcat, onConfirm, onCancel }: DeleteConfirmationProps): JSX.Element => {
-    // Mesaj construit direct, fără useMemo
     const message = `Sigur doriți să ștergeți subcategoria ${subcat} din categoria ${cat}? Această acțiune nu poate fi anulată.`;
-    
-    // Nota: Am eliminat verificările dinamice cu useEffect și le-am mutat în handler-ul de onClick 
-    // pentru a evita problemele cu regulile de hook-uri
     
     return (
       <div 
@@ -152,12 +137,10 @@ export const CategoryEditor: React.FC<Props> = ({
     );
   };
 
-  // Funcție simpla pentru validarea unui request de ștergere - înlocuiește useCallback și useEffect
+  // Validare ștergere subcategorie
   const isValidDeleteRequest = (cat: string, subcat: string): boolean => {
-    // Resetăm eroarea la începutul verificării
     setError(null);
     
-    // Verificări de siguranță
     if (!cat) {
       setError(MESAJE.CATEGORII.EROARE_STERGERE);
       return false;
@@ -203,7 +186,7 @@ export const CategoryEditor: React.FC<Props> = ({
                       // Resetăm inputul pentru subcategorie nouă pentru experiență mai bună
                       setNewSubcat('');
                     }}
-                    aria-selected={selectedCategory===cat.name}
+                    aria-pressed={selectedCategory===cat.name}
                     aria-controls="subcategories-section"
                     data-testid={`cat-select-${cat.name}`}
                   >
@@ -221,7 +204,6 @@ export const CategoryEditor: React.FC<Props> = ({
                 subcat={subcatAction.subcat}
                 onConfirm={async () => {
                   try {
-                    // Verificăm dacă ștergerea este validă înainte de a continua
                     if (isValidDeleteRequest(subcatAction.cat, subcatAction.subcat)) {
                       await _deleteSubcategory(userId, subcatAction.cat, subcatAction.subcat, "delete");
                       setSubcatAction(null);
@@ -239,7 +221,6 @@ export const CategoryEditor: React.FC<Props> = ({
               <>
                 <h3 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text' as ComponentType, 'accent' as ComponentVariant, undefined, undefined)}>{selectedCategory}</span></h3>
                 <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}
-                  role="list"
                   aria-label={UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}>
                 
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
