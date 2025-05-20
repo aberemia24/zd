@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, ChangeEvent, KeyboardEvent } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
-import { BUTTONS, PLACEHOLDERS, UI, INFO } from '@shared-constants/ui';
+import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS, EXCEL_GRID } from '@shared-constants/ui';
 import { MESAJE } from '@shared-constants/messages';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import type { ComponentType, ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
@@ -85,6 +85,9 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Adăugare subcategorie nouă
   const handleAdd = async (cat: CustomCategory): Promise<void> => {
+    // Resetarea stării de eroare când începe o acțiune nouă
+    setError(null);
+    
     if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
     if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
@@ -98,6 +101,9 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Redenumire subcategorie
   const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
+    // Resetarea stării de eroare la începutul unei noi operațiuni
+    setError(null);
+    
     if (!newName.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
     if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
     await renameSubcategory(userId, cat, oldName, newName.trim());
@@ -164,27 +170,58 @@ export const CategoryEditor: React.FC<Props> = ({
     );
   };
 
-  // Ștergere subcategorie cu confirmare modal în loc de window.confirm()
-  const handleDelete = useCallback(async (cat: string, subcat: string): Promise<void> => {
-    // IMPORTANT: Setam subcategoria pentru ștergere în variabila separată
-    // și ne asigurăm că modul de editare este dezactivat
-    
-    // Verificare de siguranță: putem șterge doar subcategorii personalizate
-    const categoryObj = categories.find(c => c.name === cat);
-    const subcatObj = categoryObj?.subcategories.find(sc => sc.name === subcat);
-    
-    if (!subcatObj?.isCustom) {
-      setError(MESAJE.CATEGORII.NU_SE_POT_STERGE_PREDEFINITE);
-      return;
+  // Funcție helper pentru navigare cu tastatura (accesibilitate)
+  const handleKeyboardNavigation = (e: KeyboardEvent<HTMLElement>, action: () => void) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      action();
     }
-    
-    setSubcatAction({ type: 'delete', cat, subcat });
+  };
+  
+  // Ștergere subcategorie cu confirmare modal în loc de window.confirm()
+  const handleDelete = useCallback(async (cat: string, subcat: string) => {
+    try {
+      // Resetăm eroarea la începutul operațiunii
+      setError(null);
+      
+      // Verificare de siguranță: categoria există?
+      if (!cat) {
+        setError(MESAJE.CATEGORII.EROARE_STERGERE);
+        return;
+      }
+      
+      // Verificare de siguranță: avem subcategoria în lista curentă?
+      const categoryObj = categories.find(c => c.name === cat);
+      if (!categoryObj) {
+        setError(MESAJE.CATEGORII.EROARE_STERGERE);
+        return;
+      }
+      
+      const subcatObj = categoryObj.subcategories.find(sc => sc.name === subcat);
+      if (!subcatObj) {
+        setError(MESAJE.CATEGORII.EROARE_STERGERE);
+        return;
+      }
+      
+      // Verificare de siguranță: putem șterge doar subcategorii personalizate
+      if (!subcatObj.isCustom) {
+        setError(MESAJE.CATEGORII.NU_SE_POT_STERGE_PREDEFINITE);
+        return;
+      }
+      
+      // Dacă toate verificările au trecut, arătăm dialogul de confirmare
+      setSubcatAction({ type: 'delete', cat, subcat });
+    } catch (error) {
+      // Gestionăm orice eroare neașteptată
+      console.error('Eroare la procesarea ștergerii:', error);
+      setError(MESAJE.CATEGORII.EROARE_STERGERE);
+    }
   }, [categories, setError, setSubcatAction]);
 
   return (
     <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
       <div className={getEnhancedComponentClasses('card', 'elevated', 'lg')}>
-        <button className={getEnhancedComponentClasses('button' as ComponentType, 'ghost' as ComponentVariant, 'sm' as ComponentSize, undefined)} onClick={onClose} data-testid="close-editor">✕</button>
+        <button className={getEnhancedComponentClasses('button' as ComponentType, 'ghost' as ComponentVariant, 'sm' as ComponentSize, undefined)} onClick={onClose} data-testid="close-editor">{EXCEL_GRID.ACTIONS.CLOSE}</button>
         <h2 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.TITLE}</h2>
         {error && <div className={getEnhancedComponentClasses('alert' as ComponentType, 'error' as ComponentVariant, 'sm' as ComponentSize, undefined)} data-testid="error-msg">{error}</div>}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-6'])}>
@@ -193,7 +230,20 @@ export const CategoryEditor: React.FC<Props> = ({
             <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
               {categories.map(cat => (
                 <li key={cat.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType, undefined, undefined, selectedCategory===cat.name ? 'active' as ComponentState : undefined)} data-testid={`category-item-${cat.name}`}>
-                  <button onClick={()=>setSelectedCategory(cat.name)} data-testid={`cat-select-${cat.name}`}>{cat.name}</button>
+                  <button 
+                    onClick={()=>{
+                      setSelectedCategory(cat.name);
+                      // Resetăm erorile când utilizatorul schimbă categoria
+                      setError(null);
+                      // Resetăm inputul pentru subcategorie nouă pentru experiență mai bună
+                      setNewSubcat('');
+                    }}
+                    aria-selected={selectedCategory===cat.name}
+                    aria-controls="subcategories-section"
+                    data-testid={`cat-select-${cat.name}`}
+                  >
+                    {cat.name}
+                  </button>
                 </li>
               ))}
             </ul>
@@ -212,7 +262,10 @@ export const CategoryEditor: React.FC<Props> = ({
             {selectedCategory ? (
               <>
                 <h3 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text' as ComponentType, 'accent' as ComponentVariant, undefined, undefined)}>{selectedCategory}</span></h3>
-                <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
+                <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}
+                  role="list"
+                  aria-label={UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}>
+                
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>
                       {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
@@ -248,23 +301,27 @@ export const CategoryEditor: React.FC<Props> = ({
                               className={getEnhancedComponentClasses('badge' as ComponentType, 'success' as ComponentVariant, 'xs' as ComponentSize, 'pulse' as ComponentState)}
                               data-testid={`custom-flag-${sc.name}`}
                             >
-                              custom
+                              {FLAGS.CUSTOM}
                             </span>
                           )}
                           {badge(selectedCategory, sc.name)}
                           <button
                             onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
+                            onKeyDown={(e) => handleKeyboardNavigation(e, () => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); })}
                             className={getEnhancedComponentClasses('button' as ComponentType, 'accent' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                             data-testid={`edit-subcat-btn-${sc.name}`}
-                          >Redenumește</button>
+                            aria-label={`${UI.CATEGORY_EDITOR.RENAME_BUTTON} ${sc.name}`}
+                          >{UI.CATEGORY_EDITOR.RENAME_BUTTON}</button>
                           {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                           {sc.isCustom && (
                             <button 
-                              onClick={()=>handleDelete(selectedCategory, sc.name)} 
+                              onClick={()=>handleDelete(selectedCategory, sc.name)}
+                              onKeyDown={(e) => handleKeyboardNavigation(e, () => handleDelete(selectedCategory, sc.name))}
                               className={getEnhancedComponentClasses('button' as ComponentType, 'error' as ComponentVariant, 'xs' as ComponentSize, 'hover' as ComponentState)}
                               data-testid={`delete-subcat-btn-${sc.name}`}
+                              aria-label={`${UI.CATEGORY_EDITOR.DELETE_BUTTON} ${sc.name}`}
                             >
-                              Șterge
+                              {UI.CATEGORY_EDITOR.DELETE_BUTTON}
                             </button>
                           )}
                         </>
