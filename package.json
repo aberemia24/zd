@@ -6,7 +6,11 @@
     "backend",
     "shared"
   ],
+  "bin": {
+    "sync-shared-constants": "scripts/sync-shared-constants.js"
+  },
   "scripts": {
+    "sync-shared-constants": "node scripts/sync-shared-constants.js",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write .",
     "test": "echo 'Define test scripts in packages'"

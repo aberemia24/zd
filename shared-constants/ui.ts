@@ -170,10 +170,24 @@ export const UI = {
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   DELETE_SUBCATEGORY: 'Șterge subcategorie',
   EDIT_SUBCATEGORY: 'Editează subcategorie',
-  // Texte UI pentru CategoryEditor
-  CATEGORY_EDITOR_TITLE: 'Gestionare Subcategorii',
-  CATEGORY_EDITOR_CATEGORIES: 'Categorii',
-  CATEGORY_EDITOR_SUBCATEGORIES_FOR: 'Subcategorii pentru',
+  
+  // Secțiune UI pentru CategoryEditor
+  CATEGORY_EDITOR: {
+    TITLE: 'Gestionare Subcategorii',
+    CATEGORIES_SECTION_TITLE: 'Categorii',
+    SUBCATEGORIES_SECTION_TITLE: 'Subcategorii pentru',
+    CUSTOM_BADGE: 'custom',
+    RENAME_BUTTON: 'Redenumește',
+    DELETE_BUTTON: 'Șterge',
+    ADD_PLACEHOLDER: 'Adaugă subcategorie nouă',
+    ADD_BUTTON: 'Adaugă',
+    NO_SELECTION: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
+    DELETE_CONFIRMATION_TITLE: 'Confirmare ștergere',
+    DELETE_CONFIRMATION_TEXT: 'Ești sigur că vrei să ștergi subcategoria {subcat} din {cat}?',
+    DELETE_WARNING: 'Atenție: Există {count} tranzacții care folosesc această subcategorie.',
+    CONFIRM_DELETE_BUTTON: 'Confirmă ștergerea',
+    CANCEL_BUTTON: 'Anulează'
+  },
 };
 
 // Flag pentru subcategoriile custom

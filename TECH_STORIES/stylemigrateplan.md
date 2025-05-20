@@ -63,7 +63,7 @@ Am analizat alte componente recent refactorizate pentru a asigura consistența:
 - [x] ✅ Inputuri: `getEnhancedComponentClasses('input', ...)` cu efecte vizuale
 
 ### 3.3. Extragere și centralizare texte (În curs)
-- [ ] ⬜ Adaugă în `shared-constants/ui.ts` secțiunea `CATEGORY_EDITOR` cu toate textele UI:
+- [x] ⬜ Adaugă în `shared-constants/ui.ts` secțiunea `CATEGORY_EDITOR` cu toate textele UI:
 ```ts
 CATEGORY_EDITOR: {
   TITLE: 'Gestionare Subcategorii',
@@ -82,8 +82,8 @@ CATEGORY_EDITOR: {
   CANCEL_BUTTON: 'Anulează'
 }
 ```
-- [ ] ⬜ Centralizare mesaje în `shared-constants/messages.ts` pentru textele de sistem din CategoryEditor
-- [ ] ⬜ Adaugă în `shared-constants/messages.ts` secțiunea `CATEGORII` cu toate mesajele de validare/eroare:
+- [x] ⬜ Centralizare mesaje în `shared-constants/messages.ts` pentru textele de sistem din CategoryEditor
+- [x] ⬜ Adaugă în `shared-constants/messages.ts` secțiunea `CATEGORII` cu toate mesajele de validare/eroare:
 ```ts
 CATEGORII: {
   NUME_GOL: 'Numele nu poate fi gol',

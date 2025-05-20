@@ -4,6 +4,7 @@ import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from 'react';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { CustomCategory, CustomSubcategory } from '../../../types/Category';
 import { BUTTONS, PLACEHOLDERS, UI, INFO } from '@shared-constants/ui';
+import { MESAJE } from '@shared-constants/messages';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import type { ComponentType, ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
 
@@ -26,7 +27,7 @@ export const CategoryEditor: React.FC<Props> = ({
   initialSubcategory,
   initialMode = 'add' // Valoare implicită: mod de adăugare
 }) => {
-  const { categories, saveCategories, renameSubcategory, deleteSubcategory, getSubcategoryCount } = useCategoryStore();
+  const { categories, saveCategories, renameSubcategory, deleteSubcategory: _deleteSubcategory, getSubcategoryCount } = useCategoryStore();
   
   // Folosim proprietățile inițiale pentru a preselecta categoria și subcategoria dacă sunt furnizate
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
@@ -84,8 +85,8 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Adăugare subcategorie nouă
   const handleAdd = async (cat: CustomCategory): Promise<void> => {
-    if (!newSubcat.trim()) return setError('Numele nu poate fi gol');
-    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError('Există deja o subcategorie cu acest nume');
+    if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
+    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
       ...c,
       subcategories: [...c.subcategories, { name: newSubcat.trim(), isCustom: true }]
@@ -97,8 +98,8 @@ export const CategoryEditor: React.FC<Props> = ({
 
   // Redenumire subcategorie
   const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
-    if (!newName.trim()) return setError('Numele nu poate fi gol');
-    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError('Există deja o subcategorie cu acest nume');
+    if (!newName.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
+    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
     await renameSubcategory(userId, cat, oldName, newName.trim());
     setSubcatAction(null);
     setError(null);
@@ -124,23 +125,22 @@ export const CategoryEditor: React.FC<Props> = ({
       
       // Dacă nu este custom, închide dialogul de ștergere și afișează eroare
       if (subcatObj && !subcatObj.isCustom) {
-        setError('Nu se pot șterge subcategoriile predefinite, doar cele personalizate.');
+        setError(MESAJE.CATEGORII.NU_SE_POT_STERGE_PREDEFINITE);
         onCancel();
       }
-    }, [cat, subcat, categories]); // Dependăm de toate datele folosite în efect
+    }, [cat, subcat, categories, onCancel]); // Dependăm de toate datele folosite în efect
     
     // Count pentru a arăta câte tranzacții vor fi afectate
     const count = getSubcategoryCount(cat, subcat);
     
     return (
       <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid={`delete-confirm-${cat}-${subcat}`}>
-        <h3 className={getEnhancedComponentClasses('section-header')}>Confirmare ștergere</h3>
-        <p className={getEnhancedComponentClasses('spacing','small')}>Ești sigur că vrei să ștergi subcategoria <strong>{subcat}</strong> din <strong>{cat}</strong>?</p>
+        <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TITLE}</h3>
+        <p className={getEnhancedComponentClasses('spacing','small')}>{UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TEXT.replace('{subcat}', subcat).replace('{cat}', cat)}</p>
         
         {count > 0 && (
           <p className={`${getEnhancedComponentClasses('spacing','small')} ${getEnhancedComponentClasses('form-error-message')}`} data-testid={`delete-warning-${cat}-${subcat}`}>
-            Atenție: Există <strong>{count}</strong> tranzacții care folosesc această subcategorie. 
-            Acestea vor fi mutate în categoria principală.
+            {UI.CATEGORY_EDITOR.DELETE_WARNING.replace('{count}', count.toString())}
           </p>
         )}
         
@@ -150,14 +150,14 @@ export const CategoryEditor: React.FC<Props> = ({
             className={getEnhancedComponentClasses('button', 'error', 'sm')}
             data-testid={`confirm-delete-${cat}-${subcat}`}
           >
-            Confirmă ștergerea
+            {UI.CATEGORY_EDITOR.CONFIRM_DELETE_BUTTON}
           </button>
           <button
             onClick={onCancel}
             className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
             data-testid={`cancel-delete-${cat}-${subcat}`}
           >
-            Anulează
+            {UI.CATEGORY_EDITOR.CANCEL_BUTTON}
           </button>
         </div>
       </div>
@@ -174,7 +174,7 @@ export const CategoryEditor: React.FC<Props> = ({
     const subcatObj = categoryObj?.subcategories.find(sc => sc.name === subcat);
     
     if (!subcatObj?.isCustom) {
-      setError('Nu se pot șterge subcategoriile predefinite, doar cele personalizate.');
+      setError(MESAJE.CATEGORII.NU_SE_POT_STERGE_PREDEFINITE);
       return;
     }
     
@@ -185,11 +185,11 @@ export const CategoryEditor: React.FC<Props> = ({
     <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
       <div className={getEnhancedComponentClasses('card', 'elevated', 'lg')}>
         <button className={getEnhancedComponentClasses('button', 'ghost', 'sm')} onClick={onClose} data-testid="close-editor">✕</button>
-        <h2 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_TITLE}</h2>
+        <h2 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.TITLE}</h2>
         {error && <div className={getEnhancedComponentClasses('alert', 'error', 'sm')} data-testid="error-msg">{error}</div>}
         <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-6'])}>
           <div className={getEnhancedComponentClasses('card-section' as unknown as ComponentType)} data-testid="categories-section">
-            <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_CATEGORIES}</h3>
+            <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}</h3>
             <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
               {categories.map(cat => (
                 <li key={cat.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType, undefined, undefined, selectedCategory===cat.name ? 'active' as ComponentState : undefined)} data-testid={`category-item-${cat.name}`}>
@@ -211,7 +211,7 @@ export const CategoryEditor: React.FC<Props> = ({
             
             {selectedCategory ? (
               <>
-                <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR_SUBCATEGORIES_FOR} <span className={getEnhancedComponentClasses('text','accent')}>{selectedCategory}</span></h3>
+                <h3 className={getEnhancedComponentClasses('section-header')}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text','accent')}>{selectedCategory}</span></h3>
                 <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
                   {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>

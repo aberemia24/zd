@@ -784,3 +784,10 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Documentarea abordării în BEST_PRACTICES.md pentru a asigura consistența în viitor
 
 ```
+## [2025-05-20] Adăugare CLI și documentație pentru sincronizarea shared-constants
+ - Am adăugat shebang în `scripts/sync-shared-constants.js` pentru a-l putea rula ca script Node
+ - Am definit câmpul `bin` și scriptul `sync-shared-constants` în `package.json` la nivel de workspace
+ - Am actualizat README.md cu instrucțiuni de rulare manuală `npm run sync-shared-constants` și `npx sync-shared-constants`
+- Am verificat și sincronizat copiile în `frontend/src/shared-constants` cu comanda CLI
+
+# Summary: Facilitare rulare manuală și documentare pentru sincronizarea `shared-constants`

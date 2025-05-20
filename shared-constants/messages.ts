@@ -59,4 +59,11 @@ export const MESAJE = {
     FORMAT_DATE: 'Data introdusă nu are un format valid.',
     CAMP_LIPSA: 'Completați toate câmpurile obligatorii.',
   },
+  // Mesaje pentru CategoryEditor
+  CATEGORII: {
+    NUME_GOL: 'Numele nu poate fi gol',
+    SUBCATEGORIE_EXISTENTA: 'Există deja o subcategorie cu acest nume',
+    EROARE_STERGERE: 'Eroare la ștergerea subcategoriei',
+    NU_SE_POT_STERGE_PREDEFINITE: 'Nu se pot șterge subcategoriile predefinite, doar cele personalizate.'
+  }
 };

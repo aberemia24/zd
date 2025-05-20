@@ -60,6 +60,9 @@ Detalii complete: vezi [BEST_PRACTICES.md](./BEST_PRACTICES.md).
 # Instalare dependențe
 npm install
 
+# Sincronizare shared constants (opțional înainte de build/start)
+npm run sync-shared-constants
+
 # Start frontend
 cd frontend
 npm start
@@ -100,7 +103,7 @@ Structură răspuns:
 
 ## 🔒 Securitate
 
-- Autentificare Firebase Auth.
+- Autentificare Supabase Auth.
 - Date sensibile în `.env`.
 - Validare input cu NestJS și Zod.
 
