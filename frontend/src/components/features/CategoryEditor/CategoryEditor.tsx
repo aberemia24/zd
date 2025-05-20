@@ -47,17 +47,6 @@ export const CategoryEditor: React.FC<Props> = ({
   const [newSubcat, setNewSubcat] = useState('');
   const [error, setError] = useState<string | null>(null);
   
-  // Memoizare pentru categoria selectată - obiect complet
-  const selectedCategoryObj = useMemo(() => {
-    return categories.find((cat: CustomCategory) => cat.name === selectedCategory) || null;
-  }, [categories, selectedCategory]);
-  
-  // Memoizare pentru subcategoriile categoriei selectate
-  const selectedSubcategories = useMemo(() => {
-    return selectedCategoryObj?.subcategories || [];
-  }, [selectedCategoryObj]);
-  
-  
   // Efect pentru inițializarea corectă a modului de editare sau ștergere
   useEffect(() => {
     if (open && initialCategory && initialSubcategory) {
@@ -79,8 +68,10 @@ export const CategoryEditor: React.FC<Props> = ({
     }
   }, [open, initialCategory, initialSubcategory, initialMode]);
 
+  if (!open) return null;
+
   // Helper pentru badge count
-  const badge = useCallback((cat: string, subcat: string) => {
+  const badge = (cat: string, subcat: string) => {
     const count = getSubcategoryCount(cat, subcat);
     return count > 0 ? (
       <span
@@ -90,47 +81,30 @@ export const CategoryEditor: React.FC<Props> = ({
         {count}
       </span>
     ) : null;
-  }, [getSubcategoryCount]);
+  };
 
   // Adăugare subcategorie nouă
-  const handleAdd = useCallback(async (cat: CustomCategory): Promise<void> => {
+  const handleAdd = async (cat: CustomCategory): Promise<void> => {
     if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) {
-      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
-    }
+    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
       ...c,
       subcategories: [...c.subcategories, { name: newSubcat.trim(), isCustom: true }]
     } : c);
-    try {
-      await saveCategories(userId, updated); // Corectez ordinea parametrilor
-      setNewSubcat('');
-      setError(null);
-    } catch (err) {
-      setError(MESAJE.CATEGORII.NUME_GOL); // Folosesc o constantă existentă în lipsa EROARE_SALVARE
-    }
-  }, [categories, newSubcat, saveCategories, setError, setNewSubcat, userId]);
-  
+    await saveCategories(userId, updated);
+    setNewSubcat('');
+    setError(null);
+  };
+
   // Redenumire subcategorie
-  const handleRename = useCallback(async (cat: string, oldName: string, newName: string): Promise<void> => {
+  const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
     if (!newName.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some(
-      (sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())
-    ) {
-      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
-    }
-    
-    try {
-      await renameSubcategory(userId, cat, oldName, newName.trim());
-      setSubcatAction(null);
-      setError(null);
-    } catch (err) {
-      setError(MESAJE.CATEGORII.NUME_GOL); // Folosesc o constantă existentă în lipsa EROARE_SALVARE
-    }
-  }, [categories, renameSubcategory, setError, setSubcatAction, userId]);
-  
-  if (!open) return null;
-  
+    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    await renameSubcategory(userId, cat, oldName, newName.trim());
+    setSubcatAction(null);
+    setError(null);
+  };
+
   // Definirea interfeței explicite pentru proprietățile componentei DeleteConfirmation.
   interface DeleteConfirmationProps {
     cat: string;
@@ -206,28 +180,6 @@ export const CategoryEditor: React.FC<Props> = ({
     
     setSubcatAction({ type: 'delete', cat, subcat });
   }, [categories, setError, setSubcatAction]);
-  
-  // Memoizare pentru handler-ul de selectare categorie
-  const createCategorySelectHandler = useCallback((categoryName: string) => {
-    return () => setSelectedCategory(categoryName);
-  }, [setSelectedCategory]);
-  
-  // Memoizare pentru handler-ul de keyboard al input-ului de adăugare
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && selectedCategoryObj) {
-      handleAdd(selectedCategoryObj);
-    }
-    if (e.key === 'Escape') {
-      setNewSubcat('');
-    }
-  }, [handleAdd, selectedCategoryObj, setNewSubcat]);
-  
-  // Memoizare pentru handler-ul butonului de adăugare
-  const handleAddClick = useCallback(() => {
-    if (selectedCategoryObj) {
-      handleAdd(selectedCategoryObj);
-    }
-  }, [handleAdd, selectedCategoryObj]);
 
   return (
     <div className={getEnhancedComponentClasses('modal' as ComponentType)} data-testid="category-editor-modal">
@@ -241,7 +193,7 @@ export const CategoryEditor: React.FC<Props> = ({
             <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
               {categories.map(cat => (
                 <li key={cat.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType, undefined, undefined, selectedCategory===cat.name ? 'active' as ComponentState : undefined)} data-testid={`category-item-${cat.name}`}>
-                  <button onClick={createCategorySelectHandler(cat.name)} data-testid={`cat-select-${cat.name}`}>{cat.name}</button>
+                  <button onClick={()=>setSelectedCategory(cat.name)} data-testid={`cat-select-${cat.name}`}>{cat.name}</button>
                 </li>
               ))}
             </ul>
@@ -261,7 +213,7 @@ export const CategoryEditor: React.FC<Props> = ({
               <>
                 <h3 className={getEnhancedComponentClasses('section-header' as ComponentType, undefined, undefined, undefined)}>{UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}<span className={getEnhancedComponentClasses('text' as ComponentType, 'accent' as ComponentVariant, undefined, undefined)}>{selectedCategory}</span></h3>
                 <ul className={getEnhancedComponentClasses('list-container' as unknown as ComponentType)}>
-                  {selectedSubcategories.map((sc: CustomSubcategory) => (
+                  {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
                     <li key={sc.name} className={getEnhancedComponentClasses('list-item' as unknown as ComponentType)} data-testid={`subcat-item-${sc.name}`}>
                       {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
                         <div className={getEnhancedComponentClasses('input-group' as ComponentType, 'inline' as ComponentVariant, 'md' as ComponentSize, undefined)}>
@@ -325,12 +277,15 @@ export const CategoryEditor: React.FC<Props> = ({
                     type="text"
                     value={newSubcat}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => setNewSubcat(e.target.value)}
-                    onKeyDown={handleKeyDown}
+                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                      if (e.key === 'Enter') handleAdd(categories.find(cat => cat.name === selectedCategory)!);
+                      if (e.key === 'Escape') setNewSubcat('');
+                    }}
                     placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
                     className={getEnhancedComponentClasses('input' as ComponentType, undefined, 'sm' as ComponentSize)}
                     data-testid="add-subcat-input"
                   />
-                  <button onClick={handleAddClick} className={getEnhancedComponentClasses('button' as ComponentType, 'primary' as ComponentVariant, 'sm' as ComponentSize)} data-testid="add-subcat-btn">{BUTTONS.ADD}</button>
+                  <button onClick={()=>handleAdd(categories.find(cat=>cat.name===selectedCategory)!)} className={getEnhancedComponentClasses('button' as ComponentType, 'primary' as ComponentVariant, 'sm' as ComponentSize)} data-testid="add-subcat-btn">{BUTTONS.ADD}</button>
                 </div>
               </>
             ) : (
