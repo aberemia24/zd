@@ -64,6 +64,7 @@ export const MESAJE = {
     NUME_GOL: 'Numele nu poate fi gol',
     SUBCATEGORIE_EXISTENTA: 'Există deja o subcategorie cu acest nume',
     EROARE_STERGERE: 'Eroare la ștergerea subcategoriei',
-    NU_SE_POT_STERGE_PREDEFINITE: 'Nu se pot șterge subcategoriile predefinite, doar cele personalizate.'
+    NU_SE_POT_STERGE_PREDEFINITE: 'Nu se pot șterge subcategoriile predefinite, doar cele personalizate.',
+    CONFIRMARE_STERGERE: 'Sigur doriți să ștergeți subcategoria {subcategoria} din categoria {categoria}? Această acțiune nu poate fi anulată.'
   }
 };
