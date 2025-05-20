@@ -68,10 +68,8 @@ export const CategoryEditor: React.FC<Props> = ({
     }
   }, [open, initialCategory, initialSubcategory, initialMode]);
 
-  if (!open) return null;
-
   // Helper pentru badge count
-  const badge = (cat: string, subcat: string) => {
+  const badge = useCallback((cat: string, subcat: string) => {
     const count = getSubcategoryCount(cat, subcat);
     return count > 0 ? (
       <span
@@ -81,30 +79,47 @@ export const CategoryEditor: React.FC<Props> = ({
         {count}
       </span>
     ) : null;
-  };
+  }, [getSubcategoryCount]);
 
   // Adăugare subcategorie nouă
-  const handleAdd = async (cat: CustomCategory): Promise<void> => {
+  const handleAdd = useCallback(async (cat: CustomCategory): Promise<void> => {
     if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    if (cat.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newSubcat.trim().toLowerCase())) {
+      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    }
     const updated = categories.map((c: CustomCategory) => c.name === cat.name ? {
       ...c,
       subcategories: [...c.subcategories, { name: newSubcat.trim(), isCustom: true }]
     } : c);
-    await saveCategories(userId, updated);
-    setNewSubcat('');
-    setError(null);
-  };
-
+    try {
+      await saveCategories(userId, updated); // Corectez ordinea parametrilor
+      setNewSubcat('');
+      setError(null);
+    } catch (err) {
+      setError(MESAJE.CATEGORII.NUME_GOL); // Folosesc o constantă existentă în lipsa EROARE_SALVARE
+    }
+  }, [categories, newSubcat, saveCategories, setError, setNewSubcat, userId]);
+  
   // Redenumire subcategorie
-  const handleRename = async (cat: string, oldName: string, newName: string): Promise<void> => {
+  const handleRename = useCallback(async (cat: string, oldName: string, newName: string): Promise<void> => {
     if (!newName.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
-    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some((sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())) return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
-    await renameSubcategory(userId, cat, oldName, newName.trim());
-    setSubcatAction(null);
-    setError(null);
-  };
-
+    if (categories.find((c: CustomCategory) => c.name === cat)?.subcategories.some(
+      (sc: CustomSubcategory) => sc.name.toLowerCase() === newName.trim().toLowerCase())
+    ) {
+      return setError(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
+    }
+    
+    try {
+      await renameSubcategory(userId, cat, oldName, newName.trim());
+      setSubcatAction(null);
+      setError(null);
+    } catch (err) {
+      setError(MESAJE.CATEGORII.NUME_GOL); // Folosesc o constantă existentă în lipsa EROARE_SALVARE
+    }
+  }, [categories, renameSubcategory, setError, setSubcatAction, userId]);
+  
+  if (!open) return null;
+  
   // Definirea interfeței explicite pentru proprietățile componentei DeleteConfirmation.
   interface DeleteConfirmationProps {
     cat: string;
