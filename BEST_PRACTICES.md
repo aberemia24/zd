@@ -47,11 +47,13 @@
 Tailwind/PostCSS procesează directivelor în ordinea fizică a fișierului. @layer trebuie să fie în același context cu directivele Tailwind.
 
 **Pattern recomandat:**
+
 - Modularizează utilitarele doar logic (comentarii, secțiuni), nu fizic (fișiere separate cu @layer).
 - Pentru proiecte mari, folosește pluginuri Tailwind custom sau barrel-uri JS pentru tokens, nu fișiere CSS importate separat.
 
 **Consistență prin token-uri și utilitare centralizate (Actualizat Mai 2025):**
 Pentru a menține coerența vizuală și mentenanță (așa cum s-a demonstrat în refactorizarea temei "earthy"):
+
 - Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
 - Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
 - Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
@@ -107,6 +109,7 @@ Abordarea recomandată (în ordine de prioritate):
 ### Documentare și exemple
 
 Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
+
 - Explicații detaliate ale arhitecturii
 - Exemple pentru fiecare tip de componentă
 - Ghid de migrare pentru componente existente
@@ -132,6 +135,7 @@ Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
 - **Testare robustă**: Toate elementele funcționale din grid trebuie să aibă `data-testid` unic și predictibil pentru testare automată.
 
 **Exemplu:**
+
 ```tsx
 // Vizibilitate acțiuni doar la hover
 <div className="subcategory-row" onMouseEnter={...} onMouseLeave={...}>
@@ -161,6 +165,7 @@ Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
 - **Folosirea TanStack Table**: Pentru tabele complexe, preferați @tanstack/react-table peste soluții improvizate.
 
 **Exemplu de caching pentru calcule frecvente:**
+
 ```typescript
 // Definire cache la nivel de modul
 const calculationsCache = new Map<string, any>();
@@ -202,6 +207,7 @@ export function resetCalculationsCache(): void {
 ```
 
 **Exemplu de hook custom optimizat:**
+
 ```typescript
 // Hook pentru logica componentei, separat de UI
 export function useComplexGrid(
@@ -231,14 +237,14 @@ export function useComplexGrid(
 }
 ```
 
-**Beneficii demonstrate:**
+**Beneficii demonstrated:**
+
 - Reducerea timpului de randare pentru LunarGrid cu 75% pentru seturi mari de date.
 - Eliberarea memoriei și prevenirea leak-urilor prin managementul corect al resurselor.
 - Creșterea testabilității datorită separației responsabilităților.
 - UI fluid chiar și pentru tabele cu sute/mii de rânduri prin virtualizare.
 - Separarea clară a stărilor previne bug-uri de tip "Cannot update a component while rendering a different component".
 - Respectarea regulilor globale și patternurilor documentate asigură mentenanță și testare predictibilă.
-
 
 - Controlled components testate cu wrapper cu stare locală.
 - Folosirea `await waitFor` sau `await act(async () => {...})` pentru actualizări asincrone.
@@ -247,47 +253,58 @@ export function useComplexGrid(
 - Minimizarea console noise în teste.
 
 #### Testare robustă cu constants și data-testid
+
 - Orice mesaj de eroare, loading sau feedback din UI și din teste trebuie să provină din constants (`@shared-constants/messages`), nu stringuri hardcodate.
 - Toate elementele funcționale (butoane, inputuri, itemi listă, feedback) au `data-testid` unic, stabil și predictibil (vezi regula globală 3.1 și exemplul de mai jos).
 - Testele verifică mesaje/indicatori folosind valorile din constants și selectează elementele prin `data-testid`, nu prin text hardcodat.
 - Exemplu corect:
+
 ```tsx
 import { MESAJE } from '@shared-constants/messages';
 expect(screen.getByTestId('error-msg')).toHaveTextContent(MESAJE.EROARE_INCARCARE_TRANZACTII);
 expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
 ```
+
 - Pentru formulare complexe, verifică valorile inițiale pe câmpuri individuale cu `waitFor` (vezi lessons learned).
 
 #### Politica de mocking
+
 - Se mock-uiesc **doar** serviciile externe (API/fetch, date/time, random, browser APIs).
 - **Nu** se mock-uiesc stores Zustand, hooks custom sau logică proprie (vezi regula globală mock-uri testare și DEV_LOG.md).
 - Orice excepție se documentează clar în PR și BEST_PRACTICES.md.
 
 #### Anti-pattern critic: useEffect(fetch, [queryParams]) cu Zustand
+
 - Este **interzis** să folosești direct `useEffect(() => fetchTransactions(), [queryParams])` cu Zustand, deoarece duce la infinite loop și Maximum update depth exceeded.
 - Regula critică este documentată în global_rules.md secțiunea 8.2 și trebuie respectată strict.
 - Exemplu greșit (NU folosiți!):
+
 ```tsx
 useEffect(() => {
   useTransactionStore.getState().fetchTransactions();
 }, [queryParams]);
 ```
+
 - Exemplu corect:
+
 ```tsx
 useEffect(() => {
   useTransactionStore.getState().fetchTransactions();
 }, []); // Doar la mount
 ```
+
 - Dacă fetch-ul depinde de parametri, folosește un guard intern/caching în store pentru a preveni buclele.
 - Orice abatere se documentează explicit în code review și DEV_LOG.md.
 
 #### Motivare
+
 - Aceste reguli asigură testare robustă, mentenanță ușoară, onboarding rapid și QA predictibil.
 - Centralizarea mesajelor și constantelor elimină bug-uri și inconsistențe între FE/BE/teste.
 - Interzicerea mock-ului pe stores/hooks asigură teste care reflectă comportamentul real al aplicației.
 - Respectarea anti-patternului Zustand previne bug-uri greu de diagnosticat și regresii ascunse.
 
 #### Referințe
+
 - [global_rules.md] secțiunea 3, 8.2, 9
 - [DEV_LOG.md] pentru schimbări și excepții
 - [LESSON] Testare valori inițiale în formulare complexe
@@ -299,6 +316,7 @@ useEffect(() => {
 Pentru a preveni eroarea "Maximum update depth exceeded" în aplicații cu Zustand, următoarele practici sunt esențiale:
 
 1. **Separă setarea parametrilor de fetch-ul de date**:
+
    ```typescript
    // INCORECT - poate crea buclă infinită
    React.useEffect(() => {
@@ -318,6 +336,7 @@ Pentru a preveni eroarea "Maximum update depth exceeded" în aplicații cu Zusta
    ```
 
 2. **Evită apelurile directe la store.getState() în efecte**:
+
    ```typescript
    // INCORECT - poate crea buclă infinită
    setTimeout(() => {
@@ -332,6 +351,7 @@ Pentru a preveni eroarea "Maximum update depth exceeded" în aplicații cu Zusta
    ```
 
 3. **Folosește useRef pentru a evita re-render-uri inutile**:
+
    ```typescript
    // INCORECT - poate crea buclă infinită
    const [lastUpdate, setLastUpdate] = useState(Date.now());
@@ -345,6 +365,7 @@ Pentru a preveni eroarea "Maximum update depth exceeded" în aplicații cu Zusta
    ```
 
 4. **Adaugă setTimeout pentru a preveni actualizările în cascadă**:
+
    ```typescript
    // INCORECT - poate crea buclă infinită dacă refresh() modifică starea
    await transactionStore.saveTransaction(data);
@@ -379,6 +400,7 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 - Pentru orice state de autentificare, folosiți middleware-ul `persist` din Zustand, cu partialize pentru a salva doar datele relevante (ex: user, nu loading/error).
 - Verificați sesiunea la pornirea aplicației cu un efect global (`App.tsx` sau entrypoint).
 - Exemplu corect:
+
   ```ts
   export const useAuthStore = create(
     persist(
@@ -390,10 +412,10 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
     )
   );
   ```
+
 - Nu mock-uiți store-urile Zustand la testare (vezi politica de mocking).
 - Orice fetch asincron cu Zustand trebuie să respecte regula anti-pattern (NU folosiți useEffect(fetch, [queryParams]) fără guard intern/caching).
 - Sursa unică pentru categorii/subcategorii: doar `shared-constants/categories.ts`, validare la nivel de service și trigger DB.
-
 
 - Teste pentru inițializare, setters, acțiuni asincrone și selectors.
 - Mock-uri izolate pentru servicii injectate.
@@ -418,13 +440,16 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 ### API Integration
 
 #### Centralizare chei query params tranzacții
+
 - Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts`.
 - Importurile se fac EXPLICIT din `@shared-constants/queryParams` (nu din barrel și nu local).
 - Motiv: sincronizare automată între frontend și backend, fără duplicare sau risc de desincronizare la refactor.
 - Exemplu corect:
+
   ```typescript
   import { QUERY_PARAMS } from '@shared-constants/queryParams';
   ```
+
 - Orice modificare la aceste chei se anunță și se documentează în `DEV_LOG.md`.
 
 - Endpointuri, parametri, headere definite în `constants/api.ts`.
@@ -446,20 +471,24 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 - Barrel-ul `shared-constants/index.ts` trebuie actualizat imediat după orice modificare.
 - Orice modificare la enums/constants partajate trebuie anunțată și documentată în `DEV_LOG.md`.
 - Exemplu corect de import:
+
   ```typescript
   import { TransactionType, CategoryType } from '@shared-constants';
   ```
+
 - Auditarea automată a importurilor se face cu `node tools/validate-constants.js` și este obligatorie înainte de orice commit major.
 
 ## Best practices: React Query (2025)
 
 ### Pattern recomandat
+
 - Folosește hooks dedicate pentru fetch/mutații (ex: `useTransactions`, `useCategories`)
 - Separă UI state (filtre, formulare) de server state (date fetch-uite)
 - Toate fetch/mutații folosesc rutele centralizate din `@shared-constants/api`
 - Serviciile (ex: TransactionService) nu conțin string-uri hardcodate
 
 ### Exemplu usage
+
 ```tsx
 const { data, isLoading } = useTransactions({ year, month });
 const { mutate: addTransaction } = useTransactions().create;
@@ -467,17 +496,20 @@ addTransaction({ ... });
 ```
 
 ### Anti-patternuri
+
 - ❌ Fetch în useEffect + Zustand store (vezi secțiunea anti-pattern)
 - ❌ String-uri hardcodate pentru endpoint-uri sau mesaje
 - ❌ Mutarea logicii de fetch în store-uri UI
 
 ### Riscuri
+
 - Navigare rapidă → folosește debounce în hooks/componente grid
 - Orice schimbare la contractul API trebuie reflectată în tipuri/hooks
 
 ---
 
 ### Checklist future-proof pentru constants shared
+
 - [ ] Toate constantele/enumurile/mesajele partajate se definesc DOAR în `shared-constants/`.
 - [ ] Importurile pentru constants shared se fac DOAR prin path mapping `@shared-constants`.
 - [ ] Barrel-ul `shared-constants/index.ts` se actualizează la fiecare modificare.
@@ -500,6 +532,7 @@ addTransaction({ ... });
 - Documentează excepțiile în code review.
 
 **Exemple:**
+
 ```tsx
 <button data-testid="save-btn">Salvează</button>
 <input data-testid="amount-input" />
@@ -508,23 +541,29 @@ addTransaction({ ... });
 
 - Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, CRACO):
   - În `tsconfig.json` adaugă la `compilerOptions.paths`:
+
     ```json
     "@shared-constants": ["../shared-constants/index.ts"],
     "@shared-constants/*": ["../shared-constants/*"]
     ```
+
   - În `jest.config.js`:
+
     ```js
     moduleNameMapper: {
       '^@shared-constants$': '<rootDir>/../shared-constants/index.ts',
       '^@shared-constants/(.*)$': '<rootDir>/../shared-constants/$1',
     }
     ```
+
   - În `craco.config.js` (sau echivalent webpack):
+
     ```js
     alias: {
       '@shared-constants': path.resolve(__dirname, '../shared-constants'),
     }
     ```
+
 - Verifică periodic ca toate aceste configurații să fie sincronizate și testele să ruleze fără erori de path mapping.
 - Orice discrepanță între configurări trebuie remediată imediat și documentată în `DEV_LOG.md`.
 
@@ -587,6 +626,7 @@ useEffect(() => {
 Deoarece fetchTransactions poate actualiza queryParams (sau alte state-uri relevante), acest lucru duce la re-trigger continuu al efectului și la Maximum update depth exceeded.
 
 ### Soluție corectă
+
 - Rulează fetchTransactions doar la mount (dep list `[]`) sau folosește debounce/guard explicit pentru a evita buclele.
 
 ```tsx
@@ -595,9 +635,10 @@ useEffect(() => {
 }, []); // Doar la mount
 ```
 
-- Dacă ai nevoie de fetch la schimbare de parametri, folosește un guard intern în store (ex: comparație deep cu ultimii parametri, caching, etc).
+- Dacă ai nevoie de fetch la schimbare de parametri, folosește un guard intern în store pentru a preveni buclele.
 
 ### Recomandare
+
 - Nu folosi niciodată direct useEffect cu dependență pe queryParams pentru fetch-uri din store-uri Zustand fără protecție suplimentară.
 - Documentează întotdeauna motivul în code review dacă ai nevoie de un pattern diferit.
 
@@ -656,14 +697,15 @@ useEffect(() => {
 - Orice workaround sau excepție se documentează aici și în DEV_LOG.md.
 
 **Anti-patternuri observate:**
+
 - Efecte care ascultă pe localStorage sau polling pentru a detecta schimbări între tab-uri sau componente.
 - Folosirea de event-emitteri custom pentru propagarea modificărilor între stores sau UI.
 
 **Pattern corect:**
+
 - Store unic Zustand, acțiuni clare, confirmare la delete, fără side-effects ascunse.
 
 Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
-
 
 - **Context**: Implementarea salvare/actualizare de categorii personalizate în Supabase a relevat probleme cu formatarea jsonb și onConflict.
 - **Lecții învățate**:
@@ -671,6 +713,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
       - Pentru câmpuri de tip jsonb, Supabase acceptă obiectul direct (nu stringificat manual)
       - Verificare în prealabil a schemei tabelului cu `MCP.list_tables()` sau SQL Editor
       - Exemplu corect:
+
       ```typescript
       // CORECT: Se transmite direct obiectul pentru jsonb
       const payload = {
@@ -681,9 +724,11 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
         }
       };
       ```
+
   2. **Pattern selectInsertUpdate în loc de upsert**:
      - Folosirea `upsert({ onConflict: 'field' })` necesită constrângere UNIQUE pe field
      - Când upsert eșuează cu "no unique or exclusion constraint matching ON CONFLICT specification", implementează un pattern select-then-insert/update:
+
      ```typescript
      // Verificare dacă există înregistrare pentru user
      const { data } = await supabase
@@ -698,6 +743,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
        await supabase.from(TABLE).update(payload).eq('user_id', userId);
      }
      ```
+
   3. **Gestionare robustă erori**:
      - Logging standardizat pentru diagnostic ușor (context + error specific)
      - Returnare valori sigure (array gol, null) în caz de eroare
@@ -711,6 +757,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
 - **Problemă**: "Cannot update a component while rendering a different component" când același state e modificat în componente diferite.
 - **Lecții învățate**:
   1. **Stare separată pentru fiecare mod de operare**:
+
      ```typescript
      // INCORECT: Reutilizarea aceleiași variabile pentru operațiuni diferite
      const [editingItem, setEditingItem] = useState(null);
@@ -720,8 +767,9 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
      const [editingItem, setEditingItem] = useState(null);
      const [deletingItem, setDeletingItem] = useState(null);
      ```
-     
+
   2. **useEffect pentru manipularea stării în timpul render-ului**:
+
      ```typescript
      // INCORECT: Manipulare de state direct în timpul render-ului
      const Component = () => {
@@ -741,8 +789,9 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
        }, [condition]);
      };
      ```
-     
+
   3. **Reset complet al stării la tranziția între moduri**:
+
      ```typescript
      // La activarea modului de editare
      const handleEdit = (item) => {
@@ -782,6 +831,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
 - Orice excepție trebuie documentată clar în PR și BEST_PRACTICES.md.
 
 **TODO/PLAN:**
+
 - Eliminarea treptată a mock-urilor pentru store-uri Zustand (`__mocks__/stores/`).
 - Refactorizarea testelor pentru a folosi store-urile reale și doar mock-uri pentru servicii externe (Supabase, date, random, browser APIs).
 - Task planificat incremental, va fi documentat în DEV_LOG.md la fiecare etapă majoră.
@@ -791,6 +841,7 @@ Toate aceste reguli au fost integrate și în global_rules.md și DEV_LOG.md.
 ### Consistență prin token-uri și utilitare centralizate
 
 Pentru a menține coerența vizuală și mentenabilitatea (așa cum s-a demonstrat în refactorizarea temei "earthy" din Mai 2025):
+
 - Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
 - Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
 - Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
@@ -809,7 +860,8 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
 
 ### Principii Cheie și Configurare Inițială
 
-1.  **`<BrowserRouter>`**: Componenta rădăcină pentru activarea rutării. De obicei, se plasează în `index.tsx` pentru a împacheta întreaga aplicație:
+1. **`<BrowserRouter>`**: Componenta rădăcină pentru activarea rutării. De obicei, se plasează în `index.tsx` pentru a împacheta întreaga aplicație:
+
     ```tsx
     // frontend/src/index.tsx
     import React from 'react';
@@ -828,7 +880,8 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
     );
     ```
 
-2.  **`<Routes>` și `<Route>`**: Definirea rutelor se face în interiorul unui component `<Routes>`. Fiecare `<Route>` mapează o cale (`path`) la un element (`element` - componenta React de randat).
+2. **`<Routes>` și `<Route>`**: Definirea rutelor se face în interiorul unui component `<Routes>`. Fiecare `<Route>` mapează o cale (`path`) la un element (`element` - componenta React de randat).
+
     ```tsx
     // frontend/src/App.tsx
     import { Routes, Route, Navigate } from 'react-router-dom';
@@ -860,7 +913,8 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
 
 ### Navigare
 
-1.  **`<Link>`**: Pentru navigare declarativă (similar cu tag-ul `<a>` HTML), se folosește componenta `<Link to="/cale">
+1. **`<Link>`**: Pentru navigare declarativă (similar cu tag-ul `<a>` HTML), se folosește componenta `<Link to="/cale">
+
     ```tsx
     import { Link } from 'react-router-dom';
 
@@ -868,7 +922,8 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
     <Link to="/dashboard">Mergi la Dashboard</Link>
     ```
 
-2.  **`useNavigate()`**: Pentru navigare programatică (de exemplu, după un submit de formular sau o acțiune asincronă).
+2. **`useNavigate()`**: Pentru navigare programatică (de exemplu, după un submit de formular sau o acțiune asincronă).
+
     ```tsx
     import { useNavigate } from 'react-router-dom';
 
@@ -883,7 +938,8 @@ Migrarea la `react-router-dom` (versiunea 6) aduce o abordare modernă și decla
     };
     ```
 
-3.  **`useLocation()`**: Pentru a accesa obiectul `location` care conține informații despre URL-ul curent (ex: `pathname`, `search`, `hash`).
+3. **`useLocation()`**: Pentru a accesa obiectul `location` care conține informații despre URL-ul curent (ex: `pathname`, `search`, `hash`).
+
     ```tsx
     import { useLocation } from 'react-router-dom';
 
@@ -916,9 +972,10 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
 
 1. **Eroare**: `Could not find the 'userId' column of 'transactions' in the schema cache`
    - **Cauza**: Frontend trimite `userId` în payload, dar schema DB are `user_id`
-   - **Soluție**: 
+   - **Soluție**:
      - Alinierea strictă a numelor de câmpuri între modelele TS și schema DB
      - Transformare explicită în servicii (nu în componente UI)
+
      ```typescript
      // Corect - Transformare nume de câmpuri în serviciu
      async createTransaction(data: TransactionDTO) {
@@ -936,6 +993,7 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
    - **Soluție**:
      - Eliminarea tuturor câmpurilor care nu sunt în schemele DB și validare
      - Validarea payload-urilor cu Zod sau TypeScript utility types
+
      ```typescript
      // Validare cu TypeScript
      type DbColumnKeys = keyof DBTransaction; // Exact columns from schema
@@ -957,6 +1015,7 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
 - Efectele de focus (outline, ring, shadow) se aplică DOAR dinamic, ca efect (ex: `fx-no-outline`), pentru a permite controlul complet și centralizat prin sistemul de stiluri rafinate.
 - Motiv: Dacă pui clasele de focus direct în `base`, acestea nu pot fi suprascrise de efecte sau variante, ceea ce duce la imposibilitatea eliminării chenarului de focus la nevoie (ex: design modern, UX, QA, accesibilitate controlată).
 - Exemplu corect:
+
   ```ts
   // navigationComponents.ts
   tab: {
@@ -965,6 +1024,7 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
   // În componentă:
   getEnhancedComponentClasses('tab', ..., ..., ..., ['fx-no-outline'])
   ```
+
 - Documentează orice excepție explicit în PR și DEV_LOG.md.
  pentru sincronizare schemă-model
 
@@ -998,3 +1058,177 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
 3. **Securitate**: Validează întotdeauna datele de intrare pentru a preveni SQLi sau alte vulnerabilități
 
 ---
+
+## Interogări SQL eficiente cu Supabase
+
+### SQL Group By și coloane agregate (2025-05-21)
+
+- **Context**: Implementarea `fetchActiveSubcategories` a relevat probleme cu operațiile de grup în Supabase.
+- **Regulă** (**obligatorie**): Când utilizați `GROUP BY` în interogări SQL:
+  1. Includeți TOATE coloanele neagregate din clauza SELECT în clauza GROUP BY
+  2. SAU utilizați funcții agregate pentru coloanele care nu sunt în GROUP BY
+  3. Pentru seturi mici/medii de date, preferați gruparea în JavaScript pentru flexibilitate
+
+- **Exemplu corect**:
+
+```typescript
+// Corect: Toate coloanele neagregate sunt în GROUP BY
+const { data } = await supabase
+  .from('transactions')
+  .select('category, subcategory, count(*)')
+  .group('category, subcategory');
+
+// Alternativă: Grupare client-side pentru seturi mici de date
+const { data } = await supabase
+  .from('transactions')
+  .select('category, subcategory');
+
+// Grupați local
+const grouped = data.reduce((acc, item) => {
+  const key = `${item.category}|${item.subcategory}`;
+  if (!acc[key]) {
+    acc[key] = { category: item.category, subcategory: item.subcategory, count: 1 };
+  } else {
+    acc[key].count++;
+  }
+  return acc;
+}, {});
+```
+
+### Funcții RPC în Supabase (2025-05-21)
+
+- **Context**: Implementarea inițială a încercat să utilizeze o funcție RPC (`exec_sql`) care nu exista.
+- **Regulă** (**obligatorie**): Funcțiile RPC trebuie declarate explicit în Supabase înainte de a fi folosite.
+  1. Verificați întotdeauna existența funcțiilor RPC înainte de a le folosi
+  2. Preferați API-ul standard Supabase pentru operațiuni CRUD simple
+  3. Documentați și testați extensiv toate funcțiile RPC personalizate
+
+- **Exemplu corect**:
+
+```typescript
+// Verificare existență RPC înainte de utilizare
+const checkRpcExists = async (functionName: string) => {
+  try {
+    const { data } = await supabase
+      .from('pg_proc')
+      .select('proname')
+      .eq('proname', functionName)
+      .single();
+    return !!data;
+  } catch (error) {
+    return false;
+  }
+};
+
+// Sau pur și simplu folosiți API-ul standard pentru operațiuni comune
+const { data } = await supabase
+  .from('transactions')
+  .select('category, subcategory')
+  .eq('user_id', userId);
+```
+
+## React Performance și Unicitate
+
+### Rezolvarea problemei Duplicate Keys (2025-05-21)
+
+- **Context**: Avertismente în consolă despre chei duplicate în liste React din cauza unor ID-uri duplicate între seturi de date.
+- **Regulă** (**obligatorie**): Pentru proprietatea `key` în liste React:
+  1. Generați chei unice combinând ID-ul cu alte informații (index, timestamp, context)
+  2. NU folosiți doar index-ul ca și cheie (anti-pattern)
+  3. NU folosiți doar ID-ul atunci când există posibilitatea de ID-uri duplicate între seturi de date
+
+- **Exemplu corect**:
+
+```tsx
+// Rău (potențiale chei duplicate)
+{transactions.map((transaction) => (
+  <tr key={transaction.id}>...</tr>
+))}
+
+// Corect (cheie unică garantată)
+{transactions.map((transaction, index) => (
+  <tr key={`${transaction.id}-${index}`}>...</tr>
+))}
+
+// Alternativ, adăugați context la cheie
+{transactions.map((transaction) => (
+  <tr key={`tx-${transaction.id}-${transaction.date}`}>...</tr>
+))}
+```
+
+### Optimizarea dropdown-urilor cu seturi mari de date (2025-05-21)
+
+- **Context**: Dropdown-uri cu toate subcategoriile afișate, incluzând cele fără tranzacții asociate, cauzau experiență utilizator sub-optimală.
+- **Regulă** (**recomandată**): Pentru dropdown-uri cu multe opțiuni:
+  1. Filtrați opțiunile la sursa de date pentru a afișa doar cele relevante
+  2. Afișați numărul de itemi asociați pentru context (ex: "Salariu (3)")
+  3. Implementați stări de loading pentru feedback vizual în timpul încărcării
+  4. Adăugați mesaje relevante pentru situațiile fără rezultate (empty states)
+
+- **Exemplu corect**:
+
+```tsx
+// Hook personalizat pentru filtrarea eficientă a subcategoriilor
+const { subcategories, isLoading, isEmpty } = useActiveSubcategories({
+  category, 
+  type,
+  enabled: !!category
+});
+
+// Componenta Select cu stare de loading și mesaj pentru lipsa rezultatelor
+<Select
+  options={isEmpty ? [{ value: '', label: INFO.NO_SUBCATEGORIES, disabled: true }] : subcategories}
+  isLoading={isLoading}
+  placeholder={isLoading ? LOADER.TEXT : PLACEHOLDERS.SELECT}
+/>
+```
+
+## Organizarea codului și best practices
+
+### Hooks personalizate React Query pentru resurse partajate (2025-05-21)
+
+- **Context**: Implementarea filtrării subcategoriilor active a necesitat un hook React Query specializat.
+
+- **Regulă** (**recomandată**): Pentru resurse partajate între componente:
+  1. Creați hooks personalizate care encapsulează logica React Query
+  2. Folosiți chei query predictibile și consistente pentru cache eficient
+  3. Implementați transformări de date în hook, nu în componente
+  4. Returnați informații bogate (isLoading, isEmpty, isError) pentru UX complet
+
+- **Exemplu ideal**:
+
+```typescript
+// Hook personalizat pentru subcategorii active
+export function useActiveSubcategories({ category, type, enabled = true }) {
+  const { user } = useAuthStore();
+  const userId = user?.id;
+  
+  // Query cu cheie unică și dependințe clare
+  const query = useQuery({
+    queryKey: ['activeSubcategories', userId, category, type],
+    queryFn: () => supabaseService.fetchActiveSubcategories(userId, category, type),
+    enabled: enabled && !!userId,
+  });
+  
+  // Transformare date pentru componente UI
+  const formattedSubcategories = useMemo(() => {
+    if (!query.data) return [];
+    
+    return query.data.map(item => ({
+      value: item.subcategory,
+      label: `${formatLabel(item.subcategory)} (${item.count})`,
+      count: item.count,
+      category: item.category
+    }));
+  }, [query.data]);
+  
+  // Return rich API pentru UX complet
+  return {
+    subcategories: formattedSubcategories,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error,
+    isEmpty: query.data?.length === 0,
+  };
+}
+```

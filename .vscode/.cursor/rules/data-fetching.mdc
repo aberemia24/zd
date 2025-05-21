@@ -1,0 +1,111 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+<group_by>
+- Când utilizați GROUP BY în interogări SQL, includeți TOATE coloanele neagregate din SELECT
+- Pentru seturi mici/medii de date, preferați gruparea în JavaScript (client-side)
+- Validați întotdeauna SQL complex înainte de implementare în producție
+
+CORECT:
+```typescript
+// SQL corect - toate coloanele neagregate sunt în GROUP BY
+.select('category, subcategory, count(*)')
+.group('category, subcategory')
+
+// Alternativ, grupare în JavaScript pentru flexibilitate
+const groupedData = data.reduce((acc, item) => {
+  const key = `${item.category}|${item.subcategory}`;
+  if (!acc[key]) acc[key] = { count: 1, /* ... */ };
+  else acc[key].count++;
+  return acc;
+}, {});
+```
+</group_by>
+
+<rpc_functions>
+- Verificați întotdeauna existența funcțiilor RPC înainte de utilizare
+- Preferați API-ul standard Supabase pentru operațiuni CRUD simple
+- Documentați toate funcțiile RPC personalizate în `/backend/rpc_functions.md`
+
+CORECT:
+```typescript
+// Folosiți API-ul standard când e posibil
+const { data } = await supabase
+  .from('transactions')
+  .select('category, subcategory')
+  .eq('user_id', userId);
+```
+</rpc_functions>
+
+<react_keys>
+- Generați chei unice combinând ID-ul cu alte informații (index, context)
+- NU folosiți doar index-ul ca cheie (anti-pattern)
+- NU folosiți doar ID-ul când pot exista duplicate
+
+CORECT:
+```tsx
+// Chei unice și predictibile
+{transactions.map((transaction, index) => (
+  <tr key={`${transaction.id}-${index}`}>...</tr>
+))}
+```
+</react_keys>
+
+<dropdown_optimization>
+- Filtrați opțiunile în backend sau custom hooks, nu în componente
+- Afișați numărul de itemi asociați pentru context util (ex: "Salariu (3)")
+- Implementați stări de loading și empty states explicite
+- Folosiți `useMemo` pentru transformarea datelor în opțiuni
+
+CORECT:
+```tsx
+// Hook specializat pentru subcategorii active
+const { subcategories, isLoading, isEmpty } = useActiveSubcategories({
+  category, type, enabled: !!category
+});
+
+// Componenta cu feedback vizual
+<Select
+  options={isEmpty ? [{value: '', label: INFO.NO_SUBCATEGORIES, disabled: true}] : subcategories}
+  isLoading={isLoading}
+  placeholder={isLoading ? LOADER.TEXT : PLACEHOLDERS.SELECT}
+/>
+```
+</dropdown_optimization>
+
+<custom_hooks>
+- Creați hooks personalizate pentru resurse partajate între componente
+- Implementați transformări de date în hooks, nu în componente
+- Returnați stare bogată (isLoading, isEmpty, isError) pentru UX complet
+- Folosiți React Query pentru caching și revalidare automată
+
+CORECT:
+```typescript
+export function useCustomData(params) {
+  const query = useQuery({
+    queryKey: ['uniqueKey', ...dependencyValues],
+    queryFn: () => fetchData(params),
+    enabled: !!requiredValue,
+  });
+  
+  // Transformare date pentru componente
+  const formattedData = useMemo(() => {
+    if (!query.data) return [];
+    return query.data.map(item => ({
+      // Transformare pentru componente
+    }));
+  }, [query.data]);
+  
+  return {
+    data: formattedData,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    isEmpty: query.data?.length === 0,
+  };
+}
+```
+</custom_hooks>
+
+

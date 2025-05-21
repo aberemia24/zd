@@ -1,6 +1,56 @@
+## [2025-05-21] Optimizare și corecții la filtrarea subcategoriilor active
+
+### Probleme întâlnite:
+- Eroare SQL la încărcarea subcategoriilor active: `column "transactions.category" must appear in the GROUP BY clause or be used in an aggregate function`
+- Ineficiență la încărcarea tuturor subcategoriilor, incluzând cele fără tranzacții asociate
+- Eroare 404 la încercarea utilizării funcțiilor RPC (`exec_sql`) inexistente în Supabase
+- Duplicate keys în listarea tranzacțiilor: `Encountered two children with the same key`
+
+### Soluții implementate:
+1. **Refactorizare `fetchActiveSubcategories`**:
+   - Înlocuită implementarea bazată pe SQL GROUP BY cu grupare locală în JavaScript
+   - Utilizarea metodei standard Supabase pentru query-uri în loc de RPC
+   - Preluarea listei complete de tranzacții cu subcategorii și gruparea lor locală
+   - Separare clară între logica de filtrare și procesare
+
+2. **Îmbunătățiri în UI**:
+   - Afișarea numărului de tranzacții per subcategorie `(3)` direct în dropdown pentru context
+   - Mesaj specific pentru cazul când nu există subcategorii active
+   - State de loading pentru a indica utilizatorului că datele se încarcă
+
+3. **Rezolvare duplicate keys**:
+   - Generare chei unice pentru rândurile din tabel prin combinarea ID-ului cu indexul: `key={`${t.id}-${idx}`}`
+   - Asigurarea unicității pentru a evita avertismentele React și comportamentul incorect
+
+### Lecții învățate:
+1. **Grupare SQL vs. locală**: 
+   - În Supabase, operațiile de GROUP BY trebuie să includă toate coloanele neagregate din SELECT sau să fie folosite în funcții agregate
+   - Pentru seturi mici de date, procesarea locală poate fi o alternativă validă și mai flexibilă
+
+2. **RPC vs. API standard**:
+   - Funcțiile RPC trebuie create explicit în Supabase înainte de a fi folosite
+   - Preferați API-ul standard Supabase pentru operațiuni CRUD când nu aveți nevoie de logică complexă la nivel de DB
+   - Testați existența funcțiilor RPC înainte de a le folosi în producție
+
+3. **Keys în React**:
+   - Nu folosiți doar ID-urile pentru key când listați elemente similare din seturi de date diferite
+   - Combinați ID-ul cu alte informații (index, timestamp) pentru a asigura unicitatea
+
+4. **Memoization și caching**:
+   - Folosiți React Query pentru a cache-ui și reutiliza rezultate între diferite componente
+   - Definiți corect cheile de query pentru a beneficia complet de invalidare automată a cache-ului
+   - Folosiți `useMemo` pentru a evita recalcularea listelor și opțiunilor la fiecare render
+
+### Impact și beneficii:
+- UX îmbunătățit prin filtre mai relevante, fără opțiuni goale
+- Reducerea numărului de query-uri către backend
+- Evitarea erorilor SQL și simplificarea logicii de procesare
+- Experiență fluidă pentru utilizator, cu feedback vizual adecvat
+
 ## [2025-05-20] Începere refactorizare stiluri CategoryEditor
 
-### Modificări finalizate:
+### Modificări finalizate
+
 - Înlocuite textele hardcodate cu constante din `shared-constants/ui.ts`, `PLACEHOLDERS`, `INFO`
 - Extins `ComponentType` în `themeTypes.ts` cu `card-section`, `list-container`, `list-item`
 - Adăugate configurații în `componentMap` pentru `card-section`, `list-container`, `list-item`
@@ -8,14 +58,15 @@
 - Aplicare `getEnhancedComponentClasses('card', 'elevated', 'lg', ...)` pentru card principal
 - Aplicare `getEnhancedComponentClasses('button', 'ghost', 'sm', ...)` pentru buton închidere
 
-### Impact așteptat:
+### Impact așteptat
+
 - Eliminarea claselor Tailwind hardcodate
 - UI consistent cu restul componentelor rafinate
 
 ## [2025-05-19] Refactorizare TransactionsPage cu stiluri rafinate
 
+### Modificări
 
-### Modificări:
 - Aplicat sistemul de stiluri rafinate la `TransactionsPage.tsx`
 - Eliminarea claselor Tailwind hardcodate și înlocuirea lor cu `getEnhancedComponentClasses`
 - Structurarea paginii în secțiuni logice: formular, filtre, tabel
@@ -24,18 +75,21 @@
 - Stilizare consistentă cu componentele refactorizate anterior: TransactionTable, TransactionForm, TransactionFilters
 - Înlocuirea div-urilor de eroare simple cu componenta primitiva Alert cu efecte vizuale (withIcon, withFadeIn, withAccentBorder, withShadow)
 
-### Motivație:
+### Motivație
+
 - Aliniere la standardele vizuale moderne definite în GHID_STILURI_RAFINATE.md
 - Eliminarea claselor CSS hardcodate conform regulilor globale
 - Îmbunătățirea experienței utilizator prin efecte vizuale consistente și profesionale
 - Facilitarea schimbării temelor prin utilizarea sistemului de tokens
 
-### Lecții învățate:
+### Lecții învățate
+
 - Extensibilitatea sistemului: când lipsesc componente sau efecte vizuale noi, acestea trebuie adăugate în directorul `componentMap/` (nu prin clase Tailwind hardcodate)
 - Importanța respectării tipurilor definite în `themeTypes.ts` (ComponentType, ComponentVariant, ComponentState)
 - Necesitatea înțelegerii relației între `componentMap`, `themeTypes.ts` și `getEnhancedComponentClasses`
 
-### Impact:
+### Impact
+
 - UX îmbunătățit prin interfață vizuală modernă și consistentă
 - Codebase mai curat și mai ușor de întreținut
 - Separarea clară a conținutului de prezentare
@@ -43,16 +97,19 @@
 
 ## [2024-05-16] Dezactivare validare strictă la nivel de frontend pentru a permite subcategorii personalizate
 
-### Modificări:
+### Modificări
+
 - Modificată funcția `validateCategoryAndSubcategory` din `supabaseService.ts` pentru a accepta toate combinațiile de categorie/subcategorie, delegând validarea completă către backend
 - Păstrat apelurile pentru compatibilitate cu codul existent, dar fără a bloca tranzacțiile
 - Adăugate loguri de debug detaliate pentru a facilita identificarea potențialelor probleme cu subcategoriile personalizate
 - Îmbunătățite mesajele de eroare pentru utilizator, cu referințe clare la verificarea categoriilor și subcategoriilor disponibile
 
-### Motivație:
+### Motivație
+
 Validarea strictă a categoriilor și subcategoriilor direct în frontend era incompatibilă cu funcționalitatea de subcategorii personalizate. Utilizatorii nu puteau folosi subcategoriile personalizate pentru tranzacții noi. Delegarea validării către backend asigură o experiență consistentă.
 
-### Impactul modificării:
+### Impactul modificării
+
 - O singură sursă de adevăr pentru validarea categoriilor (backend-ul/baza de date)
 - Suport complet pentru subcategoriile personalizate create de utilizator
 - Fără schimbări în API-uri sau semnături de funcții existente
@@ -60,7 +117,8 @@ Validarea strictă a categoriilor și subcategoriilor direct în frontend era in
 
 ## [2024-05-16] Actualizare trigger SQL pentru validarea categorii/subcategorii în Supabase
 
-### Modificări:
+### Modificări
+
 - Am actualizat funcția `validate_transaction_categories()` din Supabase pentru a suporta subcategorii personalizate
 - Adăugat validare pentru trei tipuri de subcategorii:
   1. Subcategorii predefinite originale (din lista hardcodată)
@@ -70,47 +128,55 @@ Validarea strictă a categoriilor și subcategoriilor direct în frontend era in
   - Index pe `user_id` pentru filtrare rapidă
   - Index GIN pe `category_data` pentru căutări rapide în structura JSON
 
-### Motivație:
+### Motivație
+
 Triggerul SQL original valida strict categoriile și subcategoriile folosind liste hardcodate, ceea ce împiedica utilizarea subcategoriilor personalizate sau redenumite. Noua implementare consultă tabela `custom_categories` pentru a valida corespunzător toate tipurile de subcategorii.
 
-### Impactul modificării:
+### Impactul modificării
+
 - Utilizatorii pot acum crea tranzacții folosind atât subcategorii predefinite cât și personalizate
 - Validarea rămâne la nivel de backend, asigurând integritatea datelor
 - Performanță optimizată prin indexuri adecvate
 
-### Considerații tehnice și riscuri:
+### Considerații tehnice și riscuri
 
 #### Performanța
+
 - Interogarea jsonb_path_exists poate fi costisitoare pentru seturi mari de date
 - Indexul GIN pe `category_data` ar trebui să atenueze această problemă în majoritatea cazurilor
 - Recomandare: Monitorizează performanța pentru utilizatorii cu multe subcategorii personalizate
 
 #### Structura JSON
+
 - Calea JSON folosită (`$.categories[*].subcategories[*].name`) trebuie să corespundă exact cu structura din tabela `custom_categories`
 - Orice modificare viitoare a structurii JSON în frontend necesită actualizarea corespunzătoare a triggerului
 - Recomandare: Adaugă teste automate pentru a verifica sincronizarea dintre structura frontend și backend
 
 #### Case sensitivity
+
 - Verificările categoriilor și subcategoriilor sunt case-sensitive
 - Asigură-te că frontend-ul folosește exact aceeași scriere (majuscule/minuscule) ca în backend
 - Risc: Inconsistențe în caz pot duce la validare eșuată pentru subcategorii care par identice utilizatorului
 
 #### Testări necesare
+
 - Subcategorie predefinită (ex: "Salarii")
-- Subcategorie predefinită redenumită 
+- Subcategorie predefinită redenumită
 - Subcategorie personalizată nouă
 - Tranzacție fără subcategorie
 
 ## [2025-05-19] Implementare sistem complet de design tokens (WINDSURF-CSS-001)
 
-### Modificări:
+### Modificări
+
 - Creat și integrat fișierul `frontend/src/styles/theme-variables.css` cu toate variabilele CSS generate automat din `theme.ts` (culori, spacing, shadow, radius, font, breakpoints, etc.)
 - Creat fișierul `frontend/src/styles/theme-components.css` cu clase CSS reutilizabile pentru butoane, inputuri, carduri, layout, tipografie etc., toate bazate pe tokens
 - Adăugat scriptul `frontend/src/styles/generate-css-variables.js` pentru generarea automată a variabilelor CSS din tokens
 - Modificat `frontend/src/index.css` pentru a importa la început variabilele și clasele centralizate
 - Eliminat orice dublare de config Tailwind; frontend-ul folosește o singură sursă de tokens
 
-### Reguli și pași de mentenanță:
+### Reguli și pași de mentenanță
+
 - Toate stilurile în componente trebuie să utilizeze exclusiv sistemul de design tokens (WINDSURF-CSS-001)
 - Clase Tailwind hardcodate sunt interzise (excepție doar cu comentariu @windsurf-exception și doar dacă nu există token)
 - Orice nevoie nouă de stil se rezolvă prin extinderea tokens și a claselor centralizate, nu prin hardcodare
@@ -120,29 +186,34 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 ## [2025-05-18] Refactorizare hooks tranzacții: infinite loading & caching
 
-### Modificări:
+### Modificări
+
 - Creat hook nou `useMonthlyTransactions` pentru încărcarea tuturor tranzacțiilor pe lună (Lunar Grid).
 - Creat hook nou `useInfiniteTransactions` pentru încărcare infinită (paginare) în Transactions Table.
 - Eliminat complet hook-ul `useTransactions` (deprecated); orice utilizare accidentală returnează eroare clară.
 - Am implementat un mecanism de cache partajat (`['transactions']`) pentru a asigura invalidarea corectă la mutații (create/update/delete) între ambele hooks.
 - Refactorizat integrarea în paginile principale (`LunarGridPage.tsx`, `TransactionsPage.tsx`).
 
-### Motivație & Design:
+### Motivație & Design
+
 - Separarea clară între încărcarea bulk (toate tranzacțiile pentru grid) și încărcarea incrementală (infinite loading pentru tabel).
 - Modularitate: fiecare hook are responsabilitate unică, fără duplicare de logică.
 - Facilitează testarea, extensibilitatea și mentenanța pe termen lung.
 
-### Probleme întâlnite și rezolvate:
+### Probleme întâlnite și rezolvate
+
 - Inițial, tranzacțiile nu se afișau corect din cauza transmiterii greșite a userId-ului către query-uri.
 - Erori la mutații: rezolvate prin partajarea cheii de cache și invalidare globală.
 - Acces accidental la hook-ul vechi: prevenit cu stub explicit și mesaj de eroare.
 
-### Lecții învățate:
+### Lecții învățate
+
 - Caching-ul trebuie să fie centralizat și predictibil pentru a evita bug-uri subtile la sincronizarea datelor.
 - Separarea clară a responsabilităților între hooks permite evoluție rapidă fără regresii.
 - Testarea edge-case-urilor de mutații și cache este critică pentru UX robust.
 
-### Next steps:
+### Next steps
+
 - Scriere teste unitare pentru ambele hooks (bulk și infinite loading), inclusiv scenarii de cache/mutații.
 - Actualizare `BEST_PRACTICES.md` cu noul pattern pentru hooks și caching.
 - Monitorizare performanță și UX pentru ajustări ulterioare.
@@ -173,89 +244,89 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - **Sumar:** Implementarea TanStack Table a evidențiat mai multe probleme de tipizare și managementul constant-elor care au devenit lecții valoroase pentru echipă.
 
 - **Probleme întâlnite și rezolvate:**
-    - **Extensia fișierelor pentru componente React cu JSX**: Fișierele `.ts` care conțin sintaxă JSX generează erori. Soluție: Redenumirea la `.tsx`.
-    - **Structuri ierarhice în constante**: Adăugarea obiectului imbricat `MESAJE.VALIDARE` a cauzat erori de tipizare în `safeMessage`. Soluție: Refactorizarea funcției pentru a suporta acces ierarhic corect tipizat.
-    - **Cast corect pentru enum-uri**: Tipizarea explicită pentru proprietăți de tip enum precum `FrequencyType` este necesară pentru a evita problemele de conversie între `string` și enum.
-    - **Import și folosire corectă a constantelor**: Toate constantele trebuie importate exclusiv via alias-uri definite (`@shared-constants`).
+  - **Extensia fișierelor pentru componente React cu JSX**: Fișierele `.ts` care conțin sintaxă JSX generează erori. Soluție: Redenumirea la `.tsx`.
+  - **Structuri ierarhice în constante**: Adăugarea obiectului imbricat `MESAJE.VALIDARE` a cauzat erori de tipizare în `safeMessage`. Soluție: Refactorizarea funcției pentru a suporta acces ierarhic corect tipizat.
+  - **Cast corect pentru enum-uri**: Tipizarea explicită pentru proprietăți de tip enum precum `FrequencyType` este necesară pentru a evita problemele de conversie între `string` și enum.
+  - **Import și folosire corectă a constantelor**: Toate constantele trebuie importate exclusiv via alias-uri definite (`@shared-constants`).
 
 - **Lecții de arhitectură și reguli noi:**
-    - **Structuri imbricate în constante**: Când adăugăm structuri imbricate în sursa unică de adevăr (ex: `MESAJE.VALIDARE`), toate utilitarele care le folosesc trebuie adaptate (ex: `safeMessage`).
-    - **JSX necesită extensia .tsx**: Indiferent cât de simplă e logica unui fișier, dacă conține JSX => extensia trebuie să fie `.tsx`, nu `.ts`.
-    - **Tipizare explicită pentru cast-uri**: Folosiți întotdeauna cast-uri explicite (ex: `as FrequencyType`) pentru a converti între string și enum-uri.
-    - **Testarea modularizată**: Evitați testarea 'Big Bang' a întregii implementări; testați pe componente și funcționalități izolate.
+  - **Structuri imbricate în constante**: Când adăugăm structuri imbricate în sursa unică de adevăr (ex: `MESAJE.VALIDARE`), toate utilitarele care le folosesc trebuie adaptate (ex: `safeMessage`).
+  - **JSX necesită extensia .tsx**: Indiferent cât de simplă e logica unui fișier, dacă conține JSX => extensia trebuie să fie `.tsx`, nu `.ts`.
+  - **Tipizare explicită pentru cast-uri**: Folosiți întotdeauna cast-uri explicite (ex: `as FrequencyType`) pentru a converti între string și enum-uri.
+  - **Testarea modularizată**: Evitați testarea 'Big Bang' a întregii implementări; testați pe componente și funcționalități izolate.
 
 - **Beneficii aduse de această experiență:**
-    - Cod mai robust și mai tipizat pentru întreaga aplicație
-    - Funcția `safeMessage` îmbunătățită poate gestiona acum mesaje structurate ierarhic
-    - Dezvoltarea de pattern-uri clare pentru structurarea constantelor și mesajelor
-    - Detectarea timpurie a problemelor de tipizare înainte de compilare
+  - Cod mai robust și mai tipizat pentru întreaga aplicație
+  - Funcția `safeMessage` îmbunătățită poate gestiona acum mesaje structurate ierarhic
+  - Dezvoltarea de pattern-uri clare pentru structurarea constantelor și mesajelor
+  - Detectarea timpurie a problemelor de tipizare înainte de compilare
 
 ## [2025-05-15] Implementare completă TanStack Table în LunarGrid
 
 - **Sumar:** S-a finalizat implementarea completă a TanStack Table în componenta `LunarGrid` cu integrare în pagina existentă.
 - **Modificări principale:**
-    - Extindere `shared-constants/ui.ts` cu `EXCEL_GRID.TABLE_CONTROLS` pentru textele de interfață
-    - Implementare `useLunarGridTable` pentru management de date și stare optimizată
-    - Creare `LunarGridTanStack` cu folosirea exclusivă a constantelor și metodelor existente
-    - Integrare în `LunarGridPage` cu toggle pentru comutare între implementarea clasică și cea nouă
-    - Persistăm preferința utilizatorului în localStorage pentru a fi reținută între sesiuni
+  - Extindere `shared-constants/ui.ts` cu `EXCEL_GRID.TABLE_CONTROLS` pentru textele de interfață
+  - Implementare `useLunarGridTable` pentru management de date și stare optimizată
+  - Creare `LunarGridTanStack` cu folosirea exclusivă a constantelor și metodelor existente
+  - Integrare în `LunarGridPage` cu toggle pentru comutare între implementarea clasică și cea nouă
+  - Persistăm preferința utilizatorului în localStorage pentru a fi reținută între sesiuni
 - **Conformitate cu regulile globale:**
-    - **Zero texte hardcodate**: Toate mesajele provin din sursa unică de adevăr `@shared-constants`
-    - **Zero referințe la funcții inexistente**: Toată implementarea se bazează pe funcțiile existente din stores/servicii
-    - **Testabilitate**: Toate elementele interactive au atribute `data-testid` pentru testare automată
-    - **Anti-pattern useEffect evitat**: Fetch-urile sunt gestionate corect fără dep arrays problematice
+  - **Zero texte hardcodate**: Toate mesajele provin din sursa unică de adevăr `@shared-constants`
+  - **Zero referințe la funcții inexistente**: Toată implementarea se bazează pe funcțiile existente din stores/servicii
+  - **Testabilitate**: Toate elementele interactive au atribute `data-testid` pentru testare automată
+  - **Anti-pattern useEffect evitat**: Fetch-urile sunt gestionate corect fără dep arrays problematice
 - **Beneficii principale:**
-    - **Performanță crescută**: Componenta TanStack poate gestiona mii de tranzacții fără probleme
-    - **UX păstrat**: Toate funcționalitățile din implementarea originală au fost menținute
-    - **Adaptabilitate**: Utilizatorii pot comuta ușor între implementarea clasică și cea nouă
+  - **Performanță crescută**: Componenta TanStack poate gestiona mii de tranzacții fără probleme
+  - **UX păstrat**: Toate funcționalitățile din implementarea originală au fost menținute
+  - **Adaptabilitate**: Utilizatorii pot comuta ușor între implementarea clasică și cea nouă
 - **Fișiere create/modificate:**
-    - `shared-constants/ui.ts` - adăugare constante pentru controalele tabelului
-    - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts` - implementare hook pentru TanStack Table
-    - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx` - componenta principală TanStack
-    - `frontend/src/pages/LunarGridPage.tsx` - integrare cu toggle între implementarea clasică și cea nouă
-    - `tests/plans/LunarGridTanStack.test.plan.md` - plan detaliat de testare
+  - `shared-constants/ui.ts` - adăugare constante pentru controalele tabelului
+  - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts` - implementare hook pentru TanStack Table
+  - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx` - componenta principală TanStack
+  - `frontend/src/pages/LunarGridPage.tsx` - integrare cu toggle între implementarea clasică și cea nouă
+  - `tests/plans/LunarGridTanStack.test.plan.md` - plan detaliat de testare
 
 ## [2025-05-15] Pregătire implementare TanStack Table în LunarGrid
 
 - **Sumar:** S-au pregătit resursele necesare pentru implementarea TanStack Table în componenta `LunarGrid`.
 - **Modificări principale:**
-    - Adăugare constante necesare în `shared-constants/ui.ts` - secțiunea `EXCEL_GRID.TABLE_CONTROLS`
-    - Creare script de verificare funcții (`scripts/verify-functions.js`) pentru validarea API-urilor existente
-    - Creare plan detaliat de testare respectând regulile globale de testabilitate
-    - Pregătire documentație și setup pentru implementarea incrementală
+  - Adăugare constante necesare în `shared-constants/ui.ts` - secțiunea `EXCEL_GRID.TABLE_CONTROLS`
+  - Creare script de verificare funcții (`scripts/verify-functions.js`) pentru validarea API-urilor existente
+  - Creare plan detaliat de testare respectând regulile globale de testabilitate
+  - Pregătire documentație și setup pentru implementarea incrementală
 - **Design & Arhitectură:**
-    - Zero texte hardcodate: Toate textele necesare adăugate în `shared-constants/ui.ts`
-    - Zero referințe la funcții inexistente: Script de verificare pentru store-uri
-    - Respectarea strictă a regulilor globale pentru sursa unică de adevăr
+  - Zero texte hardcodate: Toate textele necesare adăugate în `shared-constants/ui.ts`
+  - Zero referințe la funcții inexistente: Script de verificare pentru store-uri
+  - Respectarea strictă a regulilor globale pentru sursa unică de adevăr
 - **Next Steps:**
-    - Instalare dependențe TanStack Table necesare
-    - Implementare hook custom `useLunarGridTable.ts`
-    - Creare componentă `LunarGridTanStack.tsx`
-    - Implementare teste conform planului
+  - Instalare dependențe TanStack Table necesare
+  - Implementare hook custom `useLunarGridTable.ts`
+  - Creare componentă `LunarGridTanStack.tsx`
+  - Implementare teste conform planului
 
 ## [2025-05-15] Integrare TanStack Table în LunarGrid
 
 - **Sumar:** S-a finalizat integrarea TanStack Table în componenta `LunarGrid` pentru performanță și extensibilitate superioară.
 - **Modificări principale:**
-    - Creat componentă nouă: `LunarGridTanStack.tsx` (implementare grid cu TanStack Table)
-    - Creat hook custom: `useLunarGridTable.ts` pentru logica tabelului
-    - Creat componentă dedicată rândurilor de subcategorie: `TanStackSubcategoryRows.tsx`
-    - Definit tipuri noi și clarificate în `types.ts` pentru categorii, subcategorii, și popover
-    - Actualizat `tsconfig.json` pentru includerea tipurilor TanStack Table
+  - Creat componentă nouă: `LunarGridTanStack.tsx` (implementare grid cu TanStack Table)
+  - Creat hook custom: `useLunarGridTable.ts` pentru logica tabelului
+  - Creat componentă dedicată rândurilor de subcategorie: `TanStackSubcategoryRows.tsx`
+  - Definit tipuri noi și clarificate în `types.ts` pentru categorii, subcategorii, și popover
+  - Actualizat `tsconfig.json` pentru includerea tipurilor TanStack Table
 - **Design & Arhitectură:**
-    - Migrare incrementală, fără a rupe API-ul sau funcționalitatea existentă
-    - Păstrat pattern-urile de stare și props din `LunarGrid` original
-    - Toate importurile și constantele respectă regulile globale (`@shared-constants`)
+  - Migrare incrementală, fără a rupe API-ul sau funcționalitatea existentă
+  - Păstrat pattern-urile de stare și props din `LunarGrid` original
+  - Toate importurile și constantele respectă regulile globale (`@shared-constants`)
 - **Testare & Next Steps:**
-    - Urmează commit + push pentru aceste modificări
-    - Pași următori: remediere erori lint/type, testare completă a noilor componente și integrarea cu restul aplicației
+  - Urmează commit + push pentru aceste modificări
+  - Pași următori: remediere erori lint/type, testare completă a noilor componente și integrarea cu restul aplicației
 - **Branch:** `feature/lunargrid-tanstack-migration`
 - **Fișiere principale modificate/adăugate:**
-    - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`
-    - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts`
-    - `frontend/src/components/features/LunarGrid/TanStackSubcategoryRows.tsx`
-    - `frontend/src/components/features/LunarGrid/types.ts`
-    - `frontend/src/components/features/LunarGrid/tsconfig.json`
+  - `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`
+  - `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.ts`
+  - `frontend/src/components/features/LunarGrid/TanStackSubcategoryRows.tsx`
+  - `frontend/src/components/features/LunarGrid/types.ts`
+  - `frontend/src/components/features/LunarGrid/tsconfig.json`
 
 ---
 
@@ -263,47 +334,47 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 - **Sumar:** S-a refactorizat sistemul de navigare al aplicației frontend pentru a utiliza `react-router-dom` (v6) în locul mecanismului anterior bazat pe `window.location.hash`. Această modificare aduce o structură de rutare mai robustă, standardizată și mentenabilă.
 - **Modificări cheie:**
-    - `index.tsx`: Aplicația a fost împachetată cu `<BrowserRouter>`.
-    - `App.tsx`: Logica de rutare a fost centralizată folosind `<Routes>`, `<Route>`, `<Link>`, și `<Navigate>`. S-au definit rute publice (login, register) și rute protejate (transactions, lunar-grid, options). Componenta gestionează redirecționarea automată către `/login` pentru rutele protejate dacă utilizatorul nu este autentificat, și către `/transactions` (sau ruta implicită) după login.
-    - `LoginForm.tsx` și `RegisterForm.tsx`: Butoanele de navigare către pagina opusă au fost înlocuite cu componente `<Link>` de la `react-router-dom`.
-    - `OptionsPage.tsx`: Funcționalitatea de logout care folosește `useNavigate()` pentru redirecționare este acum funcțională corect în contextul noului router.
+  - `index.tsx`: Aplicația a fost împachetată cu `<BrowserRouter>`.
+  - `App.tsx`: Logica de rutare a fost centralizată folosind `<Routes>`, `<Route>`, `<Link>`, și `<Navigate>`. S-au definit rute publice (login, register) și rute protejate (transactions, lunar-grid, options). Componenta gestionează redirecționarea automată către `/login` pentru rutele protejate dacă utilizatorul nu este autentificat, și către `/transactions` (sau ruta implicită) după login.
+  - `LoginForm.tsx` și `RegisterForm.tsx`: Butoanele de navigare către pagina opusă au fost înlocuite cu componente `<Link>` de la `react-router-dom`.
+  - `OptionsPage.tsx`: Funcționalitatea de logout care folosește `useNavigate()` pentru redirecționare este acum funcțională corect în contextul noului router.
 - **Beneficii:**
-    - Navigare declarativă și standard în React.
-    - URL-uri curate și SEO-friendly (deși nu e focusul principal pentru această aplicație).
-    - Gestionare mai bună a stării de navigare și a istoricului browser-ului.
-    - Cod mai curat și mai ușor de înțeles în `App.tsx` pentru gestionarea paginilor.
+  - Navigare declarativă și standard în React.
+  - URL-uri curate și SEO-friendly (deși nu e focusul principal pentru această aplicație).
+  - Gestionare mai bună a stării de navigare și a istoricului browser-ului.
+  - Cod mai curat și mai ușor de înțeles în `App.tsx` pentru gestionarea paginilor.
 - **Branch:** `feature/react-router-migration`
 - **Fișiere principale modificate:**
-    - `frontend/src/index.tsx`
-    - `frontend/src/App.tsx`
-    - `frontend/src/components/features/Auth/LoginForm.tsx`
-    - `frontend/src/components/features/Auth/RegisterForm.tsx`
+  - `frontend/src/index.tsx`
+  - `frontend/src/App.tsx`
+  - `frontend/src/components/features/Auth/LoginForm.tsx`
+  - `frontend/src/components/features/Auth/RegisterForm.tsx`
 - **Notă:** S-au rezolvate și erorile de sintaxă (`Unexpected token`) din `App.tsx` care apăreau din cauza unui comentariu JSX formatat incorect. Testarea manuală completă a fluxurilor de login, register, navigare și logout a fost efectuată cu succes.
 
 ## [2025-05-11] Refactorizare extinsă pentru tema "Earthy" și aplicare token-uri de stil
 
 - **Sumar:** S-a finalizat o refactorizare amplă a mai multor componente și pagini cheie din aplicație pentru a se alinia complet la noua temă "earthy". Acest proces a implicat eliminarea stilurilor hardcodate și înlocuirea lor cu token-uri de stil predefinite (`--color-primary-500`, `spacing-token`, `rounded-token` etc.) și clase utilitare custom din `index.css`. Scopul principal a fost asigurarea consistenței vizuale, îmbunătățirea mentenabilității și respectarea ghidului de stil al aplicației.
 - **Principalele zone afectate:**
-    - Componente de autentificare: `LoginForm`, `RegisterForm`.
-    - Componente de tranzacții: `TransactionFilters`, `TransactionForm`, `TransactionTable`.
-    - Pagini principale: `LunarGridPage`, `OptionsPage`, `TransactionsPage`.
-    - Ajustări minore în alte componente pentru a reflecta utilizarea token-urilor (ex: butoane, input-uri, carduri, alerte).
+  - Componente de autentificare: `LoginForm`, `RegisterForm`.
+  - Componente de tranzacții: `TransactionFilters`, `TransactionForm`, `TransactionTable`.
+  - Pagini principale: `LunarGridPage`, `OptionsPage`, `TransactionsPage`.
+  - Ajustări minore în alte componente pentru a reflecta utilizarea token-urilor (ex: butoane, input-uri, carduri, alerte).
 - **Beneficii:**
-    - Aspect vizual unitar și modern în întreaga aplicație.
-    - Cod CSS mai curat și mai ușor de întreținut.
-    - Respectarea bunelelor practici de theming și design system.
-    - Facilitarea actualizărilor viitoare ale temei.
-- **Branch:** `feature/earthy-theme-refactor` 
+  - Aspect vizual unitar și modern în întreaga aplicație.
+  - Cod CSS mai curat și mai ușor de întreținut.
+  - Respectarea bunelelor practici de theming și design system.
+  - Facilitarea actualizărilor viitoare ale temei.
+- **Branch:** `feature/earthy-theme-refactor`
 - **Fișiere principale modificate (selecție):**
-    - `frontend/src/components/features/Auth/LoginForm.tsx`
-    - `frontend/src/components/features/Auth/RegisterForm.tsx`
-    - `frontend/src/components/features/TransactionFilters/TransactionFilters.tsx`
-    - `frontend/src/components/features/TransactionForm/TransactionForm.tsx`
-    - `frontend/src/components/features/TransactionTable/TransactionTable.tsx`
-    - `frontend/src/pages/LunarGridPage.tsx`
-    - `frontend/src/pages/OptionsPage.tsx`
-    - `frontend/src/pages/TransactionsPage.tsx`
-    - `frontend/src/index.css` 
+  - `frontend/src/components/features/Auth/LoginForm.tsx`
+  - `frontend/src/components/features/Auth/RegisterForm.tsx`
+  - `frontend/src/components/features/TransactionFilters/TransactionFilters.tsx`
+  - `frontend/src/components/features/TransactionForm/TransactionForm.tsx`
+  - `frontend/src/components/features/TransactionTable/TransactionTable.tsx`
+  - `frontend/src/pages/LunarGridPage.tsx`
+  - `frontend/src/pages/OptionsPage.tsx`
+  - `frontend/src/pages/TransactionsPage.tsx`
+  - `frontend/src/index.css`
 - **Notă:** Toate modificările au respectat regulile globale, inclusiv utilizarea exclusivă a constantelor din `@shared-constants` pentru texte și `data-testid` pentru elementele interactive.
 
 ## [2025-05-10] Îmbunătățiri UI și refactorizare subcategorii în LunarGrid
@@ -328,8 +399,6 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
   - `frontend/src/pages/LunarGridPage.tsx`
   - `frontend/src/App.tsx`
 - **Documentare suplimentară:** Best practice și patternuri noi adăugate în `BEST_PRACTICES.md`.
-
-
 
 # [2025-05-09] Bug Fix și îmbunătățiri pentru CategoryEditor
 
@@ -364,7 +433,6 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Store nou Zustand: `frontend/src/stores/categoryStore.ts` (fuziune cu predefinite, persist, acțiuni CRUD)
 - Respectat reguli globale: persist, barrel, fără string-uri hardcodate, testabilitate (serviciile injectabile)
 
-
 ## 2025-05-09 - Implementare editare/adăugare tranzacții direct din LunarGrid (DEV-5 Complet)
 
 - Implementat mecanism excel-like pentru editare rapidă direct în celulele LunarGrid:
@@ -388,8 +456,8 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Documentare și audit complet al pașilor în [TECH_STORIES/implementare Supabase.md].
 - Toate modificările conforme cu regulile globale, fără excepții.
 
-
 ## 2025-05-08 - Implementare sistem expandare/colapsare categorii în LunarGrid (DEV-12 Complet)
+
 - Implementat sistemul de expandare/colapsare pentru categoriile din LunarGrid conform AC-10.
 - Funcționalități implementate:
   - Expandare/colapsare categorii principale prin click, cu iconuri intuitive (ChevronDown/ChevronRight)
@@ -403,6 +471,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Toate implementările respectă regulile pentru persistență, surse unice de adevăr și formatare.
 
 ## 2025-05-08 - Implementare calcul SOLD pentru LunarGrid (DEV-4 Complet)
+
 - Adăugat rândul SOLD la finalul tabelului LunarGrid, implementând criterii de acceptare AC-3.
 - Funcționalități implementate pentru rândul SOLD:
   - Calcul corect al soldului zilnic (Σ venituri - Σ cheltuieli)
@@ -415,22 +484,24 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - DEV-4 este acum complet. Următoarele task-uri: DEV-5 (formular TransactionModal), DEV-6 (hook navigare lună).
 
 ## 2025-05-08 - Update major testare și best practices (LunarGrid & TransactionsPage)
+
 - Toate testele pentru LunarGridPage și TransactionsPage au fost refactorizate:
-    - Fără stringuri hardcodate: folosesc exclusiv mesaje/constante din `@shared-constants/messages`.
-    - Async handling robust: orice update/test asincron folosește `await act(async () => ...)` și `waitFor` pentru elemente care apar/dispar în DOM.
-    - Toate elementele funcționale au `data-testid` unic și predictibil, testele selectează doar prin acest atribut.
-    - Mocking strict: doar servicii externe (ex: supabaseService), nu stores Zustand sau logică proprie.
-    - Testele reflectă comportamentul real al utilizatorului (user-centric).
+  - Fără stringuri hardcodate: folosesc exclusiv mesaje/constante din `@shared-constants/messages`.
+  - Async handling robust: orice update/test asincron folosește `await act(async () => ...)` și `waitFor` pentru elemente care apar/dispar în DOM.
+  - Toate elementele funcționale au `data-testid` unic și predictibil, testele selectează doar prin acest atribut.
+  - Mocking strict: doar servicii externe (ex: supabaseService), nu stores Zustand sau logică proprie.
+  - Testele reflectă comportamentul real al utilizatorului (user-centric).
 - Acceptance criteria și Definition of Done din `TECH_STORIES/MVP-1-GRID-LUNAR.md` au fost actualizate:
-    - Adăugat criteriu explicit pentru mesaje/indicatori: să provină din constants și să fie verificați cu `data-testid`.
-    - Toate testele trebuie să respecte best practices async și mocking.
-    - Orice fetch asincron cu Zustand respectă regula anti-pattern (fără `useEffect(fetch, [queryParams])`).
+  - Adăugat criteriu explicit pentru mesaje/indicatori: să provină din constants și să fie verificați cu `data-testid`.
+  - Toate testele trebuie să respecte best practices async și mocking.
+  - Orice fetch asincron cu Zustand respectă regula anti-pattern (fără `useEffect(fetch, [queryParams])`).
 - Adăugată secțiune nouă "Best Practices – Testare & State Management" în `MVP-1-GRID-LUNAR.md` și extins `BEST_PRACTICES.md` cu:
-    - Centralizare constants/messages/API, testare robustă cu constants și data-testid, politica de mocking, anti-pattern critic Zustand, exemple de test corect.
+  - Centralizare constants/messages/API, testare robustă cu constants și data-testid, politica de mocking, anti-pattern critic Zustand, exemple de test corect.
 - Motivare: aceste schimbări asigură robustețe, mentenanță ușoară, onboarding rapid pentru QA/dev și elimină bug-uri greu de diagnosticat.
 - Toate modificările sunt aliniate cu regulile globale (vezi global_rules.md secțiunea 3, 8.2, 9). Nu există excepții sau workaround-uri rămase.
 
 ## 2025-05-08 - MVP-1-GRID-LUNAR: progres taskuri DEV-0 ... DEV-4
+
 - **DEV-0** bifat: structura de categorii/subcategorii validată, sursă unică de adevăr în `shared-constants/categories.ts`.
 - **DEV-1** bifat: adăugat `actualAmount` (number?) și `status` (enum TransactionStatus: PLANNED/COMPLETED) în `TransactionSchema` și tipuri.
 - **DEV-2** bifat: mapping TransactionType <-> categorie principală implementat în `shared-constants/category-mapping.ts`, exportat în barrel, folosit deja în TransactionForm.
@@ -439,8 +510,8 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Barrel și enums actualizate pentru import predictibil.
 - Toate modificările documentate și validate conform regulilor globale și user story-ului.
 
-
 ## 2025-04-29 - Audit și refactorizare completă testabilitate (data-testid)
+
 - Refactorizat toate componentele primitive (Button, Input, Select, Checkbox, Textarea) pentru propagarea și setarea predictibilă a atributului `data-testid` (default sau explicit).
 - Refactorizat toate componentele de features (TransactionForm, TransactionTable, ExcelGrid etc.) pentru a avea `data-testid` pe toate elementele funcționale (butoane, inputuri, rânduri, feedback, etc.).
 - Toate testele relevante folosesc doar `data-testid` predictibil pentru selectarea elementelor.
@@ -449,8 +520,8 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Regula și patternul au fost documentate și sunt obligatorii pentru orice cod nou (vezi regulile globale și BEST_PRACTICES.md).
 - Orice excepție trebuie justificată și notată aici și în code review.
 
-
 ## 2025-04-21 - Setup Inițial
+
 - Creat structură monorepo: frontend (React + TDD), backend (NestJS + TDD), shared.
 - Configurare testare automată cu Jest și Testing Library.
 - Implementat model unificat `Transaction` și validare runtime cu Zod.
@@ -458,12 +529,14 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Implementat endpoint GET /transactions cu filtrare, sortare și paginare.
 
 ## 2025-04-22 - Refactorizare Frontend
+
 - Extragere `TransactionForm` și `TransactionTable` în componente dedicate.
 - Mutare teste unitare colocate cu componentele.
 - Configurare reporteri Jest (`summarizing-reporter`, `jest-html-reporter`).
 - Consolidare convenții și best practices inițiale.
 
 ## 2025-04-23 - Dropdown-uri Dinamice și Testare Robusta
+
 - Finalizare flux principal tranzacții frontend.
 - Refactorizare filtrare categorii/subcategorii în funcție de tip.
 - Eliminare completă opțiune 'Transfer'.
@@ -472,6 +545,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Documentare completă a lecțiilor în BEST_PRACTICES.md.
 
 ## 2025-04-24 - Eliminare Hardcodări și TailwindCSS
+
 - Centralizare completă texte UI și mesaje în constants/ui.ts și constants/messages.ts.
 - Refactorizare structură componente în primitives și features.
 - Configurare TailwindCSS și Jest DOM Matchers.
@@ -479,11 +553,13 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Creare componentă demonstrativă Excel-like Grid pentru raportare.
 
 ## 2025-04-24 - Implementare Sursă Unică Enums
+
 - Definire enums partajate în `shared/enums.ts`.
 - Re-export frontend din `constants/enums.ts`.
 - Configurare build shared și suport complet Jest/CRA.
 
 ## 2025-04-25 - Refactorizare App.tsx cu Hooks și Servicii
+
 - Separare logică aplicație în `useTransactionForm`, `useTransactionFilters`, `useTransactionData`.
 - Implementare servicii `TransactionService` și `TransactionApiClient`.
 - Testare hooks și servicii cu mock-uri dedicate.
@@ -491,6 +567,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Lecții importante: handling async controlat, barrel exports, mock-uri pentru metode publice.
 
 ## 2025-04-25 - Migrare la Zustand
+
 - Creare store `useTransactionStore` în `frontend/src/stores/`.
 - Testare TDD pentru Zustand: inițializare, setters, acțiuni asincrone, selectors.
 - Evitare props drilling excesiv și utilizare selectors pentru optimizare.
@@ -499,6 +576,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 ---
 
 ## 2025-04-28 - Centralizare chei query params tranzacții (QUERY_PARAMS)
+
 - Mutat toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) în `shared-constants/queryParams.ts`.
 - Eliminat duplicarea din `frontend/src/constants/api.ts` și `backend/src/constants/api.ts`.
 - Importurile se fac EXPLICIT din `@shared-constants/queryParams` (nu din barrel!).
@@ -514,7 +592,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 **Descriere**: Am finalizat migrarea completă de la Zustand la React Query pentru toate operațiunile de date. Această schimbare aduce îmbunătățiri semnificative în gestionarea stării server și operațiunile de cache.
 
-### Modificări majore:
+### Modificări majore
 
 1. **Structura nouă pentru API calls**:
    - Toate apelurile API sunt acum gestionate prin custom hooks React Query (`useQuery` și `useMutation`)
@@ -531,7 +609,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
    - Reducere număr de request-uri redundante
    - Optimizare performanță la navigarea între pagini
 
-### Riscuri și observații:
+### Riscuri și observații
 
 1. **Schimbare de paradigmă**:
    - Zustand rămâne util pentru UI state, dar nu mai este folosit pentru date de server
@@ -541,7 +619,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
    - Anumite edge cases și scenarii complexe pot necesita testare suplimentară
    - Monitorizare atentă performanță în producție
 
-### Resurse:
+### Resurse
 
 - Noi secțiuni în README.md și BEST_PRACTICES.md cu exemple și recomandări
 - Updated tests pentru noul pattern
@@ -554,7 +632,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 
 **Descriere**: Am restaurat funcționalitatea de editare inline și expand/collapse în tabelul TanStack, asigurând paritate funcțională cu tabelul clasic, după migrarea la React Query.
 
-### Probleme rezolvate:
+### Probleme rezolvate
 
 1. **Editare inline restaurată**:
    - Înlocuit modal prompt() cu input direct în celulă la dublu-click
@@ -573,7 +651,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 4. **Eliminate câmpuri inutile**:
    - Eliminat câmpul `description` care cauza erori la backend (nu exista în schema DB)
 
-### Lecții învățate:
+### Lecții învățate
 
 1. **Schema DB vs. Frontend models**:
    - Este critică sincronizarea perfectă între modelele din frontend și schema din backend
@@ -587,7 +665,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
    - Se poate menține paritate funcțională chiar și cu implementări tehnice diferite
    - Experiența utilizator trebuie să fie consistentă indiferent de implementarea tehnică
 
-### Riscuri reziduale:
+### Riscuri reziduale
 
 1. **Testarea complexă**:
    - Necesită testare extinsă pentru a asigura funcționalitatea corectă în toate scenariile
@@ -597,14 +675,13 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
    - Poziționarea elementelor (ex: popover) depinde de structura DOM și poate fi fragilă
    - Necesară atenție la schimbări de layout sau CSSanța
 
-
-
 - Centralizarea rutelor și mesajelor elimină bug-uri de sincronizare
 - Testele trebuie să reflecte mereu contractul actual al hooks/servicii
 
 ---
 
 ## 2025-05-05 - Remediere teste unitare cu mock-uri Supabase și ajustare aserțiuni
+
 - Creat `__mocks__/supabase.ts` și `__mocks__/supabaseService.ts` ca mock-uri automate pentru Supabase în teste.
 - Implementat mock-uri pentru `supabaseAuthService` cu suport pentru tipurile definite (`AuthErrorType`, `AuthUser`).
 - Ajustat testele pentru a reflecta contractul actual al store-urilor (`""` vs `undefined`, aserțiuni corecte pentru errorType).
@@ -614,6 +691,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Lecție: testele unitare trebuie actualizate când contractul serviciilor se schimbă, iar mock-urile trebuie să fie disponibile la același path ca modulele reale pentru a fi folosite automat de Jest.
 
 ## 2025-05-05 - Rezolvare probleme App.test.tsx și infrastructură de testare cu mock-uri
+
 - Rezolvate erorile în `App.test.tsx` legate de `currentQueryParams.limit` (TypeError: Cannot read properties of undefined).
 - Implementat pattern robust pentru mockarea store-urilor Zustand cu selectors corect implementați.
 - Adăugat suport corect pentru `getState()` în mock-urile Zustand pentru a evita erorile în `useEffect`.
@@ -631,6 +709,7 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Lecție importantă: Mockarea serviciilor cu proprietăți private necesită abordarea prin module-level mocks (conform "WORKAROUND Mock-uri Jest" din memorie).
 
 ## 2025-05-03 - Îmbunătățiri autentificare Supabase, UX & Security
+
 - Introducere tip `AuthUser` (id, email) și folosire typing strict în store și servicii pentru autentificare.
 - Definire enum `AuthErrorType` pentru categorii de erori autentificare (`INVALID_CREDENTIALS`, `PASSWORD_WEAK`, `NETWORK`, `RLS_DENIED` etc).
 - Mapping automat între erorile brute Supabase și mesaje prietenoase pentru utilizator, afișate contextual în LoginForm și RegisterForm.
@@ -642,8 +721,8 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Documentare și audit complet al pașilor în [TECH_STORIES/implementare Supabase.md].
 - Următorii pași posibili: refresh token/session timeout, rate limiting brute force, testare automată fluxuri edge-case.
 
-
 ## 2025-04-30 - Securitate RLS, user_id, persist auth și defense-in-depth
+
 - Am întâlnit eroare 403 la inserții/POST pe /transactions din cauza lipsei câmpului user_id în payload.
 - Politicile RLS pe Supabase impun ca orice operație să fie restricționată la userul logat (`user_id = auth.uid()`).
 - Soluție: la orice inserție (createTransaction), payload-ul include explicit user_id din store-ul de autentificare.
@@ -666,39 +745,44 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 ## 2025-05-07 - Refactorizare teste Zustand: Task 1, 2, 3, 4, 5
 
 ### Task 6: Primitive
+
 - Verificare/refactorizare teste pentru componente primitive (Alert, Badge, Button, Checkbox, Input, Loader, Select, Textarea).
 - Toate testele sunt conforme cu regulile globale (nu folosesc mock store).
 - Nu a fost nevoie de modificări.
 
 ### Task 7: TransactionForm
+
 - Refactorizare test pentru TransactionForm: store real Zustand, mock doar pentru servicii externe.
 - Teste granularizate (câmpuri individuale, interacțiuni, scenarii complete de submit/validare).
 - Respectă toate regulile globale și pattern-ul recomandat pentru formulare complexe.
 - Validat manual și automat.
 
 ### Task 8: TransactionTable
+
 - Refactorizare test pentru TransactionTable: store real Zustand, mock doar pentru servicii externe.
 - Acoperire edge-case-uri, paginare, stări de loading/eroare, validare manuală și automată.
 - Respectă toate regulile globale și best practices.
 
 ### Task 9: App
+
 - Refactorizare test pentru App: integrare completă cu store-uri reale, mock doar pentru servicii externe.
 - Teste de integrare pentru fluxuri critice (filtrare, creare, loading, error), validare manuală și automată.
 - Respectă toate regulile globale și best practices.
 
 ### Task 10: Eliminare mock-uri store
+
 - Mock-urile pentru store-uri au fost eliminate complet. Testele folosesc doar store-uri reale, fără workaround-uri sau excepții.
 
 ### Task 11: Cleanup final & lessons learned
+
 - Cleanup final, actualizare documentație și lessons learned. Nu există workaround-uri sau excepții rămase. Codul și testele respectă toate regulile globale.
 
 - Task 5: Refactorizare și validare TransactionFilters:
-    - Separare completă între teste unitare și de integrare.
-    - Testele de integrare restaurate după ștergere accidentală, validate cu succes.
-    - Toate testele rulează și trec (8/8).
-    - Structura este conformă cu regulile globale și BEST_PRACTICES.md.
-    - Status: DONE, progres actualizat și în TECH_STORIES/epic-refactorizare-teste-zustand.md.
-
+  - Separare completă între teste unitare și de integrare.
+  - Testele de integrare restaurate după ștergere accidentală, validate cu succes.
+  - Toate testele rulează și trec (8/8).
+  - Structura este conformă cu regulile globale și BEST_PRACTICES.md.
+  - Status: DONE, progres actualizat și în TECH_STORIES/epic-refactorizare-teste-zustand.md.
 
 - Refactorizat toate mesajele de validare pentru a folosi exclusiv sursa unică de adevăr (`shared-constants/messages.ts`, alias `@shared-constants/messages`).
 - Eliminat toate scripturile temporare de corectare teste (`scripts/fix-description-field.js`, `fix-final-import.js`, `fix-transaction-currency.js`, etc.).
@@ -714,15 +798,17 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 ---
 
 ## 2025-04-27 - Finalizare migrare Zustand pentru tranzacții și recurență
+
 - Toate funcționalitățile de tranzacții (inclusiv recurență) folosesc exclusiv Zustand store-uri, fără hooks custom legacy.
 - Testare exhaustivă pentru toate edge cases, validare și fluxuri negative/pozitive, inclusiv recurență.
 - Nu mai există props drilling sau duplicare logică între hooks și store-uri.
 - Toate textele UI, mesajele și enums sunt centralizate și importate doar din barrel (`constants/index.ts`).
 - Convențiile și best practices au fost actualizate și respectate (vezi BEST_PRACTICES.md).
-- Documentarea și refactorizările minore rămase sunt în curs.
+- Documentarea și refactorizările minore rămâne în curs.
 - Orice abatere de la aceste reguli trebuie justificată și documentată explicit în code review și# DEV LOG
 
 ## 2025-04-27 - Migrare enums/constants la shared-constants și audit automat importuri
+
 - Finalizată migrarea enums/constants la sursa unică `shared-constants/`.
 - Toate importurile din frontend și backend folosesc doar `@shared-constants`.
 - Eliminare completă a importurilor legacy (direct din constants/enums sau shared).
@@ -731,11 +817,13 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - **DEPRECATED**: Nu mai folosiți `npm run validate:constants` pentru validarea constantelor.
 
 ## 2025-04-28 - Configurare rezolvare alias și îmbunătățiri testare
+
 - Adăugat alias `@shared-constants` în `craco.config.js` pentru Jest (moduleNameMapper).
 - Actualizat `tsconfig.json` (frontend) cu `paths` către `src/shared-constants` pentru TypeScript.
 {{ ... }}
 
 **SCHIMBĂRI:**
+
 - Mock-uri dedicate pentru store-uri Zustand cu helpers `setMockFormState`, `setMockTransactionState` pentru manipulare predictibilă a stării în teste.
 - Tipare stricte pentru mock-uri și funcții de acțiune, eliminare tipuri implicite și any-uri nejustificate.
 - Refactorizare testare pentru a folosi patternul "test focalizat pe câmp/feature", nu assert global pe tot formularul (vezi lessons learned).
@@ -744,26 +832,29 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Adăugare buton CANCEL în sursa unică BUTTONS și corectare UI copy.
 
 **LECȚII ÎNVĂȚATE:**
+
 - Mock-urile Zustand trebuie să includă explicit `getState` și să folosească helpers pentru actualizare stări în teste.
 {{ ... }}
 - Testele pe formulare complexe trebuie împărțite pe câmpuri pentru stabilitate (vezi [LESSON] Testare valori inițiale în formulare complexe).
 - Patternul de testare cu helpers pentru mock-uri crește claritatea și predictibilitatea testelor.
 
 **NEXT STEPS:**
+
 - Audit final al tuturor testelor pentru a elimina orice hardcodare sau import incorect.
 - Documentare patternuri noi în BEST_PRACTICES.md.
 - Refactorizare suplimentară pentru a reduce duplicarea codului de testare.
 
-
 **OWNER**: Echipa testare
 
 **CONTEXT**: Testele pentru componente și store-uri eșuau din cauza unor probleme fundamentale cu mock-urile pentru Supabase și store-urile Zustand. Principalele probleme erau:
+
 1. Eroarea "Invalid URL" în mock-urile Supabase
 2. Eroarea "Utilizatorul nu este autentificat!" în testele care depind de authStore
 3. Inconsistențe în abordarea de mock pentru store-uri (jest.mock vs mock direct)
 4. Probleme cu tipurile în mock-uri (Property 'getState' does not exist on type 'Mock')
 
 **SCHIMBĂRI**:
+
 - Am creat mock-uri dedicate pentru store-uri în directorul `__mocks__/stores/`:
   - `authStore.ts` - asigură un user autentificat valid pentru toate testele
   - `transactionFormStore.ts` - mockează starea formularului de tranzacții
@@ -773,12 +864,14 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Am adăugat tipuri explicite pentru parametrii funcțiilor de mock pentru a evita erorile TypeScript
 
 **LECȚII ÎNVĂȚATE**:
+
 - Abordarea cu `jest.mock()` și variabile din afara factory-ului poate duce la probleme de scoping
 - Este mai bine să folosim o abordare cu funcții helper pentru a modifica starea mock-urilor în teste
 - Tipurile pentru mock-uri trebuie să fie explicite și să includă toate proprietățile necesare
 - Mock-urile pentru store-uri Zustand trebuie să includă explicit `getState` pentru a funcționa corect
 
 **NEXT STEPS**:
+
 - Refactorizarea completă a testelor pentru a folosi noua abordare cu `setMockState` în loc de `mockImplementation`
 - Adăugarea de tipuri mai stricte pentru mock-uri pentru a evita erorile TypeScript
 - Documentarea abordării în BEST_PRACTICES.md pentru a asigura consistența în viitor
@@ -817,6 +910,7 @@ Am extins și refactorizat complet sistemul de filtrare pentru tranzacții, adă
    - Toate datele sunt filtrate pe server, reducând traficul de rețea
 
 **Fișiere modificate:**
+
 - frontend/src/components/features/TransactionFilters/TransactionFilters.tsx
 - frontend/src/services/hooks/useInfiniteTransactions.ts
 - frontend/src/services/supabaseService.ts
@@ -824,6 +918,7 @@ Am extins și refactorizat complet sistemul de filtrare pentru tranzacții, adă
 - shared-constants/ui.ts
 
 **Plan viitor:**
+
 - Adăugare filtre pentru status tranzacții
 - Persistența filtrelor în URL
 - Memoizarea rezultatelor pentru performance
