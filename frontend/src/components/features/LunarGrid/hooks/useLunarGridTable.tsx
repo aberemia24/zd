@@ -1,4 +1,3 @@
-
 import { useMemo, useRef, useCallback, useEffect } from 'react';
 import { useReactTable, getCoreRowModel, ColumnDef, Table } from '@tanstack/react-table';
 
@@ -30,6 +29,7 @@ export type TransformedTableDataRow = {
   subcategory?: string;
   isCategory: boolean;
   total: number;
+  subRows?: TransformedTableDataRow[]; // Adăugat pentru subrows native
   [dayKey: string]: any; // For 'day-1', 'day-2', etc.
 };
 
@@ -83,16 +83,69 @@ export function useLunarGridTable(
 
   // Pipeline de transformare a datelor
   
-  // Transformăm în formatul necesar pentru tabel
-  const rawTableData = useMemo(() => 
-    transformTransactionsToRowData(validTransactions, categories, expandedCategories), 
-    [validTransactions, categories, expandedCategories]
-  );
+  // Transformăm în formatul necesar pentru tabel cu subrows native
+  const rawTableData = useMemo(() => {
+    // 1. Grupăm tranzacțiile pe categorii și subcategorii
+    const categoriesMap: Record<string, TransformedTableDataRow> = {};
+    const subcategoriesMap: Record<string, TransformedTableDataRow[]> = {};
 
-  const tableDataForTanStack = useMemo(() => 
-    transformToTableData(rawTableData, year, month), 
-    [rawTableData, year, month]
-  ) as TransformedTableDataRow[];
+    categories.forEach(category => {
+      // Construiesc subRows cu TOATE subcategoriile definite, nu doar cele cu tranzacții
+      const subRows: TransformedTableDataRow[] = category.subcategories.map(subcat => ({
+        id: `${category.name}-${subcat.name}`,
+        category: category.name,
+        subcategory: subcat.name,
+        isCategory: false,
+        total: 0,
+      }));
+      categoriesMap[category.name] = {
+        id: category.name,
+        category: category.name,
+        isCategory: true,
+        total: 0,
+        subRows,
+      };
+      subcategoriesMap[category.name] = subRows;
+    });
+
+    // 2. Parcurgem tranzacțiile și agregăm sumele pe subcategorii
+    validTransactions.forEach(t => {
+      const cat = t.category;
+      const subcat = t.subcategory || '';
+      const day = new Date(t.date).getDate();
+      const amount = t.status === 'COMPLETED' && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
+      if (!cat) return;
+      if (!subcategoriesMap[cat]) subcategoriesMap[cat] = [];
+      let subRow = subcategoriesMap[cat].find((s: TransformedTableDataRow) => s.subcategory === subcat);
+      if (!subRow) {
+        // Dacă subcategoria nu există în lista definită, o adăugăm (fallback pentru date corupte)
+        subRow = {
+          id: `${cat}-${subcat}`,
+          category: cat,
+          subcategory: subcat,
+          isCategory: false,
+          total: 0,
+        };
+        subcategoriesMap[cat].push(subRow);
+        // O adăugăm și la subRows din categoriesMap
+        if (categoriesMap[cat]) categoriesMap[cat].subRows?.push(subRow);
+      }
+      subRow[`day-${day}`] = (subRow[`day-${day}`] || 0) + amount;
+      subRow.total = (subRow.total || 0) + amount;
+      // Categorie (agregare totală)
+      if (!categoriesMap[cat]) categoriesMap[cat] = { id: cat, category: cat, isCategory: true, total: 0, subRows: [] };
+      categoriesMap[cat][`day-${day}`] = (categoriesMap[cat][`day-${day}`] || 0) + amount;
+      categoriesMap[cat].total = (categoriesMap[cat].total || 0) + amount;
+    });
+
+    // 3. Atașăm subRows la fiecare categorie
+    Object.keys(categoriesMap).forEach(cat => {
+      categoriesMap[cat].subRows = subcategoriesMap[cat] || [];
+    });
+
+    // 4. Returnăm array-ul de categorii (fără sold)
+    return Object.values(categoriesMap);
+  }, [validTransactions, categories]);
 
   // Generare coloane pentru tabel
   const columns = useMemo<ColumnDef<TransformedTableDataRow>[]>(() => {
@@ -109,21 +162,10 @@ export function useLunarGridTable(
             const original = row.original as TransformedTableDataRow;
             return (
               <div className="flex items-center">
-                {original.isCategory ? (
-                  <>
-                    {expandedCategories[original.category] ? (
-                      <span className="mr-1" data-testid={`expand-btn-${original.category}`}>▼</span>
-                    ) : (
-                      <span className="mr-1" data-testid={`expand-btn-${original.category}`}>▶</span>
-                    )}
-                    <span className="font-semibold">{displayValue}</span>
-                  </>
-                ) : (
-                  <div className="flex items-center pl-8">
-                    <div className="w-4 h-0 border-t border-secondary-400 mr-2" />
-                    <span>{displayValue}</span>
-                  </div>
-                )}
+                {row.getCanExpand && row.getCanExpand() ? (
+                  <span className="mr-1" data-testid={`expand-btn-${original.category}`}>{row.getIsExpanded() ? '▼' : '▶'}</span>
+                ) : null}
+                <span className={original.isCategory ? 'font-semibold' : ''}>{displayValue}</span>
               </div>
             );
           },
@@ -139,27 +181,12 @@ export function useLunarGridTable(
           accessorKey: colConfig.accessorKey,
           cell: ({ getValue, row }) => {
             const value = getValue<number>();
-            const original = row.original as TransformedTableDataRow;
             const colorClass = getBalanceStyleClass(value);
             return (
-              <div
-                className={`text-right ${colorClass}`}
-                data-testid={`cell-${original.category}-${original.subcategory || 'category'}-${dayNumber}`}
-                onClick={(e) => {
-                  if (original.category !== EXCEL_GRID.HEADERS.SOLD) {
-                    const amount = value !== 0 ? Math.abs(value).toString() : '';
-                    // TODO: type needs to be determined. Placeholder for now.
-                    onCellClick?.(e, original.category, original.subcategory, dayNumber, amount, ''); 
-                  }
-                }}
-                onDoubleClick={(e) => {
-                  if (original.category !== EXCEL_GRID.HEADERS.SOLD) {
-                    const amount = value !== 0 ? Math.abs(value).toString() : '';
-                    onCellDoubleClick?.(e, original.category, original.subcategory, dayNumber, amount);
-                  }
-                }}
-              >
-                {value !== 0 ? formatCurrency(value) : '—'}
+              <div className={`text-right ${colorClass}`}>
+                {typeof value === 'number' && !isNaN(value) && value !== 0
+                  ? formatCurrency(value)
+                  : '—'}
               </div>
             );
           },
@@ -175,27 +202,31 @@ export function useLunarGridTable(
           cell: ({ getValue }) => {
             const value = getValue<number>();
             const colorClass = getBalanceStyleClass(value);
-            return <div className={`text-right ${colorClass}`}>{formatCurrency(value)}</div>;
+            return (
+              <div className={`text-right ${colorClass}`}>
+                {typeof value === 'number' && !isNaN(value) && value !== 0
+                  ? formatCurrency(value)
+                  : '—'}
+              </div>
+            );
           },
           size: 100,
         };
       }
       return colConfig as ColumnDef<TransformedTableDataRow>; // Fallback, ar trebui acoperite toate cazurile
     });
-  }, [year, month, expandedCategories, onCellClick, onCellDoubleClick, formatCurrency, getBalanceStyleClass]);
+  }, [year, month, onCellClick, onCellDoubleClick, formatCurrency, getBalanceStyleClass]);
 
   const table = useReactTable({
-    data: tableDataForTanStack,
+    data: rawTableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    autoResetExpanded: false, // Conform recomandare utilizator
-    getRowId: (row) => row.id, // Conform recomandare utilizator, 'id' vine din transformToTableData
+    getSubRows: (row) => row.subRows || [],
+    autoResetExpanded: false,
+    getRowId: (row) => row.id,
   });
 
-  const dailyBalances = useMemo(() => {
-    const soldRow = rawTableData.find((r: LunarGridRowData) => r.category === EXCEL_GRID.HEADERS.SOLD);
-    return soldRow ? soldRow.dailyAmounts : {};
-  }, [rawTableData]);
+  const dailyBalances = useMemo(() => ({}), [rawTableData]);
 
   // Funcția getSumForCell originală se baza pe LunarGridRowData.
   // O adaptăm sau o eliminăm dacă nu mai e necesară extern.

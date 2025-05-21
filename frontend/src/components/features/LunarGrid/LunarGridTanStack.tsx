@@ -34,6 +34,7 @@ import { API } from '@shared-constants/api';
 
 // Import doar componente existente
 import CellTransactionPopover from './CellTransactionPopover';
+import type { Row } from '@tanstack/react-table';
 
 export interface LunarGridTanStackProps {
   year: number;
@@ -61,9 +62,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   
   // Categorii și state management
   const categories = useCategoryStore((state) => state.categories);
-  
-  // State pentru expandare categorii - folosim Record<string, boolean> pentru compatibilitate cu useLunarGridTable
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   
   // State pentru celula în curs de editare (editare inline)
   const [editingCell, setEditingCell] = useState<EditingCellState | null>(null);
@@ -98,32 +96,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const isCreating = createTransactionMutation.isPending;
   const isUpdating = updateTransactionMutation.isPending;
   const isDeleting = deleteTransactionMutation.isPending;
-  
-  // Funcții pentru gestionarea categoriilor
-  const toggleCategory = useCallback((category: string) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  }, []);
-  
-  // Expandează toate categoriile
-  const expandAll = useCallback(() => {
-    const allExpanded: Record<string, boolean> = {};
-    categories.forEach((cat: CustomCategory) => {
-      allExpanded[cat.name] = true;
-    });
-    setExpandedCategories(allExpanded);
-  }, [categories]);
-  
-  // Colapsează toate categoriile
-  const collapseAll = useCallback(() => {
-    const allCollapsed: Record<string, boolean> = {};
-    categories.forEach((cat: CustomCategory) => {
-      allCollapsed[cat.name] = false;
-    });
-    setExpandedCategories(allCollapsed);
-  }, [categories]);
   
   // Helper pentru a determina tipul tranzacției - funcție LOCALĂ, nu referință externă
   const determineTransactionType = useCallback((category: string): TransactionType => {
@@ -316,13 +288,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
   const { 
     table,
     tableContainerRef,
-    isLoading, // Adăugat
-    error, // Adăugat
-    getCellId // Funcție utilă pentru a identifica celule
+    isLoading,
+    error,
+    getCellId,
+    dailyBalances,
+    days
   } = useLunarGridTable(
     year, 
     month, 
-    expandedCategories, 
+    {}, // expandedCategories nu mai e folosit, TanStack gestionează intern
     handleCellClick, 
     handleCellDoubleClick
   );
@@ -332,14 +306,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     <div>
       <div className="flex justify-end space-x-2 mb-2">
         <button 
-          onClick={() => expandAll()}
+          onClick={() => table.toggleAllRowsExpanded(true)}
           className="btn btn-secondary" 
           data-testid="expand-all-btn"
         >
           {EXCEL_GRID.TABLE_CONTROLS.EXPAND_ALL}
         </button>
         <button 
-          onClick={() => collapseAll()}
+          onClick={() => table.toggleAllRowsExpanded(false)}
           className="btn btn-secondary" 
           data-testid="collapse-all-btn"
         >
@@ -371,7 +345,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
           >
             <thead className="bg-secondary-100 sticky top-0">
               <tr>
-                {table.getFlatHeaders().map((header: Header<TransformedTableDataRow, unknown>) => (
+                {table.getFlatHeaders().map((header) => (
                   <th
                     key={header.id}
                     className="px-4 py-2 font-medium text-secondary-700 border-b border-secondary-200"
@@ -386,56 +360,30 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
               </tr>
             </thead>
             <tbody>
-              {table.getRowModel().rows.map((row: TableRow<TransformedTableDataRow>) => {
-                const isCategory = row.original.type === 'category';
-                const isExpanded = expandedCategories[row.original.category || ''];
-                
-                return (
-                  <tr
-                    key={row.id}
-                    className={
-                      isCategory
-                        ? "bg-primary-50 hover:bg-primary-100 cursor-pointer"
-                        : "hover:bg-secondary-50"
-                    }
-                    onClick={
-                      isCategory
-                        ? () => toggleCategory(row.original.category || '')
-                        : undefined
-                    }
-                    data-testid={`row-${row.id}`}
-                    data-category={row.original.category}
-                    data-subcategory={row.original.subcategory}
-                  >
-                    {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>) => (
-                      <td 
-                        key={cell.id}
-                        className="border-t border-secondary-200 py-2 px-3 first:border-l last:border-r"
-                        data-testid={`cell-${cell.column.id}-${row.id}`}
-                      >
-                        {/* Renderizare condiționată pentru celule: Input în mod de editare */}
-                        {editingCell && 
-                         getCellId(cell.row.original.category, cell.row.original.subcategory, parseInt(cell.column.id)) === editingCell.id ? (
-                          <div className="relative w-full h-full">
-                            <input
-                              ref={editingCell.inputRef}
-                              type="number"
-                              className="w-full h-full p-1 focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                              defaultValue={editingCell.amount || ''}
-                              onKeyDown={handleInlineKeyDown}
-                              onBlur={(e) => handleInlineEditSave(e.target.value)}
-                              autoFocus
-                              data-testid="inline-edit-input"
-                            />
-                          </div>
-                        ) : (
-                          flexRender(cell.column.columnDef.cell, cell.getContext())
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
+              {/* Rendering recursiv pentru categorii și subcategorii */}
+              {table.getRowModel().rows.map(row => renderRow(row))}
+              {/* Rândul custom Sold la final */}
+              <tr className="bg-gray-100 font-bold border-t-2" data-testid="sold-row">
+                <td
+                  className="sticky left-0 bg-gray-100 z-10 px-4 py-2"
+                  data-testid="sold-label"
+                >
+                  {EXCEL_GRID.HEADERS.SOLD}
+                </td>
+                {days.map((day: number) => {
+                  const balance = dailyBalances[day] || 0;
+                  const colorClass = balance === 0 ? 'text-secondary-400' : balance > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium';
+                  return (
+                    <td
+                      key={day}
+                      className={`px-4 py-2 text-right ${colorClass}`}
+                      data-testid={`sold-day-${day}`}
+                    >
+                      {typeof balance === 'number' ? (balance !== 0 ? balance.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—') : '—'}
+                    </td>
+                  );
+                })}
+              </tr>
             </tbody>
           </table>
         )}
@@ -465,5 +413,39 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     </div>
   );
 };
+
+// Adaug funcția recursivă renderRow înainte de return:
+const renderRow = (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => (
+  <React.Fragment key={row.id}>
+    <tr className={row.getCanExpand() ? "bg-primary-50" : ""}>
+      {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>, idx: number) => (
+        <td
+          key={cell.id}
+          style={idx === 0 && level > 0 ? { paddingLeft: 32 * level } : undefined}
+          className={idx === 0 && level > 0 ? "pl-8" : ""}
+        >
+          {/* Săgeată doar dacă are subrows */}
+          {idx === 0 && row.getCanExpand() && row.subRows.length > 0 && (
+            <span
+              onClick={e => {
+                e.stopPropagation();
+                row.toggleExpanded();
+              }}
+              style={{ cursor: "pointer", marginRight: 8 }}
+              aria-expanded={row.getIsExpanded()}
+              data-testid={`expand-btn-${row.original.category}`}
+            >
+              {row.getIsExpanded() ? "▼" : "▶"}
+            </span>
+          )}
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </td>
+      ))}
+    </tr>
+    {row.getIsExpanded() && row.subRows.length > 0 &&
+      row.subRows.map((subRow: Row<TransformedTableDataRow>) => renderRow(subRow, level + 1))
+    }
+  </React.Fragment>
+);
 
 export default LunarGridTanStack;
