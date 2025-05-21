@@ -783,24 +783,48 @@ Triggerul SQL original valida strict categoriile și subcategoriile folosind lis
 - Adăugarea de tipuri mai stricte pentru mock-uri pentru a evita erorile TypeScript
 - Documentarea abordării în BEST_PRACTICES.md pentru a asigura consistența în viitor
 
-```
-## [2025-05-20] Adăugare CLI și documentație pentru sincronizarea shared-constants
- - Am adăugat shebang în `scripts/sync-shared-constants.js` pentru a-l putea rula ca script Node
- - Am definit câmpul `bin` și scriptul `sync-shared-constants` în `package.json` la nivel de workspace
- - Am actualizat README.md cu instrucțiuni de rulare manuală `npm run sync-shared-constants` și `npx sync-shared-constants`
-- Am verificat și sincronizat copiile în `frontend/src/shared-constants` cu comanda CLI
+## 2023-09-01: Extindere și Refactorizare Sistem Filtre Tranzacții
 
-# Summary: Facilitare rulare manuală și documentare pentru sincronizarea `shared-constants`
+**Responsabil:** Echipa Frontend
+**Tipul schimbării:** Feature și Refactor
+**Status:** Completat ✅
 
-```
+**Descriere:**
 
-Follow these instructions to make the following change to my code document.
+Am extins și refactorizat complet sistemul de filtrare pentru tranzacții, adăugând următoarele funcționalități noi:
 
-Instruction: Update DEV_LOG to reflect changes
+1. **Filtre avansate:**
+   - Filtrare după interval de date (de la/până la)
+   - Filtrare după sumă (min/max)
+   - Căutare text în descriere, categorie și subcategorie
 
-Code Edit:
-```
-{{ ... }}
-- - Added rename and delete subcategory buttons with hardcoded labels
-+ - Updated CategoryEditor to replace hardcoded UI text with shared UI.CATEGORY_EDITOR constants for custom badge, rename and delete buttons, input placeholder, and add button
-{{ ... }}
+2. **Optimizări UX:**
+   - Interfață modernă cu design system tokens
+   - Expandare/colapsare filtre avansate
+   - Badge cu numărul de filtre active
+   - Buton de resetare pentru toate filtrele
+
+3. **Optimizări tehnice:**
+   - Debounce pentru input-uri text (reducere API calls)
+   - Structură modularizată și extensibilă
+   - Toate textele centralizate în shared-constants
+   - Zero clase Tailwind hardcodate în JSX
+
+4. **Beneficii:**
+   - UX îmbunătățit: utilizatorii pot găsi mai repede tranzacțiile căutate
+   - Consumul de resurse redus prin debounce și optimizări
+   - Codebase mai curat și mai maintainable
+   - Toate datele sunt filtrate pe server, reducând traficul de rețea
+
+**Fișiere modificate:**
+- frontend/src/components/features/TransactionFilters/TransactionFilters.tsx
+- frontend/src/services/hooks/useInfiniteTransactions.ts
+- frontend/src/services/supabaseService.ts
+- frontend/src/utils/transactions.ts
+- shared-constants/ui.ts
+
+**Plan viitor:**
+- Adăugare filtre pentru status tranzacții
+- Persistența filtrelor în URL
+- Memoizarea rezultatelor pentru performance
+- Gruparea și salvarea seturilor de filtre frecvent folosite

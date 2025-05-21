@@ -29,6 +29,9 @@ export const supabaseService = {
     filters: Partial<Pick<TransactionValidated, 'type' | 'category' | 'recurring'>> & {
       dateFrom?: string; // Data de început pentru interval (format ISO: YYYY-MM-DD)
       dateTo?: string;   // Data de sfârșit pentru interval (format ISO: YYYY-MM-DD)
+      minAmount?: number; // Suma minimă pentru filtrare
+      maxAmount?: number; // Suma maximă pentru filtrare
+      search?: string;    // Text pentru căutare în descriere/categorie/subcategorie
     } = {}
   ): Promise<TransactionPage> {
     let query = supabase
@@ -47,6 +50,19 @@ export const supabaseService = {
     // Filtrare după interval de date
     if (filters.dateFrom) query = query.gte('date', filters.dateFrom);
     if (filters.dateTo) query = query.lte('date', filters.dateTo);
+
+    // Filtrare după interval de sume
+    if (filters.minAmount !== undefined) query = query.gte('amount', filters.minAmount);
+    if (filters.maxAmount !== undefined) query = query.lte('amount', filters.maxAmount);
+    
+    // Căutare text în descriere, categorie și subcategorie (ILIKE pentru case-insensitive)
+    if (filters.search) {
+      // Trim și escape pentru a preveni SQL injection
+      const safeSearch = filters.search.trim().replace(/'/g, "''");
+      
+      // Construim un OR complex pentru a căuta în mai multe câmpuri
+      query = query.or(`description.ilike.%${safeSearch}%, category.ilike.%${safeSearch}%, subcategory.ilike.%${safeSearch}%`);
+    }
 
     if (pagination.sort) query = query.order(pagination.sort, { ascending: pagination.order === 'asc' });
     if (pagination.limit !== undefined && pagination.offset !== undefined) {

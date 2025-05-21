@@ -37,6 +37,13 @@ const TransactionsPage: React.FC = () => {
   // Extragem user din AuthStore pentru a-l folosi în query
   const { user } = useAuthStore();
   
+  // Adaug state pentru filtrele avansate
+  const [dateFrom, setDateFrom] = React.useState<string>('');
+  const [dateTo, setDateTo] = React.useState<string>('');  
+  const [amountMin, setAmountMin] = React.useState<string>('');
+  const [amountMax, setAmountMax] = React.useState<string>('');
+  const [searchText, setSearchText] = React.useState<string>('');
+
   // Folosim hook-ul useInfiniteTransactions pentru paginare infinită
   // React Query se ocupă de caching și invalidare la mutații
   const { 
@@ -51,6 +58,14 @@ const TransactionsPage: React.FC = () => {
     limit: PAGINATION.DEFAULT_LIMIT,
     type: filterType as TransactionType || undefined,
     category: filterCategory as string || undefined,
+    // Adăugăm noile filtre avansate
+    startDate: dateFrom || undefined,
+    endDate: dateTo || undefined,
+    // Convertim string la număr pentru filtrele de sumă
+    ...(amountMin ? { minAmount: parseFloat(amountMin) } : {}),
+    ...(amountMax ? { maxAmount: parseFloat(amountMax) } : {}),
+    // Adăugăm filtrul de căutare text
+    ...(searchText ? { search: searchText } : {}),
     // Nu includem month/year pentru a avea toate tranzacțiile
     sort: 'date',
     order: 'desc'
@@ -121,6 +136,17 @@ const TransactionsPage: React.FC = () => {
           category={filterCategory}
           onTypeChange={t => handleFilterChange(t as TransactionType | '', undefined)}
           onCategoryChange={c => handleFilterChange(undefined, c as CategoryType | '')}
+          // Noile props pentru filtrele avansate
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          amountMin={amountMin}
+          amountMax={amountMax}
+          searchText={searchText}
+          onDateFromChange={setDateFrom}
+          onDateToChange={setDateTo}
+          onAmountMinChange={setAmountMin}
+          onAmountMaxChange={setAmountMax}
+          onSearchTextChange={setSearchText}
         />
       </div>
 

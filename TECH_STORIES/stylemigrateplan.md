@@ -1,132 +1,66 @@
-# ✅ Plan de Migrare a Stilurilor pentru `CategoryEditor`
+# 🟢 PLAN GENERAL DE MIGRARE & REFACTORIZARE STILURI (TOATE COMPONENTELE)
 
-## 1. Audit inițial și probleme identificate
+## 0. Scop și Principii
+- Asigurarea consistenței vizuale și tehnice în toată aplicația (frontend)
+- Eliminarea completă a claselor Tailwind hardcodate din JSX
+- Folosirea exclusivă a sistemului de design tokens, componentMap și getEnhancedComponentClasses
+- Respectarea strictă a regulilor din BEST_PRACTICES.md, styling_rules.mdc și TECH_STORIES/completed/stilurirafinate.md
+- Toate textele UI și mesajele din shared-constants
+- Toate elementele interactive cu data-testid predictibil
 
-### 1.1. Probleme de stil
-- [ ] Clase Tailwind hardcodate în JSX (ex: `bg-secondary-50`, `rounded-token`, `btn btn-primary` etc.)
-- [ ] Folosire inconsistentă a spațierii și mărimilor
-- [ ] Badge-uri și carduri fără sistem de tokens
-- [ ] Lipsă utilizare `getEnhancedComponentClasses`
-- [ ] Inconsistență cu alte componente moderne din proiect
+## 1. Pași incrementali (per feature/folder)
+1. **Audit per folder:**
+   - Identifică toate componentele cu stiluri hardcodate sau inconsistente
+   - Marchează componentele ce necesită refactor
+2. **Refactorizare incrementală:**
+   - Începe cu primitive (Button, Input, Alert, Badge, Card, etc.)
+   - Continuă cu features (TransactionTable, TransactionForm, TransactionFilters, LunarGrid, CategoryEditor, etc.)
+   - Refactorizează paginile (TransactionsPage, OptionsPage, LunarGridPage, etc.)
+3. **Checklist per componentă:**
+   - [ ] Eliminare completă clase Tailwind din JSX
+   - [ ] Folosire getEnhancedComponentClasses și tokens pentru orice stil
+   - [ ] Props pentru efecte vizuale (withShadow, withGradient, etc.)
+   - [ ] Toate textele UI din shared-constants/ui
+   - [ ] Toate mesajele din shared-constants/messages
+   - [ ] data-testid predictibil pe orice element interactiv
+   - [ ] Tipuri explicite pentru toate props-urile
+   - [ ] Memoizare și optimizare performanță (useCallback/useMemo/React.memo)
+   - [ ] Testare vizuală și automată (unde există)
+4. **Validare și tracking progres:**
+   - Marchează fiecare componentă/folder ca [x] în checklist după refactor
+   - Adaugă notă în DEV_LOG.md la fiecare pas major
+   - Rulează testele și verifică manual UI-ul
 
-### 1.2. Probleme de text/constante
-- [ ] Texte UI hardcodate (ex: "Gestionare Subcategorii", "Redenumește", "custom", etc.)
-- [ ] Texte lipsă din `shared-constants/ui.ts` și `shared-constants/messages.ts`
-- [ ] Mesaje de eroare hardcodate
+## 2. Prioritizare
+- 1️⃣ Primitive (prerechizit pentru features)
+- 2️⃣ Features (cele mai folosite în UI)
+- 3️⃣ Pagini și layout-uri
+- 4️⃣ Componente auxiliare (modals, dropdowns, loaders, etc.)
 
-### 1.3. Probleme de tip și performanță
-- [ ] Multiple state-uri locale care ar putea fi consolidate
-- [ ] Lipsă tipizare strictă pentru props și state
-- [ ] Potențiale re-renderuri inutile
-- [ ] Lipsă memoizare pentru liste și callback-uri
+## 3. Reguli de validare
+- Nu există className="..." cu Tailwind direct în JSX
+- Nu există texte hardcodate în JSX (doar din constants)
+- Toate efectele vizuale și spacing-ul doar din tokens/componentMap
+- Toate props-urile au tip explicit
+- Toate elementele interactive au data-testid
+- Toate componentele folosesc barrel exports
 
-## 2. Audit de consistență cu alte componente refactorizate
-
-Am analizat alte componente recent refactorizate pentru a asigura consistența:
-
-### 2.1 Elemente comune identificate în componente moderne
-- [x] Utilizează exclusiv `getEnhancedComponentClasses` pentru stiluri
-- [x] Folosesc props de tip `with*` pentru efecte vizuale (ex: `withGlowFocus`, `withFadeIn`)
-- [x] Utilizează memoizare strategică prin `React.memo`, `useCallback`, `useMemo`
-- [x] Au tipuri TypeScript robuste și explicite
-- [x] Folosesc constante din shared-constants pentru texte UI
-- [x] Utilizează state-uri de focus/activare pentru efecte vizuale
-- [x] Implementează props transiente cu prefix ` pentru flags care nu ajung în DOM
-- [x] Organizează codul în secțiuni logice cu comentarii descriptive
-
-### 2.2 Componente analizate
-- **TransactionForm**: Folosește efecte vizuale rafinate, state-uri de activare pentru focus
-- **LunarGridTanStack**: Optimizează prin memo și callback-uri, tipuri robuste
-- **LoginForm/RegisterForm**: Gestionează stări de UI avansate
-- **Button/Alert/Badge**: Implementează controlul efectelor vizuale prin props
-
-## 3. Taskuri de refactorizare incrementală
-
-### 3.1. Management stat și tipizare (✅ = complet, ⬜ = de făcut)
-- [x] Consolidarea state-urilor conexe (ex: editingCell și deletingCell)
-- [x] Definirea interfețelor explicite pentru toate props-urile interne
-- [ ] ⬜ Folosirea tipurilor stricte pentru toți parametrii funcțiilor
-- [ ] ⬜ Implementarea transient props cu prefix ` unde e cazul
-- [ ] ⬜ Tipizarea strictă a event handler-ilor
-
-### 3.2. Refactorizare stiluri
-- [x] ✅ Container modal: `getEnhancedComponentClasses('modal', ...)`
-- [x] ✅ Card principal: `getEnhancedComponentClasses('card', 'elevated', 'lg')`
-- [x] ✅ Buton închidere: `getEnhancedComponentClasses('button', 'ghost', 'sm')`
-- [x] ✅ Alert eroare: `getEnhancedComponentClasses('alert', 'error', ... )`
-- [x] ✅ Container conținut: `getEnhancedComponentClasses('flex', ..., ['gap-6'])`
-- [x] ✅ Secțiune categorii: `getEnhancedComponentClasses('card-section', ..., ['w-1/3', 'border-r', 'pr-4'])`
-- [x] ✅ Secțiune subcategorii: `getEnhancedComponentClasses('card-section', ..., ['w-2/3', 'pl-4'])`
-- [x] ✅ Liste: `getEnhancedComponentClasses('list-container', ...)` și itemi: `getEnhancedComponentClasses('list-item', ...)`
-- [x] ✅ Badge: `getEnhancedComponentClasses('badge', ...)` cu props `withPulse` pentru animație
-- [x] ✅ Toate butoanele: utilizare sistem variant (primary, secondary, danger, etc.)
-- [x] ✅ Inputuri: `getEnhancedComponentClasses('input', ...)` cu efecte vizuale
-
-### 3.3. Extragere și centralizare texte (În curs)
-- [x] ⬜ Adaugă în `shared-constants/ui.ts` secțiunea `CATEGORY_EDITOR` cu toate textele UI:
-```ts
-CATEGORY_EDITOR: {
-  TITLE: 'Gestionare Subcategorii',
-  CATEGORIES_SECTION_TITLE: 'Categorii',
-  SUBCATEGORIES_SECTION_TITLE: 'Subcategorii pentru',
-  CUSTOM_BADGE: 'custom',
-  RENAME_BUTTON: 'Redenumește',
-  DELETE_BUTTON: 'Șterge',
-  ADD_PLACEHOLDER: 'Adaugă subcategorie nouă',
-  ADD_BUTTON: 'Adaugă',
-  NO_SELECTION: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
-  DELETE_CONFIRMATION_TITLE: 'Confirmare ștergere',
-  DELETE_CONFIRMATION_TEXT: 'Ești sigur că vrei să ștergi subcategoria {subcat} din {cat}?',
-  DELETE_WARNING: 'Atenție: Există {count} tranzacții care folosesc această subcategorie.',
-  CONFIRM_DELETE_BUTTON: 'Confirmă ștergerea',
-  CANCEL_BUTTON: 'Anulează'
-}
-```
-- [x] ⬜ Centralizare mesaje în `shared-constants/messages.ts` pentru textele de sistem din CategoryEditor
-- [x] ⬜ Adaugă în `shared-constants/messages.ts` secțiunea `CATEGORII` cu toate mesajele de validare/eroare:
-```ts
-CATEGORII: {
-  NUME_GOL: 'Numele nu poate fi gol',
-  SUBCATEGORIE_EXISTENTA: 'Există deja o subcategorie cu acest nume',
-  EROARE_STERGERE: 'Eroare la ștergerea subcategoriei',
-  NU_SE_POT_STERGE_PREDEFINITE: 'Nu se pot șterge subcategoriile predefinite, doar cele personalizate.'
-}
-```
-
-### 3.4. Optimizări de performanță
-- [x] ✅ Memoizare componente de listă cu `React.memo`
-- [x] ✅ Folosire `useCallback` pentru event handlers
-- [x] ✅ Implementare `useMemo` pentru transformări de date
-- [x] ✅ Evitarea re-renderurilor în cascadă
-- [x] ✅ Verificare cu React DevTools pentru optimizări
-
-### 3.5. Refactorizare cod
-- [x] ✅ Actualizează importurile pentru constante și utilitare (inclusiv useCallback)
-- [x] ✅ Înlocuiește textele hardcodate cu constante din `CATEGORY_EDITOR` și `CATEGORII`
-- [x] ✅ Corectarea apelurilor `getEnhancedComponentClasses` cu type assertions și parametri corecți
-- [x] ✅ Asigurarea că funcțiile respectă regulile de memoizare cu `useCallback`
-- [x] ✅ Înlocuirea claselor Tailwind cu apeluri la `getEnhancedComponentClasses` și adăugarea type assertions
-- [x] ✅ Asigurarea că toate inputurile și butoanele folosesc tokens și variante corecte 
-- [x] ✅ Refactorizarea dialogului de confirmare pentru a folosi sistemul de design și mesaje centralizate
-
-### 3.6. Testare și Asigurarea Calității
-- [ ] ⬜ Verificarea performanței cu React DevTools
-
-### 3.7. Îmbunătățiri avansate
-- [ ] ⬜ Animare dialoguri/modal cu efecte de tranziție
-- [ ] ⬜ Management ARIA și focus pentru accesibilitate
-- [ ] ⬜ Separare logică în subcomponente reutilizabile
-- [ ] ⬜ Implementare hook custom `useCategoryEditorState` pentru gestionarea stării
-- [ ] ⬜ Suport pentru navigare cu tastatura
-- [ ] ⬜ Feedback tactil pentru dispozitive mobile
-
-## 4. Fișiere afectate
-- [ ] `frontend/src/components/features/CategoryEditor/CategoryEditor.tsx` (refactorizare principală)
-- [ ] `shared-constants/ui.ts` (adăugare texte UI)
-- [ ] `shared-constants/messages.ts` (adăugare mesaje eroare)
-- [ ] `shared-constants/index.ts` (barrel - verificare exports)
-- [ ] Posibil nou fișier: `frontend/src/components/features/CategoryEditor/useCategoryEditorState.ts` (opțional)
+## 4. Tracking progres (exemplu)
+- [ ] primitives/Button
+- [ ] primitives/Input
+- [ ] primitives/Alert
+- [ ] primitives/Badge
+- [ ] primitives/Card
+- [ ] features/TransactionTable
+- [ ] features/TransactionForm
+- [ ] features/TransactionFilters
+- [ ] features/LunarGrid
+- [ ] features/CategoryEditor
+- [ ] pages/TransactionsPage
+- [ ] pages/OptionsPage
+- [ ] pages/LunarGridPage
+- [ ] ...
 
 ---
 
-> **Notă:** Marchează fiecare task completat cu `[x]` și adaugă detalii suplimentare dacă apar decizii de arhitectură sau workaround-uri. Toate excepțiile trebuie documentate în PR și DEV_LOG.md.
+#

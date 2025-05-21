@@ -18,6 +18,13 @@ export const LABELS = {
   EMAIL: 'Email',
   PAROLA: 'Parolă',
   CONFIRMA_PAROLA: 'Confirmă parola',
+  
+  // Filtre extinse
+  SEARCH_FILTER: 'Caută:',
+  DATE_FROM_FILTER: 'De la data:',
+  DATE_TO_FILTER: 'Până la data:',
+  AMOUNT_MIN_FILTER: 'Suma minimă:',
+  AMOUNT_MAX_FILTER: 'Suma maximă:',
 };
 
 export const TITLES = {
@@ -34,6 +41,9 @@ export const PLACEHOLDERS = {
   DATE: 'Selectează data',
   DESCRIPTION: 'Adaugă o descriere (opțional)',
   CATEGORY_EDITOR_SUBCATEGORY: 'Adaugă subcategorie nouă', // added
+  SEARCH: 'Caută...',
+  AMOUNT_MIN_FILTER: 'Suma minimă',
+  AMOUNT_MAX_FILTER: 'Suma maximă',
 };
 
 export const BUTTONS = {
@@ -53,6 +63,8 @@ export const BUTTONS = {
   LOGIN: 'Autentificare',
   REGISTER: 'Crează cont',
   LOADING: 'Se încarcă...',
+  RESET_FILTERS: 'Resetează filtre',
+  RESET_ALL_FILTERS: 'Resetează toate',
 };
 
 export const TABLE = {
@@ -187,6 +199,18 @@ export const UI = {
     DELETE_WARNING: 'Atenție: Există {count} tranzacții care folosesc această subcategorie.',
     CONFIRM_DELETE_BUTTON: 'Confirmă ștergerea',
     CANCEL_BUTTON: 'Anulează'
+  },
+  FILTERS_ACTIVE: (count: number) => `${count} filtru${count === 1 ? '' : 'e'} activ${count === 1 ? '' : 'e'}`,
+  
+  // Secțiune UI pentru TransactionFilters
+  TRANSACTION_FILTERS: {
+    TITLE: 'Filtre',
+    SHOW_ADVANCED: 'Filtre avansate',
+    HIDE_ADVANCED: 'Ascunde filtre avansate',
+    NO_FILTERS: 'Nu există filtre active',
+    DATE_RANGE: 'Interval date',
+    AMOUNT_RANGE: 'Interval sume',
+    TEXT_SEARCH: 'Căutare text',
   },
 };
 

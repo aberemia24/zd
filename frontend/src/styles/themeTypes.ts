@@ -309,7 +309,23 @@ export type ComponentVariant =
   | 'column'
   | 'column-start'
   | 'compact'
-  | 'loose';
+  | 'loose'
+  | 'sm' 
+  | 'md' 
+  | 'lg' 
+  | 'xl' 
+  | 'expandable' 
+  | 'dismissible'
+  | 'border' 
+  | 'shadow' 
+  | 'xs'
+  | 'center'
+  | 'between'
+  | 'start'
+  | 'around'
+  | 'column'
+  | 'column-start'
+  | 'end';
 
 export type ComponentSize = 
   | 'xs' 

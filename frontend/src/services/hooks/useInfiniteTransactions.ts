@@ -15,6 +15,9 @@ export interface TransactionQueryParams {
   endDate?: string;
   sort?: string;
   order?: 'asc' | 'desc';
+  minAmount?: number;
+  maxAmount?: number;
+  search?: string;
 }
 
 export interface UseInfiniteTransactionsResult {
@@ -72,6 +75,9 @@ export function useInfiniteTransactions(
         recurring: queryParams.recurring,
         dateFrom: queryParams.startDate,
         dateTo: queryParams.endDate,
+        minAmount: queryParams.minAmount,
+        maxAmount: queryParams.maxAmount,
+        search: queryParams.search
       };
       
       return supabaseService.fetchTransactions(userId, pagination, filters);
