@@ -1232,3 +1232,11 @@ export function useActiveSubcategories({ category, type, enabled = true }) {
   };
 }
 ```
+
+## [2025-05-22] Lecții învățate: Curățare loguri & UX filtrare tranzacții
+
+- **Elimină toate logurile de debugging** din componente înainte de production (console.log, debug etc.).
+- **Pattern robust pentru UX la filtrare/search**: păstrează datele vechi cu useRef/useMemo cât timp se face fetch, pentru a preveni blink-ul și resetarea scroll-ului.
+- **Testare cu loguri temporare**: Folosește loguri doar pentru debugging, apoi elimină-le complet.
+- **Respectă regulile globale**: zero stringuri hardcodate, styling doar cu tokens, data-testid predictibil, importuri centralizate.
+- **Verifică re-mount-ul**: Logurile de mount/unmount sunt utile doar temporar pentru diagnosticare.

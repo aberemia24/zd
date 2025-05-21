@@ -45,6 +45,9 @@ export const supabaseService = {
       .from(TABLE)
       .select('*', { count: 'exact' });
 
+    // Câmpuri pe care se face search - modifică aici dacă adaugi/elimini coloane în DB
+    const searchFields = ['category', 'subcategory']; // adaugă 'description' dacă există în DB
+
     // Filtrare după user_id doar dacă există userId (pentru mod demo, fără login, nu filtrăm)
     if (userId) {
       query = query.eq('user_id', userId);
@@ -63,13 +66,12 @@ export const supabaseService = {
     if (filters.minAmount !== undefined) query = query.gte('amount', filters.minAmount);
     if (filters.maxAmount !== undefined) query = query.lte('amount', filters.maxAmount);
     
-    // Căutare text în descriere, categorie și subcategorie (ILIKE pentru case-insensitive)
+    // Căutare text în câmpurile configurate (ILIKE pentru case-insensitive)
     if (filters.search) {
-      // Trim și escape pentru a preveni SQL injection
       const safeSearch = filters.search.trim().replace(/'/g, "''");
-      
-      // Construim un OR complex pentru a căuta în mai multe câmpuri
-      query = query.or(`description.ilike.%${safeSearch}%, category.ilike.%${safeSearch}%, subcategory.ilike.%${safeSearch}%`);
+      // Construiește dinamic query-ul .or doar cu câmpurile existente
+      const orQuery = searchFields.map(f => `${f}.ilike.*${safeSearch}*`).join(',');
+      query = query.or(orQuery);
     }
 
     if (pagination.sort) query = query.order(pagination.sort, { ascending: pagination.order === 'asc' });

@@ -25,6 +25,8 @@ export type TransactionTableProps = {
   fetchNextPage?: () => void;
   /** Flag care indică dacă filtrele sunt active, pentru a afișa mesaj specific când nu există tranzacții */
   isFiltered?: boolean;
+  /** Flag care indică dacă se face fetching de date noi, dar avem date vechi (pentru overlay UX) */
+  isFetching?: boolean;
 };
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ 
@@ -34,13 +36,29 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   isFetchingNextPage = false,
   hasNextPage = false,
   fetchNextPage,
-  isFiltered = false
+  isFiltered = false,
+  isFetching = false,
+  ...rest
 }) => {
+  // Debug: log la fiecare render
+  // eslint-disable-next-line no-console
+  console.log('[TransactionTable] Render', {
+    key: (rest as any).key,
+    transactionsCount: transactions?.length,
+    total,
+    isLoading,
+    isFetching,
+    isFetchingNextPage,
+    hasNextPage,
+    isFiltered,
+    rest
+  });
   // Referință către container pentru implementarea intersection observer
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
   // Implementăm Intersection Observer pentru detecția scroll-ului
   React.useEffect(() => {
+    console.log('[TransactionTable] Mounted');
     // Evităm crearea observer-ului dacă nu avem fetchNextPage
     if (!fetchNextPage) return;
     
@@ -70,6 +88,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       if (bottomRef.current) {
         observer.unobserve(bottomRef.current);
       }
+      console.log('[TransactionTable] Unmounted');
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
   
@@ -135,9 +154,20 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   return (
-    <div className={getEnhancedComponentClasses('spacing', 'section')}>
+    <div className={getEnhancedComponentClasses('spacing', 'section')} style={{ position: 'relative' }}>
       {/* Container pentru tabelul responsiv cu stiluri rafinate */}
-      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, tableEffects)}>
+      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, tableEffects)} style={{ position: 'relative' }}>
+        {/* Overlay de loading peste tabel când se face fetch, dar avem date vechi */}
+        {isFetching && !isLoading && (
+          <div
+            className="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-10"
+            data-testid="transaction-table-loading-overlay"
+            style={{ pointerEvents: 'none' }}
+            aria-label={TABLE.LOADING}
+          >
+            <Spinner variant="primary" sizeVariant="md" withFadeIn />
+          </div>
+        )}
         <table 
           className={getEnhancedComponentClasses('table', 'striped')} 
           data-testid="transaction-table"
@@ -166,7 +196,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   </div>
                 </td>
               </tr>
-            ) : (!transactions || transactions.length === 0 ? (
+            ) : (!isFetching && transactions && transactions.length === 0 ? (
               <tr data-testid="transaction-table-empty">
                 <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center', 'py-8'])}>
                   <div className={getEnhancedComponentClasses('flex-group', 'center', 'md', undefined, ['flex-col', 'p-4'])}>

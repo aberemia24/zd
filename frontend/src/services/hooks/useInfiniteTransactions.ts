@@ -111,6 +111,8 @@ export function useInfiniteTransactions(
     refetchOnReconnect: true,
     retry: 3,
     enabled: !!userId, // Activăm query-ul doar dacă userId este disponibil
+    // TODO: Pentru UX avansat, poți implementa manual păstrarea datelor vechi aici
+    // placeholderData: undefined,
   });
   
   // Extragem și combinăm toate tranzacțiile din toate paginile pentru afișare

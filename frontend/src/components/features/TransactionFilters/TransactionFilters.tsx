@@ -87,21 +87,9 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   // Categoriile personalizate + predefinite din categoryStore
   const customCategories = useCategoryStore(state => state.categories);
   
-  // Adăugăm log pentru debugging
-  useEffect(() => {
-    console.log('[TransactionFilters] customCategories:', customCategories);
-    console.log('[TransactionFilters] type:', type);
-    console.log('[TransactionFilters] OPTIONS:', OPTIONS);
-  }, [customCategories, type]);
-  
   // Construim opțiunile pentru categorii din store, nu din constante
   // Respectăm regulile: memoizare, fără hardcodări, indicator pentru custom
   const categoryOptions = useMemo(() => {
-    // Logare pentru debugging
-    console.log('[categoryOptions] Start building options');
-    console.log('[categoryOptions] customCategories:', customCategories);
-    console.log('[categoryOptions] type:', type);
-    
     // Filtrăm categoriile bazate pe tipul de tranzacție selectat
     let filteredCategories = customCategories;
     
@@ -113,7 +101,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
         if (type === 'SAVING') return cat.name === 'ECONOMII';
         return true; // Dacă tipul e gol, afișăm toate
       });
-      console.log('[categoryOptions] filteredCategories după filtrarea după tip:', filteredCategories);
     }
     
     const options = filteredCategories.map(cat => ({
@@ -123,7 +110,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
              (cat.isCustom ? ' ➡️' : '') // Indicator consistent cu cel din TransactionForm
     }));
     
-    console.log('[categoryOptions] Final options:', options);
     return options;
   }, [customCategories, type]);
   
@@ -283,194 +269,131 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     onAmountMaxChange(e.target.value);
   }, [onAmountMaxChange]);
 
+  useEffect(() => {
+    return () => {
+    };
+  }, []);
+
   return (
-    <div className={getEnhancedComponentClasses('card', 'default', 'md', undefined, ['mb-token', 'p-4', 'fade-in'])}>
-      {/* Header pentru filtre cu badge de filtre active și buton de expand/collapse */}
-      <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mb-3'])}>
-        <div className={getEnhancedComponentClasses('flex-group', 'start', 'md')}>
-          <h3 className="text-lg font-medium text-secondary-700">
-            {UI.TRANSACTION_FILTERS.TITLE}
-          </h3>
-          
-          {/* Badge cu numărul de filtre active */}
-          {activeFilterCount > 0 && (
-            <Badge
-              variant="primary"
-              withGradient
-              withPulse
-              withShadow
-              className={getEnhancedComponentClasses('spacing', 'small')}
-              data-testid="active-filters-badge"
-            >
-              {UI.FILTERS_ACTIVE(activeFilterCount)}
-            </Badge>
-          )}
-        </div>
-        
-        <div className={getEnhancedComponentClasses('flex-group', 'end', 'sm')}>
-          {/* Butonul pentru reset all filters */}
-          {activeFilterCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleResetAll}
-              withTranslate
-              data-testid="reset-all-filters-btn"
-            >
-              {BUTTONS.RESET_ALL_FILTERS}
-            </Button>
-          )}
-          
-          {/* Butonul de toggle pentru filtre avansate */}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={toggleAdvancedFilters}
-            withShadow
-            data-testid="toggle-advanced-filters-btn"
-          >
-            {showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
-          </Button>
-        </div>
+    <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mb-token', 'fade-in'])}>
+      {/* Bara de filtre compactă, pe o singură linie */}
+      <div className={getEnhancedComponentClasses('flex-group', 'start', 'md', undefined, ['gap-2', 'w-full'])}>
+        {/* Filtru tip tranzacție */}
+        <Select
+          name="type-filter"
+          label=""
+          value={type || ''}
+          data-testid="type-filter"
+          onChange={handleTypeChange}
+          options={types}
+          placeholder={PLACEHOLDERS.SELECT + ' tipul'}
+          sizeVariant="sm"
+        />
+        {/* Filtru categorie */}
+        <Select
+          name="category-filter"
+          label=""
+          value={category || ''}
+          data-testid="category-filter"
+          onChange={handleCategoryChange}
+          options={categoryOptions}
+          placeholder={PLACEHOLDERS.SELECT + ' categoria'}
+          disabled={!type}
+          sizeVariant="sm"
+        />
+        {/* Filtru subcategorie */}
+        <Select
+          name="subcategory-filter"
+          label=""
+          value={subcategory || ''}
+          data-testid="subcategory-filter"
+          onChange={handleSubcategoryChange}
+          options={subcategoryOptions}
+          placeholder={isLoadingSubcategories ? LOADER.TEXT : PLACEHOLDERS.SELECT + ' subcategoria'}
+          disabled={!category || subcategoryOptions.length === 0}
+          isLoading={isLoadingSubcategories}
+          sizeVariant="sm"
+        />
       </div>
-      
-      {/* Filtre de bază - wrapper */}
-      <div className={getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['gap-4', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-3', 'mb-4'])}>
-        {/* Filtru pentru tipul tranzacției */}
-        <div className={getEnhancedComponentClasses('form-group')}>
-          <Select
-            name="type-filter"
-            label={LABELS.TYPE_FILTER}
-            value={type || ''}
-            data-testid="type-filter"
-            onChange={handleTypeChange}
-            options={types}
-            placeholder={PLACEHOLDERS.SELECT + ' tipul'}
-          />
-        </div>
-      
-        {/* Filtru pentru categorie */}
-        <div className={getEnhancedComponentClasses('form-group')}>
-          <Select
-            name="category-filter"
-            label={LABELS.CATEGORY_FILTER}
-            value={category || ''}
-            data-testid="category-filter"
-            onChange={handleCategoryChange}
-            options={categoryOptions}
-            placeholder={PLACEHOLDERS.SELECT + ' categoria'}
-            disabled={!type}
-          />
-        </div>
-      
-        {/* Filtru pentru subcategorie - acum folosește subcategoriile active */}
-        <div className={getEnhancedComponentClasses('form-group')}>
-          <Select
-            name="subcategory-filter"
-            label={LABELS.SUBCATEGORY}
-            value={subcategory || ''}
-            data-testid="subcategory-filter"
-            onChange={handleSubcategoryChange}
-            options={subcategoryOptions}
-            placeholder={isLoadingSubcategories ? LOADER.TEXT : PLACEHOLDERS.SELECT + ' subcategoria'}
-            disabled={!category || subcategoryOptions.length === 0}
-            isLoading={isLoadingSubcategories}
-          />
-        </div>
-      </div>
-      
-      {/* Filtre de bază - a doua linie pentru căutare */}
-      <div className={getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['gap-4', 'grid-cols-1', 'mb-4'])}>
-        {/* Filtru pentru căutare text */}
-        <div className={getEnhancedComponentClasses('form-group')}>
-          <Input
-            name="search-text-filter"
-            label={LABELS.SEARCH_FILTER}
-            value={searchInputValue}
-            data-testid="search-text-filter"
-            onChange={handleSearchChange}
-            placeholder={PLACEHOLDERS.SEARCH}
-            type="text"
-          />
-        </div>
-      </div>
-      
-      {/* Filtre avansate - wrapper (condiționat de state) */}
-      {showAdvancedFilters && (
-        <div className={classNames(
-          getEnhancedComponentClasses('card-section', undefined, undefined, undefined, ['mb-4', 'slide-down', 'fade-in']),
-          getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['gap-4', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-4'])
-        )}>
-          {/* Filtru pentru data de început */}
-          <div className={getEnhancedComponentClasses('form-group')}>
-            <Input
-              name="date-from-filter"
-              label={LABELS.DATE_FROM_FILTER}
-              value={dateFrom}
-              data-testid="date-from-filter"
-              onChange={handleDateFromChange}
-              placeholder={PLACEHOLDERS.SELECT + ' data de început'}
-              type="date"
-            />
-          </div>
-          
-          {/* Filtru pentru data de sfârșit */}
-          <div className={getEnhancedComponentClasses('form-group')}>
-            <Input
-              name="date-to-filter"
-              label={LABELS.DATE_TO_FILTER}
-              value={dateTo}
-              data-testid="date-to-filter"
-              onChange={handleDateToChange}
-              placeholder={PLACEHOLDERS.SELECT + ' data de sfârșit'}
-              type="date"
-            />
-          </div>
-          
-          {/* Filtru pentru suma minimă */}
-          <div className={getEnhancedComponentClasses('form-group')}>
-            <Input
-              name="amount-min-filter"
-              label={LABELS.AMOUNT_MIN_FILTER}
-              value={amountMin}
-              data-testid="amount-min-filter"
-              onChange={handleAmountMinChange}
-              placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
-              type="number"
-            />
-          </div>
-          
-          {/* Filtru pentru suma maximă */}
-          <div className={getEnhancedComponentClasses('form-group')}>
-            <Input
-              name="amount-max-filter"
-              label={LABELS.AMOUNT_MAX_FILTER}
-              value={amountMax}
-              data-testid="amount-max-filter"
-              onChange={handleAmountMaxChange}
-              placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
-              type="number"
-            />
-          </div>
-        </div>
-      )}
-      
-      {/* Footer cu acțiuni */}
-      <div className={getEnhancedComponentClasses('flex-group', 'end', 'md', undefined, ['mt-2'])}>
-        {/* Buton pentru resetarea filtrelor - visible când există filtre active */}
+      {/* Acțiuni și searchbox la finalul barei */}
+      <div className={getEnhancedComponentClasses('flex-group', 'end', 'md', undefined, ['gap-2'])}>
+        {/* Searchbox compact */}
+        <Input
+          name="search-text-filter"
+          label=""
+          value={searchInputValue}
+          data-testid="search-text-filter"
+          onChange={handleSearchChange}
+          placeholder={PLACEHOLDERS.SEARCH}
+          type="text"
+        />
+        {/* Buton reset filtre */}
         {activeFilterCount > 0 && (
-          <Button 
-            variant="secondary" 
-            size="md"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleResetAll}
             withShadow
-            withTranslate
             data-testid="reset-filters-btn"
+            aria-label={BUTTONS.RESET_FILTERS}
           >
+            {/* Icon reset dacă există, altfel text scurt */}
             {BUTTONS.RESET_FILTERS}
           </Button>
         )}
+        {/* Buton filtre avansate (icon sau text scurt) */}
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={toggleAdvancedFilters}
+          withShadow
+          data-testid="toggle-advanced-filters-btn"
+          aria-label={showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
+        >
+          {showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
+        </Button>
       </div>
+      {/* Filtre avansate - rămân sub bară, vizibile doar dacă sunt activate */}
+      {showAdvancedFilters && (
+        <div className={getEnhancedComponentClasses('card-section', undefined, undefined, undefined, ['mt-2', 'fade-in', 'grid', 'grid-cols-1', 'md:grid-cols-2', 'lg:grid-cols-4'])}>
+          <Input
+            name="date-from-filter"
+            label={LABELS.DATE_FROM_FILTER}
+            value={dateFrom}
+            data-testid="date-from-filter"
+            onChange={handleDateFromChange}
+            placeholder={PLACEHOLDERS.SELECT + ' data de început'}
+            type="date"
+          />
+          <Input
+            name="date-to-filter"
+            label={LABELS.DATE_TO_FILTER}
+            value={dateTo}
+            data-testid="date-to-filter"
+            onChange={handleDateToChange}
+            placeholder={PLACEHOLDERS.SELECT + ' data de sfârșit'}
+            type="date"
+          />
+          <Input
+            name="amount-min-filter"
+            label={LABELS.AMOUNT_MIN_FILTER}
+            value={amountMin}
+            data-testid="amount-min-filter"
+            onChange={handleAmountMinChange}
+            placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
+            type="number"
+          />
+          <Input
+            name="amount-max-filter"
+            label={LABELS.AMOUNT_MAX_FILTER}
+            value={amountMax}
+            data-testid="amount-max-filter"
+            onChange={handleAmountMaxChange}
+            placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
+            type="number"
+          />
+        </div>
+      )}
     </div>
   );
 };

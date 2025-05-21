@@ -40,3 +40,8 @@ messages.ts: Mesaje sistem
 ui.ts: Texte UI
 api.ts: Configurare API
 </directory_structure>
+<logging_and_ux>
+- Elimină toate logurile de debugging (console.log, debug etc.) înainte de production.
+- Folosește pattern-ul robust: păstrează datele vechi la fetch/filtrare (useRef/useMemo) pentru UX fluid, fără blink sau re-mount.
+- Testează cu loguri temporare, dar elimină-le după validare.
+</logging_and_ux>

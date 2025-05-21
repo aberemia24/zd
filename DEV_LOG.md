@@ -927,3 +927,24 @@ Am extins și refactorizat complet sistemul de filtrare pentru tranzacții, adă
 - Persistența filtrelor în URL
 - Memoizarea rezultatelor pentru performance
 - Gruparea și salvarea seturilor de filtre frecvent folosite
+
+## [2025-05-22] Curățare loguri și consolidare pattern UX filtrare tranzacții
+
+### Probleme și soluții
+
+- Eliminarea tuturor logurilor de debugging din componentele de filtrare și tabel tranzacții.
+- Confirmare: pattern-ul robust pentru păstrarea datelor vechi la fetch (folosind useRef/useMemo) previne blink-ul și re-mount-ul la schimbarea filtrelor.
+- Testare manuală: UX fluid, fără dispariția tranzacțiilor la filtrare/search.
+
+### Lecții învățate
+
+1. **Logurile de debugging trebuie eliminate înainte de production** pentru a evita poluarea consolei și scurgeri de date sensibile.
+2. **Pattern-ul de păstrare a datelor vechi** (cu useRef/useMemo) este esențial pentru UX fluid la fetch-uri asincrone cu React Query.
+3. **Verificarea re-mount-ului**: Folosiți loguri temporare pentru debugging, dar eliminați-le după validare.
+4. **Respectarea regulilor globale**: Zero stringuri hardcodate, doar constante centralizate, data-testid predictibil, styling doar cu tokens.
+
+### Impact
+
+- Cod mai curat, fără noise în console.
+- UX robust și predictibil la filtrare și search.
+- Documentare actualizată cu pattern-ul corect pentru infinite loading și filtrare tranzacții.

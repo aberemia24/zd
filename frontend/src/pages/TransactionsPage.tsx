@@ -78,7 +78,8 @@ const TransactionsPage: React.FC = () => {
     fetchNextPage,
     isFetchingNextPage,
     totalCount,
-    isFiltered
+    isFiltered,
+    isFetching
   } = useFilteredTransactions(queryParams);
   
   // Logging pentru debugging - doar în development
@@ -135,6 +136,17 @@ const TransactionsPage: React.FC = () => {
     }));
   }, []);
 
+  React.useEffect(() => {
+    console.log('[TransactionsPage] Mounted');
+    return () => {
+      console.log('[TransactionsPage] Unmounted');
+    };
+  }, []);
+
+  // Wrapper pentru TransactionTable - log pentru clasa generată
+  const tableWrapperClass = getEnhancedComponentClasses('flex', undefined, 'lg', undefined, ['flex-col']);
+  console.log('[TransactionsPage] tableWrapperClass', tableWrapperClass);
+
   return (
     <div className={getEnhancedComponentClasses('container', 'primary', 'lg', undefined, ['fade-in', 'page-wrapper'])}>
       {/* Titlu pagină cu efect de gradient subtil */}
@@ -179,7 +191,7 @@ const TransactionsPage: React.FC = () => {
       </div>
 
       {/* Secțiune tabel cu efect de fade-in */}
-      <div className={getEnhancedComponentClasses('flex', undefined, 'lg', undefined, ['flex-col', 'fade-in'])}>
+      <div className={tableWrapperClass}>
         <TransactionTable
           transactions={transactions}
           total={totalTransactions}
@@ -188,6 +200,7 @@ const TransactionsPage: React.FC = () => {
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
           isFiltered={isFiltered}
+          isFetching={isFetching}
         />
       </div>
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useInfiniteTransactions, type TransactionQueryParams } from './useInfiniteTransactions';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import type { TransactionValidated } from '@shared-constants/transaction.schema';
 
 /**
@@ -43,6 +43,19 @@ export function useFilteredTransactions(
     totalCount,
   } = useInfiniteTransactions(queryParams);
   
+  // Ref pentru a păstra datele vechi
+  const previousData = useRef<TransactionValidated[]>([]);
+
+  // Actualizează doar dacă ai date noi
+  if (transactions && transactions.length > 0) {
+    previousData.current = transactions;
+  }
+
+  // Returnează datele vechi dacă e loading/fetching și nu ai date noi
+  const dataToShow = (isLoading || isFetching) && (!transactions || transactions.length === 0)
+    ? previousData.current
+    : transactions;
+
   // Verifică dacă filtrele sunt active
   const isFiltered = useMemo(() => {
     return !!(
@@ -57,7 +70,7 @@ export function useFilteredTransactions(
   }, [queryParams]);
   
   return {
-    data: transactions,
+    data: dataToShow,
     isLoading,
     isFetching,
     error,
