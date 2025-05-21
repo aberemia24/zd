@@ -6,6 +6,7 @@ import { TransactionType, CategoryType, FrequencyType } from '../../../shared-co
 import { TABLE, BUTTONS } from '@shared-constants';
 import type { Transaction } from '../../../types/Transaction';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import classNames from 'classnames';
 
 export type { Transaction };
 
@@ -121,37 +122,40 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   return (
-    <div className="mt-token">
+    <div className={getEnhancedComponentClasses('spacing', 'section')}>
       {/* Container pentru tabelul responsiv cu stiluri rafinate */}
-      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, [...tableEffects, 'mt-4'])}>
+      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, tableEffects)}>
         <table 
           className={getEnhancedComponentClasses('table', 'striped')} 
           data-testid="transaction-table"
         >
           <thead>
-            <tr className="bg-secondary-100 text-secondary-700">
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.TYPE}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.AMOUNT}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.CATEGORY}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.SUBCATEGORY}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.DATE}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.RECURRING}</th>
-              <th className="px-token-sm py-token-xs text-left font-semibold sticky top-0 bg-secondary-100">{TABLE.HEADERS.FREQUENCY}</th>
+            <tr className={getEnhancedComponentClasses('table-row', undefined, undefined, undefined, headerEffects)}>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.TYPE}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.AMOUNT}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.CATEGORY}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.SUBCATEGORY}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.DATE}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.RECURRING}</th>
+              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.FREQUENCY}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr data-testid="transaction-table-loading">
-                <td colSpan={7} className="text-center py-token-lg">
-                  <div className="flex items-center justify-center">
+                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
+                  <div className={classNames(
+                    getEnhancedComponentClasses('flex-group', 'center', 'md'),
+                    getEnhancedComponentClasses('spacing', 'small')
+                  )}>
                     <Spinner variant="primary" sizeVariant="sm" withFadeIn />
-                    <span className="ml-2">{TABLE.LOADING}</span>
+                    <span>{TABLE.LOADING}</span>
                   </div>
                 </td>
               </tr>
             ) : (!transactions || transactions.length === 0 ? (
               <tr data-testid="transaction-table-empty">
-                <td colSpan={7} className="text-center py-token-lg text-secondary-500">
+                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
                   {TABLE.EMPTY}
                 </td>
               </tr>
@@ -159,10 +163,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               transactions.map((t, idx) => (
                 <tr 
                   key={t.id || idx} 
-                  className="border-b border-secondary-200 last:border-b-0 hover:bg-secondary-100 transition-colors duration-150" 
+                  className={getEnhancedComponentClasses('table-row', undefined, undefined, undefined, rowEffects)}
                   data-testid={`transaction-item-${t.id || idx}`}
                 >
-                  <td className="px-token-sm py-token-xs">
+                  <td className={getEnhancedComponentClasses('table-cell')}>
                     <Badge 
                       variant={t.type === TransactionType.EXPENSE ? 'error' : t.type === TransactionType.INCOME ? 'success' : 'secondary'}
                       pill
@@ -172,21 +176,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </Badge>
                   </td>
                   <td 
-                    className="px-token-sm py-token-xs" 
+                    className={getEnhancedComponentClasses('table-cell')} 
                     style={getAmountStyles(t.amount, t.type)}
                   >
-                    <span className="font-medium">{formatAmount(t.amount)}</span>
+                    <span className={getEnhancedComponentClasses('text', 'accent')}>{formatAmount(t.amount)}</span>
                   </td>
-                  <td className="px-token-sm py-token-xs">{t.category || ''}</td>
-                  <td className="px-token-sm py-token-xs">{t.subcategory || ''}</td>
-                  <td className="px-token-sm py-token-xs">{t.date || ''}</td>
-                  <td className="px-token-sm py-token-xs">
+                  <td className={getEnhancedComponentClasses('table-cell')}>{t.category || ''}</td>
+                  <td className={getEnhancedComponentClasses('table-cell')}>{t.subcategory || ''}</td>
+                  <td className={getEnhancedComponentClasses('table-cell')}>{t.date || ''}</td>
+                  <td className={getEnhancedComponentClasses('table-cell')}>
                     {t.recurring === true ? 
                       <Badge variant="primary" pill withPulse>{TABLE.BOOL.YES}</Badge> : 
                       <Badge variant="secondary" pill>{TABLE.BOOL.NO}</Badge>
                     }
                   </td>
-                  <td className="px-token-sm py-token-xs">
+                  <td className={getEnhancedComponentClasses('table-cell')}>
                     {t.recurring === true && t.frequency ? 
                       <Badge variant="info" pill>{t.frequency}</Badge> : ''
                     }
@@ -197,10 +201,13 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             {/* Afișăm loading indicator pentru paginile următoare */}
             {isFetchingNextPage && (
               <tr data-testid="transaction-table-next-page-loading">
-                <td colSpan={7} className="text-center py-token">
-                  <div className="flex items-center justify-center">
+                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
+                  <div className={classNames(
+                    getEnhancedComponentClasses('flex-group', 'center', 'md'),
+                    getEnhancedComponentClasses('spacing', 'small')
+                  )}>
                     <Spinner variant="primary" sizeVariant="xs" withPulse />
-                    <span className="ml-2">{TABLE.LOADING_MORE}</span>
+                    <span>{TABLE.LOADING_MORE}</span>
                   </div>
                 </td>
               </tr>
@@ -210,13 +217,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       </div>
 
       {/* Status și informații cu stiluri rafinate */}
-      <div className="mt-token flex justify-between items-center">
+      <div className={classNames(
+        getEnhancedComponentClasses('flex-group', 'between', 'md'),
+        getEnhancedComponentClasses('spacing', 'section')
+      )}>
         {/* Informații despre numărul de tranzacții afișate */}
-        <div className="text-sm">
+        <div>
           {!isLoading && transactions && transactions.length > 0 && (
             <Badge 
               variant="info" 
-              className="px-3 py-1.5"
               withGradient
               data-testid="transaction-table-info"
             >
@@ -243,7 +252,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       </div>
 
       {/* Element invizibil pentru intersection observer */}
-      <div ref={bottomRef} className="h-token opacity-0" data-testid="transaction-table-bottom-sentinel" />
+      <div ref={bottomRef} className={getEnhancedComponentClasses('spacing', 'small')} data-testid="transaction-table-bottom-sentinel" />
     </div>
   );
 };

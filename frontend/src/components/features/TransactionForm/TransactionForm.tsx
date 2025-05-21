@@ -174,12 +174,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       data-testid="transaction-form"
     >
       {/* Bara de titlu cu efect de gradient */}
-      <div className="flex justify-between items-center mb-4 bg-gradient-to-r from-primary-50 to-secondary-50 p-3 rounded-lg shadow-sm">
-        <h3 className="font-medium text-secondary-800">{form.type ? 
+      <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mb-token', 'gradient-bg-subtle', 'shadow-sm', 'rounded-lg', 'p-3'])}>
+        <h3 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>{form.type ? 
           `Adaugă ${form.type === TransactionType.INCOME ? 'venit' : 'cheltuială'}` : 
           'Adaugă tranzacție'}
         </h3>
-        
         {/* Indicator status formular */}
         {loading && (
           <Badge variant="warning" withPulse pill>
@@ -189,7 +188,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       </div>
       
       {/* Secțiunea de selectare tip tranzacție cu stiluri rafinate */}
-      <div className="flex gap-3 mb-4">
+      <div className={getEnhancedComponentClasses('flex-group', 'start', 'md', undefined, ['mb-token'])}>
         <Select
           name="type"
           label={LABELS.TYPE + '*:'}
@@ -204,12 +203,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           withFocusShadow
           withHoverEffect
           withSmoothTransition
-          className={activatedField === 'type' ? 'ring-2 ring-primary-100' : ''}
+          className={activatedField === 'type' ? getEnhancedComponentClasses('input', 'primary', undefined, 'focus') : ''}
         />
       </div>
       
       {/* Rândul principal de câmpuri cu aranjament grid și stiluri rafinate */}
-      <div className={getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['grid-cols-1', 'md:grid-cols-3', 'gap-4', 'mb-4'])}>
+      <div className={getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['cols3', 'gap-4', 'mb-token'])}>
         <Input
           name="amount"
           type="number"
@@ -240,7 +239,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           withFocusShadow
           withHoverEffect
           withSmoothTransition
-          className={activatedField === 'category' ? 'ring-2 ring-primary-100' : ''}
+          className={activatedField === 'category' ? getEnhancedComponentClasses('input', 'primary', undefined, 'focus') : ''}
         />
         <Select
           name="subcategory"
@@ -257,7 +256,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           withFocusShadow
           withHoverEffect
           withSmoothTransition
-          className={activatedField === 'subcategory' ? 'ring-2 ring-primary-100' : ''}
+          className={activatedField === 'subcategory' ? getEnhancedComponentClasses('input', 'primary', undefined, 'focus') : ''}
         />
         <Input
           name="date"
@@ -272,7 +271,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           data-testid="date-input"
           withGlowFocus={activatedField === 'date'}
         />
-        <div className="flex items-center gap-4">
+        <div className={getEnhancedComponentClasses('flex-group', 'start', 'md')}> 
           <Checkbox
             name="recurring"
             label={LABELS.RECURRING + '?'}
@@ -305,12 +304,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           withFocusShadow
           withHoverEffect
           withSmoothTransition
-          className={activatedField === 'frequency' ? 'ring-2 ring-primary-100' : ''}
+          className={activatedField === 'frequency' ? getEnhancedComponentClasses('input', 'primary', undefined, 'focus') : ''}
         />
       </div>
       
       {/* Butoane de acțiune cu efecte vizuale moderne */}
-      <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-between', 'mt-6'])}>
+      <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mt-token'])}>
         {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
         {(() => {
           // Asigurăm validarea strictă a formularului și conversia la boolean
@@ -335,7 +334,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
               submitText={BUTTONS.ADD}
             >
               {isFormValid && (
-                <span className={getEnhancedComponentClasses('indicator', 'primary', 'md', 'active', ['mr-2'])}></span>
+                <span className={getEnhancedComponentClasses('indicator', 'primary', 'md', 'active', ['spacing', 'small'])}></span>
               )}
             </ValidatedSubmitButton>
           );
@@ -361,7 +360,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           type="error" 
           message={safeMessage(error)}
           data-testid="error-message"
-          className="mt-4"
+          className={getEnhancedComponentClasses('spacing', 'section')}
           withFadeIn
           withAccentBorder
           withShadow
@@ -374,7 +373,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           type="success" 
           message={safeMessage(success)}
           data-testid="success-message"
-          className="mt-4"
+          className={getEnhancedComponentClasses('spacing', 'section')}
           withFadeIn
           withAccentBorder
           withShadow

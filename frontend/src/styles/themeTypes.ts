@@ -204,6 +204,7 @@ export type ComponentType =
   | 'container' 
   | 'grid' 
   | 'flex' 
+  | 'flex-group'
   | 'form-container' 
   | 'navbar' 
   | 'sidebar' 
@@ -300,7 +301,15 @@ export type ComponentVariant =
   | 'dark'
   | 'accent'
   | 'small'
-  | 'section';
+  | 'section'
+  | 'center'
+  | 'between'
+  | 'start'
+  | 'around'
+  | 'column'
+  | 'column-start'
+  | 'compact'
+  | 'loose';
 
 export type ComponentSize = 
   | 'xs' 

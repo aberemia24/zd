@@ -57,9 +57,15 @@ export const feedbackComponents = {
   // List containers and items
   'list-container': {
     base: 'space-y-2',
+    variants: {
+      compact: 'space-y-1',
+    },
   },
   'list-item': {
     base: 'px-4 py-2 hover:bg-secondary-50 flex items-center justify-between',
+    variants: {
+      compact: 'px-2 py-1 text-sm',
+    },
     states: {
       active: 'bg-secondary-100 font-semibold',
     },

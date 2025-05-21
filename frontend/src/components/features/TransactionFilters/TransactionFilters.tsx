@@ -38,14 +38,14 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   }, [customCategories]);
 
   return (
-    <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['gap-2', 'items-end', 'mb-token'])}>
+    <div className={getEnhancedComponentClasses('flex-group', 'start', 'md', undefined, ['mb-token'])}>
       {/* Contor filtre active */}
       {(!!type || !!category) && (
         <Badge
           variant="info"
-          className="mr-2"
           withGradient
           withPulse
+          className={getEnhancedComponentClasses('spacing', 'small')}
         >
           {`${Number(!!type) + Number(!!category)} filtru(e) activ(e)`}
         </Badge>

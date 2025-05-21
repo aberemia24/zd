@@ -142,11 +142,11 @@ const TransactionsPage: React.FC = () => {
           type="error"
           message={fetchError.message || 'Eroare la încărcarea tranzacțiilor'}
           data-testid="fetch-error"
-          className="mt-token"
           withIcon
           withFadeIn
           withAccentBorder
           withShadow
+          className={getEnhancedComponentClasses('spacing', 'section')}
         />
       )}
     </div>

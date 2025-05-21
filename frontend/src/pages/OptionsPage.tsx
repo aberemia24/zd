@@ -4,6 +4,9 @@ import { useAuthStore } from '../stores/authStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { CategoryEditor } from '../components/features/CategoryEditor';
 import { UI } from '@shared-constants/ui';
+import { Button } from '../components/primitives/Button';
+import Alert from '../components/primitives/Alert';
+import { getEnhancedComponentClasses } from '../styles/themeUtils';
 
 /**
  * Pagina de opțiuni a aplicației
@@ -22,11 +25,19 @@ const OptionsPage: React.FC = () => {
   // Dacă utilizatorul nu este autentificat, afișăm un mesaj
   if (!user) {
     return (
-      <div className="container mx-auto px-token py-token-xl" data-testid="options-page-not-logged">
-        <h1 className="text-2xl font-bold text-primary-700 mb-token">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
-        <div className="bg-warning-100 border-l-4 border-warning-500 text-warning-700 p-token mb-token" role="alert">
-          <p>{UI.LOGIN_REQUIRED || 'Trebuie să fiți autentificat pentru a accesa această pagină.'}</p>
-        </div>
+      <div className={getEnhancedComponentClasses('container', 'primary', 'lg', undefined, ['fade-in', 'page-wrapper'])} data-testid="options-page-not-logged">
+        <h1 className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'mb-token'])}>
+          {UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}
+        </h1>
+        <Alert
+          type="warning"
+          message={UI.LOGIN_REQUIRED || 'Trebuie să fiți autentificat pentru a accesa această pagină.'}
+          data-testid="options-alert-not-logged"
+          withFadeIn
+          withAccentBorder
+          withShadow
+          withIcon
+        />
       </div>
     );
   }
@@ -43,45 +54,67 @@ const OptionsPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-token py-token-xl" data-testid="options-page">
-      <h1 className="text-2xl font-bold text-primary-700 mb-token">{UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}</h1>
+    <div className={getEnhancedComponentClasses('container', 'primary', 'lg', undefined, ['fade-in', 'page-wrapper'])} data-testid="options-page">
+      <h1 className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'mb-token'])} data-testid="options-title">
+        {UI.OPTIONS_PAGE_TITLE || 'Opțiuni'}
+      </h1>
       
       {/* Secțiunea de gestionare categorii */}
-      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
-        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.CATEGORY_MANAGEMENT || 'Gestionare categorii'}</h2>
-        <p className="mb-token">{UI.CATEGORY_MANAGEMENT_DESCRIPTION || 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.'}</p>
-        
-        <button
-          onClick={() => setShowCategoryEditor(true)}
-          className="btn btn-primary"
-          data-testid="open-category-editor-btn"
-        >
-          {UI.MANAGE_CATEGORIES || 'Gestionare categorii'}
-        </button>
+      <div className={getEnhancedComponentClasses('card', 'default', 'lg', undefined, ['shadow-md', 'mb-token'])}>
+        <div className={getEnhancedComponentClasses('card-header', undefined, undefined, undefined, ['gradient-bg-subtle'])}>
+          <h2 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>{UI.CATEGORY_MANAGEMENT || 'Gestionare categorii'}</h2>
+        </div>
+        <div className={getEnhancedComponentClasses('card-body')}>
+          <p className="mb-token">{UI.CATEGORY_MANAGEMENT_DESCRIPTION || 'Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare.'}</p>
+          <Button
+            variant="primary"
+            size="md"
+            withShadow
+            dataTestId="open-category-editor-btn"
+            onClick={() => setShowCategoryEditor(true)}
+          >
+            {UI.MANAGE_CATEGORIES || 'Gestionare categorii'}
+          </Button>
+        </div>
       </div>
 
-      {/* Alte secțiuni de opțiuni pot fi adăugate aici */}
-      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
-        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.DISPLAY_OPTIONS || 'Opțiuni de afișare'}</h2>
-        <p className="text-secondary-600">{UI.COMING_SOON || 'În curând'}</p>
+      {/* Alte secțiuni de opțiuni */}
+      <div className={getEnhancedComponentClasses('card', 'default', 'lg', undefined, ['shadow-md', 'mb-token'])}>
+        <div className={getEnhancedComponentClasses('card-header')}>
+          <h2 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>{UI.DISPLAY_OPTIONS || 'Opțiuni de afișare'}</h2>
+        </div>
+        <div className={getEnhancedComponentClasses('card-body')}>
+          <p className={getEnhancedComponentClasses('text', 'accent')}>{UI.COMING_SOON || 'În curând'}</p>
+        </div>
       </div>
 
-      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
-        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.DATA_EXPORT || 'Export date'}</h2>
-        <p className="text-secondary-600">{UI.COMING_SOON || 'În curând'}</p>
+      <div className={getEnhancedComponentClasses('card', 'default', 'lg', undefined, ['shadow-md', 'mb-token'])}>
+        <div className={getEnhancedComponentClasses('card-header')}>
+          <h2 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>{UI.DATA_EXPORT || 'Export date'}</h2>
+        </div>
+        <div className={getEnhancedComponentClasses('card-body')}>
+          <p className={getEnhancedComponentClasses('text', 'accent')}>{UI.COMING_SOON || 'În curând'}</p>
+        </div>
       </div>
 
-      {/* Secțiunea Cont Utilizator - NOU */}
-      <div className="bg-secondary-50 shadow-token rounded-token-lg p-token-lg mb-token-lg">
-        <h2 className="text-xl font-semibold text-primary-600 mb-token">{UI.ACCOUNT_SETTINGS || 'Setări Cont'}</h2>
-        <p className="mb-token text-neutral-600">{UI.ACCOUNT_LOGOUT_DESCRIPTION || 'Deconectează-te de la contul tău.'}</p>
-        <button
-          onClick={handleLogout}
-          className="btn btn-danger" // Stil pentru logout, asigură-te că .btn-danger este definit în index.css
-          data-testid="logout-btn"
-        >
-          {UI.LOGOUT_BUTTON || 'Logout'}
-        </button>
+      {/* Secțiunea Cont Utilizator */}
+      <div className={getEnhancedComponentClasses('card', 'default', 'lg', undefined, ['shadow-md', 'mb-token'])}>
+        <div className={getEnhancedComponentClasses('card-header')}>
+          <h2 className={getEnhancedComponentClasses('form-label', 'secondary', 'md')}>{UI.ACCOUNT_SETTINGS || 'Setări Cont'}</h2>
+        </div>
+        <div className={getEnhancedComponentClasses('card-body')}>
+          <p className={getEnhancedComponentClasses('text', 'accent')}>{UI.ACCOUNT_LOGOUT_DESCRIPTION || 'Deconectează-te de la contul tău.'}</p>
+          <Button
+            variant="danger"
+            size="md"
+            withShadow
+            withGradient
+            dataTestId="logout-btn"
+            onClick={handleLogout}
+          >
+            {UI.LOGOUT_BUTTON || 'Logout'}
+          </Button>
+        </div>
       </div>
 
       {/* Modal pentru editarea categoriilor */}

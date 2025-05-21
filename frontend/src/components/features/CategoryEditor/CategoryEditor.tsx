@@ -13,6 +13,7 @@ import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import type { ComponentType, ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
 import { SubcatAction, SubcatActionType } from './useCategoryEditorState';
 import classNames from 'classnames';
+import { Button } from '../../primitives/Button';
 
 interface Props {
   open: boolean;
@@ -56,7 +57,8 @@ const COMPONENT_VARIANTS = {
   COMPACT: 'compact' as ComponentVariant,
   DEFAULT: 'default' as ComponentVariant,
   CENTER: 'center' as ComponentVariant,
-  WIDE: 'wide' as ComponentVariant
+  WIDE: 'wide' as ComponentVariant,
+  LOOSE: 'loose' as ComponentVariant
 };
 
 const COMPONENT_SIZES = {
@@ -141,6 +143,18 @@ export const CategoryEditor: React.FC<Props> = ({
     };
   }, [open]);
   
+  useEffect(() => {
+    if (!open) return;
+    const handleEsc = (event: Event) => {
+      const e = event as unknown as KeyboardEvent;
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   // Badge pentru număr de tranzacții în subcategorie
@@ -272,6 +286,13 @@ export const CategoryEditor: React.FC<Props> = ({
     
     return true;
   };
+
+  // validare subcategorie
+  const isValidSubcat = (txt: string) =>
+    txt.trim().length > 0 &&
+    txt.trim().length <= 32 &&
+    /^[a-zA-Z0-9ăâîșțĂÂÎȘȚ \-]+$/.test(txt.trim());
+
   return (
     <div 
       className={classNames(
@@ -323,231 +344,241 @@ export const CategoryEditor: React.FC<Props> = ({
           <div className={getEnhancedComponentClasses(COMPONENT_TYPES.FLEX_GROUP, COMPONENT_VARIANTS.DEFAULT)}>
             <div className={getEnhancedComponentClasses(COMPONENT_TYPES.CARD_SECTION)} data-testid="categories-section">
               <h3 className={getEnhancedComponentClasses(COMPONENT_TYPES.SECTION_HEADER)}>{UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}</h3>
-              <ul className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_CONTAINER)}>
-              {categories.map(cat => (
-                <li 
-                  key={cat.name} 
-                  className={getEnhancedComponentClasses(
-                    COMPONENT_TYPES.LIST_ITEM, 
-                    undefined, 
-                    undefined, 
-                    selectedCategory===cat.name ? COMPONENT_STATES.ACTIVE : undefined
-                  )} 
-                  data-testid={`category-item-${cat.name}`}
-                >
-                  <button 
-                    onClick={()=>{
-                      setSelectedCategory(cat.name);
-                      // Resetăm erorile când utilizatorul schimbă categoria
-                      setError(null);
-                      // Resetăm inputul pentru subcategorie nouă pentru experiență mai bună
-                      setNewSubcat('');
-                    }}
-                    aria-pressed={selectedCategory===cat.name}
-                    aria-controls="subcategories-section"
-                    data-testid={`cat-select-${cat.name}`}
-                  >
-                    {cat.name}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className={getEnhancedComponentClasses(COMPONENT_TYPES.CARD_SECTION)} data-testid="subcategories-section">
-            {/* Dialog de confirmare ștergere, arată doar când subcatAction.type === 'delete' */}
-            {subcatAction?.type === 'delete' && (
-              <DeleteConfirmation
-                cat={subcatAction.cat}
-                subcat={subcatAction.subcat}
-                onConfirm={async () => {
-                  try {
-                    if (isValidDeleteRequest(subcatAction.cat, subcatAction.subcat)) {
-                      await _deleteSubcategory(userId, subcatAction.cat, subcatAction.subcat, "delete");
-                      setSubcatAction(null);
-                      setError(null);
-                    }
-                  } catch (error) {
-                    console.error('Eroare la ștergerea subcategoriei:', error);
-                    setError(MESAJE.CATEGORII.EROARE_STERGERE);
-                  }
-                }}
-                onCancel={() => setSubcatAction(null)}
-              />
-            )}
-            
-            {selectedCategory ? (
-              <>
-                <h3 className={getEnhancedComponentClasses(COMPONENT_TYPES.SECTION_HEADER)}>
-                  {UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}
-                  <span className={getEnhancedComponentClasses(
-                    COMPONENT_TYPES.TEXT, 
-                    COMPONENT_VARIANTS.ACCENT, 
-                    undefined, 
-                    undefined
-                  )}>
-                    {selectedCategory}
-                  </span>
-                </h3>
-                <ul 
-                  className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_CONTAINER)}
-                  aria-label={UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}
-                >
-                
-                  {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
+              <div
+                style={{ maxHeight: 300 }}
+                className={getEnhancedComponentClasses('card-section', undefined, undefined, undefined, ['withScroll']) + ' overflow-y-auto'}
+                data-testid="categories-scroll-wrapper"
+              >
+                <ul className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_CONTAINER, COMPONENT_VARIANTS.COMPACT)}>
+                  {categories.map(cat => (
                     <li 
-                      key={sc.name} 
-                      className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_ITEM)} 
-                      data-testid={`subcat-item-${sc.name}`}
+                      key={cat.name} 
+                      className={getEnhancedComponentClasses(
+                        COMPONENT_TYPES.LIST_ITEM, 
+                        COMPONENT_VARIANTS.COMPACT, 
+                        undefined, 
+                        selectedCategory===cat.name ? COMPONENT_STATES.ACTIVE : undefined
+                      )} 
+                      data-testid={`category-item-${cat.name}`}
                     >
-                      {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
-                        <div className={getEnhancedComponentClasses(
-                          COMPONENT_TYPES.FLEX_GROUP, 
-                          COMPONENT_VARIANTS.COMPACT, 
-                          COMPONENT_SIZES.MD, 
-                          undefined
-                        )}>
-                          <input
-                            type="text"
-                            value={renameValue}
-                            onChange={(e: ChangeEvent<HTMLInputElement>) => setRenameValue(e.target.value)}
-                            onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                              if (e.key === 'Enter') handleRename(selectedCategory, sc.name, renameValue);
-                              if (e.key === 'Escape') { setSubcatAction(null); setRenameValue(''); }
-                            }}
-                            autoFocus
-                            className={getEnhancedComponentClasses(
-                              COMPONENT_TYPES.INPUT,
-                              undefined,
-                              COMPONENT_SIZES.SM
-                            )}
-                            data-testid={`rename-input-${sc.name}`}
-                          />
-                          <button 
-                            onClick={() => handleRename(selectedCategory, sc.name, renameValue)} 
-                            className={getEnhancedComponentClasses(
-                              COMPONENT_TYPES.BUTTON, 
-                              COMPONENT_VARIANTS.ACCENT, 
-                              COMPONENT_SIZES.XS
-                            )} 
-                            data-testid={`confirm-rename-${sc.name}`}
-                          >
-                            {BUTTONS.DONE}
-                          </button>
-                          <button 
-                            onClick={() => { setSubcatAction(null); setRenameValue(''); }} 
-                            className={getEnhancedComponentClasses(
-                              COMPONENT_TYPES.BUTTON, 
-                              COMPONENT_VARIANTS.SECONDARY, 
-                              COMPONENT_SIZES.XS, 
-                              COMPONENT_STATES.HOVER
-                            )} 
-                            data-testid={`cancel-rename-${sc.name}`}
-                          >
-                            {BUTTONS.CANCEL}
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <span>{sc.name}</span>
-                          {sc.isCustom && (
-                            <span
-                              className={getEnhancedComponentClasses(
-                                COMPONENT_TYPES.BADGE, 
-                                COMPONENT_VARIANTS.SUCCESS, 
-                                COMPONENT_SIZES.XS, 
-                                COMPONENT_STATES.PULSE
-                              )}
-                              data-testid={`custom-flag-${sc.name}`}
-                            >
-                              {FLAGS.CUSTOM}
-                            </span>
-                          )}
-                          {badge(selectedCategory, sc.name)}
-                          <button
-                            onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
-                            className={getEnhancedComponentClasses(
-                              COMPONENT_TYPES.BUTTON, 
-                              COMPONENT_VARIANTS.ACCENT, 
-                              COMPONENT_SIZES.XS, 
-                              COMPONENT_STATES.HOVER
-                            )}
-                            data-testid={`edit-subcat-btn-${sc.name}`}
-                            aria-label={`${UI.CATEGORY_EDITOR.RENAME_BUTTON} ${sc.name}`}
-                          >{UI.CATEGORY_EDITOR.RENAME_BUTTON}</button>
-                          {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
-                          {sc.isCustom && (
-                            <button 
-                              onClick={() => setSubcatAction({ type: 'delete', cat: selectedCategory, subcat: sc.name })}
-                              className={getEnhancedComponentClasses(
-                                COMPONENT_TYPES.BUTTON, 
-                                COMPONENT_VARIANTS.ERROR, 
-                                COMPONENT_SIZES.XS, 
-                                COMPONENT_STATES.HOVER
-                              )}
-                              data-testid={`delete-subcat-btn-${sc.name}`}
-                              aria-label={`${UI.CATEGORY_EDITOR.DELETE_BUTTON} ${sc.name}`}
-                            >
-                              {UI.CATEGORY_EDITOR.DELETE_BUTTON}
-                            </button>
-                          )}
-                        </>
-                      )}
+                      <button 
+                        onClick={()=>{
+                          setSelectedCategory(cat.name);
+                          setError(null);
+                          setNewSubcat('');
+                        }}
+                        aria-pressed={selectedCategory===cat.name}
+                        aria-controls="subcategories-section"
+                        data-testid={`cat-select-${cat.name}`}
+                      >
+                        {cat.name}
+                      </button>
                     </li>
                   ))}
                 </ul>
-                <div className={getEnhancedComponentClasses(
-                  COMPONENT_TYPES.FLEX_GROUP, 
-                  COMPONENT_VARIANTS.COMPACT, 
-                  COMPONENT_SIZES.MD, 
-                  undefined
-                )}>
-                  <input
-                    type="text"
-                    value={newSubcat}
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => setNewSubcat(e.target.value)}
-                    onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                      if (e.key === 'Enter') handleAdd(categories.find(cat => cat.name === selectedCategory)!);
-                      if (e.key === 'Escape') setNewSubcat('');
-                    }}
-                    placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
-                    className={getEnhancedComponentClasses(
-                      COMPONENT_TYPES.INPUT, 
-                      undefined, 
-                      COMPONENT_SIZES.SM
-                    )}
-                    data-testid="add-subcat-input"
-                  />
-                  <button 
-                    onClick={() => {
-                      const selectedCat = categories.find(cat => cat.name === selectedCategory);
-                      if (selectedCat) handleAdd(selectedCat);
-                    }} 
-                    className={getEnhancedComponentClasses(
-                      COMPONENT_TYPES.BUTTON, 
-                      COMPONENT_VARIANTS.PRIMARY, 
-                      COMPONENT_SIZES.SM
-                    )} 
-                    data-testid="add-subcat-btn"
-                  >
-                    {BUTTONS.ADD}
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div 
-                className={getEnhancedComponentClasses(
-                  COMPONENT_TYPES.ALERT, 
-                  COMPONENT_VARIANTS.INFO, 
-                  COMPONENT_SIZES.SM, 
-                  undefined
-                )} 
-                data-testid="no-cat-msg"
-                role="status"
-              >
-                {INFO.CATEGORY_EDITOR_EMPTY}
               </div>
-            )}
-          </div>
+            </div>
+            <div className={getEnhancedComponentClasses(COMPONENT_TYPES.CARD_SECTION)} data-testid="subcategories-section">
+              {/* Dialog de confirmare ștergere, arată doar când subcatAction.type === 'delete' */}
+              {subcatAction?.type === 'delete' && (
+                <DeleteConfirmation
+                  cat={subcatAction.cat}
+                  subcat={subcatAction.subcat}
+                  onConfirm={async () => {
+                    try {
+                      if (isValidDeleteRequest(subcatAction.cat, subcatAction.subcat)) {
+                        await _deleteSubcategory(userId, subcatAction.cat, subcatAction.subcat, "delete");
+                        setSubcatAction(null);
+                        setError(null);
+                      }
+                    } catch (error) {
+                      console.error('Eroare la ștergerea subcategoriei:', error);
+                      setError(MESAJE.CATEGORII.EROARE_STERGERE);
+                    }
+                  }}
+                  onCancel={() => setSubcatAction(null)}
+                />
+              )}
+              {selectedCategory ? (
+                <>
+                  <h3 className={getEnhancedComponentClasses(COMPONENT_TYPES.SECTION_HEADER)}>
+                    {UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{' '}
+                    <span className={getEnhancedComponentClasses(
+                      COMPONENT_TYPES.TEXT, 
+                      COMPONENT_VARIANTS.ACCENT, 
+                      undefined, 
+                      undefined
+                    )}>
+                      {selectedCategory}
+                    </span>
+                  </h3>
+                  <div
+                    style={{ maxHeight: 300 }}
+                    className={getEnhancedComponentClasses('card-section', undefined, undefined, undefined, ['withScroll']) + ' overflow-y-auto'}
+                    data-testid="subcategories-scroll-wrapper"
+                  >
+                    <ul 
+                      className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_CONTAINER, COMPONENT_VARIANTS.COMPACT)}
+                      aria-label={UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}
+                    >
+                      {categories.find((cat: CustomCategory)=>cat.name===selectedCategory)?.subcategories.map((sc: CustomSubcategory) => (
+                        <li 
+                          key={sc.name} 
+                          className={getEnhancedComponentClasses(COMPONENT_TYPES.LIST_ITEM, COMPONENT_VARIANTS.COMPACT)} 
+                          data-testid={`subcat-item-${sc.name}`}
+                        >
+                          {subcatAction?.type === 'edit' && subcatAction.cat === selectedCategory && subcatAction.subcat === sc.name ? (
+                            <div className="flex w-full items-center gap-1">
+                              <input
+                                type="text"
+                                value={renameValue}
+                                onChange={(e: ChangeEvent<HTMLInputElement>) => setRenameValue(e.target.value)}
+                                onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                                  if (e.key === 'Enter' && isValidSubcat(renameValue)) handleRename(selectedCategory, sc.name, renameValue);
+                                  if (e.key === 'Escape') { setSubcatAction(null); setRenameValue(''); }
+                                }}
+                                autoFocus
+                                className={getEnhancedComponentClasses(
+                                  COMPONENT_TYPES.INPUT,
+                                  undefined,
+                                  COMPONENT_SIZES.MD
+                                ) + ' flex-[10] rounded-md'}
+                                data-testid={`rename-input-${sc.name}`}
+                                maxLength={32}
+                              />
+                              <Button
+                                variant={COMPONENT_VARIANTS.PRIMARY}
+                                size={COMPONENT_SIZES.MD}
+                                disabled={!isValidSubcat(renameValue)}
+                                dataTestId={`confirm-rename-${sc.name}`}
+                                type="button"
+                                onClick={() => handleRename(selectedCategory, sc.name, renameValue)}
+                                withShadow
+                                className="min-w-[90px] flex-shrink-0 rounded-md"
+                              >
+                                {BUTTONS.DONE}
+                              </Button>
+                              <Button
+                                variant={COMPONENT_VARIANTS.SECONDARY}
+                                size={COMPONENT_SIZES.MD}
+                                dataTestId={`cancel-rename-${sc.name}`}
+                                type="button"
+                                onClick={() => { setSubcatAction(null); setRenameValue(''); }}
+                                className="min-w-[90px] flex-shrink-0 rounded-md"
+                              >
+                                {BUTTONS.CANCEL}
+                              </Button>
+                            </div>
+                          ) : (
+                            <>
+                              <span>{sc.name}</span>
+                              {sc.isCustom && (
+                                <span
+                                  className={getEnhancedComponentClasses(
+                                    COMPONENT_TYPES.BADGE, 
+                                    COMPONENT_VARIANTS.SUCCESS, 
+                                    COMPONENT_SIZES.XS, 
+                                    COMPONENT_STATES.PULSE
+                                  )}
+                                  data-testid={`custom-flag-${sc.name}`}
+                                >
+                                  {FLAGS.CUSTOM}
+                                </span>
+                              )}
+                              {badge(selectedCategory, sc.name)}
+                              <button
+                                onClick={() => { setSubcatAction({ type: 'edit', cat: selectedCategory, subcat: sc.name }); setRenameValue(sc.name); }}
+                                className={getEnhancedComponentClasses(
+                                  COMPONENT_TYPES.BUTTON, 
+                                  COMPONENT_VARIANTS.ACCENT, 
+                                  COMPONENT_SIZES.XS, 
+                                  COMPONENT_STATES.HOVER
+                                )}
+                                data-testid={`edit-subcat-btn-${sc.name}`}
+                                aria-label={`${UI.CATEGORY_EDITOR.RENAME_BUTTON} ${sc.name}`}
+                              >{UI.CATEGORY_EDITOR.RENAME_BUTTON}</button>
+                              {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
+                              {sc.isCustom && (
+                                <button 
+                                  onClick={() => setSubcatAction({ type: 'delete', cat: selectedCategory, subcat: sc.name })}
+                                  className={getEnhancedComponentClasses(
+                                    COMPONENT_TYPES.BUTTON, 
+                                    COMPONENT_VARIANTS.ERROR, 
+                                    COMPONENT_SIZES.XS, 
+                                    COMPONENT_STATES.HOVER
+                                  )}
+                                  data-testid={`delete-subcat-btn-${sc.name}`}
+                                  aria-label={`${UI.CATEGORY_EDITOR.DELETE_BUTTON} ${sc.name}`}
+                                >
+                                  {UI.CATEGORY_EDITOR.DELETE_BUTTON}
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="flex w-full items-center gap-1">
+                      <input
+                        type="text"
+                        value={newSubcat}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setNewSubcat(e.target.value)}
+                        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                          if (e.key === 'Enter' && isValidSubcat(newSubcat)) handleAdd(categories.find(cat => cat.name === selectedCategory)!);
+                          if (e.key === 'Escape') setNewSubcat('');
+                        }}
+                        placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
+                        className={getEnhancedComponentClasses(
+                          COMPONENT_TYPES.INPUT,
+                          undefined,
+                          COMPONENT_SIZES.MD
+                        ) + ' flex-[10] rounded-md'}
+                        data-testid="add-subcat-input"
+                        maxLength={32}
+                      />
+                      <Button
+                        variant={COMPONENT_VARIANTS.PRIMARY}
+                        size={COMPONENT_SIZES.MD}
+                        disabled={!isValidSubcat(newSubcat)}
+                        dataTestId="add-subcat-btn"
+                        type="button"
+                        onClick={() => {
+                          const selectedCat = categories.find(cat => cat.name === selectedCategory);
+                          if (selectedCat && isValidSubcat(newSubcat)) handleAdd(selectedCat);
+                        }}
+                        withShadow
+                        className="min-w-[90px] flex-shrink-0 rounded-md"
+                      >
+                        {BUTTONS.ADD}
+                      </Button>
+                      <Button
+                        variant={COMPONENT_VARIANTS.SECONDARY}
+                        size={COMPONENT_SIZES.MD}
+                        dataTestId="cancel-add-subcat-btn"
+                        type="button"
+                        onClick={() => setNewSubcat('')}
+                        className="min-w-[90px] flex-shrink-0 rounded-md"
+                      >
+                        {BUTTONS.CANCEL}
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div 
+                  className={getEnhancedComponentClasses(
+                    COMPONENT_TYPES.ALERT, 
+                    COMPONENT_VARIANTS.INFO, 
+                    COMPONENT_SIZES.SM, 
+                    undefined
+                  )} 
+                  data-testid="no-cat-msg"
+                  role="status"
+                >
+                  {INFO.CATEGORY_EDITOR_EMPTY}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
