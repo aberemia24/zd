@@ -27,6 +27,7 @@ export const supabaseService = {
     userId: string | undefined, // Am actualizat tipul pentru a permite undefined
     pagination: Pagination = {},
     filters: Partial<Pick<TransactionValidated, 'type' | 'category' | 'recurring'>> & {
+      subcategory?: string; // Adăugat filtru pentru subcategorie
       dateFrom?: string; // Data de început pentru interval (format ISO: YYYY-MM-DD)
       dateTo?: string;   // Data de sfârșit pentru interval (format ISO: YYYY-MM-DD)
       minAmount?: number; // Suma minimă pentru filtrare
@@ -45,6 +46,7 @@ export const supabaseService = {
 
     if (filters.type) query = query.eq('type', filters.type);
     if (filters.category) query = query.eq('category', filters.category);
+    if (filters.subcategory) query = query.eq('subcategory', filters.subcategory);
     if (filters.recurring !== undefined) query = query.eq('recurring', filters.recurring);
     
     // Filtrare după interval de date

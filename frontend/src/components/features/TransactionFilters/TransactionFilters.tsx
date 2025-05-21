@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import Button from '../../primitives/Button/Button';
 import Select from '../../primitives/Select/Select';
 import Badge from '../../primitives/Badge/Badge';
@@ -13,8 +13,10 @@ import classNames from 'classnames';
 export interface TransactionFiltersProps {
   type?: TransactionType | '' | string;
   category?: CategoryType | '' | string;
+  subcategory?: string;
   onTypeChange?: (type: TransactionType | '' | string) => void;
   onCategoryChange?: (category: CategoryType | '' | string) => void;
+  onSubcategoryChange?: (subcategory: string) => void;
   dateFrom?: string;
   dateTo?: string;
   amountMin?: string;
@@ -56,11 +58,13 @@ function useDebounce<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
-const TransactionFilters: React.FC<TransactionFiltersProps> = ({
+const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   type = '',
   category = '',
+  subcategory = '',
   onTypeChange = () => {},
   onCategoryChange = () => {},
+  onSubcategoryChange = () => {},
   dateFrom = '',
   dateTo = '',
   amountMin = '',
@@ -83,38 +87,88 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   
   // Construim opțiunile pentru categorii din store, nu din constante
   // Respectăm regulile: memoizare, fără hardcodări, indicator pentru custom
-  const categoryOptions = React.useMemo(() => {
-    return customCategories.map(cat => ({
+  const categoryOptions = useMemo(() => {
+    // Filtrăm categoriile bazate pe tipul de tranzacție selectat
+    let filteredCategories = customCategories;
+    
+    if (type) {
+      // Păstrăm doar categoriile compatibile cu tipul de tranzacție selectat
+      filteredCategories = customCategories.filter(cat => {
+        if (type === 'INCOME') return cat.name.includes('INCOME');
+        if (type === 'EXPENSE') return cat.name.includes('EXPENSE');
+        if (type === 'SAVING') return cat.name.includes('SAVING');
+        return true; // Dacă tipul e gol, afișăm toate
+      });
+    }
+    
+    return filteredCategories.map(cat => ({
       value: cat.name,
       // Formatăm label-ul pentru afișare, incluzând indicator pentru categorii personalizate
       label: cat.name.charAt(0) + cat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
              (cat.isCustom ? ' ➡️' : '') // Indicator consistent cu cel din TransactionForm
     }));
-  }, [customCategories]);
+  }, [customCategories, type]);
+  
+  // Construim opțiunile pentru subcategorii bazate pe categoria selectată
+  const subcategoryOptions = useMemo(() => {
+    if (!category) return [];
+    
+    // Găsim categoria selectată în lista de categorii
+    const selectedCategory = customCategories.find(cat => cat.name === category);
+    if (!selectedCategory) return [];
+    
+    // Extragem subcategoriile și le transformăm în opțiuni pentru Select
+    return selectedCategory.subcategories.map(subcat => ({
+      value: subcat.name,
+      label: subcat.name.charAt(0) + subcat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
+             (subcat.isCustom ? ' ➡️' : '')
+    }));
+  }, [customCategories, category]);
 
   // Calculăm numărul total de filtre active
-  const activeFilterCount = React.useMemo(() => {
+  const activeFilterCount = useMemo(() => {
     let count = 0;
     if (type) count++;
     if (category) count++;
+    if (subcategory) count++;
     if (dateFrom) count++;
     if (dateTo) count++;
     if (amountMin) count++;
     if (amountMax) count++;
     if (searchText) count++;
     return count;
-  }, [type, category, dateFrom, dateTo, amountMin, amountMax, searchText]);
+  }, [type, category, subcategory, dateFrom, dateTo, amountMin, amountMax, searchText]);
+  
+  // Memoizăm filtrele combinate pentru a evita recalculări inutile
+  const activeFilters = useMemo(() => ({
+    type, 
+    category, 
+    subcategory,
+    dateFrom, 
+    dateTo, 
+    amountMin, 
+    amountMax, 
+    searchText
+  }), [type, category, subcategory, dateFrom, dateTo, amountMin, amountMax, searchText]);
 
-  // Handler pentru reset global
+  // Reset subcategory when category changes
+  useEffect(() => {
+    if (subcategory && (!category || subcategoryOptions.every(opt => opt.value !== subcategory))) {
+      onSubcategoryChange('');
+    }
+  }, [category, subcategory, subcategoryOptions, onSubcategoryChange]);
+
+  // Handler pentru reset global - memoizat
   const handleResetAll = useCallback(() => {
     onTypeChange('');
     onCategoryChange('');
+    onSubcategoryChange('');
     onDateFromChange('');
     onDateToChange('');
     onAmountMinChange('');
     onAmountMaxChange('');
     onSearchTextChange('');
-  }, [onTypeChange, onCategoryChange, onDateFromChange, onDateToChange, 
+  }, [onTypeChange, onCategoryChange, onSubcategoryChange, onDateFromChange, onDateToChange, 
       onAmountMinChange, onAmountMaxChange, onSearchTextChange]);
 
   // Toggle pentru filtre avansate
@@ -139,6 +193,46 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchInputValue(e.target.value);
   }, []);
+
+  // Memoizăm handlerul pentru schimbarea tipului
+  const handleTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as TransactionType | '';
+    onTypeChange(value);
+    // Reset categorie și subcategorie când se schimbă tipul
+    onCategoryChange('');
+    onSubcategoryChange('');
+  }, [onTypeChange, onCategoryChange, onSubcategoryChange]);
+
+  // Memoizăm handlerul pentru schimbarea categoriei
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as CategoryType | '';
+    onCategoryChange(value);
+    // Reset subcategorie când se schimbă categoria
+    onSubcategoryChange('');
+  }, [onCategoryChange, onSubcategoryChange]);
+  
+  // Memoizăm handlerul pentru schimbarea subcategoriei
+  const handleSubcategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    onSubcategoryChange(e.target.value);
+  }, [onSubcategoryChange]);
+
+  // Memoizăm handlerii pentru filtrele de date
+  const handleDateFromChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onDateFromChange(e.target.value);
+  }, [onDateFromChange]);
+
+  const handleDateToChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onDateToChange(e.target.value);
+  }, [onDateToChange]);
+
+  // Memoizăm handlerii pentru filtrele de sumă
+  const handleAmountMinChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onAmountMinChange(e.target.value);
+  }, [onAmountMinChange]);
+
+  const handleAmountMaxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onAmountMaxChange(e.target.value);
+  }, [onAmountMaxChange]);
 
   return (
     <div className={getEnhancedComponentClasses('card', 'default', 'md', undefined, ['mb-token', 'p-4', 'fade-in'])}>
@@ -200,10 +294,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             label={LABELS.TYPE_FILTER}
             value={type || ''}
             data-testid="type-filter"
-            onChange={e => {
-              const value = (e.target as HTMLSelectElement).value as TransactionType | '';
-              onTypeChange(value);
-            }}
+            onChange={handleTypeChange}
             options={types}
             placeholder={PLACEHOLDERS.SELECT + ' tipul'}
           />
@@ -216,12 +307,30 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
             label={LABELS.CATEGORY_FILTER}
             value={category || ''}
             data-testid="category-filter"
-            onChange={e => onCategoryChange((e.target as HTMLSelectElement).value as CategoryType | '')}
+            onChange={handleCategoryChange}
             options={categoryOptions}
             placeholder={PLACEHOLDERS.SELECT + ' categoria'}
+            disabled={!type}
           />
         </div>
       
+        {/* Filtru pentru subcategorie - nou adăugat */}
+        <div className={getEnhancedComponentClasses('form-group')}>
+          <Select
+            name="subcategory-filter"
+            label={LABELS.SUBCATEGORY}
+            value={subcategory || ''}
+            data-testid="subcategory-filter"
+            onChange={handleSubcategoryChange}
+            options={subcategoryOptions}
+            placeholder={PLACEHOLDERS.SELECT + ' subcategoria'}
+            disabled={!category || subcategoryOptions.length === 0}
+          />
+        </div>
+      </div>
+      
+      {/* Filtre de bază - a doua linie pentru căutare */}
+      <div className={getEnhancedComponentClasses('grid', undefined, undefined, undefined, ['gap-4', 'grid-cols-1', 'mb-4'])}>
         {/* Filtru pentru căutare text */}
         <div className={getEnhancedComponentClasses('form-group')}>
           <Input
@@ -249,7 +358,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
               label={LABELS.DATE_FROM_FILTER}
               value={dateFrom}
               data-testid="date-from-filter"
-              onChange={e => onDateFromChange(e.target.value)}
+              onChange={handleDateFromChange}
               placeholder={PLACEHOLDERS.SELECT + ' data de început'}
               type="date"
             />
@@ -262,7 +371,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
               label={LABELS.DATE_TO_FILTER}
               value={dateTo}
               data-testid="date-to-filter"
-              onChange={e => onDateToChange(e.target.value)}
+              onChange={handleDateToChange}
               placeholder={PLACEHOLDERS.SELECT + ' data de sfârșit'}
               type="date"
             />
@@ -275,7 +384,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
               label={LABELS.AMOUNT_MIN_FILTER}
               value={amountMin}
               data-testid="amount-min-filter"
-              onChange={e => onAmountMinChange(e.target.value)}
+              onChange={handleAmountMinChange}
               placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
               type="number"
             />
@@ -288,7 +397,7 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
               label={LABELS.AMOUNT_MAX_FILTER}
               value={amountMax}
               data-testid="amount-max-filter"
-              onChange={e => onAmountMaxChange(e.target.value)}
+              onChange={handleAmountMaxChange}
               placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
               type="number"
             />
@@ -315,5 +424,8 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({
     </div>
   );
 };
+
+// Aplicăm React.memo pentru a preveni re-rendări inutile
+const TransactionFilters = React.memo(TransactionFiltersComponent);
 
 export default TransactionFilters;

@@ -107,6 +107,26 @@ export const layoutComponents = {
       auto: 'grid-cols-auto',
     }
   },
+  
+  // Componenta flex cu stiluri similare cu flex-group
+  flex: {
+    base: 'flex',
+    variants: {
+      default: 'items-center',
+      center: 'items-center justify-center',
+      start: 'items-start justify-start',
+      end: 'items-center justify-end',
+      between: 'items-center justify-between',
+      around: 'items-center justify-around',
+      column: 'flex-col',
+      'column-start': 'flex-col items-start justify-start',
+    },
+    sizes: {
+      sm: 'gap-1',
+      md: 'gap-2',
+      lg: 'gap-4',
+    }
+  },
 
   'flex-group': {
     base: 'flex',
@@ -114,6 +134,7 @@ export const layoutComponents = {
       default: 'items-center',
       center: 'items-center justify-center',
       start: 'items-start justify-start',
+      end: 'items-center justify-end',
       between: 'items-center justify-between',
       around: 'items-center justify-around',
       column: 'flex-col',
@@ -125,6 +146,24 @@ export const layoutComponents = {
       sm: 'gap-1',
       md: 'gap-2',
       lg: 'gap-4',
+    }
+  },
+  
+  // Container specific pentru formulare
+  'form-container': {
+    base: 'w-full',
+    variants: {
+      default: 'space-y-4',
+      compact: 'space-y-2',
+      loose: 'space-y-6',
+      card: 'bg-white rounded-lg shadow-sm p-6 border border-secondary-200 space-y-4',
+    },
+    sizes: {
+      sm: 'max-w-md',
+      md: 'max-w-lg',
+      lg: 'max-w-2xl',
+      xl: 'max-w-4xl',
+      full: 'max-w-full',
     }
   },
   

@@ -10,6 +10,7 @@ export interface TransactionQueryParams {
   offset?: number;
   type?: TransactionType | string;
   category?: string;
+  subcategory?: string;
   recurring?: boolean;
   startDate?: string;
   endDate?: string;
@@ -72,6 +73,7 @@ export function useInfiniteTransactions(
       const filters = {
         type: queryParams.type as TransactionType | undefined,
         category: queryParams.category,
+        subcategory: queryParams.subcategory,
         recurring: queryParams.recurring,
         dateFrom: queryParams.startDate,
         dateTo: queryParams.endDate,
