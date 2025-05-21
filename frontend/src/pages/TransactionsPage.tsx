@@ -13,6 +13,9 @@ import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 import { PAGINATION } from '@shared-constants';
 import Alert from '../components/primitives/Alert/Alert';
 import { getEnhancedComponentClasses } from '../styles/themeUtils';
+// Import-urile pentru categorii nu mai sunt necesare deoarece inițializarea se face în App.tsx
+// import { useCategoryStore } from '../stores/categoryStore';
+// import { CATEGORIES } from '@shared-constants/categories';
 
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
@@ -44,6 +47,8 @@ const TransactionsPage: React.FC = () => {
   const [amountMin, setAmountMin] = React.useState<string>('');
   const [amountMax, setAmountMax] = React.useState<string>('');
   const [searchText, setSearchText] = React.useState<string>('');
+  
+  // Inițializarea categoriilor a fost mutată în App.tsx, deci comentăm/eliminăm codul de aici
   
   // Memoizăm parametrii de query pentru a preveni recalculări inutile
   const queryParams = useMemo(() => ({
@@ -182,6 +187,7 @@ const TransactionsPage: React.FC = () => {
           isFetchingNextPage={isFetchingNextPage}
           hasNextPage={hasNextPage}
           fetchNextPage={fetchNextPage}
+          isFiltered={isFiltered}
         />
       </div>
 

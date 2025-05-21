@@ -13,7 +13,7 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   /** Clasă suplimentară pentru wrapper */
   wrapperClassName?: string;
   /** Opțiuni disponibile */
-  options: Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string; disabled?: boolean }>;
   /** Placeholder pentru select */
   placeholder?: string;
   /** Variantă de stilizare (folosește enum ComponentVariant) */
@@ -22,6 +22,8 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
   sizeVariant?: ComponentSize;
   /** Pentru testare */
   'data-testid'?: string;
+  /** Indicator de stare loading */
+  isLoading?: boolean;
   
   // Efecte vizuale rafinate
   /** Adaugă hover effect cu animație subtilă */
@@ -47,6 +49,7 @@ const Select: React.FC<SelectProps> = ({
   variant = 'primary',
   sizeVariant = 'md',
   disabled,
+  isLoading = false,
   'data-testid': dataTestId,
   withHoverEffect = false,
   withCustomIcon,
@@ -123,18 +126,40 @@ const Select: React.FC<SelectProps> = ({
         )}
         value={options.some(opt => opt.value === rest.value) ? rest.value : ''}
         data-testid={dataTestId || `select-field${error ? '-error' : ''}${disabled ? '-disabled' : ''}`}
-        disabled={disabled}
+        disabled={disabled || isLoading}
         {...rest}
       >
         {placeholder && <option value="">{placeholder}</option>}
         {options.map(opt => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+          <option key={opt.value} value={opt.value} disabled={opt.disabled}>{opt.label}</option>
         ))}
       </select>
       
-      {/* Icon personalizat sau cel standard */}
+      {/* Icon personalizat, loading spinner sau icon standard */}
       <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none pr-2">
-        {withCustomIcon ? (
+        {isLoading ? (
+          // Spinner de loading când isLoading este true
+          <svg 
+            className="animate-spin h-4 w-4 text-primary-500" 
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24"
+          >
+            <circle 
+              className="opacity-25" 
+              cx="12" 
+              cy="12" 
+              r="10" 
+              stroke="currentColor" 
+              strokeWidth="4"
+            ></circle>
+            <path 
+              className="opacity-75" 
+              fill="currentColor" 
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        ) : withCustomIcon ? (
           withCustomIcon
         ) : (
           <svg 

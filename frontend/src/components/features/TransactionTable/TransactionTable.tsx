@@ -3,7 +3,7 @@ import Button from '../../primitives/Button';
 import Badge from '../../primitives/Badge/Badge';
 import Spinner from '../../primitives/Spinner';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
-import { TABLE, BUTTONS } from '@shared-constants';
+import { TABLE, BUTTONS, INFO } from '@shared-constants';
 import type { Transaction } from '../../../types/Transaction';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import classNames from 'classnames';
@@ -23,6 +23,8 @@ export type TransactionTableProps = {
   hasNextPage?: boolean;
   /** Callback pentru încărcarea următoarei pagini */
   fetchNextPage?: () => void;
+  /** Flag care indică dacă filtrele sunt active, pentru a afișa mesaj specific când nu există tranzacții */
+  isFiltered?: boolean;
 };
 
 const TransactionTable: React.FC<TransactionTableProps> = ({ 
@@ -31,7 +33,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   isLoading = false,
   isFetchingNextPage = false,
   hasNextPage = false,
-  fetchNextPage
+  fetchNextPage,
+  isFiltered = false
 }) => {
   // Referință către container pentru implementarea intersection observer
   const bottomRef = React.useRef<HTMLDivElement>(null);
@@ -121,6 +124,16 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     return numericAmount.toFixed(2) + ' RON';
   };
 
+  // Determinăm mesajul pentru cazul când nu există tranzacții
+  const getEmptyMessage = (): string => {
+    if (isFiltered) {
+      // Dacă filtrele sunt active, afișăm mesajul pentru "nu există tranzacții pentru filtrele selectate"
+      return TABLE.NO_TRANSACTIONS || INFO.NO_TRANSACTIONS;
+    }
+    // Altfel, afișăm mesajul standard pentru tabel gol
+    return TABLE.EMPTY;
+  };
+
   return (
     <div className={getEnhancedComponentClasses('spacing', 'section')}>
       {/* Container pentru tabelul responsiv cu stiluri rafinate */}
@@ -155,14 +168,27 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               </tr>
             ) : (!transactions || transactions.length === 0 ? (
               <tr data-testid="transaction-table-empty">
-                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
-                  {TABLE.EMPTY}
+                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center', 'py-8'])}>
+                  <div className={getEnhancedComponentClasses('flex-group', 'center', 'md', undefined, ['flex-col', 'p-4'])}>
+                    <span className={getEnhancedComponentClasses('text', 'secondary', 'lg')}>
+                      {getEmptyMessage()}
+                    </span>
+                    {isFiltered && (
+                      <Badge 
+                        variant="secondary" 
+                        className={getEnhancedComponentClasses('spacing', 'small', undefined, undefined, ['mt-2'])}
+                        withShadow
+                      >
+                        Încercați să ajustați filtrele
+                      </Badge>
+                    )}
+                  </div>
                 </td>
               </tr>
             ) : (
               transactions.map((t, idx) => (
                 <tr 
-                  key={t.id || idx} 
+                  key={`${t.id}-${idx}`} 
                   className={getEnhancedComponentClasses('table-row', undefined, undefined, undefined, rowEffects)}
                   data-testid={`transaction-item-${t.id || idx}`}
                 >
@@ -198,15 +224,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                 </tr>
               ))
             ))}
-            {/* Afișăm loading indicator pentru paginile următoare */}
+            {/* Fără date, dar în curs de încărcare - arăta indicator de loading pentru următoarea pagină */}
             {isFetchingNextPage && (
-              <tr data-testid="transaction-table-next-page-loading">
+              <tr data-testid="transaction-table-loading-more">
                 <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
                   <div className={classNames(
                     getEnhancedComponentClasses('flex-group', 'center', 'md'),
                     getEnhancedComponentClasses('spacing', 'small')
                   )}>
-                    <Spinner variant="primary" sizeVariant="xs" withPulse />
+                    <Spinner variant="primary" sizeVariant="sm" withFadeIn />
                     <span>{TABLE.LOADING_MORE}</span>
                   </div>
                 </td>
@@ -215,44 +241,30 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           </tbody>
         </table>
       </div>
-
-      {/* Status și informații cu stiluri rafinate */}
-      <div className={classNames(
-        getEnhancedComponentClasses('flex-group', 'between', 'md'),
-        getEnhancedComponentClasses('spacing', 'section')
-      )}>
-        {/* Informații despre numărul de tranzacții afișate */}
-        <div>
-          {!isLoading && transactions && transactions.length > 0 && (
-            <Badge 
-              variant="info" 
-              withGradient
-              data-testid="transaction-table-info"
+      
+      {/* Informații despre numărul total de tranzacții */}
+      {!isLoading && transactions && transactions.length > 0 && (
+        <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mt-4', 'text-sm', 'text-secondary-700'])}>
+          <span>
+            {TABLE.SHOWING_INFO.replace('{shown}', String(transactions.length)).replace('{total}', String(total))}
+          </span>
+          {hasNextPage && (
+            <Button
+              variant="ghost" 
+              size="sm"
+              onClick={() => fetchNextPage?.()}
+              disabled={isFetchingNextPage}
+              withTranslate
+              data-testid="load-more-btn"
             >
-              {TABLE.SHOWING_INFO
-                .replace('{shown}', String(transactions.length))
-                .replace('{total}', String(total))}
-            </Badge>
+              {isFetchingNextPage ? TABLE.LOADING_MORE : BUTTONS.NEXT_PAGE}
+            </Button>
           )}
         </div>
-        
-        {/* Buton pentru încărcarea manuală a mai multor tranzacții */}
-        {hasNextPage && !isFetchingNextPage && (
-          <Button 
-            variant="primary" 
-            size="sm"
-            onClick={() => fetchNextPage?.()} 
-            disabled={isFetchingNextPage || !hasNextPage}
-            withShadow
-            withTranslate
-          >
-            {BUTTONS.NEXT_PAGE}
-          </Button>
-        )}
-      </div>
-
+      )}
+      
       {/* Element invizibil pentru intersection observer */}
-      <div ref={bottomRef} className={getEnhancedComponentClasses('spacing', 'small')} data-testid="transaction-table-bottom-sentinel" />
+      <div ref={bottomRef} style={{ height: '10px', margin: '10px 0' }} />
     </div>
   );
 };

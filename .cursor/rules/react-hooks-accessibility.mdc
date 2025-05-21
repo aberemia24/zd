@@ -1,6 +1,7 @@
 ---
-trigger: glob
+description: 
 globs: frontend/src/components/**
+alwaysApply: false
 ---
 
 <hook_rules>

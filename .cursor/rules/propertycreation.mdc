@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
-
 <property_creation>
 - Înainte de a adăuga o proprietate nouă într-un component:
   1. Verifică dacă există deja în `shared-constants/ui.ts` (pentru UI)

@@ -19,6 +19,12 @@ export interface TransactionPage {
   count: number;
 }
 
+export interface ActiveSubcategory {
+  category: string;
+  subcategory: string;
+  count: number;
+}
+
 const TABLE = 'transactions';
 
 export const supabaseService = {
@@ -74,6 +80,91 @@ export const supabaseService = {
     const { data, count, error } = await query;
     if (error) throw error;
     return { data: data as TransactionValidated[], count: count || 0 };
+  },
+
+  // Fetch subcategorii active - cele care au cel puțin o tranzacție
+  // Metodă nouă pentru a obține doar subcategoriile active din tranzacții
+  async fetchActiveSubcategories(
+    userId: string | undefined,
+    category?: string,
+    type?: string
+  ): Promise<ActiveSubcategory[]> {
+    try {
+      // Folosim un logging pentru debugging
+      console.log(`[fetchActiveSubcategories] Încep căutarea subcategoriilor active cu: userId=${userId}, category=${category}, type=${type}`);
+      
+      // Selectăm toate tranzacțiile pentru a le grupa local
+      let query = supabase
+        .from(TABLE)
+        .select('category, subcategory')
+        .not('subcategory', 'is', null);
+      
+      // Aplicăm filtrele primite
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+      
+      if (category) {
+        query = query.eq('category', category);
+      }
+      
+      if (type) {
+        query = query.eq('type', type);
+      }
+      
+      // Executăm interogarea
+      const { data, error } = await query;
+      
+      if (error) {
+        console.error('Eroare la încărcarea subcategoriilor active:', error);
+        return [];
+      }
+      
+      if (!data || !Array.isArray(data)) {
+        console.warn('Nu am primit date pentru subcategorii active');
+        return [];
+      }
+      
+      console.log(`[fetchActiveSubcategories] Am găsit ${data.length} tranzacții cu subcategorii`);
+      
+      // Grupăm rezultatele local pentru a obține contoare
+      const groupedData: Record<string, ActiveSubcategory> = {};
+      
+      // Parcurgem toate tranzacțiile și construim un map pentru a număra subcategoriile
+      data.forEach(item => {
+        // Verificăm dacă avem subcategorie validă
+        if (!item.subcategory) return;
+        
+        const key = `${item.category}|${item.subcategory}`;
+        
+        if (!groupedData[key]) {
+          groupedData[key] = {
+            category: item.category,
+            subcategory: item.subcategory,
+            count: 1
+          };
+        } else {
+          groupedData[key].count++;
+        }
+      });
+      
+      // Logăm datele pentru debugging
+      console.log(`[fetchActiveSubcategories] Am grupat în ${Object.keys(groupedData).length} subcategorii active`);
+      
+      // Transformăm obiectul în array
+      const result = Object.values(groupedData);
+      
+      // Sortăm rezultatele după categorie și subcategorie
+      return result.sort((a, b) => {
+        if (a.category !== b.category) {
+          return a.category.localeCompare(b.category);
+        }
+        return a.subcategory.localeCompare(b.subcategory);
+      });
+    } catch (error) {
+      console.error('Eroare la fetchActiveSubcategories:', error);
+      return [];
+    }
   },
 
   // Helper pentru validarea categoriei și subcategoriei - MODIFICAT pentru a accepta subcategorii personalizate

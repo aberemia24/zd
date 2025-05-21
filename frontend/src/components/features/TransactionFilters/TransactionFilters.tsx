@@ -7,8 +7,10 @@ import { OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
 import type { TransactionType, CategoryType } from '@shared-constants';
 import { useCategoryStore } from '../../../stores/categoryStore';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
-import { BUTTONS, UI } from '@shared-constants/ui';
+import { BUTTONS, UI, TABLE, LOADER, INFO } from '@shared-constants/ui';
 import classNames from 'classnames';
+import { useActiveSubcategories } from '../../../services/hooks/useActiveSubcategories';
+import { MESAJE } from '@shared-constants/messages';
 
 export interface TransactionFiltersProps {
   type?: TransactionType | '' | string;
@@ -85,45 +87,92 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   // Categoriile personalizate + predefinite din categoryStore
   const customCategories = useCategoryStore(state => state.categories);
   
+  // Adăugăm log pentru debugging
+  useEffect(() => {
+    console.log('[TransactionFilters] customCategories:', customCategories);
+    console.log('[TransactionFilters] type:', type);
+    console.log('[TransactionFilters] OPTIONS:', OPTIONS);
+  }, [customCategories, type]);
+  
   // Construim opțiunile pentru categorii din store, nu din constante
   // Respectăm regulile: memoizare, fără hardcodări, indicator pentru custom
   const categoryOptions = useMemo(() => {
+    // Logare pentru debugging
+    console.log('[categoryOptions] Start building options');
+    console.log('[categoryOptions] customCategories:', customCategories);
+    console.log('[categoryOptions] type:', type);
+    
     // Filtrăm categoriile bazate pe tipul de tranzacție selectat
     let filteredCategories = customCategories;
     
     if (type) {
       // Păstrăm doar categoriile compatibile cu tipul de tranzacție selectat
       filteredCategories = customCategories.filter(cat => {
-        if (type === 'INCOME') return cat.name.includes('INCOME');
-        if (type === 'EXPENSE') return cat.name.includes('EXPENSE');
-        if (type === 'SAVING') return cat.name.includes('SAVING');
+        if (type === 'INCOME') return cat.name === 'VENITURI';
+        if (type === 'EXPENSE') return cat.name !== 'VENITURI' && cat.name !== 'ECONOMII';
+        if (type === 'SAVING') return cat.name === 'ECONOMII';
         return true; // Dacă tipul e gol, afișăm toate
       });
+      console.log('[categoryOptions] filteredCategories după filtrarea după tip:', filteredCategories);
     }
     
-    return filteredCategories.map(cat => ({
+    const options = filteredCategories.map(cat => ({
       value: cat.name,
       // Formatăm label-ul pentru afișare, incluzând indicator pentru categorii personalizate
       label: cat.name.charAt(0) + cat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
              (cat.isCustom ? ' ➡️' : '') // Indicator consistent cu cel din TransactionForm
     }));
+    
+    console.log('[categoryOptions] Final options:', options);
+    return options;
   }, [customCategories, type]);
   
-  // Construim opțiunile pentru subcategorii bazate pe categoria selectată
+  // Obține subcategoriile active folosind noul hook
+  const {
+    subcategories: activeSubcategories,
+    isLoading: isLoadingSubcategories,
+    isEmpty: noActiveSubcategories
+  } = useActiveSubcategories({
+    category,
+    type,
+    enabled: !!category // Activăm doar dacă avem o categorie selectată
+  });
+  
+  // Combinăm subcategoriile active cu cele din store dacă e necesar
   const subcategoryOptions = useMemo(() => {
+    // Dacă nu avem o categorie selectată, returnăm un array gol
     if (!category) return [];
     
-    // Găsim categoria selectată în lista de categorii
-    const selectedCategory = customCategories.find(cat => cat.name === category);
-    if (!selectedCategory) return [];
+    // Dacă se încarcă subcategoriile active, afișăm toate subcategoriile din store ca înainte
+    if (isLoadingSubcategories) {
+      // Găsim categoria selectată în lista de categorii
+      const selectedCategory = customCategories.find(cat => cat.name === category);
+      if (!selectedCategory) return [];
+      
+      // Extragem subcategoriile și le transformăm în opțiuni pentru Select
+      return selectedCategory.subcategories.map(subcat => ({
+        value: subcat.name,
+        label: subcat.name.charAt(0) + subcat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
+               (subcat.isCustom ? ' ➡️' : '')
+      }));
+    }
     
-    // Extragem subcategoriile și le transformăm în opțiuni pentru Select
-    return selectedCategory.subcategories.map(subcat => ({
-      value: subcat.name,
-      label: subcat.name.charAt(0) + subcat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
-             (subcat.isCustom ? ' ➡️' : '')
+    // Dacă nu avem subcategorii active sau componentele de căutare returnează array gol, afișăm un mesaj în dropdown
+    if (noActiveSubcategories || activeSubcategories.length === 0) {
+      return [{ 
+        value: '', 
+        label: INFO.NO_SUBCATEGORIES || TABLE.NO_SUBCATEGORIES,
+        disabled: true
+      }];
+    }
+    
+    // Altfel, returnăm subcategoriile active cu numărul de tranzacții pentru fiecare
+          return activeSubcategories.map(subcat => ({
+      value: subcat.value,
+      label: subcat.label, // Numărul de tranzacții este deja adăugat în hook-ul useActiveSubcategories
+      disabled: false
     }));
-  }, [customCategories, category]);
+  }, [category, customCategories, isLoadingSubcategories, activeSubcategories, noActiveSubcategories]);
 
   // Calculăm numărul total de filtre active
   const activeFilterCount = useMemo(() => {
@@ -314,7 +363,7 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           />
         </div>
       
-        {/* Filtru pentru subcategorie - nou adăugat */}
+        {/* Filtru pentru subcategorie - acum folosește subcategoriile active */}
         <div className={getEnhancedComponentClasses('form-group')}>
           <Select
             name="subcategory-filter"
@@ -323,8 +372,9 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             data-testid="subcategory-filter"
             onChange={handleSubcategoryChange}
             options={subcategoryOptions}
-            placeholder={PLACEHOLDERS.SELECT + ' subcategoria'}
+            placeholder={isLoadingSubcategories ? LOADER.TEXT : PLACEHOLDERS.SELECT + ' subcategoria'}
             disabled={!category || subcategoryOptions.length === 0}
+            isLoading={isLoadingSubcategories}
           />
         </div>
       </div>

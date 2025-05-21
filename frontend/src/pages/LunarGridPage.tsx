@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { EXCEL_GRID, UI } from '@shared-constants/ui';
 import LunarGrid from '../components/features/LunarGrid';
 import LunarGridTanStack from '../components/features/LunarGrid/LunarGridTanStack';
@@ -9,6 +9,7 @@ import { useCategoryStore } from '../stores/categoryStore';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMonthlyTransactions } from '../services/hooks/useMonthlyTransactions';
+import { getEnhancedComponentClasses } from '../styles/themeUtils';
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar
@@ -49,53 +50,6 @@ const LunarGridPage: React.FC = () => {
   const loadCategories = useCategoryStore(state => state.loadUserCategories);
   const mergeWithDefaults = useCategoryStore(state => state.mergeWithDefaults);
   
-  // Inițializăm store-ul de categorii la prima încărcare
-  // Acest efect respectă regulile globale prin:
-  // 1. Operare o singură dată la montare ([] ca dependențe)
-  // 2. Folosirea useRef pentru a preveni efecte multiple
-  const categoriesLoadedRef = React.useRef(false);
-  
-  // Efect pentru încărcarea categoriilor personalizate și fuzionarea cu cele predefinite
-  React.useEffect(() => {
-    // Guard pentru a preveni încărcări multiple
-    if (categoriesLoadedRef.current) return;
-    
-    // Doar pentru utilizatorii autentificați
-    if (!user) return;
-    
-    const initializeCategories = async () => {
-      try {
-        console.log('LunarGridPage: Inițializare categorii personalizate');
-        
-        // 1. Mai întâi încărcăm categoriile personalizate din DB
-        await loadCategories(user.id);
-        
-        // 2. Apoi fuzionăm cu cele predefinite din CATEGORIES (shared-constants)
-        // Conversia e necesară pentru că CATEGORIES are un format ușor diferit de CustomCategory[]
-        const defaultCategories = Object.entries(CATEGORIES).map(([name, subcats]) => ({
-          name,
-          subcategories: Object.values(subcats).flat().map(subcatName => ({
-            name: subcatName,
-            isCustom: false
-          })),
-          isCustom: false
-        }));
-        
-        // 3. Fuziune - prioritate pentru cele personalizate
-        mergeWithDefaults(defaultCategories);
-        
-        // Marcăm ca încărcat pentru a preveni operații duplicate
-        categoriesLoadedRef.current = true;
-        
-        console.log('LunarGridPage: Categorii inițializate cu succes');
-      } catch (error) {
-        console.error('Eroare la inițializarea categoriilor:', error);
-      }
-    };
-    
-    initializeCategories();
-  }, [user, loadCategories, mergeWithDefaults]); // Dependențe minimale necesare
-  
   // Actualizăm URL-ul când se schimbă luna/anul
   // Nu mai avem nevoie de logica de fetch, este gestionată de React Query
   React.useEffect(() => {
@@ -108,17 +62,6 @@ const LunarGridPage: React.FC = () => {
     
     console.log(`LunarGridPage: URL updated for ${year}-${month}`);
   }, [year, month]);
-  
-  // Nu mai avem nevoie de efectul pentru fetch inițial
-  // React Query se ocupă automat de aceasta în useTransactions
-  // Următorul comentariu este doar pentru documentare
-  /* 
-   * React Query gestionează automat starea pentru:
-   * - Fetch inițial (la montare)
-   * - Refetch la schimbarea dependențelor (year, month)
-   * - Cache și invalidare cache
-   * - Loading states & error handling
-   */
   
   /**
    * Funcție de debounce care actualizează luna/anul și invalidează cache-ul cu întârziere
@@ -194,95 +137,106 @@ const LunarGridPage: React.FC = () => {
     setUseTanStack(prev => !prev);
   };
 
+  // Handler pentru a actualiza luna și anul - optimizat cu debounce
+  // pentru a evita cereri API multiple când utilizatorul schimbă rapid luna/anul
+  const handleMonthChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMonth = parseInt(e.target.value, 10);
+    setMonth(newMonth);
+    
+    // Invalidate cache pentru a forța o nouă cerere cu noile valori
+    if (debounceTimerRef.current) {
+      window.clearTimeout(debounceTimerRef.current);
+    }
+    
+    debounceTimerRef.current = window.setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['transactions', 'monthly'] });
+    }, 100);
+  }, [queryClient]);
+  
+  // Optimizare similară pentru schimbarea anului
+  const handleYearChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const newYear = parseInt(e.target.value, 10);
+    if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
+      setYear(newYear);
+      
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current);
+      }
+      
+      debounceTimerRef.current = window.setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['transactions', 'monthly'] });
+      }, 100);
+    }
+  }, [queryClient]);
+  
+  // Generăm opțiuni pentru dropdown cu luni
+  const monthOptions = useMemo(() => {
+    const options = [];
+    for (let i = 1; i <= 12; i++) {
+      options.push(
+        <option key={i} value={i}>
+          {getMonthName(i)}
+        </option>
+      );
+    }
+    return options;
+  }, []);
+
   return (
-    <>
-      <div className="flex justify-between items-center mb-token">
-        <h1 className="text-2xl font-bold text-primary-700" data-testid="lunar-grid-title">
+    <div className="container mx-auto px-4 pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+        <h1 className={getEnhancedComponentClasses('form-label', 'primary', 'xl')}>
           {TITLES.GRID_LUNAR}
         </h1>
         
-        <div className="flex items-center space-x-token-sm">
-          {/* Toggle pentru implementare */}
-          <div 
-            className="flex items-center bg-secondary-100 rounded-lg p-1 shadow-sm" 
-            data-testid="implementation-toggle"
+        <div className="flex items-center space-x-4 mt-4 md:mt-0">
+          <select 
+            value={month}
+            onChange={handleMonthChange}
+            className={getEnhancedComponentClasses('select', 'primary', 'md')}
+            data-testid="month-selector"
           >
-            <button 
-              className={`px-3 py-1 text-sm rounded-md transition-all ${useTanStack ? 'bg-primary-500 text-white' : 'text-primary-600'}`}
-              onClick={toggleImplementation}
-              data-testid="tanstack-toggle-btn"
-            >
-              {EXCEL_GRID.TABLE_CONTROLS.VIRTUAL_TABLE}
-            </button>
-            <button 
-              className={`px-3 py-1 text-sm rounded-md transition-all ${!useTanStack ? 'bg-primary-500 text-white' : 'text-primary-600'}`}
-              onClick={toggleImplementation}
-              data-testid="legacy-toggle-btn"
-            >
-              {EXCEL_GRID.TABLE_CONTROLS.LEGACY_TABLE}
-            </button>
-          </div>
-
-          {/* Link to Options for managing categories */}
-          <div>
-            <a
-              href="#options"
-              className="text-sm text-accent-600 hover:text-accent-700 underline"
-              data-testid="manage-categories-link"
-              onClick={e => {
-                e.preventDefault();
-                const newUrl = `${window.location.pathname}#options`;
-                window.history.replaceState({}, '', newUrl);
-                window.dispatchEvent(new HashChangeEvent('hashchange'));
-              }}
-            >
-              {UI.MANAGE_CATEGORIES}
-            </a>
-          </div>
-        </div>
-        
-        <div className="flex items-center gap-token">
-          <button 
-            onClick={goToPreviousMonth}
-            className="btn-icon bg-secondary-200 text-secondary-700 hover:bg-secondary-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            data-testid="prev-month-btn"
-          >
-            &larr;
-          </button>
+            {monthOptions}
+          </select>
           
-          <span className="text-lg font-medium text-primary-700" data-testid="current-month">
-            {getMonthName(month)} {year}
-          </span>
+          <input
+            type="number"
+            value={year}
+            onChange={handleYearChange}
+            min="1900"
+            max="2100"
+            className={getEnhancedComponentClasses('input', 'primary', 'md', undefined, ['w-24'])}
+            data-testid="year-input"
+          />
           
           <button 
-            onClick={goToNextMonth}
-            className="btn-icon bg-secondary-200 text-secondary-700 hover:bg-secondary-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
-            data-testid="next-month-btn"
+            onClick={toggleImplementation}
+            className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
+            data-testid="toggle-implementation"
           >
-            &rarr;
+            {useTanStack ? 'Utilizează tabel clasic' : 'Utilizează TanStack Table'}
           </button>
         </div>
       </div>
       
-      {/* Afișăm o versiune diferită în funcție de preferința utilizatorului */}
+      {/* Arată Loading state când încărcăm date */}
       {loading ? (
-        <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">{EXCEL_GRID.LOADING}</div>
-      ) : useTanStack ? (
-        <div data-testid="tanstack-implementation">
-          <LunarGridTanStack year={year} month={month} />
-          <div className="mt-token text-xs text-secondary-500 text-right">
-            {EXCEL_GRID.TABLE_CONTROLS.VERSION}: TanStack (optimizat pentru performanță)
-          </div>
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full" />
+          <p className="ml-3 text-secondary-700">Se încarcă datele pentru {getMonthName(month)} {year}...</p>
         </div>
       ) : (
-        <div data-testid="legacy-implementation">
-          <LunarGrid year={year} month={month} />
-          <div className="mt-token text-xs text-secondary-500 text-right">
-            {EXCEL_GRID.TABLE_CONTROLS.VERSION}: Clasic
-          </div>
-        </div>
+        <>
+          {useTanStack ? (
+            // Versiunea nouă cu TanStack Table
+            <LunarGridTanStack year={year} month={month} />
+          ) : (
+            // Versiunea clasică legacy
+            <LunarGrid year={year} month={month} />
+          )}
+        </>
       )}
-    </>
+    </div>
   );
 };
 

@@ -1,4 +1,5 @@
 EXEMPLE CONCRETE, FLUXURI DE DATE ȘI PATTERN-URI UI
+
 1. Exemple Concrete de Utilizare pentru Componente Majore
 1.1 TransactionForm
 Exemplu Utilizare:
@@ -9,7 +10,7 @@ import TransactionForm from '../components/features/TransactionForm';
 <TransactionForm />
 
 // Exemplu cu callbacks
-<TransactionForm 
+<TransactionForm
   onSave={(formData) => console.log('Tranzacție salvată:', formData)}
   onCancel={() => console.log('Formular anulat')}
 />
@@ -68,7 +69,7 @@ const MyLunarGrid = () => {
         <span>{`${getMonthName(month)} ${year}`}</span>
         <button onClick={() => setMonth(prev => Math.min(12, prev + 1))}>Luna următoare</button>
       </div>
-      
+
       <LunarGridTanStack 
         transactions={transactions}
         categories={categories}
@@ -141,6 +142,7 @@ const LunarGridTanStack = ({
 1.2.1 Utilizare utils/lunarGrid
 
 Structura utilitarelor pentru LunarGrid:
+
 ```
 frontend/src/utils/lunarGrid/
 ├── calculations.ts     # Calcule pentru sume și transformări cu memorare
@@ -150,6 +152,7 @@ frontend/src/utils/lunarGrid/
 ```
 
 Exemplu utilizare utilitare pentru date:
+
 ```typescript
 import { 
   calculateAmountsForCategory, 
@@ -225,6 +228,7 @@ useEffect(() => {
 1.2.3 Optimizări pentru performanță
 
 - **Memorare pentru calcule costisitoare**:
+
 ```typescript
 // Cache pentru funcțiile de calcul din calculations.ts
 const categoryAmountsCache = new Map<string, Record<number, number>>();
@@ -248,6 +252,7 @@ categoryAmountsCache.set(cacheKey, resultObj);
 ```
 
 - **Virtualizare tabel pentru randare eficientă**:
+
 ```typescript
 // Configurare virtualizare pentru scroll eficient
 const rowVirtualizer = useVirtualizer({
@@ -266,6 +271,7 @@ rowVirtualizer.getVirtualItems().map(virtualRow => {
 ```
 
 - **Optimizare re-render cu React.memo**:
+
 ```typescript
 // Componenta optimizată pentru rânduri subcategorii
 const TanStackSubcategoryRows = React.memo(({ 
@@ -274,6 +280,7 @@ const TanStackSubcategoryRows = React.memo(({
   // ... implementare randare ...
 });
 ```
+
 1.3 TransactionTable
 Exemplu Utilizare:
 tsx// În TransactionsPage.tsx
@@ -292,7 +299,7 @@ const TransactionsWithPagination = () => {
   };
   
   return (
-    <TransactionTable 
+    <TransactionTable
       limit={limit}
       offset={offset}
       onPageChange={handlePageChange}
@@ -314,7 +321,7 @@ const OptionsPageWithCategoryEditor = () => {
       <button onClick={() => setShowEditor(true)}>
         Gestionare Categorii
       </button>
-      
+
       {/* Modal pentru editarea categoriilor */}
       <CategoryEditor
         open={showEditor}
@@ -346,6 +353,7 @@ const OptionsPageWithCategoryEditor = () => {
                                                      └─────────────────┘
 
 Flux:
+
 1. User completează și trimite formularul TransactionForm
 2. transactionFormStore.handleSubmit() validează și apelează transactionStore.saveTransaction()
 3. transactionStore apelează supabaseService.createTransaction() sau updateTransaction()
@@ -355,7 +363,8 @@ Flux:
 7. TransactionTable se re-renderează automat cu datele noi
 
 Cache & Invalidare:
-- transactionStore menține un cache intern pentru fiecare lună/an 
+
+- transactionStore menține un cache intern pentru fiecare lună/an
 - Invalidarea cache-ului se face după orice operație de scriere (add/edit/delete)
 - Cache-ul are TTL de 15 minute pentru refresh automat
 2.2 Flux Categorii Personalizate (CategoryStore)
@@ -375,6 +384,7 @@ Cache & Invalidare:
                                                      └─────────────────┘
 
 Flux:
+
 1. User adaugă/redenumește/șterge subcategorie în CategoryEditor
 2. categoryStore.renameSubcategory() / addSubcategory() / deleteSubcategory() se apelează
 3. categoryService execută operația CRUD în Supabase
@@ -404,6 +414,7 @@ Flux:
                                                    └──────────────────┘
 
 Flux Optimizat:
+
 1. Utilizatorul interacționează cu o celulă din grid-ul virtualizat TanStack
    - Click simpu -> onCellClick(category, day)
    - Dublu-click -> onCellDoubleClick(category, day)
@@ -425,10 +436,12 @@ Flux Optimizat:
    pentru a optimiza performanța chiar și cu seturi mari de date
 
 Optimizări noi:
+
 - Memorare și cache pentru calculele intensive (calculateAmountsForCategory, etc.)
 - Virtualizare tabel pentru randare eficientă a mii de rânduri
 - Separarea clară a logicii de business în hook-ul useLunarGridTable
 - Schema ReactMemo pentru optimizarea re-render-ului componentelor
+
 3. Pattern-uri de Interacțiune UI
 3.1 Pattern: Editare în Grid (LunarGrid)
 tsx// LunarGrid.tsx implementează trei pattern-uri de editare:
@@ -513,7 +526,7 @@ const [expandedCategories, setExpandedCategories] = useState<Record<string, bool
 const toggleCategory = (category: string) => {
   setExpandedCategories(prev => {
     const newState = { ...prev, [category]: !prev[category] };
-    
+
     // Salvează în localStorage
     try {
       localStorage.setItem(LOCALSTORAGE_CATEGORY_EXPAND_KEY, JSON.stringify(newState));
@@ -526,26 +539,26 @@ const toggleCategory = (category: string) => {
 };
 
 // Utilizare în componenta de randare
-<tr 
-  className="bg-secondary-100 hover:bg-secondary-200 cursor-pointer" 
+<tr
+  className="bg-secondary-100 hover:bg-secondary-200 cursor-pointer"
   onClick={() => toggleCategory(categoryKey)}
   data-testid={`category-row-${categoryKey}`}
 >
   <td className="...">
-    {isExpanded ? 
-      <ChevronDown size={16} className="mr-1" /> : 
+    {isExpanded ?
+      <ChevronDown size={16} className="mr-1" /> :
       <ChevronRight size={16} className="mr-1" />}
     {categoryKey}
   </td>
   {/* ... */}
 </tr>
 
-{/* Afișează subcategoriile doar dacă categoria este expandată */}
+{/*Afișează subcategoriile doar dacă categoria este expandată */}
 {isExpanded && (
   <SubcategoryRows
     categoryKey={categoryKey}
     subcategories={subcategories}
-    /* ... */
+    /* ...*/
   />
 )}
 3.3 Pattern: Editare/Ștergere Subcategorii (SubcategoryRows & CategoryEditor)
@@ -597,8 +610,8 @@ const [deleteMode, setDeleteMode] = useState<boolean>(false);
 
 // Confirmarea ștergerii într-un componenta separată
 {deleteMode && deletingSubcat && (
-  <DeleteConfirmation 
-    cat={deletingSubcat.cat} 
+  <DeleteConfirmation
+    cat={deletingSubcat.cat}
     subcat={deletingSubcat.subcat}
     onConfirm={handleConfirmDelete}
     onCancel={() => {

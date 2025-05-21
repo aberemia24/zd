@@ -87,6 +87,8 @@ export const TABLE = {
     YES: 'Da',
     NO: 'Nu',
   },
+  NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
+  NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
 };
 
 // Texte pentru componenta de încărcare (Loader)
@@ -222,4 +224,6 @@ export const FLAGS = {
 // Mesaj informativ pentru starea goală a editorului de categorii
 export const INFO = {
   CATEGORY_EDITOR_EMPTY: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
+  NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
+  NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
 };

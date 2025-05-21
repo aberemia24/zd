@@ -15,6 +15,9 @@ import { getEnhancedComponentClasses } from './styles/themeUtils';
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from './stores/authStore';
+// Import pentru inițializarea categoriilor
+import { useCategoryStore } from './stores/categoryStore';
+import { CATEGORIES } from '@shared-constants/categories';
 
 /**
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
@@ -28,10 +31,50 @@ export const App: React.FC = () => {
   console.log('🔜 App render using react-router-dom');
   
   const { user, loading, checkUser } = useAuthStore();
-
+  
+  // Inițializarea categoriilor la nivel global
+  const loadCategories = useCategoryStore(state => state.loadUserCategories);
+  const mergeWithDefaults = useCategoryStore(state => state.mergeWithDefaults);
+  
+  // Verificăm dacă utilizatorul este autentificat
   useEffect(() => {
     checkUser();
   }, [checkUser]);
+  
+  // Inițializăm categoriile după autentificare
+  useEffect(() => {
+    // Nu încărcăm categoriile dacă utilizatorul nu este autentificat
+    if (!user) return;
+    
+    console.log('[App] Inițializare categorii globală');
+    
+    const initializeCategories = async () => {
+      try {
+        // 1. Mai întâi încărcăm categoriile personalizate din DB
+        await loadCategories(user.id);
+        
+        // 2. Apoi fuzionăm cu cele predefinite din CATEGORIES (shared-constants)
+        // Conversia e necesară pentru că CATEGORIES are un format ușor diferit de CustomCategory[]
+        const defaultCategories = Object.entries(CATEGORIES).map(([name, subcats]) => ({
+          name,
+          subcategories: Object.values(subcats).flat().map(subcatName => ({
+            name: subcatName,
+            isCustom: false
+          })),
+          isCustom: false
+        }));
+        
+        // 3. Fuziune - prioritate pentru cele personalizate
+        mergeWithDefaults(defaultCategories);
+        
+        console.log('[App] Categorii inițializate cu succes');
+      } catch (error) {
+        console.error('[App] Eroare la inițializarea categoriilor:', error);
+      }
+    };
+    
+    initializeCategories();
+  }, [user, loadCategories, mergeWithDefaults]);
   
   // Afișează spinner în timpul încărcării stării de autentificare
   if (loading) {

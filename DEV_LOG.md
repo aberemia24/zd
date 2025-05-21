@@ -1,12 +1,14 @@
 ## [2025-05-21] Optimizare și corecții la filtrarea subcategoriilor active
 
-### Probleme întâlnite:
+### Probleme întâlnite
+
 - Eroare SQL la încărcarea subcategoriilor active: `column "transactions.category" must appear in the GROUP BY clause or be used in an aggregate function`
 - Ineficiență la încărcarea tuturor subcategoriilor, incluzând cele fără tranzacții asociate
 - Eroare 404 la încercarea utilizării funcțiilor RPC (`exec_sql`) inexistente în Supabase
 - Duplicate keys în listarea tranzacțiilor: `Encountered two children with the same key`
 
-### Soluții implementate:
+### Soluții implementate
+
 1. **Refactorizare `fetchActiveSubcategories`**:
    - Înlocuită implementarea bazată pe SQL GROUP BY cu grupare locală în JavaScript
    - Utilizarea metodei standard Supabase pentru query-uri în loc de RPC
@@ -22,8 +24,9 @@
    - Generare chei unice pentru rândurile din tabel prin combinarea ID-ului cu indexul: `key={`${t.id}-${idx}`}`
    - Asigurarea unicității pentru a evita avertismentele React și comportamentul incorect
 
-### Lecții învățate:
-1. **Grupare SQL vs. locală**: 
+### Lecții învățate
+
+1. **Grupare SQL vs. locală**:
    - În Supabase, operațiile de GROUP BY trebuie să includă toate coloanele neagregate din SELECT sau să fie folosite în funcții agregate
    - Pentru seturi mici de date, procesarea locală poate fi o alternativă validă și mai flexibilă
 
@@ -41,7 +44,8 @@
    - Definiți corect cheile de query pentru a beneficia complet de invalidare automată a cache-ului
    - Folosiți `useMemo` pentru a evita recalcularea listelor și opțiunilor la fiecare render
 
-### Impact și beneficii:
+### Impact și beneficii
+
 - UX îmbunătățit prin filtre mai relevante, fără opțiuni goale
 - Reducerea numărului de query-uri către backend
 - Evitarea erorilor SQL și simplificarea logicii de procesare
