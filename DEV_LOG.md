@@ -1,3 +1,48 @@
+# Log dezvoltare proiect BudgetApp
+
+## [2025-05-22] Audit documentație și concordanță cu codul
+
+### Sumar
+
+S-a efectuat un audit complet al documentației, cu focus pe concordanța între pattern-urile și regulile documentate și implementarea lor efectivă în cod. Scopul a fost de a identifica eventualele discrepanțe și de a consolida documentația pentru a reflecta cu acuratețe starea actuală a proiectului.
+
+### Constatări cheie
+
+1. **React Query + Zustand**: Pattern-urile documentate în `BEST_PRACTICES.md` sunt implementate corect în cod:
+   - Hooks specializate (`useMonthlyTransactions`, `useInfiniteTransactions`) implementate conform documentației
+   - Structură chei query corectă și optimizări de caching (staleTime, keepPreviousData)
+   - Separare clară între UI state (Zustand) și server state (React Query)
+   - Mutații corecte cu invalidare cache
+
+2. **Sistem de stilizare**: Sistemul de design tokens și componentMap este implementat conform documentației:
+   - `getEnhancedComponentClasses` aplicat corect în componente
+   - Structura base/variants/sizes/states respectată
+   - Efecte vizuale (fx-*) implementate și utilizate corect
+
+3. **Organizare cod**: Structura de directoare și organizarea codului reflectă documentația:
+   - Componente primitive în `components/primitives/`
+   - Componente de feature în `components/features/`
+   - Servicii în `services/`
+   - Hooks specializate în `services/hooks/`
+
+### Îmbunătățiri necesare
+
+1. **Documentație sistem stiluri rafinate**:
+   - Necesită mai multe exemple de utilizare a `fx-` effects în componente reale
+   - Adăugare detalii despre integrarea `componentMap` cu Tailwind
+
+2. **Documentație services layer**:
+   - Adăugare secțiune specifică despre pattern-ul serviciilor în frontend
+   - Exemplu complet de interacțiune services-hooks-componente
+
+3. **Instrucțiuni pentru validare automată**:
+   - Pași concreți pentru rularea scriptului de validare constants
+   - Automatizare verificări de consistență între documentație și cod
+
+### Impact
+
+Auditul a confirmat că documentația existentă reflectă cu acuratețe starea actuală a codului, dar există oportunități de îmbunătățire pentru a face documentația mai completă și mai utilă pentru dezvoltatorii noi. Aceste îmbunătățiri vor fi implementate în următoarea iterație a documentației.
+
 ## [2025-05-21] Optimizare și corecții la filtrarea subcategoriilor active
 
 ### Probleme întâlnite

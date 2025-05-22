@@ -19,111 +19,190 @@
 - Refactorizare: Incrementală, cu acoperire de teste.
 - Fără Breaking Changes fără documentare și consens.
 
-## Pattern hooks tranzacții: bulk vs. infinite loading
+## Convenții pentru imports [ACTUALIZAT 2025-05-22]
 
-- Pentru tranzacții, folosește două hooks specializate:
-  - `useMonthlyTransactions` (bulk, pentru grid lunar)
-  - `useInfiniteTransactions` (infinite loading, pentru tabel)
-- Cheia de cache trebuie să fie partajată (`['transactions']`) pentru a asigura invalidarea corectă la orice mutație (create/update/delete).
-- Fiecare hook are responsabilitate unică; este interzisă duplicarea logicii între ele sau cu alte hooks.
-- Orice extensie viitoare (filtre, sortări) trebuie să păstreze această separare și să folosească cache-ul partajat.
-- Refactorizările de hooks trebuie documentate în `DEV_LOG.md` și validate cu teste unitare înainte de integrare.
-- Exemplu canonical: vezi implementările actuale pentru `useMonthlyTransactions` și `useInfiniteTransactions` (frontend/src/services/hooks/).
+### Organizare imports
 
-## Testing
+Toate importurile trebuie să urmeze următoarea structură:
 
----
+```typescript
+// 1. Librării externe
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-## Best Practice: Tailwind/PostCSS - Utilitare custom cu @layer/@apply
+// 2. Constante și shared
+import { MESSAGES, TRANSACTION_TYPES } from '@shared-constants';
 
-**NU folosi @import pentru fișiere ce conțin @layer și @apply (ex: utils.css) în fișierul principal de stiluri (index.css).**
+// 3. Componente și hooks
+import { Button } from 'components/primitives';
+import { TransactionForm } from 'components/features';
+import { useTransactionStore } from 'stores';
 
-- Toate utilitarele custom cu @layer components trebuie scrise direct în index.css, după @tailwind components și înainte de @tailwind utilities.
-- Dacă folosești @import pentru astfel de fișiere, buildul va eșua cu eroarea:
-  > `@layer components is used but no matching @tailwind components directive is present.`
-- @import e permis doar pentru reseturi simple sau variabile, nu pentru utilitare cu @apply/@layer.
+// 4. Servicii
+import { transactionService } from 'services';
 
-**Motivație:**
-Tailwind/PostCSS procesează directivelor în ordinea fizică a fișierului. @layer trebuie să fie în același context cu directivele Tailwind.
-
-**Pattern recomandat:**
-
-- Modularizează utilitarele doar logic (comentarii, secțiuni), nu fizic (fișiere separate cu @layer).
-- Pentru proiecte mari, folosește pluginuri Tailwind custom sau barrel-uri JS pentru tokens, nu fișiere CSS importate separat.
-
-**Consistență prin token-uri și utilitare centralizate (Actualizat Mai 2025):**
-Pentru a menține coerența vizuală și mentenanță (așa cum s-a demonstrat în refactorizarea temei "earthy"):
-
-- Utilizați exclusiv clasele Tailwind bazate pe token-urile de design definite în `tailwind.config.js` (ex: `bg-primary-500`, `text-neutral-700`, `p-token`, `rounded-token`).
-- Consultați și utilizați clasele utilitare custom (ex: `.btn`, `.input-field`, `.alert`, `.card-base`) definite în `frontend/src/index.css`. Acestea sunt create pentru a încapsula stiluri repetitive și a asigura aplicarea corectă a temei.
-- Evitați stilurile hardcodate sau clasele Tailwind generice care nu respectă sistemul de token-uri (ex: `bg-red-500` în loc de `bg-error-500` sau o clasă utilitară `alert-error`).
-
-**Data:** 2025-05-11
-
-## Sistemul de stiluri rafinate (2025-05-19)
-
-**Context**: Am implementat un sistem de stiluri rafinate pentru toate componentele din aplicație. Acest sistem înlocuiește utilizarea directă a claselor Tailwind în JSX cu o abordare sistematică bazată pe tokens și un API unificat.
-
-### Principii fundamentale
-
-1. **Sursă unică de adevăr**: Toate stilurile sunt definite în directorul `componentMap/` grupate pe categorii funcționale.
-2. **Tokens vs. clase**: Utilizăm tokens semantice (`primary`, `success`, `lg`, etc.) în loc de clase CSS specifice.
-3. **Extensibilitate**: Sistemul poate fi extins prin adăugarea de noi componente, variante, sau efecte vizuale.
-4. **Consistență**: Toate componentele au o structură unitară: bază, variante, mărimi, stări.
-
-### API-ul sistemului: `getEnhancedComponentClasses`
-
-Toate componentele trebuie să folosească funcția centrală pentru genera clasele CSS:
-
-```tsx
-import { getEnhancedComponentClasses } from '../styles/themeUtils';
-
-// Exemplu de utilizare
-<div className={getEnhancedComponentClasses(
-  'card',             // Tipul componentei (definit în themeTypes.ts)
-  'primary',          // Varianta (default, primary, secondary, etc.)
-  'md',               // Mărimea (sm, md, lg, etc.)
-  isActive ? 'active' : undefined,  // Starea (active, disabled, etc.)
-  ['shadow-md', 'gradient-bg-subtle'] // Efecte adiționale
-)}>...</div>
+// 5. Utilitare și tipuri
+import { formatCurrency, groupByCategory } from 'utils';
+import type { Transaction, TransactionFilters } from 'types';
 ```
 
-### Extinderea sistemului
+### Imports pentru constants partajate
 
-Când întru funcționalități noi trebuie să adăugăm componente sau efecte noi:
+- Sursă unică de adevăr: `shared-constants/`
+- Import **doar** prin path mapping `@shared-constants`
+- **Interzis**: importuri din barrel-uri locale sau direct din frontend/src/constants
+- Validare automată periodică cu `npm run validate:constants`
 
-1. **NU adăugați clase Tailwind hardcodate**: Este strict interzis să adăugați clase CSS direct în JSX.
-2. **Extindeți sistemul**:
-   - Adăugați noul tip de componentă în `themeTypes.ts` (dacă e necesar)
-   - Adăugați configurația componentei în fișierul corespunzător din `componentMap/`
-   - Demonstrați și documentați noua componentă/efect în `DEV_LOG.md`
+### [2025-04-25] Importuri pentru constants locale: barrel & portabilitate
 
-### Componentele primitive vs. construirea manuală
+**Regulă:** Pentru orice cod partajat între runtime și test (mai ales constants folosite în stores/hooks/teste), folosește importuri din barrel (`index.ts`) cu cale relativă scurtă, nu import direct din fișier sau cu path mapping custom.
 
-Abordarea recomandată (în ordine de prioritate):
+**Exemplu corect:**
+```typescript
+// În orice fișier din src/stores sau src/hooks
+import { INITIAL_FORM_STATE, MESAJE } from '../constants';
+```
 
-1. **Folosiți componentele primitive** dacă există (Button, Alert, Card, etc.) cu props-uri pentru efecte (`withShadow`, `withGradient`, etc.)
-2. **Folosiți `getEnhancedComponentClasses`** pentru HTML direct (`div`, `span`, etc.)
-3. **DOAR în caz de excepție**: extensibilizați sistemul adăugând noi componente/efecte
+**De ce?**
+- Barrel-ul (`constants/index.ts`) re-exportă TOATE constantele relevante, deci importul e robust la schimbări de structură.
+- TypeScript și Jest rezolvă corect modulele fără configurări suplimentare sau mapping custom.
+- Evită probleme de rezoluție la runtime și la testare, indiferent de OS sau context.
 
-### Documentare și exemple
+**Atenție:**
+- Actualizează barrel-ul dacă adaugi/ștergi constante!
+- Nu folosi importuri absolute sau path mapping custom pentru constants (ex: `@constants/xyz`) decât dacă ai nevoie de compatibilitate cu unelte externe sau monorepo.
 
-Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
+## Pattern hooks tranzacții: React Query + Zustand [ACTUALIZAT 2025-05-22]
 
-- Explicații detaliate ale arhitecturii
-- Exemple pentru fiecare tip de componentă
-- Ghid de migrare pentru componente existente
-- Recomandări de performanță și accesibilitate
+### Arhitectură hooks specializate
 
-**Pentru referință**: Modelele TransactionTable, TransactionForm și TransactionFilters au fost deja refactorizate și pot fi folosite ca exemplu.
+- Pentru tranzacții, folosim două hooks specializate combinate cu Zustand:
+  - `useMonthlyTransactions` (bulk, pentru grid lunar)
+  - `useInfiniteTransactions` (infinite loading, pentru tabel)
+  - `useTransactionStore` (state global UI și cache-invalidare)
 
-### Principii Generale
+- Cheia de cache React Query este structurată ierarhic pentru invalidare eficientă:
+  ```typescript
+  // Cheie primară partajată
+  const baseQueryKey = ['transactions'];
+  
+  // Chei derivate pentru queries specifice
+  const monthlyQueryKey = [...baseQueryKey, 'monthly', { year, month }];
+  const infiniteQueryKey = [...baseQueryKey, 'infinite', { filters }];
+  ```
 
-- Teste unitare și de integrare pentru toate componentele și serviciile.
-- Teste exhaustive pentru cazuri pozitive, negative și edge cases.
-- Fără hardcodări de date în teste.
+- La operațiuni de modificare (create/update/delete), invalidăm întregul cache 'transactions':
+  ```typescript
+  // În mutații
+  const queryClient = useQueryClient();
+  queryClient.invalidateQueries({ queryKey: ['transactions'] });
+  ```
+
+### Separarea responsabilităților
+
+- Hooks specializate au responsabilități clare și nu trebuie să conțină logică duplicată:
+  - Hooks de **citire**: `useMonthlyTransactions`, `useInfiniteTransactions` - doar pentru fetch și caching
+  - Hooks de **modificare**: `useTransactionMutations` - pentru create/update/delete
+  - **Zustand store**: `useTransactionStore` - pentru state UI (filtre, selecții, etc.)
+
+- Exemplu corect:
+  ```typescript
+  // Hook specializat pentru tranzacții lunare
+  export function useMonthlyTransactions({ year, month }: MonthlyParams) {
+    const queryKey = ['transactions', 'monthly', { year, month }];
+    
+    return useQuery({
+      queryKey,
+      queryFn: () => transactionService.getMonthlyTransactions(year, month),
+      staleTime: 5 * 60 * 1000, // 5 minute cache
+    });
+  }
+  
+  // Hook specializat pentru mutații
+  export function useTransactionMutations() {
+    const queryClient = useQueryClient();
+    
+    return {
+      create: useMutation({
+        mutationFn: (data: TransactionInput) => transactionService.createTransaction(data),
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['transactions'] });
+        },
+      }),
+      // similar pentru update și delete
+    };
+  }
+  ```
+
+### Pattern pentru infinite loading [NOU]
+
+Pentru tranzacții infinite, folosim pattern-ul recomandat de React Query:
+
+```typescript
+export function useInfiniteTransactions(filters: TransactionFilters) {
+  return useInfiniteQuery({
+    queryKey: ['transactions', 'infinite', filters],
+    queryFn: ({ pageParam = 0 }) => 
+      transactionService.getTransactions({ ...filters, offset: pageParam, limit: 20 }),
+    getNextPageParam: (lastPage, allPages) => 
+      lastPage.length === 20 ? allPages.length * 20 : undefined,
+  });
+}
+
+// Utilizare în componente
+const { 
+  data, 
+  fetchNextPage, 
+  hasNextPage, 
+  isFetchingNextPage 
+} = useInfiniteTransactions(filters);
+
+// Întreaga listă de tranzacții (toate paginile)
+const transactions = useMemo(() => 
+  data?.pages.flatMap(page => page) || [], 
+  [data]
+);
+```
+
+## Testing [ACTUALIZAT 2025-05-22]
 
 ### Practici React & Testing Library
+
+#### Pattern robust pentru testare componente
+
+- **Testare completă bazată pe comportament**: Testează interacțiunile utilizatorului și rezultatele acestora, nu implementarea internă
+- **Organizare teste**:
+  ```typescript
+  describe('ComponentName', () => {
+    // Setup comun
+    beforeEach(() => {
+      // Mockuri, setup inițial comun
+    });
+    
+    describe('inițializare', () => {
+      it('se renderează fără erori', () => {...});
+      it('afișează valorile inițiale corect', () => {...});
+    });
+    
+    describe('interacțiuni', () => {
+      it('actualizează state la click', () => {...});
+      it('gestionează submit-ul formularului', () => {...});
+    });
+    
+    describe('cazuri de eroare', () => {
+      it('afișează mesajul de eroare corect', () => {...});
+    });
+  });
+  ```
+
+- **User Event în loc de fireEvent**: Pentru interacțiuni apropiate de comportamentul utilizatorului
+  ```typescript
+  // Mai puțin preferabil
+  fireEvent.click(button);
+  
+  // Recomandat
+  await userEvent.click(button);
+  ```
 
 #### Pattern UI pentru grid-uri cu subcategorii (2025-05-10)
 
@@ -152,106 +231,6 @@ Consultați `frontend/src/styles/GHID_STILURI_RAFINATE.md` pentru:
 <input data-testid="rename-input" value={currentName} ... />
 ```
 
-**Lecții învățate:**
-
-#### Optimizare Componente Complexe și Vizualizări de Date (2025-05-16)
-
-- **Virtualizare pentru grid-uri mari**: Utilizați `@tanstack/react-virtual` pentru randarea eficientă a grid-urilor cu multe date.
-- **Memorare calcule intensive**: Implementați un cache pentru funcțiile de calcul care sunt apelate frecvent.
-- **Separare clară a responsabilităților**: Fiecare componentă complexă trebuie să aibă un hook dedicat pentru gestionarea stării și logicii.
-- **Evitați efectele secundare în useMemo**: `useMemo` trebuie să efectueze doar calcule pure, fără efecte secundare.
-- **Optimizați re-renderurile cu React.memo**: Utilizeți `React.memo` pentru componentele care pot primi aceleași props frecvent.
-- **Refactorizare în unități mai mici**: Funcțiile complexe trebuie divizate în funcții mai mici, specializate, pentru testabilitate.
-- **Folosirea TanStack Table**: Pentru tabele complexe, preferați @tanstack/react-table peste soluții improvizate.
-
-**Exemplu de caching pentru calcule frecvente:**
-
-```typescript
-// Definire cache la nivel de modul
-const calculationsCache = new Map<string, any>();
-
-// Funcție de generare cheie pentru cache
-function generateCacheKey(...keys: (string | number)[]): string {
-  return keys.join(':');
-}
-
-// Funcție cu memorare
-export function calculateTotal(categoryName: string, transactions: Transaction[]): number {
-  // Generare cheie unică pentru caching
-  const cacheKey = generateCacheKey(
-    categoryName, 
-    transactions.length,
-    transactions[0]?.date || ''
-  );
-  
-  // Verificare cache
-  if (calculationsCache.has(cacheKey)) {
-    return calculationsCache.get(cacheKey);
-  }
-  
-  // Calcul efectiv
-  const result = transactions
-    .filter(t => t.category === categoryName)
-    .reduce((sum, t) => sum + t.amount, 0);
-  
-  // Salvare în cache
-  calculationsCache.set(cacheKey, result);
-  
-  return result;
-}
-
-// Funcție pentru invalidarea cache-ului
-export function resetCalculationsCache(): void {
-  calculationsCache.clear();
-}
-```
-
-**Exemplu de hook custom optimizat:**
-
-```typescript
-// Hook pentru logica componentei, separat de UI
-export function useComplexGrid(
-  data: DataType[],
-  options: GridOptions
-) {
-  // Date derivate calculate o singură dată cu useMemo
-  const processedData = useMemo(() => 
-    transformData(data),
-    [data]
-  );
-  
-  // State sincronizat cu datele procesate
-  const [tableState, setTableState] = useState(processedData);
-  
-  // Effect pentru sincronizare, separat de calcul
-  useEffect(() => {
-    setTableState(processedData);
-  }, [processedData]);
-  
-  // Alte logici de business...
-  
-  return {
-    tableState,
-    // alte valori și funcții necesare componentei
-  };
-}
-```
-
-**Beneficii demonstrated:**
-
-- Reducerea timpului de randare pentru LunarGrid cu 75% pentru seturi mari de date.
-- Eliberarea memoriei și prevenirea leak-urilor prin managementul corect al resurselor.
-- Creșterea testabilității datorită separației responsabilităților.
-- UI fluid chiar și pentru tabele cu sute/mii de rânduri prin virtualizare.
-- Separarea clară a stărilor previne bug-uri de tip "Cannot update a component while rendering a different component".
-- Respectarea regulilor globale și patternurilor documentate asigură mentenanță și testare predictibilă.
-
-- Controlled components testate cu wrapper cu stare locală.
-- Folosirea `await waitFor` sau `await act(async () => {...})` pentru actualizări asincrone.
-- Testare exhaustivă dropdown-uri (categorie, subcategorie, tip).
-- Teste colocate în același folder cu componentele.
-- Minimizarea console noise în teste.
-
 #### Testare robustă cu constants și data-testid
 
 - Orice mesaj de eroare, loading sau feedback din UI și din teste trebuie să provină din constants (`@shared-constants/messages`), nu stringuri hardcodate.
@@ -267,34 +246,59 @@ expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
 
 - Pentru formulare complexe, verifică valorile inițiale pe câmpuri individuale cu `waitFor` (vezi lessons learned).
 
-#### Politica de mocking
+#### Politica de mocking [ACTUALIZAT]
 
 - Se mock-uiesc **doar** serviciile externe (API/fetch, date/time, random, browser APIs).
-- **Nu** se mock-uiesc stores Zustand, hooks custom sau logică proprie (vezi regula globală mock-uri testare și DEV_LOG.md).
-- Orice excepție se documentează clar în PR și BEST_PRACTICES.md.
+- **Nu** se mock-uiesc stores Zustand, hooks custom sau logică proprie.
+- Pentru testare cu React Query, folosește `QueryClientProvider` cu un client de test:
+  ```typescript
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+  
+  const wrapper = ({ children }) => (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+  
+  const { result } = renderHook(() => useMonthlyTransactions({ year: 2025, month: 5 }), { wrapper });
+  ```
 
-#### Anti-pattern critic: useEffect(fetch, [queryParams]) cu Zustand
+- Evită mock-uri inutile care testează implementarea în loc de comportament.
+- Exemplu corect pentru testarea unui formular cu React Query și Zustand:
+  ```typescript
+  // Mock doar serviciul extern
+  jest.mock('../services/transactionService', () => ({
+    createTransaction: jest.fn().mockResolvedValue({ id: '123', amount: 100 }),
+  }));
+  
+  // NU mock-ui useTransactionStore, folosește-l direct
+  
+  test('formularul de tranzacție funcționează corect', async () => {
+    render(<TransactionForm />);
+    
+    await userEvent.type(screen.getByTestId('amount-input'), '100');
+    await userEvent.selectOptions(screen.getByTestId('category-select'), 'Food');
+    await userEvent.click(screen.getByTestId('submit-btn'));
+    
+    // Verifică că serviciul a fost apelat corect
+    expect(transactionService.createTransaction).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 100, category: 'Food' })
+    );
+    
+    // Verifică UI după operațiune
+    await waitFor(() => {
+      expect(screen.getByTestId('success-message')).toBeInTheDocument();
+    });
+  });
+  ```
 
-- Este **interzis** să folosești direct `useEffect(() => fetchTransactions(), [queryParams])` cu Zustand, deoarece duce la infinite loop și Maximum update depth exceeded.
-- Regula critică este documentată în global_rules.md secțiunea 8.2 și trebuie respectată strict.
-- Exemplu greșit (NU folosiți!):
-
-```tsx
-useEffect(() => {
-  useTransactionStore.getState().fetchTransactions();
-}, [queryParams]);
-```
-
-- Exemplu corect:
-
-```tsx
-useEffect(() => {
-  useTransactionStore.getState().fetchTransactions();
-}, []); // Doar la mount
-```
-
-- Dacă fetch-ul depinde de parametri, folosește un guard intern/caching în store pentru a preveni buclele.
-- Orice abatere se documentează explicit în code review și DEV_LOG.md.
+#### Anti-pattern critic: useEffect(fetch, [queryParams]) cu Zustand- Este **interzis** să folosești direct `useEffect(() => fetchTransactions(), [queryParams])` cu Zustand, deoarece duce la infinite loop și Maximum update depth exceeded.- Regula critică este documentată în global_rules.md secțiunea 8.2 și trebuie respectată strict.- Exemplu greșit (NU folosiți!):```tsxuseEffect(() => {  useTransactionStore.getState().fetchTransactions();}, [queryParams]);```- Exemplu corect:```tsxuseEffect(() => {  useTransactionStore.getState().fetchTransactions();}, []); // Doar la mount```- Dacă fetch-ul depinde de parametri, folosește un guard intern/caching în store pentru a preveni buclele.- Orice abatere se documentează explicit în code review și DEV_LOG.md.## React Query Best Practices [NOU 2025-05-22]### Arhitectură recomandată1. **Separare clară a responsabilităților**:   - **Query Hooks**: Pentru fetch și caching (ex: `useTransactions`, `useCategories`)   - **Mutation Hooks**: Pentru operațiuni de modificare (ex: `useTransactionMutations`)   - **Service Layer**: Pentru API calls și transformare date (ex: `transactionService.ts`)2. **Pattern pentru keys structurate**:   ```typescript   // Structură recomandată pentru query keys   const queryKey = [     'entitate',      // Nivel 1: Tipul entității (ex: 'transactions', 'categories')     'operațiune',    // Nivel 2: Tipul operațiunii (ex: 'list', 'detail', 'monthly')     paramsObject     // Nivel 3: Params ca obiect (pentru invalidare selectivă)   ];      // Exemple:   const monthlyKey = ['transactions', 'monthly', { year: 2025, month: 5 }];   const detailKey = ['transactions', 'detail', { id: '123' }];   ```3. **Optimizări importante**:   - **staleTime**: Setați o valoare adecvată pentru a reduce fetch-urile inutile   - **cacheTime**: Cât timp să păstreze datele în cache după ce nu mai sunt folosite   - **refetchOnWindowFocus**: În general, setați la `false` pentru tranzacții   - **keepPreviousData**: Setați la `true` pentru a păstra UI stabil în timpul schimbării filtrelor   ```typescript   export function useMonthlyTransactions(params: MonthlyParams) {     return useQuery({       queryKey: ['transactions', 'monthly', params],       queryFn: () => transactionService.getMonthlyTransactions(params),       staleTime: 5 * 60 * 1000,      // 5 minute       cacheTime: 30 * 60 * 1000,     // 30 minute       refetchOnWindowFocus: false,       keepPreviousData: true,     });   }   ```### Mutations și optimistic updatesPentru o experiență utilizator fluidă, folosiți optimistic updates:```typescriptexport function useAddTransaction() {  const queryClient = useQueryClient();    return useMutation({    mutationFn: (newTransaction: TransactionInput) =>       transactionService.createTransaction(newTransaction),        // Optimistic update    onMutate: async (newTransaction) => {      // 1. Anulăm orice refetch în desfășurare      await queryClient.cancelQueries({ queryKey: ['transactions'] });            // 2. Salvăm starea anterioară      const previousTransactions = queryClient.getQueryData<Transaction[]>(        ['transactions', 'list']      );            // 3. Actualizăm optimist cache-ul      if (previousTransactions) {        queryClient.setQueryData(          ['transactions', 'list'],           [...previousTransactions, { ...newTransaction, id: 'temp-id' }]        );      }            // 4. Returnăm contextul pentru onError      return { previousTransactions };    },        // În caz de eroare, revertim schimbarea    onError: (err, newTransaction, context) => {      if (context?.previousTransactions) {        queryClient.setQueryData(          ['transactions', 'list'],          context.previousTransactions        );      }    },        // După succes, invalidăm pentru a obține datele reale    onSuccess: () => {      queryClient.invalidateQueries({ queryKey: ['transactions'] });    },  });}
 
 #### Motivare
 
@@ -642,6 +646,33 @@ useEffect(() => {
 - Nu folosi niciodată direct useEffect cu dependență pe queryParams pentru fetch-uri din store-uri Zustand fără protecție suplimentară.
 - Documentează întotdeauna motivul în code review dacă ai nevoie de un pattern diferit.
 
+### Rezolvarea problemei Duplicate Keys (2025-05-21)
+
+- **Context**: Avertismente în consolă despre chei duplicate în liste React din cauza unor ID-uri duplicate între seturi de date.
+- **Regulă** (**obligatorie**): Pentru proprietatea `key` în liste React:
+  1. Generați chei unice combinând ID-ul cu alte informații (index, timestamp, context)
+  2. NU folosiți doar index-ul ca și cheie (anti-pattern)
+  3. NU folosiți doar ID-ul atunci când există posibilitatea de ID-uri duplicate între seturi de date
+
+- **Exemplu corect**:
+
+```tsx
+// Rău (potențiale chei duplicate)
+{transactions.map((transaction) => (
+  <tr key={transaction.id}>...</tr>
+))}
+
+// Corect (cheie unică garantată)
+{transactions.map((transaction, index) => (
+  <tr key={`${transaction.id}-${index}`}>...</tr>
+))}
+
+// Alternativ, adăugați context la cheie
+{transactions.map((transaction) => (
+  <tr key={`tx-${transaction.id}-${transaction.date}`}>...</tr>
+))}
+```
+
 ## Debugging și Diagnosticare
 
 - Folosirea `npx jest --listTests`, `--detectOpenHandles` pentru troubleshooting.
@@ -974,7 +1005,7 @@ Una dintre cele mai frecvente surse de erori în aplicațiile moderne este discr
    - **Cauza**: Frontend trimite `userId` în payload, dar schema DB are `user_id`
    - **Soluție**:
      - Alinierea strictă a numelor de câmpuri între modelele TS și schema DB
-     - Transformare explicită în servicii (nu în componente UI)
+     - Transformare explicită în serviciu
 
      ```typescript
      // Corect - Transformare nume de câmpuri în serviciu

@@ -2,8 +2,8 @@
 
 📁 Structură Generală
 📁 root/
-├── 📁 frontend/                # Aplicația React + Zustand + TailwindCSS
-├── 📁 backend/                 # API NestJS + MongoDB + Firebase Auth
+├── 📁 frontend/                # Aplicația React + React Query + Zustand + TailwindCSS
+├── 📁 backend/                 # API NestJS + Supabase
 ├── 📁 shared-constants/        # Sursa unică pentru constants, enums, tipuri partajate
 ├── 📄 package.json             # Configurație npm pentru monorepo (workspaces)
 ├── 📄 README.md                # Documentație generală a proiectului
@@ -29,20 +29,23 @@ Rol: Sursa unică de adevăr pentru toate constantele, enum-urile și tipurile p
 index.ts - Exportă toate constantele, folosit pentru importuri în frontend/backend
 Toate fișierele frontend/backend care folosesc constante trebuie să le importe prin @shared-constants
 Excel_grid.ts - Constante pentru vizualizarea tip grid a datelor financiare
+QUERY_KEYS.ts - Chei pentru React Query
 
 📁 frontend/
 
-Rol: Aplicația web React cu state management Zustand și UI cu TailwindCSS
+Rol: Aplicația web React cu React Query pentru server state, Zustand pentru UI state și TailwindCSS pentru stilizare
 📁 frontend/src/
 📁 frontend/src/
 ├── 📄 index.tsx                # Punct de intrare aplicație React
-├── 📄 App.tsx                  # Componenta root, configurare rutare
+├── 📄 App.tsx                  # Componenta root, configurare rutare și React Query Provider
 ├── 📁 components/              # Componente React organizate ierarhic
 │   ├── 📁 primitives/          # Componente de bază, reutilizabile
 │   └── 📁 features/            # Componente business specifice
 ├── 📁 pages/                   # Pagini principale
-├── 📁 stores/                  # State management Zustand
+├── 📁 stores/                  # State management Zustand (doar pentru UI state)
 ├── 📁 services/                # Servicii pentru API și operațiuni externe
+│   ├── 📁 hooks/               # Hooks specializate React Query
+│   └── 📁 __mocks__/           # Mockuri pentru testare
 ├── 📁 utils/                   # Utilitare și funcții de calcul reutilizabile
 ├── 📁 lunarGrid/               # Module pentru funcționalitatea LunarGrid
 │   ├── 📄 index.ts           # Barrel export pentru toate utilitarele LunarGrid
@@ -50,6 +53,11 @@ Rol: Aplicația web React cu state management Zustand și UI cu TailwindCSS
 │   ├── 📄 formatters.ts       # Funcții de formatare pentru valori monetare și date
 │   └── 📄 dataTransformers.ts # Transformări de date pentru structura tabelului
 ├── 📁 styles/                  # Stiluri, theme tokens și utilitare CSS
+│   ├── 📁 componentMap/        # Configurări pentru componente cu getEnhancedComponentClasses
+│   ├── 📄 theme.ts             # Definiții tokens de design
+│   ├── 📄 themeTypes.ts        # Tipuri pentru sistemul de design
+│   ├── 📄 themeUtils.ts        # Utilitare pentru stilizare
+│   └── 📄 componentMapIntegration.ts # Integrare componentMap cu sistemul de stiluri
 └── 📁 types/                   # Tipuri TypeScript pentru aplicație
 📁 frontend/src/components/primitives/
 Rol: Componente reutilizabile de bază (UI Kit)
@@ -93,7 +101,7 @@ Rol: Componente specifice businessului
 │   ├── 📄 TransactionForm.tsx  # Formular adăugare/editare tranzacții
 │   └── 📄 index.ts
 ├── 📁 TransactionTable/
-│   ├── 📄 TransactionTable.tsx # Tabel afișare tranzacții cu paginare
+│   ├── 📄 TransactionTable.tsx # Tabel afișare tranzacții cu infinite loading
 │   └── 📄 index.ts
 ├── 📁 TransactionFilters/
 │   ├── 📄 TransactionFilters.tsx # Filtre pentru tranzacții
@@ -114,9 +122,9 @@ Rol: Componente specifice businessului
     └── 📄 RegisterForm.tsx     # Formular înregistrare
 Dependențe cheie:
 
-TransactionForm.tsx → useTransactionFormStore
-TransactionTable.tsx → useTransactionStore
-LunarGrid.tsx → useTransactionStore, useCategoryStore
+TransactionForm.tsx → useTransactionFormStore, useTransactionMutations (React Query)
+TransactionTable.tsx → useInfiniteTransactions (React Query)
+LunarGrid.tsx → useMonthlyTransactions (React Query), useCategoryStore
 CategoryEditor.tsx → useCategoryStore
 Toate utilizează componente primitive și constante din @shared-constants
 
@@ -128,27 +136,25 @@ Rol: Pagini principale pentru rutare
 └── 📄 OptionsPage.tsx          # Pagina opțiuni și gestionare categorii
 Dependențe cheie:
 
-TransactionsPage.tsx → TransactionTable, TransactionForm, TransactionFilters
-LunarGridPage.tsx → LunarGrid
+TransactionsPage.tsx → TransactionTable, TransactionForm, TransactionFilters, useInfiniteTransactions
+LunarGridPage.tsx → LunarGrid, useMonthlyTransactions
 OptionsPage.tsx → CategoryEditor
 Toate utilizează useAuthStore pentru verificare autentificare
 
 📁 frontend/src/stores/
-Rol: State management cu Zustand
+Rol: State management cu Zustand (UI state only)
 📁 frontend/src/stores/
-├── 📄 transactionStore.ts      # Stocare și operare tranzacții
 ├── 📄 transactionFormStore.ts  # State formular tranzacții
-├── 📄 transactionFiltersStore.ts # State filtre și paginare
 ├── 📄 categoryStore.ts         # Gestiune categorii personalizate 
 └── 📄 authStore.ts             # Autentificare și sesiune
 Funcții și dependențe cheie:
 
-transactionStore.ts:
+transactionFormStore.ts:
 
-fetchTransactions(): Obține tranzacții (cache + invalidare)
-saveTransaction(): Adaugă/actualizează tranzacție
-removeTransaction(): Șterge tranzacție
-Dependențe: supabaseService, services/supabaseService.ts
+setFormField(): Actualizează câmpuri formular
+validateForm(): Validare date formular
+resetForm(): Reset formular
+Dependențe: @shared-constants/messages.ts
 
 
 authStore.ts:
@@ -168,7 +174,7 @@ Dependențe: categoryService, services/categoryService.ts
 
 
 📁 frontend/src/services/
-Rol: Servicii pentru comunicare API și operații externe
+Rol: Servicii pentru comunicare API, hooks React Query și operații externe
 
 #### [2025-05] Pattern hooks tranzacții: bulk vs. infinite loading
 - Pentru tranzacții există două hooks specializate:
@@ -183,7 +189,16 @@ Rol: Servicii pentru comunicare API și operații externe
 ├── 📄 supabaseService.ts       # Operații CRUD pentru tranzacții
 ├── 📄 supabaseAuthService.ts   # Autentificare prin Supabase
 ├── 📄 categoryService.ts       # Operații CRUD pentru categorii 
-└── 📄 transactionApiClient.ts  # Client pentru API backend
+├── 📁 hooks/                   # Hooks specializate React Query
+│   ├── 📄 useMonthlyTransactions.ts  # Hook pentru tranzacții lunare (bulk)
+│   ├── 📄 useInfiniteTransactions.ts # Hook pentru infinite loading
+│   ├── 📄 useTransactionMutations.ts # Hook pentru mutații (create/update/delete)
+│   └── 📄 index.ts             # Barrel export pentru hooks
+└── 📁 __mocks__/               # Mockuri pentru testare servicii
+    ├── 📄 supabase.ts          # Mock pentru Supabase client
+    └── 📄 supabaseService.ts   # Mock pentru serviciul Supabase
+```
+
 Funcții și dependențe cheie:
 
 supabaseService.ts:
@@ -213,14 +228,24 @@ Rol: Sistem de design, tema și utilitare CSS
 ├── 📄 theme.ts                 # Definiții tokens de design (culori, spațiere)
 ├── 📄 themeTypes.ts            # Tipuri TypeScript pentru sistemul de design
 ├── 📄 themeUtils.ts            # Funcții utilitare pentru aplicare temă
-└── 📄 componentThemes.ts       # Teme specifice pentru componente complexe
+├── 📄 componentMapIntegration.ts # Integrare componentMap cu sistemul de stiluri
+├── 📁 componentMap/            # Configurații pentru componente
+│   ├── 📄 button.ts            # Configurație pentru componenta Button
+│   ├── 📄 card.ts              # Configurație pentru componenta Card
+│   ├── 📄 input.ts             # Configurație pentru componenta Input
+│   ├── 📄 alert.ts             # Configurație pentru componenta Alert
+│   ├── 📄 fx-shadow.ts         # Efect vizual shadow
+│   ├── 📄 fx-gradient.ts       # Efect vizual gradient
+│   ├── 📄 fx-fadeIn.ts         # Efect vizual fadeIn
+│   └── 📄 index.ts             # Barrel export pentru toate configurațiile
+└── 📄 theme-variables.css      # Variabile CSS generate din theme.ts
+```
+
 Funcții și dependențe cheie:
 
-theme.ts: Exportă obiect cu toate token-urile de design (colors, spacing, etc.)
-themeUtils.ts:
-
-getComponentClasses(): Generează clase CSS semantice
-getColorClass(): Helper pentru clasele de culoare
+themeUtils.ts: 
+getEnhancedComponentClasses(): Generează clase CSS semantice cu suport pentru efecte vizuale
+applyVisualEffects(): Aplică efecte vizuale la clase existente
 Dependențe: theme.ts, themeTypes.ts
 
 
@@ -248,23 +273,20 @@ Nu are dependențe externe
 
 
 📁 backend/
-Rol: API NestJS pentru gestiune date
+Rol: API pentru backend și integrare cu Supabase
 📁 backend/
 ├── 📁 src/
-│   ├── 📄 main.ts              # Punct de intrare aplicație NestJS
-│   ├── 📄 app.module.ts        # Modul principal aplicație
-│   └── 📁 constants/           # Reexport constants din shared-constants
-│       ├── 📄 api.ts           # Import din @shared-constants/api
-│       ├── 📄 defaults.ts      # Import din @shared-constants/defaults
-│       ├── 📄 enums.ts         # Import din @shared-constants/enums
-│       ├── 📄 validation.ts    # Import din @shared-constants/validation
-│       └── 📄 index.ts         # Barrel pentru toate constantele
-├── 📄 tsconfig.json            # Configurație TypeScript cu path mapping
-└── 📄 package.json             # Dependențe backend
-Dependențe cheie:
-
-Toate fișierele din backend/src/constants/ importă din @shared-constants/*
-tsconfig.json configurează path mapping pentru @shared-constants/*
+│   ├── 📄 main.ts               # Punct de intrare NestJS
+│   ├── 📄 app.module.ts         # Modul principal aplicație
+│   ├── 📁 constants/            # Constante backend (importă din shared-constants)
+│   ├── 📁 controllers/          # Controllere API pentru rute HTTP
+│   ├── 📁 services/             # Servicii business logic
+│   └── 📁 modules/              # Module NestJS specifice
+└── 📁 migrations/               # Migrări Supabase SQL
+    ├── 📄 20XX-XX-XX_create_transactions.sql
+    ├── 📄 20XX-XX-XX_create_custom_categories.sql
+    └── 📄 20XX-XX-XX_add_subcategory_validations.sql
+```
 
 Diagrama Dependențelor Majore
 ┌─────────────────┐           ┌─────────────────┐

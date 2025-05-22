@@ -8,7 +8,7 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 
 ## 📁 Structură Directoare
 
-- `frontend/` - React + Zustand + TailwindCSS + Testing Library
+- `frontend/` - React + React Query + Zustand + TailwindCSS + Testing Library
 - `backend/` - NestJS + Supabase
 - `shared-constants/` - Sursa unică pentru enums/constants partajate (TypeScript, Zod, barrel index.ts)
 
@@ -16,8 +16,8 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 
 ## 🧑‍💻 Stack Tehnologic
 
-- **Frontend:** React, Zustand, Testing Library, Jest, TailwindCSS, i18next
-- **Backend:** NestJS, MongoDB, Firebase Auth, Jest
+- **Frontend:** React, React Query, Zustand, Testing Library, Jest, TailwindCSS, i18next
+- **Backend:** NestJS, Supabase
 - **Shared:** TypeScript, Zod
   - **Chei query params tranzacții:** Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts` și se importă EXPLICIT din `@shared-constants/queryParams`.
 - **Tooling:** ESLint, Prettier, Husky, Commitlint, npm Workspaces
@@ -28,8 +28,8 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 
 - **TDD:** Dezvoltare prin testare pentru toate componentele și serviciile.
 - **Fără Hardcodări:** Toate textele UI și mesajele centralizate în `constants/`.
-- **State Management:** Zustand, selectors pentru performanță.
-- **Caching API:** Servicii cu caching LRU și invalidare selectivă.
+- **State Management:** Zustand pentru UI state, React Query pentru server state.
+- **Caching API:** React Query pentru cache și invalidare selectivă.
 - **Structură Modulară:** `primitives/`, `features/`, `stores/`, `constants/`.
 - **Documentare Continuă:** Toate convențiile și lecțiile în [BEST_PRACTICES.md](./BEST_PRACTICES.md) și [DEV_LOG.md](./DEV_LOG.md).
 
@@ -113,28 +113,29 @@ Structură răspuns:
 
 - [BEST_PRACTICES.md](./BEST_PRACTICES.md) - Reguli oficiale de codare și arhitectură.
 - [DEV_LOG.md](./DEV_LOG.md) - Istoric decizii și lecții învățate.
+- [STYLE_GUIDE.md](./STYLE_GUIDE.md) - Ghid de stilizare și design tokens.
 
 ---
 
-## Migrare la React Query (2025-05)
+## React Query (Implementat și stabil)
 
-Aplicația folosește acum [React Query (TanStack Query)](https://tanstack.com/query/latest) pentru fetch și management state server-side (CRUD tranzacții, sincronizare, cache, optimistic updates).
+Aplicația folosește [React Query (TanStack Query)](https://tanstack.com/query/latest) pentru fetch și management state server-side (CRUD tranzacții, sincronizare, cache, optimistic updates).
 
 ### Pattern adoptat
-- **Custom hooks** pentru fetch și mutații (`useTransactions`, `useCategories` etc.)
+- **Custom hooks** pentru fetch și mutații (`useMonthlyTransactions`, `useInfiniteTransactions`, etc.)
 - **Servicii dedicate** pentru business logic și apeluri API (ex: `TransactionService`)
 - **Centralizare rute și config API** în `@shared-constants/api`
-- **UI state** separat de server state (ex: store-uri Zustand doar pentru filtre, UI, fără fetch)
+- **UI state** separat de server state (store-uri Zustand doar pentru filtre, UI, fără fetch)
 
 ### Exemplu de usage
 ```tsx
-import { useTransactions } from 'src/services/hooks/useTransactions';
+import { useMonthlyTransactions } from 'src/services/hooks/useMonthlyTransactions';
 import { API } from '@shared-constants/api';
 
-const { data, isLoading, refetch } = useTransactions({ year, month });
+const { data, isLoading, refetch } = useMonthlyTransactions({ year, month });
 
 // Pentru mutații:
-const { mutate: addTransaction } = useTransactions().create;
+const { mutate: addTransaction } = useTransactionMutations().create;
 addTransaction({ ... });
 ```
 
@@ -145,24 +146,22 @@ addTransaction({ ... });
 - Pentru orice nou API, adaugă ruta în `shared-constants/api.ts` și importă prin alias.
 - Rulează periodic `node tools/validate-constants.js` pentru audit.
 
-### Riscuri
-- Navigarea rapidă între luni → folosește debounce (300ms) în hooks/componente grid.
-- Orice schimbare de contract API necesită update la tipuri și hooks.
-- Nu lăsa cod legacy cu fetch paralel (Zustand + React Query) – folosește DOAR patternul nou.
-
 ---
 
 ## 🔥 Status Actual
 
 - Eliminare completă hardcodări ✅
-- Implementare caching optimizat ✅
+- Implementare caching optimizat cu React Query ✅
 - Refactorizare modulară frontend ✅
-- Migrare Zustand pentru state management ✅
+- Migrare Zustand pentru UI state management ✅
+- Implementare LunarGrid cu TanStack Table ✅
+- Eliminare string-uri hardcodate ✅
+- Sistem de design tokens implementat ✅
 - Documentare actualizată ✅
 
 ---
 
-_Actualizat la: 2025-04-26_
+_Actualizat la: 2025-05-22_
 
 ---
 

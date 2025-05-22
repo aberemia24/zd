@@ -4,7 +4,8 @@ EXEMPLE CONCRETE, FLUXURI DE DATE ȘI PATTERN-URI UI
 1.1 TransactionForm
 Exemplu Utilizare:
 tsx// În TransactionsPage.tsx
-import TransactionForm from '../components/features/TransactionForm';
+import { TransactionForm } from '../components/features';
+import { BUTTONS } from '@shared-constants';
 
 // Exemplu simplu
 <TransactionForm />
@@ -13,35 +14,46 @@ import TransactionForm from '../components/features/TransactionForm';
 <TransactionForm
   onSave={(formData) => console.log('Tranzacție salvată:', formData)}
   onCancel={() => console.log('Formular anulat')}
+  submitButtonText={BUTTONS.SAVE}
 />
 Structura Datelor:
 tsx// Tipul datelor din formular
 type TransactionFormData = {
-  type: string;          // Din TransactionType enum
+  type: TransactionType;  // Din TransactionType enum (@shared-constants/enums)
   amount: string;        // Sumă ca string (pentru input controlat)
   category: string;      // Categorie selectată
   subcategory: string;   // Subcategorie selectată
   date: string;          // Format: 'YYYY-MM-DD'
   recurring: boolean;    // Dacă este recurentă
-  frequency: string;     // Din FrequencyType enum, doar dacă recurring=true
+  frequency?: FrequencyType; // Din FrequencyType enum, doar dacă recurring=true
 };
 
 // La submitere, se convertește în:
-type TransactionFormWithNumberAmount = Omit<Transaction, 'amount'> & {
-  amount: number;        // Amount ca număr pentru calcule
+type TransactionCreatePayload = {
+  type: TransactionType;
+  amount: number;        // Amount convertit la număr pentru backend
+  category: string;
+  subcategory: string;
+  date: string;
+  recurring: boolean;
+  frequency?: FrequencyType;
 };
 1.2 LunarGrid (TanStack Table Implementation)
 Exemplu Utilizare:
 tsx// În LunarGridPage.tsx
-import LunarGridTanStack from '../components/features/LunarGrid';
+import { LunarGridTanStack } from '../components/features/LunarGrid';
+import { useMonthlyTransactions } from 'services/hooks';
 
-// Exemplu basic cu hook-uri Zustand pentru date
 const MyLunarGrid = () => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [month, setMonth] = useState(new Date().getMonth() + 1);
-  const transactions = useTransactionStore(state => state.transactions);
-  const categories = useCategoryStore(state => state.categories);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+  
+  // Utilizare hook specializat pentru date
+  const { data: transactions, isLoading } = useMonthlyTransactions({ year, month });
+  
+  // Categorii (din store sau hook)
+  const categories = useCategoryStore(state => state.categories);
   
   // Gestiune expandare/colapsare categorii
   const toggleCategory = useCallback((categoryName: string) => {
@@ -62,79 +74,44 @@ const MyLunarGrid = () => {
     // Aici se poate deschide un modal pentru editare/adăugare tranzacție
   }, []);
   
-  return (
-    <div>
-      <div className="controls">
-        <button onClick={() => setMonth(prev => Math.max(1, prev - 1))}>Luna anterioară</button>
-        <span>{`${getMonthName(month)} ${year}`}</span>
-        <button onClick={() => setMonth(prev => Math.min(12, prev + 1))}>Luna următoare</button>
-      </div>
-
-      <LunarGridTanStack 
-        transactions={transactions}
-        categories={categories}
-        expandedCategories={expandedCategories}
-        year={year}
-        month={month}
-        onCellClick={handleCellClick}
-        onCellDoubleClick={handleCellDoubleClick}
-        onCategoryToggle={toggleCategory}
-      />
-    </div>
-  );
-};
-
-// Arhitectură internă și utilizare hook
-tsx// Structura internă a LunarGridTanStack.tsx
-const LunarGridTanStack = ({
-  transactions,
-  categories,
-  expandedCategories,
-  year,
-  onCellClick,
-  onCellDoubleClick,
-  onCategoryToggle
-}) => {
-  // Utilizează hook-ul custom pentru toată logica
-  const {
-    table,
-    days,
-    rowVirtualizer,
-    dailyBalances,
-    getSumForCell,
-    updateTableData
-  } = useLunarGridTable(
-    transactions,
-    categories,
-    expandedCategories,
-    year,
-    month,
-    onCellClick,
-    onCellDoubleClick
-  );
+  if (isLoading) return <Loader size="lg" />;
   
-  // Implementare UI cu tabel virtualizat pentru performanță
   return (
-    <div className="lunarGridContainer">
-      <table>
-        <thead>...</thead>
-        <tbody>
-          {rowVirtualizer.getVirtualItems().map(virtualRow => {
-            // Obține rândul din tabelul TanStack în funcție de indexul virtual
-            const row = table.getRowModel().rows[virtualRow.index] as Row<LunarGridRowData>;
-            return (
-              <TanStackSubcategoryRows
-                key={row.id}
-                row={row}
-                table={table}
-                days={days}
-                getSumForCell={getSumForCell}
-                onCategoryToggle={onCategoryToggle}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+    <div className={getEnhancedComponentClasses('container', 'default', 'lg')}>
+      <div className={getEnhancedComponentClasses('card', 'elevated', 'lg', undefined, ['fadeIn'])}>
+        <div className={getEnhancedComponentClasses('card-header', 'default')}>
+          <h2 className={getEnhancedComponentClasses('heading', 'md', undefined, undefined, ['gradient-text'])}>
+            {`${getMonthName(month)} ${year}`}
+          </h2>
+          <div className={getEnhancedComponentClasses('button-group', 'default')}>
+            <button 
+              onClick={() => setMonth(prev => Math.max(1, prev - 1))}
+              className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
+            >
+              Luna anterioară
+            </button>
+            <button 
+              onClick={() => setMonth(prev => Math.min(12, prev + 1))}
+              className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
+            >
+              Luna următoare
+            </button>
+          </div>
+        </div>
+
+        <div className={getEnhancedComponentClasses('card-body', 'default')}>
+          <LunarGridTanStack 
+            transactions={transactions || []}
+            categories={categories}
+            expandedCategories={expandedCategories}
+            year={year}
+            month={month}
+            onCellClick={handleCellClick}
+            onCellDoubleClick={handleCellDoubleClick}
+            onCategoryToggle={toggleCategory}
+          />
+        </div>
+      </div>
     </div>
   );
 };
@@ -169,10 +146,10 @@ const dailyAmounts = calculateAmountsForCategory(
 );
 
 // Formatează o sumă pentru afișare 
-const formattedAmount = formatCurrency(1234.56); // "1.234,56"
+const formattedAmount = formatCurrency(1234.56); // "1.234,56 RON"
 
 // Obține clase CSS pentru stilizare sume pozitive/negative
-const amountClass = getBalanceStyleClass(-500); // "text-error-600 font-medium"
+const amountClass = getBalanceStyleClass(-500); // returnează clasele pentru sume negative
 
 // Transformă datele pentru tabel
 const rowData = transformTransactionsToRowData(
@@ -199,7 +176,7 @@ const {
   getSumForCell,
   // Actualizare date externe
   updateTableData
-} = useLunarGridTable(
+} = useLunarGridTable({
   transactions,    // Tranzacții de afișat
   categories,      // Categorii și subcategorii
   expandedCategories, // Ce categorii sunt expandate
@@ -207,7 +184,7 @@ const {
   month,           // Luna curentă (1-12)
   onCellClick,     // Handler pentru click pe celulă
   onCellDoubleClick // Handler pentru dublu-click (editare)
-);
+});
 ```
 
 Structura internă folosește memorare pentru prevenirea recalculării inutile:
@@ -247,37 +224,85 @@ if (categoryAmountsCache.has(cacheKey)) {
 
 // ... calcul efectiv ...
 
-// Salvare în cache
-categoryAmountsCache.set(cacheKey, resultObj);
+// Salvare în cache pentru viitor
+categoryAmountsCache.set(cacheKey, result);
+return result;
 ```
 
-- **Virtualizare tabel pentru randare eficientă**:
+- **Virtualizare pentru randare eficientă**:
 
 ```typescript
-// Configurare virtualizare pentru scroll eficient
+// În hook-ul useLunarGridTable
 const rowVirtualizer = useVirtualizer({
-  count: rows.length,
+  count: table.getRowModel().rows.length,
   getScrollElement: () => tableContainerRef.current,
-  estimateSize: () => 35, // înălțimea estimată a unui rând
-  overscan: 5 // număr de rânduri în plus pentru scrolling fluid
+  estimateSize: () => 35, // înălțimea estimată a rândului
+  overscan: 5 // câte rânduri să renderăm în plus față de ce se vede
 });
 
-// Utilizare în randare
-rowVirtualizer.getVirtualItems().map(virtualRow => {
-  const row = rows[virtualRow.index];
-  // Randează doar rândurile vizibile
-  return <Row key={row.id} row={row} />;
-});
+// În componenta LunarGridTanStack
+return (
+  <div ref={tableContainerRef} className="table-container" style={{ height: '600px', overflow: 'auto' }}>
+    <table>
+      <thead>...</thead>
+      <tbody>
+        {/* Virtualizare pentru performanță */}
+        <tr style={{ height: `${rowVirtualizer.getTotalSize()}px` }}>
+          <td colSpan={days.length + 2}>
+            <div style={{ position: 'relative' }}>
+              {rowVirtualizer.getVirtualItems().map(virtualRow => {
+                const row = table.getRowModel().rows[virtualRow.index];
+                return (
+                  <div
+                    key={row.id}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: `${virtualRow.size}px`,
+                      transform: `translateY(${virtualRow.start}px)`
+                    }}
+                  >
+                    <TanStackSubcategoryRows
+                      row={row}
+                      days={days}
+                      getSumForCell={getSumForCell}
+                      onCategoryToggle={onCategoryToggle}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+);
 ```
 
-- **Optimizare re-render cu React.memo**:
+- **Chei unice robuste pentru performanță**:
 
 ```typescript
-// Componenta optimizată pentru rânduri subcategorii
-const TanStackSubcategoryRows = React.memo(({ 
-  row, table, days, getSumForCell, onCategoryToggle 
-}) => {
-  // ... implementare randare ...
+// Generare chei unice robuste pentru subRows
+const generateUniqueSubRowKey = (category: string, subcategory: string | null, index: number) => {
+  if (subcategory) {
+    return `${category}-${subcategory}`;
+  }
+  // Pentru rânduri fără subcategorie (rânduri goale)
+  return `${category}-__empty-${index}`;
+};
+
+// Utilizare în transformData
+const subRows = subcategories.map((subcategory, index) => {
+  const key = generateUniqueSubRowKey(category, subcategory, index);
+  return {
+    id: key,
+    category,
+    subcategory,
+    // ...restul datelor
+  };
 });
 ```
 
