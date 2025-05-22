@@ -1233,10 +1233,13 @@ export function useActiveSubcategories({ category, type, enabled = true }) {
 }
 ```
 
-## [2025-05-22] Lecții învățate: Curățare loguri & UX filtrare tranzacții
+## [2025-05-22] Lecții învățate: Refactorizare și stabilizare LunarGridTanStack
 
-- **Elimină toate logurile de debugging** din componente înainte de production (console.log, debug etc.).
-- **Pattern robust pentru UX la filtrare/search**: păstrează datele vechi cu useRef/useMemo cât timp se face fetch, pentru a preveni blink-ul și resetarea scroll-ului.
-- **Testare cu loguri temporare**: Folosește loguri doar pentru debugging, apoi elimină-le complet.
-- **Respectă regulile globale**: zero stringuri hardcodate, styling doar cu tokens, data-testid predictibil, importuri centralizate.
-- **Verifică re-mount-ul**: Logurile de mount/unmount sunt utile doar temporar pentru diagnosticare.
+- Pattern robust pentru generare chei unice la subRows: `${category}-${subcategory}` sau `${category}-__empty-<idx>` pentru subcategorii goale.
+- Fallback automat pentru subcategorii lipsă sau corupte, cu warning doar în dev dacă apar duplicate.
+- Eliminare completă duplicate keys: nu mai există avertismente React sau bug-uri la expand/collapse all.
+- Pipeline-ul de date pentru subRows este 100% robust, combină subcategorii din definiție și fallback din tranzacții corupte.
+- Toate textele și datele din UI folosesc exclusiv sursa unică de adevăr (`@shared-constants`).
+- Testarea se face doar cu data-testid predictibil, fără stringuri hardcodate.
+- Eliminarea tuturor logurilor de debug înainte de production.
+- Patternul de pipeline și chei unice trebuie urmat la orice refactor viitor pentru griduri ierarhice.

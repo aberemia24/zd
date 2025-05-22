@@ -948,3 +948,18 @@ Am extins și refactorizat complet sistemul de filtrare pentru tranzacții, adă
 - Cod mai curat, fără noise în console.
 - UX robust și predictibil la filtrare și search.
 - Documentare actualizată cu pattern-ul corect pentru infinite loading și filtrare tranzacții.
+
+## [2025-05-22] Refactorizare și stabilizare completă LunarGridTanStack
+
+- Refactorizat pipeline-ul de date pentru subRows native TanStack Table:
+  - Generare chei unice robuste: `${category}-${subcategory}` sau `${category}-__empty-<idx>` pentru subcategorii goale
+  - Fallback automat pentru subcategorii lipsă/corupte, warning duplicate doar în dev
+  - Eliminare completă duplicate keys, nu mai există avertismente React sau bug-uri la expand/collapse all
+  - Pipeline-ul combină subcategorii din definiție și fallback din tranzacții corupte, cu indexare globală pentru subRows goale
+- Toate textele și datele din UI folosesc exclusiv sursa unică de adevăr (`@shared-constants`)
+- Testarea se face doar cu data-testid predictibil, fără stringuri hardcodate
+- Eliminarea tuturor logurilor de debug înainte de production
+- Paritate completă cu gridul clasic: toate funcționalitățile, UX și business logic sunt identice
+- Checklisturile de audit și paritate au fost actualizate, toate task-urile relevante sunt bifate
+- Patternul de pipeline și chei unice trebuie urmat la orice refactor viitor pentru griduri ierarhice
+- Documentația și fișierele mari de tracking au fost actualizate
