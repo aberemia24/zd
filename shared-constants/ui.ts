@@ -115,6 +115,8 @@ export const EXCEL_GRID = {
     RECURENT: 'Recurent',
     FRECVENTA: 'Frecvență'
   },
+  // Numărul de zile pentru fiecare lună (ianuarie = index 0)
+  DAYS_IN_MONTH: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
   NO_DATA: 'Nu există date disponibile',
   LOADING: 'Se încarcă datele...',
   PROMPTS: {
@@ -226,4 +228,14 @@ export const INFO = {
   CATEGORY_EDITOR_EMPTY: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
   NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
   NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
+};
+
+// Constante pentru LunarGrid
+export const LUNAR_GRID = {
+  COLLAPSE_ALL: 'Restrânge tot',
+  EXPAND_ALL: 'Extinde tot',
+  RESET_EXPANSION: 'Resetează',
+  LOADING: 'Se încarcă datele...',
+  NO_DATA: 'Nu există date pentru perioada selectată',
+  TOTAL_BALANCE: 'Sold'
 };

@@ -68,3 +68,11 @@ export const MESAJE = {
     CONFIRMARE_STERGERE: 'Sigur doriți să ștergeți subcategoria {subcategoria} din categoria {categoria}? Această acțiune nu poate fi anulată.'
   }
 };
+
+// Mesaje pentru LunarGrid
+export const LUNAR_GRID_MESSAGES = {
+  EROARE_INCARCARE: 'Eroare la încărcarea datelor',
+  EROARE_CREARE_TRANZACTIE: 'Eroare la crearea tranzacției',
+  EROARE_ACTUALIZARE_TRANZACTIE: 'Eroare la actualizarea tranzacției',
+  EROARE_STERGERE_TRANZACTIE: 'Eroare la ștergerea tranzacției'
+};

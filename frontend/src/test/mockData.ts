@@ -5,6 +5,7 @@ import { FORM_DEFAULTS, TransactionType, FrequencyType } from '@shared-constants
 export const MOCK_USER_ID = 'u1';
 
 export const MOCK_TRANSACTION: Transaction = {
+  id: 't1',
   _id: 't1',
   userId: MOCK_USER_ID,
   type: TransactionType.INCOME,
@@ -18,6 +19,7 @@ export const MOCK_TRANSACTION: Transaction = {
 };
 
 export const MOCK_RECURRING_TRANSACTION: Transaction = {
+  id: 't2',
   _id: 't2',
   userId: MOCK_USER_ID,
   type: TransactionType.EXPENSE,
@@ -35,6 +37,7 @@ export const MOCK_TRANSACTIONS_LIST: Transaction[] = [
   MOCK_TRANSACTION,
   MOCK_RECURRING_TRANSACTION,
   {
+    id: 't3',
     _id: 't3',
     userId: MOCK_USER_ID,
     type: TransactionType.EXPENSE,
@@ -47,6 +50,7 @@ export const MOCK_TRANSACTIONS_LIST: Transaction[] = [
     frequency: undefined
   },
   {
+    id: 't4',
     _id: 't4',
     userId: MOCK_USER_ID,
     type: TransactionType.INCOME,
@@ -87,6 +91,8 @@ export const MOCK_STATUS = {
 
 // Mock pentru TransactionFormWithNumberAmount (folosit în teste pentru form și servicii)
 export const MOCK_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount = {
+  id: 'mock-form-1',
+  userId: MOCK_USER_ID,
   type: TransactionType.EXPENSE,
   amount: 100, // Notă: în formular folosim number
   currency: FORM_DEFAULTS.CURRENCY, // Folosim sursa de adevăr pentru monedă
@@ -99,6 +105,8 @@ export const MOCK_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount 
 
 // Mock pentru TransactionFormWithNumberAmount recurent
 export const MOCK_RECURRING_TRANSACTION_FORM_WITH_NUMBER: TransactionFormWithNumberAmount = {
+  id: 'mock-form-2',
+  userId: MOCK_USER_ID,
   type: TransactionType.EXPENSE,
   amount: 200,
   currency: FORM_DEFAULTS.CURRENCY,

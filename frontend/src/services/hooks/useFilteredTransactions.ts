@@ -2,12 +2,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useInfiniteTransactions, type TransactionQueryParams } from './useInfiniteTransactions';
 import { useMemo, useRef } from 'react';
 import type { TransactionValidated } from '@shared-constants/transaction.schema';
+import type { Transaction } from '../../types/Transaction';
 
 /**
  * Tipul de returnare pentru hook-ul useFilteredTransactions
  */
 export interface UseFilteredTransactionsResult {
-  data: TransactionValidated[];
+  data: (TransactionValidated & { userId?: string })[];
   isLoading: boolean;
   isFetching: boolean;
   error: Error | null;
@@ -16,6 +17,7 @@ export interface UseFilteredTransactionsResult {
   isFetchingNextPage: boolean;
   totalCount: number;
   isFiltered: boolean;
+  refetch: () => Promise<void>;
 }
 
 /**
@@ -41,10 +43,11 @@ export function useFilteredTransactions(
     fetchNextPage,
     isFetchingNextPage,
     totalCount,
+    refetch,
   } = useInfiniteTransactions(queryParams);
   
   // Ref pentru a păstra datele vechi
-  const previousData = useRef<TransactionValidated[]>([]);
+  const previousData = useRef<(TransactionValidated & { userId?: string })[]>([]);
 
   // Actualizează doar dacă ai date noi
   if (transactions && transactions.length > 0) {
@@ -79,5 +82,6 @@ export function useFilteredTransactions(
     isFetchingNextPage,
     totalCount,
     isFiltered,
+    refetch,
   };
 } 

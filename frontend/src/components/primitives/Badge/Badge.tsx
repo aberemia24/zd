@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import { useThemeEffects } from '../../../hooks';
 import type { ComponentVariant, ComponentSize } from '../../../styles/themeTypes';
 
 export interface BadgeProps {
@@ -9,7 +9,7 @@ export interface BadgeProps {
   pill?: boolean;
   children: React.ReactNode;
   className?: string;
-  'data-testid'?: string;
+  dataTestId?: string;
   
   // Efecte vizuale rafinate
   /** Adăugare pulsare pentru a atrage atenția */
@@ -22,6 +22,8 @@ export interface BadgeProps {
   withGradient?: boolean;
   /** Adăugare efect de strălucire la hover */
   withGlow?: boolean;
+  /** Adăugare efect de intrare cu animație */
+  withFadeIn?: boolean;
 }
 
 const Badge: React.FC<BadgeProps> = ({ 
@@ -30,12 +32,13 @@ const Badge: React.FC<BadgeProps> = ({
   pill = false,
   children, 
   className,
-  'data-testid': dataTestId,
+  dataTestId,
   withPulse = false,
   isActive = false,
   withShadow = false,
   withGradient = false,
-  withGlow = false
+  withGlow = false,
+  withFadeIn = false
 }) => {
   // Mapare variante badge și dimensiuni
   const badgeVariant: ComponentVariant = (['primary', 'secondary', 'success', 'error', 'warning', 'info'].includes(variant) 
@@ -46,29 +49,14 @@ const Badge: React.FC<BadgeProps> = ({
     ? size
     : 'xs') as ComponentSize;
     
-  // Colectăm efectele vizuale rafinate într-un array
-  const effects: string[] = [];
-  
-  // Adăugăm efectele vizuale solicitate
-  if (withPulse) {
-    effects.push('pulse-animation');
-  }
-  
-  if (isActive) {
-    effects.push('badge-active');
-  }
-  
-  if (withShadow) {
-    effects.push('badge-shadow');
-  }
-  
-  if (withGradient) {
-    effects.push('badge-gradient');
-  }
-  
-  if (withGlow) {
-    effects.push('badge-glow');
-  }
+  // Utilizăm hook-ul pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withPulse,
+    withShadow,
+    withGradient,
+    withGlow,
+    withFadeIn
+  });
   
   // Determinăm starea Badge-ului
   const state = isActive ? 'active' : undefined;
@@ -76,8 +64,8 @@ const Badge: React.FC<BadgeProps> = ({
   return (
     <span
       className={classNames(
-        getEnhancedComponentClasses('badge', badgeVariant, badgeSize, state, effects),
-        pill && getEnhancedComponentClasses('badge', 'pill', undefined, undefined, effects),
+        getClasses('badge', badgeVariant, badgeSize, state),
+        pill && getClasses('badge', 'pill', undefined, undefined),
         className
       )}
       data-testid={dataTestId || `badge-${variant}${pill ? '-pill' : ''}`}

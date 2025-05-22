@@ -10,6 +10,9 @@ import { useQueryClient } from '@tanstack/react-query';
 // Import hook-uri specializate
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 import { useCreateTransaction } from '../../../services/hooks/transactionMutations';
+import { useThemeEffects } from '../../../hooks';
+import Button from '../../primitives/Button/Button';
+import Badge from '../../primitives/Badge/Badge';
 
 // Helper pentru a genera array [1, 2, ..., n]
 const getDaysInMonth = (year: number, month: number) => {
@@ -110,6 +113,13 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   
   // Hook pentru crearea tranzacțiilor
   const createTransactionMutation = useCreateTransaction();
+
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withFadeIn: true,
+    withShadow: true,
+    withTransition: true
+  });
 
   // State pentru subcategoria în curs de editare (pentru editare direct din grid)
   const [editingSubcategory, setEditingSubcategory] = React.useState<{ category: string; subcategory: string; mode: 'edit' | 'delete' | 'add' } | null>(null);
@@ -378,23 +388,35 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
 
   return (
     <React.Fragment>
-      <div className="flex justify-end space-x-2 mb-2">
-        <button onClick={expandAll} className="btn btn-secondary" data-testid="expand-all-btn">
+      <div className={getClasses('flex-group', 'end', 'md')}>
+        <Button 
+          onClick={expandAll} 
+          variant="secondary"
+          size="sm"
+          withShadow
+          data-testid="expand-all-btn"
+        >
           {UI.EXPAND_ALL}
-        </button>
-        <button onClick={collapseAll} className="btn btn-secondary" data-testid="collapse-all-btn">
+        </Button>
+        <Button 
+          onClick={collapseAll} 
+          variant="secondary"
+          size="sm"
+          withShadow
+          data-testid="collapse-all-btn"
+        >
           {UI.COLLAPSE_ALL}
-        </button>
+        </Button>
       </div>
-      <div className="overflow-x-auto rounded-lg shadow-token bg-secondary-50">
-        <table className="min-w-full text-sm align-middle border-separate border-spacing-0" data-testid="lunar-grid-table">
+      <div className={`${getClasses('card-section', 'secondary')} overflow-x-auto rounded-lg`}>
+        <table className={getClasses('table', 'striped')} data-testid="lunar-grid-table">
           <thead>
-            <tr className="excel-header">
-              <th className="sticky left-0 z-20 excel-header px-4 py-2 text-left" style={{ minWidth: 180 }}>
+            <tr className={getClasses('table-row', 'secondary')}>
+              <th className={`${getClasses('table-header')} sticky left-0 z-20 text-left`} style={{ minWidth: 180 }}>
                 {EXCEL_GRID.HEADERS.LUNA}
               </th>
               {days.map(day => (
-                <th key={day} className="excel-cell text-right">
+                <th key={day} className={`${getClasses('table-cell')} text-right`}>
                   {day}
                 </th>
               ))}

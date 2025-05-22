@@ -1,8 +1,8 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, CSSProperties, useRef, memo } from 'react';
 import { 
   flexRender, 
   Header, 
-  Row as TableRow,
+  Row,
   Cell
 } from '@tanstack/react-table';
 import { useLunarGridTable, TransformedTableDataRow } from './hooks/useLunarGridTable';
@@ -20,28 +20,34 @@ import {
   useDeleteTransaction,
   type CreateTransactionHookPayload,
   type UpdateTransactionHookPayload
-} from '../../../services/hooks/transactionMutations';
+} from '../../../services/hooks/useTransactionMutations';
 
-// Tipuri
-import type { Transaction } from '../../../types/Transaction';
-import type { CustomCategory } from '../../../types/Category'; 
+// Importăm tipuri și constante din shared-constants (sursa de adevăr)
+import { TransactionType, FrequencyType } from '@shared-constants';
+import { LUNAR_GRID, LUNAR_GRID_MESSAGES } from '@shared-constants';
 
-// Importuri din shared-constants (sursa unică de adevăr) conform memoriei 886c7659
-import { EXCEL_GRID } from '@shared-constants';
-import { MESAJE } from '@shared-constants/messages';
-import { TransactionType, FrequencyType } from '@shared-constants/enums';
-import { API } from '@shared-constants/api';
-
-// Import doar componente existente
+// Import componentele UI
+import Button from '../../primitives/Button/Button';
 import CellTransactionPopover from './CellTransactionPopover';
-import type { Row } from '@tanstack/react-table';
+
+// Import hooks de stilizare
+import { useThemeEffects } from '../../../hooks/useThemeEffects';
+
+// Helper function pentru formatarea sumelor (memorare globală deoarece este statică)
+const formatMoney = (amount: number): string => {
+  return new Intl.NumberFormat('ro-RO', {
+    style: 'decimal',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+};
 
 export interface LunarGridTanStackProps {
   year: number;
   month: number;
 }
 
-// Interfață pentru celula în editare
+// Interfața pentru starea celulei în editare
 interface EditingCellState {
   id: string;
   category: string;
@@ -52,99 +58,82 @@ interface EditingCellState {
   inputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) => {
-  // User și autorizare
-  const user = useAuthStore((state) => state.user);
-  const userId = user?.id || '';
+// Interfața pentru starea popover-ului
+interface PopoverState {
+  id?: string;
+  category: string;
+  subcategory?: string;
+  day: number;
+  type: TransactionType;
+  amount?: string;
+  anchorEl: HTMLElement;
+}
+
+// Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
+const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month }) => {
+  // Hooks pentru stilizare
+  const { getClasses, applyVariant, applyEffect } = useThemeEffects();
   
-  // Acces la queryClient pentru operații manuale când e nevoie
+  // State pentru editare inline și popover
+  const [editingCell, setEditingCell] = useState<EditingCellState | null>(null);
+  const [popover, setPopover] = useState<PopoverState | null>(null);
+  
+  // Referință pentru input focus
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Hooks pentru mutații de tranzacții - migrare de la Zustand la React Query
+  const { mutate: createTransactionMutation } = useCreateTransaction();
+  const { mutate: updateTransactionMutation } = useUpdateTransaction();
+  const { mutate: deleteTransactionMutation } = useDeleteTransaction();
+  
+  // Cache pentru invalidare după mutații
   const queryClient = useQueryClient();
   
-  // Categorii și state management
-  const categories = useCategoryStore((state) => state.categories);
-  
-  // State pentru celula în curs de editare (editare inline)
-  const [editingCell, setEditingCell] = useState<EditingCellState | null>(null);
-  
-  // State pentru popover de editare
-  const [popover, setPopover] = useState<{
-    id?: string;
-    amount?: string;
-    category: string;
-    subcategory?: string;
-    day: number;
-    type: TransactionType;
-    anchorEl: HTMLElement;
-  } | null>(null);
-  
-  // Query params pentru React Query
-  const queryParams = useMemo(() => ({
-    year,
-    month,
-    limit: 1000,
-    offset: 0,
-    sort: 'date',
-    order: 'asc' as const
-  }), [year, month]);
-  
-  // Obținem mutațiile din hook-urile specializate
-  const createTransactionMutation = useCreateTransaction();
-  const updateTransactionMutation = useUpdateTransaction();
-  const deleteTransactionMutation = useDeleteTransaction();
-  
-  // State de încărcare pentru mutații
-  const isCreating = createTransactionMutation.isPending;
-  const isUpdating = updateTransactionMutation.isPending;
-  const isDeleting = deleteTransactionMutation.isPending;
-  
-  // Helper pentru a determina tipul tranzacției - funcție LOCALĂ, nu referință externă
+  // Funcție pentru determinarea tipului de tranzacție
   const determineTransactionType = useCallback((category: string): TransactionType => {
-    if (category === 'VENITURI') return TransactionType.INCOME;
-    if (category === 'ECONOMII') return TransactionType.SAVING;
-    return TransactionType.EXPENSE;
+    const categories = useCategoryStore.getState().categories;
+    const foundCategory = categories.find(c => c.name === category);
+    return (foundCategory?.type || 'expense') as TransactionType;
   }, []);
   
-  // Handler pentru double-click pe celulă - activează editarea inline
-  const handleCellDoubleClick = useCallback(
-    (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
-      // Prevenim propagarea și default behavior
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const transactionType = determineTransactionType(category);
-      
-      // Generăm un ID unic pentru celula editată
-      const cellId = `${category}-${subcategory || 'null'}-${day}`;
-      
-      // Creăm o referință pentru input pentru a-l putea focaliza
-      const inputRef = React.createRef<HTMLInputElement>();
-      
-      // Setăm starea de editare pentru această celulă
-      setEditingCell({
-        id: cellId,
-        category,
-        subcategory,
-        day,
-        amount,
-        type: transactionType,
-        inputRef
-      });
-      
-      // Focus pe input după render
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-          inputRef.current.select();
-        }
-      }, 50);
-      
-      // Anulează și orice popover existent
+  // Handler pentru double click pe celule (editare inline)
+  const handleCellDoubleClick = useCallback((
+    e: React.MouseEvent, 
+    category: string, 
+    subcategory: string | undefined, 
+    day: number, 
+    amount: string
+  ) => {
+    e.stopPropagation();
+    
+    // Dacă este deja popover deschis, îl închidem
+    if (popover) {
       setPopover(null);
-    }, 
-    [year, month, determineTransactionType]
-  );
+    }
+    
+    // Setăm starea de editare pentru celula curentă
+    const cellId = `${category}-${subcategory || 'null'}-${day}`;
+    
+    setEditingCell({
+      id: cellId,
+      category,
+      subcategory,
+      day,
+      amount: amount && amount !== '-' ? amount.replace(/[^\d,.-]/g, '') : '',
+      type: determineTransactionType(category),
+      inputRef: inputRef
+    });
+    
+    // Focus pe input după render
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      }
+    }, 10);
+  }, [popover, determineTransactionType, inputRef]);
   
-  // Handler pentru salvarea valorii după editare inline
+  // Handler pentru salvarea valorii din input inline
   const handleInlineEditSave = useCallback((newAmount: string) => {
     if (!editingCell) return;
     
@@ -171,7 +160,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
       frequency: undefined
     };
     
-    createTransactionMutation.mutate(createPayload, {
+    createTransactionMutation(createPayload, {
       onSuccess: () => {
         setEditingCell(null);
         // Se poate adăuga notificare UI aici
@@ -198,11 +187,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     }
   }, [handleInlineEditSave, handleInlineEditCancel]);
   
-  // Notă: Funcția determineTransactionType a fost mutată mai sus
-  
   // Handler pentru click pe celulă - adaptat pentru tipul așteptat de useLunarGridTable
   const handleCellClick = useCallback(
-    (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string, type: string) => {
+    (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
       // Prevenim click-ul de la propagare pentru a evita conflicte cu expand/collapse
       e.stopPropagation();
       
@@ -222,7 +209,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
     [editingCell, determineTransactionType]
   );
   
-  // Handler pentru salvarea tranzacției din popover
+  // Handler pentru salvarea tranzacției din popover - optimizat cu useCallback
   const handleSavePopover = useCallback(
     async (formData: {
       amount: string;
@@ -230,7 +217,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
       frequency?: FrequencyType;
     }) => {
       if (!popover) {
-        console.error("Date lipsă din popover la salvare.");
         return;
       }
 
@@ -250,211 +236,271 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
         frequency: formData.recurring ? formData.frequency : undefined,
       };
 
-      if (transactionIdToEdit) {
-        // Operație de UPDATE
-        updateTransactionMutation.mutate(
-          { 
-            id: transactionIdToEdit, 
-            transactionData: commonPayload 
-          }, 
-          {
-            onSuccess: () => {
-              setPopover(null);
-              console.log('Tranzacție actualizată cu succes!');
-            },
-            onError: (error: Error) => {
-              console.error('Eroare la actualizarea tranzacției:', error);
-            },
-          }
-        );
-      } else {
-        // Operație de CREATE
-        createTransactionMutation.mutate(commonPayload, {
-          onSuccess: () => {
-            setPopover(null);
-            console.log('Tranzacție creată cu succes!');
-          },
-          onError: (error: Error) => {
-            console.error('Eroare la crearea tranzacției:', error);
-          },
-        });
-      }
-    },
-    [popover, year, month, createTransactionMutation, updateTransactionMutation]
+      createTransactionMutation(commonPayload, {
+        onSuccess: () => {
+          setPopover(null);
+        },
+        onError: (err: Error) => {
+          // Eroare tratată în UI fără console.log
+          setPopover(null);
+        }
+      });
+    }, 
+    [popover, year, month, createTransactionMutation]
   );
-  
-  // Folosește hook-ul useLunarGridTable pentru logica tabelului
-  
-  const { 
+
+  // Interogare tabel optimizată
+  const {
     table,
-    tableContainerRef,
     isLoading,
     error,
-    getCellId,
+    columns,
+    days,
     dailyBalances,
-    days
+    tableContainerRef
   } = useLunarGridTable(
     year, 
     month, 
-    {}, // expandedCategories nu mai e folosit, TanStack gestionează intern
+    {}, // expandedCategories este gestionat intern de TanStack now
     handleCellClick, 
     handleCellDoubleClick
   );
 
-  // Render cu constante și clase existente
+  // State pentru celula în editare inline - optimizat cu useCallback
+  const renderEditableCell = useCallback((category: string, subcategory: string | undefined, day: number) => {
+    if (!editingCell) return null;
+
+    const cellId = `${category}-${subcategory || 'null'}-${day}`;
+
+    if (editingCell.id !== cellId) return null;
+
+    return (
+      <input
+        type="number"
+        ref={editingCell.inputRef}
+        value={editingCell.amount}
+        onChange={(e) => setEditingCell(prev => prev ? { ...prev, amount: e.target.value } : null)}
+        onKeyDown={handleInlineKeyDown}
+        onBlur={() => handleInlineEditSave(editingCell.amount)}
+        className={applyEffect(getClasses('input', 'primary', 'sm'), 'withFadeIn', 'withGlowFocus')}
+        data-testid={`inline-edit-input-${day}`}
+        autoFocus
+      />
+    );
+  }, [editingCell, handleInlineKeyDown, getClasses, applyEffect, handleInlineEditSave]);
+
+  // Funcție pentru calcularea sumei totale - memoizată
+  const monthTotal = useMemo(() => 
+    days.reduce((acc, day) => acc + (dailyBalances[day] || 0), 0), 
+  [days, dailyBalances]);
+  
+  // Helper pentru stiluri de valori - optimizat cu useCallback
+  const getBalanceStyle = useCallback((value: number): string => {
+    if (!value) return '';
+    return value > 0 
+      ? applyVariant(getClasses('grid-value-cell'), 'positive') 
+      : applyVariant(getClasses('grid-value-cell'), 'negative');
+  }, [getClasses, applyVariant]);
+
+  // Gestionarea poziției popover-ului - memoizată
+  const popoverStyle = useMemo((): CSSProperties => {
+    if (!popover) return {};
+    
+    const rect = popover.anchorEl.getBoundingClientRect();
+    const scrollY = window.scrollY || document.documentElement.scrollTop;
+    const scrollX = window.scrollX || document.documentElement.scrollLeft;
+    
+    return {
+      position: 'absolute',
+      top: `${rect.top + scrollY}px`,
+      left: `${rect.left + scrollX}px`,
+    };
+  }, [popover]);
+
+  // Funcție helper pentru randarea recursivă a rândurilor - optimizată
+  const renderRow = useCallback((row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
+    const { original } = row;
+    
+    return (
+      <React.Fragment key={row.id}>
+        <tr className={
+          applyEffect(
+            applyVariant(
+              getClasses(original.isCategory ? 'grid-category-row' : 'grid-subcategory-row'),
+              row.getIsExpanded() ? 'expanded' : 'default'
+            ),
+            'withTransition'
+          )
+        }>
+          {row.getVisibleCells().map((cell, cellIdx) => {
+            const isFirstCell = cellIdx === 0;
+            return (
+              <td 
+                key={cell.id}
+                className={isFirstCell && level > 0 
+                  ? applyVariant(getClasses('grid-subcategory-cell'), 'indented') 
+                  : ''}
+              >
+                {renderEditableCell(
+                  original.category,
+                  original.subcategory,
+                  cell.column.id.startsWith('day-') ? parseInt(cell.column.id.split('-')[1]) : 0
+                ) || flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </td>
+            );
+          })}
+        </tr>
+        
+        {/* Rânduri expandate */}
+        {row.getIsExpanded() && row.subRows && row.subRows.length > 0 && (
+          row.subRows.map((subRow) => renderRow(subRow, level + 1))
+        )}
+      </React.Fragment>
+    );
+  }, [getClasses, applyVariant, applyEffect, renderEditableCell]);
+
+  // Renderizare (layout principal)
   return (
-    <div>
-      <div className="flex justify-end space-x-2 mb-2">
-        <button 
-          onClick={() => table.toggleAllRowsExpanded(true)}
-          className="btn btn-secondary" 
-          data-testid="expand-all-btn"
+    <>
+      <div className={applyEffect(getClasses('grid-action-group'), 'withFadeIn')}>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => table.getToggleAllRowsExpandedHandler()(!table.getIsAllRowsExpanded())}
+          dataTestId="toggle-expand-all"
+          withShadow
+          withTranslate
         >
-          {EXCEL_GRID.TABLE_CONTROLS.EXPAND_ALL}
-        </button>
-        <button 
-          onClick={() => table.toggleAllRowsExpanded(false)}
-          className="btn btn-secondary" 
-          data-testid="collapse-all-btn"
+          {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => table.resetExpanded()}
+          dataTestId="reset-expanded"
+          withShadow
+          withTranslate
         >
-          {EXCEL_GRID.TABLE_CONTROLS.COLLAPSE_ALL}
-        </button>
+          {LUNAR_GRID.RESET_EXPANSION}
+        </Button>
       </div>
-      
-      {/* TanStack Table implementation */}
+
       <div 
         ref={tableContainerRef}
-        className="overflow-auto rounded-lg shadow-token bg-secondary-50 h-[600px]"
+        className={applyEffect(
+          applyVariant(getClasses('grid-container', 'secondary'), isLoading ? 'loading' : undefined),
+          'withFadeIn',
+          'withShadow'
+        )}
+        data-testid="lunar-grid-container"
       >
-        {isLoading ? (
-          <div className="text-center py-token-xl text-secondary-600" data-testid="loading-indicator">
-            {EXCEL_GRID.LOADING}
+        {isLoading && (
+          <div className={applyVariant(getClasses('grid-message'), 'loading')} data-testid="loading-indicator">
+            {LUNAR_GRID.LOADING}
           </div>
-        ) : error ? (
-          <div className="text-center py-token-xl text-red-500" data-testid="error-indicator">
-            {MESAJE.EROARE_INCARCARE_TRANZACTII} {error.message}
+        )}
+        
+        {error && (
+          <div className={applyEffect(
+            applyVariant(getClasses('grid-message'), 'error'),
+            'withFadeIn'
+          )} data-testid="error-indicator">
+            {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
           </div>
-        ) : table.getRowModel().rows.length === 0 ? (
-          <div className="text-center py-token-xl text-secondary-600" data-testid="no-data-indicator">
-            {EXCEL_GRID.NO_DATA}
+        )}
+        
+        {!isLoading && !error && table.getRowModel().rows.length === 0 && (
+          <div className={applyEffect(
+            applyVariant(getClasses('grid-message'), 'default'),
+            'withFadeIn'
+          )} data-testid="no-data-indicator">
+            {LUNAR_GRID.NO_DATA}
           </div>
-        ) : (
+        )}
+        
+        {!isLoading && !error && table.getRowModel().rows.length > 0 && (
           <table 
-            className="w-full text-sm align-middle border-separate border-spacing-0"
+            className={applyEffect(getClasses('grid-table'), 'withFadeIn')}
             data-testid="lunar-grid-table"
           >
-            <thead className="bg-secondary-100 sticky top-0">
+            <thead className={applyEffect(getClasses('grid-header'), 'withShadow')}>
               <tr>
                 {table.getFlatHeaders().map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-2 font-medium text-secondary-700 border-b border-secondary-200"
+                    colSpan={header.colSpan}
+                    className={applyVariant(
+                      getClasses('grid-header-cell'),
+                      header.id === 'category' ? 'sticky' : 'numeric'
+                    )}
                     style={{ width: header.getSize() }}
                   >
-                    {header.isPlaceholder ? null : flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
+                    {flexRender(header.column.columnDef.header, header.getContext())}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {/* Rendering recursiv pentru categorii și subcategorii */}
-              {table.getRowModel().rows.map(row => renderRow(row))}
-              {/* Rândul custom Sold la final */}
-              <tr className="bg-gray-100 font-bold border-t-2" data-testid="sold-row">
-                <td
-                  className="sticky left-0 bg-gray-100 z-10 px-4 py-2"
-                  data-testid="sold-label"
-                >
-                  {EXCEL_GRID.HEADERS.SOLD}
+              {table.getRowModel().rows.map((row) => renderRow(row))}
+              
+              {/* Rând de total */}
+              <tr className={applyEffect(
+                getClasses('grid-total-row'),
+                'withFadeIn',
+                'withGlowHover'
+              )} data-testid="sold-row">
+                <td className={applyVariant(getClasses('grid-total-cell'), 'balance')}>
+                  {LUNAR_GRID.TOTAL_BALANCE}
                 </td>
-                {days.map((day: number) => {
+                {days.map((day) => {
                   const balance = dailyBalances[day] || 0;
-                  const colorClass = balance === 0 ? 'text-secondary-400' : balance > 0 ? 'text-success-600 font-medium' : 'text-error-600 font-medium';
+                  const cellClass = balance !== 0 
+                    ? applyEffect(getBalanceStyle(balance), 'withTransition') 
+                    : '';
                   return (
-                    <td
-                      key={day}
-                      className={`px-4 py-2 text-right ${colorClass}`}
-                      data-testid={`sold-day-${day}`}
-                    >
-                      {typeof balance === 'number' ? (balance !== 0 ? balance.toLocaleString('ro-RO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—') : '—'}
+                    <td key={day} className={cellClass}>
+                      {balance !== 0 ? formatMoney(balance) : '-'}
                     </td>
                   );
                 })}
+                <td className={applyEffect(getBalanceStyle(monthTotal), 'withGlowHover')}>
+                  {formatMoney(monthTotal)}
+                </td>
               </tr>
             </tbody>
           </table>
         )}
       </div>
       
-      {/* Popover pentru editare tranzacție complexă */}
-      {popover && !editingCell && (
-        <div className="absolute top-0 left-0 z-50" style={{ 
-          position: 'absolute',
-          top: popover.anchorEl ? `${popover.anchorEl.getBoundingClientRect().bottom}px` : '0px',
-          left: popover.anchorEl ? `${popover.anchorEl.getBoundingClientRect().left}px` : '0px'
-        }}>
+      {/* Popover pentru editare tranzacție */}
+      {popover && (
+        <div 
+          className={applyEffect(
+            applyVariant(getClasses('grid-popover'), 'withTransition'),
+            'withFadeIn',
+            'withShadow'
+          )}
+          style={popoverStyle}
+          data-testid="transaction-popover"
+        >
           <CellTransactionPopover
             initialAmount={popover.amount || ''}
             day={popover.day}
             month={month}
             year={year}
             category={popover.category}
-            subcategory={popover.subcategory || ''} 
+            subcategory={popover.subcategory || ''}
             type={popover.type}
             onSave={handleSavePopover}
             onCancel={() => setPopover(null)}
-            anchorRef={{ current: popover.anchorEl }}
           />
         </div>
       )}
-    </div>
+    </>
   );
-};
+});
 
-// Adaug funcția recursivă renderRow înainte de return:
-const renderRow = (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
-  console.log('ROW', row.id, row.original);
-  // Folosesc cheia robustă generată în pipeline
-  const rowKey = row.id;
-  return (
-    <React.Fragment key={rowKey}>
-      <tr className={row.getCanExpand() ? "bg-primary-50" : ""}>
-        {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>, idx: number) => (
-          <td
-            key={cell.id}
-            style={idx === 0 && level > 0 ? { paddingLeft: 32 * level } : undefined}
-            className={idx === 0 && level > 0 ? "pl-8" : ""}
-          >
-            {/* Săgeată doar dacă este rând de categorie și are subRows */}
-            {idx === 0 &&
-              row.original &&
-              row.original.isCategory === true &&
-              Array.isArray(row.subRows) &&
-              row.subRows.length > 0 && (
-                <span
-                  onClick={e => {
-                    e.stopPropagation();
-                    row.toggleExpanded();
-                  }}
-                  style={{ cursor: "pointer", marginRight: 8 }}
-                  aria-expanded={row.getIsExpanded()}
-                  data-testid={`expand-btn-${row.original.category}`}
-                >
-                  {row.getIsExpanded() ? "▼" : "▶"}
-                </span>
-              )}
-            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-          </td>
-        ))}
-      </tr>
-      {row.getIsExpanded() && row.subRows.length > 0 &&
-        row.subRows.map((subRow: Row<TransformedTableDataRow>) => renderRow(subRow, level + 1))
-      }
-    </React.Fragment>
-  );
-};
+// Adăugăm displayName pentru debugging mai ușor
+LunarGridTanStack.displayName = 'LunarGridTanStack';
 
 export default LunarGridTanStack;

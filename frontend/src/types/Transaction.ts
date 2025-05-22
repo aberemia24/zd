@@ -3,73 +3,96 @@
 import { TransactionType, FrequencyType, TransactionStatus } from '@shared-constants/enums';
 import { TransactionValidated, CreateTransaction } from '@shared-constants/transaction.schema';
 
-// Extind tipul Transaction pentru a fi compatibil atât cu formularele (unde amount e string)
-// cât și cu React Query (unde amount e number)
-// IMPORTANT: currency este acum opțional pentru compatibilitate cu TransactionValidated
-export type Transaction = {
+/**
+ * Definițiile de tipuri pentru tranzacții
+ */
+
+/**
+ * Interfața pentru o tranzacție
+ * Versiune actualizată care suportă toate campurile din aplicație
+ */
+export interface Transaction {
   // Identificatori
-  _id?: string;
-  id?: string;
-  userId?: string;
+  id: string;
+  _id?: string; // Pentru compatibilitate cu MongoDB
+  userId: string;
   
-  // Date de bază - obligatorii
-  type: TransactionType; // ex: 'income', 'expense', 'saving'
-  date: string; // format ISO sau local
+  // Date de bază
+  type: TransactionType;
+  date: string | Date;
   
-  // Valori numerice - suport dual pentru string (UI) și number (API)
+  // Valori numerice
   amount: number | string; // Suportă atât number (de la API) cât și string (pentru forms)
   actualAmount?: number; // Pentru tranzacții cu sumă efectivă diferită de cea planificată
   
   // Clasificare
-  category?: string; // Opțional pentru compatibilitate cu schema.ts
-  subcategory?: string; // Opțional pentru compatibilitate cu schema.ts
+  category: string;
+  subcategory: string;
   
   // Opțiuni recurente
   recurring?: boolean;
   frequency?: FrequencyType;
   
   // Metadate și extensii
-  status?: TransactionStatus; // Ex: PLANNED, COMPLETED
-  description?: string; // Descriere opțională
-  currency?: string; // Opțional (ex: 'RON', 'EUR', 'USD') - nu se mai folosește în FE
+  status?: TransactionStatus;
+  description?: string;
+  currency?: string; // Opțional (ex: 'RON', 'EUR', 'USD')
   
-  // Timestamp-uri (pentru audit)
-  created_at?: string;
-  updated_at?: string;
-};
+  // Timestamp-uri
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  created_at?: string; // Pentru compatibilitate cu API legacy
+  updated_at?: string; // Pentru compatibilitate cu API legacy
+}
 
 /**
- * Parametrii pentru filtrarea și paginarea tranzacțiilor
- * Folosit pentru comunicarea cu API și stocarea stării filtrelor
+ * Filtru pentru tranzacții
+ * Combină toate proprietățile de filtrare disponibile în aplicație
  */
-export type TransactionQueryParams = {
-  limit?: number;
-  offset?: number;
-  sort?: string;
-  order?: 'asc' | 'desc';
-  startDate?: string;
-  endDate?: string;
-  type?: TransactionType; // Modificat din string în TransactionType
+export interface TransactionFilters {
+  // Filtre de bază
+  type?: TransactionType;
   category?: string;
   subcategory?: string;
+  
+  // Filtre de dată
+  month?: number;
+  year?: number;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  includeAdjacentDays?: boolean;
+  
+  // Filtre de valoare
   minAmount?: number;
   maxAmount?: number;
+  
+  // Filtre de proprietăți
+  recurring?: boolean;
+  frequency?: FrequencyType;
+  
+  // Filtre de căutare
   search?: string;
-  recurring?: boolean; // Adăugat pentru filtrarea după tranzacții recurente
-};
+  userId?: string;
+  
+  // Filtre de paginare și sortare
+  page?: number;
+  pageSize?: number;
+  limit?: number;
+  offset?: number;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  sort?: string;
+  order?: 'asc' | 'desc';
+}
 
 /**
  * Versiunea formularului de tranzacție cu amount ca număr
  * Folosit intern pentru validare și calcule înainte de a fi transformat în Transaction
  */
 export type TransactionFormWithNumberAmount = Omit<Transaction, 'amount'> & {
-  type: TransactionType;
-  frequency?: FrequencyType;
   amount: number; // amount ca număr pentru calcule și validare
 };
 
-export type TransactionQueryParamsWithRecurring = TransactionQueryParams & {
-  month?: number;
-  year?: number;
-  includeAdjacentDays?: boolean;
-};
+// Alias pentru compatibilitate cu codul existent
+export type TransactionQueryParams = TransactionFilters;
+export type TransactionQueryParamsWithRecurring = TransactionFilters;

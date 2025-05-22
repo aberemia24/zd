@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { getEnhancedComponentClasses } from '../../styles/themeUtils';
+import { useThemeEffects } from '../../hooks';
 import type { ComponentSize, ComponentVariant } from '../../styles/themeTypes';
 import { LOADER } from '@shared-constants';
 
@@ -64,69 +64,53 @@ const Spinner: React.FC<SpinnerProps> = ({
     }
   };
   
-  // Colectăm efectele vizuale rafinate
-  const containerEffects: string[] = [];
-  const svgEffects: string[] = [];
-  const circleEffects: string[] = [];
-  const pathEffects: string[] = [];
-  
-  // Adăugăm efectele solicitate
-  if (withFadeIn) {
-    containerEffects.push('fade-in');
-  }
-  
-  if (withPulse) {
-    svgEffects.push('pulse-effect');
-  }
-  
-  if (withGradient) {
-    pathEffects.push('gradient-stroke');
-    circleEffects.push('gradient-stroke-light');
-  }
-  
-  if (withShadow) {
-    svgEffects.push('shadow-glow');
-  }
+  // Utilizăm hook-ul pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withFadeIn,
+    withPulse,
+    withGradient,
+    withShadow
+  });
   
   return (
-  <div 
-    className={classNames(
-      getEnhancedComponentClasses('loader-container', variant as ComponentVariant, sizeVariant as ComponentSize, undefined, containerEffects),
-      className
-    )} 
-    data-testid={dataTestId || 'spinner'}
-  >
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 44 44"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <div 
       className={classNames(
-        getEnhancedComponentClasses('loader-svg', variant as ComponentVariant, sizeVariant as ComponentSize, undefined, svgEffects),
-        getSpeedClass()
-      )}
+        getClasses('loader-container', variant as ComponentVariant, sizeVariant as ComponentSize),
+        className
+      )} 
+      data-testid={dataTestId || 'spinner'}
     >
-      {showBackground && (
-        <circle
-          cx="22"
-          cy="22"
-          r="20"
-          className={getEnhancedComponentClasses('loader-circle', variant as ComponentVariant, undefined, undefined, circleEffects)}
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 44 44"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={classNames(
+          getClasses('loader-svg', variant as ComponentVariant, sizeVariant as ComponentSize),
+          getSpeedClass()
+        )}
+      >
+        {showBackground && (
+          <circle
+            cx="22"
+            cy="22"
+            r="20"
+            className={getClasses('loader-circle', variant as ComponentVariant)}
+            strokeWidth="4"
+            fill="none"
+            opacity="0.2"
+          />
+        )}
+        <path
+          d="M42 22c0-11.046-8.954-20-20-20"
+          className={getClasses('loader-path', variant as ComponentVariant)}
           strokeWidth="4"
-          fill="none"
-          opacity="0.2"
+          strokeLinecap="round"
         />
-      )}
-      <path
-        d="M42 22c0-11.046-8.954-20-20-20"
-        className={getEnhancedComponentClasses('loader-path', variant as ComponentVariant, undefined, undefined, pathEffects)}
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
-    </svg>
-  </div>
-);
+      </svg>
+    </div>
+  );
 };
 
 export default Spinner;

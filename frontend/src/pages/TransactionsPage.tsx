@@ -1,14 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import TransactionForm from '../components/features/TransactionForm/TransactionForm';
 import TransactionTable from '../components/features/TransactionTable/TransactionTable';
 import TransactionFilters from '../components/features/TransactionFilters/TransactionFilters';
 import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
 import { useAuthStore } from '../stores/authStore';
 import { useFilteredTransactions } from '../services/hooks/useFilteredTransactions';
-// Următoarele importuri au fost eliminate deoarece mutațiile sunt gestionate în componente specializate
-// și nu direct în TransactionsPage
-// import { useCreateTransaction, useUpdateTransaction, useDeleteTransaction } from '../services/hooks/transactionMutations';
-// import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { TITLES, TransactionType, CategoryType } from '@shared-constants';
 import { PAGINATION } from '@shared-constants';
 import Alert from '../components/primitives/Alert/Alert';
@@ -16,6 +13,7 @@ import { getEnhancedComponentClasses } from '../styles/themeUtils';
 // Import-urile pentru categorii nu mai sunt necesare deoarece inițializarea se face în App.tsx
 // import { useCategoryStore } from '../stores/categoryStore';
 // import { CATEGORIES } from '@shared-constants/categories';
+import type { Transaction } from '../types/Transaction';
 
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
@@ -40,6 +38,9 @@ const TransactionsPage: React.FC = () => {
   
   // Extragem user din AuthStore pentru a-l folosi în query
   const { user } = useAuthStore();
+  
+  // Adăugăm queryClient pentru a invalida query-urile după adăugarea unei tranzacții
+  const queryClient = useQueryClient();
   
   // Adaug state pentru filtrele avansate
   const [dateFrom, setDateFrom] = React.useState<string>('');
@@ -71,7 +72,7 @@ const TransactionsPage: React.FC = () => {
 
   // Folosim noul hook useFilteredTransactions cu optimizări de performance
   const { 
-    data: transactions,
+    data: rawTransactions,
     error: fetchError, 
     isLoading,
     hasNextPage,
@@ -79,13 +80,64 @@ const TransactionsPage: React.FC = () => {
     isFetchingNextPage,
     totalCount,
     isFiltered,
-    isFetching
+    isFetching,
+    refetch
   } = useFilteredTransactions(queryParams);
+  
+  // Procesăm tranzacțiile pentru a asigura compatibilitatea cu tipul Transaction
+  // Adăugăm userId acolo unde lipsește pentru a satisface interfața Transaction
+  const transactions = useMemo(() => {
+    if (!rawTransactions) return [];
+    
+    return rawTransactions.map(transaction => {
+      const processedTransaction = { ...transaction };
+      
+      // Asigurăm că toate tranzacțiile au userId
+      if (!processedTransaction.userId && user?.id) {
+        processedTransaction.userId = user.id;
+      }
+      
+      // Asigurăm că _id este transferat la id dacă e necesar
+      if (!(processedTransaction as any).id && (processedTransaction as any)._id) {
+        (processedTransaction as any).id = (processedTransaction as any)._id;
+      }
+      
+      // Ne asigurăm că date este mereu string
+      if (processedTransaction.date && typeof processedTransaction.date !== 'string') {
+        processedTransaction.date = String(processedTransaction.date);
+      }
+      
+      return processedTransaction;
+    });
+  }, [rawTransactions, user?.id]);
+  
+  // Handler pentru evenimentul transaction:created
+  const handleTransactionCreated = useCallback(() => {
+    // Invalidăm cache-ul pentru a reîncărca datele
+    queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    
+    // Reîncărcăm datele direct
+    refetch();
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('TransactionsPage - Tranzacție nouă creată, reîncărcăm datele.');
+    }
+  }, [queryClient, refetch]);
+  
+  // Adăugăm listener pentru evenimentul transaction:created
+  useEffect(() => {
+    window.addEventListener('transaction:created', handleTransactionCreated);
+    
+    return () => {
+      window.removeEventListener('transaction:created', handleTransactionCreated);
+    };
+  }, [handleTransactionCreated]);
   
   // Logging pentru debugging - doar în development
   if (process.env.NODE_ENV === 'development') {
     console.log('TransactionsPage - user:', user);
-    console.log('TransactionsPage - transactions:', transactions);
+    console.log('TransactionsPage - rawTransactions:', rawTransactions);
+    console.log('TransactionsPage - processed transactions:', transactions);
     console.log('TransactionsPage - totalCount:', totalCount);
     console.log('TransactionsPage - isFiltered:', isFiltered);
   }
@@ -98,7 +150,7 @@ const TransactionsPage: React.FC = () => {
   const totalTransactions = totalCount;
   
   // Callback pentru schimbarea filtrelor - declanșează refetch via React Query
-  const handleFilterChange = React.useCallback((
+  const handleFilterChange = useCallback((
     newType?: string, 
     newCategory?: string, 
     newSubcategory?: string
@@ -116,7 +168,7 @@ const TransactionsPage: React.FC = () => {
   }, [setFilterType, setFilterCategory]);
   
   // Handler pentru schimbarea subcategoriei
-  const handleSubcategoryChange = React.useCallback((newSubcategory: string) => {
+  const handleSubcategoryChange = useCallback((newSubcategory: string) => {
     setFilters(prev => ({
       ...prev,
       subcategory: newSubcategory
@@ -124,7 +176,7 @@ const TransactionsPage: React.FC = () => {
   }, []);
   
   // Sync cu filterStore la montare - doar pentru UI consistency
-  React.useEffect(() => {
+  useEffect(() => {
     const storeType = useTransactionFiltersStore.getState().filterType;
     const storeCategory = useTransactionFiltersStore.getState().filterCategory;
     

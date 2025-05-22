@@ -52,7 +52,6 @@ export function useCreateTransaction() {
       return { previousData };
     },
     onError: (err, newTransaction, context) => {
-      console.error('Eroare la crearea tranzacției:', err);
       // Rollback - restaurăm datele la starea anterioară
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
@@ -104,7 +103,6 @@ export function useUpdateTransaction() {
       return { previousData };
     },
     onError: (err, variables, context) => {
-      console.error('Eroare la actualizarea tranzacției:', err);
       // Rollback - restaurăm datele la starea anterioară
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
@@ -157,7 +155,6 @@ export function useDeleteTransaction() {
       return { previousData };
     },
     onError: (err, transactionId, context) => {
-      console.error('Eroare la ștergerea tranzacției:', err);
       // Rollback - restaurăm datele la starea anterioară
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
@@ -222,15 +219,9 @@ export function useUpdateTransactionStatus() {
     onSuccess: (data) => {
       // Invalidăm toate query-urile de tranzacții pentru a asigura date proaspete
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
-      
-      // Log pentru debugging
-      console.log(`Status tranzacție actualizat cu succes: ${data?.id || 'no id'} -> ${data?.status || 'unknown'}`);
-      
       return data;
     },
     onError: (err, variables, context) => {
-      console.error('Eroare la actualizarea statusului tranzacției:', err);
-      
       // Rollback - restaurăm datele la starea anterioară în caz de eroare
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);

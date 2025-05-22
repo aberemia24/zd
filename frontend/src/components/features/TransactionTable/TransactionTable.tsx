@@ -1,5 +1,5 @@
-import React from 'react';
-import Button from '../../primitives/Button';
+import React, { useMemo, useCallback } from 'react';
+import Button from '../../primitives/Button/Button';
 import Badge from '../../primitives/Badge/Badge';
 import Spinner from '../../primitives/Spinner';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
@@ -7,12 +7,14 @@ import { TABLE, BUTTONS, INFO } from '@shared-constants';
 import type { Transaction } from '../../../types/Transaction';
 import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
 import classNames from 'classnames';
+import { useThemeEffects } from '../../../hooks';
+import type { TransactionValidated } from '@shared-constants/transaction.schema';
 
 export type { Transaction };
 
 export type TransactionTableProps = {
   /** Lista de tranzacții încărcate din toate paginile */
-  transactions: Transaction[];
+  transactions: (TransactionValidated & { userId?: string })[];
   /** Numărul total de tranzacții (pentru informații) */
   total: number;
   /** Flag care indică dacă datele inițiale sunt în curs de încărcare */
@@ -40,80 +42,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   isFetching = false,
   ...rest
 }) => {
-  // Debug: log la fiecare render
-  // eslint-disable-next-line no-console
-  console.log('[TransactionTable] Render', {
-    key: (rest as any).key,
-    transactionsCount: transactions?.length,
-    total,
-    isLoading,
-    isFetching,
-    isFetchingNextPage,
-    hasNextPage,
-    isFiltered,
-    rest
-  });
   // Referință către container pentru implementarea intersection observer
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
-  // Implementăm Intersection Observer pentru detecția scroll-ului
-  React.useEffect(() => {
-    console.log('[TransactionTable] Mounted');
-    // Evităm crearea observer-ului dacă nu avem fetchNextPage
-    if (!fetchNextPage) return;
-    
-    // Funcția callback pentru intersection observer
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries;
-      // Dacă elementul nostru este vizibil și avem pagini disponibile, și nu suntem deja în loading
-      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    };
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses, hasEffect } = useThemeEffects({
+    withFadeIn: true,
+    withShadow: true,
+    withTransition: true,
+    withGlowFocus: true,
+    withScaleEffect: true,
+    withAccentBorder: true
+  });
 
-    // Creăm un nou observer care va detecta când elementul e vizibil
-    const observer = new IntersectionObserver(handleObserver, {
-      root: null, // viewport
-      rootMargin: '0px',
-      threshold: 0.1 // 10% vizibil
-    });
-
-    // Începem să observăm elementul nostru
-    if (bottomRef.current) {
-      observer.observe(bottomRef.current);
-    }
-
-    // Cleanup la unmount
-    return () => {
-      if (bottomRef.current) {
-        observer.unobserve(bottomRef.current);
-      }
-      console.log('[TransactionTable] Unmounted');
-    };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-  
-  // Generam efectele pentru componente
-  const tableEffects = [
-    'responsive',        // Tabel responsive pe dispozitive mobile
-    'shadow-hover',      // Umbră la hover peste întregul tabel
-    'rounded-corners',   // Colțuri rotunjite pentru aspect modern
-    'fade-in'            // Apariție graduală la încărcare
-  ];
-  
-  // Efecte pentru rânduri
-  const rowEffects = [
-    'hover-highlight',   // Evidențiere la hover
-    'smooth-transition'  // Tranziție lină între stări
-  ];
-  
-  // Efecte pentru antetul tabelului
-  const headerEffects = [
-    'sticky-header',     // Header fix la scroll
-    'gradient-bg-subtle' // Gradient subtil pentru antet
-  ];
-
-  // Format pentru sumă cu semn și culoare pentru tipul tranzacției
-  const getAmountStyles = (amount: number | string | undefined, type?: string): React.CSSProperties => {
+  // Memoizăm funcția de formatare pentru a evita recalculările inutile
+  const getAmountStyles = useCallback((amount: number | string | undefined, type?: string): React.CSSProperties => {
     if (amount === undefined || amount === null) return {};
     
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -129,10 +72,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     }
     
     return {};
-  };
+  }, []);
   
-  // Formatter pentru valori monetare
-  const formatAmount = (amount: number | string | undefined): string => {
+  // Memoizăm formatorul pentru valori monetare
+  const formatAmount = useCallback((amount: number | string | undefined): string => {
     if (amount === undefined || amount === null) return '';
     
     const numericAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -141,88 +84,186 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     
     // Adaugă simbolul RON și formatare cu 2 zecimale
     return numericAmount.toFixed(2) + ' RON';
-  };
+  }, []);
 
-  // Determinăm mesajul pentru cazul când nu există tranzacții
-  const getEmptyMessage = (): string => {
+  // Memoizăm formatorul pentru date
+  const formatDate = useCallback((date: string | Date | undefined): string => {
+    if (!date) return '';
+    
+    if (typeof date === 'object' && date instanceof Date) {
+      // Formatăm obiectul Date ca string
+      return date.toLocaleDateString('ro-RO');
+    }
+    
+    // Încercăm să creăm un obiect Date din string
+    try {
+      const dateObj = new Date(date as string);
+      return dateObj.toLocaleDateString('ro-RO');
+    } catch (e) {
+      // Dacă nu putem formata, returnăm string-ul original
+      return String(date);
+    }
+  }, []);
+
+  // Memoizăm mesajul pentru cazul când nu există tranzacții
+  const emptyMessage = useMemo(() => {
     if (isFiltered) {
       // Dacă filtrele sunt active, afișăm mesajul pentru "nu există tranzacții pentru filtrele selectate"
       return TABLE.NO_TRANSACTIONS || INFO.NO_TRANSACTIONS;
     }
     // Altfel, afișăm mesajul standard pentru tabel gol
     return TABLE.EMPTY;
-  };
+  }, [isFiltered]);
+
+  // Implementăm Intersection Observer pentru detecția scroll-ului
+  React.useEffect(() => {
+    // Evităm crearea observer-ului dacă nu avem fetchNextPage
+    if (!fetchNextPage) return;
+    
+    // Funcția callback pentru intersection observer
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      // Dacă elementul nostru este vizibil și avem pagini disponibile, și nu suntem deja în loading
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    };
+
+    // Opțiuni pentru Intersection Observer
+    const options = {
+      root: null, // viewport
+      rootMargin: '100px', // mărește aria de detectare pentru o experiență mai fluidă
+      threshold: 0.1 // 10% vizibil
+    };
+
+    // Creăm un nou observer care va detecta când elementul e vizibil
+    const observer = new IntersectionObserver(handleObserver, options);
+
+    // Începem să observăm elementul nostru
+    if (bottomRef.current) {
+      observer.observe(bottomRef.current);
+    }
+
+    // Cleanup la unmount
+    return () => {
+      if (bottomRef.current) {
+        observer.unobserve(bottomRef.current);
+      }
+    };
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  // Memoizăm rândul de loading pentru reutilizare
+  const loadingRow = useMemo(() => (
+    <tr data-testid="transaction-table-loading">
+      <td colSpan={7} className={getClasses('table-cell')} aria-live="polite">
+        <div className={classNames(
+          getClasses('flex-group', 'center', 'md'),
+          getClasses('spacing', 'small')
+        )}>
+          <Spinner variant="primary" sizeVariant="sm" withFadeIn withPulse />
+          <span>{TABLE.LOADING}</span>
+        </div>
+      </td>
+    </tr>
+  ), [getClasses]);
+
+  // Memoizăm rândul de loading pentru paginarea infinită
+  const loadingMoreRow = useMemo(() => (
+    <tr data-testid="transaction-table-loading-more">
+      <td colSpan={7} className={getClasses('table-cell')} aria-live="polite">
+        <div className={classNames(
+          getClasses('flex-group', 'center', 'md'),
+          getClasses('spacing', 'small')
+        )}>
+          <Spinner variant="primary" sizeVariant="sm" withFadeIn withPulse />
+          <span>{TABLE.LOADING_MORE}</span>
+        </div>
+      </td>
+    </tr>
+  ), [getClasses]);
+
+  // Clasa CSS pentru componenta overlay de loading
+  const overlayClasses = useMemo(() => 
+    classNames(
+      "absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-10",
+      getClasses('flex-group', 'center')
+    ), [getClasses]);
+
+  // Memoizăm rândul gol pentru reutilizare
+  const emptyRow = useMemo(() => (
+    <tr data-testid="transaction-table-empty">
+      <td colSpan={7} className={getClasses('table-cell', 'secondary')} aria-live="polite">
+        <div className={classNames(
+          getClasses('flex-group', 'center', 'md'),
+          getClasses('spacing', 'md'),
+          'flex-col p-4'
+        )}>
+          <span className={getClasses('text', 'secondary', 'lg')}>
+            {emptyMessage}
+          </span>
+          {isFiltered && (
+            <Badge 
+              variant="secondary" 
+              className={getClasses('spacing', 'small')}
+              withShadow
+            >
+              Încercați să ajustați filtrele
+            </Badge>
+          )}
+        </div>
+      </td>
+    </tr>
+  ), [getClasses, emptyMessage, isFiltered]);
 
   return (
-    <div className={getEnhancedComponentClasses('spacing', 'section')} style={{ position: 'relative' }}>
+    <div className={getClasses('spacing', 'section')} style={{ position: 'relative' }}>
       {/* Container pentru tabelul responsiv cu stiluri rafinate */}
-      <div className={getEnhancedComponentClasses('table-container', undefined, undefined, undefined, tableEffects)} style={{ position: 'relative' }}>
+      <div 
+        className={getClasses('table-container')} 
+        style={{ position: 'relative' }}
+        role="region" 
+        aria-label={TABLE.HEADERS.TYPE + " " + TABLE.HEADERS.AMOUNT}
+      >
         {/* Overlay de loading peste tabel când se face fetch, dar avem date vechi */}
         {isFetching && !isLoading && (
           <div
-            className="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-10"
+            className={overlayClasses}
             data-testid="transaction-table-loading-overlay"
-            style={{ pointerEvents: 'none' }}
+            aria-live="polite"
             aria-label={TABLE.LOADING}
+            style={{ pointerEvents: 'none' }}
           >
-            <Spinner variant="primary" sizeVariant="md" withFadeIn />
+            <Spinner variant="primary" sizeVariant="md" withFadeIn withPulse />
           </div>
         )}
         <table 
-          className={getEnhancedComponentClasses('table', 'striped')} 
+          className={getClasses('table', 'striped')} 
           data-testid="transaction-table"
         >
           <thead>
-            <tr className={getEnhancedComponentClasses('table-row', undefined, undefined, undefined, headerEffects)}>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.TYPE}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.AMOUNT}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.CATEGORY}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.SUBCATEGORY}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.DATE}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.RECURRING}</th>
-              <th className={getEnhancedComponentClasses('table-header')}>{TABLE.HEADERS.FREQUENCY}</th>
+            <tr className={getClasses('table-header-row')}>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.TYPE}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.AMOUNT}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.CATEGORY}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.SUBCATEGORY}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.DATE}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.RECURRING}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.FREQUENCY}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr data-testid="transaction-table-loading">
-                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
-                  <div className={classNames(
-                    getEnhancedComponentClasses('flex-group', 'center', 'md'),
-                    getEnhancedComponentClasses('spacing', 'small')
-                  )}>
-                    <Spinner variant="primary" sizeVariant="sm" withFadeIn />
-                    <span>{TABLE.LOADING}</span>
-                  </div>
-                </td>
-              </tr>
+              loadingRow
             ) : (!isFetching && transactions && transactions.length === 0 ? (
-              <tr data-testid="transaction-table-empty">
-                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center', 'py-8'])}>
-                  <div className={getEnhancedComponentClasses('flex-group', 'center', 'md', undefined, ['flex-col', 'p-4'])}>
-                    <span className={getEnhancedComponentClasses('text', 'secondary', 'lg')}>
-                      {getEmptyMessage()}
-                    </span>
-                    {isFiltered && (
-                      <Badge 
-                        variant="secondary" 
-                        className={getEnhancedComponentClasses('spacing', 'small', undefined, undefined, ['mt-2'])}
-                        withShadow
-                      >
-                        Încercați să ajustați filtrele
-                      </Badge>
-                    )}
-                  </div>
-                </td>
-              </tr>
+              emptyRow
             ) : (
               transactions.map((t, idx) => (
                 <tr 
                   key={`${t.id}-${idx}`} 
-                  className={getEnhancedComponentClasses('table-row', undefined, undefined, undefined, rowEffects)}
+                  className={getClasses('table-row')}
                   data-testid={`transaction-item-${t.id || idx}`}
                 >
-                  <td className={getEnhancedComponentClasses('table-cell')}>
+                  <td className={getClasses('table-cell')}>
                     <Badge 
                       variant={t.type === TransactionType.EXPENSE ? 'error' : t.type === TransactionType.INCOME ? 'success' : 'secondary'}
                       pill
@@ -232,21 +273,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     </Badge>
                   </td>
                   <td 
-                    className={getEnhancedComponentClasses('table-cell')} 
+                    className={getClasses('table-cell')} 
                     style={getAmountStyles(t.amount, t.type)}
                   >
-                    <span className={getEnhancedComponentClasses('text', 'accent')}>{formatAmount(t.amount)}</span>
+                    <span className={getClasses('text', 'accent')}>{formatAmount(t.amount)}</span>
                   </td>
-                  <td className={getEnhancedComponentClasses('table-cell')}>{t.category || ''}</td>
-                  <td className={getEnhancedComponentClasses('table-cell')}>{t.subcategory || ''}</td>
-                  <td className={getEnhancedComponentClasses('table-cell')}>{t.date || ''}</td>
-                  <td className={getEnhancedComponentClasses('table-cell')}>
+                  <td className={getClasses('table-cell')}>{t.category || ''}</td>
+                  <td className={getClasses('table-cell')}>{t.subcategory || ''}</td>
+                  <td className={getClasses('table-cell')}>{formatDate(t.date)}</td>
+                  <td className={getClasses('table-cell')}>
                     {t.recurring === true ? 
                       <Badge variant="primary" pill withPulse>{TABLE.BOOL.YES}</Badge> : 
                       <Badge variant="secondary" pill>{TABLE.BOOL.NO}</Badge>
                     }
                   </td>
-                  <td className={getEnhancedComponentClasses('table-cell')}>
+                  <td className={getClasses('table-cell')}>
                     {t.recurring === true && t.frequency ? 
                       <Badge variant="info" pill>{t.frequency}</Badge> : ''
                     }
@@ -255,27 +296,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               ))
             ))}
             {/* Fără date, dar în curs de încărcare - arăta indicator de loading pentru următoarea pagină */}
-            {isFetchingNextPage && (
-              <tr data-testid="transaction-table-loading-more">
-                <td colSpan={7} className={getEnhancedComponentClasses('table-cell', undefined, undefined, undefined, ['text-center'])}>
-                  <div className={classNames(
-                    getEnhancedComponentClasses('flex-group', 'center', 'md'),
-                    getEnhancedComponentClasses('spacing', 'small')
-                  )}>
-                    <Spinner variant="primary" sizeVariant="sm" withFadeIn />
-                    <span>{TABLE.LOADING_MORE}</span>
-                  </div>
-                </td>
-              </tr>
-            )}
+            {isFetchingNextPage && loadingMoreRow}
           </tbody>
         </table>
       </div>
       
       {/* Informații despre numărul total de tranzacții */}
       {!isLoading && transactions && transactions.length > 0 && (
-        <div className={getEnhancedComponentClasses('flex-group', 'between', 'md', undefined, ['mt-4', 'text-sm', 'text-secondary-700'])}>
-          <span>
+        <div 
+          className={classNames(
+            getClasses('flex-group', 'between', 'md'),
+            'mt-4'
+          )}
+          aria-live="polite"
+        >
+          <span className={getClasses('text', 'secondary', 'sm')}>
             {TABLE.SHOWING_INFO.replace('{shown}', String(transactions.length)).replace('{total}', String(total))}
           </span>
           {hasNextPage && (
@@ -285,7 +320,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               onClick={() => fetchNextPage?.()}
               disabled={isFetchingNextPage}
               withTranslate
-              data-testid="load-more-btn"
+              withShadow
+              dataTestId="load-more-btn"
+              aria-label={isFetchingNextPage ? TABLE.LOADING_MORE : BUTTONS.NEXT_PAGE}
             >
               {isFetchingNextPage ? TABLE.LOADING_MORE : BUTTONS.NEXT_PAGE}
             </Button>
@@ -294,9 +331,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       )}
       
       {/* Element invizibil pentru intersection observer */}
-      <div ref={bottomRef} style={{ height: '10px', margin: '10px 0' }} />
+      <div ref={bottomRef} style={{ height: '20px', margin: '10px 0' }} aria-hidden="true" />
     </div>
   );
 };
 
-export default TransactionTable;
+export default React.memo(TransactionTable);

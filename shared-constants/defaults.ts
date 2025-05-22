@@ -18,4 +18,5 @@ export const INITIAL_FORM_STATE = {
   date: '',
   recurring: false,
   frequency: '',
+  description: '',
 };

@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import { useThemeEffects } from '../../../hooks';
 import type { ComponentVariant } from '../../../styles/themeTypes';
 
 export interface AlertProps {
@@ -11,7 +11,7 @@ export interface AlertProps {
   className?: string;
   dismissible?: boolean;
   onDismiss?: () => void;
-  'data-testid'?: string;
+  dataTestId?: string;
   
   // Efecte vizuale rafinate
   /** Adaugă animație la apariție */
@@ -24,6 +24,8 @@ export interface AlertProps {
   withIcon?: boolean;
   /** Adaugă background cu gradient */
   withGradient?: boolean;
+  /** Adaugă efect de hover pentru butoane */
+  withHoverEffect?: boolean;
 }
 
 const Alert: React.FC<AlertProps> = ({ 
@@ -33,41 +35,27 @@ const Alert: React.FC<AlertProps> = ({
   className,
   dismissible = false,
   onDismiss,
-  'data-testid': dataTestId,
+  dataTestId,
   withFadeIn = false,
   withAccentBorder = false,
   withShadow = false,
   withIcon = false,
-  withGradient = false
+  withGradient = false,
+  withHoverEffect = true
 }) => {
   // Determinăm varianta din tip (type → ComponentVariant)
   const variant: ComponentVariant = (['success', 'error', 'warning', 'info'].includes(type) 
     ? type 
     : 'info') as ComponentVariant;
     
-  // Colectăm efectele vizuale rafinate într-un array
-  const alertEffects: string[] = [];
-  const buttonEffects: string[] = [];
-  
-  // Adăugăm efectele vizuale solicitate
-  if (withFadeIn) {
-    alertEffects.push('fade-in');
-  }
-  
-  if (withAccentBorder) {
-    alertEffects.push('accent-border');
-  }
-  
-  if (withShadow) {
-    alertEffects.push('alert-shadow');
-  }
-  
-  if (withGradient) {
-    alertEffects.push('alert-gradient');
-  }
-  
-  // Un efect de hover pentru butonul de închidere
-  buttonEffects.push('hover-scale');
+  // Utilizăm hook-ul pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withFadeIn,
+    withShadow,
+    withGradient,
+    withHoverEffect,
+    withAccentBorder
+  });
   
   // Stabilim iconița în funcție de tipul alertei
   const alertIcon = withIcon ? getAlertIcon(type) : null;
@@ -75,7 +63,7 @@ const Alert: React.FC<AlertProps> = ({
   return (
     <div
       className={classNames(
-        getEnhancedComponentClasses('alert', variant, undefined, undefined, alertEffects),
+        getClasses('alert', variant),
         className
       )}
       role="alert"
@@ -98,7 +86,7 @@ const Alert: React.FC<AlertProps> = ({
         {dismissible && (
           <button 
             type="button" 
-            className={getEnhancedComponentClasses('button', 'ghost', 'xs', undefined, buttonEffects)}
+            className={getClasses('button', 'ghost', 'xs')}
             onClick={onDismiss}
             aria-label="Închide"
             data-testid="alert-dismiss-btn"

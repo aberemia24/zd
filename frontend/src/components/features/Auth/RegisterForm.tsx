@@ -4,7 +4,7 @@ import { useAuthStore } from '../../../stores/authStore';
 import type { AuthErrorType } from '../../../services/supabaseAuthService';
 import toast from 'react-hot-toast';
 import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
-import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import { useThemeEffects } from '../../../hooks';
 import Input from '../../primitives/Input/Input';
 import { ValidatedSubmitButton } from '../../primitives/Button';
 import Alert from '../../primitives/Alert/Alert';
@@ -16,6 +16,13 @@ const RegisterForm: React.FC = () => {
   const { register, loading, error, errorType } = useAuthStore();
   const [success, setSuccess] = useState<string | null>(null);
   const [activatedField, setActivatedField] = useState<string | null>(null);
+  
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withFadeIn: true,
+    withShadow: true,
+    withGradient: true
+  });
   
   // Funcție pentru validarea formatului de email
   const isValidEmail = (email: string): boolean => {
@@ -82,15 +89,15 @@ const RegisterForm: React.FC = () => {
 
   return (
     <form 
-      className={getEnhancedComponentClasses('form-container', 'primary', 'md', undefined, ['fade-in', 'shadow-md'])}
+      className={getClasses('form-container', 'primary', 'md')}
       onSubmit={handleSubmit} 
       data-testid="register-form"
     >
-      <div className={getEnhancedComponentClasses('card-header', 'default', undefined, undefined, ['gradient-bg-subtle'])}>
-        <h2 className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'text-center'])}>Înregistrare</h2>
+      <div className={getClasses('card-header', 'default')}>
+        <h2 className={getClasses('form-label', 'primary', 'xl')}>Înregistrare</h2>
       </div>
       
-      <div className={getEnhancedComponentClasses('card-body', undefined, undefined, undefined, ['space-y-token'])}>
+      <div className={getClasses('card-body')}>
         {/* Email Input */}
         <Input
           id="register-email"
@@ -166,15 +173,15 @@ const RegisterForm: React.FC = () => {
           size="md"
           isLoading={loading}
           data-testid="register-submit"
-          className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['w-full', 'justify-center'])}
+          className={getClasses('flex')}
           submitText={BUTTONS.REGISTER}
         />
         
         {/* Login Link */}
-        <div className={getEnhancedComponentClasses('flex', undefined, undefined, undefined, ['justify-center', 'mt-4'])}>
+        <div className={getClasses('flex')}>
           <Link 
             to="/login" 
-            className={getEnhancedComponentClasses('button', 'link', 'sm', undefined, ['text-center'])}
+            className={getClasses('button', 'link', 'sm')}
             data-testid="switch-to-login"
           >
             Ai deja cont? Autentifică-te!

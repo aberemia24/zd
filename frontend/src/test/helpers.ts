@@ -9,6 +9,7 @@ import { TransactionType } from 'shared-constants';
 
 export function createMockTransaction(overrides: Partial<Transaction> = {}): Transaction {
   return {
+    id: 'mockId',
     _id: 'mockId',
     userId: MOCK_USER_ID,
     type: TransactionType.INCOME,

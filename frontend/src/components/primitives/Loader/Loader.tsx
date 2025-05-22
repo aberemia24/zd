@@ -1,6 +1,6 @@
 import React from 'react';
 import { LOADER } from '@shared-constants';
-import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
+import { useThemeEffects } from '../../../hooks';
 import type { ComponentSize, ComponentVariant } from '../../../styles/themeTypes';
 
 export interface LoaderProps {
@@ -9,7 +9,7 @@ export interface LoaderProps {
   text?: string;
   showText?: boolean;
   className?: string;
-  'data-testid'?: string;
+  dataTestId?: string;
   
   // Efecte vizuale rafinate
   withPulse?: boolean;       // Efect de pulsare
@@ -23,52 +23,32 @@ const Loader: React.FC<LoaderProps> = ({
   text = LOADER.TEXT,
   showText = true,
   className,
-  'data-testid': dataTestId,
+  dataTestId,
   withPulse = false,
   withGradient = false,
   withFadeIn = false
 }) => {
-  // Efecte vizuale pentru container
-  const containerEffects: string[] = [];
-  if (withFadeIn) {
-    containerEffects.push('fade-in');
-  }
-  
-  // Efecte vizuale pentru SVG
-  const svgEffects: string[] = [];
-  if (withPulse) {
-    svgEffects.push('pulse-animation');
-  }
-  
-  // Efecte vizuale pentru elemente interne
-  const circleEffects: string[] = [];
-  const pathEffects: string[] = [];
-  
-  if (withGradient) {
-    circleEffects.push('gradient-stroke');
-    pathEffects.push('gradient-fill');
-  }
-  
-  // Efecte pentru text
-  const textEffects: string[] = [];
-  if (withGradient) {
-    textEffects.push('gradient-text');
-  }
+  // Utilizăm hook-ul pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withPulse,
+    withGradient,
+    withFadeIn
+  });
   
   return (
     <div 
-      className={getEnhancedComponentClasses('loader-container', variant as ComponentVariant, undefined, undefined, containerEffects)} 
+      className={getClasses('loader-container', variant as ComponentVariant)} 
       data-testid={dataTestId || 'loader-container'}
     >
       <svg 
-        className={getEnhancedComponentClasses('loader-svg', variant as ComponentVariant, size as ComponentSize, undefined, svgEffects)} 
+        className={getClasses('loader-svg', variant as ComponentVariant, size as ComponentSize)} 
         xmlns="http://www.w3.org/2000/svg" 
         fill="none" 
         viewBox="0 0 24 24"
         data-testid="loader-svg"
       >
         <circle 
-          className={getEnhancedComponentClasses('loader-circle', variant as ComponentVariant, undefined, undefined, circleEffects)} 
+          className={getClasses('loader-circle', variant as ComponentVariant)} 
           cx="12" 
           cy="12" 
           r="10" 
@@ -76,14 +56,14 @@ const Loader: React.FC<LoaderProps> = ({
           strokeWidth="4"
         ></circle>
         <path 
-          className={getEnhancedComponentClasses('loader-path', variant as ComponentVariant, undefined, undefined, pathEffects)} 
+          className={getClasses('loader-path', variant as ComponentVariant)} 
           fill="currentColor" 
           d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
         ></path>
       </svg>
       {showText && (
         <span 
-          className={getEnhancedComponentClasses('loader-text', variant as ComponentVariant, undefined, undefined, textEffects)} 
+          className={getClasses('loader-text', variant as ComponentVariant)} 
           data-testid="loader-text"
         >
           {text}

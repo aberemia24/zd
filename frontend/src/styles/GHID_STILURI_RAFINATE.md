@@ -1,5 +1,7 @@
 # Ghid de Utilizare a Stilurilor Rafinate
 
+> **[IMPORTANT] DECIZIE DE STANDARDIZARE**: S-a decis standardizarea întregului proiect pe abordarea cu **useThemeEffects**. Exemplele cu `getEnhancedComponentClasses` din acest document vor fi actualizate treptat, dar principiile de bază și regulile rămân valabile. Consultați `memory-bank/activeContext.md` pentru exemplele actualizate de utilizare a hook-ului useThemeEffects.
+
 ## [IMPORTANT] Focus outline și efecte de focus la taburi/NavLink
 
 - Nu adăuga niciodată clase de focus vizual (ex: `focus:ring-*`, `focus:outline-*`) direct în stilurile de bază (`base`) ale componentelor de navigare sau taburi în `componentMap`.

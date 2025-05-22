@@ -15,7 +15,7 @@
   - PostgreSQL ca bază de date
   - TypeScript pentru type safety
 
-- **Shared Constants**:
+- **Shared Constants in Src**:
   - Sursă unică de adevăr pentru constante
   - Sistem de generare automată pentru frontend
 

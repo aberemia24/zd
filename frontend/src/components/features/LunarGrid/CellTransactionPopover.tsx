@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useCallback } from 'react';
-import Input from '../../primitives/Input';
-import Checkbox from '../../primitives/Checkbox';
-import Select from '../../primitives/Select';
-import Button from '../../primitives/Button';
+import Input from '../../primitives/Input/Input';
+import Checkbox from '../../primitives/Checkbox/Checkbox';
+import Select from '../../primitives/Select/Select';
+import Button from '../../primitives/Button/Button';
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from '@shared-constants';
 import { FrequencyType } from '@shared-constants/enums';
+import { useThemeEffects } from '../../../hooks';
 
 interface CellTransactionPopoverProps {
   initialAmount: string;
@@ -16,10 +17,10 @@ interface CellTransactionPopoverProps {
   type: string;
   onSave: (data: {
     amount: string;
-    description: string; // Adăugat
+    description: string;
     recurring: boolean;
-    frequency?: FrequencyType; // Modificat
-  }) => Promise<void>; // Modificat
+    frequency?: FrequencyType;
+  }) => Promise<void>;
   onCancel: () => void;
   anchorRef?: React.RefObject<HTMLElement>;
 }
@@ -38,15 +39,23 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
 }) => {
   const [amount, setAmount] = React.useState(initialAmount || '');
   const [recurring, setRecurring] = React.useState(false);
-  const [frequency, setFrequency] = React.useState<FrequencyType | ''>(''); // Permite string gol inițial
-  const [description, setDescription] = React.useState(''); // Adăugat state pentru descriere
+  const [frequency, setFrequency] = React.useState<FrequencyType | ''>('');
+  const [description, setDescription] = React.useState('');
+  const [activatedField, setActivatedField] = React.useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withFadeIn: true,
+    withShadow: true,
+    withTransition: true
+  });
 
   // Handler pentru salvare - definit înainte de a fi folosit în useEffect
   const handleSave = useCallback(() => {
     if (!amount || isNaN(Number(amount))) return;
-    onSave({ amount, recurring, frequency: frequency || undefined, description }); // Adăugat description, asigură undefined pt frequency
-  }, [amount, recurring, frequency, onSave]);
+    onSave({ amount, recurring, frequency: frequency || undefined, description });
+  }, [amount, recurring, frequency, onSave, description]);
   
   // Autofocus input la deschidere
   useEffect(() => {
@@ -75,65 +84,103 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onCancel, handleSave]);
 
+  // Handleri pentru efecte de focus/blur
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setActivatedField(e.target.id);
+  };
+
+  const handleBlur = () => {
+    setActivatedField(null);
+  };
+
   return (
-    <div className="bg-secondary-50 rounded-token shadow-token p-token flex flex-col gap-2 z-50" data-testid="cell-transaction-popover">
-      <label htmlFor="amount-input" className="font-medium">{LABELS.AMOUNT}*</label>
+    <div 
+      className={getClasses('card-section', 'secondary', 'sm', 'active')} 
+      data-testid="cell-transaction-popover"
+    >
+      <div className={getClasses('flex-group', 'between', 'sm')}>
+        <label htmlFor="amount-input" className={getClasses('form-label', 'secondary', 'sm')}>{LABELS.AMOUNT}*</label>
+      </div>
       <Input
         id="amount-input"
         name="amount"
         type="number"
         value={amount}
         onChange={e => setAmount(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         placeholder={PLACEHOLDERS.AMOUNT}
         data-testid="cell-amount-input"
         min={0.01}
         step="0.01"
-        maxLength={12} /* Limită rezonabilă pentru sume financiare */
+        maxLength={12}
         autoFocus
-        inputRef={inputRef}
+        ref={inputRef}
+        withGlowFocus={activatedField === 'amount-input'}
+        withTransition
       />
-      <label htmlFor="description-input" className="font-medium mt-2">{LABELS.DESCRIPTION}</label>
+      <div className={getClasses('flex-group', 'between', 'sm')}>
+        <label htmlFor="description-input" className={getClasses('form-label', 'secondary', 'sm')}>{LABELS.DESCRIPTION}</label>
+      </div>
       <Input
         id="description-input"
         name="description"
         type="text"
         value={description}
         onChange={e => setDescription(e.target.value)}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         placeholder={PLACEHOLDERS.DESCRIPTION}
         data-testid="cell-description-input"
         maxLength={100} 
+        withGlowFocus={activatedField === 'description-input'}
+        withTransition
       />
+      <div className={getClasses('spacing', 'section', 'sm')}>
       <Checkbox
         name="recurring"
         checked={recurring}
         onChange={e => setRecurring(e.target.checked)}
         label={LABELS.RECURRING}
         data-testid="cell-recurring-checkbox"
+          withBorderAnimation
+          withScaleEffect
       />
+      </div>
       {recurring && (
         <Select
           name="frequency"
           value={frequency}
           onChange={e => setFrequency(e.target.value as FrequencyType)}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
           options={OPTIONS.FREQUENCY}
           placeholder={PLACEHOLDERS.SELECT}
           data-testid="cell-frequency-select"
+          withGlowFocus
+          withHoverEffect
+          withTransition
+          className={activatedField === 'frequency' ? getClasses('input', 'primary', undefined, 'focus') : ''}
         />
       )}
-      <div className="flex gap-2 mt-2">
+      <div className={getClasses('flex-group', 'between', 'md')}>
         <Button
           type="button"
+          variant="primary"
+          size="sm"
           onClick={handleSave}
           data-testid="cell-save-btn"
-          className="btn btn-primary"
+          withShadow
         >
           {BUTTONS.ADD}
         </Button>
         <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={onCancel}
           data-testid="cell-cancel-btn"
-          className="btn btn-secondary"
+          withShadow
         >
           {BUTTONS.CANCEL}
         </Button>

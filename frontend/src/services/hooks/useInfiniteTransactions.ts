@@ -4,6 +4,8 @@ import type { TransactionPage, Pagination } from '../supabaseService';
 import type { TransactionValidated } from '@shared-constants/transaction.schema';
 import { TransactionType } from '@shared-constants/enums';
 import { useAuthStore } from '../../stores/authStore';
+import type { Transaction } from '../../types/Transaction';
+import { useMemo } from 'react';
 
 export interface TransactionQueryParams {
   limit?: number;
@@ -22,7 +24,7 @@ export interface TransactionQueryParams {
 }
 
 export interface UseInfiniteTransactionsResult {
-  data: TransactionValidated[];
+  data: (TransactionValidated & { userId?: string })[];
   pages: TransactionPage[];
   isLoading: boolean;
   isFetching: boolean;
@@ -31,6 +33,7 @@ export interface UseInfiniteTransactionsResult {
   fetchNextPage: () => void;
   isFetchingNextPage: boolean;
   totalCount: number;
+  refetch: () => Promise<void>;
 }
 
 /**
@@ -82,7 +85,10 @@ export function useInfiniteTransactions(
         search: queryParams.search
       };
       
-      return supabaseService.fetchTransactions(userId, pagination, filters);
+      const result = await supabaseService.fetchTransactions(userId, pagination, filters);
+      
+      // Nu modificăm tipul datelor returnate din queryFn pentru a evita erorile TypeScript
+      return result;
     },
     // Funcția getNextPageParam determină dacă mai există pagini de încărcat și care este următorul pageParam
     getNextPageParam: (lastPage, allPages) => {
@@ -115,14 +121,39 @@ export function useInfiniteTransactions(
     // placeholderData: undefined,
   });
   
-  // Extragem și combinăm toate tranzacțiile din toate paginile pentru afișare
-  const allTransactions = infiniteQuery.data?.pages.flatMap(page => page.data) || [];
+  // Procesăm datele pentru a le face compatibile cu interfața Transaction
+  const processedTransactions = useMemo(() => {
+    const allTransactions = infiniteQuery.data?.pages.flatMap(page => page.data) || [];
+    
+    // Adăugăm userId și id (dacă este necesar) la fiecare tranzacție
+    return allTransactions.map(transaction => {
+      // Folosim tipul any temporar pentru a evita erorile TypeScript
+      const anyTransaction = transaction as any;
+      
+      // Adăugăm userId dacă nu există
+      if (!anyTransaction.userId && userId) {
+        anyTransaction.userId = userId;
+      }
+      
+      // Adăugăm id bazat pe _id dacă lipsește
+      if (anyTransaction._id && !anyTransaction.id) {
+        anyTransaction.id = anyTransaction._id;
+      }
+      
+      return anyTransaction;
+    });
+  }, [infiniteQuery.data, userId]);
   
   // Calculăm numărul total de tranzacții din rezultatele paginii
   const totalCount = infiniteQuery.data?.pages[0]?.count || 0;
   
+  // Funcția refetch pentru a reîncărca datele
+  const refetch = async () => {
+    await infiniteQuery.refetch();
+  };
+  
   return {
-    data: allTransactions,
+    data: processedTransactions,
     pages: infiniteQuery.data?.pages || [],
     isLoading: infiniteQuery.isLoading,
     isFetching: infiniteQuery.isFetching,
@@ -131,5 +162,6 @@ export function useInfiniteTransactions(
     fetchNextPage: infiniteQuery.fetchNextPage,
     isFetchingNextPage: infiniteQuery.isFetchingNextPage,
     totalCount,
+    refetch,
   };
 }

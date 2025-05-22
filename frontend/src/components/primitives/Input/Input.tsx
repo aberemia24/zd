@@ -1,122 +1,96 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import classNames from 'classnames';
-import { getEnhancedComponentClasses } from '../../../styles/themeUtils';
-import type { ComponentState, ComponentVariant } from '../../../styles/themeTypes';
+import { useThemeEffects } from '../../../hooks';
+import type { ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'data-testid'> & {
   label?: string;
   error?: string;
-  wrapperClassName?: string;
-  'data-testid'?: string;
-  inputRef?: React.RefObject<HTMLInputElement>;
-  
-  // Efecte vizuale rafinate
-  withFloatingLabel?: boolean;  // Label plutitor care se mișcă deasupra când input-ul are focus
-  withGlowFocus?: boolean;     // Efect de strălucire la focus
-  withTransition?: boolean;    // Tranziții animate pentru stările input-ului
-  withIconLeft?: React.ReactNode; // Icoană la stânga input-ului
-  withIconRight?: React.ReactNode; // Icoană la dreapta input-ului
-}
+  variant?: ComponentVariant;
+  size?: ComponentSize;
+  dataTestId?: string;
+  // Proprietăți pentru efecte vizuale
+  withFloatingLabel?: boolean;
+  withGlowFocus?: boolean;
+  withTransition?: boolean;
+  withIconLeft?: React.ReactNode;
+  withIconRight?: React.ReactNode;
+  withFadeIn?: boolean;
+};
 
-const Input: React.FC<InputProps> = ({ 
-  label, 
-  error, 
-  className, 
-  wrapperClassName, 
-  'data-testid': dataTestId, 
-  inputRef, 
-  disabled,
-  readOnly,
+const Input = forwardRef<HTMLInputElement, InputProps>(({
+  label,
+  error,
+  variant = 'primary',
+  size = 'md',
+  className,
+  disabled = false,
+  dataTestId,
   withFloatingLabel = false,
   withGlowFocus = false,
   withTransition = false,
   withIconLeft,
   withIconRight,
-  ...rest 
-}) => {
-  // Determinăm starea input-ului
-  const state: ComponentState | undefined = error 
-    ? 'error' 
-    : disabled 
-      ? 'disabled' 
-      : readOnly 
-        ? 'readonly' 
-        : undefined;
+  withFadeIn = false,
+  ...rest
+}, ref) => {
+  const state: ComponentState | undefined = disabled ? 'disabled' : error ? 'error' : undefined;
   
-  // Determinăm varianta corectă de input
-  const variant: ComponentVariant = error ? 'error' : 'primary';
-  
-  // Adăugăm efectele vizuale
-  const formGroupEffects: string[] = [];
-  const labelEffects: string[] = [];
-  const inputEffects: string[] = [];
-  
-  if (withFloatingLabel && label) {
-    formGroupEffects.push('floating-label-group');
-    labelEffects.push('floating-label');
-  }
-  
-  if (withGlowFocus) {
-    inputEffects.push('focus-glow');
-  }
-  
-  if (withTransition) {
-    inputEffects.push('input-transition');
-  }
-  
-  // Determinăm clasele pentru iconițe
-  const hasIcon = withIconLeft || withIconRight;
-  if (hasIcon) {
-    inputEffects.push(withIconLeft ? 'has-icon-left' : '', withIconRight ? 'has-icon-right' : '');
-  }
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses, hasEffect } = useThemeEffects({
+    withFloatingLabel,
+    withGlowFocus,
+    withTransition,
+    withFadeIn
+  });
   
   return (
-  <div className={classNames(
-    getEnhancedComponentClasses('form-group', undefined, undefined, undefined, formGroupEffects),
-    wrapperClassName
-  )}>
-    {label && (
-      <label className={getEnhancedComponentClasses('form-label', variant, undefined, state, labelEffects)}>
-        {label}
-      </label>
-    )}
-    
-    <div className={classNames('relative', hasIcon ? 'input-icon-wrapper' : '')}>
-      {withIconLeft && (
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary-400">
-          {withIconLeft}
-        </div>
+    <div className={classNames(
+      getClasses('input-wrapper', variant, size, state),
+      { 'has-icon-left': !!withIconLeft },
+      { 'has-icon-right': !!withIconRight },
+      className
+    )}>
+      {label && (
+        <label 
+          htmlFor={rest.id} 
+          className={getClasses('label', variant, size, state)}
+        >
+          {label}
+        </label>
       )}
-      
-      <input
-        ref={inputRef}
-        className={classNames(
-          getEnhancedComponentClasses('input', variant, undefined, state, inputEffects),
-          className
+      <div className="relative">
+        {withIconLeft && (
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            {withIconLeft}
+          </span>
         )}
-        data-testid={dataTestId || `input-field${error ? '-error' : ''}${disabled ? '-disabled' : ''}${readOnly ? '-readonly' : ''}`}
-        disabled={disabled}
-        readOnly={readOnly}
-        {...rest}
-      />
-      
-      {withIconRight && (
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none text-secondary-400">
-          {withIconRight}
+        <input
+          ref={ref}
+          className={classNames(
+            getClasses('input', variant, size, state),
+            { 'pl-10': !!withIconLeft },
+            { 'pr-10': !!withIconRight }
+          )}
+          disabled={disabled}
+          data-testid={dataTestId || `input-${variant}-${size}`}
+          {...rest}
+        />
+        {withIconRight && (
+          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+            {withIconRight}
+          </span>
+        )}
+      </div>
+      {error && (
+        <div className={getClasses('error-message', variant, size, state)}>
+          {error}
         </div>
       )}
     </div>
-    
-    {error && (
-      <span 
-        className={getEnhancedComponentClasses('form-error')} 
-        data-testid="input-error"
-      >
-        {error}
-      </span>
-    )}
-  </div>
-);
-};
+  );
+});
+
+Input.displayName = 'Input';
 
 export default Input;

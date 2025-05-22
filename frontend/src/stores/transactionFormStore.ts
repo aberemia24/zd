@@ -9,6 +9,7 @@ import { TransactionType, TransactionStatus } from '@shared-constants/enums';
 import { FrequencyType } from '@shared-constants/enums';
 import type { CreateTransaction } from '@shared-constants/transaction.schema';
 // Nu importăm useQueryClient direct în store pentru a evita încălcarea regulilor React Hooks
+import { useAuthStore } from './authStore';
 
 export interface TransactionFormStoreState {
   form: TransactionFormData;
@@ -91,8 +92,17 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
       try {
         const { form } = get();
         
-        // Construim payload-ul pentru React Query conform CreateTransaction
-        const transactionData: CreateTransaction = {
+        // Obținem userId din AuthStore
+        const user = useAuthStore.getState().user;
+        
+        if (!user || !user.id) {
+          set({ error: 'Trebuie să fiți autentificat pentru a adăuga tranzacții.' });
+          set({ loading: false });
+          return;
+        }
+        
+        // Construim payload-ul pentru API conform CreateTransaction
+        const transactionData: CreateTransaction & { userId: string } = {
           type: form.type as TransactionType,
           amount: Number(form.amount),
           date: form.date,
@@ -100,38 +110,77 @@ export const useTransactionFormStore = create<TransactionFormStoreState>((set, g
           subcategory: form.subcategory || '',
           description: form.description || '',
           recurring: form.recurring || false,
-          frequency: form.frequency ? form.frequency as FrequencyType : undefined,
+          frequency: form.recurring && form.frequency ? form.frequency as FrequencyType : undefined,
           status: TransactionStatus.COMPLETED,
-          // Nu mai includem currency conform schema.ts unde nu este folosit în FE
+          // Adăugăm userId la payload
+          userId: user.id
         };
         
-        // Nu mai folosim queryClient direct în store pentru a evita încălcarea regulilor React Hooks
-        // Invalidarea cache-ului se va face în componenta care folosește acest store
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Trimit tranzacție cu payload:', transactionData);
+        }
         
-        // Observație: userId NU trebuie inclus explicit în payload
-        // Conform notei din transaction.schema.ts: "user_id nu e expus în FE (doar pe backend)"
-        // AuthToken-ul din Supabase va fi folosit pentru identificarea user-ului în backend
+        // Adăugăm token-ul de autentificare la header
+        const token = localStorage.getItem('supabase.auth.token');
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        };
         
-        // Adăugăm tranzacția folosind hook API direct
-        // Această abordare poate fi îmbunătățită printr-un adapter dedicat pentru store+React Query
-        await fetch(API.ROUTES.TRANSACTIONS, {
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        // Adăugăm tranzacția folosind fetch API
+        const response = await fetch(API.ROUTES.TRANSACTIONS, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers,
           body: JSON.stringify(transactionData),
         });
         
-        // Invalidăm query-urile pentru a reîncărca datele actualizate
-        // Această operație trebuie făcută în componenta care folosește acest store
-        // Conform regulilor anti-pattern din memoria d7b6eb4b-0702-4b0a-b074-3915547a2544
+        // Verificăm dacă răspunsul este ok
+        if (!response.ok) {
+          // Încercăm să extragem mesajul de eroare din răspuns
+          let errorMessage = MESAJE.EROARE_ADAUGARE;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || MESAJE.EROARE_ADAUGARE;
+          } catch (parseError) {
+            // Dacă nu putem parsa răspunsul, folosim mesajul generic
+            console.error('Eroare la parsarea răspunsului de eroare:', parseError);
+          }
+          throw new Error(errorMessage);
+        }
+        
+        // Parsăm răspunsul pentru a confirma succesul
+        const responseData = await response.json();
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Răspuns după adăugare tranzacție:', responseData);
+        }
         
         set({ success: MESAJE.SUCCES_ADAUGARE });
         // Resetăm formularul după adăugare reușită
         get().resetForm();
+        
+        // Pentru a notifica alte componente despre schimbare, putem emite un eveniment
+        const event = new CustomEvent('transaction:created', { 
+          detail: responseData 
+        });
+        window.dispatchEvent(event);
+        
       } catch (error) {
         console.error('Eroare la adăugarea tranzacției:', error);
-        set({ error: MESAJE.EROARE_ADAUGARE });
+        
+        // Gestionăm mai robustă erorile
+        let errorMessage = MESAJE.EROARE_ADAUGARE;
+        
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'object' && error && 'message' in error) {
+          errorMessage = (error as any).message || MESAJE.EROARE_ADAUGARE;
+        }
+        
+        set({ error: errorMessage });
       } finally {
         set({ loading: false });
       }

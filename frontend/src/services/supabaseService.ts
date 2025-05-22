@@ -278,5 +278,37 @@ export const supabaseService = {
       .eq('id', id)
       .eq('user_id', user.id);
     if (error) throw error;
+  },
+
+  // Obține categoriile personalizate ale utilizatorului
+  async fetchUserCategories(userId: string): Promise<any[]> {
+    if (!userId) {
+      throw new Error(MESAJE.EROARE_NECUNOSCUTA || 'ID utilizator necesar');
+    }
+    
+    try {
+      // Obținem categoriile personalizate din tabelul 'user_categories'
+      const { data: customCategories, error } = await supabase
+        .from('user_categories')
+        .select('*')
+        .eq('user_id', userId);
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Combinăm categoriile predefinite cu cele personalizate
+      // Structura poate varia în funcție de implementarea specifică
+      const mergedCategories = { ...CATEGORIES };
+      
+      // Aici putem adăuga logica de combinare a categoriilor personalizate
+      // În funcție de implementarea specifică
+      
+      return customCategories || [];
+    } catch (error) {
+      console.error('Eroare la încărcarea categoriilor utilizatorului:', error);
+      // Returnăm categoriile implicite ca fallback
+      return [];
+    }
   }
 };

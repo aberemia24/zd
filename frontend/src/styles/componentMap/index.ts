@@ -11,6 +11,9 @@ import { dataComponents } from './dataComponents';
 import { utilityComponents } from './utilityComponents';
 import { effectComponents } from './effectComponents';
 import { modalComponents } from './modalComponents';
+import tableConfig from './table';
+import categoryConfig from './category';
+import gridConfig from './grid';
 
 /**
  * Definiție pentru configurațiile de stiluri ale componentelor
@@ -59,7 +62,16 @@ export const componentMap: ComponentMap = {
   ...effectComponents,
   
   // Componente modale
-  ...modalComponents
+  ...modalComponents,
+
+  // Componente de tabel rafinate
+  ...tableConfig,
+  
+  // Componente pentru categorii
+  ...categoryConfig,
+  
+  // Componente pentru grid (LunarGrid)
+  ...gridConfig
 };
 
 export default componentMap;
