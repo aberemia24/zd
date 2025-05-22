@@ -49,6 +49,48 @@ export interface UseLunarGridTableResult {
   dailyBalances: Record<number, number>;
 }
 
+// Helper robust pentru generare subRows UNICE cu indexare globală pe subcategory goală
+function buildUniqueSubRows(categoryName: string, subcategories: any[], fallbackRows: any[]) {
+  // Combină toate subRows (din definiție și fallback)
+  const all = [
+    ...subcategories.map(sub => ({ subcategory: sub.name || '', source: 'def' })),
+    ...fallbackRows.map(sub => ({ subcategory: sub.subcategory || '', source: 'fallback' })),
+  ];
+  const seen = new Set<string>();
+  let emptyCount = 0;
+  return all.map((sub, idx) => {
+    let id;
+    if (sub.subcategory) {
+      id = `${categoryName}-${sub.subcategory}`;
+    } else {
+      id = `${categoryName}-__empty-${emptyCount}`;
+      emptyCount++;
+    }
+    while (seen.has(id)) {
+      id = `${categoryName}-__empty-${emptyCount}-${Math.random().toString(36).slice(2, 6)}`;
+      emptyCount++;
+    }
+    seen.add(id);
+    return {
+      id,
+      category: categoryName,
+      subcategory: sub.subcategory,
+      isCategory: false,
+      total: 0,
+    };
+  });
+}
+
+// Validare pentru duplicate (doar în dev)
+function warnIfDuplicateIds(rows: any[], context: string) {
+  const ids = rows.map(r => r.id);
+  const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
+  if (duplicates.length > 0 && process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.warn(`[LunarGrid] Chei duplicate detectate în ${context}:`, duplicates);
+  }
+}
+
 export function useLunarGridTable(
   year: number,
   month: number,
@@ -87,63 +129,75 @@ export function useLunarGridTable(
   const rawTableData = useMemo(() => {
     // 1. Grupăm tranzacțiile pe categorii și subcategorii
     const categoriesMap: Record<string, TransformedTableDataRow> = {};
-    const subcategoriesMap: Record<string, TransformedTableDataRow[]> = {};
+    const fallbackRowsMap: Record<string, any[]> = {};
 
     categories.forEach(category => {
-      // Construiesc subRows cu TOATE subcategoriile definite, nu doar cele cu tranzacții
-      const subRows: TransformedTableDataRow[] = category.subcategories.map(subcat => ({
-        id: `${category.name}-${subcat.name}`,
-        category: category.name,
-        subcategory: subcat.name,
-        isCategory: false,
-        total: 0,
-      }));
       categoriesMap[category.name] = {
         id: category.name,
         category: category.name,
         isCategory: true,
         total: 0,
-        subRows,
+        subRows: [], // va fi completat ulterior
       };
-      subcategoriesMap[category.name] = subRows;
+      fallbackRowsMap[category.name] = [];
     });
 
     // 2. Parcurgem tranzacțiile și agregăm sumele pe subcategorii
     validTransactions.forEach(t => {
       const cat = t.category;
-      const subcat = t.subcategory || '';
+      const subcat = typeof t.subcategory === 'string' ? t.subcategory : '';
       const day = new Date(t.date).getDate();
       const amount = t.status === 'COMPLETED' && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
       if (!cat) return;
-      if (!subcategoriesMap[cat]) subcategoriesMap[cat] = [];
-      let subRow = subcategoriesMap[cat].find((s: TransformedTableDataRow) => s.subcategory === subcat);
-      if (!subRow) {
-        // Dacă subcategoria nu există în lista definită, o adăugăm (fallback pentru date corupte)
-        subRow = {
-          id: `${cat}-${subcat}`,
-          category: cat,
-          subcategory: subcat,
-          isCategory: false,
-          total: 0,
-        };
-        subcategoriesMap[cat].push(subRow);
-        // O adăugăm și la subRows din categoriesMap
-        if (categoriesMap[cat]) categoriesMap[cat].subRows?.push(subRow);
+      // Caută dacă subcategoria există deja în definiție
+      const categoryDef = categories.find(c => c.name === cat);
+      const existsInDef = categoryDef && categoryDef.subcategories.some(s => (s.name || '') === subcat);
+      if (!existsInDef) {
+        // Adaugă la fallbackRows pentru această categorie
+        fallbackRowsMap[cat] = fallbackRowsMap[cat] || [];
+        // Nu adăuga duplicate fallback
+        if (!fallbackRowsMap[cat].some(s => s.subcategory === subcat)) {
+          fallbackRowsMap[cat].push({ subcategory: subcat });
+        }
       }
-      subRow[`day-${day}`] = (subRow[`day-${day}`] || 0) + amount;
-      subRow.total = (subRow.total || 0) + amount;
+    });
+
+    // 3. Construim subRows UNICE pentru fiecare categorie
+    Object.keys(categoriesMap).forEach(cat => {
+      const categoryDef = categories.find(c => c.name === cat);
+      const subcategories = categoryDef ? categoryDef.subcategories : [];
+      const fallbackRows = fallbackRowsMap[cat] || [];
+      // Construim subRows UNICE
+      const subRows = buildUniqueSubRows(cat, subcategories, fallbackRows);
+      categoriesMap[cat].subRows = subRows;
+    });
+
+    // 4. Parcurgem tranzacțiile și agregăm sumele pe subRows
+    validTransactions.forEach(t => {
+      const cat = t.category;
+      const subcat = typeof t.subcategory === 'string' ? t.subcategory : '';
+      const day = new Date(t.date).getDate();
+      const amount = t.status === 'COMPLETED' && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
+      if (!cat) return;
+      const subRows = categoriesMap[cat]?.subRows || [];
+      let subRow = subRows.find((s: TransformedTableDataRow) => s.subcategory === subcat);
+      if (subRow) {
+        subRow[`day-${day}`] = (subRow[`day-${day}`] || 0) + amount;
+        subRow.total = (subRow.total || 0) + amount;
+      }
       // Categorie (agregare totală)
       if (!categoriesMap[cat]) categoriesMap[cat] = { id: cat, category: cat, isCategory: true, total: 0, subRows: [] };
       categoriesMap[cat][`day-${day}`] = (categoriesMap[cat][`day-${day}`] || 0) + amount;
       categoriesMap[cat].total = (categoriesMap[cat].total || 0) + amount;
     });
 
-    // 3. Atașăm subRows la fiecare categorie
+    // 5. Validare pentru duplicate la nivel de subRows
     Object.keys(categoriesMap).forEach(cat => {
-      categoriesMap[cat].subRows = subcategoriesMap[cat] || [];
+      warnIfDuplicateIds(categoriesMap[cat].subRows!, `subRows pentru categoria ${cat}`);
     });
+    warnIfDuplicateIds(Object.values(categoriesMap), 'categorii principale');
 
-    // 4. Returnăm array-ul de categorii (fără sold)
+    // 6. Returnăm array-ul de categorii (fără sold)
     return Object.values(categoriesMap);
   }, [validTransactions, categories]);
 

@@ -415,37 +415,46 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = ({ year, month }) =>
 };
 
 // Adaug funcția recursivă renderRow înainte de return:
-const renderRow = (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => (
-  <React.Fragment key={row.id}>
-    <tr className={row.getCanExpand() ? "bg-primary-50" : ""}>
-      {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>, idx: number) => (
-        <td
-          key={cell.id}
-          style={idx === 0 && level > 0 ? { paddingLeft: 32 * level } : undefined}
-          className={idx === 0 && level > 0 ? "pl-8" : ""}
-        >
-          {/* Săgeată doar dacă are subrows */}
-          {idx === 0 && row.getCanExpand() && row.subRows.length > 0 && (
-            <span
-              onClick={e => {
-                e.stopPropagation();
-                row.toggleExpanded();
-              }}
-              style={{ cursor: "pointer", marginRight: 8 }}
-              aria-expanded={row.getIsExpanded()}
-              data-testid={`expand-btn-${row.original.category}`}
-            >
-              {row.getIsExpanded() ? "▼" : "▶"}
-            </span>
-          )}
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
-    {row.getIsExpanded() && row.subRows.length > 0 &&
-      row.subRows.map((subRow: Row<TransformedTableDataRow>) => renderRow(subRow, level + 1))
-    }
-  </React.Fragment>
-);
+const renderRow = (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
+  console.log('ROW', row.id, row.original);
+  // Folosesc cheia robustă generată în pipeline
+  const rowKey = row.id;
+  return (
+    <React.Fragment key={rowKey}>
+      <tr className={row.getCanExpand() ? "bg-primary-50" : ""}>
+        {row.getVisibleCells().map((cell: Cell<TransformedTableDataRow, unknown>, idx: number) => (
+          <td
+            key={cell.id}
+            style={idx === 0 && level > 0 ? { paddingLeft: 32 * level } : undefined}
+            className={idx === 0 && level > 0 ? "pl-8" : ""}
+          >
+            {/* Săgeată doar dacă este rând de categorie și are subRows */}
+            {idx === 0 &&
+              row.original &&
+              row.original.isCategory === true &&
+              Array.isArray(row.subRows) &&
+              row.subRows.length > 0 && (
+                <span
+                  onClick={e => {
+                    e.stopPropagation();
+                    row.toggleExpanded();
+                  }}
+                  style={{ cursor: "pointer", marginRight: 8 }}
+                  aria-expanded={row.getIsExpanded()}
+                  data-testid={`expand-btn-${row.original.category}`}
+                >
+                  {row.getIsExpanded() ? "▼" : "▶"}
+                </span>
+              )}
+            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+          </td>
+        ))}
+      </tr>
+      {row.getIsExpanded() && row.subRows.length > 0 &&
+        row.subRows.map((subRow: Row<TransformedTableDataRow>) => renderRow(subRow, level + 1))
+      }
+    </React.Fragment>
+  );
+};
 
 export default LunarGridTanStack;
