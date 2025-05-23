@@ -45,7 +45,7 @@ describe('Select', () => {
   it('adaugă clasa corectă pentru borderul de eroare', () => {
     const { container } = render(<Select options={opțiuniTest} value="" onChange={() => {}} error="Eroare" />);
     const select = container.querySelector('select');
-    expect(select).toHaveClass('border-red-500');
+    expect(select).toHaveClass('border-error-500');
   });
 
   // Test pentru clase personalizate pe wrapper

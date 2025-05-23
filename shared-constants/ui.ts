@@ -58,6 +58,7 @@ export const BUTTONS = {
   PREV_PAGE: 'Înapoi',
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   MANAGE_CATEGORIES: 'Gestionare categorii',
+  EXPORT: 'Exportă',
   
   // Constante pentru autentificare/înregistrare
   LOGIN: 'Autentificare',
@@ -77,6 +78,7 @@ export const TABLE = {
     DATE: 'Dată',
     RECURRING: 'Recurent',
     FREQUENCY: 'Frecvență',
+    DESCRIPTION: 'Descriere',
   },
   EMPTY: 'Nicio tranzacție',
   LOADING: 'Se încarcă...',

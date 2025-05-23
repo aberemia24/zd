@@ -18,5 +18,6 @@ exports.INITIAL_FORM_STATE = {
     date: '',
     recurring: false,
     frequency: '',
+    description: '',
 };
 //# sourceMappingURL=defaults.js.map

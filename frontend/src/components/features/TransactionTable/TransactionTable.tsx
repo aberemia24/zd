@@ -155,7 +155,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   // Memoizăm rândul de loading pentru reutilizare
   const loadingRow = useMemo(() => (
     <tr data-testid="transaction-table-loading">
-      <td colSpan={7} className={getClasses('table-cell')} aria-live="polite">
+      <td colSpan={8} className={getClasses('table-cell')} aria-live="polite">
         <div className={classNames(
           getClasses('flex-group', 'center', 'md'),
           getClasses('spacing', 'small')
@@ -170,7 +170,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   // Memoizăm rândul de loading pentru paginarea infinită
   const loadingMoreRow = useMemo(() => (
     <tr data-testid="transaction-table-loading-more">
-      <td colSpan={7} className={getClasses('table-cell')} aria-live="polite">
+      <td colSpan={8} className={getClasses('table-cell')} aria-live="polite">
         <div className={classNames(
           getClasses('flex-group', 'center', 'md'),
           getClasses('spacing', 'small')
@@ -192,7 +192,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   // Memoizăm rândul gol pentru reutilizare
   const emptyRow = useMemo(() => (
     <tr data-testid="transaction-table-empty">
-      <td colSpan={7} className={getClasses('table-cell', 'secondary')} aria-live="polite">
+      <td colSpan={8} className={getClasses('table-cell', 'secondary')} aria-live="polite">
         <div className={classNames(
           getClasses('flex-group', 'center', 'md'),
           getClasses('spacing', 'md'),
@@ -246,6 +246,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.AMOUNT}</th>
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.CATEGORY}</th>
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.SUBCATEGORY}</th>
+              <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.DESCRIPTION}</th>
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.DATE}</th>
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.RECURRING}</th>
               <th className={getClasses('table-header')} scope="col">{TABLE.HEADERS.FREQUENCY}</th>
@@ -280,6 +281,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   </td>
                   <td className={getClasses('table-cell')}>{t.category || ''}</td>
                   <td className={getClasses('table-cell')}>{t.subcategory || ''}</td>
+                  <td className={getClasses('table-cell')}>{t.description || ''}</td>
                   <td className={getClasses('table-cell')}>{formatDate(t.date)}</td>
                   <td className={getClasses('table-cell')}>
                     {t.recurring === true ? 

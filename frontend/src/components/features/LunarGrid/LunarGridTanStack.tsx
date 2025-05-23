@@ -92,7 +92,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
   // Funcție pentru determinarea tipului de tranzacție
   const determineTransactionType = useCallback((category: string): TransactionType => {
     const categories = useCategoryStore.getState().categories;
-    const foundCategory = categories.find(c => c.name === category);
+    const foundCategory = categories.find((c: any) => c.name === category);
     return (foundCategory?.type || 'expense') as TransactionType;
   }, []);
   
@@ -345,7 +345,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
                   original.category,
                   original.subcategory,
                   cell.column.id.startsWith('day-') ? parseInt(cell.column.id.split('-')[1]) : 0
-                ) || flexRender(cell.column.columnDef.cell, cell.getContext())}
+                ) || (flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode)}
               </td>
             );
           })}
@@ -435,7 +435,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
                     )}
                     style={{ width: header.getSize() }}
                   >
-                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
                   </th>
                 ))}
               </tr>

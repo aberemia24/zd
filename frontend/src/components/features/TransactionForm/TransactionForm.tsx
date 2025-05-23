@@ -68,68 +68,76 @@ interface TransactionFormProps {
   onCancel?: () => void;
 }
 const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) => {
+  // TOATE HOOK-URILE TREBUIE SĂ FIE ÎNAINTE DE EARLY RETURNS
+  
   // Selectăm starea și acțiunile relevante din store
-  // Acceptă error ca string sau ca obiect (Record<string, string>) pentru validări pe câmpuri
-  const { form, error, success, loading, setField, handleSubmit, resetForm } = useTransactionFormStore() as {
-    form: TransactionFormData;
-    error: string | Record<string, string>;
-    success: string;
-    loading: any; // Poate fi string sau boolean în funcție de implementare API
-    setField: (name: keyof TransactionFormData, value: any) => void;
-    handleSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<void>;
-    resetForm: () => void;
-  };
+  const storeData = useTransactionFormStore();
+  
+  // Preluare categorii fuzionate din categoryStore (personalizate + predefinite)
+  const categories = useCategoryStore(state => state.categories);
+  
+  // Definiție pentru starea formularului - dacă utilizatorul editează activ un câmp
+  const [activatedField, setActivatedField] = React.useState<string | null>(null);
+  
+  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
+  const { getClasses } = useThemeEffects({
+    withShadow: true,
+    withFadeIn: true
+  });
 
+  // Destructuram store data safe
+  const { form, error, success, loading, setField, handleSubmit, resetForm } = storeData || {};
 
   // Handler pentru schimbare câmp
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (!form) return; // Guard defensiv
+    
     const { name, value, type } = e.target;
     const isCheckbox = type === 'checkbox';
     const checkedValue = isCheckbox ? (e.target as HTMLInputElement).checked : undefined;
-    setField(name as keyof typeof form, isCheckbox ? checkedValue : value);
+    setField && setField(name as keyof typeof form, isCheckbox ? checkedValue : value);
     // Resetăm frequency dacă debifăm recurring
     if (name === 'recurring' && isCheckbox && checkedValue === false) {
-      setField('frequency', '');
+      setField && setField('frequency', '');
     }
     // Resetăm category și subcategory când type se schimbă
     if (name === 'type') {
-      setField('category', '');
-      setField('subcategory', '');
+      setField && setField('category', '');
+      setField && setField('subcategory', '');
     }
     // Resetăm subcategorie când category se schimbă
     if (name === 'category') {
-      setField('subcategory', '');
+      setField && setField('subcategory', '');
     }
-  }, [setField]);
+  }, [setField, form]);
 
   // Handler pentru submit: folosește store.handleSubmit și resetForm
   const onSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form || !handleSubmit || !resetForm) return; // Guard defensiv
+    
     // Fix: amount number, fără id
     await handleSubmit();
     onSave?.(form);
     resetForm();
   }, [handleSubmit, resetForm, form, onSave]);
 
-  // Preluare categorii fuzionate din categoryStore (personalizate + predefinite)
-  const categories = useCategoryStore(state => state.categories);
-
   // Filtrare categorii principale în funcție de tip (folosind mapping centralizat)
   const categoriiFiltrate = React.useMemo(() => {
-    if (!form.type) return [];
+    if (!form || !form.type) return [];
     
     const allowed = getCategoriesForTransactionType(form.type as TransactionType);
     if (!allowed.length) return [];
     
     // Filtrăm categoriile permise din categoriile fuzionate
     return categories.filter(cat => allowed.includes(cat.name));
-  }, [form.type, categories]);
+  }, [form?.type, categories]);
 
   // Lista de opțiuni pentru dropdown-ul de categorie (grupuri mari)
   const optiuniCategorie = React.useMemo(() => {
     return categoriiFiltrate.map(cat => ({
       value: cat.name,
-      // Formatăm label-ul pentru display, adaugăm indicator custom dacă e nevoie
+      // Formatăm label-ul pentru display, adăugăm indicator custom dacă e nevoie
       label: cat.name.charAt(0) + cat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
              (cat.isCustom ? ' ➡️' : '') // Indicator pentru categorii personalizate
     }));
@@ -137,7 +145,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
 
   // Lista de opțiuni pentru subcategorie, acum cu suport pentru subcategorii personalizate
   const optiuniSubcategorie = React.useMemo(() => {
-    if (!form.category) return [];
+    if (!form || !form.category) return [];
     
     // Găsim categoria selectată
     const selectedCategory = categories.find(cat => cat.name === form.category);
@@ -151,27 +159,38 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
       customStyle: subcat.isCustom ? 'text-accent' : undefined, // Stil special pentru subcategorii personalizate
       // Nu mai avem nevoie de group în noua structură
     }));
-  }, [form.category, categories]);
+  }, [form, categories]);
 
-  // Definiție pentru starea formularului - dacă utilizatorul editează activ un câmp
-  const [activatedField, setActivatedField] = React.useState<string | null>(null);
-  
   // Handler pentru focus - marchează câmpul drept activat pentru efecte vizuale
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
     setActivatedField(e.target.name);
-  };
+  }, []);
   
   // Handler pentru blur - resetează starea de activare
-  const handleBlur = () => {
+  const handleBlur = useCallback(() => {
     setActivatedField(null);
-  };
-  
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withShadow: true,
-    withFadeIn: true
-  });
-  
+  }, []);
+
+  // Verificare defensivă pentru store data DUPĂ toate hook-urile
+  if (!storeData) {
+    return (
+      <div className="flex justify-center items-center p-4" data-testid="transaction-form-loading">
+        <div>Loading store...</div>
+      </div>
+    );
+  }
+
+  // Guard defensiv DUPĂ toate hook-urile pentru a respecta Rules of Hooks
+  // Verifică atât form cât și proprietățile esențiale
+  if (!form || typeof form !== 'object' || 
+      !('amount' in form) || !('type' in form) || !('category' in form)) {
+    return (
+      <div className="flex justify-center items-center p-4" data-testid="transaction-form-loading">
+        <div>Loading form...</div>
+      </div>
+    );
+  }
+
   return (
     <form
       aria-label={LABELS.FORM}
@@ -224,7 +243,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           onFocus={handleFocus}
           onBlur={handleBlur}
           aria-label={LABELS.AMOUNT}
-          error={typeof error === 'object' ? error.amount : undefined}
+          error={typeof error === 'object' && error ? (error as Record<string, string>).amount : undefined}
           data-testid="amount-input"
           withFloatingLabel
           withGlowFocus={activatedField === 'amount'}
@@ -273,7 +292,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           onFocus={handleFocus}
           onBlur={handleBlur}
           aria-label={LABELS.DATE}
-          error={typeof error === 'object' ? error.date : undefined}
+          error={typeof error === 'object' && error ? (error as Record<string, string>).date : undefined}
           data-testid="date-input"
           withGlowFocus={activatedField === 'date'}
         />
@@ -328,7 +347,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           withFloatingLabel
           withGlowFocus={activatedField === 'description'}
           withTransition
-          className={getClasses('col-span-full')}
+          className="col-span-full"
         />
       </div>
       

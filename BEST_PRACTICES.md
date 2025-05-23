@@ -72,31 +72,7 @@ import { INITIAL_FORM_STATE, MESAJE } from '../constants';
 - Actualizează barrel-ul dacă adaugi/ștergi constante!
 - Nu folosi importuri absolute sau path mapping custom pentru constants (ex: `@constants/xyz`) decât dacă ai nevoie de compatibilitate cu unelte externe sau monorepo.
 
-## Pattern hooks tranzacții: React Query + Zustand [ACTUALIZAT 2025-05-22]
-
-### Arhitectură hooks specializate
-
-- Pentru tranzacții, folosim două hooks specializate combinate cu Zustand:
-  - `useMonthlyTransactions` (bulk, pentru grid lunar)
-  - `useInfiniteTransactions` (infinite loading, pentru tabel)
-  - `useTransactionStore` (state global UI și cache-invalidare)
-
-- Cheia de cache React Query este structurată ierarhic pentru invalidare eficientă:
-  ```typescript
-  // Cheie primară partajată
-  const baseQueryKey = ['transactions'];
-  
-  // Chei derivate pentru queries specifice
-  const monthlyQueryKey = [...baseQueryKey, 'monthly', { year, month }];
-  const infiniteQueryKey = [...baseQueryKey, 'infinite', { filters }];
-  ```
-
-- La operațiuni de modificare (create/update/delete), invalidăm întregul cache 'transactions':
-  ```typescript
-  // În mutații
-  const queryClient = useQueryClient();
-  queryClient.invalidateQueries({ queryKey: ['transactions'] });
-  ```
+## Pattern hooks tranzacții: React Query + Zustand [ACTUALIZAT 2025-05-22]### Arhitectură hooks specializate- Pentru tranzacții, folosim două hooks specializate combinate cu Zustand:  - `useMonthlyTransactions` (bulk, pentru grid lunar)  - `useInfiniteTransactions` (infinite loading, pentru tabel)  - `useTransactionMutations` (mutații create/update/delete)  - `useTransactionStore` (state global UI și cache-invalidare)- Cheia de cache React Query este structurată ierarhic pentru invalidare eficientă:  ```typescript  // Cheie primară partajată în transactionMutations.ts  const TRANSACTIONS_BASE_KEY = ['transactions'] as const;    // Chei derivate pentru queries specifice  const monthlyQueryKey = queryKeys.transactions.monthly(year, month, userId);  const infiniteQueryKey = [...TRANSACTIONS_BASE_KEY, 'infinite', userId, queryParams];  ```- La operațiuni de modificare (create/update/delete), invalidăm întregul cache 'transactions':  ```typescript  // În mutații  const queryClient = useQueryClient();  queryClient.invalidateQueries({ queryKey: ['transactions'] });  ```- **Pattern validat în cod**: hooks implementate conform documentației cu:  - Separare clară între bulk loading (`useMonthlyTransactions`) și infinite loading (`useInfiniteTransactions`)  - Cache partajat prin `TRANSACTIONS_BASE_KEY` pentru invalidare eficientă  - Utilizarea `queryKeys` din `reactQueryUtils.ts` pentru consistență
 
 ### Separarea responsabilităților
 
@@ -134,35 +110,7 @@ import { INITIAL_FORM_STATE, MESAJE } from '../constants';
   }
   ```
 
-### Pattern pentru infinite loading [NOU]
-
-Pentru tranzacții infinite, folosim pattern-ul recomandat de React Query:
-
-```typescript
-export function useInfiniteTransactions(filters: TransactionFilters) {
-  return useInfiniteQuery({
-    queryKey: ['transactions', 'infinite', filters],
-    queryFn: ({ pageParam = 0 }) => 
-      transactionService.getTransactions({ ...filters, offset: pageParam, limit: 20 }),
-    getNextPageParam: (lastPage, allPages) => 
-      lastPage.length === 20 ? allPages.length * 20 : undefined,
-  });
-}
-
-// Utilizare în componente
-const { 
-  data, 
-  fetchNextPage, 
-  hasNextPage, 
-  isFetchingNextPage 
-} = useInfiniteTransactions(filters);
-
-// Întreaga listă de tranzacții (toate paginile)
-const transactions = useMemo(() => 
-  data?.pages.flatMap(page => page) || [], 
-  [data]
-);
-```
+### Pattern pentru infinite loading [ACTUALIZAT 2025-05-22]Pentru tranzacții infinite, folosim pattern-ul implementat în `useInfiniteTransactions`:```typescript// Pattern implementat cu configurări avansate și optimizăriexport function useInfiniteTransactions(queryParams: TransactionQueryParams) {  const TRANSACTIONS_BASE_KEY = ['transactions'] as const;  const queryKey = [...TRANSACTIONS_BASE_KEY, 'infinite', userId, queryParams];    return useInfiniteQuery({    queryKey,    initialPageParam: 0,    queryFn: async ({ pageParam }) => {      const pagination = {        limit: PAGE_SIZE,        offset: pageParam as number,        sort: queryParams.sort,        order: queryParams.order,      };            return await supabaseService.fetchTransactions(userId, pagination, filters);    },    getNextPageParam: (lastPage, allPages) => {      const currentOffset = allPages.length * PAGE_SIZE;            if (lastPage.data.length < PAGE_SIZE || currentOffset >= lastPage.count) {        return undefined;      }            return currentOffset;    },    // Configurări avansate pentru UX    gcTime: 5 * 60 * 1000,    staleTime: 30 * 1000,    enabled: !!userId,  });}// Pattern procesare date cu useMemo pentru compatibilitateconst processedTransactions = useMemo(() => {  const allTransactions = infiniteQuery.data?.pages.flatMap(page => page.data) || [];    return allTransactions.map(transaction => {    // Normalizare userId și id pentru compatibilitate    if (!transaction.userId && userId) {      transaction.userId = userId;    }        return transaction;  });}, [infiniteQuery.data, userId]);```
 
 ## Testing [ACTUALIZAT 2025-05-22]
 
@@ -204,14 +152,7 @@ const transactions = useMemo(() =>
   await userEvent.click(button);
   ```
 
-#### Pattern UI pentru grid-uri cu subcategorii (2025-05-10)
-
-- **Butoane de acțiune (edit/delete) vizibile doar la hover**: Reduce aglomerarea vizuală și crește focusul pe acțiuni relevante.
-- **Inputuri de redenumire pre-populate**: La editarea inline a subcategoriilor, inputul trebuie să afișeze valoarea originală pentru UX predictibil.
-- **Separarea stărilor pentru moduri conflictuale**: Folosește state separat pentru editare și ștergere (ex: `editingSubcat`, `deletingSubcat`). Nu modifica state direct în timpul render-ului; folosește `useEffect` pentru tranziții.
-- **Referință anti-pattern Zustand**: Nu folosi `useEffect(fetch, [queryParams])` cu Zustand (vezi regula critică și memoria d7b6eb4b-0702-4b0a-b074-3915547a2544).
-- **Virtualizare pentru tabele mari**: Utilizați TanStack Virtual pentru a renderiza doar elementele vizibile în viewport.
-- **Testare robustă**: Toate elementele funcționale din grid trebuie să aibă `data-testid` unic și predictibil pentru testare automată.
+### Pattern useThemeEffects și componentMap [NOU 2025-05-22]### Hook-ul useThemeEffects pentru efecte vizuale uniforme- **Sursă unică pentru efecte vizuale**: Toate componentele folosesc `useThemeEffects` pentru aplicarea consistentă a efectelor- **Pattern implementat în cod**:  ```typescript  import { useThemeEffects } from 'hooks/useThemeEffects';    // În componente  const { getClasses, hasEffect, applyVariant, applyEffect } = useThemeEffects({    withShadow: true,    withGradient: isHighlighted,    withFadeIn: isVisible  });    // Aplicare efecte  <button className={getClasses('button', 'primary', 'md')}>    {hasEffect('withGradient') && <GradientOverlay />}    Buton cu efecte  </button>  ```- **Efecte disponibile validate**:  - `withShadow`: aplică `shadow-glow`  - `withGradient`: aplică `gradient-text`  - `withFadeIn`: aplică `fadeIn`  - `withSlideIn`: aplică `slideIn`  - `withPulse`: aplică `pulse-animation`  - `withGlow`: aplică `badge-glow`  - `withHoverEffect`: aplică `hover-scale`### Sistemul componentMap pentru stilizare centralizată- **Organizare pe tipuri**: Fiecare tip de componentă are propriul fișier în `styles/componentMap/`- **Structură standardizată**:  ```typescript  // În styles/componentMap/button.ts  export const buttonConfig = {    base: 'px-4 py-2 rounded font-medium transition-all duration-200',    variants: {      primary: 'bg-blue-600 text-white hover:bg-blue-700',      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300'    },    sizes: {      sm: 'px-3 py-1 text-sm',      md: 'px-4 py-2 text-base',      lg: 'px-6 py-3 text-lg'    }  };  ```- **Integrare cu getEnhancedComponentClasses**: componentMap servește ca sursă pentru `getEnhancedComponentClasses`- **Extensibilitate**: Adăugarea de noi efecte sau variante se face în componentMap, nu prin clase hardcodate### Pattern UI pentru grid-uri cu subcategorii [ACTUALIZAT 2025-05-22]- **Butoane de acțiune (edit/delete) vizibile doar la hover**: Reduce aglomerarea vizuală și crește focusul pe acțiuni relevante.- **Inputuri de redenumire pre-populate**: La editarea inline a subcategoriilor, inputul trebuie să afișeze valoarea originală pentru UX predictibil.- **Separarea stărilor pentru moduri conflictuale**: Folosește state separat pentru editare și ștergere (ex: `editingSubcat`, `deletingSubcat`). Nu modifica state direct în timpul render-ului; folosește `useEffect` pentru tranziții.- **Referință anti-pattern Zustand**: Nu folosi `useEffect(fetch, [queryParams])` cu Zustand (vezi regula critică și memoria d7b6eb4b-0702-4b0a-b074-3915547a2544).- **Virtualizare pentru tabele mari**: Utilizați TanStack Virtual pentru a renderiza doar elementele vizibile în viewport (implementat în LunarGrid).- **Testare robustă**: Toate elementele funcționale din grid trebuie să aibă `data-testid` unic și predictibil pentru testare automată.
 
 **Exemplu:**
 
@@ -231,20 +172,7 @@ const transactions = useMemo(() =>
 <input data-testid="rename-input" value={currentName} ... />
 ```
 
-#### Testare robustă cu constants și data-testid
-
-- Orice mesaj de eroare, loading sau feedback din UI și din teste trebuie să provină din constants (`@shared-constants/messages`), nu stringuri hardcodate.
-- Toate elementele funcționale (butoane, inputuri, itemi listă, feedback) au `data-testid` unic, stabil și predictibil (vezi regula globală 3.1 și exemplul de mai jos).
-- Testele verifică mesaje/indicatori folosind valorile din constants și selectează elementele prin `data-testid`, nu prin text hardcodat.
-- Exemplu corect:
-
-```tsx
-import { MESAJE } from '@shared-constants/messages';
-expect(screen.getByTestId('error-msg')).toHaveTextContent(MESAJE.EROARE_INCARCARE_TRANZACTII);
-expect(screen.getByTestId('loading-indicator')).toBeInTheDocument();
-```
-
-- Pentru formulare complexe, verifică valorile inițiale pe câmpuri individuale cu `waitFor` (vezi lessons learned).
+#### Testare robustă cu constants și data-testid [ACTUALIZAT 2025-05-22]**Pattern validat în cod pentru testare modernă:**- **Obligatoriu**: Toate mesajele UI și sistemului provin din `@shared-constants` (messages.ts, ui.ts)- **Obligatoriu**: Toate elementele interactive au `data-testid` unic și predictibil- **Pattern standard**: `{component}-{element}-{id?}` pentru data-testid (ex: `transaction-row-123`, `add-btn`, `error-msg`)- **Selecție în teste**: Doar prin `data-testid`, nu prin text, clase sau structură DOM**Exemplu pattern implementat:**```tsx// În componente<Button   data-testid="save-transaction-btn"  onClick={handleSave}>  {UI.BUTTONS.SAVE}</Button><div data-testid="transaction-form-error">  {MESSAGES.ERRORS.INVALID_AMOUNT}</div>// În testeimport { UI, MESSAGES } from '@shared-constants';test('salvarea tranzacției funcționează corect', async () => {  render(<TransactionForm />);    // Selecție prin data-testid  const saveBtn = screen.getByTestId('save-transaction-btn');  const errorDiv = screen.queryByTestId('transaction-form-error');    // Verificare text prin constants  expect(saveBtn).toHaveTextContent(UI.BUTTONS.SAVE);  expect(errorDiv).not.toBeInTheDocument();    // Interacțiuni  await userEvent.click(saveBtn);    // Așteptare rezultat asincron  await waitFor(() => {    expect(screen.getByTestId('transaction-form-error'))      .toHaveTextContent(MESSAGES.ERRORS.INVALID_AMOUNT);  });});```**Pattern pentru formulare complexe validat:**```tsx// Verificare valori inițiale cu waitFor pentru stabilitatetest('formularul se inițializează cu valorile corecte', async () => {  render(<TransactionForm initialData={mockTransaction} />);    // Verificare individuală cu waitFor pentru câmpuri complexe  await waitFor(() => {    expect(screen.getByTestId('amount-input')).toHaveValue('100.50');  });    await waitFor(() => {    expect(screen.getByTestId('category-select')).toHaveValue('Food');  });    await waitFor(() => {    expect(screen.getByTestId('date-input')).toHaveValue('2025-05-22');  });});#### Pattern memoizare și optimizare performanță [NOU 2025-05-22]**Pattern implementat în componente pentru performanță optimă:****1. Memoizarea componentelor cu React.memo:**```tsx// Pattern validat în TransactionTable, LunarGrid, CategoryEditorconst TransactionTable = React.memo(({   transactions,   onTransactionClick,   filters }: TransactionTableProps) => {  // Implementare componentă});// Export cu displayName pentru debuggingTransactionTable.displayName = 'TransactionTable';export default TransactionTable;```**2. Memoizarea funcțiilor cu useCallback:**```tsx// Pattern pentru funcții event handlers și callbacksconst handleSaveTransaction = useCallback(async (data: TransactionInput) => {  try {    await transactionService.createTransaction(data);    queryClient.invalidateQueries({ queryKey: ['transactions'] });  } catch (error) {    console.error('Eroare salvare tranzacție:', error);  }}, [queryClient]);// Pattern pentru funcții de procesare dateconst handleFilterTransactions = useCallback((filters: TransactionFilters) => {  // Logică filtrare}, []);```**3. Memoizarea calculelor costisitoare cu useMemo:**```tsx// Pattern pentru procesare date complexeconst processedTransactions = useMemo(() => {  return transactions    .filter(tx => tx.userId === userId)    .map(tx => ({      ...tx,      formattedAmount: formatCurrency(tx.amount),      categoryLabel: getCategoryLabel(tx.category)    }))    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());}, [transactions, userId]);// Pattern pentru chei de grupconst groupedByCategory = useMemo(() => {  return processedTransactions.reduce((acc, transaction) => {    const key = `${transaction.category}|${transaction.subcategory}`;    if (!acc[key]) acc[key] = [];    acc[key].push(transaction);    return acc;  }, {} as Record<string, Transaction[]>);}, [processedTransactions]);```**Reguli de aplicare:**- **React.memo**: Pentru orice componentă care primește props complexe sau se re-renderează frecvent- **useCallback**: Pentru funcții event handlers care se trimit ca props către componente memoizate- **useMemo**: Pentru calcule costisitoare, procesări de arrays mari sau transformări complexe- **Chei unice**: Pentru liste React, combină ID-ul cu index sau alte date pentru unicitate garantată
 
 #### Politica de mocking [ACTUALIZAT]
 
@@ -1274,3 +1202,276 @@ export function useActiveSubcategories({ category, type, enabled = true }) {
 - Testarea se face doar cu data-testid predictibil, fără stringuri hardcodate.
 - Eliminarea tuturor logurilor de debug înainte de production.
 - Patternul de pipeline și chei unice trebuie urmat la orice refactor viitor pentru griduri ierarhice.
+
+## Pattern URL persistence cu React Router [NOU 2025-05-25]
+
+### Implementare cu useURLFilters
+
+Pentru a sincroniza filtrele și parametrii de căutare cu URL-ul paginii, folosim pattern-ul implementat în `useURLFilters.ts`. Acest pattern permite:
+
+- Partajarea ușoară a URL-urilor cu filtre specifice
+- Navigare backward/forward cu păstrarea filtrelor
+- Bookmarking-ul unei căutări specifice
+- Refresh-ul paginii fără pierderea stării filtrelor
+
+```typescript
+// Pattern implementat în useURLFilters.ts
+import { useEffect, useCallback, useRef } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
+
+export const useURLFilters = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+  
+  const {
+    loadFromURL,
+    getURLSearchParams,
+    // state monitorizat pentru schimbări
+  } = useTransactionFiltersStore();
+
+  // Încărcare filtre din URL la montare
+  useEffect(() => {
+    const currentParams = new URLSearchParams(window.location.search);
+    loadFromURL(currentParams);
+  }, [loadFromURL]);
+
+  // Actualizare URL cu debounce când filtrele se schimbă
+  const updateURL = useCallback(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      const newParams = getURLSearchParams();
+      setSearchParams(newParams, { replace: true });
+    }, 300); // Debounce 300ms
+  }, [getURLSearchParams, setSearchParams]);
+
+  // Handler pentru back/forward în browser
+  useEffect(() => {
+    const handlePopState = () => {
+      const currentParams = new URLSearchParams(window.location.search);
+      loadFromURL(currentParams);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [loadFromURL]);
+
+  return {
+    getCurrentURL: useCallback(() => {
+      const params = getURLSearchParams();
+      const baseURL = window.location.origin + window.location.pathname;
+      const queryString = params.toString();
+      return queryString ? `${baseURL}?${queryString}` : baseURL;
+    }, [getURLSearchParams]),
+    clearFiltersAndURL: useCallback(() => {
+      useTransactionFiltersStore.getState().resetFilters();
+      setSearchParams(new URLSearchParams(), { replace: true });
+    }, [setSearchParams])
+  };
+}
+```
+
+### Store cu suport URL persistence
+
+Zustand store-ul trebuie să implementeze metodele `loadFromURL` și `getURLSearchParams` pentru a suporta sincronizarea cu URL-ul:
+
+```typescript
+// În transactionFiltersStore.ts
+export const useTransactionFiltersStore = create<TransactionFiltersState>((set, get) => ({
+  // State și setters...
+  
+  // URL persistence
+  loadFromURL: (searchParams: URLSearchParams) => {
+    const type = searchParams.get('type') || '';
+    const category = searchParams.get('category') || '';
+    // Încarcă toți parametrii din URL
+    
+    set({
+      filterType: type as TransactionType | '',
+      filterCategory: category as CategoryType | '',
+      // Setează toate valorile în store
+    });
+  },
+
+  getURLSearchParams: () => {
+    const { 
+      filterType, 
+      filterCategory,
+      // Toate filtrele
+    } = get();
+
+    const params = new URLSearchParams();
+    
+    // Adaugă doar valorile non-empty în URL
+    if (filterType) params.set('type', filterType);
+    if (filterCategory) params.set('category', filterCategory);
+    // Adaugă toți parametrii relevanți
+
+    return params;
+  },
+}));
+```
+
+### Utilizare în componente
+
+```typescript
+// În pagina sau componenta principală
+import { useURLFilters } from '../hooks/useURLFilters';
+
+const MyFiltersComponent = () => {
+  const { getCurrentURL, clearFiltersAndURL } = useURLFilters();
+  
+  // Filtrele sunt automat sincronizate cu URL-ul
+
+  return (
+    <div>
+      <button onClick={clearFiltersAndURL}>Resetează filtrele</button>
+      <a href={getCurrentURL()}>Link către aceste filtre</a>
+    </div>
+  );
+};
+```
+
+### Best practices pentru URL persistence
+
+- Limitați parametrii URL doar la valorile non-default pentru a păstra URL-urile curate
+- Folosiți debounce pentru a evita actualizările excesive ale URL-ului în timpul modificărilor rapide
+- Asigurați-vă că valorile din URL sunt sanitizate și validate înainte de a fi utilizate
+- Gestionați corect evenimentele de browser back/forward pentru a menține o experiență fluidă
+- Nu stocați date sensibile sau foarte mari în URL
+
+## Pattern Export cu progres și format multiplu [NOU 2025-05-25]
+
+### Implementare cu ExportManager și useExport
+
+Pentru exporturi flexibile și cu feedback de progres, folosim pattern-ul implementat în `useExport.ts` și `ExportManager.ts`. Acest pattern oferă:
+
+- Suport pentru multiple formate (CSV, Excel, PDF)
+- Feedback vizual de progres în timpul exportului
+- Gestionare robustă a erorilor
+- Opțiuni configurabile pentru fiecare format
+
+```typescript
+// Pattern implementat în hook-ul useExport
+export const useExport = (): UseExportReturn => {
+  const [state, setState] = useState<ExportState>({
+    isExporting: false,
+    progress: 0,
+    error: null
+  });
+
+  // Progress callback pentru tracking export
+  const onProgress = useCallback((progress: number) => {
+    setState(prev => ({ ...prev, progress }));
+  }, []);
+
+  // Mutation pentru export
+  const exportMutation = useMutation({
+    mutationFn: async ({ 
+      transactions, 
+      format, 
+      options 
+    }) => {
+      setState(prev => ({ ...prev, isExporting: true, error: null, progress: 0 }));
+      
+      try {
+        await ExportManager.exportTransactions(transactions, format, {
+          ...options,
+          onProgress
+        });
+        
+        setState(prev => ({ ...prev, progress: 100 }));
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : MESAJE.EROARE_NECUNOSCUTA;
+        setState(prev => ({ ...prev, error: errorMessage }));
+        throw error;
+      } finally {
+        setState(prev => ({ ...prev, isExporting: false }));
+      }
+    }
+  });
+
+  const exportData = useCallback(async (
+    transactions: Transaction[], 
+    format: ExportFormat, 
+    options?: ExportOptions
+  ) => {
+    await exportMutation.mutateAsync({ transactions, format, options });
+  }, [exportMutation]);
+
+  return {
+    exportData,
+    state,
+    resetState: useCallback(() => {
+      setState({
+        isExporting: false,
+        progress: 0,
+        error: null
+      });
+    }, [])
+  };
+};
+```
+
+### Utilizare în componente
+
+```typescript
+// În componenta care oferă export
+import { useExport } from '../hooks/useExport';
+import { ExportFormat } from '../utils/ExportManager';
+
+const ExportComponent = ({ transactions }) => {
+  const { exportData, state } = useExport();
+  
+  const handleExport = async (format: ExportFormat) => {
+    try {
+      await exportData(transactions, format, {
+        filename: `tranzactii_${new Date().toISOString().slice(0, 10)}`,
+        title: 'Raport Tranzacții',
+        includeHeaders: true
+      });
+      
+      // Succes
+    } catch (error) {
+      // Error handling
+    }
+  };
+
+  return (
+    <div>
+      <div className="export-buttons">
+        <button onClick={() => handleExport('csv')}>Export CSV</button>
+        <button onClick={() => handleExport('excel')}>Export Excel</button>
+        <button onClick={() => handleExport('pdf')}>Export PDF</button>
+      </div>
+      
+      {state.isExporting && (
+        <div className="progress-bar">
+          <div 
+            className="progress" 
+            style={{ width: `${state.progress}%` }}
+          />
+          <span>{state.progress}%</span>
+        </div>
+      )}
+      
+      {state.error && (
+        <div className="error">{state.error}</div>
+      )}
+    </div>
+  );
+};
+```
+
+### Best practices pentru exporturi
+
+- Oferiți feedback vizual clar în timpul operațiunilor de export
+- Gestionați erorile în mod elegant și oferiți mesaje de eroare utile
+- Folosiți biblioteci specializate pentru fiecare format (xlsx pentru Excel, jsPDF pentru PDF)
+- Implementați timeout-uri și retries pentru exporturi mari
+- Considerați exportul asincron (server-side) pentru seturi foarte mari de date
+- Validați datele înainte de export pentru a evita erorile în timpul procesării
+- Oferiți opțiuni de personalizare (nume fișier, includere headere, etc.)

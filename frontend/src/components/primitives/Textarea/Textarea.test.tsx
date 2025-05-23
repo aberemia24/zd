@@ -30,7 +30,7 @@ describe('Textarea', () => {
   it('adaugă clasa corectă pentru borderul de eroare', () => {
     const { container } = render(<Textarea error="Eroare" />);
     const textarea = container.querySelector('textarea');
-    expect(textarea).toHaveClass('border-red-500');
+    expect(textarea).toHaveClass('border-error-500');
   });
 
   // Test pentru clase personalizate pe wrapper

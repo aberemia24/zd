@@ -57,20 +57,38 @@ Detalii complete: vezi [BEST_PRACTICES.md](./BEST_PRACTICES.md).
 ## 🛠️ Setup Rapid
 
 ```bash
-# Instalare dependențe
+# Instalare dependințe
 npm install
 
 # Sincronizare shared constants (opțional înainte de build/start)
 npm run sync-shared-constants
-
-# Start frontend
-cd frontend
-npm start
-
-# Start backend
-cd backend
-npm run start:dev
 ```
+
+### Start Frontend
+
+**PowerShell (Windows):**
+```powershell
+cd frontend; npm start
+```
+
+**Bash/Zsh (Linux/macOS):**
+```bash
+cd frontend && npm start
+```
+
+### Start Backend
+
+**PowerShell (Windows):**
+```powershell
+cd backend; npm run start:dev
+```
+
+**Bash/Zsh (Linux/macOS):**
+```bash
+cd backend && npm run start:dev
+```
+
+> **💡 Notă**: PowerShell folosește `;` ca separator de comenzi, în timp ce Bash/Zsh folosesc `&&`.
 
 Configurează `.env`-urile după modelele existente.
 

@@ -8,4 +8,8 @@ export declare const API: {
     };
     readonly TIMEOUT: 10000;
     readonly RETRY_LIMIT: 3;
+    readonly SUPABASE: {
+        readonly URL: string;
+        readonly ANON_KEY: string | undefined;
+    };
 };

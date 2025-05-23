@@ -36,4 +36,47 @@ export declare const MESAJE: {
     EROARE_RETEA: string;
     PAROLA_PREA_SLABA: string;
     EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: string;
+    VALIDARE: {
+        SUMA_INVALIDA: string;
+        FORMAT_DATE: string;
+        CAMP_LIPSA: string;
+    };
+    CATEGORII: {
+        NUME_GOL: string;
+        SUBCATEGORIE_EXISTENTA: string;
+        EROARE_STERGERE: string;
+        NU_SE_POT_STERGE_PREDEFINITE: string;
+        CONFIRMARE_STERGERE: string;
+    };
+    EROARE_EXPORT: string;
+    SUCCES_EXPORT: string;
+    EXPORT_IN_PROGRES: string;
+    EXPORT_FINALIZAT: string;
+};
+export declare const LUNAR_GRID_MESSAGES: {
+    EROARE_INCARCARE: string;
+    EROARE_CREARE_TRANZACTIE: string;
+    EROARE_ACTUALIZARE_TRANZACTIE: string;
+    EROARE_STERGERE_TRANZACTIE: string;
+};
+export declare const EXPORT_MESSAGES: {
+    EROARE_GENERALA: string;
+    EROARE_FORMAT: string;
+    EROARE_DATE_INVALIDE: string;
+    EROARE_TIMEOUT: string;
+    SUCCES: string;
+    IN_PROGRES: string;
+    ANULAT: string;
+    CONFIRMARE_MULTE_RANDURI: string;
+    SUGESTIE_FILTRARE: string;
+    SALVARE: string;
+    DESCHIDERE: string;
+};
+export declare const URL_PERSISTENCE: {
+    LINK_COPIAT: string;
+    LINK_NEGASIT: string;
+    FILTRE_RESETATE: string;
+    FILTRE_INVALIDE: string;
+    FILTRE_INCARCATE: string;
+    FILTRE_SALVATE: string;
 };

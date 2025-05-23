@@ -10,6 +10,15 @@ export declare const LABELS: {
     TYPE_FILTER: string;
     CATEGORY_FILTER: string;
     FORM: string;
+    DESCRIPTION: string;
+    EMAIL: string;
+    PAROLA: string;
+    CONFIRMA_PAROLA: string;
+    SEARCH_FILTER: string;
+    DATE_FROM_FILTER: string;
+    DATE_TO_FILTER: string;
+    AMOUNT_MIN_FILTER: string;
+    AMOUNT_MAX_FILTER: string;
 };
 export declare const TITLES: {
     TRANZACTII: string;
@@ -17,11 +26,18 @@ export declare const TITLES: {
     OPTIUNI: string;
 };
 export declare const PLACEHOLDERS: {
+    ADD_SUBCATEGORY: string;
     SELECT: string;
     AMOUNT: string;
     DATE: string;
+    DESCRIPTION: string;
+    CATEGORY_EDITOR_SUBCATEGORY: string;
+    SEARCH: string;
+    AMOUNT_MIN_FILTER: string;
+    AMOUNT_MAX_FILTER: string;
 };
 export declare const BUTTONS: {
+    RENAME: string;
     ADD: string;
     CANCEL: string;
     DONE: string;
@@ -31,6 +47,12 @@ export declare const BUTTONS: {
     PREV_PAGE: string;
     ADD_SUBCATEGORY: string;
     MANAGE_CATEGORIES: string;
+    EXPORT: string;
+    LOGIN: string;
+    REGISTER: string;
+    LOADING: string;
+    RESET_FILTERS: string;
+    RESET_ALL_FILTERS: string;
 };
 export declare const TABLE: {
     HEADERS: {
@@ -45,11 +67,15 @@ export declare const TABLE: {
     };
     EMPTY: string;
     LOADING: string;
+    LOADING_MORE: string;
     PAGE_INFO: string;
+    SHOWING_INFO: string;
     BOOL: {
         YES: string;
         NO: string;
     };
+    NO_TRANSACTIONS: string;
+    NO_SUBCATEGORIES: string;
 };
 export declare const LOADER: {
     TEXT: string;
@@ -61,16 +87,47 @@ export declare const EXCEL_GRID: {
         CHELTUIELI: string;
         ECONOMII: string;
         SOLD: string;
+        CATEGORII: string;
+        TOTAL: string;
+        ACTIUNI: string;
+        ZI: string;
+        SUMA: string;
+        TIP: string;
+        DATA: string;
+        DESCRIERE: string;
+        RECURENT: string;
+        FRECVENTA: string;
     };
+    DAYS_IN_MONTH: number[];
     NO_DATA: string;
     LOADING: string;
     PROMPTS: {
         ENTER_AMOUNT: string;
+        SELECT_CATEGORY: string;
+        SELECT_SUBCATEGORY: string;
+        SELECT_DAY: string;
+        ENTER_DESCRIPTION: string;
     };
     ACTIONS: {
         ADD_SUBCATEGORY: string;
         EDIT_SUBCATEGORY: string;
         DELETE_SUBCATEGORY: string;
+        ADD_TRANSACTION: string;
+        EDIT_TRANSACTION: string;
+        DELETE_TRANSACTION: string;
+        EXPAND_ALL: string;
+        COLLAPSE_ALL: string;
+        SAVE_CHANGES: string;
+        CANCEL: string;
+        CONFIRM: string;
+        CLOSE: string;
+    };
+    TABLE_CONTROLS: {
+        EXPAND_ALL: string;
+        COLLAPSE_ALL: string;
+        VIRTUAL_TABLE: string;
+        LEGACY_TABLE: string;
+        VERSION: string;
     };
 };
 export declare const OPTIONS: {
@@ -94,9 +151,54 @@ export declare const UI: {
     MANAGE_CATEGORIES: string;
     DISPLAY_OPTIONS: string;
     DATA_EXPORT: string;
+    ACCOUNT_SETTINGS: string;
+    ACCOUNT_LOGOUT_DESCRIPTION: string;
+    LOGOUT_BUTTON: string;
     COMING_SOON: string;
     LOGIN_REQUIRED: string;
     ADD_SUBCATEGORY: string;
     DELETE_SUBCATEGORY: string;
     EDIT_SUBCATEGORY: string;
+    CATEGORY_EDITOR: {
+        TITLE: string;
+        CATEGORIES_SECTION_TITLE: string;
+        SUBCATEGORIES_SECTION_TITLE: string;
+        CUSTOM_BADGE: string;
+        RENAME_BUTTON: string;
+        DELETE_BUTTON: string;
+        ADD_PLACEHOLDER: string;
+        ADD_BUTTON: string;
+        NO_SELECTION: string;
+        DELETE_CONFIRMATION_TITLE: string;
+        DELETE_CONFIRMATION_TEXT: string;
+        DELETE_WARNING: string;
+        CONFIRM_DELETE_BUTTON: string;
+        CANCEL_BUTTON: string;
+    };
+    FILTERS_ACTIVE: (count: number) => string;
+    TRANSACTION_FILTERS: {
+        TITLE: string;
+        SHOW_ADVANCED: string;
+        HIDE_ADVANCED: string;
+        NO_FILTERS: string;
+        DATE_RANGE: string;
+        AMOUNT_RANGE: string;
+        TEXT_SEARCH: string;
+    };
+};
+export declare const FLAGS: {
+    CUSTOM: string;
+};
+export declare const INFO: {
+    CATEGORY_EDITOR_EMPTY: string;
+    NO_TRANSACTIONS: string;
+    NO_SUBCATEGORIES: string;
+};
+export declare const LUNAR_GRID: {
+    COLLAPSE_ALL: string;
+    EXPAND_ALL: string;
+    RESET_EXPANSION: string;
+    LOADING: string;
+    NO_DATA: string;
+    TOTAL_BALANCE: string;
 };

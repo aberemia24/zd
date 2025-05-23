@@ -64,12 +64,13 @@ export function getEnhancedComponentClasses(
   if (effects && effects.length > 0) {
     effects.forEach(effect => {
       const effectType = `fx-${effect}`;
-      if (componentMap[effectType] && componentMap[effectType].base) {
-        classes.push(componentMap[effectType].base);
+      const effectConfig = componentMap[effectType];
+      if (effectConfig && effectConfig.base) {
+        classes.push(effectConfig.base);
         
         // Aplicăm și varianta de efect dacă există
-        if (variant && componentMap[effectType].variants && componentMap[effectType].variants[variant as string]) {
-          classes.push(componentMap[effectType].variants[variant as string]);
+        if (variant && effectConfig.variants && effectConfig.variants[variant as string]) {
+          classes.push(effectConfig.variants[variant as string]);
         }
       }
     });
@@ -116,11 +117,12 @@ export function applyVisualEffects(
     const effectType = `fx-${effect}`;
     const classes = [];
     
-    if (componentMap[effectType] && componentMap[effectType].base) {
-      classes.push(componentMap[effectType].base);
+    const effectConfig = componentMap[effectType];
+    if (effectConfig && effectConfig.base) {
+      classes.push(effectConfig.base);
       
-      if (variant && componentMap[effectType].variants && componentMap[effectType].variants[variant as string]) {
-        classes.push(componentMap[effectType].variants[variant as string]);
+      if (variant && effectConfig.variants && effectConfig.variants[variant as string]) {
+        classes.push(effectConfig.variants[variant as string]);
       }
     }
     

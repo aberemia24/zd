@@ -4,6 +4,46 @@
  */
 
 export const formComponents = {
+  'input-wrapper': {
+    base: 'relative flex flex-col space-y-1',
+    variants: {
+      primary: '',
+      success: '',
+      error: '',
+    },
+    sizes: {
+      sm: 'space-y-0.5',
+      md: 'space-y-1',
+      lg: 'space-y-1.5',
+      xl: 'space-y-2',
+    },
+    states: {
+      disabled: 'opacity-60',
+      error: '',
+      focus: '',
+    }
+  },
+
+  label: {
+    base: 'block text-sm font-medium text-secondary-700 transition-colors duration-200',
+    variants: {
+      primary: 'text-secondary-700',
+      success: 'text-success-700',
+      error: 'text-error-700',
+    },
+    sizes: {
+      sm: 'text-xs',
+      md: 'text-sm',
+      lg: 'text-base',
+      xl: 'text-lg',
+    },
+    states: {
+      disabled: 'text-secondary-400',
+      error: 'text-error-600',
+      required: 'after:content-["*"] after:ml-1 after:text-error-500',
+    }
+  },
+
   input: {
     base: `w-full border rounded-lg px-3 py-2 
            transition-all duration-200
@@ -156,6 +196,26 @@ export const formComponents = {
     states: {
       disabled: 'text-secondary-400',
       error: 'text-error-600',
+    }
+  },
+
+  // Error message styling pentru validation feedback
+  'error-message': {
+    base: 'mt-1 text-sm text-error-600 transition-colors duration-200',
+    variants: {
+      primary: 'text-error-600',
+      success: 'text-success-600',
+      error: 'text-error-600',
+    },
+    sizes: {
+      sm: 'text-xs mt-0.5',
+      md: 'text-sm mt-1',
+      lg: 'text-base mt-1.5',
+      xl: 'text-lg mt-2',
+    },
+    states: {
+      visible: 'opacity-100',
+      hidden: 'opacity-0',
     }
   },
 };

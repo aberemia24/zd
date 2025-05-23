@@ -29,7 +29,7 @@ export interface AlertProps {
 }
 
 const Alert: React.FC<AlertProps> = ({ 
-  type = 'success', 
+  type = 'info', 
   message, 
   title,
   className,

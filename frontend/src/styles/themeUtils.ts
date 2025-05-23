@@ -644,11 +644,12 @@ export function getComponentClasses(
   // Clasele pentru starea specificată
   if (state && config.states && config.states[state]) {
     // Verificăm dacă config.states[state] este un string sau un obiect
-    if (typeof config.states[state] === 'string') {
-      classes.push(config.states[state] as string);
-    } else if (variant && typeof config.states[state] === 'object') {
+    const stateValue = config.states[state];
+    if (typeof stateValue === 'string') {
+      classes.push(stateValue);
+    } else if (variant && typeof stateValue === 'object' && stateValue !== null) {
       // Dacă este un obiect, încercăm să luăm starea specifică variantei
-      const stateObj = config.states[state] as Record<string, string>;
+      const stateObj = stateValue as Record<string, string>;
       if (stateObj[variant]) {
         classes.push(stateObj[variant]);
       }

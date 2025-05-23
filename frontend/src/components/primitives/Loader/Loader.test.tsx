@@ -37,7 +37,7 @@ describe('Loader', () => {
     render(<Loader />);
     const textElement = screen.getByTestId('loader-text');
     expect(textElement).toBeInTheDocument();
-    expect(textElement).toHaveClass('text-gray-600');
+    expect(textElement).toHaveClass('text-secondary-700');
   });
 
   // Test pentru structura corectă a animației

@@ -1,160 +1,346 @@
 // Zustand store pentru gestionarea categoriilor personalizate (fuziune cu predefinite, acțiuni CRUD)
 // Owner: echipa FE
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 import { CustomCategoriesPayload, CustomCategory } from '../types/Category';
 import { categoryService } from '../services/categoryService';
 import { supabaseService } from '../services/supabaseService';
+import { 
+  BaseStoreState, 
+  storeLogger, 
+  createDevtoolsOptions, 
+  createAsyncAction,
+  createPersistConfig
+} from './storeUtils';
 
-interface CategoryStoreState {
+interface CategoryStoreState extends BaseStoreState {
   categories: CustomCategory[];
   version: number;
-  loading: boolean;
-  error: string | null;
+  
+  // Async actions
   loadUserCategories: (userId: string) => Promise<void>;
   saveCategories: (userId: string, categories: CustomCategory[]) => Promise<void>;
   renameSubcategory: (userId: string, category: string, oldName: string, newName: string) => Promise<boolean>;
   deleteSubcategory: (userId: string, category: string, subcategory: string, action: 'migrate' | 'delete', target?: string) => Promise<boolean>;
+  
+  // Sync actions
   mergeWithDefaults: (defaults: CustomCategory[]) => void;
-  // Pentru badge statistici
   getSubcategoryCount: (category: string, subcategory: string) => number;
+  setCategories: (categories: CustomCategory[]) => void;
+  incrementVersion: () => void;
 }
 
+const STORE_NAME = 'CategoryStore';
+
 export const useCategoryStore = create<CategoryStoreState>()(
-  persist(
-    (set, get) => ({
-      categories: [],
-      version: 1,
-      loading: false,
-      error: null,
+  devtools(
+    persist(
+      (set, get) => {
+        // Helper pentru logging standardizat
+        const logAction = (action: string, data?: any) => {
+          storeLogger.info(STORE_NAME, action, data);
+        };
 
-      async loadUserCategories(userId) {
-        if (!userId) {
-          console.warn('[categoryStore] loadUserCategories: utilizator neautentificat');
-          return;
-        }
+        // Helper pentru setări standardizate
+        const setLoading = (loading: boolean) => {
+          set({ loading, lastUpdated: new Date() }, false, 'setLoading');
+        };
         
-        set({ loading: true, error: null });
-        
-        try {
-          const data = await categoryService.getUserCategories(userId);
+        const setError = (error: string | null) => {
+          set({ error, lastUpdated: new Date() }, false, 'setError');
+          if (error) {
+            storeLogger.error(STORE_NAME, 'Error set', error);
+          }
+        };
+
+        // Creăm acțiuni async standardizate
+        const createCategoryAction = <T extends any[]>(
+          actionName: string,
+          action: (...args: T) => Promise<any>
+        ) => createAsyncAction(STORE_NAME, actionName, action, setLoading, setError);
+
+        return {
+          // State inițial cu BaseStoreState
+          loading: false,
+          error: null,
+          lastUpdated: new Date(),
           
-          // Validare - ne asigurăm că data.categories este întotdeauna un array
-          if (data && Array.isArray(data.categories)) {
-            set({ 
-              categories: data.categories, 
-              version: data.version || 1, 
-              loading: false,
-              error: null
+          // Category state
+          categories: [],
+          version: 1,
+
+          // Async actions cu error handling standardizat
+          loadUserCategories: createCategoryAction('loadUserCategories', async (userId: string) => {
+            if (!userId) {
+              const errorMsg = 'User ID is required for loading categories';
+              storeLogger.warn(STORE_NAME, errorMsg);
+              throw new Error(errorMsg);
+            }
+            
+            const data = await categoryService.getUserCategories(userId);
+            
+            // Validare - ne asigurăm că data.categories este întotdeauna un array
+            if (data && Array.isArray(data.categories)) {
+              set({ 
+                categories: data.categories, 
+                version: data.version || 1, 
+                error: null,
+                lastUpdated: new Date()
+              }, false, 'loadUserCategories_success');
+              
+              logAction('Categories loaded successfully', { 
+                count: data.categories.length, 
+                version: data.version 
+              });
+            } else {
+              // Initializăm cu array gol dacă nu avem date valide
+              set({ 
+                categories: [], 
+                version: 1, 
+                error: null,
+                lastUpdated: new Date()
+              }, false, 'loadUserCategories_empty');
+              
+              logAction('No categories found, starting with empty list');
+            }
+          }),
+
+          saveCategories: createCategoryAction('saveCategories', async (userId: string, categories: CustomCategory[]) => {
+            const newVersion = get().version + 1;
+            const success = await categoryService.saveUserCategories(userId, { 
+              categories, 
+              version: newVersion 
             });
-            console.log(`[categoryStore] ${data.categories.length} categorii încărcate cu succes`);
-          } else {
-            // Initializăm cu array gol dacă nu avem date valide
-            set({ 
-              categories: [], 
-              version: 1, 
-              loading: false,
-              error: null
+            
+            if (success) {
+              set({ 
+                categories, 
+                version: newVersion, 
+                error: null,
+                lastUpdated: new Date()
+              }, false, 'saveCategories_success');
+              
+              logAction('Categories saved successfully', { 
+                count: categories.length, 
+                version: newVersion 
+              });
+            } else {
+              throw new Error('Failed to save categories to backend');
+            }
+          }),
+
+          renameSubcategory: createCategoryAction('renameSubcategory', async (
+            userId: string, 
+            category: string, 
+            oldName: string, 
+            newName: string
+          ) => {
+            // Update store + backend + tranzacții
+            const updatedCategories = get().categories.map((cat: CustomCategory) =>
+              cat.name === category
+                ? {
+                    ...cat,
+                    subcategories: cat.subcategories.map((sc: any) =>
+                      sc.name === oldName ? { ...sc, name: newName } : sc
+                    ),
+                  }
+                : cat
+            );
+            
+            const newVersion = get().version + 1;
+            
+            // Save to backend
+            await categoryService.saveUserCategories(userId, { 
+              categories: updatedCategories, 
+              version: newVersion 
             });
-            console.log('[categoryStore] Nici o categorie nu a fost găsită, se începe cu lista goală');
-          }
-        } catch (err) {
-          console.error('[categoryStore] Eroare la încărcarea categoriilor:', err);
-          set({ 
-            loading: false, 
-            error: 'Nu s-au putut încărca categoriile. Verifică conexiunea.' 
-          });
-        }
-      },
+            
+            // Update transactions
+            await categoryService.updateTransactionsForSubcategoryRename(
+              userId, 
+              category, 
+              oldName, 
+              newName
+            );
+            
+            // Update store
+            set({ 
+              categories: updatedCategories, 
+              version: newVersion,
+              lastUpdated: new Date()
+            }, false, 'renameSubcategory_success');
+            
+            logAction('Subcategory renamed successfully', { 
+              category, 
+              oldName, 
+              newName 
+            });
+            
+            return true;
+          }),
 
-      async saveCategories(userId, categories) {
-        set({ loading: true, error: null });
-        const ok = await categoryService.saveUserCategories(userId, { categories, version: get().version + 1 });
-        if (ok) {
-          set({ categories, version: get().version + 1, loading: false });
-        } else {
-          set({ loading: false, error: 'Eroare la salvarea categoriilor.' });
-        }
-      },
+          deleteSubcategory: createCategoryAction('deleteSubcategory', async (
+            userId: string, 
+            category: string, 
+            subcategory: string, 
+            action: 'migrate' | 'delete', 
+            target?: string
+          ) => {
+            // Update store + backend + tranzacții
+            const updatedCategories = get().categories.map((cat: CustomCategory) =>
+              cat.name === category
+                ? {
+                    ...cat,
+                    subcategories: cat.subcategories.filter((sc: any) => sc.name !== subcategory),
+                  }
+                : cat
+            );
+            
+            const newVersion = get().version + 1;
+            
+            // Save to backend
+            await categoryService.saveUserCategories(userId, { 
+              categories: updatedCategories, 
+              version: newVersion 
+            });
+            
+            // Handle transaction migration/deletion
+            await categoryService.handleSubcategoryDeletion(
+              userId, 
+              category, 
+              subcategory, 
+              action, 
+              target
+            );
+            
+            // Update store
+            set({ 
+              categories: updatedCategories, 
+              version: newVersion,
+              lastUpdated: new Date()
+            }, false, 'deleteSubcategory_success');
+            
+            logAction('Subcategory deleted successfully', { 
+              category, 
+              subcategory, 
+              action, 
+              target 
+            });
+            
+            return true;
+          }),
 
-      async renameSubcategory(userId, category, oldName, newName) {
-        // Update store + backend + tranzacții
-        const cats = get().categories.map(cat =>
-          cat.name === category
-            ? {
-                ...cat,
-                subcategories: cat.subcategories.map(sc =>
-                  sc.name === oldName ? { ...sc, name: newName } : sc
-                ),
+          // Sync actions
+          mergeWithDefaults: (defaults: CustomCategory[]) => {
+            // Fuzionează categoriile predefinite cu cele custom, prioritate pentru custom
+            const custom = get().categories;
+            const merged = defaults.map((def: CustomCategory) => {
+              const found = custom.find((cat: CustomCategory) => cat.name === def.name);
+              if (found) {
+                // Prioritate subcategorii custom
+                const customSubs = found.subcategories.map((sc: any) => sc.name);
+                return {
+                  ...def,
+                  subcategories: [
+                    ...found.subcategories,
+                    ...def.subcategories.filter(
+                      (sc: any) => !customSubs.includes(sc.name)
+                    ),
+                  ],
+                  isCustom: found.isCustom,
+                };
               }
-            : cat
-        );
-        await categoryService.saveUserCategories(userId, { categories: cats, version: get().version + 1 });
-        await categoryService.updateTransactionsForSubcategoryRename(userId, category, oldName, newName);
-        set({ categories: cats, version: get().version + 1 });
-        return true;
-      },
+              return def;
+            });
+            
+            // Adaugă categoriile complet custom
+            const onlyCustom = custom.filter((cat: CustomCategory) => !defaults.some((def: CustomCategory) => def.name === cat.name));
+            const finalCategories = [...merged, ...onlyCustom];
+            
+            set({ 
+              categories: finalCategories,
+              lastUpdated: new Date()
+            }, false, 'mergeWithDefaults');
+            
+            logAction('Categories merged with defaults', { 
+              defaultsCount: defaults.length,
+              customCount: custom.length,
+              mergedCount: finalCategories.length
+            });
+          },
 
-      async deleteSubcategory(userId, category, subcategory, action, target) {
-        // Update store + backend + tranzacții
-        const cats = get().categories.map(cat =>
-          cat.name === category
-            ? {
-                ...cat,
-                subcategories: cat.subcategories.filter(sc => sc.name !== subcategory),
-              }
-            : cat
-        );
-        await categoryService.saveUserCategories(userId, { categories: cats, version: get().version + 1 });
-        await categoryService.handleSubcategoryDeletion(userId, category, subcategory, action, target);
-        set({ categories: cats, version: get().version + 1 });
-        return true;
-      },
+          getSubcategoryCount: (category: string, subcategory: string) => {
+            // NOTĂ: Această metodă a fost actualizată pentru a elimina dependența de useTransactionStore.transactions
+            // care a fost deprecat în favoarea React Query.
+            //
+            // Acum, aceasta este o metodă temporară care va returna mereu 0. Pentru o implementare
+            // completă, s-ar putea face un apel direct la baza de date prin supabaseService sau
+            // s-ar putea folosi React Query / useTransactions pentru a obține count-ul real.
+            //
+            // Recomandare: Dacă aveți nevoie de numărătoare exactă, implementați un endpoint dedicat
+            // pentru counting în backend sau folosiți un hook dedicat React Query pentru statistici.
+            
+            logAction('getSubcategoryCount called (deprecated method)', { category, subcategory });
+            return 0; // Valoare temporară până la implementarea completă
+          },
 
-      mergeWithDefaults(defaults) {
-        // Fuzionează categoriile predefinite cu cele custom, prioritate pentru custom
-        const custom = get().categories;
-        const merged = defaults.map(def => {
-          const found = custom.find(cat => cat.name === def.name);
-          if (found) {
-            // Prioritate subcategorii custom
-            const customSubs = found.subcategories.map(sc => sc.name);
-            return {
-              ...def,
-              subcategories: [
-                ...found.subcategories,
-                ...def.subcategories.filter(
-                  sc => !customSubs.includes(sc.name)
-                ),
-              ],
-              isCustom: found.isCustom,
-            };
+          setCategories: (categories: CustomCategory[]) => {
+            set({ 
+              categories,
+              lastUpdated: new Date()
+            }, false, 'setCategories');
+            logAction('Categories set manually', { count: categories.length });
+          },
+
+          incrementVersion: () => {
+            const newVersion = get().version + 1;
+            set({ 
+              version: newVersion,
+              lastUpdated: new Date()
+            }, false, 'incrementVersion');
+            logAction('Version incremented', { version: newVersion });
+          },
+
+          // Base store actions
+          setLoading,
+          setError,
+          clearError: () => {
+            set({ error: null, lastUpdated: new Date() }, false, 'clearError');
+            logAction('Error cleared');
+          },
+          reset: () => {
+            set({
+              loading: false,
+              error: null,
+              categories: [],
+              version: 1,
+              lastUpdated: new Date()
+            }, false, 'reset');
+            logAction('Store reset');
           }
-          return def;
-        });
-        // Adaugă categoriile complet custom
-        const onlyCustom = custom.filter(cat => !defaults.some(def => def.name === cat.name));
-        set({ categories: [...merged, ...onlyCustom] });
+        };
       },
-
-      getSubcategoryCount(category, subcategory) {
-        // NOTĂ: Această metodă a fost actualizată pentru a elimina dependența de useTransactionStore.transactions
-        // care a fost deprecat în favoarea React Query.
-        //
-        // Acum, aceasta este o metodă temporară care va returna mereu 0. Pentru o implementare
-        // completă, s-ar putea face un apel direct la baza de date prin supabaseService sau
-        // s-ar putea folosi React Query / useTransactions pentru a obține count-ul real.
-        //
-        // Recomandare: Dacă aveți nevoie de numărătoare exactă, implementați un endpoint dedicat
-        // pentru counting în backend sau folosiți un hook dedicat React Query pentru statistici.
-        
-        console.log('getSubcategoryCount: Metodă actualizată după migrarea la React Query');
-        return 0; // Valoare temporară până la implementarea completă
-      },
-    }),
-    {
-      name: 'category-store',
-      partialize: (state) => ({ categories: state.categories, version: state.version }),
-    }
+      createPersistConfig('category', (state: CategoryStoreState) => ({ 
+        categories: state.categories, 
+        version: state.version 
+      }))
+    ),
+    createDevtoolsOptions(STORE_NAME)
   )
 );
+
+// Selectori optimizați pentru performance
+export const useCategoriesData = () => useCategoryStore(state => ({
+  categories: state.categories,
+  version: state.version,
+  loading: state.loading,
+  error: state.error
+}));
+
+export const useCategoryActions = () => useCategoryStore(state => ({
+  loadUserCategories: state.loadUserCategories,
+  saveCategories: state.saveCategories,
+  renameSubcategory: state.renameSubcategory,
+  deleteSubcategory: state.deleteSubcategory,
+  mergeWithDefaults: state.mergeWithDefaults
+}));

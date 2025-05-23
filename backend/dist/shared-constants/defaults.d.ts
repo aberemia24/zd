@@ -15,4 +15,5 @@ export declare const INITIAL_FORM_STATE: {
     date: string;
     recurring: boolean;
     frequency: string;
+    description: string;
 };

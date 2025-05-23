@@ -23,33 +23,41 @@ describe('Alert', () => {
   it('aplică clasa corectă pentru tipul success', () => {
     const { container } = render(<Alert type="success" message="Operație reușită" />);
     const alert = container.firstChild as HTMLElement;
-    expect(alert).toHaveClass('bg-green-50');
-    expect(alert).toHaveClass('border-green-200');
-    expect(alert).toHaveClass('text-green-700');
+    expect(alert).toHaveClass('bg-gradient-to-r');
+    expect(alert).toHaveClass('from-success-50');
+    expect(alert).toHaveClass('border-l-4');
+    expect(alert).toHaveClass('border-success-500');
+    expect(alert).toHaveClass('text-success-800');
   });
 
   it('aplică clasa corectă pentru tipul error', () => {
     const { container } = render(<Alert type="error" message="Eroare de procesare" />);
     const alert = container.firstChild as HTMLElement;
-    expect(alert).toHaveClass('bg-red-50');
-    expect(alert).toHaveClass('border-red-200');
-    expect(alert).toHaveClass('text-red-700');
+    expect(alert).toHaveClass('bg-gradient-to-r');
+    expect(alert).toHaveClass('from-error-50');
+    expect(alert).toHaveClass('border-l-4');
+    expect(alert).toHaveClass('border-error-500');
+    expect(alert).toHaveClass('text-error-800');
   });
 
   it('aplică clasa corectă pentru tipul warning', () => {
     const { container } = render(<Alert type="warning" message="Atenție la acțiune" />);
     const alert = container.firstChild as HTMLElement;
-    expect(alert).toHaveClass('bg-yellow-50');
-    expect(alert).toHaveClass('border-yellow-200');
-    expect(alert).toHaveClass('text-yellow-700');
+    expect(alert).toHaveClass('bg-gradient-to-r');
+    expect(alert).toHaveClass('from-warning-50');
+    expect(alert).toHaveClass('border-l-4');
+    expect(alert).toHaveClass('border-warning-500');
+    expect(alert).toHaveClass('text-warning-800');
   });
 
   it('aplică clasa corectă pentru tipul info (default)', () => {
     const { container } = render(<Alert message="Informație importantă" />);
     const alert = container.firstChild as HTMLElement;
-    expect(alert).toHaveClass('bg-blue-50');
-    expect(alert).toHaveClass('border-blue-200');
-    expect(alert).toHaveClass('text-blue-700');
+    expect(alert).toHaveClass('bg-gradient-to-r');
+    expect(alert).toHaveClass('from-blue-50');
+    expect(alert).toHaveClass('border-l-4');
+    expect(alert).toHaveClass('border-blue-500');
+    expect(alert).toHaveClass('text-blue-800');
   });
 
   // Test pentru clase personalizate
@@ -64,9 +72,10 @@ describe('Alert', () => {
     const { container } = render(<Alert message="Test clase de bază" />);
     const alert = container.firstChild as HTMLElement;
     expect(alert).toHaveClass('border');
-    expect(alert).toHaveClass('rounded');
+    expect(alert).toHaveClass('rounded-lg');
     expect(alert).toHaveClass('p-4');
     expect(alert).toHaveClass('my-2');
-    expect(alert).toHaveClass('text-center');
+    expect(alert).toHaveClass('flex');
+    expect(alert).toHaveClass('items-start');
   });
 });
