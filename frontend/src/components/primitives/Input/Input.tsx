@@ -1,89 +1,82 @@
 import React, { forwardRef } from 'react';
-import classNames from 'classnames';
-import { useThemeEffects } from '../../../hooks';
-import type { ComponentVariant, ComponentSize, ComponentState } from '../../../styles/themeTypes';
+import { cn } from '../../../styles/new/shared/utils';
+import { 
+  input, 
+  inputWrapper, 
+  label,
+  type InputProps as CVAInputProps,
+  type LabelProps 
+} from '../../../styles/new/components/forms';
 
-export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'data-testid'> & {
+export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'data-testid'> & 
+  CVAInputProps & {
   label?: string;
   error?: string;
-  variant?: ComponentVariant;
-  size?: ComponentSize;
   dataTestId?: string;
-  // Proprietăți pentru efecte vizuale
-  withFloatingLabel?: boolean;
-  withGlowFocus?: boolean;
-  withTransition?: boolean;
+  // Simplified props - removed complex effects, kept essential
   withIconLeft?: React.ReactNode;
   withIconRight?: React.ReactNode;
-  withFadeIn?: boolean;
 };
 
 const Input = forwardRef<HTMLInputElement, InputProps>(({
-  label,
+  label: labelText,
   error,
-  variant = 'primary',
+  variant = 'default',
   size = 'md',
   className,
   disabled = false,
   dataTestId,
-  withFloatingLabel = false,
-  withGlowFocus = false,
-  withTransition = false,
   withIconLeft,
   withIconRight,
-  withFadeIn = false,
   ...rest
 }, ref) => {
-  const state: ComponentState | undefined = disabled ? 'disabled' : error ? 'error' : undefined;
-  
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses, hasEffect } = useThemeEffects({
-    withFloatingLabel,
-    withGlowFocus,
-    withTransition,
-    withFadeIn
-  });
+  // Determine variant based on error state
+  const inputVariant = error ? 'error' : variant;
   
   return (
-    <div className={classNames(
-      getClasses('input-wrapper', variant, size, state),
-      { 'has-icon-left': !!withIconLeft },
-      { 'has-icon-right': !!withIconRight },
+    <div className={cn(
+      inputWrapper({ size }),
       className
     )}>
-      {label && (
+      {labelText && (
         <label 
           htmlFor={rest.id} 
-          className={getClasses('label', variant, size, state)}
+          className={label({ 
+            variant: error ? 'error' : 'default',
+            size 
+          })}
         >
-          {label}
+          {labelText}
         </label>
       )}
       <div className="relative">
         {withIconLeft && (
-          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+          <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
             {withIconLeft}
           </span>
         )}
         <input
           ref={ref}
-          className={classNames(
-            getClasses('input', variant, size, state),
-            { 'pl-10': !!withIconLeft },
-            { 'pr-10': !!withIconRight }
+          className={cn(
+            input({ 
+              variant: inputVariant, 
+              size 
+            }),
+            withIconLeft && "pl-10",
+            withIconRight && "pr-10"
           )}
           disabled={disabled}
-          data-testid={dataTestId || `input-${variant}-${size}`}
+          data-testid={dataTestId || `input-${inputVariant}-${size}`}
           {...rest}
         />
         {withIconRight && (
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none">
             {withIconRight}
           </span>
         )}
       </div>
       {error && (
-        <div className={getClasses('error-message', variant, size, state)}>
+        <div className="text-sm text-red-600 mt-1">
           {error}
         </div>
       )}

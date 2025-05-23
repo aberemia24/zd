@@ -27,7 +27,7 @@ export interface ValidatedSubmitButtonProps extends Omit<ButtonProps, 'variant'>
 
 /**
  * Buton specializat pentru formulare, cu stare validată
- * Schimbă automat varianta și efectele vizuale în funcție de validitatea formularului
+ * Schimbă automat varianta în funcție de validitatea formularului
  * 
  * @param props - Proprietățile butonului
  * @returns Un buton adaptat pentru submit cu stare validată
@@ -44,12 +44,9 @@ const ValidatedSubmitButton: React.FC<ValidatedSubmitButtonProps> = ({
   return (
     <Button
       type="submit"
-      variant={isFormValid ? 'success' : 'primary'} 
+      variant={isFormValid ? 'primary' : 'secondary'}
       disabled={!isFormValid || isLoading || disabled}
       isLoading={Boolean(isLoading)}
-      withShadow={Boolean(isFormValid)}
-      withGradient={Boolean(isFormValid)}
-      withTranslate={Boolean(isFormValid)}
       {...rest}
     >
       {isLoading ? loadingText : (submitText || children)}
