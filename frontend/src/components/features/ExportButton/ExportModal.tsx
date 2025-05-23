@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Button from '../../primitives/Button/Button';
 import Input from '../../primitives/Input/Input';
 import Select from '../../primitives/Select/Select';
-import { useThemeEffects } from '../../../hooks/useThemeEffects';
+import { cn } from '../../../styles/new/shared/utils';import { modal } from '../../../styles/new/components/layout';
 import type { ExportFormat } from '../../../utils/ExportManager';
 import { BUTTONS } from '@shared-constants/ui';
 import { EXPORT_MESSAGES } from '@shared-constants/messages';
@@ -50,6 +50,7 @@ const EXPORT_FORMATS: Array<{ value: ExportFormat; label: string; description: s
 /**
  * Modal pentru configurarea opțiunilor de export
  * Permite selecția formatului și configurarea parametrilor
+ * Migrated la CVA styling system pentru consistență
  */
 export const ExportModal: React.FC<ExportModalProps> = ({
   isOpen,
@@ -63,8 +64,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const [title, setTitle] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-
-  const { getClasses } = useThemeEffects();
 
   // Închide modalul la apăsarea pe overlay
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -101,18 +100,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   // Returnează null dacă modalul nu este deschis
   if (!isOpen) return null;
 
-  const overlayClasses = getClasses('modal-overlay');
-  const modalClasses = getClasses('modal');
-  const progressClasses = getClasses('progress-bar');
-  const progressBarClasses = getClasses('progress-fill');
-
   return (
-    <div 
-      className={`${overlayClasses} fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50`}
-      onClick={handleOverlayClick}
-      data-testid="export-modal-overlay"
-    >
-      <div className={`${modalClasses} bg-white rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg`} data-testid="export-modal">
+        <div       className={cn(        modal({ overlay: 'default' }),        'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'      )}      onClick={handleOverlayClick}      data-testid="export-modal-overlay"    >      <div         className={cn(          'bg-white rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg',          'transform transition-all duration-300 ease-out'        )}         data-testid="export-modal"      >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -120,7 +109,12 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className={cn(
+              'text-gray-400 hover:text-gray-600',
+              'transition-colors duration-150',
+              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1',
+              'rounded-md p-1'
+            )}
             data-testid="export-modal-close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,11 +129,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             <p className="text-sm text-gray-600 mb-2">
               {exportState.status || EXPORT_MESSAGES.IN_PROGRES.replace('{progress}', exportState.progress.toString())}
             </p>
-            <div className={`${progressClasses} w-full bg-gray-200 rounded-full h-2 mb-4 shadow-sm`}>
-              <div 
-                className={`${progressBarClasses} bg-blue-600 h-2 rounded-full transition-all duration-300 bg-gradient-to-r from-blue-500 to-blue-600`}
-                style={{ width: `${exportState.progress}%` }}
-              />
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4 shadow-sm">              <div                 className="bg-primary-500 h-2 rounded-full transition-all duration-300"                style={{ width: `${exportState.progress}%` }}              />
             </div>
             <p className="text-xs text-gray-500 mt-1">
               {exportState.progress}% complet
@@ -232,8 +222,8 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           </div>
 
           {/* Info despre tranzacțiile care vor fi exportate */}
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-            <p className="text-sm text-blue-800">
+          <div className="bg-primary-50 border border-primary-200 rounded-md p-3">
+            <p className="text-sm text-primary-800">
               Se vor exporta {transactionCount} tranzacții
             </p>
           </div>
@@ -266,7 +256,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             size="md"
             disabled={exportState.isExporting || transactionCount === 0}
             className="flex-1"
-            withShadow
             dataTestId="export-modal-confirm"
           >
             {exportState.isExporting ? 'Se exportă...' : BUTTONS.EXPORT}

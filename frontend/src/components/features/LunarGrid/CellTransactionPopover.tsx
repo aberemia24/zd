@@ -5,7 +5,10 @@ import Select from '../../primitives/Select/Select';
 import Button from '../../primitives/Button/Button';
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from '@shared-constants';
 import { FrequencyType } from '@shared-constants/enums';
-import { useThemeEffects } from '../../../hooks';
+import { cn } from '../../../styles/new/shared/utils';
+import { card } from '../../../styles/new/components/layout';
+import { formGroup } from '../../../styles/new/components/feedback';
+import { flex as flexContainer } from '../../../styles/new/components/layout';
 
 interface CellTransactionPopoverProps {
   initialAmount: string;
@@ -41,15 +44,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
   const [recurring, setRecurring] = React.useState(false);
   const [frequency, setFrequency] = React.useState<FrequencyType | ''>('');
   const [description, setDescription] = React.useState('');
-  const [activatedField, setActivatedField] = React.useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withFadeIn: true,
-    withShadow: true,
-    withTransition: true
-  });
 
   // Handler pentru salvare - definit înainte de a fi folosit în useEffect
   const handleSave = useCallback(() => {
@@ -84,106 +79,95 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onCancel, handleSave]);
 
-  // Handleri pentru efecte de focus/blur
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setActivatedField(e.target.id);
-  };
-
-  const handleBlur = () => {
-    setActivatedField(null);
-  };
-
   return (
     <div 
-      className={getClasses('card-section', 'secondary', 'sm', 'active')} 
+      className={cn(card({ variant: 'elevated', size: 'sm' }), 'animate-fadeIn transition-all duration-150')} 
       data-testid="cell-transaction-popover"
     >
-      <div className={getClasses('flex-group', 'between', 'sm')}>
-        <label htmlFor="amount-input" className={getClasses('form-label', 'secondary', 'sm')}>{LABELS.AMOUNT}*</label>
-      </div>
-      <Input
-        id="amount-input"
-        name="amount"
-        type="number"
-        value={amount}
-        onChange={e => setAmount(e.target.value)}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder={PLACEHOLDERS.AMOUNT}
-        data-testid="cell-amount-input"
-        min={0.01}
-        step="0.01"
-        maxLength={12}
-        autoFocus
-        ref={inputRef}
-        withGlowFocus={activatedField === 'amount-input'}
-        withTransition
-      />
-      <div className={getClasses('flex-group', 'between', 'sm')}>
-        <label htmlFor="description-input" className={getClasses('form-label', 'secondary', 'sm')}>{LABELS.DESCRIPTION}</label>
-      </div>
-      <Input
-        id="description-input"
-        name="description"
-        type="text"
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        placeholder={PLACEHOLDERS.DESCRIPTION}
-        data-testid="cell-description-input"
-        maxLength={100} 
-        withGlowFocus={activatedField === 'description-input'}
-        withTransition
-      />
-      <div className={getClasses('spacing', 'section', 'sm')}>
-      <Checkbox
-        name="recurring"
-        checked={recurring}
-        onChange={e => setRecurring(e.target.checked)}
-        label={LABELS.RECURRING}
-        data-testid="cell-recurring-checkbox"
-          withBorderAnimation
-          withScaleEffect
-      />
-      </div>
-      {recurring && (
-        <Select
-          name="frequency"
-          value={frequency}
-          onChange={e => setFrequency(e.target.value as FrequencyType)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          options={OPTIONS.FREQUENCY}
-          placeholder={PLACEHOLDERS.SELECT}
-          data-testid="cell-frequency-select"
-          withGlowFocus
-          withHoverEffect
-          withTransition
-          className={activatedField === 'frequency' ? getClasses('input', 'primary', undefined, 'focus') : ''}
+      <div className={cn(formGroup({ variant: 'default' }), 'space-y-4')}>
+        <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center' }))}>
+          <label htmlFor="amount-input" className="text-sm font-medium text-gray-700">
+            {LABELS.AMOUNT}*
+          </label>
+        </div>
+        <Input
+          id="amount-input"
+          name="amount"
+          type="number"
+          value={amount}
+          onChange={e => setAmount(e.target.value)}
+          placeholder={PLACEHOLDERS.AMOUNT}
+          data-testid="cell-amount-input"
+          min={0.01}
+          step="0.01"
+          maxLength={12}
+          autoFocus
+          ref={inputRef}
+          variant="default"
+          size="md"
         />
-      )}
-      <div className={getClasses('flex-group', 'between', 'md')}>
-        <Button
-          type="button"
-          variant="primary"
-          size="sm"
-          onClick={handleSave}
-          data-testid="cell-save-btn"
-          withShadow
-        >
-          {BUTTONS.ADD}
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={onCancel}
-          data-testid="cell-cancel-btn"
-          withShadow
-        >
-          {BUTTONS.CANCEL}
-        </Button>
+        
+        <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center' }))}>
+          <label htmlFor="description-input" className="text-sm font-medium text-gray-700">
+            {LABELS.DESCRIPTION}
+          </label>
+        </div>
+        <Input
+          id="description-input"
+          name="description"
+          type="text"
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          placeholder={PLACEHOLDERS.DESCRIPTION}
+          data-testid="cell-description-input"
+          maxLength={100} 
+          variant="default"
+          size="md"
+        />
+        
+        <Checkbox
+          name="recurring"
+          checked={recurring}
+          onChange={e => setRecurring(e.target.checked)}
+          label={LABELS.RECURRING}
+          data-testid="cell-recurring-checkbox"
+          variant="default"
+          size="md"
+        />
+        
+        {recurring && (
+          <Select
+            name="frequency"
+            value={frequency}
+            onChange={e => setFrequency(e.target.value as FrequencyType)}
+            options={OPTIONS.FREQUENCY}
+            placeholder={PLACEHOLDERS.SELECT}
+            data-testid="cell-frequency-select"
+            variant="default"
+            size="md"
+          />
+        )}
+        
+        <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center', gap: 'md' }))}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            data-testid="cell-save-btn"
+          >
+            {BUTTONS.ADD}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={onCancel}
+            data-testid="cell-cancel-btn"
+          >
+            {BUTTONS.CANCEL}
+          </Button>
+        </div>
       </div>
     </div>
   );

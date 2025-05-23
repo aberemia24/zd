@@ -10,7 +10,7 @@ import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { useThemeEffects } from '../../../hooks';
+import { cn } from '../../../styles/new/shared/utils';import { formGroup } from '../../../styles/new/components/feedback';import { flex as flexContainer } from '../../../styles/new/components/layout';
 
 /**
  * Returnează un mesaj bazat pe o cheie, suportând și acces la proprietăți imbricate.
@@ -67,6 +67,7 @@ interface TransactionFormProps {
   onSave?: (form: TransactionFormData) => void;
   onCancel?: () => void;
 }
+
 const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) => {
   // TOATE HOOK-URILE TREBUIE SĂ FIE ÎNAINTE DE EARLY RETURNS
   
@@ -75,15 +76,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
   
   // Preluare categorii fuzionate din categoryStore (personalizate + predefinite)
   const categories = useCategoryStore(state => state.categories);
-  
-  // Definiție pentru starea formularului - dacă utilizatorul editează activ un câmp
-  const [activatedField, setActivatedField] = React.useState<string | null>(null);
-  
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withShadow: true,
-    withFadeIn: true
-  });
 
   // Destructuram store data safe
   const { form, error, success, loading, setField, handleSubmit, resetForm } = storeData || {};
@@ -161,16 +153,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     }));
   }, [form, categories]);
 
-  // Handler pentru focus - marchează câmpul drept activat pentru efecte vizuale
-  const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setActivatedField(e.target.name);
-  }, []);
-  
-  // Handler pentru blur - resetează starea de activare
-  const handleBlur = useCallback(() => {
-    setActivatedField(null);
-  }, []);
-
   // Verificare defensivă pentru store data DUPĂ toate hook-urile
   if (!storeData) {
     return (
@@ -195,120 +177,109 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     <form
       aria-label={LABELS.FORM}
       onSubmit={onSubmit}
-      className={getClasses('form-container', undefined, undefined, undefined)}
+      className={cn(formGroup({ variant: 'default' }), 'space-y-6')}
       data-testid="transaction-form"
     >
       {/* Bara de titlu cu efect de gradient */}
-      <div className={getClasses('flex-group', 'between', 'md')}>
-        <h3 className={getClasses('form-label', 'secondary', 'md')}>{form.type ? 
-          `Adaugă ${form.type === TransactionType.INCOME ? 'venit' : 'cheltuială'}` : 
-          'Adaugă tranzacție'}
+      <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center' }))}>
+        <h3 className="text-lg font-medium text-gray-900">
+          {form.type ? 
+            `Adaugă ${form.type === TransactionType.INCOME ? 'venit' : 'cheltuială'}` : 
+            'Adaugă tranzacție'}
         </h3>
         {/* Indicator status formular */}
         {loading && (
-          <Badge variant="warning" withPulse pill>
+          <Badge variant="warning" size="sm">
             Se procesează...
           </Badge>
         )}
       </div>
       
       {/* Secțiunea de selectare tip tranzacție cu stiluri rafinate */}
-      <div className={getClasses('flex-group', 'start', 'md')}>
+      <div className="space-y-4">
         <Select
           name="type"
           label={LABELS.TYPE + '*:'}
           value={form.type}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.TYPE}
           options={OPTIONS.TYPE}
           placeholder={PLACEHOLDERS.SELECT}
-          data-testid="type-select"
-          withGlowFocus
-          withHoverEffect
-          withTransition
-          className={activatedField === 'type' ? getClasses('input', 'primary', undefined, 'focus') : ''}
+          dataTestId="type-select"
+          variant="default"
+          size="md"
         />
       </div>
       
       {/* Rândul principal de câmpuri cu aranjament grid și stiluri rafinate */}
-      <div className={getClasses('grid')}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Input
           name="amount"
           type="number"
           label={LABELS.AMOUNT + '*:'}
           value={form.amount}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.AMOUNT}
           error={typeof error === 'object' && error ? (error as Record<string, string>).amount : undefined}
-          data-testid="amount-input"
-          withFloatingLabel
-          withGlowFocus={activatedField === 'amount'}
-          withTransition
+          dataTestId="amount-input"
+          variant="default"
+          size="md"
         />
+        
         <Select
           name="category"
           label={LABELS.CATEGORY + '*:'}
           value={form.category}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.CATEGORY}
           options={optiuniCategorie}
           disabled={!form.type || optiuniCategorie.length === 0}
           placeholder={PLACEHOLDERS.SELECT}
-          data-testid="category-select"
-          withGlowFocus
-          withHoverEffect
-          withTransition
-          className={activatedField === 'category' ? getClasses('input', 'primary', undefined, 'focus') : ''}
+          dataTestId="category-select"
+          variant="default"
+          size="md"
         />
+        
         <Select
           name="subcategory"
           label={LABELS.SUBCATEGORY}
           value={form.subcategory}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.SUBCATEGORY}
           options={optiuniSubcategorie}
           disabled={!form.category || optiuniSubcategorie.length === 0}
           placeholder={PLACEHOLDERS.SELECT}
-          data-testid="subcategory-select"
-          withGlowFocus
-          withHoverEffect
-          withTransition
-          className={activatedField === 'subcategory' ? getClasses('input', 'primary', undefined, 'focus') : ''}
+          dataTestId="subcategory-select"
+          variant="default"
+          size="md"
         />
+        
         <Input
           name="date"
           type="date"
           label={LABELS.DATE + '*:'}
           value={form.date}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.DATE}
           error={typeof error === 'object' && error ? (error as Record<string, string>).date : undefined}
-          data-testid="date-input"
-          withGlowFocus={activatedField === 'date'}
+          dataTestId="date-input"
+          variant="default"
+          size="md"
         />
-        <div className={getClasses('flex-group', 'start', 'md')}> 
+        
+        <div className="flex items-center gap-3">
           <Checkbox
             name="recurring"
             label={LABELS.RECURRING + '?'}
             checked={form.recurring}
             onChange={handleChange}
-            data-testid="recurring-checkbox"
-            withBorderAnimation
-            withScaleEffect
+            dataTestId="recurring-checkbox"
+            variant="default"
+            size="md"
           />
           
           {form.recurring && (
-            <Badge variant="primary" withPulse pill>
+            <Badge variant="primary" size="sm">
               Recurent
             </Badge>
           )}
@@ -319,40 +290,34 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
           label={LABELS.FREQUENCY}
           value={form.frequency}
           onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           aria-label={LABELS.FREQUENCY}
           options={OPTIONS.FREQUENCY}
           disabled={!form.recurring}
           placeholder={PLACEHOLDERS.SELECT}
-          data-testid="frequency-select"
-          withGlowFocus
-          withHoverEffect
-          withTransition
-          className={activatedField === 'frequency' ? getClasses('input', 'primary', undefined, 'focus') : ''}
+          dataTestId="frequency-select"
+          variant="default"
+          size="md"
         />
         
         {/* Adăugăm câmp pentru descriere */}
-        <Input
-          name="description"
-          type="text"
-          label={LABELS.DESCRIPTION}
-          value={form.description || ''}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          aria-label={LABELS.DESCRIPTION}
-          placeholder={PLACEHOLDERS.DESCRIPTION}
-          data-testid="description-input"
-          withFloatingLabel
-          withGlowFocus={activatedField === 'description'}
-          withTransition
-          className="col-span-full"
-        />
+        <div className="col-span-full">
+          <Input
+            name="description"
+            type="text"
+            label={LABELS.DESCRIPTION}
+            value={form.description || ''}
+            onChange={handleChange}
+            aria-label={LABELS.DESCRIPTION}
+            placeholder={PLACEHOLDERS.DESCRIPTION}
+            dataTestId="description-input"
+            variant="default"
+            size="md"
+          />
+        </div>
       </div>
       
       {/* Butoane de acțiune cu efecte vizuale moderne */}
-      <div className={getClasses('flex-group', 'between', 'md')}>
+      <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center' }))}>
         {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
         {(() => {
           // Asigurăm validarea strictă a formularului și conversia la boolean
@@ -364,34 +329,27 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
             (!form.recurring || (form.recurring && form.frequency))
           );
           
-          // Aplicăm efecte vizuale diferite în funcție de starea formularului
-          
-          // Buton cu stil subtil când e inactiv (ghost) și vizibil când e valid (success)
           return (
             <ValidatedSubmitButton
               isFormValid={isFormValid}
               size="md"
               isLoading={Boolean(loading)}
-              data-testid="add-transaction-button"
+              dataTestId="add-transaction-button"
               aria-label={BUTTONS.ADD}
               submitText={BUTTONS.ADD}
-            >
-              {isFormValid && (
-                <span className={getClasses('indicator', 'primary', 'md', 'active')}></span>
-              )}
-            </ValidatedSubmitButton>
+            />
           );
         })()}
+        
         <Button
           type="button"
           variant="secondary"
           size="md"
-          data-testid="cancel-btn"
+          dataTestId="cancel-btn"
           onClick={() => {
             resetForm();
             onCancel?.();
           }}
-          withShadow
         >
           {BUTTONS.CANCEL}
         </Button>
@@ -402,12 +360,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         <Alert
           type="error" 
           message={safeMessage(error)}
-          data-testid="error-message"
-          className={getClasses('spacing', 'section')}
-          withFadeIn
-          withAccentBorder
-          withShadow
-          withIcon
+          dataTestId="error-message"
+          size="md"
         />
       )}
       
@@ -415,12 +369,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
         <Alert
           type="success" 
           message={safeMessage(success)}
-          data-testid="success-message"
-          className={getClasses('spacing', 'section')}
-          withFadeIn
-          withAccentBorder
-          withShadow
-          withIcon
+          dataTestId="success-message"
+          size="md"
         />
       )}
     </form>

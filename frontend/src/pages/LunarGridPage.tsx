@@ -9,12 +9,15 @@ import { useCategoryStore } from '../stores/categoryStore';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMonthlyTransactions } from '../services/hooks/useMonthlyTransactions';
-import { getEnhancedComponentClasses } from '../styles/themeUtils';
+import { cn } from '../styles/new/shared/utils';
+import { container } from '../styles/new/components/layout';
+import { button } from '../styles/new/components/forms';
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar
  * Permite navigarea între luni și vizualizarea tranzacțiilor pe zile/categorii
  * Cu debounce implementat pentru a evita prea multe cereri API la navigare rapidă
+ * Migrated la CVA styling system pentru consistență
  */
 const LunarGridPage: React.FC = () => {
   // Acces la queryClient pentru a gestiona invalidarea cache-ului în mod eficient
@@ -183,9 +186,9 @@ const LunarGridPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 pb-10">
+    <div className={cn(container({ size: 'xl' }), 'pb-10')}>
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 className={getEnhancedComponentClasses('form-label', 'primary', 'xl')}>
+        <h1 className="text-3xl font-bold text-gray-900">
           {TITLES.GRID_LUNAR}
         </h1>
         
@@ -193,7 +196,7 @@ const LunarGridPage: React.FC = () => {
           <select 
             value={month}
             onChange={handleMonthChange}
-            className={getEnhancedComponentClasses('select', 'primary', 'md')}
+            className="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
             data-testid="month-selector"
           >
             {monthOptions}
@@ -205,13 +208,16 @@ const LunarGridPage: React.FC = () => {
             onChange={handleYearChange}
             min="1900"
             max="2100"
-            className={getEnhancedComponentClasses('input', 'primary', 'md', undefined, ['w-24'])}
+            className="form-input w-24 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
             data-testid="year-input"
           />
           
           <button 
             onClick={toggleImplementation}
-            className={getEnhancedComponentClasses('button', 'secondary', 'sm')}
+            className={cn(
+              button({ variant: 'secondary', size: 'sm' }),
+              'whitespace-nowrap'
+            )}
             data-testid="toggle-implementation"
           >
             {useTanStack ? 'Utilizează tabel clasic' : 'Utilizează TanStack Table'}
@@ -223,7 +229,7 @@ const LunarGridPage: React.FC = () => {
       {loading ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full" />
-          <p className="ml-3 text-secondary-700">Se încarcă datele pentru {getMonthName(month)} {year}...</p>
+          <p className="ml-3 text-gray-700">Se încarcă datele pentru {getMonthName(month)} {year}...</p>
         </div>
       ) : (
         <>

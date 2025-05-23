@@ -1,11 +1,18 @@
 import React, { useMemo, useCallback } from 'react';
 import { TanStackSubcategoryRowsProps } from './types';
 import { TransactionType } from '@shared-constants/enums';
+import { cn } from '../../../styles/new/shared/utils';
+import { 
+  tableRow, 
+  tableCell 
+} from '../../../styles/new/data';
+import { button } from '../../../styles/new/components/forms';
 
 /**
  * Componentă pentru afișarea rândurilor de subcategorii în cadrul grilei TanStack Table
  * Această componentă este optimizată pentru re-render-uri independente de categoria părinte
  * Folosește memoizare pentru a preveni re-renderări inutile
+ * Migrated la CVA styling system pentru consistență
  */
 const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
   categoryKey,
@@ -37,35 +44,55 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
         return (
           <tr 
             key={`${categoryKey}-${subcategory.name}`}
-            className="hover:bg-gray-50"
+            className={cn(
+              tableRow({ variant: 'hoverable' }),
+              'group transition-colors duration-150'
+            )}
             data-testid={`subcat-row-${categoryKey}-${subcategory.name}`}
           >
             {/* Prima celulă: numele subcategoriei */}
             <td 
-              className="sticky left-0 bg-white z-10 pl-8 py-2 flex justify-between items-center"
+              className={cn(
+                tableCell({ variant: 'default' }),
+                'sticky left-0 bg-white z-10 pl-8',
+                'flex justify-between items-center'
+              )}
               data-testid={`subcategory-${categoryKey}-${subcategory.name}`}
             >
-              <div className="flex items-center">
-                <span>{subcategory.name}</span>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-700">{subcategory.name}</span>
                 {isCustom && (
-                  <span className="ml-2 text-xs text-teal-600 bg-teal-100 py-0.5 px-1.5 rounded">
+                  <span className={cn(
+                    'inline-flex items-center rounded-full px-2 py-0.5',
+                    'text-xs font-medium',
+                    'bg-emerald-100 text-emerald-700'
+                  )}>
                     custom
                   </span>
                 )}
               </div>
               
               {/* Butoane acțiuni pentru subcategorii (doar afișate la hover) */}
-              <div className="hidden group-hover:flex space-x-1">
+              <div className={cn(
+                'flex items-center space-x-1 opacity-0',
+                'group-hover:opacity-100 transition-opacity duration-150'
+              )}>
                 {handleEditSubcategory && (
                   <button 
                     onClick={() => handleEditSubcategory(categoryKey, subcategory.name)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className={cn(
+                      'inline-flex items-center justify-center',
+                      'w-6 h-6 rounded-md',
+                      'text-gray-400 hover:text-gray-600',
+                      'hover:bg-gray-100 transition-colors duration-150',
+                      'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1'
+                    )}
                     data-testid={`edit-subcategory-${categoryKey}-${subcategory.name}`}
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      width="16" 
-                      height="16" 
+                      width="14" 
+                      height="14" 
                       viewBox="0 0 24 24" 
                       fill="none" 
                       stroke="currentColor" 
@@ -82,13 +109,19 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
                 {isCustom && handleDeleteSubcategory && (
                   <button 
                     onClick={() => handleDeleteSubcategory(categoryKey, subcategory.name)}
-                    className="text-gray-500 hover:text-red-600"
+                    className={cn(
+                      'inline-flex items-center justify-center',
+                      'w-6 h-6 rounded-md',
+                      'text-gray-400 hover:text-red-600',
+                      'hover:bg-red-50 transition-colors duration-150',
+                      'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1'
+                    )}
                     data-testid={`delete-subcategory-${categoryKey}-${subcategory.name}`}
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      width="16" 
-                      height="16" 
+                      width="14" 
+                      height="14" 
                       viewBox="0 0 24 24" 
                       fill="none" 
                       stroke="currentColor" 
@@ -115,7 +148,12 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
               return (
                 <td 
                   key={day} 
-                  className={`px-4 py-2 text-right cursor-pointer ${getBalanceStyle(amount)}`}
+                  className={cn(
+                    tableCell({ variant: 'clickable' }),
+                    'text-right cursor-pointer',
+                    getBalanceStyle(amount),
+                    'transition-colors duration-150'
+                  )}
                   onClick={(e) => handleCellClick(
                     e, 
                     categoryKey, 

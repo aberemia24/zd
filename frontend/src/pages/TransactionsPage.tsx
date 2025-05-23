@@ -2,19 +2,17 @@ import React, { useMemo, useCallback, useEffect } from 'react';
 import TransactionForm from '../components/features/TransactionForm/TransactionForm';
 import TransactionTable from '../components/features/TransactionTable/TransactionTable';
 import TransactionFilters from '../components/features/TransactionFilters/TransactionFilters';
-import { ExportButton } from '../components/features/ExportButton';
+import { ExportButton } from '../components/features/ExportButton/ExportButton';
+import Alert from '../components/primitives/Alert/Alert';
+import { useQueryClient } from '@tanstack/react-query';
+import { TransactionType, CategoryType } from '@shared-constants';
+import { useFilteredTransactions } from '../services/hooks/useFilteredTransactions';
 import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
 import { useAuthStore } from '../stores/authStore';
-import { useFilteredTransactions } from '../services/hooks/useFilteredTransactions';
-import { useQueryClient } from '@tanstack/react-query';
-import { TITLES, TransactionType, CategoryType } from '@shared-constants';
+import { cn } from '../styles/new/shared/utils';
+import { card, container as pageContainer } from '../styles/new/components/layout';
 import { PAGINATION } from '@shared-constants';
-import Alert from '../components/primitives/Alert/Alert';
-import { getEnhancedComponentClasses } from '../styles/themeUtils';
-import { useURLFilters } from '../hooks/useURLFilters';
-// Import-urile pentru categorii nu mai sunt necesare deoarece inițializarea se face în App.tsx
-// import { useCategoryStore } from '../stores/categoryStore';
-// import { CATEGORIES } from '@shared-constants/categories';
+import { TITLES } from '@shared-constants';
 import type { Transaction } from '../types/Transaction';
 
 /**
@@ -23,10 +21,7 @@ import type { Transaction } from '../types/Transaction';
  * Refactorizat pentru React Query (TanStack Query) cu optimizări de performanță și persistență URL
  */
 const TransactionsPage: React.FC = () => {
-  // Initialize URL filters hook for URL persistence
-  const { getCurrentURL, clearFiltersAndURL } = useURLFilters();
-  
-  // Get filter values directly from store (synchronized with URL)
+  // Destructurarea store-ului pentru filtre cu logica completă de state management
   const {
     filterType,
     filterCategory,
@@ -151,24 +146,29 @@ const TransactionsPage: React.FC = () => {
     setFilterSubcategory(newSubcategory);
   }, [setFilterSubcategory]);
 
-  // Wrapper pentru TransactionTable - log pentru clasa generată
-  const tableWrapperClass = getEnhancedComponentClasses('flex', undefined, 'lg', undefined, ['flex-col']);
-
   return (
-    <div className={getEnhancedComponentClasses('container', 'primary', 'lg', undefined, ['fade-in', 'page-wrapper'])}>
+    <div className={cn(pageContainer({ size: 'lg' }), 'space-y-6')}>
       {/* Titlu pagină cu efect de gradient subtil */}
       <h1 
-        className={getEnhancedComponentClasses('form-label', 'primary', 'xl', undefined, ['gradient-text-subtle', 'mb-token'])}
+        className="text-3xl font-bold text-gray-900 mb-6"
         data-testid="transactions-title"
       >
         {TITLES.TRANZACTII}
       </h1>
 
-      {/* Afișăm alerte pentru erori de fetch */}      {fetchError && (        <Alert           type="error"           title="Eroare la încărcarea tranzacțiilor"          message={fetchError.message}        />      )}
+      {/* Afișăm alerte pentru erori de fetch */}
+      {fetchError && (
+        <Alert 
+          type="error" 
+          title="Eroare la încărcarea tranzacțiilor" 
+          message={fetchError.message}
+          size="md"
+        />
+      )}
 
       {/* Formularul pentru adăugarea tranzacțiilor */}
       <div 
-        className={getEnhancedComponentClasses('card', 'secondary', 'md', undefined, ['mb-token-large'])}
+        className={cn(card({ variant: 'elevated', size: 'md' }))}
         data-testid="transaction-form-container"
       >
         <TransactionForm />
@@ -176,7 +176,7 @@ const TransactionsPage: React.FC = () => {
 
       {/* Filtrele pentru tranzacții cu state-ul din Zustand store */}
       <div 
-        className={getEnhancedComponentClasses('card', 'default', 'md', undefined, ['mb-token'])}
+        className={cn(card({ variant: 'default', size: 'md' }))}
         data-testid="transaction-filters-container"
       >
         <TransactionFilters
@@ -201,7 +201,7 @@ const TransactionsPage: React.FC = () => {
 
       {/* Export Button */}
       <div 
-        className={getEnhancedComponentClasses('card', 'default', 'md', undefined, ['mb-token'])}
+        className={cn(card({ variant: 'default', size: 'md' }))}
         data-testid="export-button-container"
       >
         <ExportButton 
@@ -212,7 +212,7 @@ const TransactionsPage: React.FC = () => {
 
       {/* Tabelul cu tranzacții */}
       <div 
-        className={tableWrapperClass}
+        className="flex flex-col space-y-4"
         data-testid="transaction-table-container"
       >
         <TransactionTable 

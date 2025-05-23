@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/authStore';
 import toast from 'react-hot-toast';
 import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
-import { useThemeEffects } from '../../../hooks';
+import { cn } from '../../../styles/new/shared/utils';
+import { card } from '../../../styles/new/components/layout';
+import { button } from '../../../styles/new/components/forms';
 import Input from '../../primitives/Input/Input';
 import { ValidatedSubmitButton } from '../../primitives/Button';
 import Alert from '../../primitives/Alert/Alert';
@@ -14,14 +16,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error, errorType } = useAuthStore();
-  const [activatedField, setActivatedField] = useState<string | null>(null);
-  
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withFadeIn: true,
-    withShadow: true,
-    withGradient: true
-  });
   
   // Funcție pentru validarea formatului de email
   const isValidEmail = (email: string): boolean => {
@@ -31,15 +25,6 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
   // Verifică dacă formularul este valid (email corect și parolă introdusă)
   const isFormValid = isValidEmail(email) && password.length >= 6;
-
-  // Handleri pentru efecte de focus/blur
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setActivatedField(e.target.id);
-  };
-
-  const handleBlur = () => {
-    setActivatedField(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,15 +67,18 @@ const LoginForm: React.FC<LoginFormProps> = () => {
 
   return (
     <form 
-      className={getClasses('form-container', 'primary', 'md')}
+      className={cn(
+        card({ variant: 'elevated', size: 'md' }),
+        'w-full max-w-md mx-auto'
+      )}
       onSubmit={handleSubmit} 
       data-testid="login-form"
     >
-      <div className={getClasses('card-header', 'default')}>
-        <h2 className={getClasses('form-label', 'primary', 'xl')}>Autentificare</h2>
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900">Autentificare</h2>
       </div>
       
-      <div className={getClasses('card-body')}>
+      <div className="p-6 space-y-4">
         {/* Email Input */}
         <Input
           id="email"
@@ -98,12 +86,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           label={`${LABELS.EMAIL}*`}
           value={email}
           onChange={e => setEmail(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           required
-          data-testid="login-email"
-          withGlowFocus={activatedField === 'email'}
-          withTransition
+          variant={error ? 'error' : 'default'}
+          dataTestId="login-email"
         />
         
         {/* Password Input */}
@@ -113,12 +98,9 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           label={`${LABELS.PAROLA}*`}
           value={password}
           onChange={e => setPassword(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           required
-          data-testid="login-password"
-          withGlowFocus={activatedField === 'password'}
-          withTransition
+          variant={error ? 'error' : 'default'}
+          dataTestId="login-password"
         />
         
         {/* Error Message */}
@@ -126,10 +108,8 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           <Alert
             type="error"
             message={getErrorMessage() || ''}
-            data-testid="login-error"
-            withIcon
-            withFadeIn
-            withAccentBorder
+            size="md"
+            dataTestId="login-error"
           />
         )}
         
@@ -138,16 +118,19 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           isFormValid={isFormValid}
           size="md"
           isLoading={loading}
-          data-testid="login-submit"
-          className={getClasses('flex')}
+          dataTestId="login-submit"
+          className="w-full"
           submitText={BUTTONS.LOGIN}
         />
         
         {/* Register Link */}
-        <div className={getClasses('flex')}>
+        <div className="text-center">
           <Link 
             to="/register" 
-            className={getClasses('button', 'link', 'sm')}
+            className={cn(
+              button({ variant: 'ghost', size: 'sm' }),
+              'text-blue-600 hover:text-blue-700'
+            )}
             data-testid="switch-to-register"
           >
             Nu ai cont? Crează unul!

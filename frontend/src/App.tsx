@@ -11,7 +11,8 @@ import { Toaster } from 'react-hot-toast';
 import Spinner from './components/primitives/Spinner';
 import NavLink from './components/primitives/NavLink';
 import { TITLES } from '@shared-constants';
-import { getEnhancedComponentClasses } from './styles/themeUtils';
+import { cn } from './styles/new/shared/utils';
+import { container, flex } from './styles/new/components/layout';
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from './stores/authStore';
@@ -21,6 +22,7 @@ import { CATEGORIES } from '@shared-constants/categories';
 
 /**
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
+ * Migrated la CVA styling system pentru consistență
  * 
  * Structura:
  * 
@@ -79,9 +81,7 @@ export const App: React.FC = () => {
   // Afișează spinner în timpul încărcării stării de autentificare
   if (loading) {
     return (
-      <div className={getEnhancedComponentClasses('container', 'primary', undefined, 'loading', ['centered', 'fixed'])}>
-        <Spinner sizeVariant="xl" />
-      </div>
+            <div className={cn(        container({ size: 'lg' }),        'min-h-screen flex items-center justify-center'      )}>        <Spinner size="xl" />      </div>
     );
   }
 
@@ -92,9 +92,12 @@ export const App: React.FC = () => {
   return (
     <>
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className={getEnhancedComponentClasses('container', 'primary', 'lg')}>
+      <div className={container({ size: 'lg' })}>
         {user && ( /* Afișează navigarea doar dacă utilizatorul este logat */ 
-          <div className={getEnhancedComponentClasses('navbar-container', 'primary') + ' mb-6'}>
+          <div className={cn(
+            flex({ direction: 'row', gap: 'lg', justify: 'start' }),
+            'border-b border-gray-200 mb-6 pb-4'
+          )}>
             <NavLink to="/transactions" testId="transactions-tab">
               {TITLES.TRANZACTII}
             </NavLink>

@@ -5,7 +5,7 @@ import { button, type ButtonProps as CVAButtonProps } from '../../../styles/new/
 
 /**
  * Componentă primitivă pentru linkuri de navigare
- * Folosește exclusiv hook-ul useThemeEffects pentru stilizare consistentă
+ * Folosește CVA styling system pentru stilizare consistentă
  * Respectă sursa unică de adevăr pentru stiluri, fără clase hardcodate
  */
 interface NavLinkProps extends Omit<CVAButtonProps, 'fullWidth'> {

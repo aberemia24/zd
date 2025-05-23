@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 // Import hook-uri specializate
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 import { useCreateTransaction } from '../../../services/hooks/transactionMutations';
-import { useThemeEffects } from '../../../hooks';
+import { cn } from '../../../styles/new/shared/utils';
 import Button from '../../primitives/Button/Button';
 import Badge from '../../primitives/Badge/Badge';
 
@@ -114,12 +114,7 @@ export const LunarGrid: React.FC<LunarGridProps> = ({ year, month }) => {
   // Hook pentru crearea tranzacțiilor
   const createTransactionMutation = useCreateTransaction();
 
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withFadeIn: true,
-    withShadow: true,
-    withTransition: true
-  });
+  
 
   // State pentru subcategoria în curs de editare (pentru editare direct din grid)
   const [editingSubcategory, setEditingSubcategory] = React.useState<{ category: string; subcategory: string; mode: 'edit' | 'delete' | 'add' } | null>(null);

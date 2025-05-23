@@ -6,11 +6,13 @@ import Input from '../../primitives/Input/Input';
 import { OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
 import type { TransactionType, CategoryType } from '@shared-constants';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { useThemeEffects } from '../../../hooks';
+
 import { BUTTONS, UI, TABLE, LOADER, INFO } from '@shared-constants/ui';
 import classNames from 'classnames';
 import { useActiveSubcategories } from '../../../services/hooks/useActiveSubcategories';
 import { MESAJE } from '@shared-constants/messages';
+import { cn } from '../../../styles/new/shared/utils';
+import { flex as flexContainer, card } from '../../../styles/new/components/layout';
 
 export interface TransactionFiltersProps {
   type?: TransactionType | '' | string;
@@ -269,17 +271,11 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     onAmountMaxChange(e.target.value);
   }, [onAmountMaxChange]);
 
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withFadeIn: true,
-    withShadow: true,
-    withTransition: true
-  });
-
+  // Utilizăm flexContainer și card în loc de useThemeEffects
   return (
-    <div className={getClasses('flex-group', 'between', 'md')}>
+    <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center', gap: 'md' }))}>
       {/* Bara de filtre compactă, pe o singură linie */}
-      <div className={getClasses('flex-group', 'start', 'md')}>
+      <div className={cn(flexContainer({ direction: 'row', justify: 'start', align: 'center', gap: 'md' }))}>
         {/* Filtru tip tranzacție */}
         <Select
           name="type-filter"
@@ -290,7 +286,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           options={types}
           placeholder={PLACEHOLDERS.SELECT + ' tipul'}
           size="sm"
-          withTransition
         />
         {/* Filtru categorie */}
         <Select
@@ -303,7 +298,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           placeholder={PLACEHOLDERS.SELECT + ' categoria'}
           disabled={!type}
           size="sm"
-          withTransition
         />
         {/* Filtru subcategorie */}
         <Select
@@ -317,11 +311,10 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           disabled={!category || subcategoryOptions.length === 0}
           isLoading={isLoadingSubcategories}
           size="sm"
-          withTransition
         />
       </div>
       {/* Acțiuni și searchbox la finalul barei */}
-      <div className={getClasses('flex-group', 'end', 'md')}>
+      <div className={cn(flexContainer({ direction: 'row', justify: 'end', align: 'center', gap: 'md' }))}>
         {/* Searchbox compact */}
         <Input
           name="search-text-filter"
@@ -331,7 +324,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           onChange={handleSearchChange}
           placeholder={PLACEHOLDERS.SEARCH}
           type="text"
-          withTransition
         />
         {/* Buton reset filtre */}
         {activeFilterCount > 0 && (
@@ -339,20 +331,17 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleResetAll}
-            withShadow
             data-testid="reset-filters-btn"
             aria-label={BUTTONS.RESET_FILTERS}
           >
-            {/* Icon reset dacă există, altfel text scurt */}
             {BUTTONS.RESET_FILTERS}
           </Button>
         )}
-        {/* Buton filtre avansate (icon sau text scurt) */}
+        {/* Buton filtre avansate */}
         <Button
           variant="secondary"
           size="sm"
           onClick={toggleAdvancedFilters}
-          withShadow
           data-testid="toggle-advanced-filters-btn"
           aria-label={showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
         >
@@ -361,7 +350,7 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
       </div>
       {/* Filtre avansate - rămân sub bară, vizibile doar dacă sunt activate */}
       {showAdvancedFilters && (
-        <div className={getClasses('card-section')}>
+        <div className={cn(card({ variant: 'flat', size: 'md' }), 'mt-4')}>
           <Input
             name="date-from-filter"
             label={LABELS.DATE_FROM_FILTER}
@@ -370,7 +359,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             onChange={handleDateFromChange}
             placeholder={PLACEHOLDERS.SELECT + ' data de început'}
             type="date"
-            withTransition
           />
           <Input
             name="date-to-filter"
@@ -380,7 +368,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             onChange={handleDateToChange}
             placeholder={PLACEHOLDERS.SELECT + ' data de sfârșit'}
             type="date"
-            withTransition
           />
           <Input
             name="amount-min-filter"
@@ -390,7 +377,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             onChange={handleAmountMinChange}
             placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
             type="number"
-            withTransition
           />
           <Input
             name="amount-max-filter"
@@ -400,7 +386,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             onChange={handleAmountMaxChange}
             placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
             type="number"
-            withTransition
           />
         </div>
       )}

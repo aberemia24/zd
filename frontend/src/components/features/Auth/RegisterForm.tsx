@@ -4,7 +4,9 @@ import { useAuthStore } from '../../../stores/authStore';
 import type { AuthErrorType } from '../../../services/supabaseAuthService';
 import toast from 'react-hot-toast';
 import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
-import { useThemeEffects } from '../../../hooks';
+import { cn } from '../../../styles/new/shared/utils';
+import { card } from '../../../styles/new/components/layout';
+import { button } from '../../../styles/new/components/forms';
 import Input from '../../primitives/Input/Input';
 import { ValidatedSubmitButton } from '../../primitives/Button';
 import Alert from '../../primitives/Alert/Alert';
@@ -15,14 +17,6 @@ const RegisterForm: React.FC = () => {
   const [confirm, setConfirm] = useState('');
   const { register, loading, error, errorType } = useAuthStore();
   const [success, setSuccess] = useState<string | null>(null);
-  const [activatedField, setActivatedField] = useState<string | null>(null);
-  
-  // Utilizăm hook-ul de efecte pentru gestionarea efectelor vizuale
-  const { getClasses } = useThemeEffects({
-    withFadeIn: true,
-    withShadow: true,
-    withGradient: true
-  });
   
   // Funcție pentru validarea formatului de email
   const isValidEmail = (email: string): boolean => {
@@ -36,15 +30,6 @@ const RegisterForm: React.FC = () => {
   
   // Verifică dacă formularul este valid
   const isFormValid = isValidEmail(email) && isPasswordValid && doPasswordsMatch;
-
-  // Handleri pentru efecte de focus/blur
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    setActivatedField(e.target.id);
-  };
-
-  const handleBlur = () => {
-    setActivatedField(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,15 +74,18 @@ const RegisterForm: React.FC = () => {
 
   return (
     <form 
-      className={getClasses('form-container', 'primary', 'md')}
+      className={cn(
+        card({ variant: 'elevated', size: 'md' }),
+        'w-full max-w-md mx-auto'
+      )}
       onSubmit={handleSubmit} 
       data-testid="register-form"
     >
-      <div className={getClasses('card-header', 'default')}>
-        <h2 className={getClasses('form-label', 'primary', 'xl')}>Înregistrare</h2>
+      <div className="px-6 py-4 border-b border-gray-200">
+        <h2 className="text-xl font-semibold text-gray-900">Înregistrare</h2>
       </div>
       
-      <div className={getClasses('card-body')}>
+      <div className="p-6 space-y-4">
         {/* Email Input */}
         <Input
           id="register-email"
@@ -105,12 +93,9 @@ const RegisterForm: React.FC = () => {
           label={`${LABELS.EMAIL}*`}
           value={email}
           onChange={e => setEmail(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           required
-          data-testid="register-email"
-          withGlowFocus={activatedField === 'register-email'}
-          withTransition
+          variant={error ? 'error' : 'default'}
+          dataTestId="register-email"
         />
         
         {/* Password Input */}
@@ -120,12 +105,9 @@ const RegisterForm: React.FC = () => {
           label={`${LABELS.PAROLA}*`}
           value={password}
           onChange={e => setPassword(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           required
-          data-testid="register-password"
-          withGlowFocus={activatedField === 'register-password'}
-          withTransition
+          variant={password.length > 0 && !isPasswordValid ? 'error' : 'default'}
+          dataTestId="register-password"
         />
         
         {/* Confirm Password Input */}
@@ -135,12 +117,9 @@ const RegisterForm: React.FC = () => {
           label={`${LABELS.CONFIRMA_PAROLA}*`}
           value={confirm}
           onChange={e => setConfirm(e.target.value)}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
           required
-          data-testid="register-confirm"
-          withGlowFocus={activatedField === 'register-confirm'}
-          withTransition
+          variant={confirm.length > 0 && !doPasswordsMatch ? 'error' : 'default'}
+          dataTestId="register-confirm"
         />
         
         {/* Error Message */}
@@ -148,10 +127,8 @@ const RegisterForm: React.FC = () => {
           <Alert
             type="error"
             message={getErrorMessage()}
-            data-testid="register-error"
-            withIcon
-            withFadeIn
-            withAccentBorder
+            size="md"
+            dataTestId="register-error"
           />
         )}
         
@@ -160,10 +137,8 @@ const RegisterForm: React.FC = () => {
           <Alert
             type="success"
             message={success || ''}
-            data-testid="register-success"
-            withIcon
-            withFadeIn
-            withAccentBorder
+            size="md"
+            dataTestId="register-success"
           />
         )}
         
@@ -172,16 +147,19 @@ const RegisterForm: React.FC = () => {
           isFormValid={isFormValid}
           size="md"
           isLoading={loading}
-          data-testid="register-submit"
-          className={getClasses('flex')}
+          dataTestId="register-submit"
+          className="w-full"
           submitText={BUTTONS.REGISTER}
         />
         
         {/* Login Link */}
-        <div className={getClasses('flex')}>
+        <div className="text-center">
           <Link 
             to="/login" 
-            className={getClasses('button', 'link', 'sm')}
+            className={cn(
+              button({ variant: 'ghost', size: 'sm' }),
+              'text-blue-600 hover:text-blue-700'
+            )}
             data-testid="switch-to-login"
           >
             Ai deja cont? Autentifică-te!
