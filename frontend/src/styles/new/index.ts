@@ -16,7 +16,7 @@ export * from './components';
 export * from './grid';
 
 // Data domain (display components, category styling)
-// export * from './data'; // TBD  
+export * from './data';
 
 // Shared utilities (cn function, effects, helpers)
 export * from './shared';
@@ -134,6 +134,55 @@ export {
   type GridActionGroupProps,
   type GridOverlayProps
 } from './grid/grid';
+
+// Data Display & Category Management (20 exports)
+export {
+  tableContainer,
+  dataTable,
+  tableHeader,
+  tableCell,
+  tableRow,
+  tablePagination,
+  tablePageButton,
+  tableSortIcon,
+  categoryContainer,
+  categoryList,
+  categoryItem,
+  categoryHeader,
+  categoryBadge,
+  categoryActionButton,
+  categoryAddForm,
+  categoryDialog,
+  modalContainer,
+  modalHeader,
+  modalTitle,
+  modalCloseButton,
+  modalBody,
+  flexGroup,
+  cardSection,
+  type TableContainerProps,
+  type DataTableProps,
+  type TableHeaderProps,
+  type TableCellProps,
+  type TableRowProps,
+  type TablePageButtonProps,
+  type TableSortIconProps,
+  type CategoryContainerProps,
+  type CategoryListProps,
+  type CategoryItemProps,
+  type CategoryHeaderProps,
+  type CategoryBadgeProps,
+  type CategoryActionButtonProps,
+  type CategoryAddFormProps,
+  type CategoryDialogProps,
+  type ModalContainerProps,
+  type ModalHeaderProps,
+  type ModalTitleProps,
+  type ModalCloseButtonProps,
+  type ModalBodyProps,
+  type FlexGroupProps,
+  type CardSectionProps
+} from './data/display';
 
 // Core utilities
 export { cn } from './shared/utils'; 
