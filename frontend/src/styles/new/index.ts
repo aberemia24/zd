@@ -13,7 +13,7 @@
 export * from './components';
 
 // Grid domain (grid-specific components și effects)
-// export * from './grid'; // TBD
+export * from './grid';
 
 // Data domain (display components, category styling)
 // export * from './data'; // TBD  
@@ -100,6 +100,40 @@ export {
   type BreadcrumbItemProps,
   type PaginationItemProps
 } from './components/layout';
+
+// Grid Excel-like Components (17 exports)
+export {
+  gridContainer,
+  gridTable,
+  gridHeader,
+  gridHeaderCell,
+  gridCategoryRow,
+  gridSubcategoryRow,
+  gridTotalRow,
+  gridCell,
+  gridExpandIcon,
+  gridCellActions,
+  gridActionButton,
+  gridPopover,
+  gridMessage,
+  gridActionGroup,
+  gridOverlay,
+  type GridContainerProps,
+  type GridTableProps,
+  type GridHeaderProps,
+  type GridHeaderCellProps,
+  type GridCategoryRowProps,
+  type GridSubcategoryRowProps,
+  type GridTotalRowProps,
+  type GridCellProps,
+  type GridExpandIconProps,
+  type GridCellActionsProps,
+  type GridActionButtonProps,
+  type GridPopoverProps,
+  type GridMessageProps,
+  type GridActionGroupProps,
+  type GridOverlayProps
+} from './grid/grid';
 
 // Core utilities
 export { cn } from './shared/utils'; 
