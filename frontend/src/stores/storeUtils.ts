@@ -23,12 +23,7 @@ export interface BaseStoreActions {
 /**
  * Pattern standard pentru logging în stores
  */
-export const storeLogger = {
-  info: (storeName: string, action: string, data?: any) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[${storeName}] ${action}`, data);
-    }
-  },
+export const storeLogger = {  info: (storeName: string, action: string, data?: any) => {    if (import.meta.env.NODE_ENV === 'development') {      console.log(`[${storeName}] ${action}`, data);    }  },
   
   error: (storeName: string, action: string, error: any) => {
     console.error(`[${storeName}] Error in ${action}:`, error);
@@ -42,12 +37,7 @@ export const storeLogger = {
 /**
  * Configurare standard pentru devtools
  */
-export const createDevtoolsOptions = (storeName: string): DevtoolsOptions => ({
-  name: storeName,
-  enabled: process.env.NODE_ENV === 'development',
-  serialize: true,
-  anonymousActionType: `${storeName}_action`,
-});
+export const createDevtoolsOptions = (storeName: string): DevtoolsOptions => ({  name: storeName,  enabled: import.meta.env.NODE_ENV === 'development',  serialize: true,  anonymousActionType: `${storeName}_action`,});
 
 /**
  * Creează acțiuni de bază standardizate pentru orice store

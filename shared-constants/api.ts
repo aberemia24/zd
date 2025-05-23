@@ -14,9 +14,9 @@ export const API = {
   TIMEOUT: 10000, // ms
   RETRY_LIMIT: 3,
   
-  // Configurație Supabase (folosită în script-uri și servicii)
+  // Configurație Supabase (configurarea env se face în servicii)
   SUPABASE: {
-    URL: process.env.SUPABASE_URL || 'https://pzyvibdgpfgohvewdmit.supabase.co',
-    ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    URL: 'https://pzyvibdgpfgohvewdmit.supabase.co',
+    // ANON_KEY se va configura în servicii din variabile de mediu
   },
 } as const;

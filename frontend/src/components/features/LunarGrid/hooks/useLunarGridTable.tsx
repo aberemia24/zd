@@ -85,7 +85,7 @@ function buildUniqueSubRows(categoryName: string, subcategories: any[], fallback
 function warnIfDuplicateIds(rows: any[], context: string) {
   const ids = rows.map(r => r.id);
   const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
-  if (duplicates.length > 0 && process.env.NODE_ENV !== 'production') {
+      if (duplicates.length > 0 && import.meta.env.NODE_ENV !== 'production') {
     // eslint-disable-next-line no-console
     console.warn(`[LunarGrid] Chei duplicate detectate în ${context}:`, duplicates);
   }

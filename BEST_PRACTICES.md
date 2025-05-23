@@ -471,7 +471,7 @@ addTransaction({ ... });
 <li data-testid={`transaction-item-${id}`}>...</li>
 ```
 
-- Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, CRACO):
+- Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, Vite):
   - În `tsconfig.json` adaugă la `compilerOptions.paths`:
 
     ```json
@@ -488,13 +488,7 @@ addTransaction({ ... });
     }
     ```
 
-  - În `craco.config.js` (sau echivalent webpack):
-
-    ```js
-    alias: {
-      '@shared-constants': path.resolve(__dirname, '../shared-constants'),
-    }
-    ```
+  - În `vite.config.ts`:      ```typescript      resolve: {        alias: {          '@shared-constants': path.resolve(__dirname, '../shared-constants')        }      }      ```
 
 - Verifică periodic ca toate aceste configurații să fie sincronizate și testele să ruleze fără erori de path mapping.
 - Orice discrepanță între configurări trebuie remediată imediat și documentată în `DEV_LOG.md`.

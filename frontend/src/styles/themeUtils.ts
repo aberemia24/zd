@@ -610,7 +610,7 @@ export function getComponentClasses(
   state?: string
 ): ComponentClasses {
   // Afișare avertisment despre funcția deprecată în development
-  if (process.env.NODE_ENV !== 'production') {
+  if (import.meta.env.NODE_ENV !== 'production') {
     console.warn(
       '[DEPRECATED] getComponentClasses este o funcție deprecată și va fi eliminată în versiunile viitoare.'
       + ' Folosiți `getEnhancedComponentClasses` din componentMapIntegration.ts în loc.'
