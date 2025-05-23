@@ -25,14 +25,19 @@ export * from './shared';
  * Quick access to common components
  * For convenience și backward compatibility
  */
+
+// Forms & Actions (17 exports)
 export { 
   button, 
+  buttonGroup,
   input, 
+  inputWrapper,
   select, 
   textarea, 
   checkbox, 
   label,
   type ButtonProps,
+  type ButtonGroupProps,
   type InputProps,
   type SelectProps,
   type TextareaProps,
@@ -40,4 +45,61 @@ export {
   type LabelProps
 } from './components/forms';
 
+// Feedback & Utilities (18 exports)
+export {
+  badge,
+  alert, 
+  toast,
+  dropdown,
+  dropdownItem,
+  loader,
+  pill,
+  formGroup,
+  formError,
+  glassEffect,
+  type BadgeProps,
+  type AlertProps,
+  type ToastProps,
+  type DropdownProps,
+  type DropdownItemProps,
+  type LoaderProps,
+  type PillProps,
+  type FormGroupProps,
+  type GlassEffectProps
+} from './components/feedback';
+
+// Layout & Navigation (22 exports)
+export {
+  card,
+  cardHeader,
+  cardBody,
+  cardFooter,
+  modal,
+  modalContent,
+  container,
+  grid,
+  flex,
+  divider,
+  tab,
+  navbar,
+  sidebar,
+  breadcrumb,
+  breadcrumbItem,
+  pagination,
+  paginationItem,
+  type CardProps,
+  type ModalProps,
+  type ModalContentProps,
+  type ContainerProps,
+  type GridProps,
+  type FlexProps,
+  type DividerProps,
+  type TabProps,
+  type NavbarProps,
+  type SidebarProps,
+  type BreadcrumbItemProps,
+  type PaginationItemProps
+} from './components/layout';
+
+// Core utilities
 export { cn } from './shared/utils'; 
