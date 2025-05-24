@@ -1,6 +1,5 @@
 import React from 'react';
-import { cn } from '../../../styles/new/shared/utils';
-import { alert, type AlertProps as CVAAlertProps } from '../../../styles/new/components/feedback';
+import { cn } from '../../../styles/cva/shared/utils';import { alert, type AlertProps as CVAAlertProps } from '../../../styles/cva/components/feedback';
 
 export interface AlertProps extends Omit<CVAAlertProps, 'variant'> {
   type?: 'success' | 'error' | 'warning' | 'info';

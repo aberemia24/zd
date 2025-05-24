@@ -61,7 +61,6 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         className={className}
         variant="secondary"
         size="md"
-        withShadow
         dataTestId="export-button"
       >
         {state.isExporting ? 'Se exportă...' : BUTTONS.EXPORT}

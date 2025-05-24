@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '../../../styles/new/shared/utils';
-import { loader, type LoaderProps as CVALoaderProps } from '../../../styles/new/components/feedback';
+import { cn } from '../../../styles/cva/shared/utils';
+import { loader, type LoaderProps as CVALoaderProps } from '../../../styles/cva/components/feedback';
 
 export interface SpinnerProps extends CVALoaderProps {
   sizeValue?: number;

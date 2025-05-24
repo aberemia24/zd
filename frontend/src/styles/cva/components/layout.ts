@@ -16,22 +16,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 export const card = cva(
   [
-    "bg-white rounded-lg overflow-hidden",
-    "transition-all duration-150",
-    "will-change-transform"
+    "bg-white rounded-lg border",
+    "transition-all duration-150"
   ],
   {
     variants: {
       variant: {
         default: [
           "border border-gray-200 shadow-sm",
-          "hover:shadow-md hover:border-gray-300",
-          "hover:-translate-y-0.5"
+          "hover:shadow-md hover:border-gray-300"
         ],
         elevated: [
           "shadow-md",
-          "hover:shadow-lg hover:-translate-y-1",
-          "active:shadow-sm active:translate-y-0"
+          "hover:shadow-lg"
         ],
         flat: [
           "border border-gray-200",
@@ -39,8 +36,7 @@ export const card = cva(
         ],
         interactive: [
           "border border-gray-200 shadow-sm cursor-pointer",
-          "hover:shadow-md hover:border-blue-200 hover:-translate-y-0.5",
-          "active:shadow-inner active:translate-y-0.5"
+          "hover:shadow-md hover:border-blue-200"
         ]
       },
       size: {

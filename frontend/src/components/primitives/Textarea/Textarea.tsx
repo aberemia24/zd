@@ -1,12 +1,12 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   textarea, 
   inputWrapper, 
   label,
   type TextareaProps as CVATextareaProps,
   type LabelProps 
-} from '../../../styles/new/components/forms';
+} from '../../../styles/cva/components/forms';
 
 export interface TextareaProps extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'data-testid'>, CVATextareaProps {
   label?: string;

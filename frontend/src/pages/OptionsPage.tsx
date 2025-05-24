@@ -6,8 +6,8 @@ import { CategoryEditor } from '../components/features/CategoryEditor';
 import { UI } from '@shared-constants/ui';
 import { Button } from '../components/primitives/Button';
 import Alert from '../components/primitives/Alert';
-import { cn } from '../styles/new/shared/utils';
-import { container, card, flex } from '../styles/new/components/layout';
+import { cn } from '../styles/cva/shared/utils';
+import { container, card, flex } from '../styles/cva/components/layout';
 
 /**
  * Pagina de opțiuni a aplicației

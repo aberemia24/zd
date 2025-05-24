@@ -5,10 +5,10 @@ import Select from '../../primitives/Select/Select';
 import Button from '../../primitives/Button/Button';
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from '@shared-constants';
 import { FrequencyType } from '@shared-constants/enums';
-import { cn } from '../../../styles/new/shared/utils';
-import { card } from '../../../styles/new/components/layout';
-import { formGroup } from '../../../styles/new/components/feedback';
-import { flex as flexContainer } from '../../../styles/new/components/layout';
+import { cn } from '../../../styles/cva/shared/utils';
+import { card } from '../../../styles/cva/components/layout';
+import { formGroup } from '../../../styles/cva/components/feedback';
+import { flex as flexContainer } from '../../../styles/cva/components/layout';
 
 interface CellTransactionPopoverProps {
   initialAmount: string;

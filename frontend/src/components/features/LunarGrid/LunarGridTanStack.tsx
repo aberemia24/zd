@@ -31,12 +31,12 @@ import Button from '../../primitives/Button/Button';
 import CellTransactionPopover from './CellTransactionPopover';
 
 // Import CVA styling system
-import { cn } from '../../../styles/new/shared/utils';
-import {   dataTable,   tableHeader,   tableCell } from '../../../styles/new/data';
+import { cn } from '../../../styles/cva/shared/utils';
+import {   dataTable,   tableHeader,   tableCell } from '../../../styles/cva/data';
 import { 
   flex as flexContainer, 
   container as gridContainer 
-} from '../../../styles/new/components/layout';
+} from '../../../styles/cva/components/layout';
 
 // Helper function pentru formatarea sumelor (memorare globală deoarece este statică)
 const formatMoney = (amount: number): string => {
@@ -60,7 +60,6 @@ interface EditingCellState {
   day: number;
   amount: string;
   type: TransactionType;
-  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 // Interfața pentru starea popover-ului
@@ -122,8 +121,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
       subcategory,
       day,
       amount: amount && amount !== '-' ? amount.replace(/[^\d,.-]/g, '') : '',
-      type: determineTransactionType(category),
-      inputRef: inputRef
+      type: determineTransactionType(category)
     });
     
     // Focus pe input după render
@@ -279,7 +277,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     return (
       <input
         type="number"
-        ref={editingCell.inputRef}
+        ref={inputRef}
         value={editingCell.amount}
         onChange={(e) => setEditingCell(prev => prev ? { ...prev, amount: e.target.value } : null)}
         onKeyDown={handleInlineKeyDown}

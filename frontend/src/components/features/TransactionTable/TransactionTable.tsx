@@ -5,14 +5,14 @@ import Spinner from '../../primitives/Spinner/Spinner';
 import { TransactionType, CategoryType, FrequencyType } from '../../../shared-constants/enums';
 import { TABLE, BUTTONS, INFO } from '@shared-constants';
 import type { Transaction } from '../../../types/Transaction';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   dataTable, 
   tableHeader, 
   tableCell, 
   flex as flexContainer,
   container as pageContainer
-} from '../../../styles/new';
+} from '../../../styles/cva';
 import type { TransactionValidated } from '@shared-constants/transaction.schema';
 
 export type { Transaction };

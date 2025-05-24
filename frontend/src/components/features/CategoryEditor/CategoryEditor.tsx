@@ -10,9 +10,9 @@ import Button from '../../primitives/Button/Button';
 import Input from '../../primitives/Input/Input';
 import Badge from '../../primitives/Badge/Badge';
 import Alert from '../../primitives/Alert/Alert';
-import { cn } from '../../../styles/new/shared/utils';
-import { modal } from '../../../styles/new/components/layout';
-import { card, flex } from '../../../styles/new/components/layout';
+import { cn } from '../../../styles/cva/shared/utils';
+import { modal } from '../../../styles/cva/components/layout';
+import { card, flex } from '../../../styles/cva/components/layout';
 import { useCategoryEditorState, SubcatAction, SubcatActionType } from './useCategoryEditorState';
 
 interface Props {

@@ -10,7 +10,7 @@ import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from '@shared-constants';
 import { MESAJE } from '@shared-constants';
 import { useTransactionFormStore } from '../../../stores/transactionFormStore';
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { cn } from '../../../styles/new/shared/utils';import { formGroup } from '../../../styles/new/components/feedback';import { flex as flexContainer } from '../../../styles/new/components/layout';
+import { cn } from '../../../styles/cva/shared/utils';import { formGroup } from '../../../styles/cva/components/feedback';import { flex as flexContainer } from '../../../styles/cva/components/layout';
 
 /**
  * Returnează un mesaj bazat pe o cheie, suportând și acces la proprietăți imbricate.

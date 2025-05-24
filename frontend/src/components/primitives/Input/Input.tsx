@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   input, 
   inputWrapper, 
   label,
   type InputProps as CVAInputProps,
   type LabelProps 
-} from '../../../styles/new/components/forms';
+} from '../../../styles/cva/components/forms';
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'data-testid'> & 
   CVAInputProps & {

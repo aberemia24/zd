@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   checkbox, 
   inputWrapper, 
   label,
   type CheckboxProps as CVACheckboxProps,
   type LabelProps 
-} from '../../../styles/new/components/forms';
+} from '../../../styles/cva/components/forms';
 
 export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'data-testid' | 'size'>, CVACheckboxProps {
   label?: string;

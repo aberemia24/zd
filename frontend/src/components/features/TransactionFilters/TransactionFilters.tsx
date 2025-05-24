@@ -11,8 +11,8 @@ import { BUTTONS, UI, TABLE, LOADER, INFO } from '@shared-constants/ui';
 import classNames from 'classnames';
 import { useActiveSubcategories } from '../../../services/hooks/useActiveSubcategories';
 import { MESAJE } from '@shared-constants/messages';
-import { cn } from '../../../styles/new/shared/utils';
-import { flex as flexContainer, card } from '../../../styles/new/components/layout';
+import { cn } from '../../../styles/cva/shared/utils';
+import { flex as flexContainer, card } from '../../../styles/cva/components/layout';
 
 export interface TransactionFiltersProps {
   type?: TransactionType | '' | string;

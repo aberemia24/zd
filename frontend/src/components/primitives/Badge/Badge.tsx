@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '../../../styles/new/shared/utils';
-import { badge, type BadgeProps as CVABadgeProps } from '../../../styles/new/components/feedback';
+import { cn } from '../../../styles/cva/shared/utils';
+import { badge, type BadgeProps as CVABadgeProps } from '../../../styles/cva/components/feedback';
 
 export interface BadgeProps extends CVABadgeProps {
   children: React.ReactNode;

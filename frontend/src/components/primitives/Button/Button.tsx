@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '../../../styles/new/shared/utils';
-import { button, type ButtonProps as CVAButtonProps } from '../../../styles/new/components/forms';
+import { cn } from '../../../styles/cva/shared/utils';
+import { button, type ButtonProps as CVAButtonProps } from '../../../styles/cva/components/forms';
 
 export type ButtonProps = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'data-testid'> & 
   CVAButtonProps & {

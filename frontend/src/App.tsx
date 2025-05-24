@@ -11,8 +11,8 @@ import { Toaster } from 'react-hot-toast';
 import Spinner from './components/primitives/Spinner';
 import NavLink from './components/primitives/NavLink';
 import { TITLES } from '@shared-constants';
-import { cn } from './styles/new/shared/utils';
-import { container, flex } from './styles/new/components/layout';
+import { cn } from './styles/cva/shared/utils';
+import { container, flex } from './styles/cva/components/layout';
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from './stores/authStore';

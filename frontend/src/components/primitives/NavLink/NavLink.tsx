@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '../../../styles/new/shared/utils';
-import { button, type ButtonProps as CVAButtonProps } from '../../../styles/new/components/forms';
+import { cn } from '../../../styles/cva/shared/utils';
+import { button, type ButtonProps as CVAButtonProps } from '../../../styles/cva/components/forms';
 
 /**
  * Componentă primitivă pentru linkuri de navigare

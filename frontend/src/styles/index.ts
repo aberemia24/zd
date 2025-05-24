@@ -1,6 +1,16 @@
-// Exportăm fișierele pentru a fi disponibile în întreaga aplicație
-export * from './themeTypes';
-export * from './themeUtils';
+/**
+ * STYLES SYSTEM - Modern CVA-based styling
+ * 
+ * Main export: CVA components from components/
+ * Legacy files deprecated and marked for cleanup
+ */
 
-// Export CVA system
-export * from './new'; 
+// ✅ MODERN CVA SYSTEM (PRIMARY)
+export * from './cva';
+
+// ✅ DESIGN TOKENS (CORE)
+export * from './themeTypes';
+export * from './theme';
+
+// ❌ LEGACY (DEPRECATED - marked for removal)
+// export * from './themeUtils'; // DEPRECATED after CVA migration 

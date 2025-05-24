@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { EXCEL_GRID, UI } from '@shared-constants/ui';
-import LunarGrid from '../components/features/LunarGrid';
 import LunarGridTanStack from '../components/features/LunarGrid/LunarGridTanStack';
 import { TITLES } from '@shared-constants';
 import { CATEGORIES } from '@shared-constants/categories';
@@ -9,15 +8,14 @@ import { useCategoryStore } from '../stores/categoryStore';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMonthlyTransactions } from '../services/hooks/useMonthlyTransactions';
-import { cn } from '../styles/new/shared/utils';
-import { container } from '../styles/new/components/layout';
-import { button } from '../styles/new/components/forms';
+import { cn } from '../styles/cva/shared/utils';
+import { container } from '../styles/cva/components/layout';
+import { button } from '../styles/cva/components/forms';
 
 /**
- * Pagină dedicată pentru afișarea grid-ului lunar
+ * Pagină dedicată pentru afișarea grid-ului lunar cu TanStack Table
  * Permite navigarea între luni și vizualizarea tranzacțiilor pe zile/categorii
  * Cu debounce implementat pentru a evita prea multe cereri API la navigare rapidă
- * Migrated la CVA styling system pentru consistență
  */
 const LunarGridPage: React.FC = () => {
   // Acces la queryClient pentru a gestiona invalidarea cache-ului în mod eficient
@@ -30,18 +28,10 @@ const LunarGridPage: React.FC = () => {
   // Timer pentru debounce - evităm cereri API multiple când utilizatorul schimbă rapid luna/anul
   const debounceTimerRef = React.useRef<number | null>(null);
   
-  // State pentru a alege între implementarea clasică și cea TanStack
-  const [useTanStack, setUseTanStack] = React.useState(() => {
-    // Încercaăm să citim preferința din localStorage, default la true pentru versiunea nouă
-    const savedPreference = localStorage.getItem('lunarGrid-useTanStack');
-    return savedPreference !== null ? savedPreference === 'true' : true;
-  });
-  
   // Extragem user din AuthStore
   const { user } = useAuthStore();
   
   // Folosim React Query prin hook-ul useMonthlyTransactions pentru verificarea stării de loading
-  // Aceasta înlocuiește vechile referințe la useTransactionStore.loading și fetchTransactions
   const { isLoading: loading } = useMonthlyTransactions(
     year, 
     month, 
@@ -130,16 +120,6 @@ const LunarGridPage: React.FC = () => {
     return monthNames[month - 1];
   };
   
-  // Salvăm preferința utilizatorului în localStorage pentru a o reține între sesiuni
-  React.useEffect(() => {
-    localStorage.setItem('lunarGrid-useTanStack', useTanStack.toString());
-  }, [useTanStack]);
-
-  // Toggle între implementarea clasică și implementarea TanStack
-  const toggleImplementation = () => {
-    setUseTanStack(prev => !prev);
-  };
-
   // Handler pentru a actualiza luna și anul - optimizat cu debounce
   // pentru a evita cereri API multiple când utilizatorul schimbă rapid luna/anul
   const handleMonthChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -211,17 +191,6 @@ const LunarGridPage: React.FC = () => {
             className="form-input w-24 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
             data-testid="year-input"
           />
-          
-          <button 
-            onClick={toggleImplementation}
-            className={cn(
-              button({ variant: 'secondary', size: 'sm' }),
-              'whitespace-nowrap'
-            )}
-            data-testid="toggle-implementation"
-          >
-            {useTanStack ? 'Utilizează tabel clasic' : 'Utilizează TanStack Table'}
-          </button>
         </div>
       </div>
       
@@ -232,15 +201,7 @@ const LunarGridPage: React.FC = () => {
           <p className="ml-3 text-gray-700">Se încarcă datele pentru {getMonthName(month)} {year}...</p>
         </div>
       ) : (
-        <>
-          {useTanStack ? (
-            // Versiunea nouă cu TanStack Table
-            <LunarGridTanStack year={year} month={month} />
-          ) : (
-            // Versiunea clasică legacy
-            <LunarGrid year={year} month={month} />
-          )}
-        </>
+        <LunarGridTanStack year={year} month={month} />
       )}
     </div>
   );

@@ -1,12 +1,12 @@
 import React, { forwardRef } from 'react';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   select, 
   inputWrapper, 
   label,
   type SelectProps as CVASelectProps,
   type LabelProps 
-} from '../../../styles/new/components/forms';
+} from '../../../styles/cva/components/forms';
 
 // Omitem proprietatea 'size' din props pentru a evita conflictul
 // Props custom pentru Select. Nu dublăm props native HTML (ex: value, label)!

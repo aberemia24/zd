@@ -1,7 +1,7 @@
 import React from 'react';
 import { LOADER } from '@shared-constants';
-import { cn } from '../../../styles/new/shared/utils';
-import { loader, type LoaderProps as CVALoaderProps } from '../../../styles/new/components/feedback';
+import { cn } from '../../../styles/cva/shared/utils';
+import { loader, type LoaderProps as CVALoaderProps } from '../../../styles/cva/components/feedback';
 
 export interface LoaderProps extends CVALoaderProps {
   text?: string;

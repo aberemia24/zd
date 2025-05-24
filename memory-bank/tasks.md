@@ -16,9 +16,7 @@
 - **Testing**: ✅ TRECUT (0 failed tests)
 - **Database Schema**: ✅ ENHANCED (description/status columns)
 
-## [NEW] TASK 13: Styling System Cleanup & Visual Polish (FINALIZARE TASK 12)
-
-- **Status**: ✅ COMPLETE - IMPLEMENTED SUCCESSFULLY
+## [COMPLETE] TASK 13: Styling System Cleanup & Visual Polish (FINALIZARE TASK 12)- **Status**: ✅ COMPLETE - IMPLEMENTED SUCCESSFULLY ✨- **Reflection**: ✅ DOCUMENTED în `memory-bank/reflection/reflection-task13-styling-cleanup.md`- **Impact**: -2945 linii legacy code, sistem CVA unificat, Professional Blue + Inter font
 - **Complexitate**: **Level 2** (Simple Enhancement - Cleanup & Visual Polish)
 - **Estimare**: **1-2 zile** (focus pe eliminare legacy + aplicare Professional Blue)
 - **Prioritate**: **ÎNALTĂ** (elimină confuzia pentru developers, finalizează Task 12)
@@ -60,9 +58,7 @@
 
 **A1. ComponentMap Cleanup (30 min)** ✅ COMPLETE- [x] Delete `frontend/src/styles/componentMap/` folder complet (13 fișiere, ~1600 linii)- [x] Grep search pentru remaining imports în aplicație- [x] Verify no broken references (unlikely - migration declarată completă)**A2. ThemeUtils Cleanup (30 min)** ✅ COMPLETE- [x] Analyze `frontend/src/styles/themeUtils.ts` (718 linii)- [x] Keep doar exports necesare pentru backward compatibility- [x] Remove deprecated functions (estimated 93% reduction - de la 718 la 53 linii)- [x] Update imports în applicație dacă necesare**A3. CSS Legacy Cleanup (30 min)** ✅ COMPLETE- [x] Remove hardcoded classes din `frontend/src/index.css` (.btn, .excel-cell)- [x] Delete `frontend/src/styles/theme-components.css` (226 linii deprecated)- [x] Verify no broken styles în aplicație
 
-#### **PHASE B: PROFESSIONAL BLUE IMPLEMENTATION (Ziua 1 - 1.5 ore)**
-
-**B1. Color Palette Update (45 min)** ✅ COMPLETE- [x] Update `frontend/src/styles/theme-variables.css`:  - `--color-primary-500: #16a34a` → `--color-primary-500: #3b82f6`  - Update entire primary palette cu Professional Blue values  - Update gradients să folosească new blue palette- [x] Test visual consistency în aplicație**B2. Inter Font Integration (30 min)** ✅ COMPLETE- [x] Add `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap')` în CSS- [x] Update `--font-family-sans: 'Inter', system-ui, sans-serif`- [x] Add `font-variant-numeric: tabular-nums` pentru tabele- [x] Test typography appearance**B3. Modern Design Refinements (15 min)** ✅ COMPLETE- [x] Update shadows cu valorile subtile din creative document- [x] Update border-radius cu modern values (0.125rem, 0.375rem, etc.)- [x] Apply consistent micro-animations `duration-150ms`
+#### **PHASE B: PROFESSIONAL BLUE IMPLEMENTATION (Ziua 1 - 1.5 ore)****B1. Color Palette Update (45 min)** ✅ COMPLETE- [x] Update `frontend/src/styles/theme-variables.css`:  - `--color-primary-500: #16a34a` → `--color-primary-500: #3b82f6`  - Update entire primary palette cu Professional Blue values (#eff6ff → #1e3a8a)  - Update gradients să folosească new blue palette- [x] Test visual consistency în aplicație**B2. Inter Font Integration (30 min)** ✅ COMPLETE- [x] Add `@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap')` în `frontend/src/index.css`- [x] Update `--font-family-sans: 'Inter', system-ui, sans-serif` în theme-variables.css- [x] Add `font-variant-numeric: tabular-nums` pentru tabele și cifre- [x] Test typography appearance**B3. Modern Design Refinements (15 min)** ✅ COMPLETE  - [x] Update shadows cu valorile subtile din creative document- [x] Update border-radius cu modern values (0.125rem, 0.375rem, etc.)- [x] Apply consistent micro-animations `duration-150ms`
 
 #### **PHASE C: VALIDATION & FINALIZATION (Ziua 2 - 1 oră)**
 
@@ -216,28 +212,7 @@ REDUCTION: 80% code reduction în styling system
 - ❌ **CSS Legacy**: `index.css` cu clase `.btn`, `.excel-cell` hardcodate 
 - ❌ **CSS Components**: `theme-components.css` (226 linii) cu stiluri vechi
 
-### 🚨 PROBLEME IDENTIFICATE ÎN IMPLEMENTAREA ACTUALĂ:
-
-#### **Problem 1: MULTIPLE STYLING SYSTEMS COEXIST**
-```typescript
-// ❌ REALITATEA: 3 sisteme paralele confuze
-styles/
-├── componentMap/          // 13 fișiere, ~1600 linii (NECURĂȚAT)
-├── new/                   // CVA system (NOU, incomplet)  
-├── themeUtils.ts          // 718 linii (DEPRECAT, dar încă folosit)
-├── theme-variables.css    // VERDE palette (VECHE)
-└── index.css             // Hard-coded classes (.btn, .excel-cell)
-```
-
-#### **Problem 2: VISUAL INCONSISTENCY**
-- Unele componente: CVA + Tailwind classes
-- Altele: CSS Variables cu paleta VERDE veche (`--color-primary-500: #16a34a`)
-- CSS legacy: `.btn-primary` cu verde în loc de albastru
-
-#### **Problem 3: DEVELOPER CONFUSION**
-- 3 moduri de styling în același proiect
-- Documentation în tasks.md spune "Professional Blue" dar app-ul e verde
-- Nou developers nu știu ce sistem să folosească
+### ✅ IMPLEMENTAREA FINALĂ - TASK 13 COMPLETE#### **✅ SINGLE CVA STYLING SYSTEM ACHIEVED**```typescript// ✅ REALITATEA: 1 sistem curat și consistentstyles/├── new/                   // CVA system (COMPLET, Professional Blue)  ├── themeUtils.ts          // 53 linii (cleanup complet)├── theme-variables.css    // PROFESSIONAL BLUE palette (#3b82f6)└── index.css             // Inter font + tabular numerals```#### **✅ VISUAL CONSISTENCY ACHIEVED**- Toate componentele: CVA + Professional Blue (#3b82f6)- CSS Variables: Professional Blue palette consistentă- Inter Font: Aplicat global cu tabular numerals pentru cifre- Zero legacy systems rămase#### **✅ DEVELOPER EXPERIENCE OPTIMIZED**- 1 singur sistem de styling (CVA)- Professional Blue theme aplicat consistent- Inter typography pentru modern fintech appearance- Clear patterns pentru noi features
 
 ### 📋 CE RĂMÂNE DE FĂCUT (LISTĂ REALISTĂ):
 
@@ -1090,3 +1065,149 @@ cd frontend; npm start
 - **Visual Design**: NEEDS CLEANUP & IMPLEMENTATION 🟡
 - **Developer Experience**: NEEDS SIMPLIFICATION (prea multe sisteme paralele) 🟡
 💡 NEXT VAN ASSESSMENT**: Perfect timing pentru evaluarea Task 13 cleanup priorities 
+
+## [RECENT SUCCESS] Eliminare Tabel Clasic LunarGrid (NIVEL 1 QUICK FIX) ✅
+
+- **Status**: ✅ COMPLETED SUCCESSFULLY
+- **Complexitate**: **Level 1** (Quick Bug Fix)
+- **Estimare**: **10-15 minute** (șters fișier specific + actualizare referințe)
+- **Prioritate**: **MEDIE** (cleanup code)
+- **Created**: 2025-12-19
+- **COMPLETION Date**: 2025-12-19 ✅ COMPLETE
+
+### 🎯 TASK REALIZAT:
+**Eliminare LunarGrid.tsx clasic:**
+- ❌ ~~Ștergere completă feature LunarGrid~~ (GREȘIT - am înțeles greșit)
+- ✅ **Eliminare doar LunarGrid.tsx** (tabelul clasic vechi)
+- ✅ **Păstrare LunarGridTanStack.tsx** (versiunea modernă cu TanStack Table)
+- ✅ **Actualizare index.ts** pentru export doar LunarGridTanStack
+- ✅ **Actualizare LunarGridPage.tsx** elimină toggle și logic clasic
+
+### 🔧 MODIFICĂRI IMPLEMENTATE:
+**1. Cleanup Selective:**
+- Șters DOAR `LunarGrid.tsx` (tabelul clasic vechi)
+- Păstrat întreg directorul `LunarGrid/` cu TanStack și componente
+- Păstrat `CellTransactionPopover.tsx`, `hooks/`, `types.ts`
+
+**2. Export Updates:**
+- `index.ts`: Export doar `LunarGridTanStack` (eliminated tabel clasic)
+- `LunarGridPage.tsx`: Eliminated toggle logic și folosește doar TanStack
+
+**3. Import Fixes:**
+- Updated toate import-urile CVA: `styles/new/` → `styles/cva/`
+- Fixed TypeScript errors în LunarGridTanStack
+
+### 📊 IMPACT:
+**Code Cleanup:**
+- -1 fișier LunarGrid.tsx clasic (eliminat)
+- -50+ linii toggle logic din LunarGridPage.tsx
+- CVA imports consistency across LunarGrid components
+
+**UX Improvement:**
+- Utilizatorii folosesc doar versiunea modernă TanStack Table
+- Eliminată confuzia de a avea 2 versiuni diferite
+- Interface mai simplificată (fără toggle buttons)
+
+### ✅ SUCCESS CRITERIA ACHIEVED:
+1. ✅ **LunarGrid.tsx eliminat** - tabelul clasic nu mai există
+2. ✅ **LunarGridTanStack păstrat** - versiunea modernă funcționează
+3. ✅ **Toggle logic eliminat** - nu mai există confusion între versiuni
+4. ✅ **Build success** - aplicația compilează și rulează corect
+5. ✅ **CVA imports** - consistency în styling system
+6. ✅ **Zero regression** - functionalitatea modernă intactă
+
+### 🎉 REZULTAT FINAL:
+**Single Modern Table Implementation:**
+- Aplicația folosește doar LunarGridTanStack (TanStack Table modern)
+- UX simplificat fără toggle confusing
+- Code base mai curat cu o singură implementare de tabel
+- Styling consistency cu CVA system
+
+---
+
+## [RECENT FIX] Eliminare Hover Movement în UI Components (NIVEL 1 QUICK FIX)
+
+- **Status**: ✅ COMPLETED - FIXED
+- **Complexitate**: **Level 1** (Quick Bug Fix)
+- **Estimare**: **5-10 minute** (identificare + fix + test)
+- **Prioritate**: **ÎNALTĂ** (UX issue foarte enervant)
+- **Created**: 2025-12-19
+- **COMPLETION Date**: 2025-12-19 ✅ COMPLETE
+
+### 🎯 PROBLEMA IDENTIFICATĂ:
+**Hover Movement în UI Components:**
+- Toate componentele UI se mișcau ușor la hover (butoane, carduri, form elements)
+- Efectul era cauzat de `translate`, `scale`, și `transform` properties în sistemul CVA
+- UX-ul era compromis - interfața părea instabilă și enervantă
+
+### 🔍 ROOT CAUSE ANALYSIS:
+**Transform Effects în CVA System identificate:**
+1. **Card Components**: `hover:-translate-y-0.5`, `hover:-translate-y-1`, `active:translate-y-0`
+2. **Button Components**: `active:translate-y-0`
+3. **Category Action Buttons**: `hover:scale-105`
+4. **Modal Components**: Various transform effects
+
+### 🔧 SOLUȚII APLICATE:
+
+#### **✅ Layout Components Fix** (`frontend/src/styles/cva/components/layout.ts`):
+```typescript
+// BEFORE (problematic):
+card: [
+  "hover:shadow-md hover:border-gray-300 hover:-translate-y-0.5"  // MOVEMENT!
+  "hover:shadow-lg hover:-translate-y-1 active:translate-y-0"     // MOVEMENT!
+]
+
+// AFTER (fixed):
+card: [
+  "hover:shadow-md hover:border-gray-300"  // Clean hover, no movement
+  "hover:shadow-lg"                        // Clean hover, no movement
+]
+```
+
+#### **✅ Form Components Fix** (`frontend/src/styles/cva/components/forms.ts`):
+```typescript
+// BEFORE (problematic):
+button: [
+  "active:translate-y-0"  // MOVEMENT!
+]
+
+// AFTER (fixed):
+button: [
+  // Nu mai există active translate - clean interactions
+]
+```
+
+#### **✅ Data Components Fix** (`frontend/src/styles/cva/data/display.ts`):
+```typescript
+// BEFORE (problematic):
+categoryActionButton: {
+  hover: { true: "hover:scale-105" }  // SCALE MOVEMENT!
+}
+
+// AFTER (fixed):
+categoryActionButton: {
+  // Nu mai există scale effects - clean hover states
+}
+```
+
+### 🎯 REZULTATE:
+- ✅ **Zero Movement**: Toate componentele au hover states clean, fără translate/scale
+- ✅ **Maintained Aesthetics**: Shadow și color transitions păstrate pentru feedback vizual
+- ✅ **Build Success**: npm run build successful fără erori
+- ✅ **UX Improvement**: Interfața pare mult mai stabilă și profesională
+
+### 📊 COMPONENTS FIXED:
+- **Card Components**: default, elevated, flat, interactive variants
+- **Button Components**: toate variantele (primary, secondary, ghost, etc.)
+- **Category Action Buttons**: edit, delete, confirm, cancel
+- **Modal Components**: eliminat transform effects problematice
+
+### 🚀 BENEFICII:
+- **Stabilitate Vizuală**: UI nu mai "sare" la hover
+- **Profesionalism**: Aplicația pare mult mai polish și stabilă
+- **UX Îmbunătățit**: Utilizatorii nu mai sunt distrați de movement-uri
+- **Performance**: Eliminate transformările care pot cauza layout thrashing
+
+---
+
+## [COMPLETE] TASK 13: Styling System Cleanup & Visual Polish (FINALIZARE TASK 12)

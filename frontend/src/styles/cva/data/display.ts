@@ -262,9 +262,6 @@ export const categoryActionButton = cva(
         delete: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
         confirm: "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
         cancel: "bg-gray-300 text-gray-700 hover:bg-gray-400 focus:ring-gray-500"
-      },
-      hover: {
-        true: "hover:scale-105"
       }
     },
     defaultVariants: {
