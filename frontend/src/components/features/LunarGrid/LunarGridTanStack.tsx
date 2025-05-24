@@ -1,25 +1,17 @@
 import React, { useCallback, useState, useMemo, CSSProperties, useRef, memo } from 'react';
 import { 
   flexRender, 
-  Header, 
-  Row,
-  Cell
+  Row
 } from '@tanstack/react-table';
 import { useLunarGridTable, TransformedTableDataRow } from './hooks/useLunarGridTable';
 
-// Importuri din stores - eliminat useTransactionStore conform memoriei anti-pattern
+// Importuri din stores
 import { useCategoryStore } from '../../../stores/categoryStore';
-import { useAuthStore } from '../../../stores/authStore';
 
 // React Query și hooks pentru tranzacții
-import { useQueryClient } from '@tanstack/react-query';
-// Import direct al hook-urilor specializate pentru mutații
 import {
   useCreateTransaction,
-  useUpdateTransaction,
-  useDeleteTransaction,
-  type CreateTransactionHookPayload,
-  type UpdateTransactionHookPayload
+  type CreateTransactionHookPayload
 } from '../../../services/hooks/useTransactionMutations';
 
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
@@ -32,7 +24,7 @@ import CellTransactionPopover from './CellTransactionPopover';
 
 // Import CVA styling system
 import { cn } from '../../../styles/cva/shared/utils';
-import {   dataTable,   tableHeader,   tableCell } from '../../../styles/cva/data';
+import { dataTable, tableHeader, tableCell, tableRow } from '../../../styles/cva/data';
 import { 
   flex as flexContainer, 
   container as gridContainer 
@@ -82,13 +74,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
   // Referință pentru input focus
   const inputRef = useRef<HTMLInputElement>(null);
   
-  // Hooks pentru mutații de tranzacții - migrare de la Zustand la React Query
+  // Hooks pentru mutații de tranzacții
   const { mutate: createTransactionMutation } = useCreateTransaction();
-  const { mutate: updateTransactionMutation } = useUpdateTransaction();
-  const { mutate: deleteTransactionMutation } = useDeleteTransaction();
-  
-  // Cache pentru invalidare după mutații
-  const queryClient = useQueryClient();
   
   // Funcție pentru determinarea tipului de tranzacție
   const determineTransactionType = useCallback((category: string): TransactionType => {
@@ -147,8 +134,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     // Construim data
     const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
     
-    // Folosim React Query mutation în loc de Zustand conform memoriei [d7b6eb4b]
-    // Nu trimitem userId, acesta este gestionat în hook-ul useTransactions
+    // Folosim React Query mutation în loc de Zustand
     const createPayload: CreateTransactionHookPayload = {
       amount: Number(newAmount),
       category,
@@ -156,19 +142,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
       type: transactionType,
       date,
       recurring: false,
-      // Fără description - eliminat complet
       frequency: undefined
     };
     
     createTransactionMutation(createPayload, {
       onSuccess: () => {
         setEditingCell(null);
-        // Se poate adăuga notificare UI aici
       },
       onError: (error: Error) => {
         console.error('Eroare la crearea tranzacției:', error);
         setEditingCell(null);
-        // Se poate adăuga notificare eroare aici
       }
     });
   }, [editingCell, year, month, createTransactionMutation]);
@@ -187,21 +170,18 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     }
   }, [handleInlineEditSave, handleInlineEditCancel]);
   
-  // Handler pentru click pe celulă - adaptat pentru tipul așteptat de useLunarGridTable
+  // Handler pentru click pe celulă
   const handleCellClick = useCallback(
     (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
-      // Prevenim click-ul de la propagare pentru a evita conflicte cu expand/collapse
       e.stopPropagation();
       
-      // Dacă suntem deja în modul editare, nu deschidem popover
       if (editingCell) return;
       
-      // Deschide popover pentru editare tranzacție complexă (nu doar sumă)
       setPopover({
         category,
         subcategory,
         day,
-        type: determineTransactionType(category), // forțăm tipul corect în loc de parametrul type care poate fi undefined
+        type: determineTransactionType(category),
         amount,
         anchorEl: e.currentTarget as HTMLElement
       });
@@ -209,7 +189,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     [editingCell, determineTransactionType]
   );
   
-  // Handler pentru salvarea tranzacției din popover - optimizat cu useCallback
+  // Handler pentru salvarea tranzacției din popover
   const handleSavePopover = useCallback(
     async (formData: {
       amount: string;
@@ -220,8 +200,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         return;
       }
 
-      // Extragem detaliile din starea popover
-      const { id: transactionIdToEdit, category, subcategory, day, type: transactionTypeFromPopover } = popover;
+      const { category, subcategory, day, type: transactionTypeFromPopover } = popover;
 
       const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
 
@@ -231,7 +210,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         subcategory: subcategory || undefined,
         type: transactionTypeFromPopover,
         date,
-        // Eliminăm complet câmpul description și nu mai adaugăm userId (gestionat în useTransactions)
         recurring: formData.recurring,
         frequency: formData.recurring ? formData.frequency : undefined,
       };
@@ -240,8 +218,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         onSuccess: () => {
           setPopover(null);
         },
-        onError: (err: Error) => {
-          // Eroare tratată în UI fără console.log
+        onError: () => {
           setPopover(null);
         }
       });
@@ -254,19 +231,18 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     table,
     isLoading,
     error,
-    columns,
     days,
     dailyBalances,
     tableContainerRef
   } = useLunarGridTable(
     year, 
     month, 
-    {}, // expandedCategories este gestionat intern de TanStack now
+    {}, 
     handleCellClick, 
     handleCellDoubleClick
   );
 
-  // State pentru celula în editare inline - optimizat cu useCallback
+  // State pentru celula în editare inline
   const renderEditableCell = useCallback((category: string, subcategory: string | undefined, day: number) => {
     if (!editingCell) return null;
 
@@ -293,12 +269,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     );
   }, [editingCell, handleInlineKeyDown, handleInlineEditSave]);
 
-  // Funcție pentru calcularea sumei totale - memoizată
+  // Funcție pentru calcularea sumei totale
   const monthTotal = useMemo(() => 
     days.reduce((acc, day) => acc + (dailyBalances[day] || 0), 0), 
   [days, dailyBalances]);
   
-  // Helper pentru stiluri de valori - optimizat cu useCallback
+  // Helper pentru stiluri de valori
   const getBalanceStyle = useCallback((value: number): string => {
     if (!value) return 'text-gray-400';
     return value > 0 
@@ -306,7 +282,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
       : 'text-red-600 font-medium';
   }, []);
 
-  // Gestionarea poziției popover-ului - memoizată
+  // Gestionarea poziției popover-ului
   const popoverStyle = useMemo((): CSSProperties => {
     if (!popover) return {};
     
@@ -321,47 +297,77 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     };
   }, [popover]);
 
-  // Funcție helper pentru randarea recursivă a rândurilor - optimizată
+  // Funcție helper pentru randarea recursivă a rândurilor
   const renderRow = useCallback((row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
     const { original } = row;
-    
+    const isCategory = original.isCategory;
+    const isSubcategory = !isCategory && original.subcategory;
+        
     return (
       <React.Fragment key={row.id}>
         <tr className={cn(
-          'transition-all duration-150',
-          original.isCategory 
-            ? 'bg-gray-50 hover:bg-gray-100 font-medium'
-            : 'hover:bg-gray-50',
+          tableRow({
+            editability: isCategory ? 'readonly' : 'editable'
+          }),
           row.getIsExpanded() ? 'border-b border-gray-200' : ''
         )}>
           {row.getVisibleCells().map((cell, cellIdx) => {
             const isFirstCell = cellIdx === 0;
+            const isDayCell = cell.column.id.startsWith('day-');
+                        
+            // Determine cell editability
+            const cellEditability = isCategory 
+              ? 'category'
+              : (isDayCell && isSubcategory ? 'editable' : 'readonly');
+                        
             return (
               <td 
                 key={cell.id}
                 className={cn(
-                  tableCell({ variant: 'default' }),
+                  tableCell({
+                    variant: isDayCell ? 'numeric' : 'default',
+                    editability: cellEditability
+                  }),
                   isFirstCell && level > 0 ? 'pl-8' : '',
-                  isFirstCell ? 'sticky left-0 bg-inherit z-10' : 'text-right'
+                  isFirstCell ? 'sticky left-0 bg-inherit z-10' : ''
                 )}
-              >
-                {renderEditableCell(
+                onClick={isDayCell && isSubcategory ? (e) => handleCellClick(
+                  e,
                   original.category,
                   original.subcategory,
-                  cell.column.id.startsWith('day-') ? parseInt(cell.column.id.split('-')[1]) : 0
-                ) || (flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode)}
+                  parseInt(cell.column.id.split('-')[1]),
+                  cell.getValue() as string || ''
+                ) : undefined}
+                onDoubleClick={isDayCell && isSubcategory ? (e) => handleCellDoubleClick(
+                  e,
+                  original.category,
+                  original.subcategory,
+                  parseInt(cell.column.id.split('-')[1]),
+                  cell.getValue() as string || ''
+                ) : undefined}
+                title={isCategory && isDayCell ? 'Suma calculată automată din subcategorii' : undefined}
+              >
+                {isDayCell && isSubcategory ? (
+                  renderEditableCell(
+                    original.category,
+                    original.subcategory,
+                    parseInt(cell.column.id.split('-')[1])
+                  ) || (flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode)
+                ) : (
+                  flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode
+                )}
               </td>
             );
           })}
         </tr>
-        
+                
         {/* Rânduri expandate */}
         {row.getIsExpanded() && row.subRows && row.subRows.length > 0 && (
           row.subRows.map((subRow) => renderRow(subRow, level + 1))
         )}
       </React.Fragment>
     );
-  }, [renderEditableCell, tableCell]);
+  }, [renderEditableCell, tableCell, tableRow, handleCellClick, handleCellDoubleClick]);
 
   // Renderizare (layout principal)
   return (

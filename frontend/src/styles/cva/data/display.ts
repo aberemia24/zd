@@ -76,6 +76,23 @@ export const tableCell = cva(
         default: "",
         clickable: "hover:bg-gray-50 cursor-pointer",
         numeric: "text-right tabular-nums"
+      },
+      editability: {
+        editable: [
+          "hover:bg-blue-50 cursor-text",
+          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50",
+          "active:bg-blue-100 transition-all duration-150"
+        ],
+        readonly: [
+          "bg-slate-50/50 text-slate-600 cursor-default",
+          "hover:bg-slate-100/50",
+          "font-medium transition-all duration-150"
+        ],
+        category: [
+          "bg-slate-50 text-slate-700 font-semibold cursor-default",
+          "border-l-4 border-l-blue-500 pl-6",
+          "hover:bg-slate-100 transition-all duration-150"
+        ]
       }
     },
     defaultVariants: {
@@ -98,6 +115,20 @@ export const tableRow = cva(
       state: {
         active: "bg-blue-50",
         selected: "bg-blue-100 hover:bg-blue-100"
+      },
+      editability: {
+        editable: [
+          "bg-white border border-slate-200",
+          "hover:bg-blue-50 hover:border-blue-500 hover:shadow-sm",
+          "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-opacity-20",
+          "cursor-pointer transition-all duration-150"
+        ],
+        readonly: [
+          "bg-slate-50 border border-slate-200 border-l-4 border-l-blue-500",
+          "hover:bg-slate-100 hover:border-slate-300",
+          "cursor-default text-slate-600 font-semibold",
+          "transition-all duration-150"
+        ]
       }
     },
     defaultVariants: {

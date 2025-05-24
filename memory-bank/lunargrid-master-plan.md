@@ -8,6 +8,7 @@
 
 ### Obiectivul principal
 **Să știi în fiecare zi câți bani vei avea** - nu doar câți ai cheltuit, ci câți vei avea în viitor pe baza planificării tale.
+NU ESTE INTENTIONAT PENTRU MOBILE USE, WEB USE ONLY sa fie cat mai bun acolo. 
 
 ### Workflow-ul utilizatorului țintă
 1. **Introducerea veniturilor**: toate veniturile cunoscute (salarii, chirii, venituri ocazionale)

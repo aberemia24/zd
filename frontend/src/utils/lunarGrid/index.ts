@@ -17,3 +17,7 @@ export * from './dataTransformers';
 
 // Re-export types for convenience
 export type { LunarGridRowData } from '../../components/features/LunarGrid/types';
+
+// Barrel export pentru utilitățile LunarGrid
+export * from './financialCalculations';
+export * from './recurringTransactionGenerator';
