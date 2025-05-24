@@ -1,12 +1,12 @@
 import React, { useMemo, useCallback } from 'react';
 import { TanStackSubcategoryRowsProps } from './types';
 import { TransactionType } from '@shared-constants/enums';
-import { cn } from '../../../styles/new/shared/utils';
+import { cn } from '../../../styles/cva/shared/utils';
 import { 
   tableRow, 
   tableCell 
-} from '../../../styles/new/data';
-import { button } from '../../../styles/new/components/forms';
+} from '../../../styles/cva/data';
+import { button } from '../../../styles/cva/components/forms';
 
 /**
  * Componentă pentru afișarea rândurilor de subcategorii în cadrul grilei TanStack Table

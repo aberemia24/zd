@@ -338,47 +338,7 @@ const VirtualizedLunarGrid = () => {
 };
 ```
 
-#### 5.2 Mobile responsiveness
-```typescript
-const useMobileDetection = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  return isMobile;
-};
 
-// Gesturi touch pentru mobile
-const useTouchGestures = () => {
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-  
-  const handleTouchStart = (e) => {
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-  
-  const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > 50;
-    const isRightSwipe = distance < -50;
-    
-    if (isLeftSwipe) handleSwipeLeft();
-    if (isRightSwipe) handleSwipeRight();
-  };
-  
-  return { handleTouchStart, handleTouchEnd };
-};
-```
 
 ---
 
@@ -393,8 +353,8 @@ frontend/src/components/features/LunarGrid/
 │   ├── useLunarGridLogic.ts
 │   ├── useCellNavigation.ts
 │   ├── useRangeSelection.ts
-│   ├── useMobileDetection.ts
-│   └── useTouchGestures.ts
+│   
+│ 
 ├── modals/
 │   ├── TransactionModal.tsx
 │   ├── RecurringSetupModal.tsx
