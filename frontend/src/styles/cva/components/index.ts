@@ -14,4 +14,5 @@ export * from './forms';
 export * from './feedback';
 
 // Layout, navigation și modal components  
-export * from './layout'; 
+export * from './layout';
+export * from './modal'; 

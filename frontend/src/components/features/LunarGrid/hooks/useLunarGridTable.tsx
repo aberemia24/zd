@@ -95,7 +95,7 @@ export function useLunarGridTable(
   year: number,
   month: number,
   expandedCategories: Record<string, boolean>,
-  onCellClick?: (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string, type: string) => void,
+  onCellClick?: (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => void,
   onCellDoubleClick?: (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => void
 ): UseLunarGridTableResult {
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -201,6 +201,41 @@ export function useLunarGridTable(
     return Object.values(categoriesMap);
   }, [validTransactions, categories]);
 
+  // Click handler strategy OPTIMIZATĂ - handler-e definite la nivel de hook
+  const stableClickHandlers = useMemo(() => {
+    if (!onCellClick && !onCellDoubleClick) return null;
+    
+    let clickTimer: NodeJS.Timeout | null = null;
+    
+    return {
+      handleSingleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
+        e.stopPropagation();
+        
+        if (!onCellClick) return;
+        
+        // Delay single click pentru a permite double click să îl anuleze
+        clickTimer = setTimeout(() => {
+          onCellClick(e, category, subcategory, dayNumber, valueDisplay);
+        }, 200);
+      },
+      
+      handleDoubleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Anulează single click dacă există
+        if (clickTimer) {
+          clearTimeout(clickTimer);
+          clickTimer = null;
+        }
+        
+        if (onCellDoubleClick) {
+          onCellDoubleClick(e, category, subcategory, dayNumber, valueDisplay);
+        }
+      }
+    };
+  }, [onCellClick, onCellDoubleClick]);
+
   // Generare coloane pentru tabel
   const columns = useMemo<ColumnDef<TransformedTableDataRow>[]>(() => {
     const generatedCols = generateTableColumns(year, month); // Din @utils/lunarGrid/dataTransformers
@@ -235,12 +270,33 @@ export function useLunarGridTable(
           accessorKey: colConfig.accessorKey,
           cell: ({ getValue, row }) => {
             const value = getValue<number>();
+            const original = row.original as TransformedTableDataRow;
             const colorClass = getBalanceStyleClass(value);
+            const valueDisplay = typeof value === 'number' && !isNaN(value) && value !== 0
+              ? formatCurrency(value)
+              : '—';
+            
+            // Adăugăm click handlers doar pentru subcategorii (nu pentru categorii)
+            const isSubcategory = !original.isCategory && original.subcategory;
+            
+            if (isSubcategory && stableClickHandlers) {
+              return (
+                <div 
+                  className={`text-right ${colorClass} cursor-pointer hover:bg-blue-50 p-2 transition-colors duration-150`}
+                  onClick={(e) => stableClickHandlers.handleSingleClick(e, original.category, original.subcategory, dayNumber, valueDisplay)}
+                  onDoubleClick={(e) => stableClickHandlers.handleDoubleClick(e, original.category, original.subcategory, dayNumber, valueDisplay)}
+                  title="Click: Quick Add | Double-click: Advanced Edit"
+                  data-testid={`cell-${original.category}-${original.subcategory}-${dayNumber}`}
+                >
+                  {valueDisplay}
+                </div>
+              );
+            }
+            
+            // Pentru categorii (readonly)
             return (
-              <div className={`text-right ${colorClass}`}>
-                {typeof value === 'number' && !isNaN(value) && value !== 0
-                  ? formatCurrency(value)
-                  : '—'}
+              <div className={`text-right ${colorClass} p-2`} title="Suma calculată automată din subcategorii">
+                {valueDisplay}
               </div>
             );
           },
@@ -269,7 +325,7 @@ export function useLunarGridTable(
       }
       return colConfig as ColumnDef<TransformedTableDataRow>; // Fallback, ar trebui acoperite toate cazurile
     });
-  }, [year, month, onCellClick, onCellDoubleClick, formatCurrency, getBalanceStyleClass]);
+  }, [year, month, stableClickHandlers, formatCurrency, getBalanceStyleClass]);
 
   const table = useReactTable({
     data: rawTableData,
