@@ -140,7 +140,8 @@ describe('useInlineCellEdit - Phase 1 Core Functionality', () => {
     await act(async () => {
       result.current.handleKeyDown({
         key: 'Enter',
-        preventDefault: jest.fn()
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn()
       } as any);
     });
 
@@ -156,7 +157,8 @@ describe('useInlineCellEdit - Phase 1 Core Functionality', () => {
     act(() => {
       result.current.handleKeyDown({
         key: 'Escape',
-        preventDefault: jest.fn()
+        preventDefault: jest.fn(),
+        stopPropagation: jest.fn()
       } as any);
     });
 

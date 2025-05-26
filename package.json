@@ -19,6 +19,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/nodemailer": "^6.4.17",
     "@vitejs/plugin-react": "^4.5.0",
     "commitlint": "^18.6.1",
     "eslint": "^8.56.0",

@@ -199,7 +199,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         if (validationType === 'amount' || validationType === 'percentage') {
           convertedValue = parseFloat(inputValue);
         }
-        onSave(convertedValue).catch(err => console.error('Save error:', err));
+        Promise.resolve(onSave(convertedValue)).catch(err => console.error('Save error:', err));
         return;
       }
       inlineKeyDown(e);
@@ -209,15 +209,64 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     onKeyDown?.(e);
   };
 
-  // Handle cell click pentru focus
-  const handleCellClick = () => {
-    if (!isEditing) {
+  // Handle cell click pentru focus și start edit (single click activation)
+  const handleCellClick = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (!isEditing && !isReadonly) {
+      // Single click activează editarea conform Creative Phase 1 decisions
+      if (onStartEdit) {
+        onStartEdit();
+      } else {
+        startEdit();
+      }
+    } else if (!isEditing) {
       onFocus?.();
     }
   };
 
+  // Handle character typing pentru immediate edit activation (type-to-edit)
+  const handleCharacterTyping = (e: React.KeyboardEvent) => {
+    // Type-to-edit: daca nu suntem în edit mode și se tastează un caracter
+    if (!isEditing && !isReadonly && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      const char = e.key;
+      // Verifică dacă este un caracter printabil (nu F1-F12, arrows, etc.)
+      if (char.length === 1 && char.match(/[a-zA-Z0-9.,\-\s]/)) {
+        e.preventDefault();
+        // Activează editarea cu caracterul tastat
+        if (onStartEdit) {
+          onStartEdit();
+        } else {
+          startEdit();
+        }
+        // După activare, setează valoarea cu caracterul tastat
+        setTimeout(() => {
+          if (inputRef.current) {
+            inputRef.current.value = char;
+            inputRef.current.setSelectionRange(1, 1); // Cursor la sfârșitul caracterului
+            // Trigger onChange event
+            const event = new Event('input', { bubbles: true });
+            inputRef.current.dispatchEvent(event);
+          }
+        }, 0);
+        return;
+      }
+    }
+    
+    // Continue cu keyboard handling normal
+    handleCombinedKeyDown(e);
+  };
+
   // Handle double click pentru start edit
-  const handleCellDoubleClick = () => {
+  const handleCellDoubleClick = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (!isEditing && !isReadonly) {
       if (onStartEdit) {
         onStartEdit();
@@ -239,7 +288,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       >
         <input
           ref={inputRef}
-          type={validationType === 'amount' ? 'number' : 'text'}
+          type="text"
           defaultValue={isControlled ? String(value) : undefined}
           value={isControlled ? undefined : editValue}
           onChange={(e) => {
@@ -249,7 +298,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             }
             setValue(e.target.value);
           }}
-          onKeyDown={handleCombinedKeyDown}
+          onKeyDown={(e) => {
+            // Previne form submission
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            handleCombinedKeyDown(e);
+          }}
           onBlur={isControlled ? async () => {
             // În controlled mode, salvăm direct cu prop-ul onSave
             try {
@@ -257,9 +313,12 @@ export const EditableCell: React.FC<EditableCellProps> = ({
               const inputValue = (inputRef.current?.value || '').trim();
               let convertedValue: string | number = inputValue;
               if (validationType === 'amount' || validationType === 'percentage') {
-                convertedValue = parseFloat(inputValue);
+                const numValue = parseFloat(inputValue);
+                if (!isNaN(numValue)) {
+                  convertedValue = numValue;
+                }
               }
-              await onSave(convertedValue);
+              await Promise.resolve(onSave(convertedValue));
             } catch (err) {
               console.error('Save error:', err);
             }
@@ -274,6 +333,8 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           aria-describedby={`cell-${cellId}-description`}
           disabled={isSaving}
           autoFocus
+          autoComplete="off"
+          spellCheck={false}
         />
         <div 
           id={`cell-${cellId}-description`}
@@ -312,9 +373,9 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       }), className, {
         'cursor-not-allowed': isReadonly
       })}
-      onClick={handleCellClick}
-      onDoubleClick={handleCellDoubleClick}
-      onKeyDown={handleCombinedKeyDown}
+      onClick={(e) => handleCellClick(e)}
+      onDoubleClick={(e) => handleCellDoubleClick(e)}
+      onKeyDown={handleCharacterTyping}
       tabIndex={isReadonly ? -1 : 0}
       data-testid={testId || `editable-cell-${cellId}`}
       role="gridcell"

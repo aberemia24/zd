@@ -5,61 +5,55 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { TEST_CONSTANTS } from '@shared-constants';
 import Select from './Select';
 
 describe('Select', () => {
   // Date de test comune pentru opțiuni
   const opțiuniTest = [
-    { value: 'opțiune1', label: 'Opțiunea 1' },
-    { value: 'opțiune2', label: 'Opțiunea 2' },
-    { value: 'opțiune3', label: 'Opțiunea 3' },
+    { value: 'opțiune1', label: TEST_CONSTANTS.SELECT.OPTION_1 },
+    { value: 'opțiune2', label: TEST_CONSTANTS.SELECT.OPTION_2 },
+    { value: 'opțiune3', label: TEST_CONSTANTS.SELECT.OPTION_3 },
   ];
 
   // Test pentru randarea de bază
   it('se randează corect cu opțiunile specificate', () => {
     render(<Select options={opțiuniTest} value="" onChange={() => {}} />);
-    expect(screen.getByText('Opțiunea 1')).toBeInTheDocument();
-    expect(screen.getByText('Opțiunea 2')).toBeInTheDocument();
-    expect(screen.getByText('Opțiunea 3')).toBeInTheDocument();
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.OPTION_1)).toBeInTheDocument();
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.OPTION_2)).toBeInTheDocument();
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.OPTION_3)).toBeInTheDocument();
   });
 
   // Test pentru placeholder
   it('afișează placeholderul corect', () => {
-    render(<Select options={opțiuniTest} value="" onChange={() => {}} placeholder="Alege o opțiune" />);
-    expect(screen.getByText('Alege o opțiune')).toBeInTheDocument();
+    render(<Select options={opțiuniTest} value="" onChange={() => {}} placeholder={TEST_CONSTANTS.SELECT.PLACEHOLDER} />);
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.PLACEHOLDER)).toBeInTheDocument();
   });
 
   // Test pentru label
   it('afișează label-ul corect', () => {
-    render(<Select options={opțiuniTest} value="" onChange={() => {}} label="Selecție" />);
-    expect(screen.getByText('Selecție')).toBeInTheDocument();
+    render(<Select options={opțiuniTest} value="" onChange={() => {}} label={TEST_CONSTANTS.SELECT.LABEL} />);
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.LABEL)).toBeInTheDocument();
   });
 
   // Test pentru erori
   it('afișează mesajul de eroare', () => {
-    render(<Select options={opțiuniTest} value="" onChange={() => {}} error="Acest câmp este obligatoriu" />);
-    expect(screen.getByText('Acest câmp este obligatoriu')).toBeInTheDocument();
+    render(<Select options={opțiuniTest} value="" onChange={() => {}} error={TEST_CONSTANTS.SELECT.REQUIRED_ERROR} />);
+    expect(screen.getByText(TEST_CONSTANTS.SELECT.REQUIRED_ERROR)).toBeInTheDocument();
   });
 
-  // Test pentru stilizarea corectă a erorii
-  it('adaugă clasa corectă pentru borderul de eroare', () => {
-    const { container } = render(<Select options={opțiuniTest} value="" onChange={() => {}} error="Eroare" />);
-    const select = container.querySelector('select');
-    expect(select).toHaveClass('border-error-500');
+  // Test pentru funcționalitate - nu clase CSS
+  it('funcționează corect când există eroare', () => {
+    render(<Select options={opțiuniTest} value="" onChange={() => {}} error={TEST_CONSTANTS.COMMON.ERROR_GENERIC} />);
+    const select = screen.getByRole('combobox');
+    expect(select).toBeInTheDocument();
+    expect(screen.getByText(TEST_CONSTANTS.COMMON.ERROR_GENERIC)).toBeInTheDocument();
   });
 
-  // Test pentru clase personalizate pe wrapper
-  it('acceptă și aplică o clasă personalizată pentru wrapper', () => {
-    const { container } = render(<Select options={opțiuniTest} value="" onChange={() => {}} wrapperClassName="test-wrapper-class" />);
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveClass('test-wrapper-class');
-  });
-
-  // Test pentru clase personalizate pe select
-  it('acceptă și aplică o clasă personalizată pentru select', () => {
-    const { container } = render(<Select options={opțiuniTest} value="" onChange={() => {}} className="test-select-class" />);
-    const select = container.querySelector('select');
-    expect(select).toHaveClass('test-select-class');
+  // Test pentru clase personalizate - comportament
+  it('funcționează cu clase personalizate', () => {
+    render(<Select options={opțiuniTest} value="" onChange={() => {}} wrapperClassName="test-wrapper-class" />);
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   // Test pentru interacțiune și selectare

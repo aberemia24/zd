@@ -11,7 +11,10 @@
 - Utilizați pattern-ul de memorare/cache pentru calcule intensive sau repetitive.
 
 - Limbă: Tot proiectul este exclusiv în limba română.
-- TDD: Obligatoriu pentru toate funcționalitățile noi.
+- **Test Strategy**: 
+  - **Pentru bug-uri**: TDD obligatoriu (test-first)
+  - **Pentru features noi**: Test-Informed Development (implementare rapidă + teste imediat după)
+  - **Pentru refactoring**: Tests-first pentru comportament existent
 - Commit-uri: Mesaje frecvente, atomice, descriptive.
 - Branching: Dezvoltare pe branch-uri de feature; `main` doar pentru cod stabil.
 - PR-uri: Obligatorii pentru orice integrare.
@@ -172,7 +175,40 @@ import { INITIAL_FORM_STATE, MESAJE } from '../constants';
 <input data-testid="rename-input" value={currentName} ... />
 ```
 
-#### Testare robustă cu constants și data-testid [ACTUALIZAT 2025-05-22]**Pattern validat în cod pentru testare modernă:**- **Obligatoriu**: Toate mesajele UI și sistemului provin din `@shared-constants` (messages.ts, ui.ts)- **Obligatoriu**: Toate elementele interactive au `data-testid` unic și predictibil- **Pattern standard**: `{component}-{element}-{id?}` pentru data-testid (ex: `transaction-row-123`, `add-btn`, `error-msg`)- **Selecție în teste**: Doar prin `data-testid`, nu prin text, clase sau structură DOM**Exemplu pattern implementat:**```tsx// În componente<Button   data-testid="save-transaction-btn"  onClick={handleSave}>  {UI.BUTTONS.SAVE}</Button><div data-testid="transaction-form-error">  {MESSAGES.ERRORS.INVALID_AMOUNT}</div>// În testeimport { UI, MESSAGES } from '@shared-constants';test('salvarea tranzacției funcționează corect', async () => {  render(<TransactionForm />);    // Selecție prin data-testid  const saveBtn = screen.getByTestId('save-transaction-btn');  const errorDiv = screen.queryByTestId('transaction-form-error');    // Verificare text prin constants  expect(saveBtn).toHaveTextContent(UI.BUTTONS.SAVE);  expect(errorDiv).not.toBeInTheDocument();    // Interacțiuni  await userEvent.click(saveBtn);    // Așteptare rezultat asincron  await waitFor(() => {    expect(screen.getByTestId('transaction-form-error'))      .toHaveTextContent(MESSAGES.ERRORS.INVALID_AMOUNT);  });});```**Pattern pentru formulare complexe validat:**```tsx// Verificare valori inițiale cu waitFor pentru stabilitatetest('formularul se inițializează cu valorile corecte', async () => {  render(<TransactionForm initialData={mockTransaction} />);    // Verificare individuală cu waitFor pentru câmpuri complexe  await waitFor(() => {    expect(screen.getByTestId('amount-input')).toHaveValue('100.50');  });    await waitFor(() => {    expect(screen.getByTestId('category-select')).toHaveValue('Food');  });    await waitFor(() => {    expect(screen.getByTestId('date-input')).toHaveValue('2025-05-22');  });});#### Pattern memoizare și optimizare performanță [NOU 2025-05-22]**Pattern implementat în componente pentru performanță optimă:****1. Memoizarea componentelor cu React.memo:**```tsx// Pattern validat în TransactionTable, LunarGrid, CategoryEditorconst TransactionTable = React.memo(({   transactions,   onTransactionClick,   filters }: TransactionTableProps) => {  // Implementare componentă});// Export cu displayName pentru debuggingTransactionTable.displayName = 'TransactionTable';export default TransactionTable;```**2. Memoizarea funcțiilor cu useCallback:**```tsx// Pattern pentru funcții event handlers și callbacksconst handleSaveTransaction = useCallback(async (data: TransactionInput) => {  try {    await transactionService.createTransaction(data);    queryClient.invalidateQueries({ queryKey: ['transactions'] });  } catch (error) {    console.error('Eroare salvare tranzacție:', error);  }}, [queryClient]);// Pattern pentru funcții de procesare dateconst handleFilterTransactions = useCallback((filters: TransactionFilters) => {  // Logică filtrare}, []);```**3. Memoizarea calculelor costisitoare cu useMemo:**```tsx// Pattern pentru procesare date complexeconst processedTransactions = useMemo(() => {  return transactions    .filter(tx => tx.userId === userId)    .map(tx => ({      ...tx,      formattedAmount: formatCurrency(tx.amount),      categoryLabel: getCategoryLabel(tx.category)    }))    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());}, [transactions, userId]);// Pattern pentru chei de grupconst groupedByCategory = useMemo(() => {  return processedTransactions.reduce((acc, transaction) => {    const key = `${transaction.category}|${transaction.subcategory}`;    if (!acc[key]) acc[key] = [];    acc[key].push(transaction);    return acc;  }, {} as Record<string, Transaction[]>);}, [processedTransactions]);```**Reguli de aplicare:**- **React.memo**: Pentru orice componentă care primește props complexe sau se re-renderează frecvent- **useCallback**: Pentru funcții event handlers care se trimit ca props către componente memoizate- **useMemo**: Pentru calcule costisitoare, procesări de arrays mari sau transformări complexe- **Chei unice**: Pentru liste React, combină ID-ul cu index sau alte date pentru unicitate garantată
+#### Organizare teste: Hibrid colocate + separate [ACTUALIZAT 2025-05-22]
+
+**Structură recomandată pentru solo developer cu AI assistance:**
+```
+frontend/src/components/
+├── primitives/Button/
+│   ├── Button.tsx
+│   └── Button.test.tsx         # Unit tests COLOCATE pentru acces rapid
+├── features/TransactionForm/
+│   ├── TransactionForm.tsx  
+│   └── TransactionForm.test.tsx # Component tests COLOCATE
+│   
+frontend/tests/
+├── integration/                # Integration tests SEPARATE
+│   ├── features/
+│   │   ├── lunar-grid/
+│   │   └── transactions/
+│   └── setup/
+└── e2e/                       # E2E tests SEPARATE
+```
+
+**Strategy pentru implementări noi (adaptată la realitatea solo dev + AI):**
+- **Bug fix**: TDD obligatoriu - Test care fail → Fix → Test pass
+- **New feature**: Test-Informed Development - Implement rapid → Add tests imediat → Refine together  
+- **Refactoring**: Tests first pentru a asigura comportament consistent
+
+**De ce hibrid?**
+- Unit tests colocate: Acces rapid în timpul development-ului
+- Integration/E2E separate: Logică cross-component, nu aparțin unei componente specifice
+- Solo developer friendly: Minimizează context switching
+
+#### Testare robustă cu constants și data-testid [ACTUALIZAT 2025-05-22]
+
+**Pattern validat în cod pentru testare modernă:**- **Obligatoriu**: Toate mesajele UI și sistemului provin din `@shared-constants` (messages.ts, ui.ts)- **Obligatoriu**: Toate elementele interactive au `data-testid` unic și predictibil- **Pattern standard**: `{component}-{element}-{id?}` pentru data-testid (ex: `transaction-row-123`, `add-btn`, `error-msg`)- **Selecție în teste**: Doar prin `data-testid`, nu prin text, clase sau structură DOM**Exemplu pattern implementat:**```tsx// În componente<Button   data-testid="save-transaction-btn"  onClick={handleSave}>  {UI.BUTTONS.SAVE}</Button><div data-testid="transaction-form-error">  {MESSAGES.ERRORS.INVALID_AMOUNT}</div>// În testeimport { UI, MESSAGES } from '@shared-constants';test('salvarea tranzacției funcționează corect', async () => {  render(<TransactionForm />);    // Selecție prin data-testid  const saveBtn = screen.getByTestId('save-transaction-btn');  const errorDiv = screen.queryByTestId('transaction-form-error');    // Verificare text prin constants  expect(saveBtn).toHaveTextContent(UI.BUTTONS.SAVE);  expect(errorDiv).not.toBeInTheDocument();    // Interacțiuni  await userEvent.click(saveBtn);    // Așteptare rezultat asincron  await waitFor(() => {    expect(screen.getByTestId('transaction-form-error'))      .toHaveTextContent(MESSAGES.ERRORS.INVALID_AMOUNT);  });});```**Pattern pentru formulare complexe validat:**```tsx// Verificare valori inițiale cu waitFor pentru stabilitatetest('formularul se inițializează cu valorile corecte', async () => {  render(<TransactionForm initialData={mockTransaction} />);    // Verificare individuală cu waitFor pentru câmpuri complexe  await waitFor(() => {    expect(screen.getByTestId('amount-input')).toHaveValue('100.50');  });    await waitFor(() => {    expect(screen.getByTestId('category-select')).toHaveValue('Food');  });    await waitFor(() => {    expect(screen.getByTestId('date-input')).toHaveValue('2025-05-22');  });});#### Pattern memoizare și optimizare performanță [NOU 2025-05-22]**Pattern implementat în componente pentru performanță optimă:****1. Memoizarea componentelor cu React.memo:**```tsx// Pattern validat în TransactionTable, LunarGrid, CategoryEditorconst TransactionTable = React.memo(({   transactions,   onTransactionClick,   filters }: TransactionTableProps) => {  // Implementare componentă});// Export cu displayName pentru debuggingTransactionTable.displayName = 'TransactionTable';export default TransactionTable;```**2. Memoizarea funcțiilor cu useCallback:**```tsx// Pattern pentru funcții event handlers și callbacksconst handleSaveTransaction = useCallback(async (data: TransactionInput) => {  try {    await transactionService.createTransaction(data);    queryClient.invalidateQueries({ queryKey: ['transactions'] });  } catch (error) {    console.error('Eroare salvare tranzacție:', error);  }}, [queryClient]);// Pattern pentru funcții de procesare dateconst handleFilterTransactions = useCallback((filters: TransactionFilters) => {  // Logică filtrare}, []);```**3. Memoizarea calculelor costisitoare cu useMemo:**```tsx// Pattern pentru procesare date complexeconst processedTransactions = useMemo(() => {  return transactions    .filter(tx => tx.userId === userId)    .map(tx => ({      ...tx,      formattedAmount: formatCurrency(tx.amount),      categoryLabel: getCategoryLabel(tx.category)    }))    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());}, [transactions, userId]);// Pattern pentru chei de grupconst groupedByCategory = useMemo(() => {  return processedTransactions.reduce((acc, transaction) => {    const key = `${transaction.category}|${transaction.subcategory}`;    if (!acc[key]) acc[key] = [];    acc[key].push(transaction);    return acc;  }, {} as Record<string, Transaction[]>);}, [processedTransactions]);```**Reguli de aplicare:**- **React.memo**: Pentru orice componentă care primește props complexe sau se re-renderează frecvent- **useCallback**: Pentru funcții event handlers care se trimit ca props către componente memoizate- **useMemo**: Pentru calcule costisitoare, procesări de arrays mari sau transformări complexe- **Chei unice**: Pentru liste React, combină ID-ul cu index sau alte date pentru unicitate garantată
 
 #### Politica de mocking [ACTUALIZAT]
 

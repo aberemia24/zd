@@ -123,7 +123,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ onSave, onCancel }) =
     
     // Filtrăm categoriile permise din categoriile fuzionate
     return categories.filter(cat => allowed.includes(cat.name));
-  }, [form?.type, categories]);
+  }, [form, categories]);
 
   // Lista de opțiuni pentru dropdown-ul de categorie (grupuri mari)
   const optiuniCategorie = React.useMemo(() => {

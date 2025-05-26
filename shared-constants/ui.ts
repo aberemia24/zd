@@ -261,3 +261,40 @@ export const LUNAR_GRID = {
   NO_DATA: 'Nu există date pentru perioada selectată',
   TOTAL_BALANCE: 'Sold'
 };
+
+// Constante pentru teste - eliminate strings hardcodate
+export const TEST_CONSTANTS = {
+  ALERTS: {
+    TEST_MESSAGE: 'Acesta este un mesaj de alertă',
+    ERROR_MESSAGE: 'Eroare de procesare',
+    SUCCESS_MESSAGE: 'Operație reușită',
+    WARNING_MESSAGE: 'Atenție la acțiune',
+    INFO_MESSAGE: 'Informație importantă',
+    CUSTOM_CLASS_MESSAGE: 'Test clasă personalizată',
+    BASE_CLASS_MESSAGE: 'Test clase de bază'
+  },
+  SELECT: {
+    PLACEHOLDER: 'Alege o opțiune',
+    OPTION_1: 'Opțiunea 1',
+    OPTION_2: 'Opțiunea 2', 
+    OPTION_3: 'Opțiunea 3',
+    LABEL: 'Selecție',
+    REQUIRED_ERROR: 'Acest câmp este obligatoriu'
+  },
+  TEXTAREA: {
+    PLACEHOLDER: 'Comentariile tale',
+    REQUIRED_ERROR: 'Acest câmp este obligatoriu',
+    LABEL: 'Textarea test',
+    TEST_VALUE: 'Acesta este un text de test'
+  },
+  CHECKBOX: {
+    LABEL: 'Acceptă termenii',
+    REQUIRED_ERROR: 'Trebuie să acceptați termenii',
+    CHECKED_LABEL: 'Opțiune bifată'
+  },
+  COMMON: {
+    TEST_MESSAGE: 'Mesaj de test',
+    LOADING: 'Se încarcă...',
+    ERROR_GENERIC: 'Eroare'
+  }
+};

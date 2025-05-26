@@ -111,9 +111,18 @@ export const useInlineCellEdit = ({
     }, 0);
   }, [isReadonly]);
 
-  // Save value
+  // Save value cu error handling îmbunătățit
   const saveValue = useCallback(async () => {
-    const validationError = validateValue(value);
+    const currentValue = value.trim();
+    
+    // Acceptă valori goale (șterge tranzacția)
+    if (!currentValue) {
+      setIsEditing(false);
+      setValue(String(initialValue));
+      return;
+    }
+    
+    const validationError = validateValue(currentValue);
     if (validationError) {
       setError(validationError);
       return;
@@ -125,9 +134,12 @@ export const useInlineCellEdit = ({
     try {
       // Pentru grid: amount/percentage = number, text/date = string
       // Utilizatorul introduce cu punct (450.5), convertim la number pentru calcule
-      let convertedValue: string | number = value;
+      let convertedValue: string | number = currentValue;
       if (validationType === 'amount' || validationType === 'percentage') {
-        convertedValue = parseFloat(value);
+        const numValue = parseFloat(currentValue);
+        if (!isNaN(numValue)) {
+          convertedValue = numValue;
+        }
       }
 
       await onSave(convertedValue);
@@ -136,20 +148,24 @@ export const useInlineCellEdit = ({
       // Show the actual error message from the network
       const errorMessage = err?.message || err?.toString() || EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
       setError(errorMessage);
+      console.error('Save error:', err);
     } finally {
       setIsSaving(false);
     }
-  }, [value, validateValue, onSave, validationType]);
+  }, [value, validateValue, onSave, validationType, initialValue]);
 
-  // Cancel editing
+  // Cancel editing cu reset complet
   const cancelEdit = useCallback(() => {
     setIsEditing(false);
-    setValue(String(initialValue));
+    setValue(String(initialValue)); // Reset la valoarea inițială
     setError(null);
+    setIsSaving(false);
   }, [initialValue]);
 
-  // Handle keyboard events
+  // Handle keyboard events cu Escape fix
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    e.stopPropagation(); // Previne propagarea care poate cauza page refresh
+    
     switch (e.key) {
       case 'Enter':
         e.preventDefault();
@@ -158,12 +174,26 @@ export const useInlineCellEdit = ({
         
       case 'Escape':
         e.preventDefault();
-        cancelEdit();
+        cancelEdit(); // Anulare directă, nu prin blur
         break;
         
       case 'Tab':
-        // Let Tab bubble up for navigation
-        saveValue();
+        // Lasă Tab să se propage pentru navigare, dar salvează data
+        e.preventDefault(); // Prevent default tab behavior
+        saveValue().then(() => {
+          // După salvare, găsește următoarea celulă editabilă
+          const form = (e.target as HTMLElement).closest('table');
+          if (form) {
+            const cells = form.querySelectorAll('[data-testid^="editable-cell-"]:not([data-testid*="editing"])');
+            const currentIndex = Array.from(cells).findIndex(cell => 
+              cell.contains(e.target as HTMLElement)
+            );
+            if (currentIndex >= 0 && currentIndex < cells.length - 1) {
+              (cells[currentIndex + 1] as HTMLElement).focus();
+              (cells[currentIndex + 1] as HTMLElement).click();
+            }
+          }
+        });
         break;
     }
   }, [saveValue, cancelEdit]);

@@ -201,33 +201,22 @@ export function useLunarGridTable(
     return Object.values(categoriesMap);
   }, [validTransactions, categories]);
 
-  // Click handler strategy OPTIMIZATĂ - handler-e definite la nivel de hook
+  // Click handler strategy SIMPLIFICATĂ - fără setTimeout pentru performance
   const stableClickHandlers = useMemo(() => {
     if (!onCellClick && !onCellDoubleClick) return null;
-    
-    let clickTimer: NodeJS.Timeout | null = null;
     
     return {
       handleSingleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
         e.stopPropagation();
         
-        if (!onCellClick) return;
-        
-        // Delay single click pentru a permite double click să îl anuleze
-        clickTimer = setTimeout(() => {
+        if (onCellClick) {
           onCellClick(e, category, subcategory, dayNumber, valueDisplay);
-        }, 200);
+        }
       },
       
       handleDoubleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
         e.stopPropagation();
         e.preventDefault();
-        
-        // Anulează single click dacă există
-        if (clickTimer) {
-          clearTimeout(clickTimer);
-          clickTimer = null;
-        }
         
         if (onCellDoubleClick) {
           onCellDoubleClick(e, category, subcategory, dayNumber, valueDisplay);

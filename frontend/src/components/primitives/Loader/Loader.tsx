@@ -51,7 +51,7 @@ const Loader: React.FC<LoaderProps> = ({
       </svg>
       {showText && (
         <span 
-          className="text-sm text-gray-600"
+          className="text-sm text-secondary-700"
           data-testid="loader-text"
         >
           {text}

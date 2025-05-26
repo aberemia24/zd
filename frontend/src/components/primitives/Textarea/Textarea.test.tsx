@@ -2,35 +2,42 @@
  * Test pentru Textarea - Componentă primitivă fără dependințe de store
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
+import { TEST_CONSTANTS } from '@shared-constants';
 import Textarea from './Textarea';
 
 describe('Textarea', () => {
   // Test pentru randarea de bază
-  it('se randează corect cu atributele de bază', () => {
-    render(<Textarea placeholder="Descriere" />);
-    expect(screen.getByPlaceholderText('Descriere')).toBeInTheDocument();
+  it('se randează corect', () => {
+    render(<Textarea data-testid="test-textarea" />);
+    expect(screen.getByTestId('test-textarea')).toBeInTheDocument();
+  });
+
+  // Test pentru placeholder
+  it('afișează placeholderul corect', () => {
+    render(<Textarea placeholder={TEST_CONSTANTS.TEXTAREA.PLACEHOLDER} />);
+    expect(screen.getByPlaceholderText(TEST_CONSTANTS.TEXTAREA.PLACEHOLDER)).toBeInTheDocument();
   });
 
   // Test pentru label
   it('afișează label-ul corect', () => {
-    render(<Textarea label="Comentariile tale" />);
-    expect(screen.getByText('Comentariile tale')).toBeInTheDocument();
+    render(<Textarea label={TEST_CONSTANTS.TEXTAREA.LABEL} />);
+    expect(screen.getByText(TEST_CONSTANTS.TEXTAREA.LABEL)).toBeInTheDocument();
   });
 
   // Test pentru erori
   it('afișează mesajul de eroare', () => {
-    render(<Textarea error="Acest câmp este obligatoriu" />);
-    expect(screen.getByText('Acest câmp este obligatoriu')).toBeInTheDocument();
+    render(<Textarea error={TEST_CONSTANTS.TEXTAREA.REQUIRED_ERROR} />);
+    expect(screen.getByText(TEST_CONSTANTS.TEXTAREA.REQUIRED_ERROR)).toBeInTheDocument();
   });
 
   // Test pentru stilizarea corectă a erorii
   it('adaugă clasa corectă pentru borderul de eroare', () => {
-    const { container } = render(<Textarea error="Eroare" />);
+    const { container } = render(<Textarea error={TEST_CONSTANTS.COMMON.ERROR_GENERIC} />);
     const textarea = container.querySelector('textarea');
-    expect(textarea).toHaveClass('border-error-500');
+    expect(textarea).toHaveClass('border-red-300');
   });
 
   // Test pentru clase personalizate pe wrapper

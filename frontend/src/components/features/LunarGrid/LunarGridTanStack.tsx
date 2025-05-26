@@ -21,6 +21,7 @@ import { LUNAR_GRID, LUNAR_GRID_MESSAGES } from '@shared-constants';
 // Import componentele UI
 import Button from '../../primitives/Button/Button';
 import CellTransactionPopover from './CellTransactionPopover';
+import { EditableCell } from './inline-editing/EditableCell';
 
 // Import CVA styling system
 import { cn } from '../../../styles/cva/shared/utils';
@@ -44,15 +45,7 @@ export interface LunarGridTanStackProps {
   month: number;
 }
 
-// Interfața pentru starea celulei în editare
-interface EditingCellState {
-  id: string;
-  category: string;
-  subcategory?: string;
-  day: number;
-  amount: string;
-  type: TransactionType;
-}
+
 
 // Interfața pentru starea popover-ului
 interface PopoverState {
@@ -67,12 +60,11 @@ interface PopoverState {
 
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month }) => {
-  // State pentru editare inline și popover
-  const [editingCell, setEditingCell] = useState<EditingCellState | null>(null);
+  // State pentru popover (păstrat doar pentru modal advanced)
   const [popover, setPopover] = useState<PopoverState | null>(null);
   
-  // Referință pentru input focus
-  const inputRef = useRef<HTMLInputElement>(null);
+  // State pentru expanded rows (să nu se colapșeze după salvare)
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   
   // Hooks pentru mutații de tranzacții
   const { mutate: createTransactionMutation } = useCreateTransaction();
@@ -84,98 +76,62 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     return (foundCategory?.type || 'expense') as TransactionType;
   }, []);
   
-  // Handler pentru double click pe celule (editare inline)
-  const handleCellDoubleClick = useCallback((
-    e: React.MouseEvent, 
+  // Handler pentru salvarea din EditableCell (folosit direct de fiecare celulă)
+  const handleEditableCellSave = useCallback(async (
     category: string, 
     subcategory: string | undefined, 
     day: number, 
-    amount: string
-  ) => {
-    e.stopPropagation();
+    value: string | number
+  ): Promise<void> => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
     
-    // Dacă este deja popover deschis, îl închidem
-    if (popover) {
-      setPopover(null);
-    }
-    
-    // Setăm starea de editare pentru celula curentă
-    const cellId = `${category}-${subcategory || 'null'}-${day}`;
-    
-    setEditingCell({
-      id: cellId,
-      category,
-      subcategory,
-      day,
-      amount: amount && amount !== '-' ? amount.replace(/[^\d,.-]/g, '') : '',
-      type: determineTransactionType(category)
-    });
-    
-    // Focus pe input după render
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-      }
-    }, 10);
-  }, [popover, determineTransactionType, inputRef]);
-  
-  // Handler pentru salvarea valorii din input inline
-  const handleInlineEditSave = useCallback((newAmount: string) => {
-    if (!editingCell) return;
-    
-    const { category, subcategory, day, type: transactionType } = editingCell;
-    
-    if (isNaN(Number(newAmount)) || !newAmount) {
-      setEditingCell(null);
-      return;
+    if (isNaN(numValue) || numValue <= 0) {
+      throw new Error('Valoare invalidă - trebuie să fie un număr pozitiv');
     }
     
     // Construim data
     const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
     
-    // Folosim React Query mutation în loc de Zustand
+    // Folosim React Query mutation - cache invalidation se face automat în onSuccess
     const createPayload: CreateTransactionHookPayload = {
-      amount: Number(newAmount),
+      amount: numValue,
       category,
       subcategory: subcategory || undefined,
-      type: transactionType,
+      type: determineTransactionType(category),
       date,
       recurring: false,
       frequency: undefined
     };
     
-    createTransactionMutation(createPayload, {
-      onSuccess: () => {
-        setEditingCell(null);
-      },
-      onError: (error: Error) => {
-        console.error('Eroare la crearea tranzacției:', error);
-        setEditingCell(null);
-      }
-    });
-  }, [editingCell, year, month, createTransactionMutation]);
-  
-  // Handler pentru anularea editării inline
-  const handleInlineEditCancel = useCallback(() => {
-    setEditingCell(null);
-  }, []);
-  
-  // Handler pentru keypress în inputul inline
-  const handleInlineKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleInlineEditSave((e.target as HTMLInputElement).value);
-    } else if (e.key === 'Escape') {
-      handleInlineEditCancel();
+    try {
+      // React Query mutation face cache invalidation automat - nu mai adăugăm manual
+      await new Promise<void>((resolve, reject) => {
+        createTransactionMutation(createPayload, {
+          onSuccess: () => {
+            resolve();
+          },
+          onError: (error: Error) => {
+            reject(error);
+          }
+        });
+      });
+      
+      // ELIMINAT: Cache invalidation manual - se face automat în mutation onSuccess
+      
+    } catch (error) {
+      throw error;
     }
-  }, [handleInlineEditSave, handleInlineEditCancel]);
+  }, [year, month, createTransactionMutation, determineTransactionType]);
   
-  // Handler pentru click pe celulă
+
+  
+  // Handler pentru click pe celulă (doar pentru modal advanced - Shift+Click)
   const handleCellClick = useCallback(
     (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => {
       e.stopPropagation();
       
-      if (editingCell) return;
+      // Doar deschide modal-ul dacă se ține Shift (pentru advanced editing)
+      if (!e.shiftKey) return;
       
       // Verifică dacă currentTarget este valid
       const anchorEl = e.currentTarget as HTMLElement;
@@ -193,7 +149,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         anchorEl
       });
     }, 
-    [editingCell, determineTransactionType]
+    [determineTransactionType]
   );
   
   // Handler pentru salvarea tranzacției din popover
@@ -233,7 +189,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
     [popover, year, month, createTransactionMutation]
   );
 
-  // Interogare tabel optimizată
+  // Interogare tabel optimizată (fără handleri de click/double-click)
   const {
     table,
     isLoading,
@@ -244,37 +200,43 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
   } = useLunarGridTable(
     year, 
     month, 
-    {}, 
-    handleCellClick, 
-    handleCellDoubleClick
+    expandedRows, 
+    handleCellClick
   );
 
-  // State pentru celula în editare inline
-  const renderEditableCell = useCallback((category: string, subcategory: string | undefined, day: number) => {
-    if (!editingCell) return null;
-
+  // Render pentru celula editabilă folosind EditableCell component
+  const renderEditableCell = useCallback((category: string, subcategory: string | undefined, day: number, currentValue: string | number) => {
     const cellId = `${category}-${subcategory || 'null'}-${day}`;
-
-    if (editingCell.id !== cellId) return null;
+    
+    // Parseaza valoarea existentă corect pentru display
+    let displayValue = '';
+    if (currentValue && currentValue !== '-' && currentValue !== '—') {
+      if (typeof currentValue === 'string') {
+        // Elimină formatarea pentru editing
+        displayValue = currentValue.replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+      } else {
+        displayValue = String(currentValue);
+      }
+    }
 
     return (
-      <input
-        type="number"
-        ref={inputRef}
-        value={editingCell.amount}
-        onChange={(e) => setEditingCell(prev => prev ? { ...prev, amount: e.target.value } : null)}
-        onKeyDown={handleInlineKeyDown}
-        onBlur={() => handleInlineEditSave(editingCell.amount)}
-        className={cn(
-          'px-3 py-2 text-sm border border-primary-300 rounded-md',
-          'focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
-          'transition-all duration-150'
-        )}
-        data-testid={`inline-edit-input-${day}`}
-        autoFocus
+      <EditableCell
+        cellId={cellId}
+        value={displayValue}
+        onSave={async (value) => {
+          try {
+            await handleEditableCellSave(category, subcategory, day, value);
+          } catch (error) {
+            console.error('Eroare la salvarea celulei:', error);
+            throw error; // Re-throw pentru EditableCell să gestioneze eroarea
+          }
+        }}
+        validationType="amount"
+        className="w-full h-full min-h-[40px]"
+        data-testid={`editable-cell-${cellId}`}
       />
     );
-  }, [editingCell, handleInlineKeyDown, handleInlineEditSave]);
+  }, [handleEditableCellSave]);
 
   // Funcție pentru calcularea sumei totale
   const monthTotal = useMemo(() => 
@@ -344,28 +306,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
                   isFirstCell && level > 0 ? 'pl-8' : '',
                   isFirstCell ? 'sticky left-0 bg-inherit z-10' : ''
                 )}
-                onClick={isDayCell && isSubcategory ? (e) => handleCellClick(
-                  e,
-                  original.category,
-                  original.subcategory,
-                  parseInt(cell.column.id.split('-')[1]),
-                  cell.getValue() as string || ''
-                ) : undefined}
-                onDoubleClick={isDayCell && isSubcategory ? (e) => handleCellDoubleClick(
-                  e,
-                  original.category,
-                  original.subcategory,
-                  parseInt(cell.column.id.split('-')[1]),
-                  cell.getValue() as string || ''
-                ) : undefined}
+
                 title={isCategory && isDayCell ? 'Suma calculată automată din subcategorii' : undefined}
               >
                 {isDayCell && isSubcategory ? (
                   renderEditableCell(
                     original.category,
                     original.subcategory,
-                    parseInt(cell.column.id.split('-')[1])
-                  ) || (flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode)
+                    parseInt(cell.column.id.split('-')[1]),
+                    cell.getValue() as string | number
+                  )
                 ) : (
                   flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode
                 )}
@@ -380,7 +330,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         )}
       </React.Fragment>
     );
-  }, [renderEditableCell, tableCell, tableRow, handleCellClick, handleCellDoubleClick]);
+  }, [renderEditableCell, tableCell, tableRow, handleCellClick]);
 
   // Renderizare (layout principal)
   return (
@@ -389,7 +339,23 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => table.getToggleAllRowsExpandedHandler()(!table.getIsAllRowsExpanded())}
+          onClick={() => {
+            const isCurrentlyExpanded = table.getIsAllRowsExpanded();
+            const newExpandedState: Record<string, boolean> = {};
+            
+            if (!isCurrentlyExpanded) {
+              // Expandează toate
+              table.getRowModel().rows.forEach(row => {
+                if (row.getCanExpand()) {
+                  newExpandedState[row.id] = true;
+                }
+              });
+            }
+            // Dacă se colapează, lăsăm newExpandedState gol (toate false)
+            
+            setExpandedRows(newExpandedState);
+            table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+          }}
           dataTestId="toggle-expand-all"
         >
           {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
@@ -397,7 +363,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => table.resetExpanded()}
+          onClick={() => {
+            setExpandedRows({});
+            table.resetExpanded();
+          }}
           dataTestId="reset-expanded"
         >
           {LUNAR_GRID.RESET_EXPANSION}
@@ -413,6 +382,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
           'transition-all duration-150'
         )}
         data-testid="lunar-grid-container"
+        onSubmit={(e) => {
+          // Previne form submission care cauzează page refresh
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          // Previne click-uri nedorite care pot cauza navigație
+          e.stopPropagation();
+        }}
       >
         {isLoading && (
           <div className="flex items-center justify-center p-4 text-gray-600" data-testid="loading-indicator">

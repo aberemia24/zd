@@ -24,3 +24,6 @@ deprecated_globalrules.md
 
 # windsurf rules
 .windsurfrules
+
+# Test persistence files
+frontend/tests/e2e/support/.mailslurp-accounts.json

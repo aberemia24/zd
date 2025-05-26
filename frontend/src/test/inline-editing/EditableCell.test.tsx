@@ -79,7 +79,7 @@ describe('EditableCell - Phase 1 UI Component', () => {
     const input = screen.getByDisplayValue('250.75');
     expect(input).toBeInTheDocument();
     expect(input).toHaveFocus();
-    expect(input).toHaveAttribute('type', 'number');
+    expect(input).toHaveAttribute('type', 'text');
   });
 
   test('activează editarea cu F2', async () => {
