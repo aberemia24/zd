@@ -4,8 +4,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'; // Importuri react-r
 
 import TransactionsPage from './pages/TransactionsPage';
 import LunarGridPage from './pages/LunarGridPage';
-import EnhancedLunarGridPage from './pages/EnhancedLunarGridPage';
-import LunarGridEnhancedPage from './pages/LunarGridEnhancedPage';
 import OptionsPage from './pages/OptionsPage';
 import LoginForm from './components/features/Auth/LoginForm';
 import RegisterForm from './components/features/Auth/RegisterForm';
@@ -111,7 +109,9 @@ export const App: React.FC = () => {
           {user ? (
             <>
               <Route path="/" element={<Navigate to="/transactions" replace />} />
-                            <Route path="/transactions" element={<TransactionsPage />} />              <Route path="/lunar-grid" element={<LunarGridPage />} />              <Route path="/enhanced-lunar-grid" element={<EnhancedLunarGridPage />} />              <Route path="/lunar-grid-enhanced" element={<LunarGridEnhancedPage />} />              <Route path="/options" element={<OptionsPage />} />
+                            <Route path="/transactions" element={<TransactionsPage />} />              
+                            <Route path="/lunar-grid" element={<LunarGridPage />} />                                    
+                            <Route path="/options" element={<OptionsPage />} />
               {/* Orice altă rută pentru utilizator logat, redirecționează la tranzacții */}
               <Route path="*" element={<Navigate to="/transactions" replace />} />
             </>

@@ -56,7 +56,19 @@ describe('Recurring Transaction Generator', () => {
       expect(nextDate.toISOString().split('T')[0]).toBe('2024-02-15');
     });
     
-    test('handles month-end edge cases correctly', () => {      const currentDate = new Date('2024-01-31');      const frequency: RecurringFrequency = {         type: 'monthly',         interval: 1,         dayOfMonth: 31       };            const nextDate = calculateNextOccurrence(currentDate, frequency);            // Should move to March (February doesn't have 31 days)      expect(nextDate.toISOString().split('T')[0]).toBe('2024-03-31');    });
+    test('handles month-end edge cases correctly', () => {
+      const currentDate = new Date('2024-01-31');
+      const frequency: RecurringFrequency = {
+        type: 'monthly',
+        interval: 1,
+        dayOfMonth: 31
+      };
+      
+      const nextDate = calculateNextOccurrence(currentDate, frequency);
+      
+      // Should move to March (February doesn't have 31 days)
+      expect(nextDate.toISOString().split('T')[0]).toBe('2024-03-31');
+    });
     
     test('calculates next yearly occurrence correctly', () => {
       const currentDate = new Date('2024-01-15');
@@ -484,4 +496,9 @@ describe('Recurring Transaction Generator', () => {
         type: 'yearly', 
         interval: 1, 
         monthOfYear: 6, 
-                dayOfMonth: 15       };            expect(formatFrequencyDisplay(frequency)).toBe('Anual în Iunie ziua 15');    });  });}); 
+        dayOfMonth: 15 
+      };
+      expect(formatFrequencyDisplay(frequency)).toBe('Anual în Iunie ziua 15');
+    });
+  });
+}); 

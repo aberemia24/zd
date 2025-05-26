@@ -192,7 +192,7 @@ export function measurePerformance<T extends any[], R>(
  * Util pentru a evita re-render-uri inutile
  */
 export function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T>();
+  const ref = useRef<T | undefined>(undefined);
   
   useEffect(() => {
     ref.current = value;

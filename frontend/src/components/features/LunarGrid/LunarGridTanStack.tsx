@@ -177,13 +177,20 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
       
       if (editingCell) return;
       
+      // Verifică dacă currentTarget este valid
+      const anchorEl = e.currentTarget as HTMLElement;
+      if (!anchorEl) {
+        console.warn('No currentTarget available for popover anchor');
+        return;
+      }
+      
       setPopover({
         category,
         subcategory,
         day,
         type: determineTransactionType(category),
         amount,
-        anchorEl: e.currentTarget as HTMLElement
+        anchorEl
       });
     }, 
     [editingCell, determineTransactionType]
@@ -284,17 +291,23 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(({ year, month 
 
   // Gestionarea poziției popover-ului
   const popoverStyle = useMemo((): CSSProperties => {
-    if (!popover) return {};
+    if (!popover || !popover.anchorEl) return {};
     
-    const rect = popover.anchorEl.getBoundingClientRect();
-    const scrollY = window.scrollY || document.documentElement.scrollTop;
-    const scrollX = window.scrollX || document.documentElement.scrollLeft;
-    
-    return {
-      position: 'absolute',
-      top: `${rect.top + scrollY}px`,
-      left: `${rect.left + scrollX}px`,
-    };
+    // Verifică dacă elementul este încă în DOM
+    try {
+      const rect = popover.anchorEl.getBoundingClientRect();
+      const scrollY = window.scrollY || document.documentElement.scrollTop;
+      const scrollX = window.scrollX || document.documentElement.scrollLeft;
+      
+      return {
+        position: 'absolute',
+        top: `${rect.top + scrollY}px`,
+        left: `${rect.left + scrollX}px`,
+      };
+    } catch (error) {
+      console.warn('Could not get bounding rect for popover anchor element:', error);
+      return {};
+    }
   }, [popover]);
 
   // Funcție helper pentru randarea recursivă a rândurilor

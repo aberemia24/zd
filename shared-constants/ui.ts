@@ -149,6 +149,26 @@ export const EXCEL_GRID = {
     VIRTUAL_TABLE: 'Tabel optimizat',
     LEGACY_TABLE: 'Tabel clasic',
     VERSION: 'Versiune'
+  },
+  // Constante pentru inline editing system
+  INLINE_EDITING: {
+    EDIT_HINT: 'Apasă F2 pentru editare',
+    VALIDATION_ERRORS: {
+      EMPTY_VALUE: 'Valoarea nu poate fi goală',
+      INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',
+      NEGATIVE_VALUE: 'Valoarea nu poate fi negativă',
+      INVALID_PERCENTAGE: 'Procentul trebuie să fie un număr valid',
+      PERCENTAGE_RANGE: 'Procentul trebuie să fie între 0 și 100',
+      INVALID_DATE: 'Data trebuie să fie în format valid',
+      TEXT_TOO_LONG: 'Textul nu poate depăși 255 de caractere'
+    },
+    SAVE_ERROR: 'Eroare la salvare',
+    PLACEHOLDER: {
+      AMOUNT: 'Introduceți suma',
+      TEXT: 'Introduceți textul',
+      PERCENTAGE: 'Introduceți procentul',
+      DATE: 'Introduceți data'
+    }
   }
 };
 

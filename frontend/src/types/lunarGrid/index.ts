@@ -1,1 +1,3 @@
-// Barrel export pentru tipurile LunarGridexport * from './FinancialCalculations';export * from './RecurringTransactions'; 
+// Barrel export pentru tipurile LunarGrid
+export * from './FinancialCalculations';
+export * from './RecurringTransactions'; 

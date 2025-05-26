@@ -3,7 +3,6 @@
 // Main components
 export { default } from './LunarGridTanStack'; // Export implicit pentru LunarGridTanStack
 export { default as LunarGridTanStack } from './LunarGridTanStack';
-export { default as EnhancedLunarGrid } from './EnhancedLunarGrid';
 export { default as TanStackSubcategoryRows } from './TanStackSubcategoryRows';
 
 // Cell components
