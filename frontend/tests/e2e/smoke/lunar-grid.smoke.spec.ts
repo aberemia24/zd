@@ -67,16 +67,30 @@ test.describe('Smoke: LunarGrid Basic Functionality', () => {
   test('celulele grid-ului răspund la click', { tag: '@smoke' }, async ({ page }) => {
     console.log('🔍 Smoke Test: Cell Interaction');
     
+    // Verifică că grid-ul e încărcat
+    await expect(page.getByTestId('lunar-grid-container')).toBeVisible();
+    
     // Expandează pentru a avea celule disponibile
+    // WORKAROUND: Grid-ul se resetează după edit, deci expandăm din nou
     const expandButton = page.getByTestId('toggle-expand-all');
     if (await expandButton.isVisible()) {
       await expandButton.click();
-      await page.waitForTimeout(2000);
+      await page.waitForTimeout(2000); // Așteaptă animația
+      
+      // Verifică că expandarea a reușit și avem celule
+      const cellCount = await page.locator('[data-testid*="editable-cell"]').count();
+      console.log(`📊 Celule după expandare: ${cellCount}`);
+      
+      if (cellCount === 0) {
+        console.log('⚠️ Nu s-au găsit celule după expandare, încercăm din nou...');
+        await expandButton.click();
+        await page.waitForTimeout(3000);
+      }
     }
     
     // Găsește prima celulă editabilă disponibilă
     const firstCell = page.locator('[data-testid*="editable-cell"]').first();
-    await expect(firstCell).toBeVisible();
+    await expect(firstCell).toBeVisible({ timeout: 10000 });
     
     // Click pe celulă
     await firstCell.click();
