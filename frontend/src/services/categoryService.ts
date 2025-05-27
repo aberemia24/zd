@@ -6,8 +6,13 @@ import { API } from "@shared-constants/api";
 import { MESAJE } from "@shared-constants/messages";
 
 // Helper pentru logging consistent
-const logError = (context: string, error: any) => {
-  console.error(`[categoryService] ${context}:`, error);
+const logError = (context: string, error: unknown) => {
+  const errorMessage = error instanceof Error 
+    ? error.message 
+    : typeof error === 'string' 
+    ? error 
+    : 'Unknown error';
+  console.error(`[categoryService] ${context}:`, errorMessage, error);
 };
 
 // Tabelele ar trebui mutate în API.TABLES conform regulilor globale (memoria 886c7659)

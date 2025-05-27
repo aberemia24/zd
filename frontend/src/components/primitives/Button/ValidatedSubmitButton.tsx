@@ -11,9 +11,9 @@ export interface ValidatedSubmitButtonProps
 
   /**
    * Indică dacă operația este în curs (loading)
-   * Convertăm orice valoare non-falsy la boolean pentru compatibilitate
+   * Acceptă boolean sau valori truthy/falsy pentru compatibilitate
    */
-  isLoading?: any;
+  isLoading?: boolean | string | number | null | undefined;
 
   /**
    * Text pentru buton în stare de loading (opțional)
@@ -46,7 +46,7 @@ const ValidatedSubmitButton: React.FC<ValidatedSubmitButtonProps> = ({
     <Button
       type="submit"
       variant={isFormValid ? "primary" : "secondary"}
-      disabled={!isFormValid || isLoading || disabled}
+      disabled={!isFormValid || Boolean(isLoading) || disabled}
       isLoading={Boolean(isLoading)}
       {...rest}
     >

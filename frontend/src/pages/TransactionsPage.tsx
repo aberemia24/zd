@@ -18,6 +18,12 @@ import { PAGINATION } from "@shared-constants";
 import { TITLES } from "@shared-constants";
 import type { Transaction } from "../types/Transaction";
 
+// Interfață pentru tranzacții cu proprietăți opționale pentru transformare
+interface RawTransactionWithOptionalId extends Omit<Transaction, 'id'> {
+  id?: string;
+  _id?: string;
+}
+
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
  * Conține formularul de adăugare, filtrele și tabelul de tranzacții
@@ -110,11 +116,9 @@ const TransactionsPage: React.FC = () => {
       }
 
       // Asigurăm că _id este transferat la id dacă e necesar
-      if (
-        !(processedTransaction as any).id &&
-        (processedTransaction as any)._id
-      ) {
-        (processedTransaction as any).id = (processedTransaction as any)._id;
+      const rawTransaction = processedTransaction as RawTransactionWithOptionalId;
+      if (!rawTransaction.id && rawTransaction._id) {
+        (processedTransaction as Transaction & { id: string }).id = rawTransaction._id;
       }
 
       // Ne asigurăm că date este mereu string

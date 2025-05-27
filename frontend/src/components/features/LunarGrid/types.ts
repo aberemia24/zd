@@ -1,6 +1,6 @@
 import { TransactionType } from "@shared-constants/enums";
 import { TransactionValidated } from "@shared-constants/transaction.schema";
-import { ColumnDef, Row, Table } from "@tanstack/react-table";
+import { ColumnDef, Row, Table, Column } from "@tanstack/react-table";
 import { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
 import { ReactNode } from "react";
 
@@ -200,19 +200,19 @@ export interface UseLunarGridTableResult {
  */
 export type CellRendererProps = {
   /** Valoarea celulei */
-  value: any;
+  value: string | number | null | undefined;
 
   /** Rândul curent */
   row: Row<LunarGridRowData>;
 
   /** Coloana curentă */
-  column: any; // TODO: Înlocuiește cu tipul corect din TanStack Table
+  column: Column<LunarGridRowData, unknown>;
 
   /** Funcție pentru actualizarea valorii */
-  updateData: (rowIndex: number, columnId: string, value: any) => void;
+  updateData: (rowIndex: number, columnId: string, value: string | number) => void;
 
-  /** Alte proprietăți */
-  [key: string]: any;
+  /** Proprietăți suplimentare pentru renderer-ul de celulă */
+  cellProps?: Record<string, unknown>;
 };
 
 /**
@@ -223,7 +223,7 @@ export interface ColumnConfig {
   id: string;
 
   /** Header-ul coloanei */
-  header: string | ((info: any) => ReactNode);
+  header: string | ((info: { column: Column<LunarGridRowData, unknown> }) => ReactNode);
 
   /** Accesorul datelor */
   accessorKey?: string;

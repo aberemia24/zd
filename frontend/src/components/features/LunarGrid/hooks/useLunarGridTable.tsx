@@ -27,6 +27,20 @@ import {
   transformToTableData,
 } from "../../../../utils/lunarGrid";
 
+// Interfaces pentru structuri de date
+interface SubcategoryDefinition {
+  name: string;
+  source?: string;
+}
+
+interface FallbackRow {
+  subcategory: string;
+}
+
+interface DailyAmount {
+  [dayKey: `day-${number}`]: number;
+}
+
 // Tip pentru datele transformate pentru TanStack Table
 export type TransformedTableDataRow = {
   id: string;
@@ -35,8 +49,7 @@ export type TransformedTableDataRow = {
   isCategory: boolean;
   total: number;
   subRows?: TransformedTableDataRow[]; // Adăugat pentru subrows native
-  [dayKey: string]: any; // For 'day-1', 'day-2', etc.
-};
+} & DailyAmount;
 
 /**
  * Hook pentru gestionarea datelor și stării pentru LunarGrid bazat pe TanStack Table.
@@ -61,8 +74,8 @@ export interface UseLunarGridTableResult {
 // Helper robust pentru generare subRows UNICE cu indexare globală pe subcategory goală
 function buildUniqueSubRows(
   categoryName: string,
-  subcategories: any[],
-  fallbackRows: any[],
+  subcategories: SubcategoryDefinition[],
+  fallbackRows: FallbackRow[],
 ) {
   // Combină toate subRows (din definiție și fallback)
   const all = [
@@ -101,7 +114,7 @@ function buildUniqueSubRows(
 }
 
 // Validare pentru duplicate (doar în dev)
-function warnIfDuplicateIds(rows: any[], context: string) {
+function warnIfDuplicateIds(rows: TransformedTableDataRow[], context: string) {
   const ids = rows.map((r) => r.id);
   const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
   if (duplicates.length > 0 && import.meta.env.NODE_ENV !== "production") {
@@ -163,7 +176,7 @@ export function useLunarGridTable(
   const rawTableData = useMemo(() => {
     // 1. Grupăm tranzacțiile pe categorii și subcategorii
     const categoriesMap: Record<string, TransformedTableDataRow> = {};
-    const fallbackRowsMap: Record<string, any[]> = {};
+    const fallbackRowsMap: Record<string, FallbackRow[]> = {};
 
     categories.forEach((category) => {
       categoriesMap[category.name] = {

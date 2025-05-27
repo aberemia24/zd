@@ -19,21 +19,34 @@ export interface UsePerformanceOptimizationProps {
   performanceThreshold?: number;
 }
 
+// Type pentru cell data în grid
+export interface CellData {
+  id: string;
+  category: string;
+  subcategory?: string;
+  day: number;
+  amount: number;
+  [key: string]: unknown;
+}
+
+// Type pentru event handlers cu type safety
+export type OptimizedEventHandler<T extends unknown[] = unknown[]> = (...args: T) => void;
+
 export interface UsePerformanceOptimizationReturn {
   /** Dacă să folosească optimizările de performanță */
   shouldOptimize: boolean;
 
   /** Handler optimizat pentru evenimente */
-  createOptimizedHandler: (
-    handler: (...args: any[]) => void,
+  createOptimizedHandler: <T extends unknown[]>(
+    handler: OptimizedEventHandler<T>,
     dependencies: unknown[],
-  ) => (...args: any[]) => void;
+  ) => OptimizedEventHandler<T>;
 
   /** Memoized cell renderer pentru reducerea re-renderurilor */
   memoizedCellRenderer: (
-    renderFn: (data: any) => React.ReactNode,
+    renderFn: (data: CellData) => React.ReactNode,
     dependencies: unknown[],
-  ) => (data: any) => React.ReactNode;
+  ) => (data: CellData) => React.ReactNode;
 
   /** Event delegation setup pentru grid */
   setupEventDelegation: () => () => void;
@@ -55,20 +68,20 @@ export const usePerformanceOptimization = ({
 
   // Create optimized event handler cu proper memoization
   const createOptimizedHandler = useCallback(
-    (handler: (...args: any[]) => void, dependencies: unknown[]) => {
+    <T extends unknown[]>(handler: OptimizedEventHandler<T>, dependencies: unknown[]) => {
       // Return a simple function without hooks inside
-      return (...args: any[]) => {
+      return ((...args: T) => {
         handler(...args);
-      };
+      }) as OptimizedEventHandler<T>;
     },
     [],
   );
 
   // Memoized cell renderer pentru reducerea re-renderurilor
   const memoizedCellRenderer = useCallback(
-    (renderFn: (data: any) => React.ReactNode, dependencies: unknown[]) => {
+    (renderFn: (data: CellData) => React.ReactNode, dependencies: unknown[]) => {
       // Return a simple function without hooks inside
-      return (data: any) => {
+      return (data: CellData) => {
         return renderFn(data);
       };
     },

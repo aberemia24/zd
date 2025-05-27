@@ -223,15 +223,31 @@ export const CellRenderer: React.FC<CellRendererProps> = ({
       // Enter sau Space pentru click
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        const mouseEvent = new MouseEvent("click", { bubbles: true }) as any;
-        handleClick(mouseEvent);
+        // Simulăm un click folosind event-ul curent ca bază
+        const syntheticEvent = {
+          ...e,
+          type: 'click',
+          button: 0,
+          buttons: 1,
+          clientX: 0,
+          clientY: 0,
+        } as unknown as React.MouseEvent;
+        handleClick(syntheticEvent);
       }
 
       // F2 pentru edit mode (Excel-like)
       if (e.key === "F2") {
         e.preventDefault();
-        const mouseEvent = new MouseEvent("dblclick", { bubbles: true }) as any;
-        handleDoubleClick(mouseEvent);
+        // Simulăm un double click folosind event-ul curent ca bază
+        const syntheticEvent = {
+          ...e,
+          type: 'dblclick',
+          button: 0,
+          buttons: 1,
+          clientX: 0,
+          clientY: 0,
+        } as unknown as React.MouseEvent;
+        handleDoubleClick(syntheticEvent);
       }
     },
     [handleClick, handleDoubleClick, cellState],

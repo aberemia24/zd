@@ -189,6 +189,14 @@ interface MutationContext<TData> {
 /**
  * Construiește opțiuni optimizate pentru queries infinite
  */
+// Interfețe pentru paginare
+interface PageData {
+  nextCursor?: string | number;
+  prevCursor?: string | number;
+  hasMore?: boolean;
+  [key: string]: unknown;
+}
+
 export function getInfiniteQueryOptions<TData, TError>(
   options: {
     /** Numărul de pagini care vor fi reținute în memorie */
@@ -206,13 +214,13 @@ export function getInfiniteQueryOptions<TData, TError>(
   return {
     staleTime: options.staleTime ?? 60 * 1000, // 1 minut implicit
     gcTime: options.gcTime ?? 5 * 60 * 1000, // 5 minute implicit (redenumit din cacheTime)
-    getNextPageParam: (lastPage: any, allPages: any[]) => {
+    getNextPageParam: (lastPage: PageData, allPages: PageData[]) => {
       // Logică implicită pentru paginare - poate fi suprascrisă
       if (lastPage?.nextCursor) return lastPage.nextCursor;
       if (lastPage?.hasMore === false) return undefined;
       return allPages.length + 1;
     },
-    getPreviousPageParam: (firstPage: any) => {
+    getPreviousPageParam: (firstPage: PageData) => {
       // Logică implicită pentru paginare inversă
       if (firstPage?.prevCursor) return firstPage.prevCursor;
       return undefined;
@@ -252,7 +260,7 @@ export function createOptimisticMutations<TData, TError, TVariables>(
         const newItem = newItemFactory(variables);
         queryClient.setQueryData<TData[]>(queryKey, (old = []) => [
           ...old,
-          newItem as any,
+          newItem,
         ]);
 
         return { previousData };

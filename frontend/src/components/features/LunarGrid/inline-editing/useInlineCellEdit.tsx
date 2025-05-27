@@ -148,10 +148,13 @@ export const useInlineCellEdit = ({
 
       await onSave(convertedValue);
       setIsEditing(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Show the actual error message from the network
-      const errorMessage =
-        err?.message || err?.toString() || EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : typeof err === 'string' 
+        ? err 
+        : EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
       setError(errorMessage);
       console.error("Save error:", err);
     } finally {
