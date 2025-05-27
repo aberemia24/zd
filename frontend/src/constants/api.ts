@@ -1,1 +1,1 @@
-import { API } from '@shared-constants/api';
+import { API } from "@shared-constants/api";

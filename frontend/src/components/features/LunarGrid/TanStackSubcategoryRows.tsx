@@ -1,12 +1,9 @@
-import React, { useMemo, useCallback } from 'react';
-import { TanStackSubcategoryRowsProps } from './types';
-import { TransactionType } from '@shared-constants/enums';
-import { cn } from '../../../styles/cva/shared/utils';
-import { 
-  tableRow, 
-  tableCell 
-} from '../../../styles/cva/data';
-import { button } from '../../../styles/cva/components/forms';
+import React, { useMemo, useCallback } from "react";
+import { TanStackSubcategoryRowsProps } from "./types";
+import { TransactionType } from "@shared-constants/enums";
+import { cn } from "../../../styles/cva/shared/utils";
+import { tableRow, tableCell } from "../../../styles/cva/data";
+import { button } from "../../../styles/cva/components/forms";
 
 /**
  * Componentă pentru afișarea rândurilor de subcategorii în cadrul grilei TanStack Table
@@ -31,7 +28,7 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
 }) => {
   // Memoizarea subcategoriilor pentru a preveni re-renderări inutile
   const memoizedSubcategories = useMemo(() => {
-    return subcategories.map(subcategory => {
+    return subcategories.map((subcategory) => {
       const isCustom = isCustomSubcategory(categoryKey, subcategory.name);
       return { subcategory, isCustom };
     });
@@ -42,62 +39,70 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
       {memoizedSubcategories.map(({ subcategory, isCustom }) => {
         // isCustom este acum calculat în memoizedSubcategories
         return (
-          <tr 
+          <tr
             key={`${categoryKey}-${subcategory.name}`}
             className={cn(
-              tableRow({ variant: 'hoverable' }),
-              'group transition-colors duration-150'
+              tableRow({ variant: "hoverable" }),
+              "group transition-colors duration-150",
             )}
             data-testid={`subcat-row-${categoryKey}-${subcategory.name}`}
           >
             {/* Prima celulă: numele subcategoriei */}
-            <td 
+            <td
               className={cn(
-                tableCell({ variant: 'default' }),
-                'sticky left-0 bg-white z-10 pl-8',
-                'flex justify-between items-center'
+                tableCell({ variant: "default" }),
+                "sticky left-0 bg-white z-10 pl-8",
+                "flex justify-between items-center",
               )}
               data-testid={`subcategory-${categoryKey}-${subcategory.name}`}
             >
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-700">{subcategory.name}</span>
+                <span className="text-sm text-gray-700">
+                  {subcategory.name}
+                </span>
                 {isCustom && (
-                  <span className={cn(
-                    'inline-flex items-center rounded-full px-2 py-0.5',
-                    'text-xs font-medium',
-                    'bg-emerald-100 text-emerald-700'
-                  )}>
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5",
+                      "text-xs font-medium",
+                      "bg-emerald-100 text-emerald-700",
+                    )}
+                  >
                     custom
                   </span>
                 )}
               </div>
-              
+
               {/* Butoane acțiuni pentru subcategorii (doar afișate la hover) */}
-              <div className={cn(
-                'flex items-center space-x-1 opacity-0',
-                'group-hover:opacity-100 transition-opacity duration-150'
-              )}>
+              <div
+                className={cn(
+                  "flex items-center space-x-1 opacity-0",
+                  "group-hover:opacity-100 transition-opacity duration-150",
+                )}
+              >
                 {handleEditSubcategory && (
-                  <button 
-                    onClick={() => handleEditSubcategory(categoryKey, subcategory.name)}
+                  <button
+                    onClick={() =>
+                      handleEditSubcategory(categoryKey, subcategory.name)
+                    }
                     className={cn(
-                      'inline-flex items-center justify-center',
-                      'w-6 h-6 rounded-md',
-                      'text-gray-400 hover:text-gray-600',
-                      'hover:bg-gray-100 transition-colors duration-150',
-                      'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1'
+                      "inline-flex items-center justify-center",
+                      "w-6 h-6 rounded-md",
+                      "text-gray-400 hover:text-gray-600",
+                      "hover:bg-gray-100 transition-colors duration-150",
+                      "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1",
                     )}
                     data-testid={`edit-subcategory-${categoryKey}-${subcategory.name}`}
                   >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="14" 
-                      height="14" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
@@ -105,28 +110,30 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
                     </svg>
                   </button>
                 )}
-                
+
                 {isCustom && handleDeleteSubcategory && (
-                  <button 
-                    onClick={() => handleDeleteSubcategory(categoryKey, subcategory.name)}
+                  <button
+                    onClick={() =>
+                      handleDeleteSubcategory(categoryKey, subcategory.name)
+                    }
                     className={cn(
-                      'inline-flex items-center justify-center',
-                      'w-6 h-6 rounded-md',
-                      'text-gray-400 hover:text-red-600',
-                      'hover:bg-red-50 transition-colors duration-150',
-                      'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1'
+                      "inline-flex items-center justify-center",
+                      "w-6 h-6 rounded-md",
+                      "text-gray-400 hover:text-red-600",
+                      "hover:bg-red-50 transition-colors duration-150",
+                      "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1",
                     )}
                     data-testid={`delete-subcategory-${categoryKey}-${subcategory.name}`}
                   >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="14" 
-                      height="14" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
                       strokeLinejoin="round"
                     >
                       <polyline points="3 6 5 6 21 6"></polyline>
@@ -138,37 +145,45 @@ const TanStackSubcategoryRows: React.FC<TanStackSubcategoryRowsProps> = ({
                 )}
               </div>
             </td>
-            
+
             {/* Celule pentru fiecare zi din lună */}
-            {days.map(day => {
+            {days.map((day) => {
               const amount = getSumForCell(categoryKey, subcategory.name, day);
-              const formattedAmount = amount !== 0 ? formatCurrency(amount) : '—';
+              const formattedAmount =
+                amount !== 0 ? formatCurrency(amount) : "—";
               const type = getTransactionTypeForCategory(categoryKey);
-              
+
               return (
-                <td 
-                  key={day} 
+                <td
+                  key={day}
                   className={cn(
-                    tableCell({ variant: 'clickable' }),
-                    'text-right cursor-pointer',
+                    tableCell({ variant: "clickable" }),
+                    "text-right cursor-pointer",
                     getBalanceStyle(amount),
-                    'transition-colors duration-150'
+                    "transition-colors duration-150",
                   )}
-                  onClick={(e) => handleCellClick(
-                    e, 
-                    categoryKey, 
-                    subcategory.name, 
-                    day, 
-                    formattedAmount, 
-                    type
-                  )}
-                  onDoubleClick={handleCellDoubleClick ? (e) => handleCellDoubleClick(
-                    e, 
-                    categoryKey, 
-                    subcategory.name, 
-                    day, 
-                    formattedAmount
-                  ) : undefined}
+                  onClick={(e) =>
+                    handleCellClick(
+                      e,
+                      categoryKey,
+                      subcategory.name,
+                      day,
+                      formattedAmount,
+                      type,
+                    )
+                  }
+                  onDoubleClick={
+                    handleCellDoubleClick
+                      ? (e) =>
+                          handleCellDoubleClick(
+                            e,
+                            categoryKey,
+                            subcategory.name,
+                            day,
+                            formattedAmount,
+                          )
+                      : undefined
+                  }
                   data-testid={`cell-${categoryKey}-${subcategory.name}-${day}`}
                 >
                   {formattedAmount}
@@ -191,7 +206,8 @@ export default React.memo(TanStackSubcategoryRows, (prevProps, nextProps) => {
     prevProps.subcategories.length === nextProps.subcategories.length &&
     prevProps.days.length === nextProps.days.length &&
     prevProps.transactions === nextProps.transactions && // Referință la același array
-    JSON.stringify(prevProps.subcategories) === JSON.stringify(nextProps.subcategories)
+    JSON.stringify(prevProps.subcategories) ===
+      JSON.stringify(nextProps.subcategories)
     // Nu verificăm funcțiile deoarece sunt puse în referințe stabile deja prin useCallback în componenta părinte
   );
 });

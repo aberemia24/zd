@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuthStore } from '../../../stores/authStore';
-import toast from 'react-hot-toast';
-import { MESAJE, LABELS, BUTTONS } from '@shared-constants';
-import { cn } from '../../../styles/cva/shared/utils';
-import { card } from '../../../styles/cva/components/layout';
-import { button } from '../../../styles/cva/components/forms';
-import Input from '../../primitives/Input/Input';
-import { ValidatedSubmitButton } from '../../primitives/Button';
-import Alert from '../../primitives/Alert/Alert';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../../stores/authStore";
+import toast from "react-hot-toast";
+import { MESAJE, LABELS, BUTTONS } from "@shared-constants";
+import { cn } from "../../../styles/cva/shared/utils";
+import { card } from "../../../styles/cva/components/layout";
+import { button } from "../../../styles/cva/components/forms";
+import Input from "../../primitives/Input/Input";
+import { ValidatedSubmitButton } from "../../primitives/Button";
+import Alert from "../../primitives/Alert/Alert";
 
 interface LoginFormProps {}
 
 const LoginForm: React.FC<LoginFormProps> = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { login, loading, error, errorType } = useAuthStore();
-  
+
   // Funcție pentru validarea formatului de email
   const isValidEmail = (email: string): boolean => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -35,14 +35,15 @@ const LoginForm: React.FC<LoginFormProps> = () => {
     } else {
       let msg = error;
       switch (errorType) {
-        case 'INVALID_CREDENTIALS':
-          msg = MESAJE.EROARE_AUTENTIFICARE || 'Date de autentificare incorecte.';
+        case "INVALID_CREDENTIALS":
+          msg =
+            MESAJE.EROARE_AUTENTIFICARE || "Date de autentificare incorecte.";
           break;
-        case 'RLS_DENIED':
-          msg = MESAJE.EROARE_RLS || 'Acces interzis (RLS).';
+        case "RLS_DENIED":
+          msg = MESAJE.EROARE_RLS || "Acces interzis (RLS).";
           break;
-        case 'NETWORK':
-          msg = MESAJE.EROARE_RETEA || 'Eroare de rețea. Încearcă din nou.';
+        case "NETWORK":
+          msg = MESAJE.EROARE_RETEA || "Eroare de rețea. Încearcă din nou.";
           break;
         default:
           msg = error || MESAJE.LOGIN_ERROR;
@@ -54,30 +55,32 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   // Determinarea mesajului de eroare formatat
   const getErrorMessage = () => {
     switch (errorType) {
-      case 'INVALID_CREDENTIALS':
-        return MESAJE.EROARE_AUTENTIFICARE || 'Date de autentificare incorecte.';
-      case 'RLS_DENIED':
-        return MESAJE.EROARE_RLS || 'Acces interzis (RLS).';
-      case 'NETWORK':
-        return MESAJE.EROARE_RETEA || 'Eroare de rețea. Încearcă din nou.';
+      case "INVALID_CREDENTIALS":
+        return (
+          MESAJE.EROARE_AUTENTIFICARE || "Date de autentificare incorecte."
+        );
+      case "RLS_DENIED":
+        return MESAJE.EROARE_RLS || "Acces interzis (RLS).";
+      case "NETWORK":
+        return MESAJE.EROARE_RETEA || "Eroare de rețea. Încearcă din nou.";
       default:
         return error;
     }
   };
 
   return (
-    <form 
+    <form
       className={cn(
-        card({ variant: 'elevated', size: 'md' }),
-        'w-full max-w-md mx-auto'
+        card({ variant: "elevated", size: "md" }),
+        "w-full max-w-md mx-auto",
       )}
-      onSubmit={handleSubmit} 
+      onSubmit={handleSubmit}
       data-testid="login-form"
     >
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-xl font-semibold text-gray-900">Autentificare</h2>
       </div>
-      
+
       <div className="p-6 space-y-4">
         {/* Email Input */}
         <Input
@@ -85,34 +88,34 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           type="email"
           label={`${LABELS.EMAIL}*`}
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
-          variant={error ? 'error' : 'default'}
+          variant={error ? "error" : "default"}
           dataTestId="login-email"
         />
-        
+
         {/* Password Input */}
         <Input
           id="password"
           type="password"
           label={`${LABELS.PAROLA}*`}
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
-          variant={error ? 'error' : 'default'}
+          variant={error ? "error" : "default"}
           dataTestId="login-password"
         />
-        
+
         {/* Error Message */}
         {error && (
           <Alert
             type="error"
-            message={getErrorMessage() || ''}
+            message={getErrorMessage() || ""}
             size="md"
             dataTestId="login-error"
           />
         )}
-        
+
         {/* Submit Button */}
         <ValidatedSubmitButton
           isFormValid={isFormValid}
@@ -122,14 +125,14 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           className="w-full"
           submitText={BUTTONS.LOGIN}
         />
-        
+
         {/* Register Link */}
         <div className="text-center">
-          <Link 
-            to="/register" 
+          <Link
+            to="/register"
             className={cn(
-              button({ variant: 'ghost', size: 'sm' }),
-              'text-blue-600 hover:text-blue-700'
+              button({ variant: "ghost", size: "sm" }),
+              "text-blue-600 hover:text-blue-700",
             )}
             data-testid="switch-to-register"
           >

@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 // Jest compatibility layer for Vitest
 // Provides Jest-specific APIs that are commonly used in tests
@@ -24,43 +24,49 @@ import { vi } from 'vitest';
 
 // Environment variables for testing
 // Mock Supabase configuration to prevent connection errors in tests
-process.env.VITE_SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://mock.supabase.co';
-process.env.VITE_SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'mock-anon-key';
+process.env.VITE_SUPABASE_URL =
+  process.env.VITE_SUPABASE_URL || "https://mock.supabase.co";
+process.env.VITE_SUPABASE_ANON_KEY =
+  process.env.VITE_SUPABASE_ANON_KEY || "mock-anon-key";
 
 // Mock Supabase module to prevent initialization errors
-vi.mock('../services/supabase', () => ({
+vi.mock("../services/supabase", () => ({
   supabase: {
     auth: {
       getUser: vi.fn(),
-      getSession: vi.fn(() => Promise.resolve({ 
-        data: { session: null }, 
-        error: null 
-      })),
+      getSession: vi.fn(() =>
+        Promise.resolve({
+          data: { session: null },
+          error: null,
+        }),
+      ),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: vi.fn(),
       resetPasswordForEmail: vi.fn(),
       onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } }
-      }))
+        data: { subscription: { unsubscribe: vi.fn() } },
+      })),
     },
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           order: vi.fn(() => ({
-            range: vi.fn(() => Promise.resolve({
-              data: [],
-              error: null,
-              count: 0
-            }))
-          }))
-        }))
+            range: vi.fn(() =>
+              Promise.resolve({
+                data: [],
+                error: null,
+                count: 0,
+              }),
+            ),
+          })),
+        })),
       })),
       insert: vi.fn(() => Promise.resolve({ data: null, error: null })),
       update: vi.fn(() => Promise.resolve({ data: null, error: null })),
-      delete: vi.fn(() => Promise.resolve({ data: null, error: null }))
-    }))
-  }
+      delete: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    })),
+  },
 }));
 
 // Additional Jest-like globals that might be needed
@@ -71,4 +77,4 @@ vi.mock('../services/supabase', () => ({
 (global as any).describe = describe;
 (global as any).it = it;
 (global as any).test = test;
-(global as any).expect = expect; 
+(global as any).expect = expect;

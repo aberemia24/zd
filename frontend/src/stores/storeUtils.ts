@@ -1,5 +1,5 @@
-import { StateCreator } from 'zustand';
-import { DevtoolsOptions } from 'zustand/middleware';
+import { StateCreator } from "zustand";
+import { DevtoolsOptions } from "zustand/middleware";
 
 /**
  * Interfață standard pentru toate store-urile cu pattern-uri comune
@@ -23,48 +23,61 @@ export interface BaseStoreActions {
 /**
  * Pattern standard pentru logging în stores
  */
-export const storeLogger = {  info: (storeName: string, action: string, data?: any) => {    if (import.meta.env.NODE_ENV === 'development') {      console.log(`[${storeName}] ${action}`, data);    }  },
-  
+export const storeLogger = {
+  info: (storeName: string, action: string, data?: any) => {
+    if (import.meta.env.NODE_ENV === "development") {
+      console.log(`[${storeName}] ${action}`, data);
+    }
+  },
+
   error: (storeName: string, action: string, error: any) => {
     console.error(`[${storeName}] Error in ${action}:`, error);
   },
-  
+
   warn: (storeName: string, message: string, data?: any) => {
     console.warn(`[${storeName}] ${message}`, data);
-  }
+  },
 };
 
 /**
  * Configurare standard pentru devtools
  */
-export const createDevtoolsOptions = (storeName: string): DevtoolsOptions => ({  name: storeName,  enabled: import.meta.env.NODE_ENV === 'development',  serialize: true,  anonymousActionType: `${storeName}_action`,});
+export const createDevtoolsOptions = (storeName: string): DevtoolsOptions => ({
+  name: storeName,
+  enabled: import.meta.env.NODE_ENV === "development",
+  serialize: true,
+  anonymousActionType: `${storeName}_action`,
+});
 
 /**
  * Creează acțiuni de bază standardizate pentru orice store
  */
 export const createBaseActions = <T extends BaseStoreState>(
   storeName: string,
-  initialState: Omit<T, keyof BaseStoreActions>
-): Pick<BaseStoreActions, 'setLoading' | 'setError' | 'clearError' | 'reset'> => ({
+  initialState: Omit<T, keyof BaseStoreActions>,
+): Pick<
+  BaseStoreActions,
+  "setLoading" | "setError" | "clearError" | "reset"
+> => ({
   setLoading: (loading: boolean) => {
-    storeLogger.info(storeName, 'setLoading', { loading });
+    storeLogger.info(storeName, "setLoading", { loading });
   },
-  
+
   setError: (error: string | null) => {
     if (error) {
-      storeLogger.error(storeName, 'setError', error);
+      storeLogger.error(storeName, "setError", error);
     } else {
-      storeLogger.info(storeName, 'clearError');
+      storeLogger.info(storeName, "clearError");
     }
   },
-  
+
   clearError: () => {
-    storeLogger.info(storeName, 'clearError');
+    storeLogger.info(storeName, "clearError");
   },
-  
+
   reset: () => {
-    storeLogger.info(storeName, 'reset');
-  }
+    storeLogger.info(storeName, "reset");
+  },
 });
 
 /**
@@ -73,16 +86,16 @@ export const createBaseActions = <T extends BaseStoreState>(
 export const createShallowSelector = <T, U>(selector: (state: T) => U) => {
   let lastState: U;
   let lastTime = 0;
-  
+
   return (state: T): U => {
     const newState = selector(state);
     const now = Date.now();
-    
+
     // Cache result for 16ms (one frame) pentru performanță
     if (now - lastTime < 16 && shallowEqual(lastState, newState)) {
       return lastState;
     }
-    
+
     lastState = newState;
     lastTime = now;
     return newState;
@@ -97,7 +110,12 @@ export const shallowEqual = <T>(a: T, b: T): boolean => {
     return true;
   }
 
-  if (typeof a !== 'object' || a === null || typeof b !== 'object' || b === null) {
+  if (
+    typeof a !== "object" ||
+    a === null ||
+    typeof b !== "object" ||
+    b === null
+  ) {
     return false;
   }
 
@@ -109,7 +127,10 @@ export const shallowEqual = <T>(a: T, b: T): boolean => {
   }
 
   for (const key of keysA) {
-    if (!Object.prototype.hasOwnProperty.call(b, key) || !Object.is((a as any)[key], (b as any)[key])) {
+    if (
+      !Object.prototype.hasOwnProperty.call(b, key) ||
+      !Object.is((a as any)[key], (b as any)[key])
+    ) {
       return false;
     }
   }
@@ -125,26 +146,27 @@ export const createAsyncAction = <T extends any[], R>(
   actionName: string,
   action: (...args: T) => Promise<R>,
   setLoading: (loading: boolean) => void,
-  setError: (error: string | null) => void
+  setError: (error: string | null) => void,
 ) => {
   return async (...args: T): Promise<R | null> => {
     try {
       storeLogger.info(storeName, `${actionName} started`, args);
       setLoading(true);
       setError(null);
-      
+
       const result = await action(...args);
-      
+
       storeLogger.info(storeName, `${actionName} completed`, result);
       setLoading(false);
-      
+
       return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       storeLogger.error(storeName, actionName, error);
       setError(errorMessage);
       setLoading(false);
-      
+
       return null;
     }
   };
@@ -155,12 +177,12 @@ export const createAsyncAction = <T extends any[], R>(
  */
 export const createPersistConfig = (
   storeName: string,
-  partialize?: (state: any) => any
+  partialize?: (state: any) => any,
 ) => ({
   name: `${storeName}-storage`,
   version: 1,
   migrate: (persistedState: any, version: number) => {
-    storeLogger.info(storeName, 'migrate storage', { version, persistedState });
+    storeLogger.info(storeName, "migrate storage", { version, persistedState });
     return persistedState;
   },
   partialize,
@@ -172,7 +194,7 @@ export const createPersistConfig = (
 export const validateStoreState = <T>(
   storeName: string,
   state: T,
-  requiredKeys: (keyof T)[]
+  requiredKeys: (keyof T)[],
 ): boolean => {
   for (const key of requiredKeys) {
     if (state[key] === undefined || state[key] === null) {
@@ -188,12 +210,12 @@ export const validateStoreState = <T>(
  */
 export const createDebouncedAction = <T extends any[]>(
   action: (...args: T) => void,
-  delay: number = 300
+  delay: number = 300,
 ) => {
   let timeoutId: NodeJS.Timeout;
-  
+
   return (...args: T) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => action(...args), delay);
   };
-}; 
+};

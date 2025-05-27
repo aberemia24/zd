@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useExport } from '../../../hooks/useExport';
-import Button from '../../primitives/Button/Button';
-import { ExportModal } from './ExportModal';
-import type { Transaction } from '../../../types/Transaction';
-import type { ExportFormat } from '../../../utils/ExportManager';
-import { BUTTONS } from '@shared-constants/ui';
+import React, { useState } from "react";
+import { useExport } from "../../../hooks/useExport";
+import Button from "../../primitives/Button/Button";
+import { ExportModal } from "./ExportModal";
+import type { Transaction } from "../../../types/Transaction";
+import type { ExportFormat } from "../../../utils/ExportManager";
+import { BUTTONS } from "@shared-constants/ui";
 
 interface ExportButtonProps {
   transactions: Transaction[];
@@ -19,7 +19,7 @@ interface ExportButtonProps {
 export const ExportButton: React.FC<ExportButtonProps> = ({
   transactions,
   disabled = false,
-  className = ''
+  className = "",
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { exportData, state, resetState } = useExport();
@@ -35,14 +35,14 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       filename?: string;
       title?: string;
       dateRange?: { from: string; to: string };
-    }
+    },
   ) => {
     try {
       await exportData(transactions, format, options);
       setIsModalOpen(false);
     } catch (error) {
       // Error is handled by useExport hook
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     }
   };
 
@@ -63,7 +63,7 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
         size="md"
         dataTestId="export-button"
       >
-        {state.isExporting ? 'Se exportă...' : BUTTONS.EXPORT}
+        {state.isExporting ? "Se exportă..." : BUTTONS.EXPORT}
       </Button>
 
       {isModalOpen && (
@@ -77,4 +77,4 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
       )}
     </>
   );
-}; 
+};

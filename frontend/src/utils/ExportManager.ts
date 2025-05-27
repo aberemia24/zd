@@ -1,11 +1,11 @@
-import { saveAs } from 'file-saver';
-import * as ExcelJS from 'exceljs';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import type { Transaction } from '../types/Transaction';
-import { TransactionType } from '@shared-constants';
+import { saveAs } from "file-saver";
+import * as ExcelJS from "exceljs";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import type { Transaction } from "../types/Transaction";
+import { TransactionType } from "@shared-constants";
 
-export type ExportFormat = 'csv' | 'pdf' | 'excel';
+export type ExportFormat = "csv" | "pdf" | "excel";
 
 export interface ExportOptions {
   filename?: string;
@@ -19,7 +19,7 @@ export interface ExportOptions {
 }
 
 // Extend jsPDF type for autoTable plugin
-declare module 'jspdf' {
+declare module "jspdf" {
   interface jsPDF {
     autoTable: (options: any) => jsPDF;
   }
@@ -32,14 +32,14 @@ export class ExportManager {
   static async exportTransactions(
     transactions: Transaction[],
     format: ExportFormat,
-    options: ExportOptions = {}
+    options: ExportOptions = {},
   ): Promise<void> {
     const {
       filename = `tranzactii_${new Date().getTime()}`,
-      title = 'Raport Tranzacții',
+      title = "Raport Tranzacții",
       onProgress,
       includeHeaders = true,
-      dateRange
+      dateRange,
     } = options;
 
     // Simulare progress pentru UX
@@ -48,7 +48,7 @@ export class ExportManager {
     // Filtrare în funcție de intervalul de date dacă este specificat
     let filteredTransactions = transactions;
     if (dateRange) {
-      filteredTransactions = transactions.filter(t => {
+      filteredTransactions = transactions.filter((t) => {
         const transactionDate = new Date(t.date);
         const fromDate = new Date(dateRange.from);
         const toDate = new Date(dateRange.to);
@@ -59,12 +59,21 @@ export class ExportManager {
     onProgress?.(30);
 
     switch (format) {
-      case 'csv':
-        return this.exportToCSV(filteredTransactions, filename, { includeHeaders, onProgress });
-      case 'pdf':
-        return this.exportToPDF(filteredTransactions, filename, { title, onProgress });
-      case 'excel':
-        return this.exportToExcel(filteredTransactions, filename, { title, onProgress });
+      case "csv":
+        return this.exportToCSV(filteredTransactions, filename, {
+          includeHeaders,
+          onProgress,
+        });
+      case "pdf":
+        return this.exportToPDF(filteredTransactions, filename, {
+          title,
+          onProgress,
+        });
+      case "excel":
+        return this.exportToExcel(filteredTransactions, filename, {
+          title,
+          onProgress,
+        });
       default:
         throw new Error(`Format de export nesuportat: ${format}`);
     }
@@ -76,17 +85,20 @@ export class ExportManager {
   private static async exportToCSV(
     transactions: Transaction[],
     filename: string,
-    options: { includeHeaders?: boolean; onProgress?: (progress: number) => void }
+    options: {
+      includeHeaders?: boolean;
+      onProgress?: (progress: number) => void;
+    },
   ): Promise<void> {
     const { includeHeaders = true, onProgress } = options;
 
     onProgress?.(50);
 
     const csvData = this.prepareCSVData(transactions, includeHeaders);
-    
+
     onProgress?.(80);
 
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
     saveAs(blob, `${filename}.csv`);
 
     onProgress?.(100);
@@ -98,47 +110,47 @@ export class ExportManager {
   private static async exportToPDF(
     transactions: Transaction[],
     filename: string,
-    options: { title?: string; onProgress?: (progress: number) => void }
+    options: { title?: string; onProgress?: (progress: number) => void },
   ): Promise<void> {
-    const { title = 'Raport Tranzacții', onProgress } = options;
+    const { title = "Raport Tranzacții", onProgress } = options;
 
     onProgress?.(50);
 
     const doc = new jsPDF();
-    
+
     // Configurare font pentru suport Unicode (română)
-    doc.setFont('helvetica');
-    
+    doc.setFont("helvetica");
+
     // Titlu
     doc.setFontSize(16);
     doc.text(title, 20, 20);
-    
+
     // Data generării
     doc.setFontSize(10);
-    doc.text(`Generat: ${new Date().toLocaleDateString('ro-RO')}`, 20, 30);
+    doc.text(`Generat: ${new Date().toLocaleDateString("ro-RO")}`, 20, 30);
 
     onProgress?.(70);
 
     // Pregătire date pentru tabel
-    const tableData = transactions.map(t => [
-      new Date(t.date).toLocaleDateString('ro-RO'),
-      t.description || '',
-      t.category || '',
-      t.subcategory || '',
+    const tableData = transactions.map((t) => [
+      new Date(t.date).toLocaleDateString("ro-RO"),
+      t.description || "",
+      t.category || "",
+      t.subcategory || "",
       this.getTransactionTypeLabel(t.type),
-      `${typeof t.amount === 'number' ? t.amount.toFixed(2) : parseFloat(t.amount.toString()).toFixed(2)} RON`
+      `${typeof t.amount === "number" ? t.amount.toFixed(2) : parseFloat(t.amount.toString()).toFixed(2)} RON`,
     ]);
 
     onProgress?.(85);
 
     // Adăugare tabel
     doc.autoTable({
-      head: [['Data', 'Descriere', 'Categorie', 'Subcategorie', 'Tip', 'Sumă']],
+      head: [["Data", "Descriere", "Categorie", "Subcategorie", "Tip", "Sumă"]],
       body: tableData,
       startY: 40,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [66, 139, 202] },
-      margin: { top: 40 }
+      margin: { top: 40 },
     });
 
     onProgress?.(95);
@@ -155,49 +167,49 @@ export class ExportManager {
   private static async exportToExcel(
     transactions: Transaction[],
     filename: string,
-    options: { title?: string; onProgress?: (progress: number) => void }
+    options: { title?: string; onProgress?: (progress: number) => void },
   ): Promise<void> {
-    const { title = 'Raport Tranzacții', onProgress } = options;
+    const { title = "Raport Tranzacții", onProgress } = options;
 
     onProgress?.(50);
 
     // Creare workbook și worksheet cu ExcelJS
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Tranzacții');
+    const worksheet = workbook.addWorksheet("Tranzacții");
 
     onProgress?.(60);
 
     // Definire header-e cu stil
     worksheet.columns = [
-      { header: 'Data', key: 'date', width: 15 },
-      { header: 'Descriere', key: 'description', width: 30 },
-      { header: 'Categorie', key: 'category', width: 20 },
-      { header: 'Subcategorie', key: 'subcategory', width: 20 },
-      { header: 'Tip', key: 'type', width: 15 },
-      { header: 'Sumă', key: 'amount', width: 15 },
-      { header: 'Status', key: 'status', width: 15 }
+      { header: "Data", key: "date", width: 15 },
+      { header: "Descriere", key: "description", width: 30 },
+      { header: "Categorie", key: "category", width: 20 },
+      { header: "Subcategorie", key: "subcategory", width: 20 },
+      { header: "Tip", key: "type", width: 15 },
+      { header: "Sumă", key: "amount", width: 15 },
+      { header: "Status", key: "status", width: 15 },
     ];
 
     // Styling pentru header
     worksheet.getRow(1).font = { bold: true };
     worksheet.getRow(1).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FF428BCA' }
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FF428BCA" },
     };
 
     onProgress?.(70);
 
     // Adăugare date
-    transactions.forEach(t => {
+    transactions.forEach((t) => {
       worksheet.addRow({
-        date: new Date(t.date).toLocaleDateString('ro-RO'),
-        description: t.description || '',
-        category: t.category || '',
-        subcategory: t.subcategory || '',
+        date: new Date(t.date).toLocaleDateString("ro-RO"),
+        description: t.description || "",
+        category: t.category || "",
+        subcategory: t.subcategory || "",
         type: this.getTransactionTypeLabel(t.type),
         amount: t.amount,
-        status: t.status || 'ACTIVE'
+        status: t.status || "ACTIVE",
       });
     });
 
@@ -205,8 +217,8 @@ export class ExportManager {
 
     // Export la Buffer pentru download
     const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { 
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(blob, `${filename}.xlsx`);
 
@@ -216,51 +228,78 @@ export class ExportManager {
   /**
    * Pregătire date CSV
    */
-  private static prepareCSVData(transactions: Transaction[], includeHeaders: boolean): string {
-    const headers = ['Data', 'Descriere', 'Categorie', 'Subcategorie', 'Tip', 'Sumă', 'Status'];
-    
-    const rows = transactions.map(t => [
-      new Date(t.date).toLocaleDateString('ro-RO'),
-      `"${(t.description || '').replace(/"/g, '""')}"`, // Escape quotes
-      t.category || '',
-      t.subcategory || '',
+  private static prepareCSVData(
+    transactions: Transaction[],
+    includeHeaders: boolean,
+  ): string {
+    const headers = [
+      "Data",
+      "Descriere",
+      "Categorie",
+      "Subcategorie",
+      "Tip",
+      "Sumă",
+      "Status",
+    ];
+
+    const rows = transactions.map((t) => [
+      new Date(t.date).toLocaleDateString("ro-RO"),
+      `"${(t.description || "").replace(/"/g, '""')}"`, // Escape quotes
+      t.category || "",
+      t.subcategory || "",
       this.getTransactionTypeLabel(t.type),
-             typeof t.amount === 'number' ? t.amount.toFixed(2) : parseFloat(t.amount.toString()).toFixed(2),
-      t.status || 'ACTIVE'
+      typeof t.amount === "number"
+        ? t.amount.toFixed(2)
+        : parseFloat(t.amount.toString()).toFixed(2),
+      t.status || "ACTIVE",
     ]);
 
     const csvRows = includeHeaders ? [headers, ...rows] : rows;
-    
-    return csvRows.map(row => row.join(',')).join('\n');
+
+    return csvRows.map((row) => row.join(",")).join("\n");
   }
 
   /**
    * Conversie tip tranzacție în label lizibil
    */
-     private static getTransactionTypeLabel(type: TransactionType): string {     switch (type) {       case TransactionType.INCOME:         return 'Venit';       case TransactionType.EXPENSE:         return 'Cheltuială';       case TransactionType.SAVING:         return 'Economie';       default:         return String(type);     }   }
+  private static getTransactionTypeLabel(type: TransactionType): string {
+    switch (type) {
+      case TransactionType.INCOME:
+        return "Venit";
+      case TransactionType.EXPENSE:
+        return "Cheltuială";
+      case TransactionType.SAVING:
+        return "Economie";
+      default:
+        return String(type);
+    }
+  }
 
   /**
    * Validare format suportat
    */
   static isFormatSupported(format: string): format is ExportFormat {
-    return ['csv', 'pdf', 'excel'].includes(format);
+    return ["csv", "pdf", "excel"].includes(format);
   }
 
   /**
    * Calculare dimensiune aproximativă fișier pentru progress tracking
    */
-  static estimateFileSize(transactions: Transaction[], format: ExportFormat): number {
+  static estimateFileSize(
+    transactions: Transaction[],
+    format: ExportFormat,
+  ): number {
     const baseSize = transactions.length * 100; // ~100 bytes per transaction
-    
+
     switch (format) {
-      case 'csv':
+      case "csv":
         return baseSize;
-      case 'pdf':
+      case "pdf":
         return baseSize * 3; // PDF-urile sunt mai mari
-      case 'excel':
+      case "excel":
         return baseSize * 2; // Excel-urile sunt mai mari decât CSV
       default:
         return baseSize;
     }
   }
-} 
+}

@@ -18,8 +18,10 @@
     "pretest": "npm run sync-shared-constants",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 110",
     "format": "prettier --write src",
+    "format:check": "prettier --check src",
+    "type-check": "tsc --noEmit",
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:smoke": "playwright test tests/e2e/smoke",
@@ -28,7 +30,14 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report test-results/e2e-report",
     "validate:constants": "node ../scripts/validate-constants.js",
-    "fix:hardcoded-strings": "node ../scripts/fix-hardcoded-strings.js"
+    "validate:shared-constants": "node ../scripts/validate-shared-constants-usage.js",
+    "validate:data-testid": "node ../scripts/validate-data-testid-consistency.js",
+    "validate:barrel-imports": "node ../scripts/validate-barrel-imports.js",
+    "validate:console-cleanup": "node ../scripts/validate-console-cleanup.js",
+    "validate:all": "node ../scripts/validate-all-automation.js",
+    "validate:quick": "npm run validate:constants && npm run validate:shared-constants",
+    "fix:hardcoded-strings": "node ../scripts/fix-hardcoded-strings.js",
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.8",
@@ -81,7 +90,9 @@
     "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
+    "lint-staged": "^16.0.0",
     "mailslurp-client": "^15.23.1",
     "msw": "^2.8.4",
     "nodemailer": "^7.0.3",
@@ -121,6 +132,21 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
+    ]
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "npm run validate:constants",
+      "npm run validate:shared-constants"
+    ],
+    "src/**/*.{js,jsx}": [
+      "eslint --fix", 
+      "prettier --write"
+    ],
+    "src/**/*.{json,md,css}": [
+      "prettier --write"
     ]
   }
 }

@@ -1,5 +1,5 @@
 // Extinderea tipurilor Jest pentru a include matchers din @testing-library/jest-dom
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 declare global {
   namespace jest {

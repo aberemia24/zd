@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import Button from '../../primitives/Button/Button';
-import Input from '../../primitives/Input/Input';
-import Select from '../../primitives/Select/Select';
-import { cn } from '../../../styles/cva/shared/utils';import { modal } from '../../../styles/cva/components/layout';
-import type { ExportFormat } from '../../../utils/ExportManager';
-import { BUTTONS } from '@shared-constants/ui';
-import { EXPORT_MESSAGES } from '@shared-constants/messages';
+import React, { useState } from "react";
+import Button from "../../primitives/Button/Button";
+import Input from "../../primitives/Input/Input";
+import Select from "../../primitives/Select/Select";
+import { cn } from "../../../styles/cva/shared/utils";
+import { modal } from "../../../styles/cva/components/layout";
+import type { ExportFormat } from "../../../utils/ExportManager";
+import { BUTTONS } from "@shared-constants/ui";
+import { EXPORT_MESSAGES } from "@shared-constants/messages";
 
 export interface ExportState {
   isExporting: boolean;
@@ -23,28 +24,32 @@ interface ExportModalProps {
       filename?: string;
       title?: string;
       dateRange?: { from: string; to: string };
-    }
+    },
   ) => Promise<void>;
   exportState: ExportState;
   transactionCount: number;
 }
 
-const EXPORT_FORMATS: Array<{ value: ExportFormat; label: string; description: string }> = [
-  { 
-    value: 'csv', 
-    label: 'CSV', 
-    description: 'Comma-separated values - compatibil cu Excel' 
+const EXPORT_FORMATS: Array<{
+  value: ExportFormat;
+  label: string;
+  description: string;
+}> = [
+  {
+    value: "csv",
+    label: "CSV",
+    description: "Comma-separated values - compatibil cu Excel",
   },
-  { 
-    value: 'pdf', 
-    label: 'PDF', 
-    description: 'Document formatat pentru vizualizare și printare' 
+  {
+    value: "pdf",
+    label: "PDF",
+    description: "Document formatat pentru vizualizare și printare",
   },
-  { 
-    value: 'excel', 
-    label: 'Excel', 
-    description: 'Fișier Excel (.xlsx) cu formatare avansată' 
-  }
+  {
+    value: "excel",
+    label: "Excel",
+    description: "Fișier Excel (.xlsx) cu formatare avansată",
+  },
 ];
 
 /**
@@ -57,13 +62,13 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   onClose,
   onExport,
   exportState,
-  transactionCount
+  transactionCount,
 }) => {
-  const [format, setFormat] = useState<ExportFormat>('csv');
-  const [filename, setFilename] = useState('');
-  const [title, setTitle] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [format, setFormat] = useState<ExportFormat>("csv");
+  const [filename, setFilename] = useState("");
+  const [title, setTitle] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   // Închide modalul la apăsarea pe overlay
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -75,15 +80,15 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   // Gestionează exportul
   const handleExport = () => {
     const options: Parameters<typeof onExport>[1] = {};
-    
+
     if (filename.trim()) {
       options.filename = filename.trim();
     }
-    
+
     if (title.trim()) {
       options.title = title.trim();
     }
-    
+
     if (dateFrom && dateTo) {
       options.dateRange = { from: dateFrom, to: dateTo };
     }
@@ -93,7 +98,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // Generează numele implicit al fișierului
   const getDefaultFilename = () => {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     return `tranzactii-${today}`;
   };
 
@@ -101,7 +106,22 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   if (!isOpen) return null;
 
   return (
-        <div       className={cn(        modal({ overlay: 'default' }),        'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'      )}      onClick={handleOverlayClick}      data-testid="export-modal-overlay"    >      <div         className={cn(          'bg-white rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg',          'transform transition-all duration-300 ease-out'        )}         data-testid="export-modal"      >
+    <div
+      className={cn(
+        modal({ overlay: "default" }),
+        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
+      )}
+      onClick={handleOverlayClick}
+      data-testid="export-modal-overlay"
+    >
+      {" "}
+      <div
+        className={cn(
+          "bg-white rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg",
+          "transform transition-all duration-300 ease-out",
+        )}
+        data-testid="export-modal"
+      >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -110,15 +130,25 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           <button
             onClick={onClose}
             className={cn(
-              'text-gray-400 hover:text-gray-600',
-              'transition-colors duration-150',
-              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1',
-              'rounded-md p-1'
+              "text-gray-400 hover:text-gray-600",
+              "transition-colors duration-150",
+              "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1",
+              "rounded-md p-1",
             )}
             data-testid="export-modal-close"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -127,9 +157,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         {exportState.isExporting && (
           <div className="mb-6">
             <p className="text-sm text-gray-600 mb-2">
-              {exportState.status || EXPORT_MESSAGES.IN_PROGRES.replace('{progress}', exportState.progress.toString())}
+              {exportState.status ||
+                EXPORT_MESSAGES.IN_PROGRES.replace(
+                  "{progress}",
+                  exportState.progress.toString(),
+                )}
             </p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4 shadow-sm">              <div                 className="bg-primary-500 h-2 rounded-full transition-all duration-300"                style={{ width: `${exportState.progress}%` }}              />
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4 shadow-sm">
+              {" "}
+              <div
+                className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${exportState.progress}%` }}
+              />
             </div>
             <p className="text-xs text-gray-500 mt-1">
               {exportState.progress}% complet
@@ -146,17 +185,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             </label>
             <Select
               value={format}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormat(e.target.value as ExportFormat)}
-              options={EXPORT_FORMATS.map(fmt => ({
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setFormat(e.target.value as ExportFormat)
+              }
+              options={EXPORT_FORMATS.map((fmt) => ({
                 value: fmt.value,
-                label: fmt.label
+                label: fmt.label,
               }))}
               placeholder="Selectează format"
               disabled={exportState.isExporting}
               dataTestId="export-format-select"
             />
             <p className="text-xs text-gray-500 mt-1">
-              {EXPORT_FORMATS.find(fmt => fmt.value === format)?.description}
+              {EXPORT_FORMATS.find((fmt) => fmt.value === format)?.description}
             </p>
           </div>
 
@@ -231,9 +272,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           {/* Mesajul de eroare */}
           {exportState.error && (
             <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-800">
-                {exportState.error}
-              </p>
+              <p className="text-sm text-red-800">{exportState.error}</p>
             </div>
           )}
         </div>
@@ -258,10 +297,10 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             className="flex-1"
             dataTestId="export-modal-confirm"
           >
-            {exportState.isExporting ? 'Se exportă...' : BUTTONS.EXPORT}
+            {exportState.isExporting ? "Se exportă..." : BUTTONS.EXPORT}
           </Button>
         </div>
       </div>
     </div>
   );
-}; 
+};

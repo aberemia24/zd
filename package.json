@@ -16,7 +16,16 @@
     "build": "cd frontend && npm run build",
     "test": "cd frontend && npm test",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "validate:constants": "node scripts/validate-constants.js",
+    "validate:shared-constants": "node scripts/validate-shared-constants-usage.js",
+    "validate:data-testid": "node scripts/validate-data-testid-consistency.js",
+    "validate:barrel-imports": "node scripts/validate-barrel-imports.js",
+    "validate:console-cleanup": "node scripts/validate-console-cleanup.js",
+    "validate:jsx-extensions": "node scripts/validate-jsx-extensions.js",
+    "validate:typescript-quality": "node scripts/validate-typescript-quality.js",
+    "validate:all": "node scripts/validate-all-automation.js",
+    "validate:quick": "npm run validate:constants && npm run validate:shared-constants && npm run validate:console-cleanup"
   },
   "devDependencies": {
     "@types/nodemailer": "^6.4.17",
