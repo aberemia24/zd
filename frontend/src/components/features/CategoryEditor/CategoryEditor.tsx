@@ -1,9 +1,7 @@
 // Modal pentru gestionarea subcategoriilor: add/edit/delete/migrare, badge count, validare
 // Owner: echipa FE
 // Migrated la CVA styling system pentru consistență
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent, useMemo, useCallback } from 'react';
-import { useCategoryStore } from '../../../stores/categoryStore';
-import { CustomCategory, CustomSubcategory } from '../../../types/Category';
+import React, { useEffect, ChangeEvent, KeyboardEvent, useMemo, useCallback } from 'react';
 import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from '@shared-constants/ui';
 import { MESAJE } from '@shared-constants/messages';
 import Button from '../../primitives/Button/Button';
@@ -13,7 +11,7 @@ import Alert from '../../primitives/Alert/Alert';
 import { cn } from '../../../styles/cva/shared/utils';
 import { modal } from '../../../styles/cva/components/layout';
 import { card, flex } from '../../../styles/cva/components/layout';
-import { useCategoryEditorState, SubcatAction, SubcatActionType } from './useCategoryEditorState';
+import { useCategoryEditorState } from './useCategoryEditorState';
 
 interface Props {
   open: boolean;
@@ -67,8 +65,8 @@ export const CategoryEditor: React.FC<Props> = ({
   // validare subcategorie - memoizată pentru a evita recrearea la fiecare render
   const isValidSubcat = useCallback((txt: string): boolean => 
     txt.trim().length > 0 &&
-    txt.trim().length <= 32 &&
-    /^[a-zA-Z0-9ăâîșțĂÂÎȘȚ \-]+$/.test(txt.trim()),
+    txt.trim().length <= 80 &&
+    /^[a-zA-Z0-9ăâîșțĂÂÎȘȚ \-|]+$/.test(txt.trim()),
   []);
 
   // Adaugă event listener pentru tasta Escape
@@ -89,7 +87,7 @@ export const CategoryEditor: React.FC<Props> = ({
   if (!open) return null;
 
   // Badge pentru număr de tranzacții în subcategorie
-  const badge = (cat: string, subcat: string): JSX.Element | null => {
+  const badge = (cat: string, subcat: string): React.ReactElement | null => {
     const count = getSubcategoryCount(cat, subcat);
     return count > 0 ? (
       <Badge 
@@ -108,7 +106,7 @@ export const CategoryEditor: React.FC<Props> = ({
     subcat: string;
     onConfirm: () => void;
     onCancel: () => void;
-  }): JSX.Element => {
+  }): React.ReactElement => {
     const message = `Sigur doriți să ștergeți subcategoria ${subcat} din categoria ${cat}? Această acțiune nu poate fi anulată.`;
     
     return (
@@ -345,7 +343,7 @@ export const CategoryEditor: React.FC<Props> = ({
                                 {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                                 {sc.isCustom && (
                                   <Button 
-                                    variant="error"
+                                    variant="danger"
                                     size="xs"
                                     onClick={() => setSubcatAction({ type: 'delete', cat: selectedCategory, subcat: sc.name })}
                                     dataTestId={`delete-subcat-btn-${sc.name}`}

@@ -117,363 +117,70 @@ module.exports = {
 
 ## Faza 2 – Testing Infrastructure cu Vitest
 
-### Vitest Configuration (Unit + Integration)
-```typescript
-// vitest.config.ts
-import { defineConfig } from 'vitest/config'
-import path from 'path'
-
-export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './tests/setup/setup.ts',
-    coverage: {
-      reporter: ['text', 'lcov'],
-      lines: 70,
-      branches: 70,
-    },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
-      '@shared-constants': path.resolve(__dirname, '../shared-constants'),
-    },
-  },
-})
-```
-
-### Test Utilities & Providers cu @shared-constants
-```typescript
-// tests/integration/setup/TestProviders.tsx
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { UI, MESSAGES } from '@shared-constants';
-
-export const createTestQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: { retry: false },
-    mutations: { retry: false },
-  },
-});
-
-export const TestProviders = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = createTestQueryClient();
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
-};
-
-// Custom render cu providers
-export const renderWithProviders = (ui: React.ReactElement) => {
-  return render(ui, { wrapper: TestProviders });
-};
-```
-
-### MSW Handlers pentru Supabase
-```typescript
-// tests/integration/setup/mockHandlers.ts
-import { http, HttpResponse } from 'msw';
-import { MESSAGES } from '@shared-constants';
-
-export const handlers = [
-  http.get('/api/transactions', () => {
-    return HttpResponse.json({
-      data: mockTransactions,
-      count: mockTransactions.length
-    });
-  }),
-  
-  http.post('/api/transactions', async ({ request }) => {
-    const transaction = await request.json();
-    return HttpResponse.json({
-      data: { ...transaction, id: 'mock-id' },
-      message: MESSAGES.SUCCESS.TRANSACTION_SAVED
-    });
-  }),
-];
-```
-
-### Playwright Setup cu Tag-based Testing
-```typescript
-// playwright.config.ts
-import { defineConfig, devices } from '@playwright/test';
-
-export default defineConfig({
-  testDir: './tests/e2e',
-  fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
-  
-  use: {
-    baseURL: 'http://localhost:5173',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
-  },
-
-  projects: [
-    {
-      name: 'smoke',
-      testMatch: /.*\.smoke\.spec\.ts/,
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'regression',
-      testMatch: /.*\.regression\.spec\.ts/,
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-
-  webServer: {
-    command: 'npm run dev',
-    port: 5173,
-    reuseExistingServer: !process.env.CI,
-  },
-});
-```
+ALREADY DONE
 
 ## Faza 3 – Integration Tests cu Pattern-urile din BEST_PRACTICES
 
-### LunarGrid Tests (lunar-grid/)
-```typescript
-// tests/integration/features/lunar-grid/LunarGrid.test.tsx
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../../setup/TestProviders';
-import { LunarGrid } from '@/components/features/LunarGrid';
-import { UI, MESSAGES } from '@shared-constants';
-
-describe('LunarGrid', () => {
-  describe('inițializare', () => {
-    it('se renderează fără erori', () => {
-      renderWithProviders(<LunarGrid />);
-      expect(screen.getByTestId('lunar-grid')).toBeInTheDocument();
-    });
-
-    it('afișează valorile inițiale corect', async () => {
-      renderWithProviders(<LunarGrid />);
-      
-      await waitFor(() => {
-        expect(screen.getByTestId('grid-month-selector')).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('editare celule', () => {
-    it('deschide formularul de editare la click pe celulă', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<LunarGrid />);
-      
-      const cell = screen.getByTestId('cell-food-15');
-      await user.click(cell);
-      
-      expect(screen.getByTestId('transaction-form-modal')).toBeInTheDocument();
-    });
-
-    it('salvează tranzacția cu succes', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<LunarGrid />);
-      
-      // Deschide formularul
-      await user.click(screen.getByTestId('cell-food-15'));
-      
-      // Completează formularul
-      await user.type(screen.getByTestId('amount-input'), '100.50');
-      await user.click(screen.getByTestId('save-transaction-btn'));
-      
-      // Verifică mesajul de succes prin constants
-      await waitFor(() => {
-        expect(screen.getByText(MESSAGES.SUCCESS.TRANSACTION_SAVED))
-          .toBeInTheDocument();
-      });
-    });
-  });
-
-  describe('navigare luni', () => {
-    it('păstrează datele la schimbarea lunii', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<LunarGrid />);
-      
-      // Navighează la luna următoare
-      await user.click(screen.getByTestId('next-month-btn'));
-      
-      // Verifică că grid-ul se actualizează
-      await waitFor(() => {
-        expect(screen.getByTestId('lunar-grid')).toBeInTheDocument();
-      });
-    });
-  });
-});
-```
-
-### Auth Tests (auth/)
-```typescript
-// tests/integration/features/auth/AuthFlow.test.tsx
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { renderWithProviders } from '../../setup/TestProviders';
-import { LoginForm } from '@/components/features/Auth';
-import { UI, MESSAGES } from '@shared-constants';
-
-describe('AuthFlow', () => {
-  describe('autentificare', () => {
-    it('gestionează login-ul cu succes', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<LoginForm />);
-      
-      await user.type(screen.getByTestId('email-input'), 'test@example.com');
-      await user.type(screen.getByTestId('password-input'), 'password123');
-      await user.click(screen.getByTestId('login-btn'));
-      
-      await waitFor(() => {
-        expect(screen.getByText(MESSAGES.SUCCESS.LOGIN_SUCCESS))
-          .toBeInTheDocument();
-      });
-    });
-
-    it('afișează erori de validare', async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<LoginForm />);
-      
-      await user.click(screen.getByTestId('login-btn'));
-      
-      await waitFor(() => {
-        expect(screen.getByText(MESSAGES.ERRORS.EMAIL_REQUIRED))
-          .toBeInTheDocument();
-      });
-    });
-  });
-});
-```
-
-### Testarea useThemeEffects și componentMap
-```typescript
-// tests/integration/features/ui/ThemeEffects.test.tsx
-import { render, screen } from '@testing-library/react';
-import { Button } from '@/components/primitives/Button';
-
-describe('useThemeEffects Integration', () => {
-  it('aplică efectele vizuale corect', () => {
-    render(
-      <Button 
-        data-testid="theme-button"
-        withShadow 
-        withGradient 
-        variant="primary"
-        size="md"
-      >
-        Test Button
-      </Button>
-    );
-    
-    const button = screen.getByTestId('theme-button');
-    
-    // Verifică aplicarea efectelor prin componentMap
-    expect(button).toHaveClass('shadow-glow');
-    expect(button).toHaveClass('gradient-text');
-    expect(button).toHaveClass('bg-blue-600'); // variant primary
-    expect(button).toHaveClass('px-4'); // size md
-  });
-
-  it('gestionează efectele condiționale', () => {
-    render(
-      <Button 
-        data-testid="conditional-button"
-        withGlow={false}
-        withPulse={true}
-      >
-        Conditional Button
-      </Button>
-    );
-    
-    const button = screen.getByTestId('conditional-button');
-    
-    expect(button).not.toHaveClass('badge-glow');
-    expect(button).toHaveClass('pulse-animation');
-  });
-});
-```
+already done
 
 ## Faza 4 – E2E Tests cu Page Object Pattern
 
-### Smoke Tests (Critical Path)
-```typescript
-// tests/e2e/smoke.spec.ts
-import { test, expect } from '@playwright/test';
-import { LoginPage } from './support/pages/LoginPage';
-import { LunarGridPage } from './support/pages/LunarGridPage';
+- de vazut ce coverage avem cu teste unitare, integrare si playwright. 
+target fiind :
+✅ FAȚ (High ROI)
 
-test.describe('Smoke Tests - Critical Path', () => {
-  test('login și adăugare tranzacție funcționează', async ({ page }) => {
-    const loginPage = new LoginPage(page);
-    const lunarGridPage = new LunarGridPage(page);
-    
-    // Login
-    await loginPage.goto();
-    await loginPage.login('test@example.com', 'password123');
-    
-    // Navighează la grid
-    await lunarGridPage.goto();
-    
-    // Adaugă tranzacție
-    await lunarGridPage.addTransaction('Food', 15, '25.50');
-    
-    // Verifică salvarea
-    await expect(page.getByTestId('success-message')).toBeVisible();
-  });
+Static analysis - TypeScript strict mode
+Integration tests pentru core components
+Test IDs consistent (ai deja data-testid în cod!)
+Visual regression cu Playwright screenshots
+Error boundaries testing
 
-  test('ciclul lunar de buget funcționează', async ({ page }) => {
-    const lunarGridPage = new LunarGridPage(page);
-    
-    await lunarGridPage.goto();
-    
-    // Navighează la luna următoare
-    await lunarGridPage.goToNextMonth();
-    
-    // Verifică încărcarea grid-ului
-    await expect(page.getByTestId('lunar-grid')).toBeVisible();
-  });
-});
-```
+❌ NU FA (Low ROI)
 
-### Page Objects Pattern cu data-testid
-```typescript
-// tests/e2e/support/pages/LunarGridPage.ts
-import { Page } from '@playwright/test';
+Unit tests pentru hooks simpli
+Mock-uri complicate pentru external APIs
+100% coverage goals
+Teste pentru styling/CSS
+Over-testing utility functions
 
-export class LunarGridPage {
-  constructor(private page: Page) {}
-  
-  async goto() {
-    await this.page.goto('/lunar-grid');
-    await this.page.waitForLoadState('networkidle');
-  }
-  
-  async addTransaction(category: string, day: number, amount: string) {
-    // Click pe celulă folosind data-testid
-    await this.page.getByTestId(`cell-${category.toLowerCase()}-${day}`).click();
-    
-    // Completează formularul
-    await this.page.fill('[data-testid="amount-input"]', amount);
-    await this.page.click('[data-testid="save-transaction-btn"]');
-    
-    // Așteaptă confirmarea
-    await this.page.waitForSelector('[data-testid="success-message"]');
-  }
-  
-  async goToNextMonth() {
-    await this.page.click('[data-testid="next-month-btn"]');
-    await this.page.waitForLoadState('networkidle');
-  }
-}
-```
+Core Integration Tests (1 săptămână)
+Testează doar critical user journeys:
 
-## Faza 5 – CI/CD Pipeline
+Login/Register flow
+Add transaction în LunarGrid
+Monthly navigation
+Categorii personalizate CRUD
+
+🛑 Criterii de Acceptare
+Coverage ≥ 70 % şi smoke‑suite green → merge permis.
+
+Quick‑check ≤ 5 min.
+
+Nightly cron salvează trace + video la failure.
+
+De exemplu, dacă există teste unitare pentru fiecare componentă trivială (primitives ca Button, Input etc.), acelea s-ar putea întreține automat cu ajutorul AI sau chiar elimina dacă nu aduc valoare (dat fiind că oricum componentele UI simple sunt acoperite de testele de integrare când apar pe ecran). Focalizarea pe testele de integrare și E2E pentru fluxurile principale (auth, add transaction, edit transaction, navigation) va oferi acoperire suficientă cu efort mai mic. Astfel, se simplifică workflow-ul: la schimbări minore de UI, nu vor pica zeci de teste unitare inutile.
+
+există referințe la un AccountManager pentru gestiunea conturilor de test
+github.com
+, sugerând că fluxul de autentificare poate fi automatizat în teste (ex. crearea unui user de test sau reutilizarea unui token), deși detaliile implementării nu sunt vizibile. Introducerea de fixturi dedicate (ex. user de test logat înainte de fiecare test E2E) ar fi un plus – dacă nu e deja configurat, se poate folosi Playwright fixtures pentru a furniza starea de autentificare la începutul testelor, evitând logarea repetitivă prin UI.
+
+Tagging și rulare selectivă: Setup-ul de Playwright suportă și etichetarea testelor. Configurația definește proiecte separate pentru teste de tip smoke vs. regression, filtrând fișierele .smoke.spec.ts respectiv .regression.spec.ts
+github.com
+. Acest lucru permite rularea rapidă a unui subset critic (smoke tests) la fiecare commit și a unei suite complete de regresie la nevoie – o abordare eficientă pentru un solo developer care vrea feedback rapid. În plus, în pipeline-ul CI sunt incluse etape distincte: de exemplu, rulare unit/integration tests, apoi e2e-smoke pe fiecare push și e2e-regression programat (schedule) pe browsere multiple
+github.com
+github.com
+. Această strategie de CI cu gating pe smoke tests indică o aplicare matură a piramidei de teste.
+Reutilizeze fixturi comune: de exemplu, un fixture Playwright pentru autentificare (dacă nu e deja implementat) ar elimina duplicarea pașilor de login în teste multiple. Dat fiind că există un loginPage și AccountManager, se poate inițializa contextul logat direct prin API sau cookie injection, economisind timp de rulare.
+
+## Faza 5 - scripturi ajutatoare
+Scripturi de verificare și automatizare: Deja există scripturi custom (ex: pentru importuri de constante, pentru data-testid, etc.)
+github.com
+. Acestea ajută la menținerea calității fără efort manual. Un câștig rapid poate fi adăugarea unor scripturi suplimentare, de exemplu:
+un script care să verifice că toate componentele folosesc doar import-uri din barrel files unde e convenția (conform BEST_PRACTICES),
+sau un script care să parseze fișierele de test și să raporteze testele marcate .only (în caz că se uită vreunul activat).
+Aceste mici unelte (eventual rulate în pre-commit) vor prinde automat erori comune, ușurând munca dezvoltatorului solo. Acest aspect ține de simplificarea mentenanței – previi bug-uri înainte să apară.
+
+## Faza 6 – CI/CD Pipeline
 
 ### GitHub Actions Workflow Optimizat
 ```yaml
