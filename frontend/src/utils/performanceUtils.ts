@@ -11,8 +11,13 @@ import { useCallback, useEffect, useRef } from "react";
  * Registry global pentru caching
  * Permite păstrarea datelor între re-render-uri și între componente
  */
+interface CacheEntry<T> {
+  value: T;
+  expiry: number;
+}
+
 export class CacheRegistry {
-  private static cache: Map<string, { value: any; expiry: number }> = new Map();
+  private static cache: Map<string, CacheEntry<unknown>> = new Map();
 
   /**
    * Obține o valoare din cache sau o calculează folosind factory
@@ -27,7 +32,7 @@ export class CacheRegistry {
     maxAge?: number,
   ): T | Promise<T> {
     // Verificăm cache-ul curent
-    const entry = this.cache.get(key);
+    const entry = this.cache.get(key) as CacheEntry<T> | undefined;
     const now = Date.now();
 
     // Dacă există o intrare validă, o returnăm

@@ -9,7 +9,7 @@ import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 export const useURLFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const {
     loadFromURL,

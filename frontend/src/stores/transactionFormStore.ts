@@ -21,7 +21,7 @@ export interface TransactionFormStoreState extends BaseStoreState {
 
   // Form actions
   setForm: (form: TransactionFormData) => void;
-  setField: (name: keyof TransactionFormData, value: any) => void;
+  setField: (name: keyof TransactionFormData, value: string | boolean | number) => void;
   setSuccess: (msg: string) => void;
   resetForm: () => void;
   validateForm: () => boolean;
@@ -43,7 +43,7 @@ const STORE_NAME = "TransactionFormStore";
 export const useTransactionFormStore = create<TransactionFormStoreState>()(
   devtools((set, get) => {
     // Helper pentru logging standardizat
-    const logAction = (action: string, data?: any) => {
+    const logAction = (action: string, data?: Record<string, unknown>) => {
       storeLogger.info(STORE_NAME, action, data);
     };
 
@@ -60,9 +60,9 @@ export const useTransactionFormStore = create<TransactionFormStoreState>()(
     };
 
     // Creăm acțiuni async standardizate
-    const createFormAction = <T extends any[]>(
+    const createFormAction = <T extends unknown[]>(
       actionName: string,
-      action: (...args: T) => Promise<any>,
+      action: (...args: T) => Promise<unknown>,
     ) =>
       createAsyncAction(STORE_NAME, actionName, action, setLoading, setError);
 
@@ -82,10 +82,10 @@ export const useTransactionFormStore = create<TransactionFormStoreState>()(
         logAction("Form set", { form });
       },
 
-      setField: (name: keyof TransactionFormData, value: any) => {
+      setField: (name: keyof TransactionFormData, value: string | boolean | number) => {
         const newForm = { ...get().form, [name]: value };
         set({ form: newForm, lastUpdated: new Date() }, false, "setField");
-        logAction("Field updated", { field: name, value });
+        logAction("Field updated", { field: String(name), value });
       },
 
       setSuccess: (msg: string) => {

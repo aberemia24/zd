@@ -62,14 +62,20 @@ export function useInfiniteTransactions(
     queryFn: ({ pageParam = 1 }) =>
       transactionService.getTransactionsPaginated({
         ...filters,
-        page: pageParam,
+        page: typeof pageParam === 'string' ? parseInt(pageParam, 10) : pageParam,
         pageSize,
       }),
     initialPageParam: 1, // Necesar în noile versiuni de React Query
-    ...getInfiniteQueryOptions({
-      staleTime: cacheConfig.expirationTimes.transactions,
-      maxPages: 5, // Limităm numărul de pagini reținute în memorie
-    }),
+    getNextPageParam: (lastPage) => {
+      // Verificăm dacă mai sunt pagini disponibile
+      if (lastPage && 'hasMore' in lastPage && lastPage.hasMore) {
+        return (lastPage.page || 1) + 1;
+      }
+      return undefined;
+    },
+    staleTime: cacheConfig.expirationTimes.transactions,
+    gcTime: 5 * 60 * 1000, // 5 minute
+    maxPages: 5, // Limităm numărul de pagini reținute în memorie
   });
 }
 

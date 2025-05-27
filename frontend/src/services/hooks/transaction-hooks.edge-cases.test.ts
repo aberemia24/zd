@@ -3,7 +3,7 @@
  * Focus pe validare și edge cases fără dependințe complexe
  */
 
-import { TransactionType, TransactionStatus } from "../../shared-constants";
+import { TransactionType, TransactionStatus } from "@shared-constants";
 
 // Test utilities pentru validarea datelor
 const validateTransactionData = (transaction: any): boolean => {

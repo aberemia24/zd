@@ -66,7 +66,7 @@ const STORE_NAME = "TransactionFiltersStore";
 export const useTransactionFiltersStore = create<TransactionFiltersState>()(
   devtools((set, get) => {
     // Helper pentru logging standardizat
-    const logAction = (action: string, data?: any) => {
+    const logAction = (action: string, data?: Record<string, unknown>) => {
       storeLogger.info(STORE_NAME, action, data);
     };
 

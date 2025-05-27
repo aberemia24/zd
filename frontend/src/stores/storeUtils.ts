@@ -24,17 +24,17 @@ export interface BaseStoreActions {
  * Pattern standard pentru logging în stores
  */
 export const storeLogger = {
-  info: (storeName: string, action: string, data?: any) => {
+  info: (storeName: string, action: string, data?: unknown) => {
     if (import.meta.env.NODE_ENV === "development") {
       console.log(`[${storeName}] ${action}`, data);
     }
   },
 
-  error: (storeName: string, action: string, error: any) => {
+  error: (storeName: string, action: string, error: unknown) => {
     console.error(`[${storeName}] Error in ${action}:`, error);
   },
 
-  warn: (storeName: string, message: string, data?: any) => {
+  warn: (storeName: string, message: string, data?: unknown) => {
     console.warn(`[${storeName}] ${message}`, data);
   },
 };
@@ -129,7 +129,7 @@ export const shallowEqual = <T>(a: T, b: T): boolean => {
   for (const key of keysA) {
     if (
       !Object.prototype.hasOwnProperty.call(b, key) ||
-      !Object.is((a as any)[key], (b as any)[key])
+      !Object.is((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])
     ) {
       return false;
     }
@@ -141,7 +141,7 @@ export const shallowEqual = <T>(a: T, b: T): boolean => {
 /**
  * Wrapper pentru async actions cu error handling standard
  */
-export const createAsyncAction = <T extends any[], R>(
+export const createAsyncAction = <T extends unknown[], R>(
   storeName: string,
   actionName: string,
   action: (...args: T) => Promise<R>,
@@ -175,13 +175,13 @@ export const createAsyncAction = <T extends any[], R>(
 /**
  * Utilitară pentru persistence config standard
  */
-export const createPersistConfig = (
+export const createPersistConfig = <T>(
   storeName: string,
-  partialize?: (state: any) => any,
+  partialize?: (state: T) => Partial<T>,
 ) => ({
   name: `${storeName}-storage`,
   version: 1,
-  migrate: (persistedState: any, version: number) => {
+  migrate: (persistedState: unknown, version: number) => {
     storeLogger.info(storeName, "migrate storage", { version, persistedState });
     return persistedState;
   },
@@ -208,7 +208,7 @@ export const validateStoreState = <T>(
 /**
  * Debounced action pentru performanță
  */
-export const createDebouncedAction = <T extends any[]>(
+export const createDebouncedAction = <T extends unknown[]>(
   action: (...args: T) => void,
   delay: number = 300,
 ) => {

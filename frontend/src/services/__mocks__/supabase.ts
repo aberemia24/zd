@@ -6,8 +6,8 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 // Tip de date pentru rezultate Supabase
 type SupabaseResult = {
-  data: any | null;
-  error: any | null;
+  data: unknown | null;
+  error: Error | null;
   count?: number;
 };
 

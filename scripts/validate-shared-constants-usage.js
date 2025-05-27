@@ -37,6 +37,12 @@ function scanFileForPatterns(filePath) {
     return [];
   }
 
+  // Skip shared-constants files themselves - they are the source of truth
+  const relativePath = path.relative(process.cwd(), filePath);
+  if (relativePath.includes('shared-constants') || relativePath.includes('\\shared-constants\\')) {
+    return [];
+  }
+
   const content = fs.readFileSync(filePath, 'utf8');
   const lines = content.split('\n');
   const issues = [];

@@ -13,8 +13,7 @@ export type { QuickAddModalProps } from "./QuickAddModal";
 export { useBaseModalLogic } from "./hooks/useBaseModalLogic";
 export type { CellContext } from "./hooks/useBaseModalLogic";
 
-// Demo Modal (pentru development reference)
-export { ModalDemo } from "./ModalDemo";
+// Demo Modal (pentru development reference) - REMOVED: file not found
 
 // Transaction Modal (legacy - poate fi eliminat în viitor)
 export { TransactionModal } from "./TransactionModal";

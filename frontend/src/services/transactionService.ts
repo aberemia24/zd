@@ -238,7 +238,7 @@ class TransactionService {
    */
   importTransactions = async (
     file: File,
-  ): Promise<{ total: number; imported: number; errors: any[] }> => {
+  ): Promise<{ total: number; imported: number; errors: string[] }> => {
     const formData = new FormData();
     formData.append("file", file);
 

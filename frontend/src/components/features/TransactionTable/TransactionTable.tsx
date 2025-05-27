@@ -182,7 +182,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             )}
           >
             <Spinner size="sm" />
-            <span>{TABLE.LOADING}</span>
+            <span data-testid="table-loading-text">{TABLE.LOADING}</span>
           </div>
         </td>
       </tr>
@@ -210,7 +210,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             )}
           >
             <Spinner size="sm" />
-            <span>{TABLE.LOADING_MORE}</span>
+            <span data-testid="table-loading-more-text">{TABLE.LOADING_MORE}</span>
           </div>
         </td>
       </tr>

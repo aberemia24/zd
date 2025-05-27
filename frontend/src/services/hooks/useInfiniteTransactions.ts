@@ -7,6 +7,13 @@ import { useAuthStore } from "../../stores/authStore";
 import type { Transaction } from "../../types/Transaction";
 import { useMemo } from "react";
 
+// Interfață pentru tranzacții raw cu proprietăți opționale pentru transformare
+interface RawTransactionWithOptionalId extends Omit<TransactionValidated, 'id'> {
+  id?: string;
+  _id?: string;
+  userId?: string;
+}
+
 export interface TransactionQueryParams {
   limit?: number;
   offset?: number;
@@ -132,20 +139,27 @@ export function useInfiniteTransactions(
 
     // Adăugăm userId și id (dacă este necesar) la fiecare tranzacție
     return allTransactions.map((transaction) => {
-      // Folosim tipul any temporar pentru a evita erorile TypeScript
-      const anyTransaction = transaction as any;
+      // Folosim tipul specific pentru a evita any
+      const rawTransaction = transaction as RawTransactionWithOptionalId;
 
       // Adăugăm userId dacă nu există
-      if (!anyTransaction.userId && userId) {
-        anyTransaction.userId = userId;
+      if (!rawTransaction.userId && userId) {
+        rawTransaction.userId = userId;
       }
 
       // Adăugăm id bazat pe _id dacă lipsește
-      if (anyTransaction._id && !anyTransaction.id) {
-        anyTransaction.id = anyTransaction._id;
+      if (rawTransaction._id && !rawTransaction.id) {
+        rawTransaction.id = rawTransaction._id;
       }
 
-      return anyTransaction;
+      // Asigurăm că id este întotdeauna string
+      const finalTransaction = {
+        ...rawTransaction,
+        id: rawTransaction.id || rawTransaction._id || '',
+        userId: rawTransaction.userId || userId || ''
+      };
+
+      return finalTransaction;
     });
   }, [infiniteQuery.data, userId]);
 

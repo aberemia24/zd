@@ -18,24 +18,24 @@ interface CategoryStoreState extends BaseStoreState {
   version: number;
 
   // Async actions
-  loadUserCategories: (userId: string) => Promise<void>;
+  loadUserCategories: (userId: string) => Promise<void | null>;
   saveCategories: (
     userId: string,
     categories: CustomCategory[],
-  ) => Promise<void>;
+  ) => Promise<void | null>;
   renameSubcategory: (
     userId: string,
     category: string,
     oldName: string,
     newName: string,
-  ) => Promise<boolean>;
+  ) => Promise<boolean | null>;
   deleteSubcategory: (
     userId: string,
     category: string,
     subcategory: string,
     action: "migrate" | "delete",
     target?: string,
-  ) => Promise<boolean>;
+  ) => Promise<boolean | null>;
 
   // Sync actions
   mergeWithDefaults: (defaults: CustomCategory[]) => void;
@@ -68,9 +68,9 @@ export const useCategoryStore = create<CategoryStoreState>()(
         };
 
         // Creăm acțiuni async standardizate
-        const createCategoryAction = <T extends unknown[]>(
+        const createCategoryAction = <T extends unknown[], R = void>(
           actionName: string,
-          action: (...args: T) => Promise<unknown>,
+          action: (...args: T) => Promise<R>,
         ) =>
           createAsyncAction(
             STORE_NAME,

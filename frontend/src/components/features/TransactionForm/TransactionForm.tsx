@@ -9,7 +9,7 @@ import {
   TransactionType,
   getCategoriesForTransactionType,
 } from "@shared-constants";
-import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS } from "@shared-constants";
+import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS, EXCEL_GRID } from "@shared-constants";
 import { MESAJE } from "@shared-constants";
 import { useTransactionFormStore } from "../../../stores/transactionFormStore";
 import { useCategoryStore } from "../../../stores/categoryStore";
@@ -99,8 +99,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       const checkedValue = isCheckbox
         ? (e.target as HTMLInputElement).checked
         : undefined;
+      
+      // Asigurăm că valoarea nu este undefined pentru setField
+      const finalValue = isCheckbox ? (checkedValue ?? false) : value;
       setField &&
-        setField(name as keyof typeof form, isCheckbox ? checkedValue : value);
+        setField(name as keyof typeof form, finalValue);
       // Resetăm frequency dacă debifăm recurring
       if (name === "recurring" && isCheckbox && checkedValue === false) {
         setField && setField("frequency", "");
@@ -184,7 +187,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         className="flex justify-center items-center p-4"
         data-testid="transaction-form-loading"
       >
-        <div>Loading store...</div>
+        <div data-testid="transaction-form-store-loading">Loading store...</div>
       </div>
     );
   }
@@ -203,7 +206,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         className="flex justify-center items-center p-4"
         data-testid="transaction-form-loading"
       >
-        <div>Loading form...</div>
+        <div data-testid="transaction-form-data-loading">Loading form...</div>
       </div>
     );
   }
@@ -228,7 +231,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         <h3 className="text-lg font-medium text-gray-900">
           {form.type
             ? `Adaugă ${form.type === TransactionType.INCOME ? "venit" : "cheltuială"}`
-            : "Adaugă tranzacție"}
+            : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
         </h3>
         {/* Indicator status formular */}
         {loading && (

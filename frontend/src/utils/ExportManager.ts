@@ -3,7 +3,7 @@ import * as ExcelJS from "exceljs";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import type { Transaction } from "../types/Transaction";
-import { TransactionType } from "@shared-constants";
+import { TransactionType, OPTIONS } from "@shared-constants";
 
 export type ExportFormat = "csv" | "pdf" | "excel";
 
@@ -19,9 +19,18 @@ export interface ExportOptions {
 }
 
 // Extend jsPDF type for autoTable plugin
+interface AutoTableOptions {
+  head?: string[][];
+  body?: string[][];
+  startY?: number;
+  styles?: { fontSize?: number };
+  headStyles?: { fillColor?: number[] };
+  margin?: { top?: number };
+}
+
 declare module "jspdf" {
   interface jsPDF {
-    autoTable: (options: any) => jsPDF;
+    autoTable: (options: AutoTableOptions) => jsPDF;
   }
 }
 
@@ -263,16 +272,8 @@ export class ExportManager {
    * Conversie tip tranzacție în label lizibil
    */
   private static getTransactionTypeLabel(type: TransactionType): string {
-    switch (type) {
-      case TransactionType.INCOME:
-        return "Venit";
-      case TransactionType.EXPENSE:
-        return "Cheltuială";
-      case TransactionType.SAVING:
-        return "Economie";
-      default:
-        return String(type);
-    }
+    const typeOption = OPTIONS.TYPE.find(option => option.value === type);
+    return typeOption ? typeOption.label : String(type);
   }
 
   /**
