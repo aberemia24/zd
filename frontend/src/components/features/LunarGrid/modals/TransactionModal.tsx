@@ -157,7 +157,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
       if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
-        handleSubmit(e as any);
+        // Convertim keyboard event într-un form event pentru handleSubmit
+        const syntheticFormEvent = {
+          preventDefault: () => e.preventDefault(),
+          stopPropagation: () => e.stopPropagation(),
+          currentTarget: e.currentTarget,
+          target: e.target,
+        } as React.FormEvent<HTMLFormElement>;
+        handleSubmit(syntheticFormEvent);
       }
     },
     [onClose, handleSubmit],

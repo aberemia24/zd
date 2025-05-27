@@ -41,7 +41,15 @@ import {
 import {
   flex as flexContainer,
   container as gridContainer,
-} from "../../../styles/cva/components/layout";
+  } from "../../../styles/cva/components/layout";
+
+// Interfață pentru categoria din store
+interface CategoryStoreItem {
+  name: string;
+  type: TransactionType;
+  subcategories: Array<{ name: string; [key: string]: unknown }>;
+  [key: string]: unknown;
+}
 
 // Helper function pentru formatarea sumelor (memorare globală deoarece este statică)
 const formatMoney = (amount: number): string => {
@@ -85,8 +93,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
       (category: string): TransactionType => {
-        const categories = useCategoryStore.getState().categories;
-        const foundCategory = categories.find((c: any) => c.name === category);
+        const categories = useCategoryStore.getState().categories as CategoryStoreItem[];
+        const foundCategory = categories.find((c) => c.name === category);
         return (foundCategory?.type || "expense") as TransactionType;
       },
       [],

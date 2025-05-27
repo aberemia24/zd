@@ -2,7 +2,7 @@
 // Owner: echipa FE
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { CustomCategoriesPayload, CustomCategory } from "../types/Category";
+import { CustomCategoriesPayload, CustomCategory, CustomSubcategory } from "../types/Category";
 import { categoryService } from "../services/categoryService";
 import { supabaseService } from "../services/supabaseService";
 import {
@@ -51,7 +51,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
     persist(
       (set, get) => {
         // Helper pentru logging standardizat
-        const logAction = (action: string, data?: any) => {
+        const logAction = (action: string, data?: Record<string, unknown>) => {
           storeLogger.info(STORE_NAME, action, data);
         };
 
@@ -68,9 +68,9 @@ export const useCategoryStore = create<CategoryStoreState>()(
         };
 
         // Creăm acțiuni async standardizate
-        const createCategoryAction = <T extends any[]>(
+        const createCategoryAction = <T extends unknown[]>(
           actionName: string,
-          action: (...args: T) => Promise<any>,
+          action: (...args: T) => Promise<unknown>,
         ) =>
           createAsyncAction(
             STORE_NAME,
@@ -182,7 +182,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                   cat.name === category
                     ? {
                         ...cat,
-                        subcategories: cat.subcategories.map((sc: any) =>
+                        subcategories: cat.subcategories.map((sc) =>
                           sc.name === oldName ? { ...sc, name: newName } : sc,
                         ),
                       }
@@ -242,7 +242,7 @@ export const useCategoryStore = create<CategoryStoreState>()(
                     ? {
                         ...cat,
                         subcategories: cat.subcategories.filter(
-                          (sc: any) => sc.name !== subcategory,
+                          (sc) => sc.name !== subcategory,
                         ),
                       }
                     : cat,
@@ -298,14 +298,14 @@ export const useCategoryStore = create<CategoryStoreState>()(
               if (found) {
                 // Prioritate subcategorii custom
                 const customSubs = found.subcategories.map(
-                  (sc: any) => sc.name,
+                  (sc: CustomSubcategory) => sc.name,
                 );
                 return {
                   ...def,
                   subcategories: [
                     ...found.subcategories,
                     ...def.subcategories.filter(
-                      (sc: any) => !customSubs.includes(sc.name),
+                      (sc: CustomSubcategory) => !customSubs.includes(sc.name),
                     ),
                   ],
                   isCustom: found.isCustom,
