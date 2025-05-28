@@ -19,7 +19,7 @@
     "test:e2e:smoke": "cd frontend && npm run test:e2e:smoke",
     "test:e2e:regression": "cd frontend && npm run test:e2e:regression",
     "type-check": "cd frontend && npm run type-check",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint scripts/ --ext .js && cd frontend && npm run lint",
     "format": "prettier --write .",
     "validate:constants": "node scripts/validate-constants.js",
     "validate:shared-constants": "node scripts/validate-shared-constants-usage.js",
