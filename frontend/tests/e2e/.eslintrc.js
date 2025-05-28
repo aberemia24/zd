@@ -1,5 +1,5 @@
 module.exports = {
-  extends: ['../../.eslintrc.js'],
+  extends: ['../../.eslintrc.json'],
   rules: {
     // Disable React Testing Library rules for Playwright E2E tests
     'testing-library/prefer-screen-queries': 'off',
