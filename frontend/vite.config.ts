@@ -35,6 +35,36 @@ export default defineConfig({
     reporters: ['default', 'html'],
     outputFile: {
       html: './test-results/index.html'
+    },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'html', 'lcov'],
+      reportsDirectory: './coverage',
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'build/',
+        'tests/',
+        'test-results/',
+        'src/test/',
+        'src/setupTests.ts',
+        'src/jest-mocks.ts',
+        '**/*.test.{ts,tsx}',
+        '**/*.spec.{ts,tsx}',
+        '**/types/',
+        'src/shared-constants/',
+        'vite.config.ts',
+        'tailwind.config.js',
+        'postcss.config.js'
+      ],
+      thresholds: {
+        global: {
+          branches: 70,
+          functions: 70,
+          lines: 70,
+          statements: 70
+        }
+      }
     }
   }
 }); 
