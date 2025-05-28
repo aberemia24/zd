@@ -47,6 +47,7 @@ jobs:
         uses: codecov/codecov-action@v4
         if: always()
         with:
+          # Secret configured in GitHub repository settings
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./frontend/coverage/lcov.info
           directory: ./frontend/coverage/
