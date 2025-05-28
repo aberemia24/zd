@@ -134,16 +134,16 @@ test.describe('TransactionForm - Test cu Date Dinamice', () => {
     const recurringCheckbox = page.getByTestId(selectors.recurringCheckbox);
     await expect(recurringCheckbox).toBeVisible();
     
+    // Obține elementele care pot fi necesare
+    const frequencySelect = page.getByTestId(selectors.frequencySelect);
+    
+    // Configurează recursivitatea
     if (formData.recurring) {
       await recurringCheckbox.check();
       console.log('✅ Checkbox recurent bifat');
       
       // Așteaptă ca select-ul de frecvență să devină activ
       await page.waitForTimeout(500);
-      
-      const frequencySelect = page.getByTestId(selectors.frequencySelect);
-      await expect(frequencySelect).toBeVisible();
-      await expect(frequencySelect).toBeEnabled();
       await frequencySelect.selectOption(formData.frequency);
       console.log(`✅ Frecvență selectată: ${formData.frequency}`);
     } else {
@@ -152,10 +152,21 @@ test.describe('TransactionForm - Test cu Date Dinamice', () => {
       console.log('✅ Tranzacție configurată ca non-recurentă');
     }
     
-    // Pasul 7: Completează descrierea (opțional)
+    // Verifică mereu starea finală - fără condiții
+    const isRecurringChecked = await recurringCheckbox.isChecked();
+    const isFrequencyEnabled = await frequencySelect.isEnabled();
+    
+    expect(isRecurringChecked).toBe(formData.recurring);
+    expect(isFrequencyEnabled).toBe(formData.recurring);
+    
+ 
+    // Pasul 7: Completează descrierea - obține elementul mai întâi
+    const descriptionInput = page.getByTestId(selectors.descriptionInput);
+    
+    // Verifică că elementul descriere există în pagină
+    await expect(descriptionInput).toBeVisible();
+    
     if (formData.description) {
-      const descriptionInput = page.getByTestId(selectors.descriptionInput);
-      await expect(descriptionInput).toBeVisible();
       await descriptionInput.fill(formData.description);
       console.log(`✅ Descriere completată: "${formData.description}"`);
     } else {
@@ -203,19 +214,19 @@ test.describe('TransactionForm - Test cu Date Dinamice', () => {
       console.log('✅ Nicio eroare detectată');
     }
     
-    // PASUL 10: VERIFICARE ÎN SUPABASE
+    // PASUL 10: VERIFICARE ÎN SUPABASE - structurat pentru a evita conditional expect
+    let isInDatabase = false;
+    
     if (userId) {
       console.log('🔍 Verificare tranzacție în baza de date Supabase...');
       
       // Așteaptă puțin mai mult pentru sincronizarea DB
       await page.waitForTimeout(2000);
       
-      const isInDatabase = await verifyTransactionInSupabase(formData, userId);
+      isInDatabase = await verifyTransactionInSupabase(formData, userId);
       
       if (isInDatabase) {
         console.log('✅ VERIFICARE SUPABASE: Tranzacția a fost găsită în baza de date cu toate detaliile corecte!');
-        // Assert pentru a confirma succesul
-        expect(isInDatabase).toBe(true);
       } else {
         console.log('❌ VERIFICARE SUPABASE: Tranzacția NU a fost găsită în baza de date!');
         console.log('🔍 Date căutate:', {
@@ -230,13 +241,16 @@ test.describe('TransactionForm - Test cu Date Dinamice', () => {
           description: formData.description
         });
         
-        // Poți alege să facă fail testul sau doar să logheze
-        // expect(isInDatabase).toBe(true); // Decomentează pentru fail explicit
         console.log('⚠️ Testul continuă, dar verificarea DB a eșuat');
       }
     } else {
       console.log('⚠️ Omit verificarea Supabase din cauza lipsei userId');
+      // Pentru cazul fără userId, considerăm verificarea ca fiind reușită
+      isInDatabase = true;
     }
+    
+    // Assert-ul se face întotdeauna, fără condiții
+    expect(isInDatabase).toBe(true);
     
     // Fă un screenshot după submit
     await page.screenshot({ 
