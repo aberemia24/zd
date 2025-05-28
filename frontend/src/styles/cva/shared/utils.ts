@@ -18,8 +18,8 @@ export { clsx };
  * Helper pentru debug - poate fi eliminat în production
  */
 export function debugClasses(classes: string) {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Generated classes:', classes);
+  if (process.env.NODE_ENV === "development") {
+    console.log("Generated classes:", classes);
   }
   return classes;
-} 
+}

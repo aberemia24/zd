@@ -1,19 +1,28 @@
-import React, { useMemo, useCallback, useEffect } from 'react';
-import TransactionForm from '../components/features/TransactionForm/TransactionForm';
-import TransactionTable from '../components/features/TransactionTable/TransactionTable';
-import TransactionFilters from '../components/features/TransactionFilters/TransactionFilters';
-import { ExportButton } from '../components/features/ExportButton/ExportButton';
-import Alert from '../components/primitives/Alert/Alert';
-import { useQueryClient } from '@tanstack/react-query';
-import { TransactionType, CategoryType } from '@shared-constants';
-import { useFilteredTransactions } from '../services/hooks/useFilteredTransactions';
-import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
-import { useAuthStore } from '../stores/authStore';
-import { cn } from '../styles/cva/shared/utils';
-import { card, container as pageContainer } from '../styles/cva/components/layout';
-import { PAGINATION } from '@shared-constants';
-import { TITLES } from '@shared-constants';
-import type { Transaction } from '../types/Transaction';
+import React, { useMemo, useCallback, useEffect } from "react";
+import TransactionForm from "../components/features/TransactionForm/TransactionForm";
+import TransactionTable from "../components/features/TransactionTable/TransactionTable";
+import TransactionFilters from "../components/features/TransactionFilters/TransactionFilters";
+import { ExportButton } from "../components/features/ExportButton/ExportButton";
+import Alert from "../components/primitives/Alert/Alert";
+import { useQueryClient } from "@tanstack/react-query";
+import { TransactionType, CategoryType } from "@shared-constants";
+import { useFilteredTransactions } from "../services/hooks/useFilteredTransactions";
+import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
+import { useAuthStore } from "../stores/authStore";
+import { cn } from "../styles/cva/shared/utils";
+import {
+  card,
+  container as pageContainer,
+} from "../styles/cva/components/layout";
+import { PAGINATION } from "@shared-constants";
+import { TITLES } from "@shared-constants";
+import type { Transaction } from "../types/Transaction";
+
+// Interfață pentru tranzacții cu proprietăți opționale pentru transformare
+interface RawTransactionWithOptionalId extends Omit<Transaction, 'id'> {
+  id?: string;
+  _id?: string;
+}
 
 /**
  * Pagină dedicată pentru gestionarea tranzacțiilor
@@ -39,38 +48,50 @@ const TransactionsPage: React.FC = () => {
     setAmountMin,
     setAmountMax,
     setSearchText,
-    resetFilters
+    resetFilters,
   } = useTransactionFiltersStore();
-  
+
   // Extragem user din AuthStore pentru a-l folosi în query
   const { user } = useAuthStore();
-  
+
   // Adăugăm queryClient pentru a invalida query-urile după adăugarea unei tranzacții
   const queryClient = useQueryClient();
-  
+
   // Memoizăm parametrii de query pentru a preveni recalculări inutile
-  const queryParams = useMemo(() => ({
-    limit: PAGINATION.DEFAULT_LIMIT,
-    type: filterType as TransactionType || undefined,
-    category: filterCategory as string || undefined,
-    subcategory: filterSubcategory || undefined,
-    // Adăugăm noile filtre avansate
-    startDate: dateFrom || undefined,
-    endDate: dateTo || undefined,
-    // Convertim string la număr pentru filtrele de sumă
-    ...(amountMin ? { minAmount: parseFloat(amountMin) } : {}),
-    ...(amountMax ? { maxAmount: parseFloat(amountMax) } : {}),
-    // Adăugăm filtrul de căutare text
-    ...(searchText ? { search: searchText } : {}),
-    // Nu includem month/year pentru a avea toate tranzacțiile
-    sort: 'date',
-    order: 'desc' as const
-  }), [filterType, filterCategory, filterSubcategory, dateFrom, dateTo, amountMin, amountMax, searchText]);
+  const queryParams = useMemo(
+    () => ({
+      limit: PAGINATION.DEFAULT_LIMIT,
+      type: (filterType as TransactionType) || undefined,
+      category: (filterCategory as string) || undefined,
+      subcategory: filterSubcategory || undefined,
+      // Adăugăm noile filtre avansate
+      startDate: dateFrom || undefined,
+      endDate: dateTo || undefined,
+      // Convertim string la număr pentru filtrele de sumă
+      ...(amountMin ? { minAmount: parseFloat(amountMin) } : {}),
+      ...(amountMax ? { maxAmount: parseFloat(amountMax) } : {}),
+      // Adăugăm filtrul de căutare text
+      ...(searchText ? { search: searchText } : {}),
+      // Nu includem month/year pentru a avea toate tranzacțiile
+      sort: "date",
+      order: "desc" as const,
+    }),
+    [
+      filterType,
+      filterCategory,
+      filterSubcategory,
+      dateFrom,
+      dateTo,
+      amountMin,
+      amountMax,
+      searchText,
+    ],
+  );
 
   // Folosim noul hook useFilteredTransactions cu optimizări de performance
-  const { 
+  const {
     data: rawTransactions,
-    error: fetchError, 
+    error: fetchError,
     isLoading,
     hasNextPage,
     fetchNextPage,
@@ -78,78 +99,88 @@ const TransactionsPage: React.FC = () => {
     totalCount,
     isFiltered,
     isFetching,
-    refetch
+    refetch,
   } = useFilteredTransactions(queryParams);
-  
+
   // Procesăm tranzacțiile pentru a asigura compatibilitatea cu tipul Transaction
   // Adăugăm userId acolo unde lipsește pentru a satisface interfața Transaction
   const transactions = useMemo(() => {
     if (!rawTransactions) return [];
-    
-    return rawTransactions.map(transaction => {
+
+    return rawTransactions.map((transaction) => {
       const processedTransaction = { ...transaction };
-      
+
       // Asigurăm că toate tranzacțiile au userId
       if (!processedTransaction.userId && user?.id) {
         processedTransaction.userId = user.id;
       }
-      
+
       // Asigurăm că _id este transferat la id dacă e necesar
-      if (!(processedTransaction as any).id && (processedTransaction as any)._id) {
-        (processedTransaction as any).id = (processedTransaction as any)._id;
+      const rawTransaction = processedTransaction as RawTransactionWithOptionalId;
+      if (!rawTransaction.id && rawTransaction._id) {
+        (processedTransaction as Transaction & { id: string }).id = rawTransaction._id;
       }
-      
+
       // Ne asigurăm că date este mereu string
-      if (processedTransaction.date && typeof processedTransaction.date !== 'string') {
+      if (
+        processedTransaction.date &&
+        typeof processedTransaction.date !== "string"
+      ) {
         processedTransaction.date = String(processedTransaction.date);
       }
-      
+
       return processedTransaction;
     });
   }, [rawTransactions, user?.id]);
-  
+
   // Handler pentru evenimentul transaction:created
   const handleTransactionCreated = useCallback(() => {
     // Invalidăm cache-ul pentru a reîncărca datele
-    queryClient.invalidateQueries({ queryKey: ['transactions'] });
-    
+    queryClient.invalidateQueries({ queryKey: ["transactions"] });
+
     // Reîncărcăm datele direct
     refetch();
   }, [queryClient, refetch]);
-  
+
   // Adăugăm listener pentru evenimentul transaction:created
   useEffect(() => {
-    window.addEventListener('transaction:created', handleTransactionCreated);
-    
+    window.addEventListener("transaction:created", handleTransactionCreated);
+
     return () => {
-      window.removeEventListener('transaction:created', handleTransactionCreated);
+      window.removeEventListener(
+        "transaction:created",
+        handleTransactionCreated,
+      );
     };
   }, [handleTransactionCreated]);
-  
+
   // Nu mai avem nevoie de filtrare locală deoarece filtrele sunt aplicate în query
   // Numărul total de tranzacții vine direct din query
   const totalTransactions = totalCount;
-  
+
   // Handlers for filter changes (now using store directly)
-  const handleFilterChange = useCallback((
-    newType?: string, 
-    newCategory?: string, 
-    newSubcategory?: string
-  ) => {
-    if (newType !== undefined) setFilterType(newType as TransactionType | '');
-    if (newCategory !== undefined) setFilterCategory(newCategory as CategoryType | '');
-    if (newSubcategory !== undefined) setFilterSubcategory(newSubcategory);
-  }, [setFilterType, setFilterCategory, setFilterSubcategory]);
-  
+  const handleFilterChange = useCallback(
+    (newType?: string, newCategory?: string, newSubcategory?: string) => {
+      if (newType !== undefined) setFilterType(newType as TransactionType | "");
+      if (newCategory !== undefined)
+        setFilterCategory(newCategory as CategoryType | "");
+      if (newSubcategory !== undefined) setFilterSubcategory(newSubcategory);
+    },
+    [setFilterType, setFilterCategory, setFilterSubcategory],
+  );
+
   // Handler pentru schimbarea subcategoriei
-  const handleSubcategoryChange = useCallback((newSubcategory: string) => {
-    setFilterSubcategory(newSubcategory);
-  }, [setFilterSubcategory]);
+  const handleSubcategoryChange = useCallback(
+    (newSubcategory: string) => {
+      setFilterSubcategory(newSubcategory);
+    },
+    [setFilterSubcategory],
+  );
 
   return (
-    <div className={cn(pageContainer({ size: 'lg' }), 'space-y-6')}>
+    <div className={cn(pageContainer({ size: "lg" }), "space-y-6")}>
       {/* Titlu pagină cu efect de gradient subtil */}
-      <h1 
+      <h1
         className="text-3xl font-bold text-gray-900 mb-6"
         data-testid="transactions-title"
       >
@@ -158,25 +189,25 @@ const TransactionsPage: React.FC = () => {
 
       {/* Afișăm alerte pentru erori de fetch */}
       {fetchError && (
-        <Alert 
-          type="error" 
-          title="Eroare la încărcarea tranzacțiilor" 
+        <Alert
+          type="error"
+          title="Eroare la încărcarea tranzacțiilor"
           message={fetchError.message}
           size="md"
         />
       )}
 
       {/* Formularul pentru adăugarea tranzacțiilor */}
-      <div 
-        className={cn(card({ variant: 'elevated', size: 'md' }))}
+      <div
+        className={cn(card({ variant: "elevated", size: "md" }))}
         data-testid="transaction-form-container"
       >
         <TransactionForm />
       </div>
 
       {/* Filtrele pentru tranzacții cu state-ul din Zustand store */}
-      <div 
-        className={cn(card({ variant: 'default', size: 'md' }))}
+      <div
+        className={cn(card({ variant: "default", size: "md" }))}
         data-testid="transaction-filters-container"
       >
         <TransactionFilters
@@ -188,8 +219,10 @@ const TransactionsPage: React.FC = () => {
           amountMin={amountMin}
           amountMax={amountMax}
           searchText={searchText}
-          onTypeChange={(type) => setFilterType(type as TransactionType | '')}
-          onCategoryChange={(category) => setFilterCategory(category as CategoryType | '')}
+          onTypeChange={(type) => setFilterType(type as TransactionType | "")}
+          onCategoryChange={(category) =>
+            setFilterCategory(category as CategoryType | "")
+          }
           onSubcategoryChange={setFilterSubcategory}
           onDateFromChange={setDateFrom}
           onDateToChange={setDateTo}
@@ -200,22 +233,22 @@ const TransactionsPage: React.FC = () => {
       </div>
 
       {/* Export Button */}
-      <div 
-        className={cn(card({ variant: 'default', size: 'md' }))}
+      <div
+        className={cn(card({ variant: "default", size: "md" }))}
         data-testid="export-button-container"
       >
-        <ExportButton 
-          transactions={transactions as Transaction[] || []}
+        <ExportButton
+          transactions={(transactions as Transaction[]) || []}
           disabled={isLoading || !transactions?.length}
         />
       </div>
 
       {/* Tabelul cu tranzacții */}
-      <div 
+      <div
         className="flex flex-col space-y-4"
         data-testid="transaction-table-container"
       >
-        <TransactionTable 
+        <TransactionTable
           transactions={transactions || []}
           total={totalTransactions || 0}
           isLoading={isLoading}

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LUNAR_GRID = exports.INFO = exports.FLAGS = exports.UI = exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
+exports.TEST_CONSTANTS = exports.LUNAR_GRID = exports.INFO = exports.FLAGS = exports.UI = exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
 const enums_1 = require("./enums");
 exports.LABELS = {
     TYPE: 'Tip',
@@ -67,6 +67,7 @@ exports.TABLE = {
         DATE: 'Dată',
         RECURRING: 'Recurent',
         FREQUENCY: 'Frecvență',
+        DESCRIPTION: 'Descriere',
     },
     EMPTY: 'Nicio tranzacție',
     LOADING: 'Se încarcă...',
@@ -131,6 +132,25 @@ exports.EXCEL_GRID = {
         VIRTUAL_TABLE: 'Tabel optimizat',
         LEGACY_TABLE: 'Tabel clasic',
         VERSION: 'Versiune'
+    },
+    INLINE_EDITING: {
+        EDIT_HINT: 'Apasă F2 pentru editare',
+        VALIDATION_ERRORS: {
+            EMPTY_VALUE: 'Valoarea nu poate fi goală',
+            INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',
+            NEGATIVE_VALUE: 'Valoarea nu poate fi negativă',
+            INVALID_PERCENTAGE: 'Procentul trebuie să fie un număr valid',
+            PERCENTAGE_RANGE: 'Procentul trebuie să fie între 0 și 100',
+            INVALID_DATE: 'Data trebuie să fie în format valid',
+            TEXT_TOO_LONG: 'Textul nu poate depăși 255 de caractere'
+        },
+        SAVE_ERROR: 'Eroare la salvare',
+        PLACEHOLDER: {
+            AMOUNT: 'Introduceți suma',
+            TEXT: 'Introduceți textul',
+            PERCENTAGE: 'Introduceți procentul',
+            DATE: 'Introduceți data'
+        }
     }
 };
 exports.OPTIONS = {
@@ -208,5 +228,40 @@ exports.LUNAR_GRID = {
     LOADING: 'Se încarcă datele...',
     NO_DATA: 'Nu există date pentru perioada selectată',
     TOTAL_BALANCE: 'Sold'
+};
+exports.TEST_CONSTANTS = {
+    ALERTS: {
+        TEST_MESSAGE: 'Acesta este un mesaj de alertă',
+        ERROR_MESSAGE: 'Eroare de procesare',
+        SUCCESS_MESSAGE: 'Operație reușită',
+        WARNING_MESSAGE: 'Atenție la acțiune',
+        INFO_MESSAGE: 'Informație importantă',
+        CUSTOM_CLASS_MESSAGE: 'Test clasă personalizată',
+        BASE_CLASS_MESSAGE: 'Test clase de bază'
+    },
+    SELECT: {
+        PLACEHOLDER: 'Alege o opțiune',
+        OPTION_1: 'Opțiunea 1',
+        OPTION_2: 'Opțiunea 2',
+        OPTION_3: 'Opțiunea 3',
+        LABEL: 'Selecție',
+        REQUIRED_ERROR: 'Acest câmp este obligatoriu'
+    },
+    TEXTAREA: {
+        PLACEHOLDER: 'Comentariile tale',
+        REQUIRED_ERROR: 'Acest câmp este obligatoriu',
+        LABEL: 'Textarea test',
+        TEST_VALUE: 'Acesta este un text de test'
+    },
+    CHECKBOX: {
+        LABEL: 'Acceptă termenii',
+        REQUIRED_ERROR: 'Trebuie să acceptați termenii',
+        CHECKED_LABEL: 'Opțiune bifată'
+    },
+    COMMON: {
+        TEST_MESSAGE: 'Mesaj de test',
+        LOADING: 'Se încarcă...',
+        ERROR_GENERIC: 'Eroare'
+    }
 };
 //# sourceMappingURL=ui.js.map

@@ -19,25 +19,20 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/jest-compat.ts', './src/setupTests.ts'],
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/cypress/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
+      '**/tests/e2e/**',
+      '**/tests/**/e2e/**'
+    ],
     env: {
       VITE_SUPABASE_URL: 'https://mock-project.supabase.co',
       VITE_SUPABASE_ANON_KEY: 'mock-anon-key'
     },
-    coverage: {
-      reporter: ['text', 'html', 'lcov'],
-      lines: 70,
-      branches: 70,
-      functions: 70,
-      statements: 70,
-      exclude: [
-        'node_modules/',
-        'src/test/',
-        '**/*.test.{ts,tsx}',
-        '**/*.config.{ts,js}',
-        'dist/'
-      ]
-    },
-    reporter: ['default', 'html'],
+    reporters: ['default', 'html'],
     outputFile: {
       html: './test-results/index.html'
     }

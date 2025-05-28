@@ -51,7 +51,7 @@ test.describe('TransactionForm - Test cu Date Dinamice', () => {
     // TestDataGenerator.reset(); - nu e necesar dacă vrem varietate
   });
 
-  test('adaugă tranzacție cu date complet aleatoare și verifică în Supabase', async ({ page }) => {
+  test('adaugă tranzacție cu date complet aleatoare și verifică în Supabase', { tag: '@features' }, async ({ page }) => {
     console.log('🚀 Test adăugare tranzacție cu verificare în Supabase');
     
     // Generează date de test complet aleatoare

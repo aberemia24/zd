@@ -57,7 +57,7 @@ test.describe('CategoryEditor - Test Funcționalități Complete', () => {
     categoryEditorPage = new CategoryEditorPage(page);
   });
 
-  test('accesează CategoryEditor din pagina Options', async ({ page }) => {
+  test('accesează CategoryEditor din pagina Options', { tag: '@features' }, async ({ page }) => {
     console.log('🚀 Test accesarea CategoryEditor');
     
     // Login

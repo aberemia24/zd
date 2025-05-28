@@ -5,7 +5,7 @@
 
 // URLs și rute
 export const URLS = {
-  BASE_URL: 'http://localhost:3002',
+  BASE_URL: 'http://localhost:3000',
   LOGIN: '/login',
   REGISTER: '/register',
   TRANSACTIONS: '/transactions',

@@ -9,7 +9,7 @@ test.describe('Explorare Aplicație', () => {
     authPage = new AuthPage(page);
   });
 
-  test('explorez lunar grid cu date dinamice', async ({ page }) => {
+  test('explorez lunar grid cu date dinamice', { tag: '@debug' }, async ({ page }) => {
     // Obține date de test dinamice pentru LunarGrid
     const testData = LunarGridTestData.getGridTestData();
     console.log('🎲 Date test generate:', {
