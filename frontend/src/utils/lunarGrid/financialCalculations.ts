@@ -1,16 +1,20 @@
-import { Transaction } from '../../types/Transaction';
-import { TransactionType } from '@shared-constants/enums';
-import { BalanceCalculation, FinancialSummary, CalculationResult } from '../../types/lunarGrid/FinancialCalculations';
+import { Transaction } from "../../types/Transaction";
+import { TransactionType } from "@shared-constants/enums";
+import {
+  BalanceCalculation,
+  FinancialSummary,
+  CalculationResult,
+} from "../../types/lunarGrid/FinancialCalculations";
 
 /**
  * Calculează soldurile zilnice folosind Sequential Daily Calculation approach
- * 
+ *
  * CORECTEAZĂ BUG-UL CRITIC: Algoritm actual adună toate sumele indiferent de tip
  * SOLUȚIE: INCOME (+), EXPENSE (-), SAVINGS (transfer din disponibil la economii)
  */
 export function calculateDailyBalances(
   startingBalance: number,
-  transactionsByDate: Map<string, Transaction[]>
+  transactionsByDate: Map<string, Transaction[]>,
 ): BalanceCalculation[] {
   const results: BalanceCalculation[] = [];
   let runningAvailable = startingBalance;
@@ -21,7 +25,7 @@ export function calculateDailyBalances(
 
   for (const date of sortedDates) {
     const dayTransactions = transactionsByDate.get(date) || [];
-    
+
     let dayAvailableChange = 0;
     let daySavingsChange = 0;
     let dailyIncome = 0;
@@ -31,10 +35,11 @@ export function calculateDailyBalances(
     // Procesează tranzacțiile zilei cu logică matematică corectă
     for (const transaction of dayTransactions) {
       // Convertește amount la number dacă este string
-      const amount = typeof transaction.amount === 'string' 
-        ? parseFloat(transaction.amount) 
-        : transaction.amount;
-        
+      const amount =
+        typeof transaction.amount === "string"
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+
       switch (transaction.type) {
         case TransactionType.INCOME:
           dayAvailableChange += amount;
@@ -66,8 +71,8 @@ export function calculateDailyBalances(
       breakdown: {
         dailyIncome,
         dailyExpenses,
-        dailySavings
-      }
+        dailySavings,
+      },
     });
   }
 
@@ -81,11 +86,13 @@ export function calculateDailyBalances(
 export function recalculateFromDate(
   existingCalculations: BalanceCalculation[],
   fromDate: string,
-  updatedTransactions: Map<string, Transaction[]>
+  updatedTransactions: Map<string, Transaction[]>,
 ): BalanceCalculation[] {
   // Găsește indexul de la care să înceapă recalcularea
-  const startIndex = existingCalculations.findIndex(calc => calc.date >= fromDate);
-  
+  const startIndex = existingCalculations.findIndex(
+    (calc) => calc.date >= fromDate,
+  );
+
   if (startIndex === -1) {
     // Data nu există în calcule existente, adaugă la sfârșit
     return existingCalculations;
@@ -93,15 +100,16 @@ export function recalculateFromDate(
 
   // Păstrează calculele de dinainte de data modificării
   const unchangedCalculations = existingCalculations.slice(0, startIndex);
-  
+
   // Calculează balanța de pornire pentru recalculare
-  const previousBalance = startIndex > 0 ? existingCalculations[startIndex - 1] : null;
+  const previousBalance =
+    startIndex > 0 ? existingCalculations[startIndex - 1] : null;
   const startingAvailable = previousBalance?.availableBalance || 0;
   const startingSavings = previousBalance?.savingsBalance || 0;
 
   // Creează map pentru tranzacțiile de la data modificării înainte
   const transactionsFromDate = new Map<string, Transaction[]>();
-  
+
   // Adaugă toate tranzacțiile de la data modificării
   for (const [date, transactions] of updatedTransactions.entries()) {
     if (date >= fromDate) {
@@ -113,7 +121,7 @@ export function recalculateFromDate(
   const recalculated = calculateDailyBalancesFromBase(
     startingAvailable,
     startingSavings,
-    transactionsFromDate
+    transactionsFromDate,
   );
 
   return [...unchangedCalculations, ...recalculated];
@@ -125,7 +133,7 @@ export function recalculateFromDate(
 function calculateDailyBalancesFromBase(
   startingAvailable: number,
   startingSavings: number,
-  transactionsByDate: Map<string, Transaction[]>
+  transactionsByDate: Map<string, Transaction[]>,
 ): BalanceCalculation[] {
   const results: BalanceCalculation[] = [];
   let runningAvailable = startingAvailable;
@@ -135,7 +143,7 @@ function calculateDailyBalancesFromBase(
 
   for (const date of sortedDates) {
     const dayTransactions = transactionsByDate.get(date) || [];
-    
+
     let dayAvailableChange = 0;
     let daySavingsChange = 0;
     let dailyIncome = 0;
@@ -144,10 +152,11 @@ function calculateDailyBalancesFromBase(
 
     for (const transaction of dayTransactions) {
       // Convertește amount la number dacă este string
-      const amount = typeof transaction.amount === 'string' 
-        ? parseFloat(transaction.amount) 
-        : transaction.amount;
-        
+      const amount =
+        typeof transaction.amount === "string"
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+
       switch (transaction.type) {
         case TransactionType.INCOME:
           dayAvailableChange += amount;
@@ -177,8 +186,8 @@ function calculateDailyBalancesFromBase(
       breakdown: {
         dailyIncome,
         dailyExpenses,
-        dailySavings
-      }
+        dailySavings,
+      },
     });
   }
 
@@ -190,7 +199,7 @@ function calculateDailyBalancesFromBase(
  */
 export function createFinancialSummary(
   calculations: BalanceCalculation[],
-  startingBalance: number
+  startingBalance: number,
 ): FinancialSummary {
   if (calculations.length === 0) {
     return {
@@ -199,14 +208,23 @@ export function createFinancialSummary(
       totalIncome: 0,
       totalExpenses: 0,
       totalSavings: 0,
-      netChange: 0
+      netChange: 0,
     };
   }
 
-  const totalIncome = calculations.reduce((sum, calc) => sum + calc.breakdown.dailyIncome, 0);
-  const totalExpenses = calculations.reduce((sum, calc) => sum + calc.breakdown.dailyExpenses, 0);
-  const totalSavings = calculations.reduce((sum, calc) => sum + calc.breakdown.dailySavings, 0);
-  
+  const totalIncome = calculations.reduce(
+    (sum, calc) => sum + calc.breakdown.dailyIncome,
+    0,
+  );
+  const totalExpenses = calculations.reduce(
+    (sum, calc) => sum + calc.breakdown.dailyExpenses,
+    0,
+  );
+  const totalSavings = calculations.reduce(
+    (sum, calc) => sum + calc.breakdown.dailySavings,
+    0,
+  );
+
   const lastCalculation = calculations[calculations.length - 1];
   const endingBalance = lastCalculation.totalBalance;
   const netChange = endingBalance - startingBalance;
@@ -217,7 +235,7 @@ export function createFinancialSummary(
     totalIncome,
     totalExpenses,
     totalSavings,
-    netChange
+    netChange,
   };
 }
 
@@ -226,17 +244,17 @@ export function createFinancialSummary(
  */
 export function calculateWithValidation(
   startingBalance: number,
-  transactionsByDate: Map<string, Transaction[]>
+  transactionsByDate: Map<string, Transaction[]>,
 ): CalculationResult {
   const errors: string[] = [];
 
   // Validări de bază
   if (startingBalance < 0) {
-    errors.push('Balanta de pornire nu poate fi negativă');
+    errors.push("Balanta de pornire nu poate fi negativă");
   }
 
   if (transactionsByDate.size === 0) {
-    errors.push('Nu există tranzacții pentru calculat');
+    errors.push("Nu există tranzacții pentru calculat");
   }
 
   // Validează tranzacțiile
@@ -246,10 +264,11 @@ export function calculateWithValidation(
     }
 
     for (const transaction of transactions) {
-      const amount = typeof transaction.amount === 'string' 
-        ? parseFloat(transaction.amount) 
-        : transaction.amount;
-        
+      const amount =
+        typeof transaction.amount === "string"
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+
       if (amount < 0) {
         errors.push(`Suma negativă în tranzacția ${transaction.id}`);
       }
@@ -265,25 +284,30 @@ export function calculateWithValidation(
       calculations: [],
       summary: createFinancialSummary([], startingBalance),
       hasErrors: true,
-      errors
+      errors,
     };
   }
 
   try {
-    const calculations = calculateDailyBalances(startingBalance, transactionsByDate);
+    const calculations = calculateDailyBalances(
+      startingBalance,
+      transactionsByDate,
+    );
     const summary = createFinancialSummary(calculations, startingBalance);
 
     return {
       calculations,
       summary,
-      hasErrors: false
+      hasErrors: false,
     };
   } catch (error) {
     return {
       calculations: [],
       summary: createFinancialSummary([], startingBalance),
       hasErrors: true,
-      errors: [`Eroare în calcul: ${error instanceof Error ? error.message : 'Eroare necunoscută'}`]
+      errors: [
+        `Eroare în calcul: ${error instanceof Error ? error.message : "Eroare necunoscută"}`,
+      ],
     };
   }
 }
@@ -294,7 +318,7 @@ export function calculateWithValidation(
 function isValidDate(dateString: string): boolean {
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!regex.test(dateString)) return false;
-  
+
   const date = new Date(dateString);
-  return date.toISOString().split('T')[0] === dateString;
-} 
+  return date.toISOString().split("T")[0] === dateString;
+}

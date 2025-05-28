@@ -1,4 +1,4 @@
-import { Transaction } from '../Transaction';
+import { Transaction } from "../Transaction";
 
 /**
  * Calculul soldurilor zilnice pentru o anumită dată
@@ -56,4 +56,4 @@ export interface TransactionBreakdown {
   savings: number;
   totalPatrimony: number;
   dailyTransactions: Transaction[];
-} 
+}

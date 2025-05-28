@@ -1,8 +1,8 @@
-import React from 'react';
-import { cn } from '../../../../styles/cva/shared/utils';
-import { cva } from 'class-variance-authority';
-import { useInlineCellEdit } from './useInlineCellEdit';
-import { EXCEL_GRID } from '@shared-constants';
+import React from "react";
+import { cn } from "../../../../styles/cva/shared/utils";
+import { cva } from "class-variance-authority";
+import { useInlineCellEdit } from "./useInlineCellEdit";
+import { EXCEL_GRID } from "@shared-constants";
 
 /**
  * Componenta EditableCell pentru LunarGrid
@@ -13,7 +13,7 @@ export interface EditableCellProps {
   cellId: string;
   value: string | number;
   onSave: (value: string | number) => Promise<void>; // amount/percentage = number, text/date = string
-  validationType: 'amount' | 'text' | 'percentage' | 'date';
+  validationType: "amount" | "text" | "percentage" | "date";
   isEditing?: boolean;
   error?: string | null;
   isSaving?: boolean;
@@ -26,7 +26,7 @@ export interface EditableCellProps {
   onKeyDown?: (e: React.KeyboardEvent) => void;
   onStartEdit?: () => void;
   onCancel?: () => void;
-  'data-testid'?: string;
+  "data-testid"?: string;
 }
 
 // CVA variants pentru cell states
@@ -40,18 +40,18 @@ const cellVariants = cva(
         editing: "bg-white ring-2 ring-blue-500 ring-inset cursor-text",
         error: "bg-red-50 border-2 border-red-400 cursor-text",
         saving: "bg-gray-100 opacity-70 cursor-wait",
-        readonly: "bg-gray-50 cursor-default opacity-60"
+        readonly: "bg-gray-50 cursor-default opacity-60",
       },
       editable: {
         true: "hover:bg-gray-50",
-        false: "cursor-default"
-      }
+        false: "cursor-default",
+      },
     },
     defaultVariants: {
       state: "normal",
-      editable: true
-    }
-  }
+      editable: true,
+    },
+  },
 );
 
 const inputVariants = cva(
@@ -62,13 +62,13 @@ const inputVariants = cva(
         amount: "text-right font-mono",
         percentage: "text-right font-mono",
         text: "text-left",
-        date: "text-center font-mono"
-      }
+        date: "text-center font-mono",
+      },
     },
     defaultVariants: {
-      validationType: "text"
-    }
-  }
+      validationType: "text",
+    },
+  },
 );
 
 export const EditableCell: React.FC<EditableCellProps> = ({
@@ -88,7 +88,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   onKeyDown,
   onStartEdit,
   onCancel,
-  'data-testid': testId
+  "data-testid": testId,
 }) => {
   const {
     isEditing: internalEditing,
@@ -100,57 +100,63 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     handleKeyDown: inlineKeyDown,
     handleBlur,
     handleDoubleClick,
-    inputRef
+    inputRef,
   } = useInlineCellEdit({
     cellId,
     initialValue: value,
     onSave,
     validationType,
-    isReadonly
+    isReadonly,
   });
 
   // Use prop values if provided, otherwise internal state
-  const isEditing = propIsEditing !== undefined ? propIsEditing : internalEditing;
+  const isEditing =
+    propIsEditing !== undefined ? propIsEditing : internalEditing;
   const error = propError !== undefined ? propError : internalError;
   const isSaving = propIsSaving !== undefined ? propIsSaving : internalIsSaving;
-  
+
   // Check if we're in controlled mode
   const isControlled = propIsEditing !== undefined;
 
   // Determine cell state pentru CVA
   const getCellState = () => {
-    if (isReadonly) return 'readonly';
-    if (isSaving) return 'saving';
-    if (error) return 'error';
-    if (isEditing) return 'editing';
-    if (isSelected || isFocused) return 'selected';
-    return 'normal';
+    if (isReadonly) return "readonly";
+    if (isSaving) return "saving";
+    if (error) return "error";
+    if (isEditing) return "editing";
+    if (isSelected || isFocused) return "selected";
+    return "normal";
   };
 
   // Format value pentru display
   const formatDisplayValue = (val: string | number): string => {
-    if (val === '' || val === null || val === undefined) return '';
-    
+    if (val === "" || val === null || val === undefined) return "";
+
     switch (validationType) {
-      case 'amount':
-        const numVal = typeof val === 'number' ? val : parseFloat(String(val));
-        return isNaN(numVal) ? String(val) : numVal.toLocaleString('ro-RO', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-        
-      case 'percentage':
-        const percentVal = typeof val === 'number' ? val : parseFloat(String(val));
-        return isNaN(percentVal) ? String(val) : `${percentVal.toLocaleString('ro-RO')}%`;
-        
-      case 'date':
+      case "amount":
+        const numVal = typeof val === "number" ? val : parseFloat(String(val));
+        return isNaN(numVal)
+          ? String(val)
+          : numVal.toLocaleString("ro-RO", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            });
+
+      case "percentage":
+        const percentVal =
+          typeof val === "number" ? val : parseFloat(String(val));
+        return isNaN(percentVal)
+          ? String(val)
+          : `${percentVal.toLocaleString("ro-RO")}%`;
+
+      case "date":
         try {
           const dateVal = new Date(val);
-          return dateVal.toLocaleDateString('ro-RO');
+          return dateVal.toLocaleDateString("ro-RO");
         } catch {
           return String(val);
         }
-        
+
       default:
         return String(val);
     }
@@ -159,7 +165,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   // Combined keyboard handler
   const handleCombinedKeyDown = (e: React.KeyboardEvent) => {
     // Handle F2 key pentru start edit (Excel behavior)
-    if (e.key === 'F2' && !isEditing && !isReadonly) {
+    if (e.key === "F2" && !isEditing && !isReadonly) {
       e.preventDefault();
       if (onStartEdit) {
         onStartEdit();
@@ -168,9 +174,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       }
       return;
     }
-    
+
     // Handle Enter key pentru start edit când selected
-    if (e.key === 'Enter' && !isEditing && (isSelected || isFocused) && !isReadonly) {
+    if (
+      e.key === "Enter" &&
+      !isEditing &&
+      (isSelected || isFocused) &&
+      !isReadonly
+    ) {
       e.preventDefault();
       if (onStartEdit) {
         onStartEdit();
@@ -181,30 +192,32 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     // Handle Escape în edit mode
-    if (e.key === 'Escape' && isEditing) {
+    if (e.key === "Escape" && isEditing) {
       e.preventDefault();
       if (onCancel) {
         onCancel();
       }
       return;
     }
-    
+
     // Pass to inline edit handler dacă editing
     if (isEditing) {
-      if (isControlled && e.key === 'Enter') {
+      if (isControlled && e.key === "Enter") {
         // În controlled mode, handle Enter save direct
         e.preventDefault();
-        const inputValue = (inputRef.current?.value || '').trim();
+        const inputValue = (inputRef.current?.value || "").trim();
         let convertedValue: string | number = inputValue;
-        if (validationType === 'amount' || validationType === 'percentage') {
+        if (validationType === "amount" || validationType === "percentage") {
           convertedValue = parseFloat(inputValue);
         }
-        Promise.resolve(onSave(convertedValue)).catch(err => console.error('Save error:', err));
+        Promise.resolve(onSave(convertedValue)).catch((err) =>
+          console.error("Save error:", err),
+        );
         return;
       }
       inlineKeyDown(e);
     }
-    
+
     // Pass to parent handler
     onKeyDown?.(e);
   };
@@ -215,7 +228,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     if (!isEditing && !isReadonly) {
       // Single click activează editarea conform Creative Phase 1 decisions
       if (onStartEdit) {
@@ -248,14 +261,14 @@ export const EditableCell: React.FC<EditableCellProps> = ({
             inputRef.current.value = char;
             inputRef.current.setSelectionRange(1, 1); // Cursor la sfârșitul caracterului
             // Trigger onChange event
-            const event = new Event('input', { bubbles: true });
+            const event = new Event("input", { bubbles: true });
             inputRef.current.dispatchEvent(event);
           }
         }, 0);
         return;
       }
     }
-    
+
     // Continue cu keyboard handling normal
     handleCombinedKeyDown(e);
   };
@@ -266,7 +279,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       e.preventDefault();
       e.stopPropagation();
     }
-    
+
     if (!isEditing && !isReadonly) {
       if (onStartEdit) {
         onStartEdit();
@@ -277,12 +290,15 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   };
 
   if (isEditing) {
-    const inputPlaceholder = placeholder || 
-      EXCEL_GRID.INLINE_EDITING.PLACEHOLDER[validationType.toUpperCase() as keyof typeof EXCEL_GRID.INLINE_EDITING.PLACEHOLDER] || 
+    const inputPlaceholder =
+      placeholder ||
+      EXCEL_GRID.INLINE_EDITING.PLACEHOLDER[
+        validationType.toUpperCase() as keyof typeof EXCEL_GRID.INLINE_EDITING.PLACEHOLDER
+      ] ||
       EXCEL_GRID.INLINE_EDITING.PLACEHOLDER.TEXT;
 
     return (
-      <div 
+      <div
         className={cn(cellVariants({ state: getCellState() }), className)}
         data-testid={testId || `editable-cell-editing-${cellId}`}
       >
@@ -300,33 +316,40 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           }}
           onKeyDown={(e) => {
             // Previne form submission
-            if (e.key === 'Enter') {
+            if (e.key === "Enter") {
               e.preventDefault();
               e.stopPropagation();
             }
             handleCombinedKeyDown(e);
           }}
-          onBlur={isControlled ? async () => {
-            // În controlled mode, salvăm direct cu prop-ul onSave
-            try {
-              // Capturăm valoarea efectivă din input
-              const inputValue = (inputRef.current?.value || '').trim();
-              let convertedValue: string | number = inputValue;
-              if (validationType === 'amount' || validationType === 'percentage') {
-                const numValue = parseFloat(inputValue);
-                if (!isNaN(numValue)) {
-                  convertedValue = numValue;
+          onBlur={
+            isControlled
+              ? async () => {
+                  // În controlled mode, salvăm direct cu prop-ul onSave
+                  try {
+                    // Capturăm valoarea efectivă din input
+                    const inputValue = (inputRef.current?.value || "").trim();
+                    let convertedValue: string | number = inputValue;
+                    if (
+                      validationType === "amount" ||
+                      validationType === "percentage"
+                    ) {
+                      const numValue = parseFloat(inputValue);
+                      if (!isNaN(numValue)) {
+                        convertedValue = numValue;
+                      }
+                    }
+                    await Promise.resolve(onSave(convertedValue));
+                  } catch (err) {
+                    console.error("Save error:", err);
+                  }
                 }
-              }
-              await Promise.resolve(onSave(convertedValue));
-            } catch (err) {
-              console.error('Save error:', err);
-            }
-          } : handleBlur}
+              : handleBlur
+          }
           placeholder={inputPlaceholder}
           className={cn(inputVariants({ validationType }), {
-            'border-red-500': error,
-            'border-blue-500': !error
+            "border-red-500": error,
+            "border-blue-500": !error,
           })}
           data-testid={`editable-cell-input-${cellId}`}
           aria-label={`Edit ${validationType} value`}
@@ -336,14 +359,11 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           autoComplete="off"
           spellCheck={false}
         />
-        <div 
-          id={`cell-${cellId}-description`}
-          className="sr-only"
-        >
+        <div id={`cell-${cellId}-description`} className="sr-only">
           {`${validationType} cell editing mode`}
         </div>
         {isSaving && (
-          <div 
+          <div
             className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75"
             role="status"
             aria-label="Saving..."
@@ -352,7 +372,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
           </div>
         )}
         {error && (
-          <div 
+          <div
             id={`error-${cellId}`}
             className="absolute top-full left-0 z-10 mt-1 px-2 py-1 text-xs text-red-600 bg-red-50 border border-red-200 rounded shadow-sm whitespace-nowrap"
             data-testid={`editable-cell-error-${cellId}`}
@@ -367,12 +387,16 @@ export const EditableCell: React.FC<EditableCellProps> = ({
 
   return (
     <div
-      className={cn(cellVariants({ 
-        state: getCellState(), 
-        editable: !isReadonly 
-      }), className, {
-        'cursor-not-allowed': isReadonly
-      })}
+      className={cn(
+        cellVariants({
+          state: getCellState(),
+          editable: !isReadonly,
+        }),
+        className,
+        {
+          "cursor-not-allowed": isReadonly,
+        },
+      )}
       onClick={(e) => handleCellClick(e)}
       onDoubleClick={(e) => handleCellDoubleClick(e)}
       onKeyDown={handleCharacterTyping}
@@ -384,7 +408,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       <div className="w-full h-full px-2 py-1 flex items-center">
         {formatDisplayValue(value)}
         {(isSelected || isFocused) && !isReadonly && (
-          <span 
+          <span
             className="ml-2 text-xs text-gray-500 opacity-75"
             data-testid={`editable-cell-hint-${cellId}`}
           >
@@ -393,7 +417,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
         )}
       </div>
       {isSaving && (
-        <div 
+        <div
           className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center"
           role="status"
           aria-label="Saving..."
@@ -403,4 +427,4 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       )}
     </div>
   );
-}; 
+};

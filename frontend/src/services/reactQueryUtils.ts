@@ -1,20 +1,20 @@
 /**
  * Utilități avansate pentru React Query
- * 
+ *
  * Acest fișier conține funcții helper pentru gestionarea eficientă a cache-ului React Query,
  * strategii de invalidare, optimizări pentru interogări paralele și secvențiale,
  * și generarea standardizată a cheilor de query.
  */
 
-import { 
-  QueryClient, 
-  QueryKey, 
+import {
+  QueryClient,
+  QueryKey,
   UseQueryOptions,
   UseMutationOptions,
   DefaultOptions,
-  QueryFunction
-} from '@tanstack/react-query';
-import { CacheRegistry } from '../utils/performanceUtils';
+  QueryFunction,
+} from "@tanstack/react-query";
+import { CacheRegistry } from "../utils/performanceUtils";
 
 /**
  * Configurare opțiuni implicite optimizate pentru React Query
@@ -24,26 +24,26 @@ export const queryClientDefaultOptions: DefaultOptions = {
     // Optimizări generale pentru toate query-urile
     staleTime: 60 * 1000, // 1 minut
     gcTime: 5 * 60 * 1000, // 5 minute (redenumit din cacheTime)
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     retry: 1,
     retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // exponential backoff with max 30s
-    
+
     // Performance optimization
     structuralSharing: true,
   },
   mutations: {
     // Default behavior for mutations
     retry: 1,
-    retryDelay: 1000
-  }
+    retryDelay: 1000,
+  },
 };
 
 /**
  * Generator standardizat pentru chei query
  * Asigură consistența și structura adecvată a cheilor pentru cache invalidation.
- * 
+ *
  * @example
  * const todoKeys = createQueryKeyFactory('todos');
  * const key1 = todoKeys.all; // ['todos']
@@ -54,20 +54,19 @@ export const queryClientDefaultOptions: DefaultOptions = {
 export function createQueryKeyFactory<T extends string>(baseKey: T) {
   const factory = {
     all: [baseKey] as const,
-    lists: () => [baseKey, 'list'] as const,
-    list: (filters?: Record<string, unknown>) => 
-      [baseKey, 'list', ...(filters ? [filters] : [])] as const,
-    details: () => [baseKey, 'detail'] as const,
-    detail: (id: string | number) => 
-      [baseKey, 'detail', id] as const,
-    infinite: (filters?: Record<string, unknown>) => 
-      [baseKey, 'infinite', ...(filters ? [filters] : [])] as const,
-    
+    lists: () => [baseKey, "list"] as const,
+    list: (filters?: Record<string, unknown>) =>
+      [baseKey, "list", ...(filters ? [filters] : [])] as const,
+    details: () => [baseKey, "detail"] as const,
+    detail: (id: string | number) => [baseKey, "detail", id] as const,
+    infinite: (filters?: Record<string, unknown>) =>
+      [baseKey, "infinite", ...(filters ? [filters] : [])] as const,
+
     // Permite extinderea cu chei personalizate
-    custom: <K extends string>(subKey: K, ...params: unknown[]) => 
-      [baseKey, subKey, ...params] as const
+    custom: <K extends string>(subKey: K, ...params: unknown[]) =>
+      [baseKey, subKey, ...params] as const,
   };
-  
+
   return factory;
 }
 
@@ -84,15 +83,15 @@ export const cacheConfig = {
     settings: 60 * 60 * 1000, // 1 oră pentru setări
     metadata: 24 * 60 * 60 * 1000, // 24 ore pentru metadate
   },
-  
+
   // Prefixe standard pentru cache keys
   keyPrefixes: {
-    user: 'user',
-    transactions: 'transactions',
-    categories: 'categories',
-    settings: 'settings',
-    statistics: 'stats',
-  }
+    user: "user",
+    transactions: "transactions",
+    categories: "categories",
+    settings: "settings",
+    statistics: "stats",
+  },
 };
 
 /**
@@ -100,23 +99,27 @@ export const cacheConfig = {
  */
 export function createCacheKey(queryKey: QueryKey): string {
   return Array.isArray(queryKey)
-    ? queryKey.map(segment => 
-        typeof segment === 'object' 
-          ? JSON.stringify(segment) 
-          : String(segment)
-      ).join(':')
+    ? queryKey
+        .map((segment) =>
+          typeof segment === "object"
+            ? JSON.stringify(segment)
+            : String(segment),
+        )
+        .join(":")
     : String(queryKey);
 }
 
 /**
  * Hook pentru a crea o QueryClient configurată optim pentru aplicație
  */
-export function createOptimizedQueryClient(customOptions?: DefaultOptions): QueryClient {
+export function createOptimizedQueryClient(
+  customOptions?: DefaultOptions,
+): QueryClient {
   return new QueryClient({
     defaultOptions: {
       ...queryClientDefaultOptions,
-      ...customOptions
-    }
+      ...customOptions,
+    },
   });
 }
 
@@ -125,11 +128,11 @@ export function createOptimizedQueryClient(customOptions?: DefaultOptions): Quer
  */
 export enum CacheRefreshType {
   /** Invalidează cache-ul și declanșează o nouă cerere */
-  INVALIDATE = 'invalidate',
+  INVALIDATE = "invalidate",
   /** Resetează complet cache-ul fără a declanșa cereri */
-  RESET = 'reset',
+  RESET = "reset",
   /** Actualizează datele în cache fără a declanșa cereri */
-  UPDATE = 'update'
+  UPDATE = "update",
 }
 
 /**
@@ -146,19 +149,20 @@ export function createCachedQueryFn<TData, TParams extends any[]>(
     maxAge?: number;
     /** Transformă rezultatul înainte de caching */
     transformer?: (data: TData) => any;
-  }
+  },
 ): (...args: TParams) => Promise<TData> {
   return async (...args: TParams) => {
     if (!options?.cacheKey) {
       // Dacă nu avem cheie de cache, executăm direct funcția
       return queryFn(...args);
     }
-    
+
     // Generăm cheia de cache
-    const key = typeof options.cacheKey === 'function'
-      ? options.cacheKey(...args)
-      : `${options.cacheKey}:${JSON.stringify(args)}`;
-    
+    const key =
+      typeof options.cacheKey === "function"
+        ? options.cacheKey(...args)
+        : `${options.cacheKey}:${JSON.stringify(args)}`;
+
     // Încercăm să obținem din cache
     try {
       return CacheRegistry.getOrCompute(
@@ -167,11 +171,11 @@ export function createCachedQueryFn<TData, TParams extends any[]>(
           const result = await queryFn(...args);
           return options.transformer ? options.transformer(result) : result;
         },
-        options.maxAge
+        options.maxAge,
       );
     } catch (error) {
       // În caz de eroare cu cache-ul, executăm direct funcția
-      console.error('[ReactQueryUtils] Cache error:', error);
+      console.error("[ReactQueryUtils] Cache error:", error);
       return queryFn(...args);
     }
   };
@@ -185,6 +189,14 @@ interface MutationContext<TData> {
 /**
  * Construiește opțiuni optimizate pentru queries infinite
  */
+// Interfețe pentru paginare
+interface PageData {
+  nextCursor?: string | number;
+  prevCursor?: string | number;
+  hasMore?: boolean;
+  [key: string]: unknown;
+}
+
 export function getInfiniteQueryOptions<TData, TError>(
   options: {
     /** Numărul de pagini care vor fi reținute în memorie */
@@ -197,23 +209,23 @@ export function getInfiniteQueryOptions<TData, TError>(
     staleTime?: number;
     /** Timp maxim pentru păstrarea valorii în cache */
     gcTime?: number;
-  } = {}
+  } = {},
 ) {
   return {
     staleTime: options.staleTime ?? 60 * 1000, // 1 minut implicit
     gcTime: options.gcTime ?? 5 * 60 * 1000, // 5 minute implicit (redenumit din cacheTime)
-    getNextPageParam: (lastPage: any, allPages: any[]) => {
+    getNextPageParam: (lastPage: PageData, allPages: PageData[]) => {
       // Logică implicită pentru paginare - poate fi suprascrisă
       if (lastPage?.nextCursor) return lastPage.nextCursor;
       if (lastPage?.hasMore === false) return undefined;
       return allPages.length + 1;
     },
-    getPreviousPageParam: (firstPage: any) => {
+    getPreviousPageParam: (firstPage: PageData) => {
       // Logică implicită pentru paginare inversă
       if (firstPage?.prevCursor) return firstPage.prevCursor;
       return undefined;
     },
-    maxPages: options.maxPages ?? 5
+    maxPages: options.maxPages ?? 5,
   };
 }
 
@@ -221,7 +233,9 @@ export function getInfiniteQueryOptions<TData, TError>(
  * Factory pentru strategii de optimistic updates
  */
 export function createOptimisticMutations<TData, TError, TVariables>(
-  baseOptions: Partial<UseMutationOptions<TData, TError, TVariables, MutationContext<TData>>> = {}
+  baseOptions: Partial<
+    UseMutationOptions<TData, TError, TVariables, MutationContext<TData>>
+  > = {},
 ) {
   return {
     /**
@@ -230,17 +244,25 @@ export function createOptimisticMutations<TData, TError, TVariables>(
     addItem: (
       queryClient: QueryClient,
       queryKey: QueryKey,
-      newItemFactory: (variables: TVariables) => TData
-    ): UseMutationOptions<TData, TError, TVariables, MutationContext<TData>> => ({
+      newItemFactory: (variables: TVariables) => TData,
+    ): UseMutationOptions<
+      TData,
+      TError,
+      TVariables,
+      MutationContext<TData>
+    > => ({
       ...baseOptions,
       onMutate: async (variables) => {
         await queryClient.cancelQueries({ queryKey });
         const previousData = queryClient.getQueryData<TData[]>(queryKey);
-        
+
         // Actualizare optimistă
         const newItem = newItemFactory(variables);
-        queryClient.setQueryData<TData[]>(queryKey, (old = []) => [...old, newItem as any]);
-        
+        queryClient.setQueryData<TData[]>(queryKey, (old = []) => [
+          ...old,
+          newItem,
+        ]);
+
         return { previousData };
       },
       onError: (err, variables, context) => {
@@ -248,7 +270,7 @@ export function createOptimisticMutations<TData, TError, TVariables>(
         if (context?.previousData) {
           queryClient.setQueryData(queryKey, context.previousData);
         }
-        
+
         if (baseOptions.onError) {
           baseOptions.onError(err, variables, context);
         }
@@ -256,13 +278,13 @@ export function createOptimisticMutations<TData, TError, TVariables>(
       onSettled: (data, error, variables, context) => {
         // Invalidare query pentru a asigura sincronizarea cu serverul
         queryClient.invalidateQueries({ queryKey: queryKey });
-        
+
         if (baseOptions.onSettled) {
           baseOptions.onSettled(data, error, variables, context);
         }
-      }
+      },
     }),
-    
+
     /**
      * Actualizează un element din array
      */
@@ -270,23 +292,26 @@ export function createOptimisticMutations<TData, TError, TVariables>(
       queryClient: QueryClient,
       queryKey: QueryKey,
       itemId: string | number,
-      idField: string = 'id'
-    ): UseMutationOptions<TData, TError, TVariables, MutationContext<TData>> => ({
+      idField: string = "id",
+    ): UseMutationOptions<
+      TData,
+      TError,
+      TVariables,
+      MutationContext<TData>
+    > => ({
       ...baseOptions,
       onMutate: async (variables) => {
         await queryClient.cancelQueries({ queryKey });
         const previousData = queryClient.getQueryData<TData[]>(queryKey);
-        
+
         // Actualizare optimistă
         queryClient.setQueryData<TData[]>(queryKey, (old = []) => {
-          return old.map(item => 
+          return old.map((item) =>
             // @ts-ignore - idField access
-            item[idField] === itemId 
-              ? { ...item, ...variables } 
-              : item
+            item[idField] === itemId ? { ...item, ...variables } : item,
           );
         });
-        
+
         return { previousData };
       },
       onError: (err, variables, context) => {
@@ -294,7 +319,7 @@ export function createOptimisticMutations<TData, TError, TVariables>(
         if (context?.previousData) {
           queryClient.setQueryData(queryKey, context.previousData);
         }
-        
+
         if (baseOptions.onError) {
           baseOptions.onError(err, variables, context);
         }
@@ -302,13 +327,13 @@ export function createOptimisticMutations<TData, TError, TVariables>(
       onSettled: (data, error, variables, context) => {
         // Invalidare query pentru a asigura sincronizarea cu serverul
         queryClient.invalidateQueries({ queryKey: queryKey });
-        
+
         if (baseOptions.onSettled) {
           baseOptions.onSettled(data, error, variables, context);
         }
-      }
+      },
     }),
-    
+
     /**
      * Șterge un element din array
      */
@@ -316,21 +341,27 @@ export function createOptimisticMutations<TData, TError, TVariables>(
       queryClient: QueryClient,
       queryKey: QueryKey,
       itemId: string | number,
-      idField: string = 'id'
-    ): UseMutationOptions<TData, TError, TVariables, MutationContext<TData>> => ({
+      idField: string = "id",
+    ): UseMutationOptions<
+      TData,
+      TError,
+      TVariables,
+      MutationContext<TData>
+    > => ({
       ...baseOptions,
       onMutate: async (variables) => {
         await queryClient.cancelQueries({ queryKey });
         const previousData = queryClient.getQueryData<TData[]>(queryKey);
-        
+
         // Actualizare optimistă
         queryClient.setQueryData<TData[]>(queryKey, (old = []) => {
-          return old.filter(item => 
-            // @ts-ignore - idField access
-            item[idField] !== itemId
+          return old.filter(
+            (item) =>
+              // @ts-ignore - idField access
+              item[idField] !== itemId,
           );
         });
-        
+
         return { previousData };
       },
       onError: (err, variables, context) => {
@@ -338,7 +369,7 @@ export function createOptimisticMutations<TData, TError, TVariables>(
         if (context?.previousData) {
           queryClient.setQueryData(queryKey, context.previousData);
         }
-        
+
         if (baseOptions.onError) {
           baseOptions.onError(err, variables, context);
         }
@@ -346,12 +377,12 @@ export function createOptimisticMutations<TData, TError, TVariables>(
       onSettled: (data, error, variables, context) => {
         // Invalidare query pentru a asigura sincronizarea cu serverul
         queryClient.invalidateQueries({ queryKey: queryKey });
-        
+
         if (baseOptions.onSettled) {
           baseOptions.onSettled(data, error, variables, context);
         }
-      }
-    })
+      },
+    }),
   };
 }
 
@@ -360,23 +391,23 @@ export function createOptimisticMutations<TData, TError, TVariables>(
  * Acceptă funcții QueryFunction definite de client cu semnătura corectă
  */
 export async function executeQueriesInParallel<TResult>(
-  queries: Array<{ 
-    key: QueryKey, 
-    fn: () => Promise<TResult> 
+  queries: Array<{
+    key: QueryKey;
+    fn: () => Promise<TResult>;
   }>,
   options?: {
     stopOnError?: boolean;
     onError?: (error: Error, index: number) => void;
     abortSignal?: AbortSignal;
-  }
+  },
 ): Promise<TResult[]> {
   const { stopOnError = false, onError, abortSignal } = options || {};
-  
+
   try {
     if (abortSignal?.aborted) {
-      throw new Error('Query execution was aborted');
+      throw new Error("Query execution was aborted");
     }
-    
+
     const queryPromises = queries.map(async ({ fn }, index) => {
       try {
         // Executăm funcția query direct, responsabilitatea formatului parametrilor
@@ -386,21 +417,21 @@ export async function executeQueriesInParallel<TResult>(
         if (onError) {
           onError(error as Error, index);
         }
-        
+
         if (stopOnError) {
           throw error;
         }
-        
+
         // Returnăm null pentru query-uri eșuate dacă nu oprim la erori
         return null;
       }
     });
-    
+
     const queryResults = await Promise.all(queryPromises);
-    
+
     return queryResults as TResult[];
   } catch (error) {
-    console.error('[ReactQueryUtils] Parallel query execution failed:', error);
+    console.error("[ReactQueryUtils] Parallel query execution failed:", error);
     throw error;
   }
-} 
+}

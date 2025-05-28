@@ -1,8 +1,13 @@
-import { TransactionType } from '@shared-constants/enums';
-import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { ColumnDef, Row, Table } from '@tanstack/react-table';
-import { Virtualizer, VirtualizerOptions } from '@tanstack/react-virtual';
-import { ReactNode } from 'react';
+import { TransactionType } from "@shared-constants/enums";
+import { TransactionValidated } from "@shared-constants/transaction.schema";
+import { ColumnDef, Row, Table, Column } from "@tanstack/react-table";
+import { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
+import { ReactNode } from "react";
+
+/**
+ * Rezultatul returnat de hook-ul useLunarGridTable
+ */
+import { TransformedTableDataRow } from "./hooks/useLunarGridTable";
 
 /**
  * Definirea tipurilor pentru LunarGrid cu TanStack Table
@@ -16,25 +21,25 @@ import { ReactNode } from 'react';
 export interface LunarGridRowData {
   /** ID unic pentru rând */
   id: string;
-  
+
   /** Numele categoriei */
   category: string;
-  
+
   /** Numele subcategoriei (doar pentru rândurile de subcategorie) */
   subcategory?: string;
-  
+
   /** Dacă rândul reprezintă o categorie (true) sau o subcategorie (false) */
   isCategory: boolean;
-  
+
   /** Dacă categoria este expandată (se aplică doar rândurilor de categorie) */
   isExpanded?: boolean;
-  
+
   /** Sumele zilnice pentru acest rând, mapate după zi {1: suma, 2: suma, ...} */
   dailyAmounts: Record<number, number>;
-  
+
   /** Lista de tranzacții asociate acestui rând */
   transactions: TransactionValidated[];
-  
+
   /** Totalul sumelor zilnice (calculat automat) */
   total?: number;
 }
@@ -45,10 +50,10 @@ export interface LunarGridRowData {
 export type DayColumnDef = ColumnDef<LunarGridRowData> & {
   /** Ziua lunii asociată acestei coloane */
   day: number;
-  
+
   /** Dacă coloana reprezintă o zi din weekend */
   isWeekend?: boolean;
-  
+
   /** Data completă (opțional) */
   date?: Date;
 };
@@ -59,19 +64,19 @@ export type DayColumnDef = ColumnDef<LunarGridRowData> & {
 export interface CategoryRow {
   /** Cheia unică a categoriei */
   categoryKey: string;
-  
+
   /** Dacă categoria este expandată */
   isExpanded: boolean;
-  
+
   /** Lista de subcategorii */
   subcategories: Array<{
     name: string;
     isCustom: boolean;
   }>;
-  
+
   /** Sumele zilnice pentru această categorie */
   dailySums: Record<number, number>;
-  
+
   /** Totalul sumelor zilnice */
   total?: number;
 }
@@ -82,16 +87,16 @@ export interface CategoryRow {
 export interface SubcategoryRow {
   /** Cheia unică a subcategoriei */
   subcategoryKey: string;
-  
+
   /** Cheia categoriei părinte */
   categoryKey: string;
-  
+
   /** Dacă subcategoria este personalizată */
   isCustom: boolean;
-  
+
   /** Sumele zilnice pentru această subcategorie */
   dailySums: Record<number, number>;
-  
+
   /** Totalul sumelor zilnice */
   total?: number;
 }
@@ -102,22 +107,22 @@ export interface SubcategoryRow {
 export interface TransactionPopoverState {
   /** Dacă popover-ul este activ */
   active: boolean;
-  
+
   /** Ziua lunii pentru care se editează tranzacția */
   day: number;
-  
+
   /** Numele categoriei */
   category: string;
-  
+
   /** Numele subcategoriei */
   subcategory: string;
-  
+
   /** Suma curentă (ca string pentru afișare/editare) */
   amount: string;
-  
+
   /** Tipul tranzacției (venit/cheltuială) */
   type: string;
-  
+
   /** Poziția popover-ului pe ecran */
   position: { top: number; left: number } | null;
 }
@@ -128,12 +133,12 @@ export interface TransactionPopoverState {
 export interface SubcategoryEditState {
   /** Numele categoriei */
   category: string;
-  
+
   /** Numele subcategoriei */
   subcategory: string;
-  
+
   /** Modul de editare: 'edit' sau 'delete' */
-  mode: 'edit' | 'delete';
+  mode: "edit" | "delete";
 }
 
 // Props pentru hook-ul useLunarGridTable
@@ -152,35 +157,30 @@ export interface UseLunarGridTableOptions {
     subcategory: string,
     day: number,
     amount: string,
-    type: string
+    type: string,
   ) => void;
   onCellDoubleClick?: (
     e: React.MouseEvent<HTMLTableCellElement>,
     category: string,
     subcategory: string,
     day: number,
-    currentAmount: string
+    currentAmount: string,
   ) => void;
-}
-
-/**
- * Rezultatul returnat de hook-ul useLunarGridTable
- */
-import { TransformedTableDataRow } from './hooks/useLunarGridTable'; // Importăm tipul din hook
+} // Importăm tipul din hook
 
 export interface UseLunarGridTableResult {
   /** Instanța de tabel TanStack */
   table: Table<TransformedTableDataRow>; // Tipare mai specifică pentru tabel
-  
+
   /** Coloanele tabelului, acum bazate pe TransformedTableDataRow */
   columns: ColumnDef<TransformedTableDataRow>[];
-  
+
   /** Zilele lunii */
   days: number[];
-  
+
   /** Referință către container-ul de tabel */
   tableContainerRef: React.RefObject<HTMLDivElement>;
-  
+
   /** Soldurile zilnice */
   dailyBalances: Record<number, number>;
 
@@ -200,19 +200,19 @@ export interface UseLunarGridTableResult {
  */
 export type CellRendererProps = {
   /** Valoarea celulei */
-  value: any;
-  
+  value: string | number | null | undefined;
+
   /** Rândul curent */
   row: Row<LunarGridRowData>;
-  
+
   /** Coloana curentă */
-  column: any; // TODO: Înlocuiește cu tipul corect din TanStack Table
-  
+  column: Column<LunarGridRowData, unknown>;
+
   /** Funcție pentru actualizarea valorii */
-  updateData: (rowIndex: number, columnId: string, value: any) => void;
-  
-  /** Alte proprietăți */
-  [key: string]: any;
+  updateData: (rowIndex: number, columnId: string, value: string | number) => void;
+
+  /** Proprietăți suplimentare pentru renderer-ul de celulă */
+  cellProps?: Record<string, unknown>;
 };
 
 /**
@@ -221,22 +221,22 @@ export type CellRendererProps = {
 export interface ColumnConfig {
   /** ID-ul coloanei */
   id: string;
-  
+
   /** Header-ul coloanei */
-  header: string | ((info: any) => ReactNode);
-  
+  header: string | ((info: { column: Column<LunarGridRowData, unknown> }) => ReactNode);
+
   /** Accesorul datelor */
   accessorKey?: string;
-  
+
   /** Dacă este o coloană de zi */
   isDayColumn?: boolean;
-  
+
   /** Ziua (pentru coloanele de zi) */
   day?: number;
-  
+
   /** Dacă este o zi din weekend */
   isWeekend?: boolean;
-  
+
   /** Funcție de randare personalizată */
   cell?: (props: CellRendererProps) => ReactNode;
 }
@@ -259,36 +259,40 @@ export interface TanStackSubcategoryRowsProps {
     subcategory: string,
     day: number,
     amount: string,
-    type: string
+    type: string,
   ) => void;
   handleCellDoubleClick?: (
     e: React.MouseEvent<HTMLTableCellElement>,
     category: string,
     subcategory: string,
     day: number,
-    currentAmount: string
+    currentAmount: string,
   ) => void;
-  handleEditSubcategory?: (category: string, subcategory: string, mode?: 'edit' | 'delete') => void;
+  handleEditSubcategory?: (
+    category: string,
+    subcategory: string,
+    mode?: "edit" | "delete",
+  ) => void;
   handleDeleteSubcategory?: (category: string, subcategory: string) => void;
   isCustomSubcategory: (category: string, subcategory: string) => boolean;
   getTransactionTypeForCategory: (category: string) => TransactionType;
-  
+
   /** Opțiuni suplimentare pentru configurarea afișării */
   options?: {
     /** Dacă se afișează coloana cu acțiuni */
     showActions?: boolean;
-    
+
     /** Dacă se permit modificări */
     isEditable?: boolean;
-    
+
     /** Stiluri personalizate */
     styles?: {
       /** Stil pentru celulele cu sume pozitive */
       positiveAmount?: string;
-      
+
       /** Stil pentru celulele cu sume negative */
       negativeAmount?: string;
-      
+
       /** Stil pentru celulele cu sume zero */
       zeroAmount?: string;
     };

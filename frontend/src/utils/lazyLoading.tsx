@@ -1,11 +1,11 @@
 /**
  * Utilități pentru încărcarea lazy a componentelor
- * 
+ *
  * Acest fișier oferă funcții helper pentru a implementa încărcarea lazy
  * a componentelor React, folosind Suspense și ErrorBoundary.
  */
 
-import React, { lazy, Suspense, ComponentType, ReactNode } from 'react';
+import React, { lazy, Suspense, ComponentType, ReactNode } from "react";
 
 // Componentul de loading implicit
 const DefaultLoader = () => (
@@ -36,7 +36,10 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -47,7 +50,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error('Eroare în componenta React:', error, errorInfo);
+    console.error("Eroare în componenta React:", error, errorInfo);
   }
 
   render(): React.ReactNode {
@@ -76,32 +79,32 @@ interface LazyLoadOptions {
 
 /**
  * Încarcă lazy un component React cu Suspense și ErrorBoundary opțional
- * 
+ *
  * @example
  * const LazyComponent = lazyLoad(() => import('./HeavyComponent'));
  */
 export function lazyLoad<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
-  options: LazyLoadOptions = {}
+  options: LazyLoadOptions = {},
 ): React.ComponentType<React.ComponentProps<T>> {
   const {
     loader: Loader = DefaultLoader,
     errorFallback: ErrorFallbackComponent = DefaultErrorFallback,
     withErrorBoundary = true,
-    minDelay = 0
+    minDelay = 0,
   } = options;
 
   // Adăugăm delay minim dacă este specificat
   const importWithDelay = async () => {
     const start = Date.now();
     const Component = await importFn();
-    
+
     // Dacă încărcarea a fost mai rapidă decât minDelay, așteptăm
     const elapsed = Date.now() - start;
     if (minDelay && elapsed < minDelay) {
-      await new Promise(resolve => setTimeout(resolve, minDelay - elapsed));
+      await new Promise((resolve) => setTimeout(resolve, minDelay - elapsed));
     }
-    
+
     return Component;
   };
 
@@ -130,16 +133,18 @@ export function lazyLoad<T extends ComponentType<any>>(
 
 /**
  * Încarcă lazy un grup de componente, util pentru codesplitting pe module/secțiuni
- * 
+ *
  * @example
  * const { UserList, UserDetails } = lazyLoadComponents({
  *   UserList: () => import('./UserList'),
  *   UserDetails: () => import('./UserDetails')
  * });
  */
-export function lazyLoadComponents<T extends Record<string, () => Promise<{ default: ComponentType<any> }>>>(
+export function lazyLoadComponents<
+  T extends Record<string, () => Promise<{ default: ComponentType<any> }>>,
+>(
   componentMap: T,
-  options: LazyLoadOptions = {}
+  options: LazyLoadOptions = {},
 ): { [K in keyof T]: React.ComponentType<any> } {
   const result: Record<string, React.ComponentType<any>> = {};
 
@@ -154,15 +159,17 @@ export function lazyLoadComponents<T extends Record<string, () => Promise<{ defa
  * Preîncarcă un component fără a-l renderiza
  * Util pentru a anticipa navigarea utilizatorului
  */
-export function preloadComponent(importFn: () => Promise<{ default: ComponentType<any> }>): void {
-  importFn().catch(error => {
-    console.warn('Preîncărcarea componentului a eșuat:', error);
+export function preloadComponent(
+  importFn: () => Promise<{ default: ComponentType<any> }>,
+): void {
+  importFn().catch((error) => {
+    console.warn("Preîncărcarea componentului a eșuat:", error);
   });
 }
 
 /**
  * Hook pentru a preîncărca mai multe componente bazat pe rutele posibile
- * 
+ *
  * @example
  * usePrefetchRoutes([
  *   { path: '/dashboard', component: () => import('./Dashboard') },
@@ -170,13 +177,16 @@ export function preloadComponent(importFn: () => Promise<{ default: ComponentTyp
  * ]);
  */
 export function usePrefetchRoutes(
-  routes: Array<{ path: string; component: () => Promise<{ default: ComponentType<any> }> }>,
-  prefetchAll: boolean = false
+  routes: Array<{
+    path: string;
+    component: () => Promise<{ default: ComponentType<any> }>;
+  }>,
+  prefetchAll: boolean = false,
 ): void {
   React.useEffect(() => {
     // Dacă prefetchAll e true, preîncărcăm toate componentele imediat
     if (prefetchAll) {
-      routes.forEach(route => {
+      routes.forEach((route) => {
         preloadComponent(route.component);
       });
       return;
@@ -185,12 +195,12 @@ export function usePrefetchRoutes(
     // Altfel, preîncărcăm doar când utilizatorul face hover pe link-uri
     const handleLinkHover = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const closestLink = target.closest('a');
-      
+      const closestLink = target.closest("a");
+
       if (closestLink) {
-        const href = closestLink.getAttribute('href');
+        const href = closestLink.getAttribute("href");
         if (href) {
-          const matchingRoute = routes.find(route => {
+          const matchingRoute = routes.find((route) => {
             // Verificăm dacă href-ul link-ului corespunde cu path-ul rutei
             return href === route.path || href.startsWith(`${route.path}/`);
           });
@@ -203,10 +213,10 @@ export function usePrefetchRoutes(
     };
 
     // Adăugăm un listener de hover pentru document
-    document.addEventListener('mouseover', handleLinkHover);
+    document.addEventListener("mouseover", handleLinkHover);
 
     return () => {
-      document.removeEventListener('mouseover', handleLinkHover);
+      document.removeEventListener("mouseover", handleLinkHover);
     };
   }, [routes, prefetchAll]);
-} 
+}

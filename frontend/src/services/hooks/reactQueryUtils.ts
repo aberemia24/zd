@@ -1,9 +1,9 @@
-import { QueryClient, QueryKey, UseQueryOptions } from '@tanstack/react-query';
+import { QueryClient, QueryKey, UseQueryOptions } from "@tanstack/react-query";
 
 /**
  * Generator de chei pentru Query-uri
  * Ajută la standardizarea cheilor pentru React Query și evitarea duplicării
- * 
+ *
  * @example
  * const transactionKeys = createQueryKeyFactory('transactions');
  * // Utilizare:
@@ -16,48 +16,50 @@ export function createQueryKeyFactory<T extends string>(baseKey: T) {
      * Cheie de bază pentru toate query-urile acestui tip
      */
     all: [baseKey] as const,
-    
+
     /**
      * Generează o cheie pentru un singur item bazat pe ID
      */
-    details: (id: string) => [baseKey, 'detail', id] as const,
-    
+    details: (id: string) => [baseKey, "detail", id] as const,
+
     /**
      * Generează o cheie pentru o listă filtrată
      */
-    list: (filters?: Record<string, unknown>) => [baseKey, 'list', filters] as const,
-    
+    list: (filters?: Record<string, unknown>) =>
+      [baseKey, "list", filters] as const,
+
     /**
      * Generează o cheie pentru date lunare
      */
-    monthly: (year: number, month: number, userId?: string) => 
-      [baseKey, 'monthly', year, month, userId] as const,
-      
+    monthly: (year: number, month: number, userId?: string) =>
+      [baseKey, "monthly", year, month, userId] as const,
+
     /**
      * Generează o cheie pentru o interogare infinită
      */
-    infinite: (filters?: Record<string, unknown>) => [baseKey, 'infinite', filters] as const,
-    
+    infinite: (filters?: Record<string, unknown>) =>
+      [baseKey, "infinite", filters] as const,
+
     /**
      * Generează o cheie pentru un query parametrizat
      */
-    withParams: <Params extends Record<string, unknown>>(params: Params) => 
-      [baseKey, params] as const
+    withParams: <Params extends Record<string, unknown>>(params: Params) =>
+      [baseKey, params] as const,
   };
 }
 
 // Chei predefinite pentru entitățile principale din aplicație
 export const queryKeys = {
-  transactions: createQueryKeyFactory('transactions'),
-  categories: createQueryKeyFactory('categories'),
-  users: createQueryKeyFactory('users'),
-  statistics: createQueryKeyFactory('statistics'),
+  transactions: createQueryKeyFactory("transactions"),
+  categories: createQueryKeyFactory("categories"),
+  users: createQueryKeyFactory("users"),
+  statistics: createQueryKeyFactory("statistics"),
 };
 
 /**
  * Optimizează opțiunile pentru query-uri React Query pentru date sensibile la starea autentificării
  * Activează query-ul doar dacă există un userId și aplică timpii de stale/gc configurabili
- * 
+ *
  * @param options Opțiuni pentru query
  * @param userId ID-ul utilizatorului
  * @param defaultStaleTime Timp implicit pentru expirarea cache-ului (30 secunde)
@@ -68,20 +70,23 @@ export function optimizeQueryOptions<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
-  TQueryKey extends QueryKey = QueryKey
+  TQueryKey extends QueryKey = QueryKey,
 >(
-  options: Omit<UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>, 'queryKey'> & {
+  options: Omit<
+    UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+    "queryKey"
+  > & {
     queryKey: TQueryKey;
   },
   userId?: string,
   defaultStaleTime = 30 * 1000,
-  defaultGcTime = 5 * 60 * 1000
+  defaultGcTime = 5 * 60 * 1000,
 ): UseQueryOptions<TQueryFnData, TError, TData, TQueryKey> {
   return {
     ...options,
     staleTime: options.staleTime ?? defaultStaleTime,
     gcTime: options.gcTime ?? defaultGcTime,
-    enabled: userId !== undefined && (options.enabled !== false)
+    enabled: userId !== undefined && options.enabled !== false,
   };
 }
 
@@ -146,7 +151,7 @@ export const caches = {
    * Exemplu: transformări de date pentru grids, calcule de sold, etc.
    */
   transactions: new CacheRegistry<any>(2 * 60 * 1000), // 2 minute
-  
+
   /**
    * Cache pentru calcule statistice
    * Exemplu: generarea datelor pentru grafice, rapoarte, etc.
@@ -159,5 +164,5 @@ export default {
   queryKeys,
   optimizeQueryOptions,
   CacheRegistry,
-  caches
-}; 
+  caches,
+};

@@ -1,14 +1,14 @@
-import Button from './Button';
-import ValidatedSubmitButton from './ValidatedSubmitButton';
-import type { ButtonProps } from './Button';
-import type { ValidatedSubmitButtonProps } from './ValidatedSubmitButton';
+import Button from "./Button";
+import ValidatedSubmitButton from "./ValidatedSubmitButton";
+import type { ButtonProps } from "./Button";
+import type { ValidatedSubmitButtonProps } from "./ValidatedSubmitButton";
 
 export {
   Button,
   ValidatedSubmitButton,
   // Exportăm tipurile pentru utilizare în alte componente
   ButtonProps,
-  ValidatedSubmitButtonProps
+  ValidatedSubmitButtonProps,
 };
 
 // Pentru compatibilitate backwards
