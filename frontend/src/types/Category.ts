@@ -1,7 +1,7 @@
 // Tipuri pentru categorii și subcategorii customizate (persistente per utilizator)
 // Owner: echipa FE
 
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from "@shared-constants";
 
 export interface CustomSubcategory {
   name: string;

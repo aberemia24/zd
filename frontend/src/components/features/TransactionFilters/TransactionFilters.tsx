@@ -1,25 +1,28 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import Button from '../../primitives/Button/Button';
-import Select from '../../primitives/Select/Select';
-import Badge from '../../primitives/Badge/Badge';
-import Input from '../../primitives/Input/Input';
-import { OPTIONS, LABELS, PLACEHOLDERS } from '@shared-constants';
-import type { TransactionType, CategoryType } from '@shared-constants';
-import { useCategoryStore } from '../../../stores/categoryStore';
+import React, { useState, useCallback, useEffect, useMemo } from "react";
+import Button from "../../primitives/Button/Button";
+import Select from "../../primitives/Select/Select";
+import Badge from "../../primitives/Badge/Badge";
+import Input from "../../primitives/Input/Input";
+import { OPTIONS, LABELS, PLACEHOLDERS } from "@shared-constants";
+import type { TransactionType, CategoryType } from "@shared-constants";
+import { useCategoryStore } from "../../../stores/categoryStore";
 
-import { BUTTONS, UI, TABLE, LOADER, INFO } from '@shared-constants/ui';
-import classNames from 'classnames';
-import { useActiveSubcategories } from '../../../services/hooks/useActiveSubcategories';
-import { MESAJE } from '@shared-constants/messages';
-import { cn } from '../../../styles/cva/shared/utils';
-import { flex as flexContainer, card } from '../../../styles/cva/components/layout';
+import { BUTTONS, UI, TABLE, LOADER, INFO } from "@shared-constants/ui";
+import classNames from "classnames";
+import { useActiveSubcategories } from "../../../services/hooks/useActiveSubcategories";
+import { MESAJE } from "@shared-constants/messages";
+import { cn } from "../../../styles/cva/shared/utils";
+import {
+  flex as flexContainer,
+  card,
+} from "../../../styles/cva/components/layout";
 
 export interface TransactionFiltersProps {
-  type?: TransactionType | '' | string;
-  category?: CategoryType | '' | string;
+  type?: TransactionType | "" | string;
+  category?: CategoryType | "" | string;
   subcategory?: string;
-  onTypeChange?: (type: TransactionType | '' | string) => void;
-  onCategoryChange?: (category: CategoryType | '' | string) => void;
+  onTypeChange?: (type: TransactionType | "" | string) => void;
+  onCategoryChange?: (category: CategoryType | "" | string) => void;
   onSubcategoryChange?: (subcategory: string) => void;
   dateFrom?: string;
   dateTo?: string;
@@ -40,14 +43,14 @@ export interface TransactionFiltersProps {
 function useDebounce<T>(value: T, delay: number): T {
   // State și setter pentru valoarea debounced
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  
+
   useEffect(
     () => {
       // Actualizăm valoarea debouncedValue după delay
       const handler = setTimeout(() => {
         setDebouncedValue(value);
       }, delay);
-      
+
       // Anulăm timeout-ul dacă valoarea se schimbă
       // Acest lucru garantează că nu se apelează setTimeout dacă valoarea
       // se schimbă în timpul delay-ului
@@ -56,111 +59,126 @@ function useDebounce<T>(value: T, delay: number): T {
       };
     },
     // Re-run efectul doar când valoarea sau delay-ul se schimbă
-    [value, delay]
+    [value, delay],
   );
-  
+
   return debouncedValue;
 }
 
 const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
-  type = '',
-  category = '',
-  subcategory = '',
+  type = "",
+  category = "",
+  subcategory = "",
   onTypeChange = () => {},
   onCategoryChange = () => {},
   onSubcategoryChange = () => {},
-  dateFrom = '',
-  dateTo = '',
-  amountMin = '',
-  amountMax = '',
-  searchText = '',
+  dateFrom = "",
+  dateTo = "",
+  amountMin = "",
+  amountMax = "",
+  searchText = "",
   onDateFromChange = () => {},
   onDateToChange = () => {},
   onAmountMinChange = () => {},
   onAmountMaxChange = () => {},
-  onSearchTextChange = () => {}
+  onSearchTextChange = () => {},
 }) => {
   // State pentru expandarea/colapsarea filtrelor avansate
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  
+
   // Opțiuni pentru tipurile de tranzacții din constante
   const types = OPTIONS.TYPE;
-  
+
   // Categoriile personalizate + predefinite din categoryStore
-  const customCategories = useCategoryStore(state => state.categories);
-  
+  const customCategories = useCategoryStore((state) => state.categories);
+
   // Construim opțiunile pentru categorii din store, nu din constante
   // Respectăm regulile: memoizare, fără hardcodări, indicator pentru custom
   const categoryOptions = useMemo(() => {
     // Filtrăm categoriile bazate pe tipul de tranzacție selectat
     let filteredCategories = customCategories;
-    
+
     if (type) {
       // Păstrăm doar categoriile compatibile cu tipul de tranzacție selectat
-      filteredCategories = customCategories.filter(cat => {
-        if (type === 'INCOME') return cat.name === 'VENITURI';
-        if (type === 'EXPENSE') return cat.name !== 'VENITURI' && cat.name !== 'ECONOMII';
-        if (type === 'SAVING') return cat.name === 'ECONOMII';
+      filteredCategories = customCategories.filter((cat) => {
+        if (type === "INCOME") return cat.name === "VENITURI";
+        if (type === "EXPENSE")
+          return cat.name !== "VENITURI" && cat.name !== "ECONOMII";
+        if (type === "SAVING") return cat.name === "ECONOMII";
         return true; // Dacă tipul e gol, afișăm toate
       });
     }
-    
-    const options = filteredCategories.map(cat => ({
+
+    const options = filteredCategories.map((cat) => ({
       value: cat.name,
       // Formatăm label-ul pentru afișare, incluzând indicator pentru categorii personalizate
-      label: cat.name.charAt(0) + cat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
-             (cat.isCustom ? ' ➡️' : '') // Indicator consistent cu cel din TransactionForm
+      label:
+        cat.name.charAt(0) +
+        cat.name.slice(1).toLowerCase().replace(/_/g, " ") +
+        (cat.isCustom ? " ➡️" : ""), // Indicator consistent cu cel din TransactionForm
     }));
-    
+
     return options;
   }, [customCategories, type]);
-  
+
   // Obține subcategoriile active folosind noul hook
   const {
     subcategories: activeSubcategories,
     isLoading: isLoadingSubcategories,
-    isEmpty: noActiveSubcategories
+    isEmpty: noActiveSubcategories,
   } = useActiveSubcategories({
     category,
     type,
-    enabled: !!category // Activăm doar dacă avem o categorie selectată
+    enabled: !!category, // Activăm doar dacă avem o categorie selectată
   });
-  
+
   // Combinăm subcategoriile active cu cele din store dacă e necesar
   const subcategoryOptions = useMemo(() => {
     // Dacă nu avem o categorie selectată, returnăm un array gol
     if (!category) return [];
-    
+
     // Dacă se încarcă subcategoriile active, afișăm toate subcategoriile din store ca înainte
     if (isLoadingSubcategories) {
       // Găsim categoria selectată în lista de categorii
-      const selectedCategory = customCategories.find(cat => cat.name === category);
+      const selectedCategory = customCategories.find(
+        (cat) => cat.name === category,
+      );
       if (!selectedCategory) return [];
-      
+
       // Extragem subcategoriile și le transformăm în opțiuni pentru Select
-      return selectedCategory.subcategories.map(subcat => ({
+      return selectedCategory.subcategories.map((subcat) => ({
         value: subcat.name,
-        label: subcat.name.charAt(0) + subcat.name.slice(1).toLowerCase().replace(/_/g, ' ') + 
-               (subcat.isCustom ? ' ➡️' : '')
+        label:
+          subcat.name.charAt(0) +
+          subcat.name.slice(1).toLowerCase().replace(/_/g, " ") +
+          (subcat.isCustom ? " ➡️" : ""),
       }));
     }
-    
+
     // Dacă nu avem subcategorii active sau componentele de căutare returnează array gol, afișăm un mesaj în dropdown
     if (noActiveSubcategories || activeSubcategories.length === 0) {
-      return [{ 
-        value: '', 
-        label: INFO.NO_SUBCATEGORIES || TABLE.NO_SUBCATEGORIES,
-        disabled: true
-      }];
+      return [
+        {
+          value: "",
+          label: INFO.NO_SUBCATEGORIES || TABLE.NO_SUBCATEGORIES,
+          disabled: true,
+        },
+      ];
     }
-    
+
     // Altfel, returnăm subcategoriile active cu numărul de tranzacții pentru fiecare
-          return activeSubcategories.map(subcat => ({
+    return activeSubcategories.map((subcat) => ({
       value: subcat.value,
       label: subcat.label, // Numărul de tranzacții este deja adăugat în hook-ul useActiveSubcategories
-      disabled: false
+      disabled: false,
     }));
-  }, [category, customCategories, isLoadingSubcategories, activeSubcategories, noActiveSubcategories]);
+  }, [
+    category,
+    customCategories,
+    isLoadingSubcategories,
+    activeSubcategories,
+    noActiveSubcategories,
+  ]);
 
   // Calculăm numărul total de filtre active
   const activeFilterCount = useMemo(() => {
@@ -174,128 +192,203 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     if (amountMax) count++;
     if (searchText) count++;
     return count;
-  }, [type, category, subcategory, dateFrom, dateTo, amountMin, amountMax, searchText]);
-  
-  // Memoizăm filtrele combinate pentru a evita recalculări inutile
-  const activeFilters = useMemo(() => ({
-    type, 
-    category, 
+  }, [
+    type,
+    category,
     subcategory,
-    dateFrom, 
-    dateTo, 
-    amountMin, 
-    amountMax, 
-    searchText
-  }), [type, category, subcategory, dateFrom, dateTo, amountMin, amountMax, searchText]);
+    dateFrom,
+    dateTo,
+    amountMin,
+    amountMax,
+    searchText,
+  ]);
+
+  // Memoizăm filtrele combinate pentru a evita recalculări inutile
+  const activeFilters = useMemo(
+    () => ({
+      type,
+      category,
+      subcategory,
+      dateFrom,
+      dateTo,
+      amountMin,
+      amountMax,
+      searchText,
+    }),
+    [
+      type,
+      category,
+      subcategory,
+      dateFrom,
+      dateTo,
+      amountMin,
+      amountMax,
+      searchText,
+    ],
+  );
 
   // Reset subcategory when category changes
   useEffect(() => {
-    if (subcategory && (!category || subcategoryOptions.every(opt => opt.value !== subcategory))) {
-      onSubcategoryChange('');
+    if (
+      subcategory &&
+      (!category ||
+        subcategoryOptions.every((opt) => opt.value !== subcategory))
+    ) {
+      onSubcategoryChange("");
     }
   }, [category, subcategory, subcategoryOptions, onSubcategoryChange]);
 
   // Handler pentru reset global - memoizat
   const handleResetAll = useCallback(() => {
-    onTypeChange('');
-    onCategoryChange('');
-    onSubcategoryChange('');
-    onDateFromChange('');
-    onDateToChange('');
-    onAmountMinChange('');
-    onAmountMaxChange('');
-    onSearchTextChange('');
-  }, [onTypeChange, onCategoryChange, onSubcategoryChange, onDateFromChange, onDateToChange, 
-      onAmountMinChange, onAmountMaxChange, onSearchTextChange]);
+    onTypeChange("");
+    onCategoryChange("");
+    onSubcategoryChange("");
+    onDateFromChange("");
+    onDateToChange("");
+    onAmountMinChange("");
+    onAmountMaxChange("");
+    onSearchTextChange("");
+  }, [
+    onTypeChange,
+    onCategoryChange,
+    onSubcategoryChange,
+    onDateFromChange,
+    onDateToChange,
+    onAmountMinChange,
+    onAmountMaxChange,
+    onSearchTextChange,
+  ]);
 
   // Toggle pentru filtre avansate
   const toggleAdvancedFilters = useCallback(() => {
-    setShowAdvancedFilters(prev => !prev);
+    setShowAdvancedFilters((prev) => !prev);
   }, []);
 
   // State intern pentru valoarea text input înainte de debounce
   const [searchInputValue, setSearchInputValue] = useState(searchText);
-  
+
   // Aplicăm debounce pe valoarea de input
   const debouncedSearchText = useDebounce(searchInputValue, 400); // 400ms delay
-  
+
   // Efect care trimite valoarea debounced către parent component
   useEffect(() => {
     if (debouncedSearchText !== searchText) {
       onSearchTextChange(debouncedSearchText);
     }
   }, [debouncedSearchText, searchText, onSearchTextChange]);
-  
+
   // Handler pentru schimbarea valorii de input
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInputValue(e.target.value);
-  }, []);
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInputValue(e.target.value);
+    },
+    [],
+  );
 
   // Memoizăm handlerul pentru schimbarea tipului
-  const handleTypeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as TransactionType | '';
-    onTypeChange(value);
-    // Reset categorie și subcategorie când se schimbă tipul
-    onCategoryChange('');
-    onSubcategoryChange('');
-  }, [onTypeChange, onCategoryChange, onSubcategoryChange]);
+  const handleTypeChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as TransactionType | "";
+      onTypeChange(value);
+      // Reset categorie și subcategorie când se schimbă tipul
+      onCategoryChange("");
+      onSubcategoryChange("");
+    },
+    [onTypeChange, onCategoryChange, onSubcategoryChange],
+  );
 
   // Memoizăm handlerul pentru schimbarea categoriei
-  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as CategoryType | '';
-    onCategoryChange(value);
-    // Reset subcategorie când se schimbă categoria
-    onSubcategoryChange('');
-  }, [onCategoryChange, onSubcategoryChange]);
-  
+  const handleCategoryChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value as CategoryType | "";
+      onCategoryChange(value);
+      // Reset subcategorie când se schimbă categoria
+      onSubcategoryChange("");
+    },
+    [onCategoryChange, onSubcategoryChange],
+  );
+
   // Memoizăm handlerul pentru schimbarea subcategoriei
-  const handleSubcategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    onSubcategoryChange(e.target.value);
-  }, [onSubcategoryChange]);
+  const handleSubcategoryChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      onSubcategoryChange(e.target.value);
+    },
+    [onSubcategoryChange],
+  );
 
   // Memoizăm handlerii pentru filtrele de date
-  const handleDateFromChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onDateFromChange(e.target.value);
-  }, [onDateFromChange]);
+  const handleDateFromChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onDateFromChange(e.target.value);
+    },
+    [onDateFromChange],
+  );
 
-  const handleDateToChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onDateToChange(e.target.value);
-  }, [onDateToChange]);
+  const handleDateToChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onDateToChange(e.target.value);
+    },
+    [onDateToChange],
+  );
 
   // Memoizăm handlerii pentru filtrele de sumă
-  const handleAmountMinChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onAmountMinChange(e.target.value);
-  }, [onAmountMinChange]);
+  const handleAmountMinChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onAmountMinChange(e.target.value);
+    },
+    [onAmountMinChange],
+  );
 
-  const handleAmountMaxChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    onAmountMaxChange(e.target.value);
-  }, [onAmountMaxChange]);
+  const handleAmountMaxChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      onAmountMaxChange(e.target.value);
+    },
+    [onAmountMaxChange],
+  );
 
   // Utilizăm flexContainer și card în loc de useThemeEffects
   return (
-    <div className={cn(flexContainer({ direction: 'row', justify: 'between', align: 'center', gap: 'md' }))}>
+    <div
+      className={cn(
+        flexContainer({
+          direction: "row",
+          justify: "between",
+          align: "center",
+          gap: "md",
+        }),
+      )}
+    >
       {/* Bara de filtre compactă, pe o singură linie */}
-      <div className={cn(flexContainer({ direction: 'row', justify: 'start', align: 'center', gap: 'md' }))}>
+      <div
+        className={cn(
+          flexContainer({
+            direction: "row",
+            justify: "start",
+            align: "center",
+            gap: "md",
+          }),
+        )}
+      >
         {/* Filtru tip tranzacție */}
         <Select
           name="type-filter"
           label=""
-          value={type || ''}
+          value={type || ""}
           data-testid="type-filter"
           onChange={handleTypeChange}
           options={types}
-          placeholder={PLACEHOLDERS.SELECT + ' tipul'}
+          placeholder={PLACEHOLDERS.SELECT + " tipul"}
           size="sm"
         />
         {/* Filtru categorie */}
         <Select
           name="category-filter"
           label=""
-          value={category || ''}
+          value={category || ""}
           data-testid="category-filter"
           onChange={handleCategoryChange}
           options={categoryOptions}
-          placeholder={PLACEHOLDERS.SELECT + ' categoria'}
+          placeholder={PLACEHOLDERS.SELECT + " categoria"}
           disabled={!type}
           size="sm"
         />
@@ -303,18 +396,31 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
         <Select
           name="subcategory-filter"
           label=""
-          value={subcategory || ''}
+          value={subcategory || ""}
           data-testid="subcategory-filter"
           onChange={handleSubcategoryChange}
           options={subcategoryOptions}
-          placeholder={isLoadingSubcategories ? LOADER.TEXT : PLACEHOLDERS.SELECT + ' subcategoria'}
+          placeholder={
+            isLoadingSubcategories
+              ? LOADER.TEXT
+              : PLACEHOLDERS.SELECT + " subcategoria"
+          }
           disabled={!category || subcategoryOptions.length === 0}
           isLoading={isLoadingSubcategories}
           size="sm"
         />
       </div>
       {/* Acțiuni și searchbox la finalul barei */}
-      <div className={cn(flexContainer({ direction: 'row', justify: 'end', align: 'center', gap: 'md' }))}>
+      <div
+        className={cn(
+          flexContainer({
+            direction: "row",
+            justify: "end",
+            align: "center",
+            gap: "md",
+          }),
+        )}
+      >
         {/* Searchbox compact */}
         <Input
           name="search-text-filter"
@@ -343,21 +449,27 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           size="sm"
           onClick={toggleAdvancedFilters}
           data-testid="toggle-advanced-filters-btn"
-          aria-label={showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
+          aria-label={
+            showAdvancedFilters
+              ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED
+              : UI.TRANSACTION_FILTERS.SHOW_ADVANCED
+          }
         >
-          {showAdvancedFilters ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
+          {showAdvancedFilters
+            ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED
+            : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
         </Button>
       </div>
       {/* Filtre avansate - rămân sub bară, vizibile doar dacă sunt activate */}
       {showAdvancedFilters && (
-        <div className={cn(card({ variant: 'flat', size: 'md' }), 'mt-4')}>
+        <div className={cn(card({ variant: "flat", size: "md" }), "mt-4")}>
           <Input
             name="date-from-filter"
             label={LABELS.DATE_FROM_FILTER}
             value={dateFrom}
             data-testid="date-from-filter"
             onChange={handleDateFromChange}
-            placeholder={PLACEHOLDERS.SELECT + ' data de început'}
+            placeholder={PLACEHOLDERS.SELECT + " data de început"}
             type="date"
           />
           <Input
@@ -366,7 +478,7 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
             value={dateTo}
             data-testid="date-to-filter"
             onChange={handleDateToChange}
-            placeholder={PLACEHOLDERS.SELECT + ' data de sfârșit'}
+            placeholder={PLACEHOLDERS.SELECT + " data de sfârșit"}
             type="date"
           />
           <Input

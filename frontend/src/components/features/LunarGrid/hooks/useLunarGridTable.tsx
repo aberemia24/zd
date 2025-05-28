@@ -1,16 +1,21 @@
-import { useMemo, useRef, useCallback, useEffect } from 'react';
-import { useReactTable, getCoreRowModel, ColumnDef, Table } from '@tanstack/react-table';
+import { useMemo, useRef, useCallback, useEffect } from "react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  ColumnDef,
+  Table,
+} from "@tanstack/react-table";
 
-import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { EXCEL_GRID } from '@shared-constants';
+import { TransactionValidated } from "@shared-constants/transaction.schema";
+import { EXCEL_GRID } from "@shared-constants";
 
 // Import stores (doar cele necesare)
-import { useCategoryStore } from '../../../../stores/categoryStore';
-import { useAuthStore } from '../../../../stores/authStore';
+import { useCategoryStore } from "../../../../stores/categoryStore";
+import { useAuthStore } from "../../../../stores/authStore";
 // Folosim direct noul hook specializat pentru încărcarea lunară
-import { useMonthlyTransactions } from '../../../../services/hooks/useMonthlyTransactions';
+import { useMonthlyTransactions } from "../../../../services/hooks/useMonthlyTransactions";
 
-import type { LunarGridRowData } from '../types';
+import type { LunarGridRowData } from "../types";
 
 // Import-uri utilitare din @utils/lunarGrid (via barrel file)
 import {
@@ -20,7 +25,21 @@ import {
   transformTransactionsToRowData,
   generateTableColumns,
   transformToTableData,
-} from '../../../../utils/lunarGrid';
+} from "../../../../utils/lunarGrid";
+
+// Interfaces pentru structuri de date
+interface SubcategoryDefinition {
+  name: string;
+  source?: string;
+}
+
+interface FallbackRow {
+  subcategory: string;
+}
+
+interface DailyAmount {
+  [dayKey: `day-${number}`]: number;
+}
 
 // Tip pentru datele transformate pentru TanStack Table
 export type TransformedTableDataRow = {
@@ -30,8 +49,7 @@ export type TransformedTableDataRow = {
   isCategory: boolean;
   total: number;
   subRows?: TransformedTableDataRow[]; // Adăugat pentru subrows native
-  [dayKey: string]: any; // For 'day-1', 'day-2', etc.
-};
+} & DailyAmount;
 
 /**
  * Hook pentru gestionarea datelor și stării pentru LunarGrid bazat pe TanStack Table.
@@ -43,18 +61,32 @@ export interface UseLunarGridTableResult {
   tableContainerRef: React.RefObject<HTMLDivElement>;
   isLoading: boolean;
   error: Error | null;
-  getCellId: (category: string, subcategory: string | undefined, day: number) => string;
+  getCellId: (
+    category: string,
+    subcategory: string | undefined,
+    day: number,
+  ) => string;
   columns: ColumnDef<TransformedTableDataRow>[];
   days: number[];
   dailyBalances: Record<number, number>;
 }
 
 // Helper robust pentru generare subRows UNICE cu indexare globală pe subcategory goală
-function buildUniqueSubRows(categoryName: string, subcategories: any[], fallbackRows: any[]) {
+function buildUniqueSubRows(
+  categoryName: string,
+  subcategories: SubcategoryDefinition[],
+  fallbackRows: FallbackRow[],
+) {
   // Combină toate subRows (din definiție și fallback)
   const all = [
-    ...subcategories.map(sub => ({ subcategory: sub.name || '', source: 'def' })),
-    ...fallbackRows.map(sub => ({ subcategory: sub.subcategory || '', source: 'fallback' })),
+    ...subcategories.map((sub) => ({
+      subcategory: sub.name || "",
+      source: "def",
+    })),
+    ...fallbackRows.map((sub) => ({
+      subcategory: sub.subcategory || "",
+      source: "fallback",
+    })),
   ];
   const seen = new Set<string>();
   let emptyCount = 0;
@@ -82,12 +114,15 @@ function buildUniqueSubRows(categoryName: string, subcategories: any[], fallback
 }
 
 // Validare pentru duplicate (doar în dev)
-function warnIfDuplicateIds(rows: any[], context: string) {
-  const ids = rows.map(r => r.id);
+function warnIfDuplicateIds(rows: TransformedTableDataRow[], context: string) {
+  const ids = rows.map((r) => r.id);
   const duplicates = ids.filter((id, idx) => ids.indexOf(id) !== idx);
-      if (duplicates.length > 0 && import.meta.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.warn(`[LunarGrid] Chei duplicate detectate în ${context}:`, duplicates);
+  if (duplicates.length > 0 && import.meta.env.NODE_ENV !== "production") {
+
+    console.warn(
+      `[LunarGrid] Chei duplicate detectate în ${context}:`,
+      duplicates,
+    );
   }
 }
 
@@ -95,25 +130,37 @@ export function useLunarGridTable(
   year: number,
   month: number,
   expandedCategories: Record<string, boolean>,
-  onCellClick?: (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => void,
-  onCellDoubleClick?: (e: React.MouseEvent, category: string, subcategory: string | undefined, day: number, amount: string) => void
+  onCellClick?: (
+    e: React.MouseEvent,
+    category: string,
+    subcategory: string | undefined,
+    day: number,
+    amount: string,
+  ) => void,
+  onCellDoubleClick?: (
+    e: React.MouseEvent,
+    category: string,
+    subcategory: string | undefined,
+    day: number,
+    amount: string,
+  ) => void,
 ): UseLunarGridTableResult {
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
   // Store hooks
-  const categories = useCategoryStore(state => state.categories);
-  const user = useAuthStore(state => state.user);
-  
+  const categories = useCategoryStore((state) => state.categories);
+  const user = useAuthStore((state) => state.user);
+
   // Folosim direct noul hook specializat pentru încărcarea lunară
-  const { 
-    transactions: validTransactions, 
-    isLoading: isLoadingTransactions, 
+  const {
+    transactions: validTransactions,
+    isLoading: isLoadingTransactions,
     error: queryError,
-    totalCount
-  } = useMonthlyTransactions(year, month, user?.id, { 
-    includeAdjacentDays: true 
+    totalCount,
+  } = useMonthlyTransactions(year, month, user?.id, {
+    includeAdjacentDays: true,
   });
-  
+
   // Gestionare erori de la React Query
   useEffect(() => {
     if (queryError) {
@@ -124,14 +171,14 @@ export function useLunarGridTable(
   const days = useMemo(() => getDaysInMonth(year, month), [year, month]);
 
   // Pipeline de transformare a datelor
-  
+
   // Transformăm în formatul necesar pentru tabel cu subrows native
   const rawTableData = useMemo(() => {
     // 1. Grupăm tranzacțiile pe categorii și subcategorii
     const categoriesMap: Record<string, TransformedTableDataRow> = {};
-    const fallbackRowsMap: Record<string, any[]> = {};
+    const fallbackRowsMap: Record<string, FallbackRow[]> = {};
 
-    categories.forEach(category => {
+    categories.forEach((category) => {
       categoriesMap[category.name] = {
         id: category.name,
         category: category.name,
@@ -143,28 +190,33 @@ export function useLunarGridTable(
     });
 
     // 2. Parcurgem tranzacțiile și agregăm sumele pe subcategorii
-    validTransactions.forEach(t => {
+    validTransactions.forEach((t) => {
       const cat = t.category;
-      const subcat = typeof t.subcategory === 'string' ? t.subcategory : '';
+      const subcat = typeof t.subcategory === "string" ? t.subcategory : "";
       const day = new Date(t.date).getDate();
-      const amount = t.status === 'COMPLETED' && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
+      const amount =
+        t.status === "COMPLETED" && typeof t.actualAmount === "number"
+          ? t.actualAmount
+          : t.amount;
       if (!cat) return;
       // Caută dacă subcategoria există deja în definiție
-      const categoryDef = categories.find(c => c.name === cat);
-      const existsInDef = categoryDef && categoryDef.subcategories.some(s => (s.name || '') === subcat);
+      const categoryDef = categories.find((c) => c.name === cat);
+      const existsInDef =
+        categoryDef &&
+        categoryDef.subcategories.some((s) => (s.name || "") === subcat);
       if (!existsInDef) {
         // Adaugă la fallbackRows pentru această categorie
         fallbackRowsMap[cat] = fallbackRowsMap[cat] || [];
         // Nu adăuga duplicate fallback
-        if (!fallbackRowsMap[cat].some(s => s.subcategory === subcat)) {
+        if (!fallbackRowsMap[cat].some((s) => s.subcategory === subcat)) {
           fallbackRowsMap[cat].push({ subcategory: subcat });
         }
       }
     });
 
     // 3. Construim subRows UNICE pentru fiecare categorie
-    Object.keys(categoriesMap).forEach(cat => {
-      const categoryDef = categories.find(c => c.name === cat);
+    Object.keys(categoriesMap).forEach((cat) => {
+      const categoryDef = categories.find((c) => c.name === cat);
       const subcategories = categoryDef ? categoryDef.subcategories : [];
       const fallbackRows = fallbackRowsMap[cat] || [];
       // Construim subRows UNICE
@@ -173,29 +225,45 @@ export function useLunarGridTable(
     });
 
     // 4. Parcurgem tranzacțiile și agregăm sumele pe subRows
-    validTransactions.forEach(t => {
+    validTransactions.forEach((t) => {
       const cat = t.category;
-      const subcat = typeof t.subcategory === 'string' ? t.subcategory : '';
+      const subcat = typeof t.subcategory === "string" ? t.subcategory : "";
       const day = new Date(t.date).getDate();
-      const amount = t.status === 'COMPLETED' && typeof t.actualAmount === 'number' ? t.actualAmount : t.amount;
+      const amount =
+        t.status === "COMPLETED" && typeof t.actualAmount === "number"
+          ? t.actualAmount
+          : t.amount;
       if (!cat) return;
       const subRows = categoriesMap[cat]?.subRows || [];
-      let subRow = subRows.find((s: TransformedTableDataRow) => s.subcategory === subcat);
+      let subRow = subRows.find(
+        (s: TransformedTableDataRow) => s.subcategory === subcat,
+      );
       if (subRow) {
         subRow[`day-${day}`] = (subRow[`day-${day}`] || 0) + amount;
         subRow.total = (subRow.total || 0) + amount;
       }
       // Categorie (agregare totală)
-      if (!categoriesMap[cat]) categoriesMap[cat] = { id: cat, category: cat, isCategory: true, total: 0, subRows: [] };
-      categoriesMap[cat][`day-${day}`] = (categoriesMap[cat][`day-${day}`] || 0) + amount;
+      if (!categoriesMap[cat])
+        categoriesMap[cat] = {
+          id: cat,
+          category: cat,
+          isCategory: true,
+          total: 0,
+          subRows: [],
+        };
+      categoriesMap[cat][`day-${day}`] =
+        (categoriesMap[cat][`day-${day}`] || 0) + amount;
       categoriesMap[cat].total = (categoriesMap[cat].total || 0) + amount;
     });
 
     // 5. Validare pentru duplicate la nivel de subRows
-    Object.keys(categoriesMap).forEach(cat => {
-      warnIfDuplicateIds(categoriesMap[cat].subRows!, `subRows pentru categoria ${cat}`);
+    Object.keys(categoriesMap).forEach((cat) => {
+      warnIfDuplicateIds(
+        categoriesMap[cat].subRows!,
+        `subRows pentru categoria ${cat}`,
+      );
     });
-    warnIfDuplicateIds(Object.values(categoriesMap), 'categorii principale');
+    warnIfDuplicateIds(Object.values(categoriesMap), "categorii principale");
 
     // 6. Returnăm array-ul de categorii (fără sold)
     return Object.values(categoriesMap);
@@ -204,24 +272,36 @@ export function useLunarGridTable(
   // Click handler strategy SIMPLIFICATĂ - fără setTimeout pentru performance
   const stableClickHandlers = useMemo(() => {
     if (!onCellClick && !onCellDoubleClick) return null;
-    
+
     return {
-      handleSingleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
+      handleSingleClick: (
+        e: React.MouseEvent,
+        category: string,
+        subcategory: string | undefined,
+        dayNumber: number,
+        valueDisplay: string,
+      ) => {
         e.stopPropagation();
-        
+
         if (onCellClick) {
           onCellClick(e, category, subcategory, dayNumber, valueDisplay);
         }
       },
-      
-      handleDoubleClick: (e: React.MouseEvent, category: string, subcategory: string | undefined, dayNumber: number, valueDisplay: string) => {
+
+      handleDoubleClick: (
+        e: React.MouseEvent,
+        category: string,
+        subcategory: string | undefined,
+        dayNumber: number,
+        valueDisplay: string,
+      ) => {
         e.stopPropagation();
         e.preventDefault();
-        
+
         if (onCellDoubleClick) {
           onCellDoubleClick(e, category, subcategory, dayNumber, valueDisplay);
         }
-      }
+      },
     };
   }, [onCellClick, onCellDoubleClick]);
 
@@ -229,30 +309,38 @@ export function useLunarGridTable(
   const columns = useMemo<ColumnDef<TransformedTableDataRow>[]>(() => {
     const generatedCols = generateTableColumns(year, month); // Din @utils/lunarGrid/dataTransformers
 
-    return generatedCols.map(colConfig => {
-      if (colConfig.accessorKey === 'category') {
+    return generatedCols.map((colConfig) => {
+      if (colConfig.accessorKey === "category") {
         return {
-          id: 'category',
+          id: "category",
           header: colConfig.header,
-          accessorFn: (row: TransformedTableDataRow) => row.isCategory ? row.category : row.subcategory,
+          accessorFn: (row: TransformedTableDataRow) =>
+            row.isCategory ? row.category : row.subcategory,
           cell: ({ row, getValue }) => {
             const displayValue = getValue<string>();
             const original = row.original as TransformedTableDataRow;
             return (
               <div className="flex items-center">
                 {row.getCanExpand && row.getCanExpand() ? (
-                  <span className="mr-1" data-testid={`expand-btn-${original.category}`}>{row.getIsExpanded() ? '▼' : '▶'}</span>
+                  <span
+                    className="mr-1"
+                    data-testid={`expand-btn-${original.category}`}
+                  >
+                    {row.getIsExpanded() ? "▼" : "▶"}
+                  </span>
                 ) : null}
-                <span className={original.isCategory ? 'font-semibold' : ''}>{displayValue}</span>
+                <span className={original.isCategory ? "font-semibold" : ""}>
+                  {displayValue}
+                </span>
               </div>
             );
           },
           size: 200,
         };
       }
-      
-      if (colConfig.accessorKey?.startsWith('day-')) {
-        const dayNumber = parseInt(colConfig.accessorKey.split('-')[1], 10);
+
+      if (colConfig.accessorKey?.startsWith("day-")) {
+        const dayNumber = parseInt(colConfig.accessorKey.split("-")[1], 10);
         return {
           id: colConfig.accessorKey,
           header: colConfig.header,
@@ -261,19 +349,36 @@ export function useLunarGridTable(
             const value = getValue<number>();
             const original = row.original as TransformedTableDataRow;
             const colorClass = getBalanceStyleClass(value);
-            const valueDisplay = typeof value === 'number' && !isNaN(value) && value !== 0
-              ? formatCurrency(value)
-              : '—';
-            
+            const valueDisplay =
+              typeof value === "number" && !isNaN(value) && value !== 0
+                ? formatCurrency(value)
+                : "—";
+
             // Adăugăm click handlers doar pentru subcategorii (nu pentru categorii)
             const isSubcategory = !original.isCategory && original.subcategory;
-            
+
             if (isSubcategory && stableClickHandlers) {
               return (
-                <div 
+                <div
                   className={`text-right ${colorClass} cursor-pointer hover:bg-blue-50 p-2 transition-colors duration-150`}
-                  onClick={(e) => stableClickHandlers.handleSingleClick(e, original.category, original.subcategory, dayNumber, valueDisplay)}
-                  onDoubleClick={(e) => stableClickHandlers.handleDoubleClick(e, original.category, original.subcategory, dayNumber, valueDisplay)}
+                  onClick={(e) =>
+                    stableClickHandlers.handleSingleClick(
+                      e,
+                      original.category,
+                      original.subcategory,
+                      dayNumber,
+                      valueDisplay,
+                    )
+                  }
+                  onDoubleClick={(e) =>
+                    stableClickHandlers.handleDoubleClick(
+                      e,
+                      original.category,
+                      original.subcategory,
+                      dayNumber,
+                      valueDisplay,
+                    )
+                  }
                   title="Click: Quick Add | Double-click: Advanced Edit"
                   data-testid={`cell-${original.category}-${original.subcategory}-${dayNumber}`}
                 >
@@ -281,10 +386,13 @@ export function useLunarGridTable(
                 </div>
               );
             }
-            
+
             // Pentru categorii (readonly)
             return (
-              <div className={`text-right ${colorClass} p-2`} title="Suma calculată automată din subcategorii">
+              <div
+                className={`text-right ${colorClass} p-2`}
+                title="Suma calculată automată din subcategorii"
+              >
                 {valueDisplay}
               </div>
             );
@@ -293,9 +401,9 @@ export function useLunarGridTable(
         };
       }
 
-      if (colConfig.accessorKey === 'total') {
+      if (colConfig.accessorKey === "total") {
         return {
-          id: 'total',
+          id: "total",
           header: colConfig.header,
           accessorKey: colConfig.accessorKey,
           cell: ({ getValue }) => {
@@ -303,9 +411,9 @@ export function useLunarGridTable(
             const colorClass = getBalanceStyleClass(value);
             return (
               <div className={`text-right ${colorClass}`}>
-                {typeof value === 'number' && !isNaN(value) && value !== 0
+                {typeof value === "number" && !isNaN(value) && value !== 0
                   ? formatCurrency(value)
-                  : '—'}
+                  : "—"}
               </div>
             );
           },
@@ -339,15 +447,22 @@ export function useLunarGridTable(
     return row ? row.dailyAmounts[day] || 0 : 0;
   }, [rawTableData]);
   */
-  
+
   // Funcție pentru a genera un ID unic pentru celule (folosit pentru identificarea celulei în editare)
-  const getCellId = useCallback((category: string, subcategory: string | undefined, day: number): string => {
-    return `${category}-${subcategory || 'null'}-${day}`;
-  }, []);
+  const getCellId = useCallback(
+    (
+      category: string,
+      subcategory: string | undefined,
+      day: number,
+    ): string => {
+      return `${category}-${subcategory || "null"}-${day}`;
+    },
+    [],
+  );
 
   return {
     table,
-    columns, 
+    columns,
     days,
     tableContainerRef,
     dailyBalances,

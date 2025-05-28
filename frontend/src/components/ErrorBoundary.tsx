@@ -1,6 +1,6 @@
-import React from 'react';
-import { MESAJE } from '@shared-constants';
-import Alert from './primitives/Alert/Alert';
+import React from "react";
+import { MESAJE } from "@shared-constants";
+import Alert from "./primitives/Alert/Alert";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -11,7 +11,10 @@ interface ErrorBoundaryState {
   error: Error | null;
 }
 
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends React.Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -23,8 +26,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // You can log error to an error reporting service here
-    // eslint-disable-next-line no-console
-    console.error('ErrorBoundary caught:', error, errorInfo);
+
+    console.error("ErrorBoundary caught:", error, errorInfo);
   }
 
   render() {

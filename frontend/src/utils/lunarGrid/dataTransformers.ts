@@ -1,51 +1,51 @@
-import { TransactionValidated } from '@shared-constants/transaction.schema';
-import { EXCEL_GRID } from '@shared-constants';
-import { LunarGridRowData } from '../../components/features/LunarGrid/types';
-import { 
-  calculateAmountsForCategory, 
-  calculateAmountsForSubcategory, 
+import { TransactionValidated } from "@shared-constants/transaction.schema";
+import { EXCEL_GRID } from "@shared-constants";
+import { LunarGridRowData } from "../../components/features/LunarGrid/types";
+import {
+  calculateAmountsForCategory,
+  calculateAmountsForSubcategory,
   calculateDailyBalance,
   getDaysInMonth,
-  resetCalculationsCache
-} from './calculations'; 
+  resetCalculationsCache,
+} from "./calculations";
 
 // Extrage doar câmpurile necesare din EXCEL_GRID
 const { HEADERS } = EXCEL_GRID;
 
 // Constante pentru identificatori
 const ROW_ID = {
-  CATEGORY_PREFIX: 'category-',
-  SUBCATEGORY_PREFIX: 'subcategory-',
-  BALANCE: 'balance'
+  CATEGORY_PREFIX: "category-",
+  SUBCATEGORY_PREFIX: "subcategory-",
+  BALANCE: "balance",
 };
 
 /**
  * Creează un rând de categorie pentru LunarGrid
- * 
- * @param categoryName Numele categoriei 
+ *
+ * @param categoryName Numele categoriei
  * @param transactions Tranzacții pentru filtrate pentru această categorie
- * @param allTransactions Toate tranzacțiile pentru calcule 
+ * @param allTransactions Toate tranzacțiile pentru calcule
  * @returns Rând de date pentru categorie
  */
 function createCategoryRow(
-  categoryName: string, 
+  categoryName: string,
   transactions: TransactionValidated[],
-  allTransactions: TransactionValidated[]
+  allTransactions: TransactionValidated[],
 ): LunarGridRowData {
   return {
     id: `${ROW_ID.CATEGORY_PREFIX}${categoryName}`,
     category: categoryName,
     isCategory: true,
     dailyAmounts: calculateAmountsForCategory(categoryName, allTransactions),
-    transactions
+    transactions,
   };
 }
 
 /**
  * Creează un rând de subcategorie pentru LunarGrid
- * 
+ *
  * @param categoryName Numele categoriei părinte
- * @param subcategoryName Numele subcategoriei 
+ * @param subcategoryName Numele subcategoriei
  * @param transactions Tranzacții filtrate pentru această subcategorie
  * @param allTransactions Toate tranzacțiile pentru calcule
  * @returns Rând de date pentru subcategorie
@@ -54,7 +54,7 @@ function createSubcategoryRow(
   categoryName: string,
   subcategoryName: string,
   transactions: TransactionValidated[],
-  allTransactions: TransactionValidated[]
+  allTransactions: TransactionValidated[],
 ): LunarGridRowData {
   return {
     id: `${ROW_ID.SUBCATEGORY_PREFIX}${categoryName}-${subcategoryName}`,
@@ -64,31 +64,33 @@ function createSubcategoryRow(
     dailyAmounts: calculateAmountsForSubcategory(
       categoryName,
       subcategoryName,
-      allTransactions
+      allTransactions,
     ),
-    transactions
+    transactions,
   };
 }
 
 /**
  * Creează rândul de sold pentru LunarGrid
- * 
+ *
  * @param transactions Toate tranzacțiile pentru calculul soldului
  * @returns Rând de date pentru sold
  */
-function createBalanceRow(transactions: TransactionValidated[]): LunarGridRowData {
+function createBalanceRow(
+  transactions: TransactionValidated[],
+): LunarGridRowData {
   return {
     id: ROW_ID.BALANCE,
     category: EXCEL_GRID.HEADERS.SOLD,
     isCategory: true,
     dailyAmounts: calculateDailyBalance(transactions),
-    transactions: []
+    transactions: [],
   };
 }
 
 /**
  * Transformă un set de tranzacții în date pentru grid cu optimizări de performanță
- * 
+ *
  * @param transactions Lista de tranzacții
  * @param categories Lista de categorii cu subcategorii
  * @param expandedCategories Obiect care indică ce categorii sunt expandate
@@ -99,33 +101,39 @@ function createBalanceRow(transactions: TransactionValidated[]): LunarGridRowDat
 export function transformTransactionsToRowData(
   transactions: TransactionValidated[],
   categories: { name: string; subcategories: { name: string }[] }[],
-  expandedCategories: Record<string, boolean>
+  expandedCategories: Record<string, boolean>,
 ): LunarGridRowData[] {
   // Resetăm cache-ul pentru noul set de calcule
   resetCalculationsCache();
-  
+
   const rows: LunarGridRowData[] = [];
 
   // Procesăm fiecare categorie
-  categories.forEach(category => {
-    const categoryTransactions = transactions.filter(t => t.category === category.name);
-    
+  categories.forEach((category) => {
+    const categoryTransactions = transactions.filter(
+      (t) => t.category === category.name,
+    );
+
     // Adăugăm rândul pentru categorie
-    rows.push(createCategoryRow(category.name, categoryTransactions, transactions));
+    rows.push(
+      createCategoryRow(category.name, categoryTransactions, transactions),
+    );
 
     // Dacă categoria este expandată, adăugăm subcategoriile
     if (expandedCategories[category.name]) {
-      category.subcategories.forEach(subcategory => {
+      category.subcategories.forEach((subcategory) => {
         const subcategoryTransactions = categoryTransactions.filter(
-          t => t.subcategory === subcategory.name
+          (t) => t.subcategory === subcategory.name,
         );
 
-        rows.push(createSubcategoryRow(
-          category.name,
-          subcategory.name,
-          subcategoryTransactions,
-          transactions
-        ));
+        rows.push(
+          createSubcategoryRow(
+            category.name,
+            subcategory.name,
+            subcategoryTransactions,
+            transactions,
+          ),
+        );
       });
     }
   });
@@ -143,17 +151,19 @@ export function transformTransactionsToRowData(
  * @returns Array cu definițiile coloanelor
  */
 export function generateTableColumns(
-  year: number, 
-  month: number
+  year: number,
+  month: number,
 ): { accessorKey: string; header: string }[] {
   const daysInMonth = getDaysInMonth(year, month);
-  
+
   // Coloana pentru categorii
-  const columns = [{
-    accessorKey: 'category',
-    header: HEADERS.CATEGORII,
-  }];
-  
+  const columns = [
+    {
+      accessorKey: "category",
+      header: HEADERS.CATEGORII,
+    },
+  ];
+
   // Coloane pentru zile
   daysInMonth.forEach((day: number) => {
     columns.push({
@@ -161,13 +171,13 @@ export function generateTableColumns(
       header: day.toString(),
     });
   });
-  
+
   // Coloana pentru total
   columns.push({
-    accessorKey: 'total',
+    accessorKey: "total",
     header: HEADERS.TOTAL,
   });
-  
+
   return columns;
 }
 
@@ -176,8 +186,12 @@ export function generateTableColumns(
  * @param rowData Datele de intrare
  * @returns Datele transformate pentru tabel
  */
-export function transformToTableData(rowData: LunarGridRowData[], year: number, month: number) {
-  return rowData.map(row => {
+export function transformToTableData(
+  rowData: LunarGridRowData[],
+  year: number,
+  month: number,
+) {
+  return rowData.map((row) => {
     const daysInMonth = getDaysInMonth(year, month);
     const rowDataForTable: Record<string, any> = {
       id: row.id,
@@ -185,9 +199,9 @@ export function transformToTableData(rowData: LunarGridRowData[], year: number, 
       isCategory: row.isCategory,
       ...(row.subcategory && { subcategory: row.subcategory }),
     };
-    
+
     // Inițializăm toate zilele cu 0 și apoi suprascriem cu valorile existente
-    daysInMonth.forEach(day => {
+    daysInMonth.forEach((day) => {
       rowDataForTable[`day-${day}`] = 0;
     });
 
@@ -195,14 +209,14 @@ export function transformToTableData(rowData: LunarGridRowData[], year: number, 
     Object.entries(row.dailyAmounts || {}).forEach(([day, amount]) => {
       rowDataForTable[`day-${day}`] = amount || 0; // Asigurăm că amount este un număr
     });
-    
+
     // Calculăm totalul robust
     let calculatedTotal = 0;
-    daysInMonth.forEach(day => {
+    daysInMonth.forEach((day) => {
       calculatedTotal += (rowDataForTable[`day-${day}`] || 0) as number;
     });
     rowDataForTable.total = calculatedTotal;
-    
+
     return rowDataForTable;
   });
 }

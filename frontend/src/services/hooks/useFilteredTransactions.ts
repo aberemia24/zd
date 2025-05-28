@@ -1,8 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
-import { useInfiniteTransactions, type TransactionQueryParams } from './useInfiniteTransactions';
-import { useMemo, useRef } from 'react';
-import type { TransactionValidated } from '@shared-constants/transaction.schema';
-import type { Transaction } from '../../types/Transaction';
+import { useQuery } from "@tanstack/react-query";
+import {
+  useInfiniteTransactions,
+  type TransactionQueryParams,
+} from "./useInfiniteTransactions";
+import { useMemo, useRef } from "react";
+import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import type { Transaction } from "../../types/Transaction";
 
 /**
  * Tipul de returnare pentru hook-ul useFilteredTransactions
@@ -26,12 +29,12 @@ export interface UseFilteredTransactionsResult {
  * - Memoizare rezultate
  * - Scrolling infinit păstrat din useInfiniteTransactions
  * - Debounce pentru queries
- * 
+ *
  * @param queryParams Parametrii de filtrare pentru tranzacții
  * @returns Rezultate filtrate cu metadate (loading, error, etc.)
  */
 export function useFilteredTransactions(
-  queryParams: TransactionQueryParams
+  queryParams: TransactionQueryParams,
 ): UseFilteredTransactionsResult {
   // Folosim hook-ul existent pentru încărcare date paginată
   const {
@@ -45,9 +48,11 @@ export function useFilteredTransactions(
     totalCount,
     refetch,
   } = useInfiniteTransactions(queryParams);
-  
+
   // Ref pentru a păstra datele vechi
-  const previousData = useRef<(TransactionValidated & { userId?: string })[]>([]);
+  const previousData = useRef<(TransactionValidated & { userId?: string })[]>(
+    [],
+  );
 
   // Actualizează doar dacă ai date noi
   if (transactions && transactions.length > 0) {
@@ -55,9 +60,10 @@ export function useFilteredTransactions(
   }
 
   // Returnează datele vechi dacă e loading/fetching și nu ai date noi
-  const dataToShow = (isLoading || isFetching) && (!transactions || transactions.length === 0)
-    ? previousData.current
-    : transactions;
+  const dataToShow =
+    (isLoading || isFetching) && (!transactions || transactions.length === 0)
+      ? previousData.current
+      : transactions;
 
   // Verifică dacă filtrele sunt active
   const isFiltered = useMemo(() => {
@@ -71,7 +77,7 @@ export function useFilteredTransactions(
       queryParams.search
     );
   }, [queryParams]);
-  
+
   return {
     data: dataToShow,
     isLoading,
@@ -84,4 +90,4 @@ export function useFilteredTransactions(
     isFiltered,
     refetch,
   };
-} 
+}

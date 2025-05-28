@@ -1,12 +1,15 @@
-import React from 'react';
-import { cn } from '../../../styles/cva/shared/utils';
-import { badge, type BadgeProps as CVABadgeProps } from '../../../styles/cva/components/feedback';
+import React from "react";
+import { cn } from "../../../styles/cva/shared/utils";
+import {
+  badge,
+  type BadgeProps as CVABadgeProps,
+} from "../../../styles/cva/components/feedback";
 
 export interface BadgeProps extends CVABadgeProps {
   children: React.ReactNode;
   className?: string;
   dataTestId?: string;
-  
+
   // Simplified props - kept only essential
   /** Badge în stil pill (rounded-full) - implicit pentru badge */
   pill?: boolean;
@@ -14,30 +17,30 @@ export interface BadgeProps extends CVABadgeProps {
   isActive?: boolean;
 }
 
-const Badge: React.FC<BadgeProps> = ({ 
-  variant = 'primary', 
-  size = 'sm',
+const Badge: React.FC<BadgeProps> = ({
+  variant = "primary",
+  size = "sm",
   pulse,
   pill = true, // badge-urile sunt pill by default
-  children, 
+  children,
   className,
   dataTestId,
-  isActive = false
+  isActive = false,
 }) => {
   return (
     <span
       className={cn(
-        badge({ 
-          variant, 
-          size, 
-          pulse 
+        badge({
+          variant,
+          size,
+          pulse,
         }),
         // Apply active styling if needed
         isActive && "ring-2 ring-blue-500 ring-opacity-50",
         // Badge-urile sunt deja rounded-full în CVA, nu mai e nevoie de prop pill
-        className
+        className,
       )}
-      data-testid={dataTestId || `badge-${variant}${pill ? '-pill' : ''}`}
+      data-testid={dataTestId || `badge-${variant}${pill ? "-pill" : ""}`}
     >
       {children}
     </span>

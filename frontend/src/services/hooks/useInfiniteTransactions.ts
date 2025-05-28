@@ -1,11 +1,18 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { supabaseService } from '../supabaseService';
-import type { TransactionPage, Pagination } from '../supabaseService';
-import type { TransactionValidated } from '@shared-constants/transaction.schema';
-import { TransactionType } from '@shared-constants/enums';
-import { useAuthStore } from '../../stores/authStore';
-import type { Transaction } from '../../types/Transaction';
-import { useMemo } from 'react';
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { supabaseService } from "../supabaseService";
+import type { TransactionPage, Pagination } from "../supabaseService";
+import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { TransactionType } from "@shared-constants/enums";
+import { useAuthStore } from "../../stores/authStore";
+import type { Transaction } from "../../types/Transaction";
+import { useMemo } from "react";
+
+// Interfață pentru tranzacții raw cu proprietăți opționale pentru transformare
+interface RawTransactionWithOptionalId extends Omit<TransactionValidated, 'id'> {
+  id?: string;
+  _id?: string;
+  userId?: string;
+}
 
 export interface TransactionQueryParams {
   limit?: number;
@@ -17,7 +24,7 @@ export interface TransactionQueryParams {
   startDate?: string;
   endDate?: string;
   sort?: string;
-  order?: 'asc' | 'desc';
+  order?: "asc" | "desc";
   minAmount?: number;
   maxAmount?: number;
   search?: string;
@@ -39,27 +46,27 @@ export interface UseInfiniteTransactionsResult {
 /**
  * Hook specializat pentru încărcarea tranzacțiilor cu paginare infinită
  * Folosește useInfiniteQuery pentru a încărca date pe măsură ce utilizatorul derulează
- * 
+ *
  * @param queryParams Parametri pentru filtrare și paginare
  * @returns Rezultatul query-ului cu tranzacții, status și funcții de control pentru paginare
  */
 export function useInfiniteTransactions(
-  queryParams: TransactionQueryParams
+  queryParams: TransactionQueryParams,
 ): UseInfiniteTransactionsResult {
   // Obținem userId din store
   const { user } = useAuthStore();
   const userId = user?.id;
-  
+
   // Definim dimensiunea paginii pentru încărcarea pagină cu pagină
   const PAGE_SIZE = queryParams.limit || 10;
-  
+
   // Folosim aceeași cheie de bază ca în transactionMutations.ts pentru a asigura
   // invalidarea corectă a cache-ului la mutații
-  const TRANSACTIONS_BASE_KEY = ['transactions'] as const;
-  
+  const TRANSACTIONS_BASE_KEY = ["transactions"] as const;
+
   // Construim cheia de query extinsă pentru acest hook specific
-  const queryKey = [...TRANSACTIONS_BASE_KEY, 'infinite', userId, queryParams];
-  
+  const queryKey = [...TRANSACTIONS_BASE_KEY, "infinite", userId, queryParams];
+
   // Folosim useInfiniteQuery pentru paginare infinită
   const infiniteQuery = useInfiniteQuery<TransactionPage, Error>({
     queryKey,
@@ -69,10 +76,10 @@ export function useInfiniteTransactions(
       const pagination: Pagination = {
         limit: PAGE_SIZE,
         offset: pageParam as number,
-        sort: queryParams.sort as 'date' | 'amount' | 'created_at' | undefined,
+        sort: queryParams.sort as "date" | "amount" | "created_at" | undefined,
         order: queryParams.order,
       };
-      
+
       const filters = {
         type: queryParams.type as TransactionType | undefined,
         category: queryParams.category,
@@ -82,11 +89,15 @@ export function useInfiniteTransactions(
         dateTo: queryParams.endDate,
         minAmount: queryParams.minAmount,
         maxAmount: queryParams.maxAmount,
-        search: queryParams.search
+        search: queryParams.search,
       };
-      
-      const result = await supabaseService.fetchTransactions(userId, pagination, filters);
-      
+
+      const result = await supabaseService.fetchTransactions(
+        userId,
+        pagination,
+        filters,
+      );
+
       // Nu modificăm tipul datelor returnate din queryFn pentru a evita erorile TypeScript
       return result;
     },
@@ -94,7 +105,7 @@ export function useInfiniteTransactions(
     getNextPageParam: (lastPage, allPages) => {
       // Calculăm offset-ul curent bazat pe paginile existente și dimensiunea paginii
       const currentOffset = allPages.length * PAGE_SIZE;
-      
+
       // Dacă numărul de rezultate din ultima pagină este mai mic decât dimensiunea paginii,
       // atunci nu mai sunt pagini disponibile
       if (lastPage.data.length < PAGE_SIZE) {
@@ -120,38 +131,46 @@ export function useInfiniteTransactions(
     // TODO: Pentru UX avansat, poți implementa manual păstrarea datelor vechi aici
     // placeholderData: undefined,
   });
-  
+
   // Procesăm datele pentru a le face compatibile cu interfața Transaction
   const processedTransactions = useMemo(() => {
-    const allTransactions = infiniteQuery.data?.pages.flatMap(page => page.data) || [];
-    
+    const allTransactions =
+      infiniteQuery.data?.pages.flatMap((page) => page.data) || [];
+
     // Adăugăm userId și id (dacă este necesar) la fiecare tranzacție
-    return allTransactions.map(transaction => {
-      // Folosim tipul any temporar pentru a evita erorile TypeScript
-      const anyTransaction = transaction as any;
-      
+    return allTransactions.map((transaction) => {
+      // Folosim tipul specific pentru a evita any
+      const rawTransaction = transaction as RawTransactionWithOptionalId;
+
       // Adăugăm userId dacă nu există
-      if (!anyTransaction.userId && userId) {
-        anyTransaction.userId = userId;
+      if (!rawTransaction.userId && userId) {
+        rawTransaction.userId = userId;
       }
-      
+
       // Adăugăm id bazat pe _id dacă lipsește
-      if (anyTransaction._id && !anyTransaction.id) {
-        anyTransaction.id = anyTransaction._id;
+      if (rawTransaction._id && !rawTransaction.id) {
+        rawTransaction.id = rawTransaction._id;
       }
-      
-      return anyTransaction;
+
+      // Asigurăm că id este întotdeauna string
+      const finalTransaction = {
+        ...rawTransaction,
+        id: rawTransaction.id || rawTransaction._id || '',
+        userId: rawTransaction.userId || userId || ''
+      };
+
+      return finalTransaction;
     });
   }, [infiniteQuery.data, userId]);
-  
+
   // Calculăm numărul total de tranzacții din rezultatele paginii
   const totalCount = infiniteQuery.data?.pages[0]?.count || 0;
-  
+
   // Funcția refetch pentru a reîncărca datele
   const refetch = async () => {
     await infiniteQuery.refetch();
   };
-  
+
   return {
     data: processedTransactions,
     pages: infiniteQuery.data?.pages || [],

@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { EXCEL_GRID } from '@shared-constants';
+import { useState, useCallback, useRef, useEffect } from "react";
+import { EXCEL_GRID } from "@shared-constants";
 
 /**
  * Hook pentru gestionarea inline editing în celule
@@ -10,7 +10,7 @@ export interface UseInlineCellEditProps {
   cellId: string;
   initialValue: string | number;
   onSave: (value: string | number) => Promise<void>; // amount/percentage = number, text/date = string
-  validationType: 'amount' | 'text' | 'percentage' | 'date';
+  validationType: "amount" | "text" | "percentage" | "date";
   isReadonly?: boolean;
 }
 
@@ -34,7 +34,7 @@ export const useInlineCellEdit = ({
   initialValue,
   onSave,
   validationType,
-  isReadonly = false
+  isReadonly = false,
 }: UseInlineCellEditProps): UseInlineCellEditReturn => {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(String(initialValue));
@@ -48,62 +48,66 @@ export const useInlineCellEdit = ({
   }, [initialValue]);
 
   // Validate value based on type
-  const validateValue = useCallback((val: string): string | null => {
-    const stringVal = String(val).trim();
-    if (!stringVal) {
-      return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.EMPTY_VALUE;
-    }
+  const validateValue = useCallback(
+    (val: string): string | null => {
+      const stringVal = String(val).trim();
+      if (!stringVal) {
+        return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.EMPTY_VALUE;
+      }
 
-    switch (validationType) {
-      case 'amount':
-        // Acceptăm numere cu punct (450.5) - standard international
-        const numVal = parseFloat(stringVal);
-        if (isNaN(numVal)) {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_NUMBER;
-        }
-        if (numVal < 0) {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.NEGATIVE_VALUE;
-        }
-        break;
+      switch (validationType) {
+        case "amount":
+          // Acceptăm numere cu punct (450.5) - standard international
+          const numVal = parseFloat(stringVal);
+          if (isNaN(numVal)) {
+            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_NUMBER;
+          }
+          if (numVal < 0) {
+            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.NEGATIVE_VALUE;
+          }
+          break;
 
-      case 'percentage':
-        const percentVal = parseFloat(stringVal);
-        if (isNaN(percentVal)) {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_PERCENTAGE;
-        }
-        if (percentVal < 0 || percentVal > 100) {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.PERCENTAGE_RANGE;
-        }
-        break;
+        case "percentage":
+          const percentVal = parseFloat(stringVal);
+          if (isNaN(percentVal)) {
+            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS
+              .INVALID_PERCENTAGE;
+          }
+          if (percentVal < 0 || percentVal > 100) {
+            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.PERCENTAGE_RANGE;
+          }
+          break;
 
-      case 'date':
-        try {
-          const dateVal = new Date(stringVal);
-          if (isNaN(dateVal.getTime())) {
+        case "date":
+          try {
+            const dateVal = new Date(stringVal);
+            if (isNaN(dateVal.getTime())) {
+              return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_DATE;
+            }
+          } catch {
             return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_DATE;
           }
-        } catch {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_DATE;
-        }
-        break;
+          break;
 
-      case 'text':
-        if (stringVal.length > 255) {
-          return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.TEXT_TOO_LONG;
-        }
-        break;
-    }
+        case "text":
+          if (stringVal.length > 255) {
+            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.TEXT_TOO_LONG;
+          }
+          break;
+      }
 
-    return null;
-  }, [validationType]);
+      return null;
+    },
+    [validationType],
+  );
 
   // Start editing mode
   const startEdit = useCallback(() => {
     if (isReadonly) return;
-    
+
     setIsEditing(true);
     setError(null);
-    
+
     // Focus input after state update
     setTimeout(() => {
       inputRef.current?.focus();
@@ -114,14 +118,14 @@ export const useInlineCellEdit = ({
   // Save value cu error handling îmbunătățit
   const saveValue = useCallback(async () => {
     const currentValue = value.trim();
-    
+
     // Acceptă valori goale (șterge tranzacția)
     if (!currentValue) {
       setIsEditing(false);
       setValue(String(initialValue));
       return;
     }
-    
+
     const validationError = validateValue(currentValue);
     if (validationError) {
       setError(validationError);
@@ -135,7 +139,7 @@ export const useInlineCellEdit = ({
       // Pentru grid: amount/percentage = number, text/date = string
       // Utilizatorul introduce cu punct (450.5), convertim la number pentru calcule
       let convertedValue: string | number = currentValue;
-      if (validationType === 'amount' || validationType === 'percentage') {
+      if (validationType === "amount" || validationType === "percentage") {
         const numValue = parseFloat(currentValue);
         if (!isNaN(numValue)) {
           convertedValue = numValue;
@@ -144,11 +148,15 @@ export const useInlineCellEdit = ({
 
       await onSave(convertedValue);
       setIsEditing(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Show the actual error message from the network
-      const errorMessage = err?.message || err?.toString() || EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : typeof err === 'string' 
+        ? err 
+        : EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
       setError(errorMessage);
-      console.error('Save error:', err);
+      console.error("Save error:", err);
     } finally {
       setIsSaving(false);
     }
@@ -163,40 +171,45 @@ export const useInlineCellEdit = ({
   }, [initialValue]);
 
   // Handle keyboard events cu Escape fix
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    e.stopPropagation(); // Previne propagarea care poate cauza page refresh
-    
-    switch (e.key) {
-      case 'Enter':
-        e.preventDefault();
-        saveValue();
-        break;
-        
-      case 'Escape':
-        e.preventDefault();
-        cancelEdit(); // Anulare directă, nu prin blur
-        break;
-        
-      case 'Tab':
-        // Lasă Tab să se propage pentru navigare, dar salvează data
-        e.preventDefault(); // Prevent default tab behavior
-        saveValue().then(() => {
-          // După salvare, găsește următoarea celulă editabilă
-          const form = (e.target as HTMLElement).closest('table');
-          if (form) {
-            const cells = form.querySelectorAll('[data-testid^="editable-cell-"]:not([data-testid*="editing"])');
-            const currentIndex = Array.from(cells).findIndex(cell => 
-              cell.contains(e.target as HTMLElement)
-            );
-            if (currentIndex >= 0 && currentIndex < cells.length - 1) {
-              (cells[currentIndex + 1] as HTMLElement).focus();
-              (cells[currentIndex + 1] as HTMLElement).click();
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      e.stopPropagation(); // Previne propagarea care poate cauza page refresh
+
+      switch (e.key) {
+        case "Enter":
+          e.preventDefault();
+          saveValue();
+          break;
+
+        case "Escape":
+          e.preventDefault();
+          cancelEdit(); // Anulare directă, nu prin blur
+          break;
+
+        case "Tab":
+          // Lasă Tab să se propage pentru navigare, dar salvează data
+          e.preventDefault(); // Prevent default tab behavior
+          saveValue().then(() => {
+            // După salvare, găsește următoarea celulă editabilă
+            const form = (e.target as HTMLElement).closest("table");
+            if (form) {
+              const cells = form.querySelectorAll(
+                '[data-testid^="editable-cell-"]:not([data-testid*="editing"])',
+              );
+              const currentIndex = Array.from(cells).findIndex((cell) =>
+                cell.contains(e.target as HTMLElement),
+              );
+              if (currentIndex >= 0 && currentIndex < cells.length - 1) {
+                (cells[currentIndex + 1] as HTMLElement).focus();
+                (cells[currentIndex + 1] as HTMLElement).click();
+              }
             }
-          }
-        });
-        break;
-    }
-  }, [saveValue, cancelEdit]);
+          });
+          break;
+      }
+    },
+    [saveValue, cancelEdit],
+  );
 
   // Handle blur (auto-save)
   const handleBlur = useCallback(() => {
@@ -222,6 +235,6 @@ export const useInlineCellEdit = ({
     handleKeyDown,
     handleBlur,
     handleDoubleClick,
-    inputRef
+    inputRef,
   };
-}; 
+};
