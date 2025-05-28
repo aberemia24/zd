@@ -92,10 +92,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 32,
+                      "workerIndex": 34,
                       "parallelIndex": 0,
                       "status": "timedOut",
-                      "duration": 30087,
+                      "duration": 30077,
                       "error": {
                         "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
                         "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
@@ -126,7 +126,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:13:46.748Z",
+                      "startTime": "2025-05-28T21:18:54.843Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -163,10 +163,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 33,
+                      "workerIndex": 35,
                       "parallelIndex": 0,
                       "status": "interrupted",
-                      "duration": 20139,
+                      "duration": 9648,
                       "error": {
                         "message": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n",
                         "stack": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\n    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\n    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:187:5",
@@ -200,7 +200,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:14:18.982Z",
+                      "startTime": "2025-05-28T21:19:27.137Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -411,8 +411,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-28T21:13:44.219Z",
-    "duration": 56359.6120000002,
+    "startTime": "2025-05-28T21:18:53.346Z",
+    "duration": 44244.66899999976,
     "expected": 0,
     "skipped": 10,
     "unexpected": 1,
