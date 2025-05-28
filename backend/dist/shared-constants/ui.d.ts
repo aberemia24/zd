@@ -64,6 +64,7 @@ export declare const TABLE: {
         DATE: string;
         RECURRING: string;
         FREQUENCY: string;
+        DESCRIPTION: string;
     };
     EMPTY: string;
     LOADING: string;
@@ -128,6 +129,25 @@ export declare const EXCEL_GRID: {
         VIRTUAL_TABLE: string;
         LEGACY_TABLE: string;
         VERSION: string;
+    };
+    INLINE_EDITING: {
+        EDIT_HINT: string;
+        VALIDATION_ERRORS: {
+            EMPTY_VALUE: string;
+            INVALID_NUMBER: string;
+            NEGATIVE_VALUE: string;
+            INVALID_PERCENTAGE: string;
+            PERCENTAGE_RANGE: string;
+            INVALID_DATE: string;
+            TEXT_TOO_LONG: string;
+        };
+        SAVE_ERROR: string;
+        PLACEHOLDER: {
+            AMOUNT: string;
+            TEXT: string;
+            PERCENTAGE: string;
+            DATE: string;
+        };
     };
 };
 export declare const OPTIONS: {
@@ -201,4 +221,39 @@ export declare const LUNAR_GRID: {
     LOADING: string;
     NO_DATA: string;
     TOTAL_BALANCE: string;
+};
+export declare const TEST_CONSTANTS: {
+    ALERTS: {
+        TEST_MESSAGE: string;
+        ERROR_MESSAGE: string;
+        SUCCESS_MESSAGE: string;
+        WARNING_MESSAGE: string;
+        INFO_MESSAGE: string;
+        CUSTOM_CLASS_MESSAGE: string;
+        BASE_CLASS_MESSAGE: string;
+    };
+    SELECT: {
+        PLACEHOLDER: string;
+        OPTION_1: string;
+        OPTION_2: string;
+        OPTION_3: string;
+        LABEL: string;
+        REQUIRED_ERROR: string;
+    };
+    TEXTAREA: {
+        PLACEHOLDER: string;
+        REQUIRED_ERROR: string;
+        LABEL: string;
+        TEST_VALUE: string;
+    };
+    CHECKBOX: {
+        LABEL: string;
+        REQUIRED_ERROR: string;
+        CHECKED_LABEL: string;
+    };
+    COMMON: {
+        TEST_MESSAGE: string;
+        LOADING: string;
+        ERROR_GENERIC: string;
+    };
 };

@@ -15,6 +15,10 @@
     "dev": "cd frontend && npm run dev",
     "build": "cd frontend && npm run build",
     "test": "cd frontend && npm test",
+    "test:integration": "cd frontend && npm run test:integration",
+    "test:e2e:smoke": "cd frontend && npm run test:e2e:smoke",
+    "test:e2e:regression": "cd frontend && npm run test:e2e:regression",
+    "type-check": "cd frontend && npm run type-check",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "format": "prettier --write .",
     "validate:constants": "node scripts/validate-constants.js",
@@ -28,6 +32,7 @@
     "validate:quick": "npm run validate:constants && npm run validate:shared-constants && npm run validate:console-cleanup"
   },
   "devDependencies": {
+    "@octokit/rest": "^21.0.0",
     "@types/nodemailer": "^6.4.17",
     "@vitejs/plugin-react": "^4.5.0",
     "commitlint": "^18.6.1",

@@ -1,0 +1,101 @@
+version: 2
+updates:
+  # Frontend dependencies
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Bucharest"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+    reviewers:
+      - "@me"
+    commit-message:
+      prefix: "chore(frontend)"
+      include: "scope"
+    groups:
+      react-ecosystem:
+        patterns:
+          - "react*"
+          - "@types/react*"
+          - "@vitejs/*"
+      testing-ecosystem:
+        patterns:
+          - "@testing-library/*"
+          - "vitest*"
+          - "@vitest/*"
+          - "@playwright/*"
+          - "playwright*"
+          - "msw*"
+      build-tools:
+        patterns:
+          - "vite*"
+          - "typescript*"
+          - "eslint*"
+          - "prettier*"
+      ui-libraries:
+        patterns:
+          - "tailwind*"
+          - "class-variance-authority"
+          - "clsx"
+          - "lucide-react"
+
+  # Backend dependencies  
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Bucharest"
+    open-pull-requests-limit: 3
+    target-branch: "develop"
+    reviewers:
+      - "@me"
+    commit-message:
+      prefix: "chore(backend)"
+      include: "scope"
+    groups:
+      nestjs-ecosystem:
+        patterns:
+          - "@nestjs/*"
+          - "nest*"
+      testing-ecosystem:
+        patterns:
+          - "jest*"
+          - "@types/jest"
+          - "supertest*"
+
+  # Root workspace dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"  
+      time: "06:00"
+      timezone: "Europe/Bucharest"
+    open-pull-requests-limit: 2
+    target-branch: "develop"
+    reviewers:
+      - "@me"
+    commit-message:
+      prefix: "chore(workspace)"
+      include: "scope"
+
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Bucharest"
+    open-pull-requests-limit: 2
+    target-branch: "develop"
+    reviewers:
+      - "@me"
+    commit-message:
+      prefix: "chore(actions)"
+      include: "scope" 
