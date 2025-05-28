@@ -32,7 +32,7 @@ fs.removeSync(DEST);
 // 2. Copiază fresh din shared-constants (cu excluderi)
 fs.copySync(SRC, DEST, { 
   overwrite: true,
-  filter: (src, dest) => {
+  filter: (src) => {
     const fileName = path.basename(src);
     return !EXCLUDED.includes(fileName);
   }

@@ -11,7 +11,6 @@ const TARGETS = [
   path.join(ROOT, 'frontend', 'src'),
   path.join(ROOT, 'backend', 'src'),
 ];
-const SHARED_ENUMS = path.join(ROOT, 'shared', 'enums.ts');
 
 const RELATIVE_ENUM_IMPORT_RE = /from\s+['"](\.\.\/)+(shared|constants)\/enums['"]/g;
 const LOCAL_ENUM_RE = /export\s+enum\s+(TransactionType|FrequencyType|CategoryType)/g;

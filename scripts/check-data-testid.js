@@ -17,8 +17,8 @@ const COMPONENT_DIRS = [
 ];
 
 const tsxFileRegex = /\.tsx$/;
-const tagRegex = new RegExp(`<(${TARGET_TAGS.join('|')})(\s+[^>]*?)?>`, 'gi');
-const dataTestIdRegex = /data-testid\s*=\s*(["'{])/i;
+const tagRegex = new RegExp(`<(${TARGET_TAGS.join('|')})( +[^>]*?)?>`, 'gi');
+const dataTestIdRegex = /data-testid *= *(["'{])/i;
 
 function scanFile(filePath) {
   const code = fs.readFileSync(filePath, 'utf8');

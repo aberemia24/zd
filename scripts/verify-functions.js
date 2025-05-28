@@ -34,12 +34,6 @@ const requiredAuthFunctions = [
   'checkUser',
 ];
 
-const requiredTypes = [
-  'TransactionValidated',
-  'CustomCategory',
-  'TransactionQueryParamsWithRecurring'
-];
-
 const requiredPackages = [
   '@tanstack/react-table',
   '@tanstack/table-core'
