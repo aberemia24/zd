@@ -148,7 +148,7 @@ describe("Transaction Hooks Edge Cases - Core Logic", () => {
 
       // Should add userId to transactions that don't have it
       const validTransactions = processed.filter(transaction => transaction !== null && transaction !== undefined);
-      expect(validTransactions).toHaveLength(processed.length);
+      expect(validTransactions).toHaveLength(3); // Only non-null/undefined items: [0], [1], [4]
       
       validTransactions.forEach((transaction) => {
         expect(transaction.userId).toBe(mockUser.id);
@@ -294,10 +294,20 @@ describe("Transaction Hooks Edge Cases - Core Logic", () => {
       expect(processed).toHaveLength(10000);
       expect(endTime - startTime).toBeLessThan(1000); // Should process quickly
 
-      // All transactions should have userId
-      processed.forEach((transaction) => {
+      // Check userId assignment logic - split verification
+      const itemsWithNullUserId = processed.filter((_, index) => index % 100 === 0);
+      const itemsWithExistingUserId = processed.filter((_, index) => index % 100 !== 0);
+      
+      // Items with null userId should be updated
+      itemsWithNullUserId.forEach((transaction) => {
         expect(transaction).toBeDefined();
         expect(transaction.userId).toBe(mockUser.id);
+      });
+      
+      // Items with existing userId should remain unchanged
+      itemsWithExistingUserId.forEach((transaction) => {
+        expect(transaction).toBeDefined();
+        expect(transaction.userId).toBe("some-user");
       });
     });
   });

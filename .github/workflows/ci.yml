@@ -44,6 +44,13 @@ jobs:
         run: cd frontend && npm run test:coverage -- --run || true
         continue-on-error: true
         
+      - name: Check coverage files
+        run: |
+          echo "Checking for coverage files..."
+          ls -la frontend/ || true
+          ls -la frontend/coverage/ || true
+          find . -name "lcov.info" -type f || true
+          
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
         if: always()
