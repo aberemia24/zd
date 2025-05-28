@@ -1,25 +1,25 @@
 /**
  * CVA STYLING SYSTEM - Main exports
- * 
+ *
  * Sistem de stilizare modern bazat pe Class Variance Authority
  * Înlocuiește sistemul componentMap cu:
  * - Professional Blue Palette
- * - CVA pentru type safety și performance  
+ * - CVA pentru type safety și performance
  * - Logical domain grouping
  * - 100% capability preservation
  */
 
 // Components domain (forms, feedback, layout)
-export * from './components';
+export * from "./components";
 
 // Grid domain (grid-specific components și effects)
-export * from './grid';
+export * from "./grid";
 
 // Data domain (display components, category styling)
-export * from './data';
+export * from "./data";
 
 // Shared utilities (cn function, effects, helpers)
-export * from './shared';
+export * from "./shared";
 
 /**
  * Quick access to common components
@@ -27,14 +27,14 @@ export * from './shared';
  */
 
 // Forms & Actions (17 exports)
-export { 
-  button, 
+export {
+  button,
   buttonGroup,
-  input, 
+  input,
   inputWrapper,
-  select, 
-  textarea, 
-  checkbox, 
+  select,
+  textarea,
+  checkbox,
   label,
   type ButtonProps,
   type ButtonGroupProps,
@@ -42,13 +42,13 @@ export {
   type SelectProps,
   type TextareaProps,
   type CheckboxProps,
-  type LabelProps
-} from './components/forms';
+  type LabelProps,
+} from "./components/forms";
 
 // Feedback & Utilities (18 exports)
 export {
   badge,
-  alert, 
+  alert,
   toast,
   dropdown,
   dropdownItem,
@@ -65,8 +65,8 @@ export {
   type LoaderProps,
   type PillProps,
   type FormGroupProps,
-  type GlassEffectProps
-} from './components/feedback';
+  type GlassEffectProps,
+} from "./components/feedback";
 
 // Layout & Navigation (22 exports)
 export {
@@ -98,8 +98,8 @@ export {
   type NavbarProps,
   type SidebarProps,
   type BreadcrumbItemProps,
-  type PaginationItemProps
-} from './components/layout';
+  type PaginationItemProps,
+} from "./components/layout";
 
 // Grid Excel-like Components (17 exports)
 export {
@@ -132,8 +132,8 @@ export {
   type GridPopoverProps,
   type GridMessageProps,
   type GridActionGroupProps,
-  type GridOverlayProps
-} from './grid/grid';
+  type GridOverlayProps,
+} from "./grid/grid";
 
 // Data Display & Category Management (20 exports)
 export {
@@ -181,8 +181,8 @@ export {
   type ModalCloseButtonProps,
   type ModalBodyProps,
   type FlexGroupProps,
-  type CardSectionProps
-} from './data/display';
+  type CardSectionProps,
+} from "./data/display";
 
 // Core utilities
-export { cn } from './shared/utils'; 
+export { cn } from "./shared/utils";

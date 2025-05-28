@@ -1,15 +1,15 @@
 /**
  * Hook pentru prefetch inteligent al rutelor bazat pe comportamentul utilizatorului
- * 
+ *
  * Acest hook monitorizează interacțiunile utilizatorului și preîncarcă
  * date și componente pentru rutele cu probabilitate mare de navigare.
  */
 
-import { useEffect, useRef, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
-import { preloadComponent } from '../utils/lazyLoading';
-import { transactionKeys } from '../services/hooks/useTransactionQueries';
+import { useEffect, useRef, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
+import { preloadComponent } from "../utils/lazyLoading";
+import { transactionKeys } from "../services/hooks/useTransactionQueries";
 
 // Tipul pentru o rută prefetchable
 interface PrefetchableRoute {
@@ -32,16 +32,16 @@ const mockImport = () => Promise.resolve({ default: () => null });
 // Maparea rutelor frecvent accesate la componentele lor și cheile de query
 const DEFAULT_ROUTES: PrefetchableRoute[] = [
   {
-    path: '/dashboard',
+    path: "/dashboard",
     component: mockImport,
     queryKeys: [
-      [...transactionKeys.custom('stats', { period: 'month' })] as unknown[],
-      [...transactionKeys.custom('recent', { limit: 5 })] as unknown[]
+      [...transactionKeys.custom("stats", { period: "month" })] as unknown[],
+      [...transactionKeys.custom("recent", { limit: 5 })] as unknown[],
     ],
     probability: 0.8,
   },
   {
-    path: '/transactions',
+    path: "/transactions",
     component: mockImport,
     queryKeys: [
       [...transactionKeys.list({ limit: 20 })] as unknown[],
@@ -50,7 +50,7 @@ const DEFAULT_ROUTES: PrefetchableRoute[] = [
     probability: 0.7,
   },
   {
-    path: '/categories',
+    path: "/categories",
     component: mockImport,
     probability: 0.4,
     onlyOnHover: true,
@@ -62,16 +62,16 @@ const DEFAULT_ROUTES: PrefetchableRoute[] = [
  * Istoric de navigare pentru a calcula probabilitățile de tranziție
  */
 const NAVIGATION_HISTORY: {
-  [fromPath: string]: { [toPath: string]: number }
+  [fromPath: string]: { [toPath: string]: number };
 } = {
-  '/dashboard': {
-    '/transactions': 65, // 65% șanse de a merge la tranzacții de la dashboard
-    '/categories': 20,  // 20% șanse de a merge la categorii
-    '/settings': 10,    // 10% șanse de a merge la setări
+  "/dashboard": {
+    "/transactions": 65, // 65% șanse de a merge la tranzacții de la dashboard
+    "/categories": 20, // 20% șanse de a merge la categorii
+    "/settings": 10, // 10% șanse de a merge la setări
   },
-  '/transactions': {
-    '/dashboard': 50,   // 50% șanse de a merge înapoi la dashboard
-    '/categories': 30,  // 30% șanse de a merge la categorii pentru a edita
+  "/transactions": {
+    "/dashboard": 50, // 50% șanse de a merge înapoi la dashboard
+    "/categories": 30, // 30% șanse de a merge la categorii pentru a edita
   },
   // Alte tranziții pot fi adăugate aici bazate pe analiza comportamentului
 };
@@ -88,7 +88,7 @@ export function usePrefetchRoutes(
     threshold?: number;
     prefetchComponents?: boolean;
     prefetchQueries?: boolean;
-  } = {}
+  } = {},
 ) {
   const {
     enabled = true,
@@ -96,99 +96,102 @@ export function usePrefetchRoutes(
     prefetchComponents = true,
     prefetchQueries = true,
   } = options;
-  
+
   const location = useLocation();
   const queryClient = useQueryClient();
   const prefetchedPaths = useRef<Set<string>>(new Set());
-  
+
   // Combinăm rutele implicite cu cele personalizate
   const routes = useMemo(() => {
     if (!customRoutes) return DEFAULT_ROUTES;
-    
+
     // Map pentru a evita duplicate
     const routeMap = new Map<string, PrefetchableRoute>();
-    
+
     // Adăugăm rutele implicite
-    DEFAULT_ROUTES.forEach(route => {
+    DEFAULT_ROUTES.forEach((route) => {
       routeMap.set(route.path, route);
     });
-    
+
     // Suprascriem/adăugăm rutele personalizate
-    customRoutes.forEach(route => {
+    customRoutes.forEach((route) => {
       routeMap.set(route.path, route);
     });
-    
+
     return Array.from(routeMap.values());
   }, [customRoutes]);
-  
+
   useEffect(() => {
     if (!enabled) return;
-    
+
     // Obținem probabilitățile pentru ruta curentă
     const currentPath = location.pathname;
     const pathTransitions = NAVIGATION_HISTORY[currentPath] || {};
-    
+
     // 1. Prefetch automat bazat pe probabilități
-    routes.forEach(route => {
+    routes.forEach((route) => {
       // Ignorăm ruta curentă
       if (route.path === currentPath) return;
-      
+
       // Ignorăm rutele care sunt doar pentru hover
       if (route.onlyOnHover) return;
-      
+
       // Calculăm probabilitatea bazată pe istoric sau valoarea implicită
-      const historyProbability = pathTransitions[route.path] 
+      const historyProbability = pathTransitions[route.path]
         ? pathTransitions[route.path] / 100
         : 0;
       const probability = historyProbability || route.probability || 0;
-      
+
       // Prefetch doar dacă probabilitatea e peste prag și nu am prefetch-uit deja
-      if (probability >= threshold && !prefetchedPaths.current.has(route.path)) {
+      if (
+        probability >= threshold &&
+        !prefetchedPaths.current.has(route.path)
+      ) {
         // Prefetch componenta
         if (prefetchComponents && route.component) {
           preloadComponent(route.component);
         }
-        
+
         // Prefetch date
         if (prefetchQueries && route.queryKeys) {
-          route.queryKeys.forEach(queryKey => {
+          route.queryKeys.forEach((queryKey) => {
             queryClient.prefetchQuery({
               queryKey: queryKey,
               staleTime: 2 * 60 * 1000, // 2 minute
             });
           });
         }
-        
+
         // Marcăm ca prefetch-uit
         prefetchedPaths.current.add(route.path);
       }
     });
-    
+
     // 2. Adăugăm listener pentru hover pe link-uri
     const handleLinkHover = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const link = target.closest('a');
-      
+      const link = target.closest("a");
+
       if (!link) return;
-      
-      const href = link.getAttribute('href');
+
+      const href = link.getAttribute("href");
       if (!href) return;
-      
+
       // Căutăm ruta corespunzătoare
-      const route = routes.find(r => {
+      const route = routes.find((r) => {
         const path = r.path;
         return href === path || href.startsWith(`${path}/`);
       });
-      
+
       if (route) {
         // Prefetch componenta
         if (prefetchComponents && route.component) {
           preloadComponent(route.component);
         }
-        
+
         // Prefetch date
         if (prefetchQueries && route.queryKeys) {
-          route.queryKeys.forEach(queryKey => {
+          route.queryKeys.forEach((queryKey) => {
             queryClient.prefetchQuery({
               queryKey: queryKey,
               staleTime: 30 * 1000, // 30 secunde
@@ -197,20 +200,28 @@ export function usePrefetchRoutes(
         }
       }
     };
-    
+
     // Adăugăm listener-ul
-    document.addEventListener('mouseover', handleLinkHover);
-    
+    document.addEventListener("mouseover", handleLinkHover);
+
     // Curățăm la unmount
     return () => {
-      document.removeEventListener('mouseover', handleLinkHover);
+      document.removeEventListener("mouseover", handleLinkHover);
     };
-  }, [enabled, location.pathname, prefetchComponents, prefetchQueries, queryClient, routes, threshold]);
-  
+  }, [
+    enabled,
+    location.pathname,
+    prefetchComponents,
+    prefetchQueries,
+    queryClient,
+    routes,
+    threshold,
+  ]);
+
   // Resetăm prefetch-urile când se schimbă ruta
   useEffect(() => {
     prefetchedPaths.current = new Set();
   }, [location.pathname]);
 }
 
-export default usePrefetchRoutes; 
+export default usePrefetchRoutes;

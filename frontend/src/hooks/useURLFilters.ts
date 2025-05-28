@@ -1,6 +1,6 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
+import { useEffect, useCallback, useRef } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 
 /**
  * Hook pentru sincronizarea filtrelor tranzacțiilor cu URL-ul
@@ -9,8 +9,8 @@ import { useTransactionFiltersStore } from '../stores/transactionFiltersStore';
 export const useURLFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const debounceTimeoutRef = useRef<NodeJS.Timeout>();
-  
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
   const {
     loadFromURL,
     getURLSearchParams,
@@ -24,7 +24,7 @@ export const useURLFilters = () => {
     searchText,
     limit,
     offset,
-    sort
+    sort,
   } = useTransactionFiltersStore();
 
   // Load filters from URL on component mount
@@ -54,7 +54,7 @@ export const useURLFilters = () => {
   // Trigger URL update when filters change
   useEffect(() => {
     updateURL();
-    
+
     return () => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
@@ -72,7 +72,7 @@ export const useURLFilters = () => {
     limit,
     offset,
     sort,
-    updateURL
+    updateURL,
   ]);
 
   // Handle browser back/forward navigation
@@ -82,10 +82,10 @@ export const useURLFilters = () => {
       loadFromURL(currentParams);
     };
 
-    window.addEventListener('popstate', handlePopState);
-    
+    window.addEventListener("popstate", handlePopState);
+
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [loadFromURL]);
 
@@ -115,6 +115,6 @@ export const useURLFilters = () => {
   return {
     getCurrentURL,
     clearFiltersAndURL,
-    searchParams
+    searchParams,
   };
-}; 
+};

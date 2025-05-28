@@ -425,6 +425,9 @@ export class TransactionFormDataGenerator {
   static getFormSelectors() {
     return {
       form: 'transaction-form',
+      formLoading: 'transaction-form-loading',
+      storeLoading: 'transaction-form-store-loading',
+      dataLoading: 'transaction-form-data-loading',
       typeSelect: 'type-select',
       amountInput: 'amount-input',
       categorySelect: 'category-select',
@@ -448,6 +451,50 @@ export class TransactionFormDataGenerator {
     const descriptionText = data.description ? ` | "${data.description}"` : ' | Fără descriere';
     
     return `${data.type} | ${data.category} → ${data.subcategory} | ${data.amount} RON | ${data.date}${recurringText}${descriptionText}`;
+  }
+}
+
+/**
+ * Clase pentru selectori TransactionTable
+ */
+export class TransactionTableDataGenerator {
+  /**
+   * Obține selectori pentru tabelul de tranzacții
+   */
+  static getTableSelectors() {
+    return {
+      table: 'transaction-table',
+      tableLoading: 'transaction-table-loading',
+      tableLoadingText: 'table-loading-text',
+      tableLoadingMore: 'transaction-table-loading-more',
+      tableLoadingMoreText: 'table-loading-more-text',
+      tableEmpty: 'transaction-table-empty',
+      tableLoadingOverlay: 'transaction-table-loading-overlay',
+      transactionItem: (id: string | number) => `transaction-item-${id}`,
+    };
+  }
+
+  /**
+   * Obține selectori pentru stări de încărcare
+   */
+  static getLoadingSelectors() {
+    return {
+      initialLoading: 'transaction-table-loading',
+      loadingMore: 'transaction-table-loading-more',
+      overlay: 'transaction-table-loading-overlay',
+      loadingText: 'table-loading-text',
+      loadingMoreText: 'table-loading-more-text',
+    };
+  }
+
+  /**
+   * Obține selectori pentru stări goale
+   */
+  static getEmptyStateSelectors() {
+    return {
+      emptyTable: 'transaction-table-empty',
+      noDataMessage: 'no-transactions-message',
+    };
   }
 }
 
