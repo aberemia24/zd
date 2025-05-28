@@ -18,7 +18,7 @@ describe("Loader", () => {
   // Test pentru prezența SVG-ului de animație
   it("conține elementul SVG de animație", () => {
     render(<Loader />);
-    const svg = screen.getByRole("img", { hidden: true });
+    const svg = screen.getByTestId("loader-svg");
     expect(svg).toBeInTheDocument();
     expect(svg).toHaveClass("animate-spin");
   });
@@ -43,11 +43,11 @@ describe("Loader", () => {
   // Test pentru structura corectă a animației
   it("conține elementele corecte pentru animația de loading", () => {
     render(<Loader />);
-    // Use test ids instead of direct node access
-    const svg = screen.getByRole("img", { hidden: true });
+    // Use data-testid instead of role
+    const svg = screen.getByTestId("loader-svg");
     expect(svg).toBeInTheDocument();
     
-    // Check for animation classes instead of accessing DOM nodes directly
+    // Check for animation classes
     expect(svg).toHaveClass("animate-spin");
   });
 });

@@ -5,27 +5,11 @@
     "node": true
   },
   "extends": [
-    "eslint:recommended",
-    "@typescript-eslint/recommended"
+    "eslint:recommended"
   ],
-  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 12,
-    "sourceType": "module",
-    "ecmaFeatures": {
-      "jsx": true
-    }
-  },
-  "plugins": [
-    "@typescript-eslint",
-    "react",
-    "react-hooks"
-  ],
-  "rules": {
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
-    "@typescript-eslint/no-explicit-any": "warn",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "sourceType": "module"
   },
   "overrides": [
     {
@@ -36,19 +20,12 @@
       "files": ["backend/**/*"],
       "env": {
         "node": true
-      },
-      "rules": {
-        "react/jsx-uses-react": "off",
-        "react/react-in-jsx-scope": "off"
       }
     },
     {
       "files": ["scripts/**/*"],
       "env": {
         "node": true
-      },
-      "rules": {
-        "@typescript-eslint/no-require-imports": "off"
       }
     }
   ],
