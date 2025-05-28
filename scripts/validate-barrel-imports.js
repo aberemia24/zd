@@ -155,7 +155,7 @@ function checkForBarrelViolation(filePath, importPath, barrels) {
   const relativePath = path.relative(frontendSrcPath, resolvedImport);
   
   // Check if any barrel directory contains this import
-  for (const [barrelPath, barrel] of barrels) {
+  for (const [barrelPath] of barrels) {
     if (relativePath.startsWith(barrelPath + '/')) {
       // This import is inside a barrel directory
       const expectedBarrelImport = './' + path.relative(fileDir, path.join(frontendSrcPath, barrelPath)).replace(/\\/g, '/');
