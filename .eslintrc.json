@@ -35,6 +35,19 @@
     "build/",
     "coverage/",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "*.vsix",
+    "*.min.js",
+    "*.bundle.js",
+    "*.chunk.js",
+    "**/vendor/**",
+    "**/bundle/**",
+    "**/chunks/**",
+    "test-results/",
+    "playwright-report/",
+    "**/*.generated.js",
+    "**/*.generated.ts",
+    "shared-constants/",
+    "tests/integration/"
   ]
 } 
