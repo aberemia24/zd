@@ -1,0 +1,144 @@
+# Budget App - Product Requirements Document
+
+## Prezentare Generală
+Budget App este o aplicație de gestiune financiară personală concepută pentru monitorizarea cheltuielilor, veniturilor și tiparelor financiare. Aplicația oferă o platformă centralizată pentru urmărirea și analiza datelor financiare cu o experiență Excel-like familiară.
+
+## Problema Rezolvată
+- Lipsa de transparență financiară asupra cheltuielilor
+- Dificultate în urmărirea tiparelor de cheltuieli pe termen lung
+- Management dezorganizat al categoriilor de cheltuieli
+- Analiza retroactivă complicată și căutare dificilă în istoric
+
+## Valoarea Oferită
+- Vizibilitate completă asupra finanțelor personale printr-un dashboard centralizat
+- Categorii și subcategorii personalizabile pentru organizarea cheltuielilor
+- Analiză avansată cu filtrare și căutare sofisticată
+- Experiență Excel-like cu grid interactiv pentru adăugare și editare rapidă
+
+## Stack Tehnologic
+- Frontend: React 18 + TypeScript cu TailwindCSS
+- State Management: Zustand pentru state global, React Query pentru server state
+- Backend: NestJS cu arhitectură modulară
+- Database: Supabase (PostgreSQL) cu real-time capabilities
+- Authentication: Supabase Auth cu Row Level Security
+- Arhitectura: Monorepo (frontend/, backend/, shared-constants/)
+
+## Funcționalități Principale
+
+### 1. Autentificare și Securitate
+- Înregistrare și login securizat cu Supabase Authentication
+- Resetare parolă prin email
+- Persistența sesiunii pentru experiență fluidă
+- Validare și securizare date la nivel de aplicație și bază de date
+
+### 2. Management Tranzacții
+- Adăugare tranzacții complete (sumă, dată, categorie, subcategorie, descriere)
+- Tipuri de tranzacții: venituri și cheltuieli cu validare specifică
+- Opțiuni de recurență: unice sau recurente (zilnic, săptămânal, lunar, anual)
+- Editare și ștergere cu confirmare pentru operațiuni destructive
+- Import/Export date în formate CSV, Excel și PDF
+
+### 3. Categorii și Subcategorii Personalizabile
+- Categorii predefinite pentru început rapid
+- Categorii personalizate cu nume și descrieri specifice
+- Subcategorii multi-nivel pentru organizare detaliată
+- Gestionare dinamică: creare, editare, ștergere cu validare integritate
+- Asociere culori și icoane pentru identificare vizuală
+
+### 4. Vizualizare Grid Lunar (LunarGrid)
+- Grid interactiv tip Excel cu categorii pe rânduri și zile pe coloane
+- Editare inline: single-click pentru popover, double-click pentru editare rapidă
+- Expand/collapse subcategorii pentru vizualizare ierarhică
+- Navigare lunară cu butoane intuitive și shortcuts de tastatură
+- Calcule automate: total pe categorie, total pe zi, total lunar
+- Virtualizare pentru performanță optimă cu volume mari de date
+
+### 5. Filtrare și Căutare Avansată
+- Filtre multiple simultane: tip, categorie, subcategorie, interval de date
+- Căutare text în descrieri și note
+- Filtre rapide pentru perioade predefinite
+- Persistență filtre în URL pentru partajare și bookmark-uri
+- Reset filtre cu un singur click
+
+### 6. Tabele și Rapoarte
+- Tabel tranzacții cu paginare și sortare avansată
+- Infinite scrolling pentru navigare fluidă prin volume mari
+- Export rapoarte în multiple formate
+- Calcule agregate: sume pe categorii, medii, tendințe
+
+## Componente Arhitecturale
+
+### Database Schema
+- Users management prin Supabase Auth
+- Transactions table cu user_id, amount, type, category, subcategory, description, date, recurrence
+- User Categories pentru categorii personalizate cu structură JSON
+- Row Level Security pentru izolarea datelor per utilizator
+
+### Frontend Architecture
+- Componente Primitive: Button, Input, Select, Modal (reutilizabile)
+- Componente Feature: TransactionForm, LunarGrid, CategoryEditor (business-specific)
+- Hooks Specializate: useTransactions, useCategories (logică business encapsulată)
+- Servicii: API clients cu error handling și retry logic
+
+### State Management
+- UI State: Zustand stores pentru filtre, modal states, user preferences
+- Server State: React Query pentru caching inteligent și sync
+- Shared Constants: Single source of truth pentru messages, enums, API routes
+
+## Roadmap Current Focus
+
+### Faza 1: MVP (Foundation) - COMPLETED ✅
+- Autentificare securizată cu Supabase
+- CRUD tranzacții cu validare
+- Categorii și subcategorii personalizabile
+- Grid lunar cu navigare de bază
+- Design system cu componente primitive
+
+### Faza 2: Enhanced UX - IN PROGRESS 🚧
+- LunarGrid interactiv cu editare inline - COMPLETED ✅
+- Virtualizare pentru performanță - COMPLETED ✅
+- Export rapoarte (CSV, Excel, PDF) - 80% complete
+- Persistența filtrelor în URL - Planning phase
+- Keyboard shortcuts pentru power users
+- Testing comprehensiv cu Vitest și Playwright
+
+### Faza 3: Advanced Analytics - PLANNED 📅
+- Dashboard cu KPIs financiari
+- Grafice și vizualizări interactive
+- Trend analysis și predictions
+- Budget goals și progress tracking
+
+## Obiective Tehnice Current
+
+### Testing și Quality Assurance
+- Structured testing cu Vitest migration - COMPLETED ✅
+- Component testing cu @testing-library - COMPLETED ✅
+- Integration tests pentru user journeys - IN PROGRESS
+- E2E testing cu Playwright - Setup phase
+- Performance optimizations și caching
+
+### Export și Reporting
+- CSV export implementation - 80% complete
+- Excel export cu XLSX formatting
+- PDF reports cu template-uri profesionale
+- Batch export pentru multiple months
+
+### Performance și UX
+- URL persistence pentru filtre și state
+- Advanced keyboard navigation
+- Optimized virtualization pentru large datasets
+- Progressive loading strategies
+
+## Cerințe de Calitate
+- Performance: <200ms query response time, <3s initial load
+- Accessibility: WCAG 2.1 AA compliance
+- Security: OWASP compliance, data encryption
+- Browser Support: Modern browsers cu graceful degradation
+- Mobile Responsiveness: Optimizat pentru toate screen sizes
+
+## Success Metrics
+- User retention: >60% după 30 zile
+- Feature adoption: >80% pentru core features
+- Performance: <100ms UI interactions
+- Error rate: <1% pentru operațiuni critice
+- Test coverage: >85% pentru business logic 
