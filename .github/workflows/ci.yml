@@ -1,0 +1,183 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  quick-check:
+    name: Quick Check (≤5min)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Lint code
+        run: npm run lint
+        
+      - name: Type check
+        run: npm run type-check
+        
+      - name: Validate shared constants
+        run: npm run validate:constants
+        
+      - name: Validate shared constants usage
+        run: npm run validate:shared-constants
+        
+      - name: Run unit tests with coverage
+        run: npm run test -- --run --coverage
+        
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./frontend/coverage/lcov.info
+          fail_ci_if_error: true
+
+  integration:
+    name: Integration Tests
+    needs: quick-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run integration tests
+        run: npm run test:integration
+        
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: integration-test-results
+          path: |
+            frontend/test-results/
+            frontend/coverage/
+
+  e2e-smoke:
+    name: E2E Smoke Tests (main only)
+    needs: integration
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Install Playwright
+        run: npx playwright install chromium
+        
+      - name: Run smoke tests
+        run: npm run test:e2e:smoke
+        
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-smoke-report
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 7
+
+  build-verification:
+    name: Build Verification
+    needs: quick-check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build frontend
+        run: cd frontend && npm run build
+        
+      - name: Build backend
+        run: cd backend && npm run build
+        
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: build-artifacts
+          path: |
+            frontend/dist/
+            backend/dist/
+          retention-days: 1
+
+  quality-gate:
+    name: Quality Gate
+    needs: [quick-check, integration, build-verification]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Check job results
+        run: |
+          echo "Quick Check: ${{ needs.quick-check.result }}"
+          echo "Integration: ${{ needs.integration.result }}"
+          echo "Build: ${{ needs.build-verification.result }}"
+          
+          if [[ "${{ needs.quick-check.result }}" != "success" ]]; then
+            echo "❌ Quick check failed - blocking merge"
+            exit 1
+          fi
+          
+          if [[ "${{ needs.integration.result }}" != "success" ]]; then
+            echo "❌ Integration tests failed - blocking merge"
+            exit 1
+          fi
+          
+          if [[ "${{ needs.build-verification.result }}" != "success" ]]; then
+            echo "❌ Build verification failed - blocking merge"
+            exit 1
+          fi
+          
+          echo "✅ All quality gates passed - merge allowed" 
