@@ -1,0 +1,177 @@
+#!/usr/bin/env node
+
+/**
+ * Script: validate-all-automation.js
+ * Master script pentru toate validările automate - Faza 5 complete
+ * Rulează toate script-urile de validare și sumarizează rezultatele
+ */
+
+const { spawn } = require('child_process');
+const path = require('path');
+
+console.log('🚀 Running complete automation validation suite...\n');
+
+// Script-uri de rulat în ordine
+const VALIDATION_SCRIPTS = [
+  {
+    name: 'Shared Constants Sync',
+    script: 'validate-constants.js',
+    description: 'Verifică sincronizarea shared-constants și string-uri hardcodate'
+  },
+  {
+    name: 'Shared Constants Usage',
+    script: 'validate-shared-constants-usage.js',
+    description: 'Validează import-uri @shared-constants și elimină string-uri hardcodate'
+  },
+  {
+    name: 'Data TestID Consistency',
+    script: 'validate-data-testid-consistency.js',
+    description: 'Verifică consistența data-testid între componente și teste'
+  },
+  {
+    name: 'Barrel Imports',
+    script: 'validate-barrel-imports.js',
+    description: 'Validează folosirea corectă a barrel files pentru import-uri'
+  },
+  {
+    name: 'Data TestID Coverage',
+    script: 'check-data-testid.js',
+    description: 'Verifică coverage-ul data-testid pentru elemente interactive'
+  },
+  {
+    name: 'Console Cleanup',
+    script: 'validate-console-cleanup.js',
+    description: 'Detectează console.log/debug statements care trebuie eliminate pentru production'
+  },
+  {
+    name: 'JSX Extensions',
+    script: 'validate-jsx-extensions.js',
+    description: 'Verifică că fișierele cu JSX folosesc extensia .tsx conform code-standards'
+  },
+  {
+    name: 'TypeScript Quality',
+    script: 'validate-typescript-quality.js',
+    description: 'Validează calitatea TypeScript: any/unknown usage, type assertions'
+  }
+];
+
+function runScript(scriptInfo) {
+  return new Promise((resolve) => {
+    const scriptPath = path.join(__dirname, scriptInfo.script);
+    const child = spawn('node', [scriptPath], { 
+      stdio: ['pipe', 'pipe', 'pipe'],
+      shell: true 
+    });
+    
+    let stdout = '';
+    let stderr = '';
+    
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+    
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+    
+    child.on('close', (code) => {
+      resolve({
+        name: scriptInfo.name,
+        description: scriptInfo.description,
+        exitCode: code,
+        stdout: stdout,
+        stderr: stderr,
+        passed: code === 0
+      });
+    });
+  });
+}
+
+function formatResults(results) {
+  console.log('📊 AUTOMATION VALIDATION RESULTS\n');
+  console.log('═'.repeat(60));
+  
+  const passed = results.filter(r => r.passed);
+  const failed = results.filter(r => !r.passed);
+  
+  // Summary
+  console.log(`✅ PASSED: ${passed.length}/${results.length}`);
+  console.log(`❌ FAILED: ${failed.length}/${results.length}`);
+  console.log('═'.repeat(60));
+  
+  // Detailed results
+  results.forEach((result, index) => {
+    const status = result.passed ? '✅' : '❌';
+    console.log(`\n${index + 1}. ${status} ${result.name}`);
+    console.log(`   📋 ${result.description}`);
+    
+    if (!result.passed) {
+      console.log(`   🚨 Exit code: ${result.exitCode}`);
+      
+      // Extract key error lines (not full output to avoid spam)
+      const errorLines = result.stdout.split('\n')
+        .filter(line => line.includes('❌') || line.includes('🚨') || line.includes('FAILED'))
+        .slice(0, 3); // Max 3 error lines per script
+      
+      if (errorLines.length > 0) {
+        console.log('   📄 Key issues:');
+        errorLines.forEach(line => {
+          console.log(`     ${line.trim()}`);
+        });
+      }
+    }
+  });
+  
+  console.log('\n' + '═'.repeat(60));
+  
+  if (failed.length === 0) {
+    console.log('🎉 ALL AUTOMATION VALIDATIONS PASSED!');
+    console.log('🎯 Code quality automation: EXCELLENT');
+    return true;
+  } else {
+    console.log('🚨 AUTOMATION VALIDATIONS FAILED');
+    console.log(`💡 Fix ${failed.length} validation issue(s) and re-run`);
+    console.log('\n📖 To run individual validations:');
+    failed.forEach(f => {
+      const scriptName = f.name.toLowerCase().replace(/\s+/g, '-');
+      console.log(`   npm run validate:${scriptName === 'shared-constants-sync' ? 'constants' : scriptName.replace('shared-constants-', 'shared-constants').replace('data-testid-', 'data-testid').replace('barrel-', 'barrel-')}`);
+    });
+    return false;
+  }
+}
+
+async function main() {
+  const startTime = Date.now();
+  const results = [];
+  
+  for (const script of VALIDATION_SCRIPTS) {
+    console.log(`🔍 Running: ${script.name}...`);
+    const result = await runScript(script);
+    results.push(result);
+    
+    // Show brief status
+    const status = result.passed ? '✅ PASS' : '❌ FAIL';
+    console.log(`   ${status}\n`);
+  }
+  
+  const endTime = Date.now();
+  const duration = ((endTime - startTime) / 1000).toFixed(1);
+  
+  console.log(`⏱️  Total validation time: ${duration}s\n`);
+  
+  const allPassed = formatResults(results);
+  
+  if (!allPassed) {
+    process.exit(1);
+  }
+}
+
+// Auto-run when called directly
+if (require.main === module) {
+  main().catch(error => {
+    console.error('🚨 Automation validation failed with error:', error);
+    process.exit(1);
+  });
+}
+
+module.exports = { runScript, formatResults }; 
