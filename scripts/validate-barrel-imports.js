@@ -207,9 +207,9 @@ function main() {
   const barrels = findBarrelFiles(FRONTEND_SRC);
   
   console.log(`📊 Found ${barrels.size} barrel files:`);
-  barrels.forEach((barrel, path) => {
+  for (const path of barrels.keys()) {
     console.log(`   ${path}/index.ts`);
-  });
+  }
   
   console.log('\n🔍 Scanning for import violations...');
   const issues = scanDirectory(FRONTEND_SRC, barrels);

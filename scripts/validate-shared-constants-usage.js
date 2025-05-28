@@ -29,9 +29,6 @@ const INCORRECT_PATTERNS = [
   /['"`]Economisire['"`](?!\s*,)/g,
 ];
 
-// Correct pattern
-const CORRECT_PATTERN = /import\s+.*from\s+['"]@shared-constants/g;
-
 function scanFileForPatterns(filePath) {
   if (!filePath.endsWith('.ts') && !filePath.endsWith('.tsx')) {
     return [];

@@ -6,23 +6,9 @@ const path = require('path');
 
 const SRC_DIR = path.join(__dirname, '../frontend/src');
 const IGNORE_FILES = ['api.ts', 'api.js'];
-const CONSTANTS_FILES = [
-  'messages',
-  'ui',
-  'defaults',
-  'enums',
-  'index',
-  'index.d', // pentru .d.ts
-];
 
 function shouldIgnore(file) {
   return IGNORE_FILES.some((f) => file.endsWith(f));
-}
-
-function isConstantsImport(importPath) {
-  return CONSTANTS_FILES.some((c) =>
-    importPath.includes(`constants/${c}`)
-  );
 }
 
 function replaceImportLine(line) {
@@ -30,7 +16,7 @@ function replaceImportLine(line) {
   // Ex: import { X } from '@shared-constants' => import { X } from 'shared-constants'
   // Ex: import { Y } from '../shared-constants' => import { Y } from 'shared-constants'
   // Ex: import { Z } from '../../shared-constants' => import { Z } from 'shared-constants'
-  const anySharedConstantsRegex = /from ['\"](@shared-constants|(\.\.\/)+shared-constants)['\"]/g;
+  const anySharedConstantsRegex = /from ['"](@shared-constants|(\.\.\/)+shared-constants)['"]/g;
   return line.replace(anySharedConstantsRegex, "from 'shared-constants'");
 }
 
