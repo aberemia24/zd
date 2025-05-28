@@ -65,624 +65,6 @@
   },
   "suites": [
     {
-      "title": "debug\\explore-app.spec.ts",
-      "file": "debug/explore-app.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Explorare Aplicație",
-          "file": "debug/explore-app.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "explorez lunar grid cu date dinamice",
-              "ok": true,
-              "tags": [
-                "debug"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 15454,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎲 Date test generate: {\n  primar: \u001b[32m'VENITURI -> Cadouri (20.50)'\u001b[39m,\n  secundar: \u001b[32m'ECONOMII -> Fond general (1110.25)'\u001b[39m,\n  total: \u001b[32m'1130.75'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "🔍 URL după login: http://localhost:3000/login\n"
-                        },
-                        {
-                          "text": "🔍 URL LunarGrid: http://localhost:3000/lunar-grid?month=2025-05\n"
-                        },
-                        {
-                          "text": "🔍 Butoane expand găsite: 15\n"
-                        },
-                        {
-                          "text": "🔍 Expandez toate categoriile cu \"toggle-expand-all\"\n"
-                        },
-                        {
-                          "text": "🔍 Selectori dinamici generați: {\n  toggleExpandAll: \u001b[32m'toggle-expand-all'\u001b[39m,\n  expandCategory: \u001b[32m'expand-btn-VENITURI'\u001b[39m,\n  celulaTinta: \u001b[32m'editable-cell-VENITURI-Cadouri-15'\u001b[39m,\n  categorieHeader: \u001b[32m'category-venituri'\u001b[39m,\n  subcategorieRow: \u001b[32m'subcategory-row-cadouri'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "🔍 Celula țintă editable-cell-VENITURI-Cadouri-15 există: true\n"
-                        },
-                        {
-                          "text": "🔍 Total celule găsite după expandare: 3875\n"
-                        },
-                        {
-                          "text": "🔍 Celula 0: editable-cell-VENITURI-Salarii - Modificat - Modificat-1, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 1: editable-cell-VENITURI-Salarii - Modificat - Modificat-2, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 2: editable-cell-VENITURI-Salarii - Modificat - Modificat-3, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 3: editable-cell-VENITURI-Salarii - Modificat - Modificat-4, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 4: editable-cell-VENITURI-Salarii - Modificat - Modificat-5, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 5: editable-cell-VENITURI-Salarii - Modificat - Modificat-6, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 6: editable-cell-VENITURI-Salarii - Modificat - Modificat-7, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 7: editable-cell-VENITURI-Salarii - Modificat - Modificat-8, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 8: editable-cell-VENITURI-Salarii - Modificat - Modificat-9, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula 9: editable-cell-VENITURI-Salarii - Modificat - Modificat-10, vizibilă: true\n"
-                        },
-                        {
-                          "text": "🔍 Celula țintă după expandare: true\n"
-                        },
-                        {
-                          "text": "🔍 Month selector există: \u001b[33mtrue\u001b[39m\n"
-                        },
-                        {
-                          "text": "🔍 Year input există: \u001b[33mtrue\u001b[39m\n"
-                        },
-                        {
-                          "text": "✅ Screenshot salvat: lunar-grid-dynamic-exploration.png\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:03:53.431Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2ef39b18422f3af63f9b-b25a4de352ea297275c9",
-              "file": "debug/explore-app.spec.ts",
-              "line": 12,
-              "column": 7
-            },
-            {
-              "title": "explorez transactions page cu date dinamice",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3394,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎲 Combinații generate pentru explorare: {\n  \u001b[32m'cheltuială'\u001b[39m: \u001b[32m'EDUCATIE -> Grădiniță | Creșă | Afterschool | Bonă (81.75)'\u001b[39m,\n  venit: \u001b[32m'VENITURI -> Venituri reportate din luna anterioară (238.00)'\u001b[39m,\n  economie: \u001b[32m'INVESTITII -> Investiție/Afacere 5 (640.25)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "🔍 URL Transactions: http://localhost:3000/transactions\n"
-                        },
-                        {
-                          "text": "🔍 Elemente categorie găsite: 4\n"
-                        },
-                        {
-                          "text": "🔍 Elemente formulare găsite: 18\n"
-                        },
-                        {
-                          "text": "🔍 Select-uri găsite: 7\n"
-                        },
-                        {
-                          "text": "🔍 Selector categorie găsit, opțiuni disponibile:\n"
-                        },
-                        {
-                          "text": "   Opțiunea 0: Alege\n"
-                        },
-                        {
-                          "text": "✅ Screenshot salvat: transactions-dynamic-exploration.png\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:13.599Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2ef39b18422f3af63f9b-eb41c917103d77b27cce",
-              "file": "debug/explore-app.spec.ts",
-              "line": 130,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "debug\\test-primary-account.spec.ts",
-      "file": "debug/test-primary-account.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Debug - Primary Account Login",
-          "file": "debug/test-primary-account.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "testează login cu contul principal direct",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3205,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Debug: Testez login cu contul principal\n"
-                        },
-                        {
-                          "text": "📧 Email: aberemia@gmail.com\n"
-                        },
-                        {
-                          "text": "🔑 Password: test123\n"
-                        },
-                        {
-                          "text": "✅ Pagina de login s-a încărcat\n"
-                        },
-                        {
-                          "text": "📝 Câmpuri completate\n"
-                        },
-                        {
-                          "text": "🚀 Submit efectuat\n"
-                        },
-                        {
-                          "text": "📍 URL după 2s: http://localhost:3000/transactions\n"
-                        },
-                        {
-                          "text": "⏳ Aștept redirect la transactions...\n"
-                        },
-                        {
-                          "text": "✅ SUCCESS! Redirectat la transactions!\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:17.004Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "94e0bb06b7dfd2ab7e86-369fd7cdf71a3425b04f",
-              "file": "debug/test-primary-account.spec.ts",
-              "line": 6,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "debug\\test-simple-generator.spec.ts",
-      "file": "debug/test-simple-generator.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Test Simple Generator",
-          "file": "debug/test-simple-generator.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "generează o combinație simplă",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔄 Generez o combinație simplă...\n"
-                        },
-                        {
-                          "text": "✅ Combinație generată: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'17.50'\u001b[39m\n}\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:20.217Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ed346e8234d946ffa8f5-5e8197bfd4b2d8e5d583",
-              "file": "debug/test-simple-generator.spec.ts",
-              "line": 5,
-              "column": 7
-            },
-            {
-              "title": "generează pentru tip specific",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "💰 Generez pentru tip EXPENSE...\n"
-                        },
-                        {
-                          "text": "✅ Combinație EXPENSE: { categorie: \u001b[32m'NUTRITIE'\u001b[39m, subcategorie: \u001b[32m'Comenzi'\u001b[39m, \u001b[32m'sumă'\u001b[39m: \u001b[32m'85.75'\u001b[39m }\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:20.224Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ed346e8234d946ffa8f5-01e8d0e6fd8ebc01eca7",
-              "file": "debug/test-simple-generator.spec.ts",
-              "line": 32,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "smoke\\critical-auth.smoke.spec.ts",
-      "file": "smoke/critical-auth.smoke.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Smoke: Critical Authentication",
-          "file": "smoke/critical-auth.smoke.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "login cu contul principal funcționează",
-              "ok": true,
-              "tags": [
-                "smoke"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1380,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Login principal\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Login principal - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:20.235Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e126e6d08fe12245c665-5ec09a80a7663343ac60",
-              "file": "smoke/critical-auth.smoke.spec.ts",
-              "line": 6,
-              "column": 7
-            },
-            {
-              "title": "navigarea între pagini funcționează",
-              "ok": true,
-              "tags": [
-                "smoke"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4938,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Basic Navigation\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Basic Navigation - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:21.619Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "e126e6d08fe12245c665-f6f2215ebf7ef84e5be5",
-              "file": "smoke/critical-auth.smoke.spec.ts",
-              "line": 34,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "smoke\\lunar-grid.smoke.spec.ts",
-      "file": "smoke/lunar-grid.smoke.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Smoke: LunarGrid Basic Functionality",
-          "file": "smoke/lunar-grid.smoke.spec.ts",
-          "line": 4,
-          "column": 6,
-          "specs": [
-            {
-              "title": "LunarGrid se deschide și afișează grid-ul",
-              "ok": true,
-              "tags": [
-                "smoke"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1837,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: LunarGrid Loading\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: LunarGrid Loading - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:26.569Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ca675092496f716193df-033cd2ceea04cd2186f4",
-              "file": "smoke/lunar-grid.smoke.spec.ts",
-              "line": 15,
-              "column": 7
-            },
-            {
-              "title": "expand/collapse categorii funcționează",
-              "ok": true,
-              "tags": [
-                "smoke"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5360,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Expand/Collapse\n"
-                        },
-                        {
-                          "text": "📊 Celule înainte: 0\n"
-                        },
-                        {
-                          "text": "📊 Celule după expandare: 3875\n"
-                        },
-                        {
-                          "text": "📊 Celule după reset: 0\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Expand/Collapse - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:28.409Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ca675092496f716193df-6662e7ad35de96b47d53",
-              "file": "smoke/lunar-grid.smoke.spec.ts",
-              "line": 27,
-              "column": 7
-            },
-            {
-              "title": "celulele grid-ului răspund la click",
-              "ok": true,
-              "tags": [
-                "smoke"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4383,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Cell Interaction\n"
-                        },
-                        {
-                          "text": "📊 Celule după expandare: 3875\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Cell Interaction - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:33.773Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ca675092496f716193df-d7001f026a035a26fb10",
-              "file": "smoke/lunar-grid.smoke.spec.ts",
-              "line": 67,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
       "title": "suites\\features\\category-editor.spec.ts",
       "file": "suites/features/category-editor.spec.ts",
       "column": 0,
@@ -697,7 +79,7 @@
           "specs": [
             {
               "title": "accesează CategoryEditor din pagina Options",
-              "ok": true,
+              "ok": false,
               "tags": [
                 "features"
               ],
@@ -710,41 +92,62 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 25,
+                      "workerIndex": 32,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5386,
-                      "errors": [],
+                      "status": "timedOut",
+                      "duration": 30087,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
+                            "column": 21,
+                            "line": 29
+                          },
+                          "message": "Error: page.waitForSelector: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m\n\u001b[2m    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\u001b[22m\n\u001b[2m    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\u001b[22m\n\u001b[2m    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:153:5\u001b[22m"
+                        }
+                      ],
                       "stdout": [
                         {
+                          "text": "🧹 Cleanup preventiv...\n"
+                        },
+                        {
+                          "text": "✅ Cleanup preventiv finalizat\n"
+                        },
+                        {
                           "text": "🚀 Test accesarea CategoryEditor\n"
-                        },
-                        {
-                          "text": "✅ Navigat la pagina Options\n"
-                        },
-                        {
-                          "text": "✅ Buton \"Gestionare categorii\" găsit\n"
-                        },
-                        {
-                          "text": "✅ Modal CategoryEditor deschis\n"
-                        },
-                        {
-                          "text": "✅ Toate secțiunile modalului sunt vizibile\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:04:38.172Z",
+                      "startTime": "2025-05-28T21:13:46.748Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-b903e-ryEditor-din-pagina-Options-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context",
+                          "contentType": "application/json",
+                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGhlYWRpbmcgXCJUcmFuemFjyJtpaVwiIFtsZXZlbD0xXVxuLSBmb3JtIFwiYWTEg3VnYXJlIHRyYW56YWPIm2llXCI6XG4gIC0gaGVhZGluZyBcIkFkYXVnxIMgdHJhbnphY8ibaWVcIiBbbGV2ZWw9M11cbiAgLSB0ZXh0OiBcIlRpcCo6XCJcbiAgLSBjb21ib2JveCBcIlRpcFwiOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJWZW5pdFwiXG4gICAgLSBvcHRpb24gXCJDaGVsdHVpYWzEg1wiXG4gICAgLSBvcHRpb24gXCJFY29ub21pc2lyZVwiXG4gIC0gdGV4dDogXCJTdW3Egyo6XCJcbiAgLSBzcGluYnV0dG9uIFwiU3VtxINcIlxuICAtIHRleHQ6IFwiQ2F0ZWdvcmllKjpcIlxuICAtIGNvbWJvYm94IFwiQ2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFN1YmNhdGVnb3JpZVxuICAtIGNvbWJvYm94IFwiU3ViY2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFwiRGF0xIMqOlwiXG4gIC0gdGV4dGJveCBcIkRhdMSDXCJcbiAgLSBjaGVja2JveFxuICAtIHRleHQ6IFJlY3VyZW50PyBGcmVjdmVuyJvEg1xuICAtIGNvbWJvYm94IFwiRnJlY3ZlbsibxINcIiBbZGlzYWJsZWRdOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJaaWxuaWNcIlxuICAgIC0gb3B0aW9uIFwiU8SDcHTEg23Dom5hbFwiXG4gICAgLSBvcHRpb24gXCJMdW5hclwiXG4gICAgLSBvcHRpb24gXCJBbnVhbFwiXG4gIC0gdGV4dDogRGVzY3JpZXJlXG4gIC0gdGV4dGJveCBcIkRlc2NyaWVyZVwiXG4gIC0gYnV0dG9uIFwiQWRhdWfEg1wiIFtkaXNhYmxlZF1cbiAgLSBidXR0b24gXCJBbnVsZWF6xINcIlxuLSBjb21ib2JveDpcbiAgLSBvcHRpb24gXCJBbGVnZSB0aXB1bFwiIFtzZWxlY3RlZF1cbiAgLSBvcHRpb24gXCJWZW5pdFwiXG4gIC0gb3B0aW9uIFwiQ2hlbHR1aWFsxINcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlzaXJlXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4gIC0gb3B0aW9uIFwiVmVuaXR1cmlcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlpXCJcbiAgLSBvcHRpb24gXCJJbmZhdGlzYXJlXCJcbiAgLSBvcHRpb24gXCJFZHVjYXRpZVwiXG4gIC0gb3B0aW9uIFwiQ2FyaWVyYVwiXG4gIC0gb3B0aW9uIFwiU2FuYXRhdGVcIlxuICAtIG9wdGlvbiBcIk51dHJpdGllXCJcbiAgLSBvcHRpb24gXCJMb2N1aW50YVwiXG4gIC0gb3B0aW9uIFwiVGltcCBsaWJlclwiXG4gIC0gb3B0aW9uIFwiQ2FsYXRvcmlpXCJcbiAgLSBvcHRpb24gXCJUcmFuc3BvcnRcIlxuICAtIG9wdGlvbiBcIkludmVzdGl0aWlcIlxuICAtIG9wdGlvbiBcIlRlc3Qg4p6h77iPXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBzdWJjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4tIHRleHRib3ggXCJDYXV0xIMuLi5cIlxuLSBidXR0b24gXCJGaWx0cmUgYXZhbnNhdGVcIlxuLSBidXR0b24gXCJFeHBvcnTEg1wiXG4tIHJlZ2lvbiBcIlRpcCBTdW3Eg1wiOlxuICAtIHRhYmxlOlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIlRpcCBTdW3EgyBDYXRlZ29yaWUgU3ViY2F0ZWdvcmllIERlc2NyaWVyZSBEYXTEgyBSZWN1cmVudCBGcmVjdmVuyJvEg1wiOlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIlRpcFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3VtxINcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkNhdGVnb3JpZVwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3ViY2F0ZWdvcmllXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJEZXNjcmllcmVcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkRhdMSDXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJSZWN1cmVudFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiRnJlY3ZlbsibxINcIlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIklOQ09NRSA5OTk5OS4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxNy4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjk5OTk5LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxNy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDIzLjAwIFJPTiBWRU5JVFVSSSBEaXZpZGVuZGUgMTMuMDYuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIyMy4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJWRU5JVFVSSVwiXG4gICAgICAgIC0gY2VsbCBcIkRpdmlkZW5kZVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxMy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDEyMy4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxMC4wNi4yMDI1IERhIFlFQVJMWVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIxMjMuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVkVOSVRVUklcIlxuICAgICAgICAtIGNlbGwgXCJTYWxhcmlpIC0gTW9kaWZpY2F0IC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjEwLjA2LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJEYVwiXG4gICAgICAgIC0gY2VsbCBcIllFQVJMWVwiXG4gICAgICAtIHJvdyBcIklOQ09NRSAzMi4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAwMi4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjMyLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIwMi4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiRVhQRU5TRSA1NjUuMDAgUk9OIEVEVUNBVElFIFRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmUgMzEuMDUuMjAyNSBEYSBXRUVLTFlcIjpcbiAgICAgICAgLSBjZWxsIFwiRVhQRU5TRVwiXG4gICAgICAgIC0gY2VsbCBcIjU2NS4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFRFVDQVRJRVwiXG4gICAgICAgIC0gY2VsbCBcIlRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzEuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIkRhXCJcbiAgICAgICAgLSBjZWxsIFwiV0VFS0xZXCJcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMTExMS4wMCBST04gRUNPTk9NSUkgRm9uZCBkZSB1cmdlbsibxIMgLSBNb2RpZmljYXQgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJTQVZJTkdcIlxuICAgICAgICAtIGNlbGwgXCIxMjExMTEuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiRUNPTk9NSUlcIlxuICAgICAgICAtIGNlbGwgXCJGb25kIGRlIHVyZ2VuyJvEgyAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMzQ0NDQuMDAgUk9OIEVDT05PTUlJIEZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0IDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzNDQ0NC4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFQ09OT01JSVwiXG4gICAgICAgIC0gY2VsbCBcIkZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgLSByb3cgXCJFWFBFTlNFIDEyMy4wMCBST04gVElNUF9MSUJFUiBNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGUgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJFWFBFTlNFXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlRJTVBfTElCRVJcIlxuICAgICAgICAtIGNlbGwgXCJNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzAuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIk51XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAtIHJvdyBcIkVYUEVOU0UgNTU1LjAwIFJPTiBUSU1QX0xJQkVSIEPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZCAzMC4wNS4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIkVYUEVOU0VcIlxuICAgICAgICAtIGNlbGwgXCI1NTUuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVElNUF9MSUJFUlwiXG4gICAgICAgIC0gY2VsbCBcIkPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDU1NS4wMCBST04gRUNPTk9NSUkgRm9uZCBnZW5lcmFsIDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiNTU1LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIkVDT05PTUlJXCJcbiAgICAgICAgLSBjZWxsIFwiRm9uZCBnZW5lcmFsXCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuLSB0ZXh0OiBTZSBhZmnImWVhesSDIDEwIGRpbiAzMTYgdHJhbnphY8ibaWlcbi0gYnV0dG9uIFwiw45uYWludGVcIiJ9"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-f07206b8cb075f2ae794",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 60,
+              "line": 149,
               "column": 7
             },
             {
@@ -760,32 +163,65 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 25,
+                      "workerIndex": 33,
                       "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1942,
-                      "errors": [],
+                      "status": "interrupted",
+                      "duration": 20139,
+                      "error": {
+                        "message": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n",
+                        "stack": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\n    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\n    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:187:5",
+                        "location": {
+                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
+                          "column": 21,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
+                            "column": 21,
+                            "line": 29
+                          },
+                          "message": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m\n\u001b[2m    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\u001b[22m\n\u001b[2m    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\u001b[22m\n\u001b[2m    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:187:5\u001b[22m"
+                        }
+                      ],
                       "stdout": [
                         {
-                          "text": "❌ Test închidere CategoryEditor cu X\n"
+                          "text": "🧹 Cleanup preventiv...\n"
                         },
                         {
-                          "text": "✅ Modal închis cu butonul X\n"
+                          "text": "✅ Cleanup preventiv finalizat\n"
+                        },
+                        {
+                          "text": "❌ Test închidere CategoryEditor cu X\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:04:43.561Z",
+                      "startTime": "2025-05-28T21:14:18.982Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-a9e8c-CategoryEditor-cu-butonul-X-chromium\\test-failed-1.png"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
+                        "column": 21,
+                        "line": 29
+                      }
                     }
                   ],
-                  "status": "expected"
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-ae4f153405a5cac489a0",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 95,
+              "line": 184,
               "column": 7
             },
             {
@@ -799,34 +235,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1978,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "⌨️ Test închidere CategoryEditor cu ESC\n"
-                        },
-                        {
-                          "text": "✅ Modal închis cu tasta ESC\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:45.509Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-fc4e95a003a87865e6f6",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 115,
+              "line": 204,
               "column": 7
             },
             {
@@ -840,45 +255,18 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1662,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "📂 Test selectare categorie și afișare subcategorii\n"
-                        },
-                        {
-                          "text": "✅ Mesaj \"Selectați o categorie\" afișat inițial\n"
-                        },
-                        {
-                          "text": "✅ Categorie INVESTITII selectată (random)\n"
-                        },
-                        {
-                          "text": "✅ 5 subcategorii afișate pentru INVESTITII\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:47.492Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-3a764999d7dcde9bf5ba",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 135,
+              "line": 224,
               "column": 7
             },
             {
               "title": "redenumește o subcategorie standard",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -887,78 +275,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 25,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 12191,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:216:33",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
-                          "column": 33,
-                          "line": 216
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mconst\u001b[39m renamedSubcat \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m`subcat-item-${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 216 |\u001b[39m     \u001b[36mawait\u001b[39m expect(renamedSubcat)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 217 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m`✅ Subcategoria redenumită cu succes în: ${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 218 |\u001b[39m     \n \u001b[90m 219 |\u001b[39m     \u001b[90m// TRACK redenumirea pentru cleanup\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
-                            "column": 33,
-                            "line": 216
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n\n\n\u001b[0m \u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mconst\u001b[39m renamedSubcat \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m`subcat-item-${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 216 |\u001b[39m     \u001b[36mawait\u001b[39m expect(renamedSubcat)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 217 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m`✅ Subcategoria redenumită cu succes în: ${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 218 |\u001b[39m     \n \u001b[90m 219 |\u001b[39m     \u001b[90m// TRACK redenumirea pentru cleanup\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:216:33\u001b[22m"
-                        }
-                      ],
-                      "stdout": [
-                        {
-                          "text": "✏️ Test redenumire subcategorie standard\n"
-                        },
-                        {
-                          "text": "✅ Categorie TRANSPORT selectată pentru redenumire\n"
-                        },
-                        {
-                          "text": "📝 Redenumesc subcategoria: Transport public - Modificat\n"
-                        },
-                        {
-                          "text": "✅ Input de redenumire afișat și focalizat\n"
-                        },
-                        {
-                          "text": "📏 Nume original: 28 chars, Nume nou: 40 chars\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:04:49.157Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-28ecb-ște-o-subcategorie-standard-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context",
-                          "contentType": "application/json",
-                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGhlYWRpbmcgXCJPcMibaXVuaVwiIFtsZXZlbD0xXVxuLSBoZWFkaW5nIFwiR2VzdGlvbmFyZSBjYXRlZ29yaWlcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiBQZXJzb25hbGl6YcibaSBjYXRlZ29yaWlsZSDImWkgc3ViY2F0ZWdvcmlpbGUgcGVudHJ1IGEgc2UgcG90cml2aSBuZXZvaWxvciBkdnMuIHNwZWNpZmljZSBkZSBidWdldGFyZS5cbi0gYnV0dG9uIFwiR2VzdGlvbmFyZSBjYXRlZ29yaWlcIlxuLSBoZWFkaW5nIFwiT3DIm2l1bmkgZGUgYWZpyJlhcmVcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiDDjm4gY3Vyw6JuZFxuLSBoZWFkaW5nIFwiRXhwb3J0IGRhdGVcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiDDjm4gY3Vyw6JuZFxuLSBoZWFkaW5nIFwiU2V0xINyaSBDb250XCIgW2xldmVsPTJdXG4tIHBhcmFncmFwaDogRGVjb25lY3RlYXrEgy10ZSBkZSBsYSBjb250dWwgdMSDdS5cbi0gYnV0dG9uIFwiTG9nb3V0XCJcbi0gZGlhbG9nIFwiR2VzdGlvbmFyZSBTdWJjYXRlZ29yaWlcIjpcbiAgLSBoZWFkaW5nIFwiR2VzdGlvbmFyZSBTdWJjYXRlZ29yaWlcIiBbbGV2ZWw9Ml1cbiAgLSBidXR0b24gXCLDjm5jaGlkZVwiOlxuICAgIC0gaW1nXG4gIC0gaGVhZGluZyBcIkNhdGVnb3JpaVwiIFtsZXZlbD0zXVxuICAtIGxpc3Q6XG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiVkVOSVRVUklcIlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIGJ1dHRvbiBcIkVDT05PTUlJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJJTkZBVElTQVJFXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJFRFVDQVRJRVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiQ0FSSUVSQVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiU0FOQVRBVEVcIlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIGJ1dHRvbiBcIk5VVFJJVElFXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJMT0NVSU5UQVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiVElNUF9MSUJFUlwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiQ0FMQVRPUklJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJUUkFOU1BPUlRcIiBbcHJlc3NlZF1cbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJJTlZFU1RJVElJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJURVNUXCJcbiAgLSBoZWFkaW5nIFwiU3ViY2F0ZWdvcmlpIHBlbnRydSBUUkFOU1BPUlRcIiBbbGV2ZWw9M11cbiAgLSBsaXN0IFwiU3ViY2F0ZWdvcmlpIHBlbnRydVwiOlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFRyYW5zcG9ydCBwdWJsaWMgLSBNb2RpZmljYXQgLSBNXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBUcmFuc3BvcnQgcHVibGljIC0gTW9kaWZpY2F0IC0gTVwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBSZXZpemlpXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBSZXZpemlpXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFNwxINsxIN0b3JpZSBhdXRvXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBTcMSDbMSDdG9yaWUgYXV0b1wiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBBY2Nlc29yaWkvQ29uc3VtYWJpbGUgcGVudHJ1IG1hyJlpbsSDXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBBY2Nlc29yaWkvQ29uc3VtYWJpbGUgcGVudHJ1IG1hyJlpbsSDXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IENvbWJ1c3RpYmlsXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBDb21idXN0aWJpbFwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBTY2hpbWJhdCBjYXVjaXVjdXJpIHZhcsSDL2lhcm7Eg1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgU2NoaW1iYXQgY2F1Y2l1Y3VyaSB2YXLEgy9pYXJuxINcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogSG90ZWwgcGVudHJ1IGFudmVsb3BlXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBIb3RlbCBwZW50cnUgYW52ZWxvcGVcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogUmVwYXJhyJtpaSBhdXRvXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBSZXBhcmHIm2lpIGF1dG9cIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogVGF4ZSBkcnVtdXJpXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBUYXhlIGRydW11cmlcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogUGFyY2FyZVxuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgUGFyY2FyZVwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBBc2lndXJhcmUgUkNBXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBBc2lndXJhcmUgUkNBXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IEFzaWd1cmFyZSBDQVNDT1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgQXNpZ3VyYXJlIENBU0NPXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFJvdmlnbmV0YVxuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgUm92aWduZXRhXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IEltcG96aXQgYXV0b1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgSW1wb3ppdCBhdXRvXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFRyYW5zcG9ydCBwdWJsaWNcbiAgICAgIC0gYnV0dG9uIFwiUmVkZW51bWXImXRlIFRyYW5zcG9ydCBwdWJsaWNcIjogUmVkZW51bWXImXRlXG4gIC0gdGV4dGJveCBcIkFkYXVnxIMgc3ViY2F0ZWdvcmllIG5vdcSDXCJcbiAgLSBidXR0b24gXCJBZGF1Z8SDXCIgW2Rpc2FibGVkXVxuICAtIGJ1dHRvbiBcIkFudWxlYXrEg1wiIn0="
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
-                        "column": 33,
-                        "line": 216
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-a614e1788c00d2d67ab8",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 171,
+              "line": 260,
               "column": 7
             },
             {
@@ -972,46 +295,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4379,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "➕ Test adăugare subcategorie nouă\n"
-                        },
-                        {
-                          "text": "✅ Categorie NUTRITIE selectată pentru adăugare subcategorie\n"
-                        },
-                        {
-                          "text": "📊 Subcategorii inițiale: 6\n"
-                        },
-                        {
-                          "text": "📝 Nume subcategorie nouă: AUTO-Subcategorie-1748466306603\n"
-                        },
-                        {
-                          "text": "✅ Subcategorie nouă adăugată cu succes și marcată ca CUSTOM\n"
-                        },
-                        {
-                          "text": "📝 Tracking subcategorie adăugată: AUTO-Subcategorie-1748466306603 în NUTRITIE (EXPENSE)\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:03.442Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-eef019cd2c04f481d1c2",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 230,
+              "line": 330,
               "column": 7
             },
             {
@@ -1025,46 +315,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9511,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "✏️ Test redenumire subcategorie custom\n"
-                        },
-                        {
-                          "text": "✅ Categorie VENITURI selectată pentru redenumire custom\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria AUTO-Custom-1748466312983 adăugată cu succes\n"
-                        },
-                        {
-                          "text": "📝 Redenumesc în: AUTO-Custom-1748466312983 - Redenumit\n"
-                        },
-                        {
-                          "text": "⚠️ Nu găsesc subcategoria cu numele complet, caut cu o parte din nume...\n"
-                        },
-                        {
-                          "text": "✅ Găsit element cu numele parțial: AUTO-Custom-1748466312983\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:07.894Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-8899af83509441774fd8",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 287,
+              "line": 387,
               "column": 7
             },
             {
@@ -1078,40 +335,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4844,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🗑️ Test ștergere subcategorie custom\n"
-                        },
-                        {
-                          "text": "✅ Categorie NUTRITIE selectată pentru ștergere\n"
-                        },
-                        {
-                          "text": "✅ Dialog de confirmare ștergere afișat\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria custom ștearsă cu succes\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:17.409Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-06ff0ecea246230398d5",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 355,
+              "line": 454,
               "column": 7
             },
             {
@@ -1125,46 +355,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5580,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔄 Test verificare modificări în TransactionForm\n"
-                        },
-                        {
-                          "text": "🎯 Verificare subcategorie: AUTO-Subcategorie-1748466306603 din NUTRITIE (EXPENSE)\n"
-                        },
-                        {
-                          "text": "✅ Tip tranzacție selectat: EXPENSE\n"
-                        },
-                        {
-                          "text": "✅ Categorie selectată: NUTRITIE\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria nouă găsită în TransactionForm!\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria AUTO-Subcategorie-1748466306603 selectată cu succes în TransactionForm\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:22.256Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-69f69cba706d499065e4",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 409,
+              "line": 508,
               "column": 7
             },
             {
@@ -1178,37 +375,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3669,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "❌ Test anulare ștergere subcategorie\n"
-                        },
-                        {
-                          "text": "✅ Categorie LOCUINTA selectată pentru test anulare ștergere\n"
-                        },
-                        {
-                          "text": "✅ Ștergerea anulată cu succes, subcategoria păstrată\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:27.840Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-571ff2a4a5daacda9b66",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 504,
+              "line": 603,
               "column": 7
             },
             {
@@ -1222,1222 +395,13 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 21348,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧹 Test cleanup - ștergere subcategorii de test\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: VENITURI\n"
-                        },
-                        {
-                          "text": "🗑️ Găsite 1 subcategorii de test în VENITURI\n"
-                        },
-                        {
-                          "text": "🗑️ Șterg subcategoria: AUTO-Custom-1748466312983 - Rede\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria AUTO-Custom-1748466312983 - Rede ștearsă cu succes\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: ECONOMII\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în ECONOMII\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: INFATISARE\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în INFATISARE\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: EDUCATIE\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în EDUCATIE\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: CARIERA\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în CARIERA\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: SANATATE\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în SANATATE\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: NUTRITIE\n"
-                        },
-                        {
-                          "text": "🗑️ Găsite 1 subcategorii de test în NUTRITIE\n"
-                        },
-                        {
-                          "text": "🗑️ Șterg subcategoria: AUTO-Subcategorie-1748466306603\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria AUTO-Subcategorie-1748466306603 ștearsă cu succes\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: LOCUINTA\n"
-                        },
-                        {
-                          "text": "🗑️ Găsite 1 subcategorii de test în LOCUINTA\n"
-                        },
-                        {
-                          "text": "🗑️ Șterg subcategoria: AUTO-CancelDelete-1748466330237\n"
-                        },
-                        {
-                          "text": "✅ Subcategoria AUTO-CancelDelete-1748466330237 ștearsă cu succes\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: TIMP_LIBER\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în TIMP_LIBER\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: CALATORII\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în CALATORII\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: TRANSPORT\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în TRANSPORT\n"
-                        },
-                        {
-                          "text": "🔍 Verificare categorii de test în: INVESTITII\n"
-                        },
-                        {
-                          "text": "✅ Nicio subcategorie de test găsită în INVESTITII\n"
-                        },
-                        {
-                          "text": "🧹 Cleanup subcategorii de test finalizat! Total șterse: 3\n"
-                        },
-                        {
-                          "text": "ℹ️ Nu există subcategorii de revertat\n"
-                        },
-                        {
-                          "text": "🎯 CLEANUP COMPLET! Subcategorii șterse: 3, Redenumiri revertite: 0\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:31.512Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-5dfc0fd8ef36a1e10650",
               "file": "suites/features/category-editor.spec.ts",
-              "line": 544,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "suites\\features\\transaction-form.spec.ts",
-      "file": "suites/features/transaction-form.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "TransactionForm - Test cu Date Dinamice",
-          "file": "suites/features/transaction-form.spec.ts",
-          "line": 45,
-          "column": 6,
-          "specs": [
-            {
-              "title": "adaugă tranzacție cu date complet aleatoare și verifică în Supabase",
-              "ok": true,
-              "tags": [
-                "features"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9010,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🚀 Test adăugare tranzacție cu verificare în Supabase\n"
-                        },
-                        {
-                          "text": "🎲 Date generate pentru formular: SAVING | INVESTITII → Investiție/Afacere 2 | 30.75 RON | 2025-05-18 | Non-recurent | Fără descriere\n"
-                        },
-                        {
-                          "text": "✅ Login realizat cu succes\n"
-                        },
-                        {
-                          "text": "⚠️ Nu s-a putut obține userId pentru verificare Supabase\n"
-                        },
-                        {
-                          "text": "✅ Formular de tranzacție găsit\n"
-                        },
-                        {
-                          "text": "✅ Tip tranzacție selectat: SAVING\n"
-                        },
-                        {
-                          "text": "✅ Sumă completată: 30.75\n"
-                        },
-                        {
-                          "text": "✅ Categorie selectată: INVESTITII\n"
-                        },
-                        {
-                          "text": "✅ Subcategorie selectată: Investiție/Afacere 2\n"
-                        },
-                        {
-                          "text": "✅ Dată completată: 2025-05-18\n"
-                        },
-                        {
-                          "text": "✅ Tranzacție configurată ca non-recurentă\n"
-                        },
-                        {
-                          "text": "✅ Fără descriere (lăsat gol)\n"
-                        },
-                        {
-                          "text": "✅ Butonul de adăugare este activ\n"
-                        },
-                        {
-                          "text": "📸 Screenshot înainte de submit salvat\n"
-                        },
-                        {
-                          "text": "✅ Formular trimis\n"
-                        },
-                        {
-                          "text": "ℹ️ Mesaj de succes nu e vizibil (poate fi normal)\n"
-                        },
-                        {
-                          "text": "✅ Nicio eroare detectată\n"
-                        },
-                        {
-                          "text": "⚠️ Omit verificarea Supabase din cauza lipsei userId\n"
-                        },
-                        {
-                          "text": "📸 Screenshot după submit salvat\n"
-                        },
-                        {
-                          "text": "ℹ️ Valoare sumă după submit: \"\"\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:05:52.909Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "a64acd18288dd18a34f5-3cebbb8e5db69e02b739",
-              "file": "suites/features/transaction-form.spec.ts",
-              "line": 54,
-              "column": 7
-            },
-            {
-              "title": "testează adăugare tranzacție recurentă",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5346,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔄 Test specific pentru tranzacție recurentă\n"
-                        },
-                        {
-                          "text": "🎲 Date recurente generate: EXPENSE | CARIERA → Servicii realizare CV | 17.50 RON | 2025-05-14 | Recurent: WEEKLY | \"Cheltuială necesară\"\n"
-                        },
-                        {
-                          "text": "✅ Configurare recurentă completă: WEEKLY\n"
-                        },
-                        {
-                          "text": "✅ Tranzacție recurentă adăugată\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:01.925Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "a64acd18288dd18a34f5-339fd51b030845c07502",
-              "file": "suites/features/transaction-form.spec.ts",
-              "line": 256,
-              "column": 7
-            },
-            {
-              "title": "testează adăugare tranzacție simplă (non-recurentă)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4685,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "📝 Test specific pentru tranzacție simplă\n"
-                        },
-                        {
-                          "text": "🎲 Date simple generate: SAVING | INVESTITII → Investiție/Afacere 4 | 687.25 RON | 2025-05-22 | Non-recurent | \"Plată pentru servicii\"\n"
-                        },
-                        {
-                          "text": "✅ Configurare simplă confirmată: non-recurentă\n"
-                        },
-                        {
-                          "text": "✅ Tranzacție simplă adăugată\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:07.279Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "a64acd18288dd18a34f5-c5d8c42d3beb3b4fbb63",
-              "file": "suites/features/transaction-form.spec.ts",
-              "line": 314,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "suites\\integration\\lunargrid-integration.spec.ts",
-      "file": "suites/integration/lunargrid-integration.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "LunarGrid Integrare Completă cu Date Dinamice",
-          "file": "suites/integration/lunargrid-integration.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "workflow complet LunarGrid cu date dinamice",
-              "ok": true,
-              "tags": [
-                "integration"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5859,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🚀 Începe workflow complet LunarGrid cu date dinamice\n"
-                        },
-                        {
-                          "text": "🎲 Date generate pentru LunarGrid: {\n  primar: \u001b[32m'INCOME | VENITURI → Venituri reportate din luna anterioară (10.50)'\u001b[39m,\n  secundar: \u001b[32m'SAVING | ECONOMII → Fond de urgență (699.25)'\u001b[39m,\n  \u001b[32m'totalAșteptat'\u001b[39m: \u001b[32m'709.75'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "✅ Navigat la LunarGrid\n"
-                        },
-                        {
-                          "text": "✅ Expandat toate categoriile\n"
-                        },
-                        {
-                          "text": "✅ 3875 celule expandate găsite\n"
-                        },
-                        {
-                          "text": "✅ Prima celulă găsită: editable-cell-VENITURI-Salarii - Modificat - Modificat-1\n"
-                        },
-                        {
-                          "text": "✅ A doua celulă găsită: editable-cell-VENITURI-Salarii - Modificat - Modificat-2\n"
-                        },
-                        {
-                          "text": "✅ Click realizat pe prima celulă\n"
-                        },
-                        {
-                          "text": "✅ Click realizat pe a doua celulă\n"
-                        },
-                        {
-                          "text": "✅ Reset expandare realizat\n"
-                        },
-                        {
-                          "text": "✅ Celule după reset: 0 (reduse față de 3875)\n"
-                        },
-                        {
-                          "text": "✅ Screenshot salvat: lunargrid-integration-complete.png\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:11.978Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "440c53061a11f59bd715-e13a44aa61fb38128c8e",
-              "file": "suites/integration/lunargrid-integration.spec.ts",
-              "line": 13,
-              "column": 7
-            },
-            {
-              "title": "testează varietatea în mai multe rulări consecutive",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 8084,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎯 Test varietate pentru rulări consecutive\n"
-                        },
-                        {
-                          "text": "📊 Celule disponibile: 3875\n"
-                        },
-                        {
-                          "text": "1. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-1 | Vizibilă: true\n"
-                        },
-                        {
-                          "text": "2. Celula testată: editable-cell-input-VENITURI-Salarii - Modificat - Modificat-1 | Vizibilă: true\n"
-                        },
-                        {
-                          "text": "3. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-2 | Vizibilă: true\n"
-                        },
-                        {
-                          "text": "⚠️ Grid-ul s-a resetat după click 3, re-expandăm...\n"
-                        },
-                        {
-                          "text": "4. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-4 | Vizibilă: true\n"
-                        },
-                        {
-                          "text": "5. Celula testată: editable-cell-input-VENITURI-Salarii - Modificat - Modificat-4 | Vizibilă: true\n"
-                        },
-                        {
-                          "text": "Celule testate: 5, unique: 5\n"
-                        },
-                        {
-                          "text": "✅ Teste de varietate completate cu succes\n"
-                        },
-                        {
-                          "text": "📊 Statistici finale: { totalEstimate: \u001b[33m408\u001b[39m, folosite: \u001b[33m0\u001b[39m, \u001b[32m'rămase'\u001b[39m: \u001b[33m408\u001b[39m }\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:17.843Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "440c53061a11f59bd715-f1a4ceaa97a0130bf24c",
-              "file": "suites/integration/lunargrid-integration.spec.ts",
-              "line": 113,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "suites\\validation\\data-generator.spec.ts",
-      "file": "suites/validation/data-generator.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Test Data Generator",
-          "file": "suites/validation/data-generator.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "verifică că generatorul produce date valide",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 10,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔄 Teste combinații următoare:\n"
-                        },
-                        {
-                          "text": "Combinația 1: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'INVESTITII'\u001b[39m,\n  subcategorie: \u001b[32m'Investiție/Afacere 1'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'209.00'\u001b[39m,\n  descriere: \u001b[32m'Test INVESTITII - Investiție/Afacere 1 (large)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Combinația 2: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de urgență'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1820.25'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond de urgență (extra_large)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Combinația 3: {\n  tip: \u001b[32m'INCOME'\u001b[39m,\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'5.50'\u001b[39m,\n  descriere: \u001b[32m'Test VENITURI - Venituri reportate din luna anterioară (small)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Combinația 4: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond general'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'16.50'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond general (small)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Combinația 5: {\n  tip: \u001b[32m'EXPENSE'\u001b[39m,\n  categorie: \u001b[32m'INFATISARE'\u001b[39m,\n  subcategorie: \u001b[32m'Produse cosmetice'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1861.25'\u001b[39m,\n  descriere: \u001b[32m'Test INFATISARE - Produse cosmetice (extra_large)'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "📊 Statistici generator: { totalEstimate: \u001b[33m408\u001b[39m, usedCombinations: \u001b[33m5\u001b[39m, cacheSize: \u001b[33m5\u001b[39m }\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.940Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "eb79a5cca070ca6e10d5-eec683f2dcc2177b30dd",
-              "file": "suites/validation/data-generator.spec.ts",
-              "line": 6,
-              "column": 7
-            },
-            {
-              "title": "verifică combinații pentru tip specific",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\n💰 Test combinații pentru EXPENSE:\n"
-                        },
-                        {
-                          "text": "Cheltuială 1: {\n  categorie: \u001b[32m'CARIERA'\u001b[39m,\n  subcategorie: \u001b[32m'Taxe autorizare | Examene titularizare sau specializare'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'304.00'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Cheltuială 2: {\n  categorie: \u001b[32m'TIMP_LIBER'\u001b[39m,\n  subcategorie: \u001b[32m'Pariuri | Loto | Casino'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'14.50'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Cheltuială 3: {\n  categorie: \u001b[32m'INFATISARE'\u001b[39m,\n  subcategorie: \u001b[32m'Produse de igienă personală'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'19.50'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "\n💵 Test combinații pentru INCOME:\n"
-                        },
-                        {
-                          "text": "Venit 1: {\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'66.75'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Venit 2: {\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'10.50'\u001b[39m\n}\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.952Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "eb79a5cca070ca6e10d5-65562a9202824746f91f",
-              "file": "suites/validation/data-generator.spec.ts",
-              "line": 40,
-              "column": 7
-            },
-            {
-              "title": "verifică combinații multiple diferite",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\n🎲 Test combinații multiple:\n"
-                        },
-                        {
-                          "text": "Combinații generate: [\n  \u001b[32m'TRANSPORT-Combustibil-1297.25'\u001b[39m,\n  \u001b[32m'VENITURI-Alocații-35.75'\u001b[39m,\n  \u001b[32m'INFATISARE-Îmbrăcăminte, încălțăminte și accesorii-1808.25'\u001b[39m,\n  \u001b[32m'CALATORII-Asigurare de călătorie-102.00'\u001b[39m\n]\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.959Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "eb79a5cca070ca6e10d5-f4088e1a5d70135f4d0a",
-              "file": "suites/validation/data-generator.spec.ts",
-              "line": 70,
-              "column": 7
-            },
-            {
-              "title": "verifică LunarGrid test data",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\n🌙 Test LunarGrid data generator:\n"
-                        },
-                        {
-                          "text": "Date LunarGrid: {\n  primar: {\n    categorie: \u001b[32m'VENITURI'\u001b[39m,\n    subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n    \u001b[32m'sumă'\u001b[39m: \u001b[32m'14.50'\u001b[39m\n  },\n  secundar: {\n    categorie: \u001b[32m'ECONOMII'\u001b[39m,\n    subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n    \u001b[32m'sumă'\u001b[39m: \u001b[32m'279.00'\u001b[39m\n  },\n  \u001b[32m'totalAșteptat'\u001b[39m: \u001b[32m'293.50'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "Selectori dinamici: {\n  toggleExpandAllButton: \u001b[32m'toggle-expand-all'\u001b[39m,\n  resetExpandedButton: \u001b[32m'reset-expanded'\u001b[39m,\n  expandCategoryButton: \u001b[32m'expand-btn-VENITURI'\u001b[39m,\n  cellSelector: \u001b[32m'editable-cell-VENITURI-Venituri reportate din luna anterioară-15'\u001b[39m,\n  categoryRow: \u001b[32m'category-row-venituri'\u001b[39m,\n  subcategoryCell: \u001b[32m'subcategory-venituri-reportate-din-luna-anterioară'\u001b[39m,\n  categoryHeader: \u001b[32m'category-venituri'\u001b[39m,\n  subcategoryRow: \u001b[32m'subcategory-row-venituri-reportate-din-luna-anterioară'\u001b[39m\n}\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.962Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "eb79a5cca070ca6e10d5-28fecf949f736b7b0480",
-              "file": "suites/validation/data-generator.spec.ts",
-              "line": 84,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "suites\\validation\\dynamic-variety.spec.ts",
-      "file": "suites/validation/dynamic-variety.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Test Varietate Date Dinamice",
-          "file": "suites/validation/dynamic-variety.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "demonstrează varietatea combinațiilor generate",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎲 Demonstrație varietate date dinamice:\n\n"
-                        },
-                        {
-                          "text": "📋 10 combinații consecutive:\n"
-                        },
-                        {
-                          "text": "1. EXPENSE | CALATORII → Bilete pentru mijloace de transport/combustibil (822.25)\n"
-                        },
-                        {
-                          "text": "2. EXPENSE | TIMP_LIBER → Jocuri de societate | Jucării pentru copii (334.00)\n"
-                        },
-                        {
-                          "text": "3. INCOME | VENITURI → Venituri reportate din luna anterioară (638.25)\n"
-                        },
-                        {
-                          "text": "4. INCOME | VENITURI → Venituri reportate din luna anterioară (94.75)\n"
-                        },
-                        {
-                          "text": "5. EXPENSE | SANATATE → Asigurări de sănătate | medicale (42.75)\n"
-                        },
-                        {
-                          "text": "6. SAVING | ECONOMII → Fond de urgență (326.00)\n"
-                        },
-                        {
-                          "text": "7. INCOME | VENITURI → Venituri reportate din luna anterioară (365.00)\n"
-                        },
-                        {
-                          "text": "8. EXPENSE | TRANSPORT → Asigurare RCA (1463.25)\n"
-                        },
-                        {
-                          "text": "9. INCOME | VENITURI → Dividende (51.75)\n"
-                        },
-                        {
-                          "text": "10. EXPENSE | CALATORII → Hrană (617.25)\n"
-                        },
-                        {
-                          "text": "\n💰 Combinații specifice per tip:\n"
-                        },
-                        {
-                          "text": "EXPENSE: TRANSPORT → Asigurare CASCO (1893.25)\n"
-                        },
-                        {
-                          "text": "INCOME: VENITURI → Chirii (87.75)\n"
-                        },
-                        {
-                          "text": "SAVING: INVESTITII → Investiție/Afacere 3 (93.75)\n"
-                        },
-                        {
-                          "text": "\n🌙 Date pentru LunarGrid:\n"
-                        },
-                        {
-                          "text": "Primar: VENITURI → Venituri reportate din luna anterioară (78.75)\n"
-                        },
-                        {
-                          "text": "Secundar: ECONOMII → Fond general (99.75)\n"
-                        },
-                        {
-                          "text": "Total așteptat: 178.50\n"
-                        },
-                        {
-                          "text": "\n📊 Statistici finale:\n"
-                        },
-                        {
-                          "text": "Total combinații estimate: 408\n"
-                        },
-                        {
-                          "text": "Combinații folosite: 15\n"
-                        },
-                        {
-                          "text": "Cache size: 0\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.970Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "920772bb101ecf01b95b-e137cae3aec5e651b51c",
-              "file": "suites/validation/dynamic-variety.spec.ts",
-              "line": 6,
-              "column": 7
-            },
-            {
-              "title": "verifică consistența categoriilor și subcategoriilor",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 39,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Verificare consistență categorii-subcategorii:\n\n"
-                        },
-                        {
-                          "text": "1. ✅ INFATISARE | General → Produse cosmetice\n"
-                        },
-                        {
-                          "text": "2. ✅ SANATATE | General → Terapii de recuperare\n"
-                        },
-                        {
-                          "text": "3. ✅ ECONOMII | Categorii de economii → Fond de urgență\n"
-                        },
-                        {
-                          "text": "4. ✅ INVESTITII | Proiecte → Investiție/Afacere 3\n"
-                        },
-                        {
-                          "text": "5. ✅ TIMP_LIBER | Diverse → Jocuri de societate | Jucării pentru copii\n"
-                        },
-                        {
-                          "text": "... și încă 15 combinații verificate cu succes!\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:25.975Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "920772bb101ecf01b95b-e7edd468bd8467f03ac9",
-              "file": "suites/validation/dynamic-variety.spec.ts",
-              "line": 61,
-              "column": 7
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "suites\\validation\\form-generator.spec.ts",
-      "file": "suites/validation/form-generator.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Generator Date TransactionForm - Validare",
-          "file": "suites/validation/form-generator.spec.ts",
-          "line": 5,
-          "column": 6,
-          "specs": [
-            {
-              "title": "validează generarea datelor aleatorii",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 29,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🧪 Test validare generator date formular\n"
-                        },
-                        {
-                          "text": "1. EXPENSE | TRANSPORT → Transport public | 808.25 RON | 2025-05-13 | Non-recurent | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "2. INCOME | VENITURI → Venituri reportate din luna anterioară | 367.00 RON | 2025-05-05 | Non-recurent | \"Plată pentru servicii\"\n"
-                        },
-                        {
-                          "text": "3. EXPENSE | TIMP_LIBER → Jocuri de societate | Jucării pentru copii | 37.75 RON | 2025-05-18 | Non-recurent | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "4. EXPENSE | TIMP_LIBER → Cadouri pentru cei dragi | 1194.25 RON | 2025-05-13 | Non-recurent | \"Cheltuială necesară\"\n"
-                        },
-                        {
-                          "text": "5. SAVING | ECONOMII → Fond general | 16.50 RON | 2025-05-08 | Non-recurent | \"Cheltuială necesară\"\n"
-                        },
-                        {
-                          "text": "6. INCOME | VENITURI → Venituri reportate din luna anterioară | 39.75 RON | 2025-05-11 | Recurent: YEARLY | \"Investiție programată\"\n"
-                        },
-                        {
-                          "text": "7. SAVING | ECONOMII → Fond de urgență | 60.75 RON | 2025-05-18 | Recurent: YEARLY | \"Achiziție planificată\"\n"
-                        },
-                        {
-                          "text": "8. EXPENSE | EDUCATIE → Grădiniță | Creșă | Afterschool | Bonă | 167.00 RON | 2025-05-15 | Non-recurent | Fără descriere\n"
-                        },
-                        {
-                          "text": "9. INCOME | VENITURI → Chirii | 97.75 RON | 2025-05-22 | Non-recurent | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "10. INCOME | VENITURI → Alte venituri | 43.75 RON | 2025-05-21 | Non-recurent | Fără descriere\n"
-                        },
-                        {
-                          "text": "✅ Toate datele generate sunt valide\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.022Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-1bde7e49c26a60d2d260",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 7,
-              "column": 7
-            },
-            {
-              "title": "validează generator pentru tranzacții recurente",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔄 Test generator pentru tranzacții recurente\n"
-                        },
-                        {
-                          "text": "1. RECURENT: INCOME | VENITURI → Venituri reportate din luna anterioară | 928.25 RON | 2025-05-26 | Recurent: DAILY | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "2. RECURENT: EXPENSE | CALATORII → Suveniruri | 13.50 RON | 2025-04-30 | Recurent: YEARLY | Fără descriere\n"
-                        },
-                        {
-                          "text": "3. RECURENT: SAVING | INVESTITII → Investiție/Afacere 3 | 5.50 RON | 2025-05-28 | Recurent: WEEKLY | \"Tranzacție de test automată\"\n"
-                        },
-                        {
-                          "text": "4. RECURENT: INCOME | VENITURI → Venituri reportate din luna anterioară | 69.75 RON | 2025-05-05 | Recurent: DAILY | \"Plată pentru servicii\"\n"
-                        },
-                        {
-                          "text": "5. RECURENT: EXPENSE | TRANSPORT → Parcare | 680.25 RON | 2025-05-09 | Recurent: WEEKLY | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "✅ Toate tranzacțiile recurente sunt valide\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.052Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-c7104c9ca78050e502e6",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 39,
-              "column": 7
-            },
-            {
-              "title": "validează generator pentru tranzacții simple",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "📝 Test generator pentru tranzacții simple\n"
-                        },
-                        {
-                          "text": "1. SIMPLU: INCOME | VENITURI → Cadouri | 370.00 RON | 2025-05-04 | Non-recurent | \"Plată pentru servicii\"\n"
-                        },
-                        {
-                          "text": "2. SIMPLU: EXPENSE | EDUCATIE → Materiale de studiu | cărți | 87.75 RON | 2025-05-24 | Non-recurent | \"Cheltuială necesară\"\n"
-                        },
-                        {
-                          "text": "3. SIMPLU: SAVING | ECONOMII → Fond de urgență | 579.25 RON | 2025-05-27 | Non-recurent | Fără descriere\n"
-                        },
-                        {
-                          "text": "4. SIMPLU: SAVING | INVESTITII → Investiție/Afacere 5 | 13.50 RON | 2025-05-03 | Non-recurent | \"Transfer regulat\"\n"
-                        },
-                        {
-                          "text": "5. SIMPLU: SAVING | ECONOMII → Fond de urgență | 19.50 RON | 2025-05-18 | Non-recurent | \"Achiziție planificată\"\n"
-                        },
-                        {
-                          "text": "✅ Toate tranzacțiile simple sunt valide\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.059Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-3f7a287861bc18adbaa3",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 57,
-              "column": 7
-            },
-            {
-              "title": "validează selectorii generați",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎯 Test validare selectori\n"
-                        },
-                        {
-                          "text": "📝 Selectori generați: {\n  form: \u001b[32m'transaction-form'\u001b[39m,\n  formLoading: \u001b[32m'transaction-form-loading'\u001b[39m,\n  storeLoading: \u001b[32m'transaction-form-store-loading'\u001b[39m,\n  dataLoading: \u001b[32m'transaction-form-data-loading'\u001b[39m,\n  typeSelect: \u001b[32m'type-select'\u001b[39m,\n  amountInput: \u001b[32m'amount-input'\u001b[39m,\n  categorySelect: \u001b[32m'category-select'\u001b[39m,\n  subcategorySelect: \u001b[32m'subcategory-select'\u001b[39m,\n  dateInput: \u001b[32m'date-input'\u001b[39m,\n  recurringCheckbox: \u001b[32m'recurring-checkbox'\u001b[39m,\n  frequencySelect: \u001b[32m'frequency-select'\u001b[39m,\n  descriptionInput: \u001b[32m'description-input'\u001b[39m,\n  addButton: \u001b[32m'add-transaction-button'\u001b[39m,\n  cancelButton: \u001b[32m'cancel-btn'\u001b[39m,\n  errorMessage: \u001b[32m'error-message'\u001b[39m,\n  successMessage: \u001b[32m'success-message'\u001b[39m\n}\n"
-                        },
-                        {
-                          "text": "✅ Toți selectorii sunt configurați corect\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.065Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-db8caf3709eb32329560",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 74,
-              "column": 7
-            },
-            {
-              "title": "demonstrează varietatea tipurilor de tranzacție",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🎲 Demonstrație varietate tipuri tranzacție\n"
-                        },
-                        {
-                          "text": "📊 Distribuție tipuri tranzacții (din 50): { INCOME: \u001b[33m25\u001b[39m, EXPENSE: \u001b[33m12\u001b[39m, SAVING: \u001b[33m13\u001b[39m }\n"
-                        },
-                        {
-                          "text": "✅ Varietate confirmată pentru toate tipurile\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.071Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-794163b7d74018211264",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 97,
-              "column": 7
-            },
-            {
-              "title": "demonstrează varietatea frecvențelor",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 26,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "⏰ Demonstrație varietate frecvențe\n"
-                        },
-                        {
-                          "text": "📊 Distribuție frecvențe (din 30 recurente): { YEARLY: \u001b[33m7\u001b[39m, WEEKLY: \u001b[33m8\u001b[39m, DAILY: \u001b[33m8\u001b[39m, MONTHLY: \u001b[33m7\u001b[39m }\n"
-                        },
-                        {
-                          "text": "✅ Varietate confirmată pentru frecvențe\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-05-28T21:06:26.074Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "ee714b49037cf32dcebf-1fdd6385efbdafe58eda",
-              "file": "suites/validation/form-generator.spec.ts",
-              "line": 122,
+              "line": 643,
               "column": 7
             }
           ]
@@ -2447,10 +411,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-28T21:03:51.738Z",
-    "duration": 155663.3459999999,
-    "expected": 37,
-    "skipped": 0,
+    "startTime": "2025-05-28T21:13:44.219Z",
+    "duration": 56359.6120000002,
+    "expected": 0,
+    "skipped": 10,
     "unexpected": 1,
     "flaky": 0
   }
