@@ -2,9 +2,6 @@ import { test, expect } from '@playwright/test';
 import { AuthPage } from '../../support/pages/AuthPage';
 import { TransactionFormDataGenerator } from '../../config/test-data-generator';
 
-// Import pentru verificarea în Supabase
-import { execSync } from 'child_process';
-
 // Adaug functionalitate pentru verificarea tranzacției în Supabase
 async function verifyTransactionInSupabase(
   formData: any, 
