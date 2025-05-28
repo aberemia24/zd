@@ -1,5 +1,5 @@
-import { Page, expect } from '@playwright/test';
-import { URLS, SELECTORS, TIMEOUTS, EXPECTED_TEXTS, STABILITY } from '../../config/test-constants';
+import { Page } from '@playwright/test';
+import { URLS, SELECTORS, TIMEOUTS, STABILITY } from '../../config/test-constants';
 import { TestAccount, TestResult, PageState } from '../../types/test-types';
 import { AccountManager } from '../AccountManager';
 
