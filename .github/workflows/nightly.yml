@@ -1,8 +1,8 @@
-name: Nightly Regression
+name: Nightly Regression Tests
 
 on:
   schedule:
-    # Runs at 3:00 AM UTC (5:00 AM RO time)
+    # Daily at 3:00 UTC (5:00 RO time)
     - cron: '0 3 * * *'
   workflow_dispatch: # Allow manual trigger
     inputs:
@@ -18,7 +18,7 @@ on:
           - all
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   regression-tests:
