@@ -79,7 +79,7 @@
           "specs": [
             {
               "title": "explorez lunar grid cu date dinamice",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "debug"
               ],
@@ -92,28 +92,87 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 15454,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🎲 Date test generate: {\n  primar: \u001b[32m'VENITURI -> Cadouri (20.50)'\u001b[39m,\n  secundar: \u001b[32m'ECONOMII -> Fond general (1110.25)'\u001b[39m,\n  total: \u001b[32m'1130.75'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "🔍 URL după login: http://localhost:3000/login\n"
+                        },
+                        {
+                          "text": "🔍 URL LunarGrid: http://localhost:3000/lunar-grid?month=2025-05\n"
+                        },
+                        {
+                          "text": "🔍 Butoane expand găsite: 15\n"
+                        },
+                        {
+                          "text": "🔍 Expandez toate categoriile cu \"toggle-expand-all\"\n"
+                        },
+                        {
+                          "text": "🔍 Selectori dinamici generați: {\n  toggleExpandAll: \u001b[32m'toggle-expand-all'\u001b[39m,\n  expandCategory: \u001b[32m'expand-btn-VENITURI'\u001b[39m,\n  celulaTinta: \u001b[32m'editable-cell-VENITURI-Cadouri-15'\u001b[39m,\n  categorieHeader: \u001b[32m'category-venituri'\u001b[39m,\n  subcategorieRow: \u001b[32m'subcategory-row-cadouri'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "🔍 Celula țintă editable-cell-VENITURI-Cadouri-15 există: true\n"
+                        },
+                        {
+                          "text": "🔍 Total celule găsite după expandare: 3875\n"
+                        },
+                        {
+                          "text": "🔍 Celula 0: editable-cell-VENITURI-Salarii - Modificat - Modificat-1, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 1: editable-cell-VENITURI-Salarii - Modificat - Modificat-2, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 2: editable-cell-VENITURI-Salarii - Modificat - Modificat-3, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 3: editable-cell-VENITURI-Salarii - Modificat - Modificat-4, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 4: editable-cell-VENITURI-Salarii - Modificat - Modificat-5, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 5: editable-cell-VENITURI-Salarii - Modificat - Modificat-6, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 6: editable-cell-VENITURI-Salarii - Modificat - Modificat-7, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 7: editable-cell-VENITURI-Salarii - Modificat - Modificat-8, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 8: editable-cell-VENITURI-Salarii - Modificat - Modificat-9, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula 9: editable-cell-VENITURI-Salarii - Modificat - Modificat-10, vizibilă: true\n"
+                        },
+                        {
+                          "text": "🔍 Celula țintă după expandare: true\n"
+                        },
+                        {
+                          "text": "🔍 Month selector există: \u001b[33mtrue\u001b[39m\n"
+                        },
+                        {
+                          "text": "🔍 Year input există: \u001b[33mtrue\u001b[39m\n"
+                        },
+                        {
+                          "text": "✅ Screenshot salvat: lunar-grid-dynamic-exploration.png\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:15.968Z",
+                      "startTime": "2025-05-28T21:03:53.431Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "2ef39b18422f3af63f9b-b25a4de352ea297275c9",
@@ -123,7 +182,7 @@
             },
             {
               "title": "explorez transactions page cu date dinamice",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -134,28 +193,45 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 3394,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🎲 Combinații generate pentru explorare: {\n  \u001b[32m'cheltuială'\u001b[39m: \u001b[32m'EDUCATIE -> Grădiniță | Creșă | Afterschool | Bonă (81.75)'\u001b[39m,\n  venit: \u001b[32m'VENITURI -> Venituri reportate din luna anterioară (238.00)'\u001b[39m,\n  economie: \u001b[32m'INVESTITII -> Investiție/Afacere 5 (640.25)'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "🔍 URL Transactions: http://localhost:3000/transactions\n"
+                        },
+                        {
+                          "text": "🔍 Elemente categorie găsite: 4\n"
+                        },
+                        {
+                          "text": "🔍 Elemente formulare găsite: 18\n"
+                        },
+                        {
+                          "text": "🔍 Select-uri găsite: 7\n"
+                        },
+                        {
+                          "text": "🔍 Selector categorie găsit, opțiuni disponibile:\n"
+                        },
+                        {
+                          "text": "   Opțiunea 0: Alege\n"
+                        },
+                        {
+                          "text": "✅ Screenshot salvat: transactions-dynamic-exploration.png\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:16.798Z",
+                      "startTime": "2025-05-28T21:04:13.599Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "2ef39b18422f3af63f9b-eb41c917103d77b27cce",
@@ -182,7 +258,7 @@
           "specs": [
             {
               "title": "testează login cu contul principal direct",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -193,28 +269,48 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 3205,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Debug: Testez login cu contul principal\n"
+                        },
+                        {
+                          "text": "📧 Email: aberemia@gmail.com\n"
+                        },
+                        {
+                          "text": "🔑 Password: test123\n"
+                        },
+                        {
+                          "text": "✅ Pagina de login s-a încărcat\n"
+                        },
+                        {
+                          "text": "📝 Câmpuri completate\n"
+                        },
+                        {
+                          "text": "🚀 Submit efectuat\n"
+                        },
+                        {
+                          "text": "📍 URL după 2s: http://localhost:3000/transactions\n"
+                        },
+                        {
+                          "text": "⏳ Aștept redirect la transactions...\n"
+                        },
+                        {
+                          "text": "✅ SUCCESS! Redirectat la transactions!\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:17.632Z",
+                      "startTime": "2025-05-28T21:04:17.004Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "94e0bb06b7dfd2ab7e86-369fd7cdf71a3425b04f",
@@ -252,22 +348,22 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10,
+                      "duration": 4,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "🔄 Generez o combinație simplă...\n"
                         },
                         {
-                          "text": "✅ Combinație generată: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'140.00'\u001b[39m\n}\n"
+                          "text": "✅ Combinație generată: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'17.50'\u001b[39m\n}\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:18.453Z",
+                      "startTime": "2025-05-28T21:04:20.217Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -293,22 +389,22 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3,
+                      "duration": 2,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "💰 Generez pentru tip EXPENSE...\n"
                         },
                         {
-                          "text": "✅ Combinație EXPENSE: {\n  categorie: \u001b[32m'CARIERA'\u001b[39m,\n  subcategorie: \u001b[32m'Consultanță juridică | financiară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1346.25'\u001b[39m\n}\n"
+                          "text": "✅ Combinație EXPENSE: { categorie: \u001b[32m'NUTRITIE'\u001b[39m, subcategorie: \u001b[32m'Comenzi'\u001b[39m, \u001b[32m'sumă'\u001b[39m: \u001b[32m'85.75'\u001b[39m }\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:18.471Z",
+                      "startTime": "2025-05-28T21:04:20.224Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -340,7 +436,7 @@
           "specs": [
             {
               "title": "login cu contul principal funcționează",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -353,28 +449,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 1380,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Smoke Test: Login principal\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Login principal - SUCCESS\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:18.486Z",
+                      "startTime": "2025-05-28T21:04:20.235Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e126e6d08fe12245c665-5ec09a80a7663343ac60",
@@ -384,7 +479,7 @@
             },
             {
               "title": "navigarea între pagini funcționează",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -397,28 +492,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4938,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Smoke Test: Basic Navigation\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Basic Navigation - SUCCESS\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:19.290Z",
+                      "startTime": "2025-05-28T21:04:21.619Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e126e6d08fe12245c665-f6f2215ebf7ef84e5be5",
@@ -445,7 +539,7 @@
           "specs": [
             {
               "title": "LunarGrid se deschide și afișează grid-ul",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -458,28 +552,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 1837,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Smoke Test: LunarGrid Loading\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: LunarGrid Loading - SUCCESS\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:20.078Z",
+                      "startTime": "2025-05-28T21:04:26.569Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "ca675092496f716193df-033cd2ceea04cd2186f4",
@@ -489,7 +582,7 @@
             },
             {
               "title": "expand/collapse categorii funcționează",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -502,28 +595,36 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 5360,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Smoke Test: Expand/Collapse\n"
+                        },
+                        {
+                          "text": "📊 Celule înainte: 0\n"
+                        },
+                        {
+                          "text": "📊 Celule după expandare: 3875\n"
+                        },
+                        {
+                          "text": "📊 Celule după reset: 0\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Expand/Collapse - SUCCESS\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:20.875Z",
+                      "startTime": "2025-05-28T21:04:28.409Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "ca675092496f716193df-6662e7ad35de96b47d53",
@@ -533,7 +634,7 @@
             },
             {
               "title": "celulele grid-ului răspund la click",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -546,28 +647,30 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 7,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4383,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔍 Smoke Test: Cell Interaction\n"
+                        },
+                        {
+                          "text": "📊 Celule după expandare: 3875\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Cell Interaction - SUCCESS\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:21.713Z",
+                      "startTime": "2025-05-28T21:04:33.773Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "ca675092496f716193df-d7001f026a035a26fb10",
@@ -594,7 +697,7 @@
           "specs": [
             {
               "title": "accesează CategoryEditor din pagina Options",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "features"
               ],
@@ -607,28 +710,36 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 8,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 5386,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🚀 Test accesarea CategoryEditor\n"
+                        },
+                        {
+                          "text": "✅ Navigat la pagina Options\n"
+                        },
+                        {
+                          "text": "✅ Buton \"Gestionare categorii\" găsit\n"
+                        },
+                        {
+                          "text": "✅ Modal CategoryEditor deschis\n"
+                        },
+                        {
+                          "text": "✅ Toate secțiunile modalului sunt vizibile\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:22.524Z",
+                      "startTime": "2025-05-28T21:04:38.172Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-f07206b8cb075f2ae794",
@@ -638,7 +749,7 @@
             },
             {
               "title": "închide CategoryEditor cu butonul X",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -649,28 +760,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 9,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 1942,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "❌ Test închidere CategoryEditor cu X\n"
+                        },
+                        {
+                          "text": "✅ Modal închis cu butonul X\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:23.334Z",
+                      "startTime": "2025-05-28T21:04:43.561Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-ae4f153405a5cac489a0",
@@ -680,7 +790,7 @@
             },
             {
               "title": "închide CategoryEditor cu tasta ESC",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -691,28 +801,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 10,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 1978,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "⌨️ Test închidere CategoryEditor cu ESC\n"
+                        },
+                        {
+                          "text": "✅ Modal închis cu tasta ESC\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:24.151Z",
+                      "startTime": "2025-05-28T21:04:45.509Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-fc4e95a003a87865e6f6",
@@ -722,7 +831,7 @@
             },
             {
               "title": "selectează o categorie și verifică afișarea subcategoriilor",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -733,28 +842,33 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 11,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 1662,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "📂 Test selectare categorie și afișare subcategorii\n"
+                        },
+                        {
+                          "text": "✅ Mesaj \"Selectați o categorie\" afișat inițial\n"
+                        },
+                        {
+                          "text": "✅ Categorie INVESTITII selectată (random)\n"
+                        },
+                        {
+                          "text": "✅ 5 subcategorii afișate pentru INVESTITII\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:24.971Z",
+                      "startTime": "2025-05-28T21:04:47.492Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-3a764999d7dcde9bf5ba",
@@ -775,25 +889,68 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 12,
+                      "workerIndex": 25,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 5,
+                      "duration": 12191,
                       "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:216:33",
+                        "location": {
+                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
+                          "column": 33,
+                          "line": 216
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mconst\u001b[39m renamedSubcat \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m`subcat-item-${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 216 |\u001b[39m     \u001b[36mawait\u001b[39m expect(renamedSubcat)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 217 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m`✅ Subcategoria redenumită cu succes în: ${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 218 |\u001b[39m     \n \u001b[90m 219 |\u001b[39m     \u001b[90m// TRACK redenumirea pentru cleanup\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
+                            "column": 33,
+                            "line": 216
+                          },
+                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('subcat-item-Transport public - Modificat - Modificat')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('subcat-item-Transport public - Modificat - Modificat')\u001b[22m\n\n\n\u001b[0m \u001b[90m 214 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForTimeout(\u001b[35m1000\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 215 |\u001b[39m     \u001b[36mconst\u001b[39m renamedSubcat \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m`subcat-item-${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 216 |\u001b[39m     \u001b[36mawait\u001b[39m expect(renamedSubcat)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 217 |\u001b[39m     console\u001b[33m.\u001b[39mlog(\u001b[32m`✅ Subcategoria redenumită cu succes în: ${newName}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 218 |\u001b[39m     \n \u001b[90m 219 |\u001b[39m     \u001b[90m// TRACK redenumirea pentru cleanup\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:216:33\u001b[22m"
                         }
                       ],
-                      "stdout": [],
+                      "stdout": [
+                        {
+                          "text": "✏️ Test redenumire subcategorie standard\n"
+                        },
+                        {
+                          "text": "✅ Categorie TRANSPORT selectată pentru redenumire\n"
+                        },
+                        {
+                          "text": "📝 Redenumesc subcategoria: Transport public - Modificat\n"
+                        },
+                        {
+                          "text": "✅ Input de redenumire afișat și focalizat\n"
+                        },
+                        {
+                          "text": "📏 Nume original: 28 chars, Nume nou: 40 chars\n"
+                        }
+                      ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:25.797Z",
+                      "startTime": "2025-05-28T21:04:49.157Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-28ecb-ște-o-subcategorie-standard-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context",
+                          "contentType": "application/json",
+                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGhlYWRpbmcgXCJPcMibaXVuaVwiIFtsZXZlbD0xXVxuLSBoZWFkaW5nIFwiR2VzdGlvbmFyZSBjYXRlZ29yaWlcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiBQZXJzb25hbGl6YcibaSBjYXRlZ29yaWlsZSDImWkgc3ViY2F0ZWdvcmlpbGUgcGVudHJ1IGEgc2UgcG90cml2aSBuZXZvaWxvciBkdnMuIHNwZWNpZmljZSBkZSBidWdldGFyZS5cbi0gYnV0dG9uIFwiR2VzdGlvbmFyZSBjYXRlZ29yaWlcIlxuLSBoZWFkaW5nIFwiT3DIm2l1bmkgZGUgYWZpyJlhcmVcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiDDjm4gY3Vyw6JuZFxuLSBoZWFkaW5nIFwiRXhwb3J0IGRhdGVcIiBbbGV2ZWw9Ml1cbi0gcGFyYWdyYXBoOiDDjm4gY3Vyw6JuZFxuLSBoZWFkaW5nIFwiU2V0xINyaSBDb250XCIgW2xldmVsPTJdXG4tIHBhcmFncmFwaDogRGVjb25lY3RlYXrEgy10ZSBkZSBsYSBjb250dWwgdMSDdS5cbi0gYnV0dG9uIFwiTG9nb3V0XCJcbi0gZGlhbG9nIFwiR2VzdGlvbmFyZSBTdWJjYXRlZ29yaWlcIjpcbiAgLSBoZWFkaW5nIFwiR2VzdGlvbmFyZSBTdWJjYXRlZ29yaWlcIiBbbGV2ZWw9Ml1cbiAgLSBidXR0b24gXCLDjm5jaGlkZVwiOlxuICAgIC0gaW1nXG4gIC0gaGVhZGluZyBcIkNhdGVnb3JpaVwiIFtsZXZlbD0zXVxuICAtIGxpc3Q6XG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiVkVOSVRVUklcIlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIGJ1dHRvbiBcIkVDT05PTUlJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJJTkZBVElTQVJFXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJFRFVDQVRJRVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiQ0FSSUVSQVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiU0FOQVRBVEVcIlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIGJ1dHRvbiBcIk5VVFJJVElFXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJMT0NVSU5UQVwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiVElNUF9MSUJFUlwiXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gYnV0dG9uIFwiQ0FMQVRPUklJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJUUkFOU1BPUlRcIiBbcHJlc3NlZF1cbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJJTlZFU1RJVElJXCJcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSBidXR0b24gXCJURVNUXCJcbiAgLSBoZWFkaW5nIFwiU3ViY2F0ZWdvcmlpIHBlbnRydSBUUkFOU1BPUlRcIiBbbGV2ZWw9M11cbiAgLSBsaXN0IFwiU3ViY2F0ZWdvcmlpIHBlbnRydVwiOlxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFRyYW5zcG9ydCBwdWJsaWMgLSBNb2RpZmljYXQgLSBNXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBUcmFuc3BvcnQgcHVibGljIC0gTW9kaWZpY2F0IC0gTVwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBSZXZpemlpXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBSZXZpemlpXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFNwxINsxIN0b3JpZSBhdXRvXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBTcMSDbMSDdG9yaWUgYXV0b1wiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBBY2Nlc29yaWkvQ29uc3VtYWJpbGUgcGVudHJ1IG1hyJlpbsSDXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBBY2Nlc29yaWkvQ29uc3VtYWJpbGUgcGVudHJ1IG1hyJlpbsSDXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IENvbWJ1c3RpYmlsXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBDb21idXN0aWJpbFwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBTY2hpbWJhdCBjYXVjaXVjdXJpIHZhcsSDL2lhcm7Eg1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgU2NoaW1iYXQgY2F1Y2l1Y3VyaSB2YXLEgy9pYXJuxINcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogSG90ZWwgcGVudHJ1IGFudmVsb3BlXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBIb3RlbCBwZW50cnUgYW52ZWxvcGVcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogUmVwYXJhyJtpaSBhdXRvXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBSZXBhcmHIm2lpIGF1dG9cIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogVGF4ZSBkcnVtdXJpXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBUYXhlIGRydW11cmlcIjogUmVkZW51bWXImXRlXG4gICAgLSBsaXN0aXRlbTpcbiAgICAgIC0gdGV4dDogUGFyY2FyZVxuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgUGFyY2FyZVwiOiBSZWRlbnVtZciZdGVcbiAgICAtIGxpc3RpdGVtOlxuICAgICAgLSB0ZXh0OiBBc2lndXJhcmUgUkNBXG4gICAgICAtIGJ1dHRvbiBcIlJlZGVudW1lyJl0ZSBBc2lndXJhcmUgUkNBXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IEFzaWd1cmFyZSBDQVNDT1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgQXNpZ3VyYXJlIENBU0NPXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFJvdmlnbmV0YVxuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgUm92aWduZXRhXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IEltcG96aXQgYXV0b1xuICAgICAgLSBidXR0b24gXCJSZWRlbnVtZciZdGUgSW1wb3ppdCBhdXRvXCI6IFJlZGVudW1lyJl0ZVxuICAgIC0gbGlzdGl0ZW06XG4gICAgICAtIHRleHQ6IFRyYW5zcG9ydCBwdWJsaWNcbiAgICAgIC0gYnV0dG9uIFwiUmVkZW51bWXImXRlIFRyYW5zcG9ydCBwdWJsaWNcIjogUmVkZW51bWXImXRlXG4gIC0gdGV4dGJveCBcIkFkYXVnxIMgc3ViY2F0ZWdvcmllIG5vdcSDXCJcbiAgLSBidXR0b24gXCJBZGF1Z8SDXCIgW2Rpc2FibGVkXVxuICAtIGJ1dHRvbiBcIkFudWxlYXrEg1wiIn0="
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts",
+                        "column": 33,
+                        "line": 216
+                      }
                     }
                   ],
                   "status": "unexpected"
@@ -806,7 +963,7 @@
             },
             {
               "title": "adaugă o subcategorie nouă",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -817,28 +974,39 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 13,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4379,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "➕ Test adăugare subcategorie nouă\n"
+                        },
+                        {
+                          "text": "✅ Categorie NUTRITIE selectată pentru adăugare subcategorie\n"
+                        },
+                        {
+                          "text": "📊 Subcategorii inițiale: 6\n"
+                        },
+                        {
+                          "text": "📝 Nume subcategorie nouă: AUTO-Subcategorie-1748466306603\n"
+                        },
+                        {
+                          "text": "✅ Subcategorie nouă adăugată cu succes și marcată ca CUSTOM\n"
+                        },
+                        {
+                          "text": "📝 Tracking subcategorie adăugată: AUTO-Subcategorie-1748466306603 în NUTRITIE (EXPENSE)\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:26.633Z",
+                      "startTime": "2025-05-28T21:05:03.442Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-eef019cd2c04f481d1c2",
@@ -848,7 +1016,7 @@
             },
             {
               "title": "redenumește o subcategorie custom",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -859,28 +1027,39 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 14,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 9511,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "✏️ Test redenumire subcategorie custom\n"
+                        },
+                        {
+                          "text": "✅ Categorie VENITURI selectată pentru redenumire custom\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria AUTO-Custom-1748466312983 adăugată cu succes\n"
+                        },
+                        {
+                          "text": "📝 Redenumesc în: AUTO-Custom-1748466312983 - Redenumit\n"
+                        },
+                        {
+                          "text": "⚠️ Nu găsesc subcategoria cu numele complet, caut cu o parte din nume...\n"
+                        },
+                        {
+                          "text": "✅ Găsit element cu numele parțial: AUTO-Custom-1748466312983\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:27.463Z",
+                      "startTime": "2025-05-28T21:05:07.894Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-8899af83509441774fd8",
@@ -890,7 +1069,7 @@
             },
             {
               "title": "șterge o subcategorie custom",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -901,28 +1080,33 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 15,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4844,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🗑️ Test ștergere subcategorie custom\n"
+                        },
+                        {
+                          "text": "✅ Categorie NUTRITIE selectată pentru ștergere\n"
+                        },
+                        {
+                          "text": "✅ Dialog de confirmare ștergere afișat\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria custom ștearsă cu succes\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:28.291Z",
+                      "startTime": "2025-05-28T21:05:17.409Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-06ff0ecea246230398d5",
@@ -932,7 +1116,7 @@
             },
             {
               "title": "verifică că modificările se reflectă în TransactionForm",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -943,28 +1127,39 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 16,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 5580,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔄 Test verificare modificări în TransactionForm\n"
+                        },
+                        {
+                          "text": "🎯 Verificare subcategorie: AUTO-Subcategorie-1748466306603 din NUTRITIE (EXPENSE)\n"
+                        },
+                        {
+                          "text": "✅ Tip tranzacție selectat: EXPENSE\n"
+                        },
+                        {
+                          "text": "✅ Categorie selectată: NUTRITIE\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria nouă găsită în TransactionForm!\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria AUTO-Subcategorie-1748466306603 selectată cu succes în TransactionForm\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:29.301Z",
+                      "startTime": "2025-05-28T21:05:22.256Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-69f69cba706d499065e4",
@@ -974,7 +1169,7 @@
             },
             {
               "title": "anulează ștergerea unei subcategorii custom",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -985,28 +1180,30 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 17,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 3669,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "❌ Test anulare ștergere subcategorie\n"
+                        },
+                        {
+                          "text": "✅ Categorie LOCUINTA selectată pentru test anulare ștergere\n"
+                        },
+                        {
+                          "text": "✅ Ștergerea anulată cu succes, subcategoria păstrată\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:30.207Z",
+                      "startTime": "2025-05-28T21:05:27.840Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-571ff2a4a5daacda9b66",
@@ -1016,7 +1213,7 @@
             },
             {
               "title": "cleanup - șterge toate subcategoriile de test create",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1027,28 +1224,123 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 18,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 21348,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🧹 Test cleanup - ștergere subcategorii de test\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: VENITURI\n"
+                        },
+                        {
+                          "text": "🗑️ Găsite 1 subcategorii de test în VENITURI\n"
+                        },
+                        {
+                          "text": "🗑️ Șterg subcategoria: AUTO-Custom-1748466312983 - Rede\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria AUTO-Custom-1748466312983 - Rede ștearsă cu succes\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: ECONOMII\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în ECONOMII\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: INFATISARE\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în INFATISARE\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: EDUCATIE\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în EDUCATIE\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: CARIERA\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în CARIERA\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: SANATATE\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în SANATATE\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: NUTRITIE\n"
+                        },
+                        {
+                          "text": "🗑️ Găsite 1 subcategorii de test în NUTRITIE\n"
+                        },
+                        {
+                          "text": "🗑️ Șterg subcategoria: AUTO-Subcategorie-1748466306603\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria AUTO-Subcategorie-1748466306603 ștearsă cu succes\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: LOCUINTA\n"
+                        },
+                        {
+                          "text": "🗑️ Găsite 1 subcategorii de test în LOCUINTA\n"
+                        },
+                        {
+                          "text": "🗑️ Șterg subcategoria: AUTO-CancelDelete-1748466330237\n"
+                        },
+                        {
+                          "text": "✅ Subcategoria AUTO-CancelDelete-1748466330237 ștearsă cu succes\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: TIMP_LIBER\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în TIMP_LIBER\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: CALATORII\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în CALATORII\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: TRANSPORT\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în TRANSPORT\n"
+                        },
+                        {
+                          "text": "🔍 Verificare categorii de test în: INVESTITII\n"
+                        },
+                        {
+                          "text": "✅ Nicio subcategorie de test găsită în INVESTITII\n"
+                        },
+                        {
+                          "text": "🧹 Cleanup subcategorii de test finalizat! Total șterse: 3\n"
+                        },
+                        {
+                          "text": "ℹ️ Nu există subcategorii de revertat\n"
+                        },
+                        {
+                          "text": "🎯 CLEANUP COMPLET! Subcategorii șterse: 3, Redenumiri revertite: 0\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:31.167Z",
+                      "startTime": "2025-05-28T21:05:31.512Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e6c5902f9bf68c18073d-5dfc0fd8ef36a1e10650",
@@ -1075,7 +1367,7 @@
           "specs": [
             {
               "title": "adaugă tranzacție cu date complet aleatoare și verifică în Supabase",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "features"
               ],
@@ -1088,28 +1380,81 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 19,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 9010,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🚀 Test adăugare tranzacție cu verificare în Supabase\n"
+                        },
+                        {
+                          "text": "🎲 Date generate pentru formular: SAVING | INVESTITII → Investiție/Afacere 2 | 30.75 RON | 2025-05-18 | Non-recurent | Fără descriere\n"
+                        },
+                        {
+                          "text": "✅ Login realizat cu succes\n"
+                        },
+                        {
+                          "text": "⚠️ Nu s-a putut obține userId pentru verificare Supabase\n"
+                        },
+                        {
+                          "text": "✅ Formular de tranzacție găsit\n"
+                        },
+                        {
+                          "text": "✅ Tip tranzacție selectat: SAVING\n"
+                        },
+                        {
+                          "text": "✅ Sumă completată: 30.75\n"
+                        },
+                        {
+                          "text": "✅ Categorie selectată: INVESTITII\n"
+                        },
+                        {
+                          "text": "✅ Subcategorie selectată: Investiție/Afacere 2\n"
+                        },
+                        {
+                          "text": "✅ Dată completată: 2025-05-18\n"
+                        },
+                        {
+                          "text": "✅ Tranzacție configurată ca non-recurentă\n"
+                        },
+                        {
+                          "text": "✅ Fără descriere (lăsat gol)\n"
+                        },
+                        {
+                          "text": "✅ Butonul de adăugare este activ\n"
+                        },
+                        {
+                          "text": "📸 Screenshot înainte de submit salvat\n"
+                        },
+                        {
+                          "text": "✅ Formular trimis\n"
+                        },
+                        {
+                          "text": "ℹ️ Mesaj de succes nu e vizibil (poate fi normal)\n"
+                        },
+                        {
+                          "text": "✅ Nicio eroare detectată\n"
+                        },
+                        {
+                          "text": "⚠️ Omit verificarea Supabase din cauza lipsei userId\n"
+                        },
+                        {
+                          "text": "📸 Screenshot după submit salvat\n"
+                        },
+                        {
+                          "text": "ℹ️ Valoare sumă după submit: \"\"\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:32.130Z",
+                      "startTime": "2025-05-28T21:05:52.909Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "a64acd18288dd18a34f5-3cebbb8e5db69e02b739",
@@ -1119,7 +1464,7 @@
             },
             {
               "title": "testează adăugare tranzacție recurentă",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1130,28 +1475,33 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 20,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 5346,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🔄 Test specific pentru tranzacție recurentă\n"
+                        },
+                        {
+                          "text": "🎲 Date recurente generate: EXPENSE | CARIERA → Servicii realizare CV | 17.50 RON | 2025-05-14 | Recurent: WEEKLY | \"Cheltuială necesară\"\n"
+                        },
+                        {
+                          "text": "✅ Configurare recurentă completă: WEEKLY\n"
+                        },
+                        {
+                          "text": "✅ Tranzacție recurentă adăugată\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:33.008Z",
+                      "startTime": "2025-05-28T21:06:01.925Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "a64acd18288dd18a34f5-339fd51b030845c07502",
@@ -1161,7 +1511,7 @@
             },
             {
               "title": "testează adăugare tranzacție simplă (non-recurentă)",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1172,28 +1522,33 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 4685,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "📝 Test specific pentru tranzacție simplă\n"
+                        },
+                        {
+                          "text": "🎲 Date simple generate: SAVING | INVESTITII → Investiție/Afacere 4 | 687.25 RON | 2025-05-22 | Non-recurent | \"Plată pentru servicii\"\n"
+                        },
+                        {
+                          "text": "✅ Configurare simplă confirmată: non-recurentă\n"
+                        },
+                        {
+                          "text": "✅ Tranzacție simplă adăugată\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:33.868Z",
+                      "startTime": "2025-05-28T21:06:07.279Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "a64acd18288dd18a34f5-c5d8c42d3beb3b4fbb63",
@@ -1220,7 +1575,7 @@
           "specs": [
             {
               "title": "workflow complet LunarGrid cu date dinamice",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "integration"
               ],
@@ -1233,28 +1588,57 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 22,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 5859,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🚀 Începe workflow complet LunarGrid cu date dinamice\n"
+                        },
+                        {
+                          "text": "🎲 Date generate pentru LunarGrid: {\n  primar: \u001b[32m'INCOME | VENITURI → Venituri reportate din luna anterioară (10.50)'\u001b[39m,\n  secundar: \u001b[32m'SAVING | ECONOMII → Fond de urgență (699.25)'\u001b[39m,\n  \u001b[32m'totalAșteptat'\u001b[39m: \u001b[32m'709.75'\u001b[39m\n}\n"
+                        },
+                        {
+                          "text": "✅ Navigat la LunarGrid\n"
+                        },
+                        {
+                          "text": "✅ Expandat toate categoriile\n"
+                        },
+                        {
+                          "text": "✅ 3875 celule expandate găsite\n"
+                        },
+                        {
+                          "text": "✅ Prima celulă găsită: editable-cell-VENITURI-Salarii - Modificat - Modificat-1\n"
+                        },
+                        {
+                          "text": "✅ A doua celulă găsită: editable-cell-VENITURI-Salarii - Modificat - Modificat-2\n"
+                        },
+                        {
+                          "text": "✅ Click realizat pe prima celulă\n"
+                        },
+                        {
+                          "text": "✅ Click realizat pe a doua celulă\n"
+                        },
+                        {
+                          "text": "✅ Reset expandare realizat\n"
+                        },
+                        {
+                          "text": "✅ Celule după reset: 0 (reduse față de 3875)\n"
+                        },
+                        {
+                          "text": "✅ Screenshot salvat: lunargrid-integration-complete.png\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:34.746Z",
+                      "startTime": "2025-05-28T21:06:11.978Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "440c53061a11f59bd715-e13a44aa61fb38128c8e",
@@ -1264,7 +1648,7 @@
             },
             {
               "title": "testează varietatea în mai multe rulări consecutive",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1275,28 +1659,54 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 23,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5,
-                      "error": {
-                        "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝",
-                        "stack": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
-                      },
-                      "errors": [
+                      "status": "passed",
+                      "duration": 8084,
+                      "errors": [],
+                      "stdout": [
                         {
-                          "message": "Error: browserType.launch: Executable doesn't exist at C:\\Users\\WINDOWS11\\AppData\\Local\\ms-playwright\\chromium_headless_shell-1169\\chrome-win\\headless_shell.exe\n╔═════════════════════════════════════════════════════════════════════════╗\n║ Looks like Playwright Test or Playwright was just installed or updated. ║\n║ Please run the following command to download new browsers:              ║\n║                                                                         ║\n║     npx playwright install                                              ║\n║                                                                         ║\n║ <3 Playwright Team                                                      ║\n╚═════════════════════════════════════════════════════════════════════════╝"
+                          "text": "🎯 Test varietate pentru rulări consecutive\n"
+                        },
+                        {
+                          "text": "📊 Celule disponibile: 3875\n"
+                        },
+                        {
+                          "text": "1. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-1 | Vizibilă: true\n"
+                        },
+                        {
+                          "text": "2. Celula testată: editable-cell-input-VENITURI-Salarii - Modificat - Modificat-1 | Vizibilă: true\n"
+                        },
+                        {
+                          "text": "3. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-2 | Vizibilă: true\n"
+                        },
+                        {
+                          "text": "⚠️ Grid-ul s-a resetat după click 3, re-expandăm...\n"
+                        },
+                        {
+                          "text": "4. Celula testată: editable-cell-VENITURI-Salarii - Modificat - Modificat-4 | Vizibilă: true\n"
+                        },
+                        {
+                          "text": "5. Celula testată: editable-cell-input-VENITURI-Salarii - Modificat - Modificat-4 | Vizibilă: true\n"
+                        },
+                        {
+                          "text": "Celule testate: 5, unique: 5\n"
+                        },
+                        {
+                          "text": "✅ Teste de varietate completate cu succes\n"
+                        },
+                        {
+                          "text": "📊 Statistici finale: { totalEstimate: \u001b[33m408\u001b[39m, folosite: \u001b[33m0\u001b[39m, \u001b[32m'rămase'\u001b[39m: \u001b[33m408\u001b[39m }\n"
                         }
                       ],
-                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:35.615Z",
+                      "startTime": "2025-05-28T21:06:17.843Z",
                       "annotations": [],
                       "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "440c53061a11f59bd715-f1a4ceaa97a0130bf24c",
@@ -1334,29 +1744,29 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 24,
+                      "duration": 10,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "🔄 Teste combinații următoare:\n"
                         },
                         {
-                          "text": "Combinația 1: {\n  tip: \u001b[32m'EXPENSE'\u001b[39m,\n  categorie: \u001b[32m'TIMP_LIBER'\u001b[39m,\n  subcategorie: \u001b[32m'Materiale & cursuri pentru hobby-uri'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'23.50'\u001b[39m,\n  descriere: \u001b[32m'Test TIMP_LIBER - Materiale & cursuri pentru hobby-uri (small)'\u001b[39m\n}\n"
+                          "text": "Combinația 1: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'INVESTITII'\u001b[39m,\n  subcategorie: \u001b[32m'Investiție/Afacere 1'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'209.00'\u001b[39m,\n  descriere: \u001b[32m'Test INVESTITII - Investiție/Afacere 1 (large)'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Combinația 2: {\n  tip: \u001b[32m'INCOME'\u001b[39m,\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'11.50'\u001b[39m,\n  descriere: \u001b[32m'Test VENITURI - Venituri reportate din luna anterioară (small)'\u001b[39m\n}\n"
+                          "text": "Combinația 2: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de urgență'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1820.25'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond de urgență (extra_large)'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Combinația 3: {\n  tip: \u001b[32m'INCOME'\u001b[39m,\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Dividende'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'13.50'\u001b[39m,\n  descriere: \u001b[32m'Test VENITURI - Dividende (small)'\u001b[39m\n}\n"
+                          "text": "Combinația 3: {\n  tip: \u001b[32m'INCOME'\u001b[39m,\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'5.50'\u001b[39m,\n  descriere: \u001b[32m'Test VENITURI - Venituri reportate din luna anterioară (small)'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Combinația 4: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1694.25'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond de rezervă (extra_large)'\u001b[39m\n}\n"
+                          "text": "Combinația 4: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond general'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'16.50'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond general (small)'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Combinația 5: {\n  tip: \u001b[32m'SAVING'\u001b[39m,\n  categorie: \u001b[32m'ECONOMII'\u001b[39m,\n  subcategorie: \u001b[32m'Fond general'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1428.25'\u001b[39m,\n  descriere: \u001b[32m'Test ECONOMII - Fond general (extra_large)'\u001b[39m\n}\n"
+                          "text": "Combinația 5: {\n  tip: \u001b[32m'EXPENSE'\u001b[39m,\n  categorie: \u001b[32m'INFATISARE'\u001b[39m,\n  subcategorie: \u001b[32m'Produse cosmetice'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'1861.25'\u001b[39m,\n  descriere: \u001b[32m'Test INFATISARE - Produse cosmetice (extra_large)'\u001b[39m\n}\n"
                         },
                         {
                           "text": "📊 Statistici generator: { totalEstimate: \u001b[33m408\u001b[39m, usedCombinations: \u001b[33m5\u001b[39m, cacheSize: \u001b[33m5\u001b[39m }\n"
@@ -1364,7 +1774,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.461Z",
+                      "startTime": "2025-05-28T21:06:25.940Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1390,37 +1800,37 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9,
+                      "duration": 5,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "\n💰 Test combinații pentru EXPENSE:\n"
                         },
                         {
-                          "text": "Cheltuială 1: {\n  categorie: \u001b[32m'EDUCATIE'\u001b[39m,\n  subcategorie: \u001b[32m'Materiale de studiu | cărți'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'484.00'\u001b[39m\n}\n"
+                          "text": "Cheltuială 1: {\n  categorie: \u001b[32m'CARIERA'\u001b[39m,\n  subcategorie: \u001b[32m'Taxe autorizare | Examene titularizare sau specializare'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'304.00'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Cheltuială 2: {\n  categorie: \u001b[32m'TIMP_LIBER'\u001b[39m,\n  subcategorie: \u001b[32m'Pariuri | Loto | Casino'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'437.00'\u001b[39m\n}\n"
+                          "text": "Cheltuială 2: {\n  categorie: \u001b[32m'TIMP_LIBER'\u001b[39m,\n  subcategorie: \u001b[32m'Pariuri | Loto | Casino'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'14.50'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Cheltuială 3: {\n  categorie: \u001b[32m'CALATORII'\u001b[39m,\n  subcategorie: \u001b[32m'Hotel pentru animale'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'16.50'\u001b[39m\n}\n"
+                          "text": "Cheltuială 3: {\n  categorie: \u001b[32m'INFATISARE'\u001b[39m,\n  subcategorie: \u001b[32m'Produse de igienă personală'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'19.50'\u001b[39m\n}\n"
                         },
                         {
                           "text": "\n💵 Test combinații pentru INCOME:\n"
                         },
                         {
-                          "text": "Venit 1: { categorie: \u001b[32m'VENITURI'\u001b[39m, subcategorie: \u001b[32m'Alocații'\u001b[39m, \u001b[32m'sumă'\u001b[39m: \u001b[32m'72.75'\u001b[39m }\n"
+                          "text": "Venit 1: {\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'66.75'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Venit 2: {\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'507.25'\u001b[39m\n}\n"
+                          "text": "Venit 2: {\n  categorie: \u001b[32m'VENITURI'\u001b[39m,\n  subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n  \u001b[32m'sumă'\u001b[39m: \u001b[32m'10.50'\u001b[39m\n}\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.498Z",
+                      "startTime": "2025-05-28T21:06:25.952Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1446,22 +1856,22 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4,
+                      "duration": 2,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "\n🎲 Test combinații multiple:\n"
                         },
                         {
-                          "text": "Combinații generate: [\n  \u001b[32m'ECONOMII-Fond general-89.75'\u001b[39m,\n  \u001b[32m'CALATORII-Bilete pentru obiective turistice-960.25'\u001b[39m,\n  \u001b[32m'ECONOMII-Fond general-323.00'\u001b[39m,\n  \u001b[32m'VENITURI-Venituri reportate din luna anterioară-1729.25'\u001b[39m\n]\n"
+                          "text": "Combinații generate: [\n  \u001b[32m'TRANSPORT-Combustibil-1297.25'\u001b[39m,\n  \u001b[32m'VENITURI-Alocații-35.75'\u001b[39m,\n  \u001b[32m'INFATISARE-Îmbrăcăminte, încălțăminte și accesorii-1808.25'\u001b[39m,\n  \u001b[32m'CALATORII-Asigurare de călătorie-102.00'\u001b[39m\n]\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.512Z",
+                      "startTime": "2025-05-28T21:06:25.959Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1487,25 +1897,25 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5,
+                      "duration": 2,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "\n🌙 Test LunarGrid data generator:\n"
                         },
                         {
-                          "text": "Date LunarGrid: {\n  primar: { categorie: \u001b[32m'VENITURI'\u001b[39m, subcategorie: \u001b[32m'Salarii'\u001b[39m, \u001b[32m'sumă'\u001b[39m: \u001b[32m'232.00'\u001b[39m },\n  secundar: {\n    categorie: \u001b[32m'ECONOMII'\u001b[39m,\n    subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n    \u001b[32m'sumă'\u001b[39m: \u001b[32m'68.75'\u001b[39m\n  },\n  \u001b[32m'totalAșteptat'\u001b[39m: \u001b[32m'300.75'\u001b[39m\n}\n"
+                          "text": "Date LunarGrid: {\n  primar: {\n    categorie: \u001b[32m'VENITURI'\u001b[39m,\n    subcategorie: \u001b[32m'Venituri reportate din luna anterioară'\u001b[39m,\n    \u001b[32m'sumă'\u001b[39m: \u001b[32m'14.50'\u001b[39m\n  },\n  secundar: {\n    categorie: \u001b[32m'ECONOMII'\u001b[39m,\n    subcategorie: \u001b[32m'Fond de rezervă'\u001b[39m,\n    \u001b[32m'sumă'\u001b[39m: \u001b[32m'279.00'\u001b[39m\n  },\n  \u001b[32m'totalAșteptat'\u001b[39m: \u001b[32m'293.50'\u001b[39m\n}\n"
                         },
                         {
-                          "text": "Selectori dinamici: {\n  toggleExpandAllButton: \u001b[32m'toggle-expand-all'\u001b[39m,\n  resetExpandedButton: \u001b[32m'reset-expanded'\u001b[39m,\n  expandCategoryButton: \u001b[32m'expand-btn-VENITURI'\u001b[39m,\n  cellSelector: \u001b[32m'editable-cell-VENITURI-Salarii-15'\u001b[39m,\n  categoryRow: \u001b[32m'category-row-venituri'\u001b[39m,\n  subcategoryCell: \u001b[32m'subcategory-salarii'\u001b[39m,\n  categoryHeader: \u001b[32m'category-venituri'\u001b[39m,\n  subcategoryRow: \u001b[32m'subcategory-row-salarii'\u001b[39m\n}\n"
+                          "text": "Selectori dinamici: {\n  toggleExpandAllButton: \u001b[32m'toggle-expand-all'\u001b[39m,\n  resetExpandedButton: \u001b[32m'reset-expanded'\u001b[39m,\n  expandCategoryButton: \u001b[32m'expand-btn-VENITURI'\u001b[39m,\n  cellSelector: \u001b[32m'editable-cell-VENITURI-Venituri reportate din luna anterioară-15'\u001b[39m,\n  categoryRow: \u001b[32m'category-row-venituri'\u001b[39m,\n  subcategoryCell: \u001b[32m'subcategory-venituri-reportate-din-luna-anterioară'\u001b[39m,\n  categoryHeader: \u001b[32m'category-venituri'\u001b[39m,\n  subcategoryRow: \u001b[32m'subcategory-row-venituri-reportate-din-luna-anterioară'\u001b[39m\n}\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.519Z",
+                      "startTime": "2025-05-28T21:06:25.962Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1548,10 +1958,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6,
+                      "duration": 4,
                       "errors": [],
                       "stdout": [
                         {
@@ -1561,58 +1971,58 @@
                           "text": "📋 10 combinații consecutive:\n"
                         },
                         {
-                          "text": "1. EXPENSE | LOCUINTA → Reparații, montaj și amenajări interioare (21.50)\n"
+                          "text": "1. EXPENSE | CALATORII → Bilete pentru mijloace de transport/combustibil (822.25)\n"
                         },
                         {
-                          "text": "2. EXPENSE | SANATATE → Abonamente medicale (17.50)\n"
+                          "text": "2. EXPENSE | TIMP_LIBER → Jocuri de societate | Jucării pentru copii (334.00)\n"
                         },
                         {
-                          "text": "3. SAVING | ECONOMII → Fond de rezervă (13.50)\n"
+                          "text": "3. INCOME | VENITURI → Venituri reportate din luna anterioară (638.25)\n"
                         },
                         {
-                          "text": "4. INCOME | VENITURI → Tichete de masă (93.75)\n"
+                          "text": "4. INCOME | VENITURI → Venituri reportate din luna anterioară (94.75)\n"
                         },
                         {
-                          "text": "5. INCOME | VENITURI → Venituri reportate din luna anterioară (98.75)\n"
+                          "text": "5. EXPENSE | SANATATE → Asigurări de sănătate | medicale (42.75)\n"
                         },
                         {
-                          "text": "6. INCOME | VENITURI → Dividende (41.75)\n"
+                          "text": "6. SAVING | ECONOMII → Fond de urgență (326.00)\n"
                         },
                         {
-                          "text": "7. INCOME | VENITURI → Salarii (18.50)\n"
+                          "text": "7. INCOME | VENITURI → Venituri reportate din luna anterioară (365.00)\n"
                         },
                         {
-                          "text": "8. INCOME | VENITURI → Venituri reportate din luna anterioară (625.25)\n"
+                          "text": "8. EXPENSE | TRANSPORT → Asigurare RCA (1463.25)\n"
                         },
                         {
-                          "text": "9. SAVING | ECONOMII → Fond general (64.75)\n"
+                          "text": "9. INCOME | VENITURI → Dividende (51.75)\n"
                         },
                         {
-                          "text": "10. EXPENSE | TRANSPORT → Transport public (28.75)\n"
+                          "text": "10. EXPENSE | CALATORII → Hrană (617.25)\n"
                         },
                         {
                           "text": "\n💰 Combinații specifice per tip:\n"
                         },
                         {
-                          "text": "EXPENSE: LOCUINTA → Cablu TV (1540.25)\n"
+                          "text": "EXPENSE: TRANSPORT → Asigurare CASCO (1893.25)\n"
                         },
                         {
-                          "text": "INCOME: VENITURI → Pensii (1165.25)\n"
+                          "text": "INCOME: VENITURI → Chirii (87.75)\n"
                         },
                         {
-                          "text": "SAVING: ECONOMII → Fond de urgență (31.75)\n"
+                          "text": "SAVING: INVESTITII → Investiție/Afacere 3 (93.75)\n"
                         },
                         {
                           "text": "\n🌙 Date pentru LunarGrid:\n"
                         },
                         {
-                          "text": "Primar: VENITURI → Chirii (10.50)\n"
+                          "text": "Primar: VENITURI → Venituri reportate din luna anterioară (78.75)\n"
                         },
                         {
-                          "text": "Secundar: ECONOMII → Fond de urgență (24.50)\n"
+                          "text": "Secundar: ECONOMII → Fond general (99.75)\n"
                         },
                         {
-                          "text": "Total așteptat: 35.00\n"
+                          "text": "Total așteptat: 178.50\n"
                         },
                         {
                           "text": "\n📊 Statistici finale:\n"
@@ -1629,7 +2039,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.536Z",
+                      "startTime": "2025-05-28T21:06:25.970Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1655,29 +2065,29 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 63,
+                      "duration": 39,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "🔍 Verificare consistență categorii-subcategorii:\n\n"
                         },
                         {
-                          "text": "1. ✅ INVESTITII | Proiecte → Investiție/Afacere 4\n"
+                          "text": "1. ✅ INFATISARE | General → Produse cosmetice\n"
                         },
                         {
-                          "text": "2. ✅ VENITURI | Surse de venit → Dividende\n"
+                          "text": "2. ✅ SANATATE | General → Terapii de recuperare\n"
                         },
                         {
-                          "text": "3. ✅ VENITURI | Report → Venituri reportate din luna anterioară\n"
+                          "text": "3. ✅ ECONOMII | Categorii de economii → Fond de urgență\n"
                         },
                         {
-                          "text": "4. ✅ INFATISARE | General → Salon de înfrumusețare\n"
+                          "text": "4. ✅ INVESTITII | Proiecte → Investiție/Afacere 3\n"
                         },
                         {
-                          "text": "5. ✅ ECONOMII | Categorii de economii → Fond general\n"
+                          "text": "5. ✅ TIMP_LIBER | Diverse → Jocuri de societate | Jucării pentru copii\n"
                         },
                         {
                           "text": "... și încă 15 combinații verificate cu succes!\n"
@@ -1685,7 +2095,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.544Z",
+                      "startTime": "2025-05-28T21:06:25.975Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1728,44 +2138,44 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 68,
+                      "duration": 29,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "🧪 Test validare generator date formular\n"
                         },
                         {
-                          "text": "1. EXPENSE | NUTRITIE → Restaurante | 76.75 RON | 2025-05-04 | Recurent: WEEKLY | \"Tranzacție de test automată\"\n"
+                          "text": "1. EXPENSE | TRANSPORT → Transport public | 808.25 RON | 2025-05-13 | Non-recurent | \"Transfer regulat\"\n"
                         },
                         {
-                          "text": "2. EXPENSE | SANATATE → Servicii medicale pentru prevenție | 19.50 RON | 2025-05-27 | Non-recurent | \"Tranzacție de test automată\"\n"
+                          "text": "2. INCOME | VENITURI → Venituri reportate din luna anterioară | 367.00 RON | 2025-05-05 | Non-recurent | \"Plată pentru servicii\"\n"
                         },
                         {
-                          "text": "3. EXPENSE | EDUCATIE → Licențe programe | 371.00 RON | 2025-05-12 | Recurent: MONTHLY | Fără descriere\n"
+                          "text": "3. EXPENSE | TIMP_LIBER → Jocuri de societate | Jucării pentru copii | 37.75 RON | 2025-05-18 | Non-recurent | \"Transfer regulat\"\n"
                         },
                         {
-                          "text": "4. SAVING | INVESTITII → Investiție/Afacere 3 | 1977.25 RON | 2025-05-10 | Non-recurent | Fără descriere\n"
+                          "text": "4. EXPENSE | TIMP_LIBER → Cadouri pentru cei dragi | 1194.25 RON | 2025-05-13 | Non-recurent | \"Cheltuială necesară\"\n"
                         },
                         {
-                          "text": "5. EXPENSE | TRANSPORT → Combustibil | 1684.25 RON | 2025-05-06 | Recurent: WEEKLY | \"Transfer regulat\"\n"
+                          "text": "5. SAVING | ECONOMII → Fond general | 16.50 RON | 2025-05-08 | Non-recurent | \"Cheltuială necesară\"\n"
                         },
                         {
-                          "text": "6. INCOME | VENITURI → Chirii | 28.75 RON | 2025-05-05 | Non-recurent | \"Transfer regulat\"\n"
+                          "text": "6. INCOME | VENITURI → Venituri reportate din luna anterioară | 39.75 RON | 2025-05-11 | Recurent: YEARLY | \"Investiție programată\"\n"
                         },
                         {
-                          "text": "7. SAVING | ECONOMII → Fond general | 9.50 RON | 2025-05-06 | Non-recurent | \"Investiție programată\"\n"
+                          "text": "7. SAVING | ECONOMII → Fond de urgență | 60.75 RON | 2025-05-18 | Recurent: YEARLY | \"Achiziție planificată\"\n"
                         },
                         {
-                          "text": "8. INCOME | VENITURI → Venituri reportate din luna anterioară | 1639.25 RON | 2025-05-01 | Non-recurent | Fără descriere\n"
+                          "text": "8. EXPENSE | EDUCATIE → Grădiniță | Creșă | Afterschool | Bonă | 167.00 RON | 2025-05-15 | Non-recurent | Fără descriere\n"
                         },
                         {
-                          "text": "9. SAVING | ECONOMII → Fond general | 1190.25 RON | 2025-05-05 | Non-recurent | Fără descriere\n"
+                          "text": "9. INCOME | VENITURI → Chirii | 97.75 RON | 2025-05-22 | Non-recurent | \"Transfer regulat\"\n"
                         },
                         {
-                          "text": "10. EXPENSE | INFATISARE → Salon de înfrumusețare | 13.50 RON | 2025-05-15 | Non-recurent | \"Transfer regulat\"\n"
+                          "text": "10. INCOME | VENITURI → Alte venituri | 43.75 RON | 2025-05-21 | Non-recurent | Fără descriere\n"
                         },
                         {
                           "text": "✅ Toate datele generate sunt valide\n"
@@ -1773,7 +2183,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.621Z",
+                      "startTime": "2025-05-28T21:06:26.022Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1799,7 +2209,7 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
                       "duration": 5,
@@ -1809,19 +2219,19 @@
                           "text": "🔄 Test generator pentru tranzacții recurente\n"
                         },
                         {
-                          "text": "1. RECURENT: EXPENSE | INFATISARE → Produse de igienă personală | 1327.25 RON | 2025-05-26 | Recurent: DAILY | \"Plată pentru servicii\"\n"
+                          "text": "1. RECURENT: INCOME | VENITURI → Venituri reportate din luna anterioară | 928.25 RON | 2025-05-26 | Recurent: DAILY | \"Transfer regulat\"\n"
                         },
                         {
-                          "text": "2. RECURENT: SAVING | INVESTITII → Investiție/Afacere 3 | 22.50 RON | 2025-05-25 | Recurent: MONTHLY | Fără descriere\n"
+                          "text": "2. RECURENT: EXPENSE | CALATORII → Suveniruri | 13.50 RON | 2025-04-30 | Recurent: YEARLY | Fără descriere\n"
                         },
                         {
-                          "text": "3. RECURENT: INCOME | VENITURI → Dividende | 961.25 RON | 2025-05-16 | Recurent: YEARLY | \"Investiție programată\"\n"
+                          "text": "3. RECURENT: SAVING | INVESTITII → Investiție/Afacere 3 | 5.50 RON | 2025-05-28 | Recurent: WEEKLY | \"Tranzacție de test automată\"\n"
                         },
                         {
-                          "text": "4. RECURENT: INCOME | VENITURI → Venituri reportate din luna anterioară | 405.00 RON | 2025-04-30 | Recurent: DAILY | \"Tranzacție de test automată\"\n"
+                          "text": "4. RECURENT: INCOME | VENITURI → Venituri reportate din luna anterioară | 69.75 RON | 2025-05-05 | Recurent: DAILY | \"Plată pentru servicii\"\n"
                         },
                         {
-                          "text": "5. RECURENT: EXPENSE | SANATATE → Veterinar pentru animale de companie | 91.75 RON | 2025-05-09 | Recurent: MONTHLY | Fără descriere\n"
+                          "text": "5. RECURENT: EXPENSE | TRANSPORT → Parcare | 680.25 RON | 2025-05-09 | Recurent: WEEKLY | \"Transfer regulat\"\n"
                         },
                         {
                           "text": "✅ Toate tranzacțiile recurente sunt valide\n"
@@ -1829,7 +2239,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.691Z",
+                      "startTime": "2025-05-28T21:06:26.052Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1855,29 +2265,29 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5,
+                      "duration": 4,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "📝 Test generator pentru tranzacții simple\n"
                         },
                         {
-                          "text": "1. SIMPLU: SAVING | INVESTITII → Investiție/Afacere 3 | 394.00 RON | 2025-05-02 | Non-recurent | \"Cheltuială necesară\"\n"
+                          "text": "1. SIMPLU: INCOME | VENITURI → Cadouri | 370.00 RON | 2025-05-04 | Non-recurent | \"Plată pentru servicii\"\n"
                         },
                         {
-                          "text": "2. SIMPLU: INCOME | VENITURI → Venituri reportate din luna anterioară | 78.75 RON | 2025-04-30 | Non-recurent | Fără descriere\n"
+                          "text": "2. SIMPLU: EXPENSE | EDUCATIE → Materiale de studiu | cărți | 87.75 RON | 2025-05-24 | Non-recurent | \"Cheltuială necesară\"\n"
                         },
                         {
-                          "text": "3. SIMPLU: EXPENSE | SANATATE → Medicamente | Suplimente alimentare | Vitamine | 59.75 RON | 2025-05-22 | Non-recurent | \"Cheltuială necesară\"\n"
+                          "text": "3. SIMPLU: SAVING | ECONOMII → Fond de urgență | 579.25 RON | 2025-05-27 | Non-recurent | Fără descriere\n"
                         },
                         {
-                          "text": "4. SIMPLU: EXPENSE | INFATISARE → Îmbrăcăminte și accesorii pentru animale de companie | 15.50 RON | 2025-05-04 | Non-recurent | \"Plată pentru servicii\"\n"
+                          "text": "4. SIMPLU: SAVING | INVESTITII → Investiție/Afacere 5 | 13.50 RON | 2025-05-03 | Non-recurent | \"Transfer regulat\"\n"
                         },
                         {
-                          "text": "5. SIMPLU: INCOME | VENITURI → Venituri reportate din luna anterioară | 11.50 RON | 2025-05-02 | Non-recurent | \"Transfer regulat\"\n"
+                          "text": "5. SIMPLU: SAVING | ECONOMII → Fond de urgență | 19.50 RON | 2025-05-18 | Non-recurent | \"Achiziție planificată\"\n"
                         },
                         {
                           "text": "✅ Toate tranzacțiile simple sunt valide\n"
@@ -1885,7 +2295,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.698Z",
+                      "startTime": "2025-05-28T21:06:26.059Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1911,10 +2321,10 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6,
+                      "duration": 4,
                       "errors": [],
                       "stdout": [
                         {
@@ -1929,7 +2339,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.707Z",
+                      "startTime": "2025-05-28T21:06:26.065Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1955,17 +2365,17 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3,
+                      "duration": 2,
                       "errors": [],
                       "stdout": [
                         {
                           "text": "🎲 Demonstrație varietate tipuri tranzacție\n"
                         },
                         {
-                          "text": "📊 Distribuție tipuri tranzacții (din 50): { INCOME: \u001b[33m10\u001b[39m, EXPENSE: \u001b[33m25\u001b[39m, SAVING: \u001b[33m15\u001b[39m }\n"
+                          "text": "📊 Distribuție tipuri tranzacții (din 50): { INCOME: \u001b[33m25\u001b[39m, EXPENSE: \u001b[33m12\u001b[39m, SAVING: \u001b[33m13\u001b[39m }\n"
                         },
                         {
                           "text": "✅ Varietate confirmată pentru toate tipurile\n"
@@ -1973,7 +2383,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.716Z",
+                      "startTime": "2025-05-28T21:06:26.071Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1999,7 +2409,7 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 24,
+                      "workerIndex": 26,
                       "parallelIndex": 0,
                       "status": "passed",
                       "duration": 1,
@@ -2009,7 +2419,7 @@
                           "text": "⏰ Demonstrație varietate frecvențe\n"
                         },
                         {
-                          "text": "📊 Distribuție frecvențe (din 30 recurente): { YEARLY: \u001b[33m6\u001b[39m, DAILY: \u001b[33m8\u001b[39m, MONTHLY: \u001b[33m8\u001b[39m, WEEKLY: \u001b[33m8\u001b[39m }\n"
+                          "text": "📊 Distribuție frecvențe (din 30 recurente): { YEARLY: \u001b[33m7\u001b[39m, WEEKLY: \u001b[33m8\u001b[39m, DAILY: \u001b[33m8\u001b[39m, MONTHLY: \u001b[33m7\u001b[39m }\n"
                         },
                         {
                           "text": "✅ Varietate confirmată pentru frecvențe\n"
@@ -2017,7 +2427,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:02:36.721Z",
+                      "startTime": "2025-05-28T21:06:26.074Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2037,11 +2447,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-28T21:02:04.062Z",
-    "duration": 32684.961999999825,
-    "expected": 14,
+    "startTime": "2025-05-28T21:03:51.738Z",
+    "duration": 155663.3459999999,
+    "expected": 37,
     "skipped": 0,
-    "unexpected": 24,
+    "unexpected": 1,
     "flaky": 0
   }
 }
