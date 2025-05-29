@@ -1,189 +1,181 @@
 # MEMORY BANK - TASK TRACKING
 
 ## CURRENT STATUS
-- **Active Task**: LunarGridTanStack Critical Fixes (Level 1) - IMPLEMENT Mode ACTIVE
-- **Plan Status**: COMPREHENSIVE PLAN RESTORED - FAZA 4 COMPLETE! ✅
-- **Current Phase**: ALL PHASES COMPLETED! 🎉 Proiect finalizat cu succes
-- **Discovery**: Infrastructure EXISTS - doar lipsește UPDATE connection + 6 gap-uri
-- **Priority**: P1 - Editare inline (2.5h) ✅ → P2 - Data alignment (1h) ✅ → P3 - Performance (1h) ✅ → P4 - Validation (30min) ✅
+- **Task Status**: **PLAN MODE ACTIVE** 📋
+- **Task Type**: Cache și Sincronizare Improvements (Level 2)  
+- **Priority**: HIGH - Critical pentru consistența aplicației
+- **Source**: PRD Document - cahchingimprovments.md
+- **Status**: DETAILED IMPLEMENTATION PLANNING ⚡
 - **Date**: 29 Mai 2025
-- **Memory Bank Status**: IMPLEMENT Mode COMPLETE - All objectives achieved
-- **PROGRESS**: 300min/5h completed (ALL PHASES COMPLETE! ✅✅✅✅)
-- **TOTAL ETA**: **5h** - COMPREHENSIVE COVERAGE ACHIEVED
 
-## ACTIVE TASK - IMPLEMENTATION IN PROGRESS
+## 🆕 **NEW TASK: CACHE SYNCHRONIZATION IMPROVEMENTS**
 
-### 🚀 **LunarGridTanStack Critical Fixes** 🎯 IMPLEMENT ACTIVE
-- **Source**: VAN Mode analysis of `PRD/app_optimizations.md`
-- **Status**: IMPLEMENT Mode - FAZA 1 execution
-- **Root Cause**: handleEditableCellSave folosește doar CREATE, nu UPDATE
+### 📋 **Task Overview**
+**Obiectiv**: Implementarea sincronizării complete între cache-ul lunar și listele globale
 
-#### **🏗️ INFRASTRUCTURE EXISTS**:
-- ✅ **useUpdateTransactionMonthly** - Hook implementat complet
-- ✅ **EditableCell** - Componentă funcțională cu validare
-- ✅ **useInlineCellEdit** - Logică editare completă  
-- ✅ **renderEditableCell** - Renderizare corectă
-- 🔴 **MISSING**: Connection la UPDATE mutation în handleEditableCellSave
+**Context**: Implementarea actuală cache-ului LunarGrid folosește actualizări optimiste pentru cache-ul lunar, dar nu sincronizează automat listele globale de tranzacții. Aceasta creează risk de inconsistență între modulele aplicației.
 
-#### **📋 IMPLEMENTATION PLAN RESTORED**:
+### 🔍 **ARCHITECTURE ANALYSIS COMPLETED** ✅
 
-**🚀 FAZA 1 - CRITICAL FIX (2.5h)** ✅ **COMPLETE**:
-- **Step 1.1**: ✅ Extinde renderEditableCell cu transactionId (30min) ← **COMPLETED**
-- **Step 1.2**: ✅ Modifică handleEditableCellSave pentru UPDATE logic (60min) ← **COMPLETED**  
-- **Step 1.3**: Import useUpdateTransactionMonthly + optimistic update (25min) ← **COMPLETED**
-- **Step 1.4**: Modifică hook tabel pentru transactionId (15min) ← **COMPLETED**
-- **🐞 Step 1.5**: FIX Bug UTC date shift - YYYY-MM-DD template (10min) ← **COMPLETED**
-- **Step 1.6**: ✅ UX feedback - spinner la saving, toast success/error (20min) ← **COMPLETED**
+#### **Current Cache Implementation Identified**:
 
-**FAZA 2 - DATA ALIGNMENT (1h)** ✅ **COMPLETE**:
-- **Step 2.1**: Reintroduce categoryStore în useLunarGridTable (30min) ← **COMPLETED**
-- **Step 2.2**: Configurează getRowId stabil (30min) ← **COMPLETED**
+**1. Monthly Cache System (Functional)** ✅
+- **Query Key**: `['transactions', 'monthly', year, month, userId]`
+- **Hook**: `useMonthlyTransactions` - specialized pentru LunarGrid
+- **Mutations**: 3 hook-uri specializate cu optimistic updates:
+  - `useCreateTransactionMonthly` - temporary ID + manual cache update
+  - `useUpdateTransactionMonthly` - optimistic update + server sync
+  - `useDeleteTransactionMonthly` - optimistic removal
 
-**FAZA 3 - PERFORMANCE (1h)** ✅ **COMPLETE**:
-- **Step 3.1**: Memoizare coloane + cleanup imports (20min) ← **COMPLETED**
-- **Step 3.2**: Componente memo (20min) ← **COMPLETED**
-- **Step 3.3**: useCallback handlers + singleton Intl.NumberFormat (20min) ← **COMPLETED**
+**2. Global Cache System (Multiple Keys Identified)** ⚠️
+- **Infinite Query Key**: `['transactions', 'infinite', userId, queryParams]`
+- **Base Key**: `['transactions']` - used by legacy mutations
+- **Hook**: `useInfiniteTransactions` - pentru main transaction list
+- **Legacy Mutations**: `useCreateTransaction`, `useUpdateTransaction`, `useDeleteTransaction`
 
-**FAZA 4 - VALIDATION & CLEANUP (30min)** ✅ **COMPLETE**:
-- **Step 4.1**: Test E2E pentru flux CRUD (add → edit → delete → navigate) (20min) ← **COMPLETED**
-- **Step 4.2**: Clean-up console.log & doc update (10min) ← **COMPLETED**
+#### **Gap Analysis**:
+- ✅ **Monthly cache updates**: Perfect - setQueryData implemented
+- ❌ **Global cache sync**: Missing - monthly mutations nu actualizează global cache
+- ⚠️ **Multiple global keys**: Complex - infinite queries cu parameetri specifici
+- 🎯 **Risk**: Inconsistența între LunarGrid și TransactionList/Dashboard
 
-#### **✅ FAZA 1 RESULTS ACHIEVED**:
+#### **Technical Solution Strategy Defined**:
 
-| Step | Implementation | Files Modified | Result |
-|------|---------------|----------------|---------|
-| **1.1** | Extended `renderEditableCell` with `transactionId` param | `LunarGridTanStack.tsx` | ✅ CREATE vs UPDATE differentiation |
-| **1.2** | Updated `handleEditableCellSave` with UPDATE logic | `LunarGridTanStack.tsx` | ✅ Full CRUD inline editing |
-| **1.3** | Added optimistic updates for UPDATE mutation | `transactionMutations.ts` | ✅ Instant UI feedback |
-| **1.4** | Extended `useLunarGridTable` with `transactionMap` | `useLunarGridTable.tsx` | ✅ Transaction ID resolution |
-| **1.5** | Fixed UTC date shift bug with YYYY-MM-DD template | `LunarGridTanStack.tsx` | ✅ Correct date handling |
-| **1.6** | Integrated toast notifications (react-hot-toast) | `LunarGridTanStack.tsx` | ✅ Success/error UX feedback |
+**1. Dual Cache Update Pattern** 🔧
+```typescript
+// În monthly mutations - update both caches
+const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+const globalInfiniteKey = ['transactions', 'infinite', userId, queryParams];
 
-#### **✅ FAZA 2 RESULTS ACHIEVED**:
+// Update monthly cache (existing)
+queryClient.setQueryData(monthlyQueryKey, updatedMonthlyData);
 
-| Step | Implementation | Files Modified | Result |
-|------|---------------|----------------|---------|
-| **2.1** | Verified categoryStore integration | `useLunarGridTable.tsx` | ✅ Fixed category structure available |
-| **2.2** | Verified stable getRowId configuration + fixed dailyBalances | `useLunarGridTable.tsx` | ✅ Stable row keys + working totals |
+// NEW: Update global infinite cache
+queryClient.setQueryData(globalInfiniteKey, (old: InfiniteData<TransactionPage>) => {
+  // Update first page with new/updated/deleted transaction
+});
+```
 
-#### **✅ FAZA 3 RESULTS ACHIEVED**:
+**2. Unified Sync Function Architecture** 📊
+```typescript
+function syncGlobalCache(
+  queryClient: QueryClient,
+  userId: string,
+  operation: 'create' | 'update' | 'delete',
+  transaction: TransactionValidated,
+  deletedId?: string
+) {
+  // Find all global cache keys for this user
+  const globalKeys = queryClient.getQueryCache()
+    .findAll(['transactions', 'infinite', userId])
+    .map(query => query.queryKey);
 
-| Step | Implementation | Files Modified | Result |
-|------|---------------|----------------|---------|
-| **3.1** | Cleanup unused imports + memoized columns | `useLunarGridTable.tsx` | ✅ Eliminated 8+ ESLint warnings |
-| **3.2** | Verified React.memo on components | LunarGrid components | ✅ All key components already memoized |
-| **3.3** | Singleton Intl.NumberFormat optimization | `formatters.ts`, `LunarGridTanStack.tsx` | ✅ CPU optimization - reuse formatter |
+  // Update each global cache
+  globalKeys.forEach(key => {
+    queryClient.setQueryData(key, (old: InfiniteData<TransactionPage>) => {
+      // Implement operation logic for each page
+    });
+  });
+}
+```
 
-#### **✅ FAZA 4 RESULTS ACHIEVED**:
+### 🎯 **Deliverables Pentru Implementare**
 
-| Step | Implementation | Files Modified | Result |
-|------|---------------|----------------|---------|
-| **4.1** | Created comprehensive E2E CRUD test | `lunargrid-crud.spec.ts` | ✅ Full workflow validation |
-| **4.2** | Cleaned production console.log statements | `LunarGridTanStack.tsx`, `LunarGridPage.tsx` | ✅ Production-ready code |
+#### **✅ 1. Update simultan în ambele cache-uri** 🔧
+- **Current**: Doar cache lunar actualizat
+- **Target**: Actualizare simultană: monthly cache + toate global cache-urile
+- **Implementation**: Integrate sync function în toate 3 monthly mutations
 
-**🎯 PERFORMANCE INFRASTRUCTURE**:
-- ✅ **Cleanup Complete**: Removed TransactionValidated, EXCEL_GRID, LunarGridRowData unused imports
-- ✅ **Memoization Verified**: All key components (LunarGridTanStack, GridCell, EditableCell) already memoized
-- ✅ **Singleton Optimization**: Intl.NumberFormat cached instance prevents repeated object creation
-- ✅ **CPU Optimization**: formatCurrency uses singleton formatter instead of new instances
+#### **✅ 2. Handle multiple global query variations** 📊
+- **Challenge**: Global cache has different queryParams (filters, pagination)
+- **Solution**: Sync all relevant infinite query caches for userId
+- **Safety**: Detect și handle missing/stale global caches
 
-**🎯 VALIDATION & CLEANUP INFRASTRUCTURE**:
-- ✅ **E2E Test Coverage**: Complete CRUD workflow (add → edit → delete → navigate) with toast verification
-- ✅ **Production Cleanup**: Removed debugging console.log statements from core components
-- ✅ **Build Verification**: All builds pass successfully with optimized code
-- ✅ **Code Quality**: Linting warnings minimized, production-ready state achieved
+#### **✅ 3. Testing sincronizare end-to-end** 🧪
+- **Scenario 1**: Add în LunarGrid → instant în infinite list 
+- **Scenario 2**: Edit în LunarGrid → update în filtered lists
+- **Scenario 3**: Delete din LunarGrid → remove din all global caches
 
-## 🏆 **COMPREHENSIVE IMPLEMENTATION SUMMARY**
+#### **✅ 4. Performance și backward compatibility** 🔍
+- **Zero performance degradation**: Sync only loaded global caches
+- **Backward compatibility**: Legacy mutations unchanged
+- **Error handling**: Rollback both monthly și global în case of failure
 
-**TOTAL EFFORT**: 5 hours (300 minutes) across 4 phases
-**VULNERABILITIES RESOLVED**: 6 critical issues (P1-P6)
-**FILES MODIFIED**: 8 core files optimized
-**INFRASTRUCTURE ENHANCED**: Full CRUD + Performance + Validation
+### 🚧 **VAN Mode Progress** ✅
+- [x] **Task Initialization**: PRD analysis complete
+- [x] **Problem Identification**: Cache synchronization gap identified
+- [x] **Architecture Analysis**: ✅ **COMPLETED** - Monthly + Global cache structure mapped
+- [x] **Cache Implementation Review**: All hooks și mutations analyzed
+- [ ] **Technical Solution Design**: Sync function architecture planning
+- [ ] **Implementation Strategy**: Phased rollout plan
+- [ ] **Performance Impact Assessment**: Zero degradation validation
 
-### **🎯 CRITICAL PROBLEMS SOLVED**:
+### 📊 **Implementation Plan Outlined**
 
-1. **✅ P1 - Inline Editing Non-Functional**: 
-   - Extended `renderEditableCell` with `transactionId` parameter
-   - Fixed `handleEditableCellSave` to support both CREATE and UPDATE operations
-   - Added optimistic updates with rollback for instant UX feedback
-   - Integrated toast notifications for success/error states
+#### **Phase 1: Core Sync Function** 
+1. Create `syncGlobalTransactionCache` utility function
+2. Handle infinite query cache updates pentru create/update/delete
+3. Error handling și rollback mechanisms
 
-2. **✅ P2 - Data "Jumping" Between Months**:
-   - Verified categoryStore integration for fixed category structure
-   - Ensured stable getRowId configuration prevents row reordering
-   - Fixed dailyBalances calculation for accurate totals
+#### **Phase 2: Integration** 
+1. Update `useCreateTransactionMonthly` cu global sync
+2. Update `useUpdateTransactionMonthly` cu global sync  
+3. Update `useDeleteTransactionMonthly` cu global sync
 
-3. **✅ P3 - Global Re-render Lag**:
-   - Cleaned up unused imports and dependencies
-   - Verified React.memo on all key components
-   - Implemented singleton Intl.NumberFormat for CPU optimization
+#### **Phase 3: Testing & Validation**
+1. Unit tests pentru sync function
+2. Integration tests pentru dual cache updates
+3. E2E tests pentru cross-module consistency
 
-4. **✅ P4-P6 - Additional Issues**:
-   - Fixed UTC date shift bug with proper YYYY-MM-DD formatting
-   - Added comprehensive E2E test coverage for CRUD workflow
-   - Cleaned production code of debugging statements
+#### **Phase 4: Performance Monitoring**
+1. Performance benchmarks before/after
+2. Cache hit ratio monitoring
+3. Memory usage validation
 
-### **🚀 INFRASTRUCTURE ACHIEVEMENTS**:
-
-- **Full CRUD Functionality**: Add, Edit, Delete, Navigate with proper persistence
-- **Optimistic UI Updates**: Instant feedback with rollback on errors
-- **Toast Notifications**: User-friendly success/error messaging
-- **Performance Optimized**: Memoization + singleton patterns
-- **Production Ready**: Clean code without debug statements
-- **Test Coverage**: E2E validation of complete workflows
-
-**STATUS**: 🎉 **ALL OBJECTIVES ACHIEVED - PROJECT COMPLETE!**
-
-## LAST TASK COMPLETED & ARCHIVED
-
-### 🏆 **LunarGrid Performance Optimizations** ✅ ARHIVAT
-- **Status**: COMPLETED & ARCHIVED
-- **Success Rate**: 100% - toate obiectivele atinse
-- **Duration**: ~4 ore (estimate: 3 ore, 75% accuracy)
-- **Archive**: [`archive-lunargrid-optimizations_20250529.md`](archive/archive-lunargrid-optimizations_20250529.md)
-
-#### **Key Achievements**:
-- ✅ **Manual Cache Updates**: Implementat complet - eliminarea re-fetch-urilor prin setQueryData
-- ✅ **React 18 Transitions**: Implementat complet - navigare fluidă cu startTransition  
-- ✅ **Preload Inteligent**: Implementat complet - prefetch pentru luni adiacente
-- ✅ **Over-engineering Prevention**: 2 propuneri corect respinse (virtualizare + CategoryStore migration)
-- ✅ **Zero Breaking Changes**: Compatibilitate completă păstrată
-
-#### **Documentation**:
-- **Reflection**: [`reflection-lunargrid-optimizations.md`](reflection/reflection-lunargrid-optimizations.md)
-- **Requirements**: [`improvements.md`](PRD/improvements.md)
+### 📋 **Status Tracking**
+- [x] VAN Mode initiated - task analysis started
+- [x] Current cache architecture analysis ✅ **COMPLETED**
+- [x] Gap identification și technical solution design ✅ **COMPLETED**
+- [ ] Sync function implementation design
+- [ ] Monthly mutation hooks update strategy
+- [ ] Comprehensive testing plan
+- [ ] Performance validation approach
+- [ ] Documentation update plan
 
 ## MEMORY BANK RESOURCES
 
 ### 📂 **Archive System**
-- **Archive Directory**: `memory-bank/archive/` - 15+ completed tasks  
-- **Reflection Directory**: `memory-bank/reflection/` - lessons learned
-- **Creative Directory**: `memory-bank/creative/` - design decisions
+- **Archive Directory**: `memory-bank/archive/` - **17+ completed tasks**  
+- **Reflection Directory**: `memory-bank/reflection/` - comprehensive lessons learned
+- **Creative Directory**: `memory-bank/creative/` - design decisions archive
 
 ### 📚 **Knowledge Base**
-- **Patterns**: Proven development patterns și lessons learned
+- **Crisis Management**: Emergency response patterns și rapid recovery strategies
+- **Cache Management**: LunarGrid optimization patterns și performance strategies ✅ **FOUNDATION**
+- **Technical Patterns**: Proven development patterns și lessons learned
 - **Best Practices**: Consolidated approaches pentru future development  
-- **Problem Solving**: Strategies pentru common challenges
 
-### 🎯 **Development Areas Available**
-- **User Experience**: Mobile responsiveness, keyboard shortcuts, gestures
-- **UI/UX**: Dark mode, accessibility, advanced theming
-- **Performance**: Bundle optimization, service workers, advanced caching
-- **New Features**: Enhanced export, budget planning, external integrations
+### 🎯 **Current Focus Areas**
+- **Cache Synchronization**: ✅ **Implementation plan ready** - Coding phase next
+- **Performance Optimization**: Continuation of LunarGrid success patterns
+- **User Experience**: Cross-module consistency improvement
+- **Code Quality**: TypeScript compliance și shared constants adherence
 
 ## PROJECT STATE
-- **Application**: Fully functional Budget App cu LunarGrid optimizat
+- **Application**: **Fully functional Budget App cu LunarGrid optimizat și crisis-free**
 - **Architecture**: Solid foundation cu TanStack Table + React Query + Zustand
 - **Performance**: Manual cache + transitions + preload implementate în LunarGrid
 - **Quality**: TypeScript 100%, shared constants compliance, CI/CD automation
-- **Testing**: Comprehensive test suite cu 70%+ coverage
+- **Testing**: Comprehensive test suite cu 70%+ coverage, **E2E tests stable**
+- **Cache System**: **DETAILED PLAN READY** - Implementation starting ⚡
 
 ## NEXT STEPS  
-**Current**: Continuing with **IMPLEMENT Mode** - FAZA 1 execution
+**PLAN Mode Completed**: Detailed technical design created → Ready for BUILD Mode
+
+**Next Phase**: Implementation execution following 4-phase plan
 
 ---
 
 *Last Update: 29 Mai 2025*  
-*Status: IMPLEMENT Mode ACTIVE - Step 1.6 în curs*
-
-## 🎉 **ALL PHASES COMPLETED SUCCESSFULLY!**
+*Status: **DETAILED PLAN COMPLETED** - Cache Synchronization Implementation Ready*  
+*Mode: **PLAN → BUILD Transition Ready***
