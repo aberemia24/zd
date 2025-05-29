@@ -1,7 +1,7 @@
 # Test info
 
-- Name: Smoke: LunarGrid Basic Functionality >> LunarGrid se deschide și afișează grid-ul
-- Location: C:\windsurf repo\budget-app\frontend\tests\e2e\smoke\lunar-grid.smoke.spec.ts:15:7
+- Name: Smoke: LunarGrid Basic Functionality >> celulele grid-ului răspund la click
+- Location: C:\windsurf repo\budget-app\frontend\tests\e2e\smoke\lunar-grid.smoke.spec.ts:67:7
 
 # Error details
 
@@ -15,7 +15,7 @@ Call log:
   - expect.toBeVisible with timeout 5000ms
   - waiting for getByTestId('lunar-grid-container')
 
-    at C:\windsurf repo\budget-app\frontend\tests\e2e\smoke\lunar-grid.smoke.spec.ts:19:60
+    at C:\windsurf repo\budget-app\frontend\tests\e2e\smoke\lunar-grid.smoke.spec.ts:71:60
 ```
 
 # Page snapshot
@@ -215,8 +215,7 @@ Call log:
    16 |     console.log('🔍 Smoke Test: LunarGrid Loading');
    17 |     
    18 |     // Verifică că container-ul principal există
->  19 |     await expect(page.getByTestId('lunar-grid-container')).toBeVisible();
-      |                                                            ^ Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
+   19 |     await expect(page.getByTestId('lunar-grid-container')).toBeVisible();
    20 |     
    21 |     // Verifică că tabelul se afișează
    22 |     await expect(page.getByTestId('lunar-grid-table')).toBeVisible();
@@ -268,7 +267,8 @@ Call log:
    68 |     console.log('🔍 Smoke Test: Cell Interaction');
    69 |     
    70 |     // Verifică că grid-ul e încărcat
-   71 |     await expect(page.getByTestId('lunar-grid-container')).toBeVisible();
+>  71 |     await expect(page.getByTestId('lunar-grid-container')).toBeVisible();
+      |                                                            ^ Error: Timed out 5000ms waiting for expect(locator).toBeVisible()
    72 |     
    73 |     // Expandează pentru a avea celule disponibile
    74 |     // WORKAROUND: Grid-ul se resetează după edit, deci expandăm din nou

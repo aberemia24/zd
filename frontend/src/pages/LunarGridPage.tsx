@@ -213,7 +213,7 @@ const LunarGridPage: React.FC = () => {
   }, []);
 
   return (
-    <div className={cn(container({ size: "xl" }), "pb-10")}>
+    <div className={cn(container({ size: "xl" }), "pb-10")} data-testid="lunar-grid-container">
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="flex items-center space-x-3">
           <h1 className="text-3xl font-bold text-gray-900">

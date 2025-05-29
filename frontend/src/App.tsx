@@ -5,7 +5,8 @@ import { Routes, Route, Navigate } from "react-router-dom"; // Importuri react-r
 import TransactionsPage from "./pages/TransactionsPage";
 import LunarGridPage from "./pages/LunarGridPage";
 import OptionsPage from "./pages/OptionsPage";
-import ProfilerDebugPage from "./components/dev/ProfilerDebugPage";
+// ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează bucla infinită de setState
+// import ProfilerDebugPage from "./components/dev/ProfilerDebugPage";
 import LoginForm from "./components/features/Auth/LoginForm";
 import RegisterForm from "./components/features/Auth/RegisterForm";
 import { Toaster } from "react-hot-toast";
@@ -135,10 +136,12 @@ export const App: React.FC = () => {
               {" "}
               {TITLES.OPTIUNI || "Opțiuni"}{" "}
             </NavLink>
+            {/* ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează crash
             <NavLink to="/profiler-debug" testId="profiler-debug-tab">
               {" "}
               🔍 Profiler Debug{" "}
             </NavLink>
+            */}
           </div>
         )}
 
@@ -152,7 +155,9 @@ export const App: React.FC = () => {
               <Route path="/transactions" element={<TransactionsPage />} />
               <Route path="/lunar-grid" element={<LunarGridPage />} />
               <Route path="/options" element={<OptionsPage />} />
+              {/* ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează crash
               <Route path="/profiler-debug" element={<ProfilerDebugPage />} />
+              */}
               {/* Orice altă rută pentru utilizator logat, redirecționează la tranzacții */}
               <Route
                 path="*"
