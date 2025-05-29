@@ -41,10 +41,13 @@ const LunarGridPage: React.FC = () => {
   });
 
   // Preload inteligent pentru luni adiacente (elimină loading states la navigare)
-  useAdjacentMonthsPreload(year, month, user?.id, {
+  // ✅ FIX: Memoizez opțiunile pentru a evita bucla infinită în useEffect
+  const preloadOptions = useMemo(() => ({
     staleTime: 60 * 1000, // 1 minut cache pentru preloaded data
     gcTime: 10 * 60 * 1000, // 10 minute garbage collection pentru preloaded data
-  });
+  }), []);
+  
+  useAdjacentMonthsPreload(year, month, user?.id, preloadOptions);
 
   // Funcționalitate pentru categorii personalizate
   const loadCategories = useCategoryStore((state) => state.loadUserCategories);

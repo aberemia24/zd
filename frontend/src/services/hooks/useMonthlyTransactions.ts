@@ -4,7 +4,7 @@ import { PAGINATION } from "@shared-constants";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { useAuthStore } from "../../stores/authStore";
 import { queryKeys, optimizeQueryOptions } from "./reactQueryUtils";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 // Utilitar pentru formatarea datelor
 function pad2(n: number): string {
@@ -160,6 +160,40 @@ export function useAdjacentMonthsPreload(
   const { user } = useAuthStore();
   const effectiveUserId = userId || user?.id;
 
+  // ✅ FIX: Destructurez opțiunile pentru a evita dependențe volatile
+  const { staleTime = 30 * 1000, gcTime = 5 * 60 * 1000 } = options;
+
+  // ✅ FIX: Memoizez funcția de preload pentru a evita recrearea la fiecare render
+  const prefetchMonthData = useCallback(async (year: number, month: number) => {
+    if (!effectiveUserId) return;
+    
+    const monthRange = getMonthRange(year, month);
+    const queryKey = queryKeys.transactions.monthly(year, month, effectiveUserId);
+    
+    return queryClient.prefetchQuery({
+      queryKey,
+      queryFn: async () => {
+        const result = await supabaseService.fetchTransactions(
+          effectiveUserId,
+          {
+            limit: 1000,
+            sort: "date",
+          },
+          {
+            dateFrom: monthRange.from,
+            dateTo: monthRange.to,
+          },
+        );
+        return {
+          data: result.data,
+          count: result.count,
+        };
+      },
+      staleTime,
+      gcTime,
+    });
+  }, [queryClient, effectiveUserId, staleTime, gcTime]);
+
   useEffect(() => {
     if (!effectiveUserId) return;
 
@@ -171,58 +205,11 @@ export function useAdjacentMonthsPreload(
     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
 
-    // Preload pentru luna anterioară
-    const prevMonthQueryKey = queryKeys.transactions.monthly(prevYear, prevMonth, effectiveUserId);
-    queryClient.prefetchQuery({
-      queryKey: prevMonthQueryKey,
-      queryFn: async () => {
-        const monthRange = getMonthRange(prevYear, prevMonth);
-        const result = await supabaseService.fetchTransactions(
-          effectiveUserId,
-          {
-            limit: 1000,
-            sort: "date",
-          },
-          {
-            dateFrom: monthRange.from,
-            dateTo: monthRange.to,
-          },
-        );
-        return {
-          data: result.data,
-          count: result.count,
-        };
-      },
-      staleTime: options.staleTime || 30 * 1000,
-      gcTime: options.gcTime || 5 * 60 * 1000,
-    });
+    // ✅ FIX: Folosesc funcția memoizată pentru a evita recrearea constantă
+    prefetchMonthData(prevYear, prevMonth);
+    prefetchMonthData(nextYear, nextMonth);
 
-    // Preload pentru luna următoare
-    const nextMonthQueryKey = queryKeys.transactions.monthly(nextYear, nextMonth, effectiveUserId);
-    queryClient.prefetchQuery({
-      queryKey: nextMonthQueryKey,
-      queryFn: async () => {
-        const monthRange = getMonthRange(nextYear, nextMonth);
-        const result = await supabaseService.fetchTransactions(
-          effectiveUserId,
-          {
-            limit: 1000,
-            sort: "date",
-          },
-          {
-            dateFrom: monthRange.from,
-            dateTo: monthRange.to,
-          },
-        );
-        return {
-          data: result.data,
-          count: result.count,
-        };
-      },
-      staleTime: options.staleTime || 30 * 1000,
-      gcTime: options.gcTime || 5 * 60 * 1000,
-    });
-
-    console.log(`Preloaded adjacent months: ${prevYear}-${prevMonth} și ${nextYear}-${nextMonth}`);
-  }, [currentYear, currentMonth, effectiveUserId, queryClient, options.staleTime, options.gcTime]);
+    // Debug redus - doar dacă e necesar
+    // console.log(`Preloaded adjacent months: ${prevYear}-${prevMonth} și ${nextYear}-${nextMonth}`);
+  }, [currentYear, currentMonth, effectiveUserId, prefetchMonthData]); // ✅ FIX: Dependențe clean și stabile
 }
