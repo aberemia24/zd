@@ -51,6 +51,9 @@ export type TransformedTableDataRow = {
   subRows?: TransformedTableDataRow[]; // Adăugat pentru subrows native
 } & DailyAmount;
 
+// Tip pentru maparea tranzacțiilor individuale
+export type TransactionMap = Map<string, string>; // key: "category-subcategory-day", value: transactionId
+
 /**
  * Hook pentru gestionarea datelor și stării pentru LunarGrid bazat pe TanStack Table.
  * Abstractizează logica de procesare a datelor și construcția tabelului.
@@ -69,6 +72,7 @@ export interface UseLunarGridTableResult {
   columns: ColumnDef<TransformedTableDataRow>[];
   days: number[];
   dailyBalances: Record<number, number>;
+  transactionMap: TransactionMap;
 }
 
 // Helper robust pentru generare subRows UNICE cu indexare globală pe subcategory goală
@@ -460,6 +464,16 @@ export function useLunarGridTable(
     [],
   );
 
+  // Tip pentru maparea tranzacțiilor individuale
+  const transactionMap = useMemo(() => {
+    const map = new Map<string, string>();
+    validTransactions.forEach((t) => {
+      const key = `${t.category}-${t.subcategory || ''}-${new Date(t.date).getDate()}`;
+      map.set(key, t.id);
+    });
+    return map;
+  }, [validTransactions]);
+
   return {
     table,
     columns,
@@ -469,5 +483,6 @@ export function useLunarGridTable(
     isLoading: isLoadingTransactions,
     error: queryError,
     getCellId, // Adăugat pentru suport editare inline
+    transactionMap,
   } as UseLunarGridTableResult;
 }
