@@ -1,0 +1,17 @@
+# Optimizări și probleme detectate LunarGridTanStack
+
+Implementarea actuală a LunarGridTanStack a adus îmbunătățiri importante (TanStack Table pentru tabelul lunar, caching cu React Query etc.), dar aplicația încă se confruntă cu probleme majore de comportament și performanță. Pe de o parte, optimizările recente (actualizări manuale de cache în loc de re-fetch, integrarea React useTransition și preîncărcarea lunilor adiacente) sunt prezente, însă, pe de altă parte, experiența utilizatorului rămâne nesatisfăcătoare: interfața reacționează lent la acțiuni, editarea inline a celulelor nu funcționează, iar datele afișate par să se deplaseze sau să nu se alinieze corect de la o lună la alta.
+
+## Probleme detectate
+1. Performanță slabă (re-render excesiv): Deși s-au eliminat re-fetch-urile inutile (prin actualizarea cache-ului în loc de invalidateQueries), componenta LunarGridTanStack încă re-randează complet întregul grid la orice schimbare, ceea ce provoacă latențe vizibile. Fiecare editare sau navigare declanșează reconstrucția tabelului și recalcularea datelor tuturor celulelor, în loc să actualizeze doar porțiunile schimbate. În cod, observăm indicii ale acestor re-render redundante: de exemplu, un efect sau memo din LunarGridTanStack depindea inițial de referințe instabile (tableCell, tableRow, handleCellClick etc.), ceea ce provoca recalculări frecvente. Aceste dependențe au fost eliminate în ultimul cod.
+
+2. Editarea inline a celulelor nu funcționează: La încercarea de a edita o celulă, fie nu se salvează modificarea, fie UI-ul revine la valoarea anterioară după un scurt timp.
+
+3. Datele afișate se deplasează sau nu se aliniază corect de la o lună la alta: Navigarea între luni produce artefacte vizuale și date incorecte în grid.
+
+## Recomandări
+- Refactorizare granulară a gridului: Separă celulele/zonele pentru a permite re-render doar acolo unde este necesar.
+- Folosire corectă a memo-izării și a cheilor stabile.
+- Testare cu profilere React și identificarea exactă a surselor de re-render excesiv.
+- Repararea fluxului de editare inline și sincronizarea corectă cu cache-ul React Query.
+- Adăugare teste unitare și de integrare pentru comportamentul gridului la navigare și editare.

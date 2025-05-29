@@ -24,6 +24,7 @@ deprecated_globalrules.md
 
 # windsurf rules
 .windsurfrules
+.cursor
 
 # Test persistence files
 frontend/tests/e2e/support/.mailslurp-accounts.json
@@ -46,6 +47,10 @@ dev-debug.log
 *.njsproj
 *.sln
 *.sw?
+.roo
+.roomodes
+.taskmasterconfig
+.taskmasterconfig.json
 # OS specific
 # Task files
 tasks.json

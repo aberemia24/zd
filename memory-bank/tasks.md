@@ -1,10 +1,54 @@
 # MEMORY BANK - TASK TRACKING
 
 ## CURRENT STATUS
-- **Active Task**: None - Ready for VAN Mode
-- **Last Completed**: ✅ LunarGrid Performance Optimizations (Level 3) - ARCHIVED
+- **Active Task**: LunarGridTanStack Critical Fixes (Level 1) - PLAN Mode Complete
+- **Plan Status**: DETAILED IMPLEMENTATION PLAN READY
+- **Discovery**: Infrastructure EXISTS - doar lipsește conexiunea UPDATE în handleEditableCellSave
+- **Priority**: P1 - Editare inline (2h) → P2 - Data alignment (1h) → P3 - Performance (1h)
 - **Date**: 29 Mai 2025
-- **Memory Bank Status**: Reset pentru următorul development priority
+- **Memory Bank Status**: PLAN Complete - Ready for IMPLEMENT Mode
+
+## ACTIVE TASK - DETAILED PLAN RESULTS
+
+### 🔍 **LunarGridTanStack Critical Fixes** 🎯 PLAN COMPLETE
+- **Source**: VAN Mode analysis of `PRD/app_optimizations.md`
+- **Status**: PLAN COMPLETE → Ready for IMPLEMENT Mode
+- **Total Effort**: 4h (2h P1 + 1h P2 + 1h P3)
+- **Root Cause Found**: handleEditableCellSave folosește doar CREATE, nu UPDATE
+
+#### **🏗️ DISCOVERY KEY - Infrastructure EXISTS**:
+- ✅ **useUpdateTransactionMonthly** - Hook implementat complet
+- ✅ **EditableCell** - Componentă funcțională cu validare
+- ✅ **useInlineCellEdit** - Logică editare completă  
+- ✅ **renderEditableCell** - Renderizare corectă
+- 🔴 **MISSING**: Connection la UPDATE mutation în handleEditableCellSave
+
+#### **📋 DETAILED IMPLEMENTATION PLAN**:
+
+**FAZA 1 - CRITICAL FIX (2h)**:
+- **Step 1.1**: Extinde renderEditableCell cu transactionId (30min)
+- **Step 1.2**: Modifică handleEditableCellSave pentru UPDATE logic (60min)  
+- **Step 1.3**: Import useUpdateTransactionMonthly (15min)
+- **Step 1.4**: Modifică hook tabel pentru transactionId (15min)
+
+**FAZA 2 - DATA ALIGNMENT (1h)**:
+- **Step 2.1**: Reintroduce categoryStore în useLunarGridTable (30min)
+- **Step 2.2**: Configurează getRowId stabil (30min)
+
+**FAZA 3 - PERFORMANCE (1h)**:
+- **Step 3.1**: Memoizare coloane (20min)
+- **Step 3.2**: Componente memo (20min) 
+- **Step 3.3**: useCallback handlers (20min)
+
+#### **🧪 VALIDATION CRITERIA**:
+- ✅ Double-click → input appears
+- ✅ Enter/blur → value saves  
+- ✅ Escape → edit cancels
+- ✅ Categories don't jump between months
+- ✅ No global re-renders on single cell edit
+
+#### **Next Mode**: 
+**IMPLEMENT Mode** pentru execution pe FAZA 1 - Critical Fix (2h)
 
 ## LAST TASK COMPLETED & ARCHIVED
 
