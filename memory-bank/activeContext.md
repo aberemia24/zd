@@ -1,15 +1,15 @@
 # Active Context - Budget App Development
 
 ## Current Status
-- **Mode**: PLAN COMPLETE → Ready for IMPLEMENT Mode
-- **Task**: LunarGridTanStack Critical Fixes (Level 1) - Implementation Ready
-- **Discovery**: Infrastructure EXISTS - doar lipsește UPDATE connection
-- **Plan Status**: DETAILED IMPLEMENTATION PLAN READY (4h total)
-- **Next Phase**: FAZA 1 - Critical Fix (2h)
+- **Mode**: PLAN COMPLETE + Gap Analysis → Ready for IMPLEMENT Mode
+- **Task**: LunarGridTanStack Critical Fixes (Level 1) - Comprehensive Plan Ready
+- **Discovery**: Infrastructure EXISTS - doar lipsește UPDATE connection + 6 gap-uri
+- **Plan Status**: COMPREHENSIVE IMPLEMENTATION PLAN READY (5h total)
+- **Next Phase**: FAZA 1 - Critical Fix (2.5h) cu gap-uri integrate
 - **Date**: 29 Mai 2025
 
-## 🎯 PLAN Mode Results - MAJOR DISCOVERY
-🔍 **Infrastructure Analysis Complete** - PLAN READY
+## 🎯 PLAN Mode Results + GAP ANALYSIS
+🔍 **Comprehensive Plan Ready** - ALL GAPS ADDRESSED
 
 #### **🏗️ KEY DISCOVERY - Infrastructure EXISTS**:
 - ✅ **useUpdateTransactionMonthly** - Hook implementat complet  
@@ -18,19 +18,31 @@
 - ✅ **renderEditableCell** - Renderizare corectă în LunarGridTanStack
 - 🔴 **ROOT CAUSE**: handleEditableCellSave folosește doar CREATE, nu UPDATE
 
-#### **📋 IMPLEMENTATION PLAN (4h)**:
-**FAZA 1 - CRITICAL FIX (2h)**:
-- Step 1.1: Extinde renderEditableCell cu transactionId (30min)
-- Step 1.2: Modifică handleEditableCellSave UPDATE logic (60min)
-- Step 1.3: Import useUpdateTransactionMonthly (15min)  
-- Step 1.4: Modifică hook tabel pentru transactionId (15min)
+#### **🐞 GAP ANALYSIS RESOLVED** (6 gap-uri):
+
+| Gap | Impact | Solution | Timing |
+|-----|--------|----------|---------|
+| 🐞 **UTC Date Shift** | Date corupte | Replace `new Date().toISOString()` cu `YYYY-MM-DD` | Step 1.5 (10min) |
+| **Optimistic Update** | UI instant la UPDATE | Extend Step 1.3 cu onMutate, onError | Step 1.3 (25min) |
+| **UX Feedback** | Claritate utilizator | Spinner + toast la save/error | Step 1.6 (20min) |
+| **Test E2E CRUD** | Previne regresii | Playwright test complet | Step 4.1 (20min) |
+| **Clean-up** | Mentenanță | Remove logs + update docs | Step 4.2 (10min) |
+| **Singleton Format** | CPU reduction | Cache Intl.NumberFormat | Step 3.3 (included) |
+
+#### **📋 COMPREHENSIVE PLAN (5h total)**:
+**FAZA 1 - CRITICAL FIX (2.5h)**:
+- Step 1.1-1.4: Core UPDATE implementation (2h)
+- 🐞 Step 1.5: FIX UTC date shift bug (10min)
+- Step 1.6: UX feedback integration (20min)
 
 **FAZA 2 - DATA ALIGNMENT (1h)**:
-- Step 2.1: Reintroduce categoryStore în useLunarGridTable (30min)
-- Step 2.2: Configurează getRowId stabil (30min)
+- Step 2.1-2.2: CategoryStore + getRowId stabil (60min)
 
 **FAZA 3 - PERFORMANCE (1h)**:
-- Step 3.1-3.3: Memoizare + componente memo + callbacks (60min)
+- Step 3.1-3.3: Memoizare + singleton optimizations (60min)
+
+**FAZA 4 - VALIDATION & CLEANUP (30min)**:
+- Step 4.1-4.2: E2E tests + cleanup (30min)
 
 ## 🎯 Active Task via VAN Analysis
 🔍 **LunarGridTanStack Critical Fixes** - 6 vulnerabilități identificate

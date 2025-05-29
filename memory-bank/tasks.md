@@ -2,11 +2,12 @@
 
 ## CURRENT STATUS
 - **Active Task**: LunarGridTanStack Critical Fixes (Level 1) - PLAN Mode Complete
-- **Plan Status**: DETAILED IMPLEMENTATION PLAN READY
-- **Discovery**: Infrastructure EXISTS - doar lipsește conexiunea UPDATE în handleEditableCellSave
-- **Priority**: P1 - Editare inline (2h) → P2 - Data alignment (1h) → P3 - Performance (1h)
+- **Plan Status**: COMPREHENSIVE IMPLEMENTATION PLAN READY (Gap Analysis Complete)
+- **Discovery**: Infrastructure EXISTS - doar lipsește UPDATE connection + 6 gap-uri fixate
+- **Priority**: P1 - Editare inline (2.5h) → P2 - Data alignment (1h) → P3 - Performance (1h) → P4 - Validation (30min)
 - **Date**: 29 Mai 2025
-- **Memory Bank Status**: PLAN Complete - Ready for IMPLEMENT Mode
+- **Memory Bank Status**: PLAN Complete + Gap Analysis - Ready for IMPLEMENT Mode
+- **REVISED ETA**: **5h total** (was 4h) - COMPREHENSIVE COVERAGE
 
 ## ACTIVE TASK - DETAILED PLAN RESULTS
 
@@ -23,13 +24,15 @@
 - ✅ **renderEditableCell** - Renderizare corectă
 - 🔴 **MISSING**: Connection la UPDATE mutation în handleEditableCellSave
 
-#### **📋 DETAILED IMPLEMENTATION PLAN**:
+#### **📋 DETAILED IMPLEMENTATION PLAN** (REVISED):
 
-**FAZA 1 - CRITICAL FIX (2h)**:
+**FAZA 1 - CRITICAL FIX (2.5h)** ⬅️ UPDATED:
 - **Step 1.1**: Extinde renderEditableCell cu transactionId (30min)
 - **Step 1.2**: Modifică handleEditableCellSave pentru UPDATE logic (60min)  
-- **Step 1.3**: Import useUpdateTransactionMonthly (15min)
+- **Step 1.3**: Import useUpdateTransactionMonthly + optimistic update (25min) ⬅️ EXTENDED
 - **Step 1.4**: Modifică hook tabel pentru transactionId (15min)
+- **🐞 Step 1.5**: FIX Bug UTC date shift - YYYY-MM-DD template (10min) ⬅️ NEW
+- **Step 1.6**: UX feedback - spinner la saving, toast success/error (20min) ⬅️ NEW
 
 **FAZA 2 - DATA ALIGNMENT (1h)**:
 - **Step 2.1**: Reintroduce categoryStore în useLunarGridTable (30min)
@@ -38,14 +41,35 @@
 **FAZA 3 - PERFORMANCE (1h)**:
 - **Step 3.1**: Memoizare coloane (20min)
 - **Step 3.2**: Componente memo (20min) 
-- **Step 3.3**: useCallback handlers (20min)
+- **Step 3.3**: useCallback handlers + singleton Intl.NumberFormat (20min) ⬅️ EXTENDED
 
-#### **🧪 VALIDATION CRITERIA**:
+**FAZA 4 - VALIDATION & CLEANUP (30min)** ⬅️ NEW:
+- **Step 4.1**: Test E2E pentru flux CRUD (add → edit → delete → navigate) (20min)
+- **Step 4.2**: Clean-up console.log & doc update (10min)
+
+#### **🐞 GAP ANALYSIS RESOLVED**:
+
+| Gap | Impact | Solution | Timing |
+|-----|--------|----------|---------|
+| 🐞 **UTC Date Shift** | Date corupte | Replace `new Date().toISOString()` cu `YYYY-MM-DD` | Step 1.5 (10min) |
+| **Optimistic Update** | UI instant la UPDATE | Extend Step 1.3 cu onMutate, onError | Step 1.3 (25min) |
+| **UX Feedback** | Claritate utilizator | Spinner + toast la save/error | Step 1.6 (20min) |
+| **Test E2E CRUD** | Previne regresii | Playwright test complet | Step 4.1 (20min) |
+| **Clean-up** | Mentenanță | Remove logs + update docs | Step 4.2 (10min) |
+| **Singleton Format** | CPU reduction | Cache Intl.NumberFormat | Step 3.3 (included) |
+
+**REVISED ETA**: **5h total** (was 4h) - **COMPREHENSIVE COVERAGE**
+
+#### **🧪 ENHANCED VALIDATION CRITERIA**:
 - ✅ Double-click → input appears
-- ✅ Enter/blur → value saves  
+- ✅ Enter/blur → value saves correctly (NEW vs EXISTING)
 - ✅ Escape → edit cancels
+- ✅ **Date bug fixed** - values appear in correct day ⬅️ NEW
+- ✅ **Optimistic updates** - instant UI, rollback on error ⬅️ NEW
+- ✅ **UX feedback** - spinner while saving, toast on success/error ⬅️ NEW
 - ✅ Categories don't jump between months
 - ✅ No global re-renders on single cell edit
+- ✅ **E2E test passes** - full CRUD flow verified ⬅️ NEW
 
 #### **Next Mode**: 
 **IMPLEMENT Mode** pentru execution pe FAZA 1 - Critical Fix (2h)
