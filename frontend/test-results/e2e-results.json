@@ -95,7 +95,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5590,
+                      "duration": 2773,
                       "errors": [],
                       "stdout": [
                         {
@@ -107,7 +107,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-29T12:44:15.325Z",
+                      "startTime": "2025-05-29T12:46:39.846Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -122,7 +122,7 @@
             },
             {
               "title": "navigarea între pagini funcționează",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -137,57 +137,25 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 6360,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator(':root')\nExpected pattern: \u001b[32m/\\/lunar-grid/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/transactions\"\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveURL with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator(':root')\u001b[22m\n\u001b[2m    9 × locator resolved to <html lang=\"ro\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/transactions\"\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator(':root')\nExpected pattern: \u001b[32m/\\/lunar-grid/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/transactions\"\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveURL with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator(':root')\u001b[22m\n\u001b[2m    9 × locator resolved to <html lang=\"ro\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/transactions\"\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\critical-auth.smoke.spec.ts:46:24",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\critical-auth.smoke.spec.ts",
-                          "column": 24,
-                          "line": 46
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 44 |\u001b[39m     \u001b[90m// Test navigare la LunarGrid\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 46 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/lunar-grid/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// Test navigare la Transactions\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\critical-auth.smoke.spec.ts",
-                            "column": 24,
-                            "line": 46
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveURL\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nLocator: locator(':root')\nExpected pattern: \u001b[32m/\\/lunar-grid/\u001b[39m\nReceived string:  \u001b[31m\"http://localhost:3000/transactions\"\u001b[39m\nCall log:\n\u001b[2m  - expect.toHaveURL with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator(':root')\u001b[22m\n\u001b[2m    9 × locator resolved to <html lang=\"ro\">…</html>\u001b[22m\n\u001b[2m      - unexpected value \"http://localhost:3000/transactions\"\u001b[22m\n\n\n\u001b[0m \u001b[90m 44 |\u001b[39m     \u001b[90m// Test navigare la LunarGrid\u001b[39m\n \u001b[90m 45 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 46 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/lunar-grid/\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 47 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 48 |\u001b[39m     \n \u001b[90m 49 |\u001b[39m     \u001b[90m// Test navigare la Transactions\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\critical-auth.smoke.spec.ts:46:24\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 5096,
+                      "errors": [],
                       "stdout": [
                         {
                           "text": "🔍 Smoke Test: Basic Navigation\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Basic Navigation - SUCCESS\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-29T12:44:21.006Z",
+                      "startTime": "2025-05-29T12:46:42.700Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-critical-auth.smoke--3a307-a-între-pagini-funcționează-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context-0",
-                          "contentType": "text/markdown",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-critical-auth.smoke--3a307-a-între-pagini-funcționează-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\critical-auth.smoke.spec.ts",
-                        "column": 24,
-                        "line": 46
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "e126e6d08fe12245c665-f6f2215ebf7ef84e5be5",
@@ -214,7 +182,7 @@
           "specs": [
             {
               "title": "LunarGrid se deschide și afișează grid-ul",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -227,59 +195,27 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7087,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:19:60",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                          "column": 60,
-                          "line": 19
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Verifică că container-ul principal există\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Verifică că tabelul se afișează\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-table'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                            "column": 60,
-                            "line": 19
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[0m \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Verifică că container-ul principal există\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Verifică că tabelul se afișează\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-table'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:19:60\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1693,
+                      "errors": [],
                       "stdout": [
                         {
                           "text": "🔍 Smoke Test: LunarGrid Loading\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: LunarGrid Loading - SUCCESS\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-29T12:44:28.808Z",
+                      "startTime": "2025-05-29T12:46:47.812Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-lunar-grid.smoke-Smo-b4966-eschide-și-afișează-grid-ul-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context-0",
-                          "contentType": "text/markdown",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-lunar-grid.smoke-Smo-b4966-eschide-și-afișează-grid-ul-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                        "column": 60,
-                        "line": 19
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "ca675092496f716193df-033cd2ceea04cd2186f4",
@@ -289,7 +225,7 @@
             },
             {
               "title": "expand/collapse categorii funcționează",
-              "ok": false,
+              "ok": true,
               "tags": [
                 "smoke"
               ],
@@ -302,59 +238,30 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7113,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:31:60",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                          "column": 60,
-                          "line": 31
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Verifică că grid-ul e încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 32 |\u001b[39m     \n \u001b[90m 33 |\u001b[39m     \u001b[90m// Count celule înainte de expandare\u001b[39m\n \u001b[90m 34 |\u001b[39m     \u001b[36mconst\u001b[39m cellsBefore \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid*=\"editable-cell\"]'\u001b[39m)\u001b[33m.\u001b[39mcount()\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                            "column": 60,
-                            "line": 31
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[0m \u001b[90m 29 |\u001b[39m     \n \u001b[90m 30 |\u001b[39m     \u001b[90m// Verifică că grid-ul e încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 32 |\u001b[39m     \n \u001b[90m 33 |\u001b[39m     \u001b[90m// Count celule înainte de expandare\u001b[39m\n \u001b[90m 34 |\u001b[39m     \u001b[36mconst\u001b[39m cellsBefore \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid*=\"editable-cell\"]'\u001b[39m)\u001b[33m.\u001b[39mcount()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:31:60\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1485,
+                      "errors": [],
                       "stdout": [
                         {
                           "text": "🔍 Smoke Test: Expand/Collapse\n"
+                        },
+                        {
+                          "text": "📊 Celule înainte: 0\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Expand/Collapse - SUCCESS\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-29T12:44:37.620Z",
+                      "startTime": "2025-05-29T12:46:49.510Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-lunar-grid.smoke-Smo-af867-apse-categorii-funcționează-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context-0",
-                          "contentType": "text/markdown",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\smoke-lunar-grid.smoke-Smo-af867-apse-categorii-funcționează-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                        "column": 60,
-                        "line": 31
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "ca675092496f716193df-6662e7ad35de96b47d53",
@@ -377,28 +284,28 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 7088,
+                      "duration": 11499,
                       "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:71:60",
+                        "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('[data-testid*=\"editable-cell\"]').first()\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid*=\"editable-cell\"]').first()\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('[data-testid*=\"editable-cell\"]').first()\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid*=\"editable-cell\"]').first()\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:93:29",
                         "location": {
                           "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                          "column": 60,
-                          "line": 71
+                          "column": 29,
+                          "line": 93
                         },
-                        "snippet": "\u001b[0m \u001b[90m 69 |\u001b[39m     \n \u001b[90m 70 |\u001b[39m     \u001b[90m// Verifică că grid-ul e încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 71 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 72 |\u001b[39m     \n \u001b[90m 73 |\u001b[39m     \u001b[90m// Expandează pentru a avea celule disponibile\u001b[39m\n \u001b[90m 74 |\u001b[39m     \u001b[90m// WORKAROUND: Grid-ul se resetează după edit, deci expandăm din nou\u001b[39m\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 91 |\u001b[39m     \u001b[90m// Găsește prima celulă editabilă disponibilă\u001b[39m\n \u001b[90m 92 |\u001b[39m     \u001b[36mconst\u001b[39m firstCell \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid*=\"editable-cell\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m     \u001b[36mawait\u001b[39m expect(firstCell)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m     \n \u001b[90m 95 |\u001b[39m     \u001b[90m// Click pe celulă\u001b[39m\n \u001b[90m 96 |\u001b[39m     \u001b[36mawait\u001b[39m firstCell\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
                             "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                            "column": 60,
-                            "line": 71
+                            "column": 29,
+                            "line": 93
                           },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[0m \u001b[90m 69 |\u001b[39m     \n \u001b[90m 70 |\u001b[39m     \u001b[90m// Verifică că grid-ul e încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 71 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 72 |\u001b[39m     \n \u001b[90m 73 |\u001b[39m     \u001b[90m// Expandează pentru a avea celule disponibile\u001b[39m\n \u001b[90m 74 |\u001b[39m     \u001b[90m// WORKAROUND: Grid-ul se resetează după edit, deci expandăm din nou\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:71:60\u001b[22m"
+                          "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('[data-testid*=\"editable-cell\"]').first()\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid*=\"editable-cell\"]').first()\u001b[22m\n\n\n\u001b[0m \u001b[90m 91 |\u001b[39m     \u001b[90m// Găsește prima celulă editabilă disponibilă\u001b[39m\n \u001b[90m 92 |\u001b[39m     \u001b[36mconst\u001b[39m firstCell \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'[data-testid*=\"editable-cell\"]'\u001b[39m)\u001b[33m.\u001b[39mfirst()\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m     \u001b[36mawait\u001b[39m expect(firstCell)\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m     \n \u001b[90m 95 |\u001b[39m     \u001b[90m// Click pe celulă\u001b[39m\n \u001b[90m 96 |\u001b[39m     \u001b[36mawait\u001b[39m firstCell\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:93:29\u001b[22m"
                         }
                       ],
                       "stdout": [
@@ -408,7 +315,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-29T12:44:46.256Z",
+                      "startTime": "2025-05-29T12:46:51.002Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -424,8 +331,8 @@
                       ],
                       "errorLocation": {
                         "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts",
-                        "column": 60,
-                        "line": 71
+                        "column": 29,
+                        "line": 93
                       }
                     }
                   ],
@@ -444,11 +351,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-29T12:44:14.341Z",
-    "duration": 39848.374,
-    "expected": 1,
+    "startTime": "2025-05-29T12:46:39.008Z",
+    "duration": 24879.412,
+    "expected": 4,
     "skipped": 0,
-    "unexpected": 4,
+    "unexpected": 1,
     "flaky": 0
   }
 }
