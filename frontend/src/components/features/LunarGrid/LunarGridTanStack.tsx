@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useState,
-  useMemo,
-  CSSProperties,
-  useRef,
-  memo,
-} from "react";
+import React, { useCallback, useState, useMemo, CSSProperties, memo } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import {
   useLunarGridTable,
@@ -14,12 +7,13 @@ import {
 
 // Importuri din stores
 import { useCategoryStore } from "../../../stores/categoryStore";
+import { useAuthStore } from "../../../stores/authStore";
 
 // React Query și hooks pentru tranzacții
 import {
-  useCreateTransaction,
-  type CreateTransactionHookPayload,
-} from "../../../services/hooks/useTransactionMutations";
+  useCreateTransactionMonthly,
+  type CreateTransactionHookPayload
+} from '../../../services/hooks/useTransactionMutations';
 
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
 import { TransactionType, FrequencyType } from "@shared-constants";
@@ -87,8 +81,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       {},
     );
 
-    // Hooks pentru mutații de tranzacții
-    const { mutate: createTransactionMutation } = useCreateTransaction();
+    // Import userId from auth store pentru hooks monthly
+    const { user } = useAuthStore();
+
+    // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
+    const { mutate: createTransactionMutation } = useCreateTransactionMonthly(year, month, user?.id);
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -383,43 +380,36 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           </React.Fragment>
         );
       },
-      [renderEditableCell, tableCell, tableRow, handleCellClick],
+      [renderEditableCell],
     );
 
     // Renderizare (layout principal)
     return (
       <>
-        <div
-          className={cn(
-            flexContainer({ direction: "row", justify: "start", gap: "md" }),
-            "mb-4",
-          )}
-        >
+        <div className={cn(flexContainer({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
           <Button
             variant="secondary"
             size="sm"
             onClick={() => {
               const isCurrentlyExpanded = table.getIsAllRowsExpanded();
               const newExpandedState: Record<string, boolean> = {};
-
+              
               if (!isCurrentlyExpanded) {
                 // Expandează toate
-                table.getRowModel().rows.forEach((row) => {
+                table.getRowModel().rows.forEach(row => {
                   if (row.getCanExpand()) {
                     newExpandedState[row.id] = true;
                   }
                 });
               }
-              // Dacă se colapează, lăsăm newExpandedState gol (toate false)
-
+              // Dacă se colapsează, lăsăm newExpandedState gol (toate false)
+              
               setExpandedRows(newExpandedState);
               table.toggleAllRowsExpanded(!isCurrentlyExpanded);
             }}
             dataTestId="toggle-expand-all"
           >
-            {table.getIsAllRowsExpanded()
-              ? LUNAR_GRID.COLLAPSE_ALL
-              : LUNAR_GRID.EXPAND_ALL}
+            {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
           </Button>
           <Button
             variant="secondary"
@@ -434,13 +424,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           </Button>
         </div>
 
-        <div
+        <div 
           ref={tableContainerRef}
           className={cn(
             gridContainer({ size: "full" }),
             "relative overflow-x-auto rounded-lg border border-gray-200",
             isLoading ? "opacity-60" : "",
-            "transition-all duration-150",
+            "transition-all duration-150"
           )}
           data-testid="lunar-grid-container"
           onSubmit={(e) => {
@@ -454,34 +444,25 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           }}
         >
           {isLoading && (
-            <div
-              className="flex items-center justify-center p-4 text-gray-600"
-              data-testid="loading-indicator"
-            >
+            <div className="flex items-center justify-center p-4 text-gray-600" data-testid="loading-indicator">
               {LUNAR_GRID.LOADING}
             </div>
           )}
-
+          
           {error && (
-            <div
-              className="flex items-center justify-center p-4 text-red-600 bg-red-50 rounded-md"
-              data-testid="error-indicator"
-            >
+            <div className="flex items-center justify-center p-4 text-red-600 bg-red-50 rounded-md" data-testid="error-indicator">
               {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
             </div>
           )}
-
+          
           {!isLoading && !error && table.getRowModel().rows.length === 0 && (
-            <div
-              className="flex items-center justify-center p-4 text-gray-600"
-              data-testid="no-data-indicator"
-            >
+            <div className="flex items-center justify-center p-4 text-gray-600" data-testid="no-data-indicator">
               {LUNAR_GRID.NO_DATA}
             </div>
           )}
-
+          
           {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-            <table
+            <table 
               className={cn(dataTable({ variant: "striped" }))}
               data-testid="lunar-grid-table"
             >
@@ -493,64 +474,52 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       colSpan={header.colSpan}
                       className={cn(
                         tableHeader(),
-                        header.id === "category"
-                          ? "sticky left-0 z-20 text-left"
-                          : "text-right",
+                        header.id === "category" 
+                          ? "sticky left-0 z-20 text-left" 
+                          : "text-right"
                       )}
                       style={{ width: header.getSize() }}
                     >
-                      {
-                        flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        ) as React.ReactNode
-                      }
+                      {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {table.getRowModel().rows.map((row) => renderRow(row))}
-
+                
                 {/* Rând de total */}
-                <tr
-                  className={cn(
-                    "bg-gray-100 font-bold border-t-2 border-gray-300",
-                    "hover:bg-gray-200 transition-colors duration-150",
-                  )}
-                  data-testid="sold-row"
-                >
-                  <td
-                    className={cn(
-                      tableCell({ variant: "default" }),
-                      "sticky left-0 bg-gray-100 z-10 font-bold",
-                    )}
-                  >
+                <tr className={cn(
+                  "bg-gray-100 font-bold border-t-2 border-gray-300",
+                  "hover:bg-gray-200 transition-colors duration-150"
+                )} data-testid="sold-row">
+                  <td className={cn(
+                    tableCell({ variant: "default" }),
+                    "sticky left-0 bg-gray-100 z-10 font-bold"
+                  )}>
                     {LUNAR_GRID.TOTAL_BALANCE}
                   </td>
                   {days.map((day) => {
                     const balance = dailyBalances[day] || 0;
                     return (
-                      <td
-                        key={day}
+                      <td 
+                        key={day} 
                         className={cn(
                           tableCell({ variant: "numeric" }),
                           getBalanceStyle(balance),
-                          "transition-colors duration-150",
+                          "transition-colors duration-150"
                         )}
                       >
                         {balance !== 0 ? formatMoney(balance) : "-"}
                       </td>
                     );
                   })}
-                  <td
-                    className={cn(
-                      tableCell({ variant: "numeric" }),
-                      getBalanceStyle(monthTotal),
-                      "font-bold",
-                      "transition-colors duration-150",
-                    )}
-                  >
+                  <td className={cn(
+                    tableCell({ variant: "numeric" }),
+                    getBalanceStyle(monthTotal),
+                    "font-bold",
+                    "transition-colors duration-150"
+                  )}>
                     {formatMoney(monthTotal)}
                   </td>
                 </tr>
@@ -558,13 +527,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             </table>
           )}
         </div>
-
+        
         {/* Popover pentru editare tranzacție */}
         {popover && (
-          <div
+          <div 
             className={cn(
               "fixed z-50 shadow-lg rounded-lg",
-              "animate-fadeIn transition-all duration-150",
+              "animate-fadeIn transition-all duration-150"
             )}
             style={popoverStyle}
             data-testid="transaction-popover"

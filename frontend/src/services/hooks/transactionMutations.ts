@@ -9,7 +9,7 @@ import {
   TransactionValidated,
   CreateTransaction,
 } from "@shared-constants/transaction.schema";
-import { TransactionStatus } from "@shared-constants/enums";
+import { TransactionStatus } from "@shared-constants";
 import { MESAJE } from "@shared-constants/messages";
 
 export type CreateTransactionHookPayload = CreateTransaction;
@@ -20,8 +20,14 @@ type MutationContext = {
 };
 
 // Definim cheia de query pentru tranzacții
-// O definim ca array pentru a fi compatibilă cu react-query
+// O definim ca array pentru a fi compatibil cu react-query
 const TRANSACTIONS_BASE_KEY = ["transactions"] as const;
+
+// Import tipul pentru monthly transactions result
+type MonthlyTransactionsResult = {
+  data: TransactionValidated[];
+  count: number;
+};
 
 /**
  * Hook pentru crearea unei tranzacții noi
@@ -223,7 +229,7 @@ export function useUpdateTransactionStatus() {
         InfiniteData<TransactionPage>
       >(TRANSACTIONS_BASE_KEY);
 
-      // Update optimist - actualizăm status-ul tranzacției în cache fără a aștepta răspunsul serverului
+      // Update optimist - actualizăm statusul tranzacției în cache fără a aștepta răspunsul serverului
       if (previousData && previousData.pages) {
         const updatedPages = previousData.pages.map((page: TransactionPage) => {
           // Verificăm dacă tranzacția există în pagina curentă
@@ -277,3 +283,133 @@ export function useUpdateTransactionStatus() {
     },
   });
 }
+
+// Hook-uri specializate pentru operațiuni monthly (FĂRĂ invalidation forțat)
+export const useCreateTransactionMonthly = (year: number, month: number, userId?: string) => {
+  const queryClient = useQueryClient();
+  const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+
+  return useMutation({
+    mutationFn: async (payload: CreateTransactionHookPayload) => {
+      const response = await supabaseService.createTransaction(payload);
+      return response;
+    },
+    onMutate: async (newTransaction) => {
+      // Cancel outgoing refetches pentru a nu rescrie cache-ul optimistic
+      await queryClient.cancelQueries({ queryKey: monthlyQueryKey });
+
+      // Snapshot current data
+      const previousData = queryClient.getQueryData(monthlyQueryKey);
+
+      // Optimistic update cu temporary ID
+      const tempTransaction = {
+        ...newTransaction,
+        id: `temp-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+        if (!old) return { data: [tempTransaction], count: 1 };
+        return {
+          data: [...old.data, tempTransaction],
+          count: old.count + 1,
+        };
+      });
+
+      return { previousData };
+    },
+    onSuccess: (savedTransaction) => {
+      // Manual cache update cu datele reale din server (elimină temp ID)
+      const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
+      
+      if (currentData) {
+        const updatedResult: MonthlyTransactionsResult = {
+          data: currentData.data.map(tx => 
+            tx.id.startsWith('temp-') ? savedTransaction : tx
+          ),
+          count: currentData.count,
+        };
+        
+        queryClient.setQueryData(monthlyQueryKey, updatedResult);
+      }
+      
+      // ELIMINAT: Nu mai facem invalidation forțat
+    },
+    onError: (err, newTransaction, context) => {
+      // Revert la datele anterioare în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData(monthlyQueryKey, context.previousData);
+      }
+    },
+  });
+};
+
+export const useUpdateTransactionMonthly = (year: number, month: number, userId?: string) => {
+  const queryClient = useQueryClient();
+  const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+
+  return useMutation({
+    mutationFn: async ({ id, transactionData }: { id: string; transactionData: UpdateTransactionHookPayload }) => {
+      const response = await supabaseService.updateTransaction(id, transactionData);
+      return response;
+    },
+    onSuccess: (updatedTransaction) => {
+      // Manual cache update cu datele reale din server
+      const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
+      
+      if (currentData) {
+        const updatedResult: MonthlyTransactionsResult = {
+          data: currentData.data.map((tx: TransactionValidated) =>
+            tx.id === updatedTransaction.id ? updatedTransaction : tx
+          ),
+          count: currentData.count,
+        };
+        
+        queryClient.setQueryData(monthlyQueryKey, updatedResult);
+      }
+      
+      // ELIMINAT: Nu mai facem invalidation forțat
+    },
+  });
+};
+
+export const useDeleteTransactionMonthly = (year: number, month: number, userId?: string) => {
+  const queryClient = useQueryClient();
+  const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await supabaseService.deleteTransaction(id);
+      return id;
+    },
+    onMutate: async (deletedId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: monthlyQueryKey });
+
+      // Snapshot current data
+      const previousData = queryClient.getQueryData(monthlyQueryKey);
+
+      // Optimistic update - eliminăm tranzacția
+      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+        if (!old) return old;
+        return {
+          data: old.data.filter((tx: any) => tx.id !== deletedId),
+          count: old.count - 1,
+        };
+      });
+
+      return { previousData };
+    },
+    onSuccess: () => {
+      // Cache-ul a fost deja actualizat în onMutate
+      // ELIMINAT: Nu mai facem invalidation forțat
+    },
+    onError: (err, deletedId, context) => {
+      // Revert la datele anterioare în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData(monthlyQueryKey, context.previousData);
+      }
+    },
+  });
+}; 
