@@ -1,79 +1,516 @@
 # MEMORY BANK - TASK TRACKING
 
-## TASK ACTIV: PRD COMPLET BUDGET APP - FINALIZAT ✅
+## TASK ACTIV: ANALIZĂ VAN - OPTIMIZĂRI PERFORMANCE LUNARGRID
 
-**Nivel**: Level 2 - Simple Enhancement  
-**Status**: COMPLETE - PRD Finalizat  
-**Data început**: 2025-01-11  
-**Data finalizare**: 2025-01-11  
-**Modul curent**: VAN Mode - Documentation Complete  
+**Nivel**: Level 3 - Intermediate Feature (Performance Impact)  
+**Status**: VAN Mode - Analiză cod în curs  
+**Data început**: 27 Ianuarie 2025  
+**Modul curent**: VAN Mode  
 
-### Descriere Task ✅ FINALIZAT
-Creare PRD complet pentru Budget App folosind exemplul dat și informațiile existente din proiect. Documentul final include toate aspectele necesare pentru dezvoltarea viitoare și servește ca sursă de adevăr pentru deciziile de produs.
+### Descriere Task
+Analiză detaliată a implementării curente LunarGrid pentru evaluarea necesității optimizărilor de performanță propuse în improvements.md, cu focus pe virtualizare, React Query migration și optimizări de rendering.
 
-### Realizări
-- [x] ✅ Analiză exemplu PRD din scripts/example_prd.txt
-- [x] ✅ Review contextul existent în memory-bank/
-- [x] ✅ Sincronizare cu BEST_PRACTICES.md și statusul actual
-- [x] ✅ Creare PRD complet în memory-bank/PRD/budget-app-prd.md
-- [x] ✅ Includere toate secțiunile necesare conform template-ului
+### 🔍 PROGRES VAN MODE - Analiză Cod Completă
 
-### PRD Budget App - Secțiuni Implementate
+#### ✅ ANALIZA ARHITECTURII CURENTE
 
-#### ✅ Prezentare Generală
-- Descrierea problemei rezolvate și valoarea oferită
-- Identificarea utilizatorilor țintă
-- Poziționarea produsului în piață
+**📊 Dimensiuni Tabel LunarGrid**:
+- **12 categorii principale** (VENITURI, ECONOMII, INFATISARE, etc.)
+- **23 grupuri de subcategorii** (ex: "General", "Utilități", "Transport")
+- **~35 rânduri totale** în tabel (categorii + grupuri subcategorii)
+- **~40 coloane** (31 zile + coloane auxiliare)
+- **~1,400 celule totale** per lună
 
-#### ✅ Funcționalități Principale  
-- Autentificare și securitate cu Supabase
-- Management tranzacții cu CRUD complet
-- Categorii și subcategorii personalizabile
-- LunarGrid interactiv cu editare inline
-- Filtrare și căutare avansată
-- Export și rapoarte
+**🏗️ Implementare Actuală**:
+- ✅ **TanStack Table v8.21.3** - implementat și funcțional
+- ✅ **TanStack Virtual v3.13.9** - INSTALAT dar NEFOLOSIT
+- ✅ **React Query v5.76.1** - folosit pentru data fetching
+- ✅ **React 18.3.1** - suportă Transition API
+- ✅ **Memoizare extensivă** - useCallback, useMemo, React.memo
+- ✅ **Cache calculations** - implementat în utils/lunarGrid/calculations.ts
 
-#### ✅ Experiența Utilizatorului
-- User personas detaliate (Ana, Mihai & Elena, Paul)
-- User journeys pentru cazuri principale
-- Considerații UX/UI și accessibility
-- Design principles și responsive design
+**🎯 State Management Actual**:
+- **React Query**: Tranzacții (useMonthlyTransactions hook specializat)
+- **Zustand**: Categorii (CategoryStore) - 432 linii, complex
+- **Local State**: UI state (expanded rows, popover state)
 
-#### ✅ Arhitectura Tehnică
-- Stack tehnologic actual (React, Zustand, TailwindCSS, Supabase)
-- Arhitectura monorepo
-- Database schema și API design
-- Integrări și deployment infrastructure
+#### 📈 EVALUARE NECESITATE OPTIMIZĂRI
 
-#### ✅ Roadmap de Dezvoltare
-- Faza 1: MVP (Foundation) - COMPLETED ✅
-- Faza 2: Enhanced UX - IN PROGRESS 🚧
-- Faza 3: Advanced Analytics - PLANNED 📅
-- Faza 4: Enterprise Features - FUTURE 🔮
+**1. Virtualizarea Condiționată** ❌ **NU ESTE NECESARĂ**
+- **Realitate**: 35 rânduri × 40 coloane = 1,400 celule
+- **Threshold virtualizare**: >100 rânduri (3,000+ celule)
+- **Concluzie**: Volumul actual este MULT sub pragul care necesită virtualizare
+- **Overhead vs Beneficiu**: Virtualizarea ar adăuga complexitate fără beneficii
 
-#### ✅ Lanțul Logic de Dependențe
-- Ordine logică de implementare features
-- Justificări pentru secvențialitatea dezvoltării
-- Identificarea blocajelor și dependințelor critice
+**2. React Query pentru Categorii** ⚠️ **EVALUARE NECESARĂ**
+- **CategoryStore actual**: 432 linii, logic complex (CRUD, versioning, migrations)
+- **Beneficii potențiale**: Unificare surse de date, cache invalidation automat
+- **Riscuri**: Categoriile sunt mai mult "configuration" decât "data"
+- **Recomandare**: Păstrare Zustand pentru categorii (sunt mai mult state decât date)
 
-#### ✅ Managementul Riscurilor
-- Riscuri tehnice (performance, state management, browser compatibility)
-- Riscuri de produs (user adoption, data migration, feature creep)
-- Riscuri de business (security, scalabilitate, competiție)
-- Strategii de mitigare pentru fiecare categorie
+**3. Preload Inteligent** ✅ **IMPLEMENTABIL SIMPLU**
+- **Implementare**: useQuery cu enabled: false pentru luna următoare/anterioară
+- **Beneficiu**: UX îmbunătățit la navigare
+- **Complexitate**: Minimă, folosind React Query existent
 
-#### ✅ Anexe
-- Research și competitive analysis
-- Specificații tehnice detaliate
-- Compliance și standards (GDPR, WCAG, OWASP)
+**4. React 18 Transitions** ✅ **IMPLEMENTABIL SIMPLU**
+- **Implementare**: startTransition pentru schimbarea lunii
+- **Beneficiu**: UI mai fluid la navigare
+- **Complexitate**: Minimă, doar wrapping în startTransition
 
-### Impact și Valoare
-- **Claritatea viziunii**: PRD servește ca sursă de adevăr pentru toate deciziile viitoare
-- **Alinierea echipei**: Înțelegere comună asupra direcției produsului
-- **Planificarea strategică**: Roadmap clar cu prioritizări justificate
-- **Risk management**: Identificarea proactivă a riscurilor și strategiilor de mitigare
+**5. Optimizare Re-renders** ✅ **DEJA IMPLEMENTAT PARȚIAL**
+- **Cache invalidation**: Implementat în useMonthlyTransactions
+- **Manual cache updates**: NU implementat (queryClient.setQueryData)
+- **Beneficiu**: Eliminare request-uri inutile după mutații
 
----
+#### 🎯 RECOMANDĂRI PRIORITIZATE
+
+**HIGH PRIORITY** (Impact mare, efort mic):
+1. **Manual cache updates** după mutații (setQueryData)
+2. **React 18 Transitions** pentru navigare lună
+3. **Preload inteligent** pentru luni adiacente
+
+**MEDIUM PRIORITY** (Impact mediu, efort mediu):
+4. **Optimizare re-renders** cu invalidare selectivă
+5. **Performance monitoring** cu React DevTools Profiler
+
+**LOW PRIORITY** (Nu sunt necesare):
+6. ❌ **Virtualizare** - overhead inutil pentru 35 rânduri
+7. ❌ **CategoryStore → React Query** - categoriile sunt configuration, nu data
+
+#### 🔧 IMPLEMENTARE RECOMANDATĂ
+
+**Faza 1: Quick Wins** (1-2 ore):
+```typescript
+// 1. Manual cache updates în mutations
+const { mutate: createTransaction } = useCreateTransaction({
+  onSuccess: (newTransaction) => {
+    queryClient.setQueryData(
+      queryKeys.transactions.monthly(year, month, userId),
+      (oldData) => oldData ? { ...oldData, data: [...oldData.data, newTransaction] } : oldData
+    );
+  }
+});
+
+// 2. React 18 Transitions pentru navigare
+const [isPending, startTransition] = useTransition();
+const handleMonthChange = (newMonth) => {
+  startTransition(() => {
+    setMonth(newMonth);
+  });
+};
+
+// 3. Preload luni adiacente
+const { data: nextMonthData } = useMonthlyTransactions(
+  year, 
+  month + 1, 
+  userId, 
+  { enabled: false }
+);
+// Trigger manual cu queryClient.prefetchQuery
+```
+
+**Faza 2: Advanced Optimizations** (2-3 ore):
+- Performance monitoring cu React DevTools
+- Optimizare invalidare cache selectivă
+- CSS will-change pentru scroll horizontal
+
+### 🎉 CONCLUZII VAN ANALYSIS
+
+**✅ ARHITECTURA ACTUALĂ ESTE SOLIDĂ**:
+- TanStack Table + React Query + memoizare extensivă
+- Performance acceptabilă pentru volumul actual de date
+- Optimizările propuse sunt "nice-to-have", nu critice
+
+**🎯 FOCUS PE QUICK WINS**:
+- Manual cache updates (impact mare, efort mic)
+- React 18 Transitions (UX îmbunătățit, efort minimal)
+- Preload inteligent (eliminare loading states)
+
+**❌ EVITĂ OVER-ENGINEERING**:
+- Virtualizarea este prematură pentru 35 rânduri
+- CategoryStore migration nu aduce beneficii semnificative
+- Complexitatea adăugată nu justifică beneficiile minime
+
+### 🎯 CONCLUZII FINALE VAN ANALYSIS - OPTIMIZĂRI LUNARGRID
+
+#### ✅ **REALITATEA CODULUI VS PROPUNERI**
+
+**📊 Dimensiuni reale identificate în cod:**
+- **35 rânduri totale** (12 categorii + 23 grupuri subcategorii) 
+- **40 coloane** (31 zile + coloane auxiliare)
+- **1,400 celule totale** per lună - **MULT SUB pragul pentru virtualizare**
+
+**🏗️ Arhitectura existentă este SOLIDĂ:**
+- ✅ TanStack Table v8.21.3 - implementat profesional
+- ✅ TanStack Virtual v3.13.9 - instalat dar NEFOLOSIT (corect!)
+- ✅ React Query v5.76.1 - data fetching optimizat
+- ✅ Memoizare extensivă - useCallback, useMemo, React.memo
+- ✅ Calcule cache-uite în utils/lunarGrid/calculations.ts
+
+#### 🎯 **EVALUARE NECESITATE PE FIECARE PROPUNERE**
+
+**1. Virtualizarea Condiționată** - ❌ **NU IMPLEMENTA**
+```typescript
+// REALITATE: 35 rânduri × 40 coloane = 1,400 celule
+// THRESHOLD: >100 rânduri (3,000+ celule) pentru virtualizare
+// CONCLUZIE: Overhead-ul virtualizării > beneficiul pentru 35 rânduri
+```
+
+**2. React Query pentru Categorii** - ❌ **PĂSTREAZĂ ZUSTAND**
+```typescript
+// CategoryStore actual: 432 linii, logic complex (CRUD, migrations)
+// Categoriile = configuration state, NU server data
+// React Query = pentru server data, Zustand = pentru app state
+```
+
+**3. Manual Cache Updates** - ✅ **IMPLEMENTEAZĂ ACUM**
+```typescript
+// IMPACT MARE + EFORT MIC
+const { mutate: createTransaction } = useCreateTransaction({
+  onSuccess: (newTransaction) => {
+    queryClient.setQueryData(queryKey, (oldData) => ({
+      ...oldData, 
+      data: [...oldData.data, newTransaction]
+    }));
+  }
+});
+```
+
+**4. React 18 Transitions** - ✅ **IMPLEMENTEAZĂ ACUM**
+```typescript
+// UX ÎMBUNĂTĂȚIT + EFORT MINIMAL
+const [isPending, startTransition] = useTransition();
+const handleMonthChange = (newMonth) => {
+  startTransition(() => setMonth(newMonth));
+};
+```
+
+**5. Preload Inteligent** - ✅ **IMPLEMENTEAZĂ ACUM**
+```typescript
+// ELIMINARE LOADING STATES + EFORT MIC
+useEffect(() => {
+  if (currentMonthData) {
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.transactions.monthly(year, month + 1, userId),
+      queryFn: () => fetchMonthlyTransactions(year, month + 1, userId)
+    });
+  }
+}, [currentMonthData, month]);
+```
+
+#### 📋 **PLAN DE IMPLEMENTARE CONCRET**
+
+**🚀 FAZA 1: Quick Wins (2-3 ore total)**
+1. ✅ **Manual cache updates** - elimină re-fetch după create/update/delete
+2. ✅ **React 18 Transitions** - UI mai fluid la schimbarea lunii  
+3. ✅ **Preload luni adiacente** - eliminare loading la navigare
+
+**📊 FAZA 2: Monitoring (1 oră)**
+4. ✅ **React DevTools Profiler** - măsurare performance reală
+5. ✅ **CSS will-change** pentru scroll orizontal dacă necesar
+
+**❌ NU IMPLEMENTA (Over-engineering):**
+- ❌ Virtualizare pentru 35 rânduri (prematur)
+- ❌ CategoryStore → React Query migration (beneficii minime)
+- ❌ Complex caching strategies (nu sunt necesare)
+
+#### 🎯 **RESPECTAREA REGULILOR PROIECTULUI**
+
+**✅ Shared Constants Usage:**
+- Toate textele UI din `@shared-constants/ui.ts`
+- Mesajele de sistem din `@shared-constants/messages.ts`
+- API routes din `@shared-constants/api.ts`
+
+**✅ Data TestID Strategy:**
+```typescript
+// Pattern pentru LunarGrid optimizations
+data-testid="lunar-grid-month-navigation"
+data-testid="lunar-grid-cache-status"
+data-testid="lunar-grid-transition-indicator"
+```
+
+**✅ TypeScript Safety:**
+```typescript
+// Manual cache updates cu type safety
+type CacheUpdateData = MonthlyTransactionsResponse;
+queryClient.setQueryData<CacheUpdateData>(queryKey, (oldData) => {
+  // Type-safe cache manipulation
+});
+```
+
+#### 🏆 **DECIZIE FINALĂ VAN**
+
+**✅ IMPLEMENTEAZĂ DOAR QUICK WINS:**
+- **Manual cache updates** - impact maxim, efort minim
+- **React 18 Transitions** - UX îmbunătățit simplu  
+- **Preload inteligent** - eliminare loading states
+
+**❌ EVITĂ OVER-ENGINEERING:**
+- **Virtualizarea este prematură** pentru volumul actual
+- **CategoryStore migration** nu justifică efortul
+- **Focus pe optimizări simple cu impact mare**
+
+**🎯 TIMPUL TOTAL ESTIMAT: 3-4 ore pentru toate optimizările utile**
+
+**STATUS VAN**: ✅ **ANALIZĂ COMPLETĂ - READY FOR PLAN MODE**
+
+## PLAN MODE: OPTIMIZĂRI PERFORMANCE LUNARGRID
+
+**Status**: PLAN Mode - Comprehensive Level 3 Planning ✅  
+**Complexity**: Level 3 - Intermediate Feature (Performance Impact)  
+**Mode Transition**: VAN → PLAN Complete  
+
+### 📋 REQUIREMENTS ANALYSIS
+
+**Core Requirements:**
+- ✅ Implementare Manual Cache Updates pentru mutations (elimină re-fetch-uri)
+- ✅ Implementare React 18 Transitions pentru navigare fluidă între luni
+- ✅ Implementare Preload Inteligent pentru luni adiacente (elimină loading states)
+- ✅ Respectarea tuturor regulilor proiectului (@shared-constants, data-testid, TypeScript)
+
+**Technical Constraints:**
+- ✅ Păstrarea arhitecturii existente TanStack Table + React Query + Zustand
+- ✅ Nu modificăm CategoryStore (categoriile rămân în Zustand)
+- ✅ Nu implementăm virtualizare (prematur pentru 35 rânduri)
+- ✅ Compatibilitate cu React 18.3.1 și dependințele existente
+
+### 🔍 COMPONENT ANALYSIS
+
+**🎯 Componente Afectate:**
+
+**1. `/frontend/src/services/hooks/useMonthlyTransactions.ts`**
+- **Modificări necesare**: Adăugare manual cache updates în mutations
+- **Dependencies**: React Query queryClient, queryKeys
+- **Impact**: Elimină re-fetch după create/update/delete operations
+
+**2. `/frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`**
+- **Modificări necesare**: Integrare React 18 Transitions pentru navigare
+- **Dependencies**: React.useTransition hook
+- **Impact**: UI mai fluid la schimbarea lunii (loading states eliminate)
+
+**3. `/frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.tsx`**
+- **Modificări necesare**: Preload logic pentru luni adiacente
+- **Dependencies**: React Query prefetchQuery
+- **Impact**: Eliminare loading states la navigare
+
+**4. `/shared-constants/ui.ts`**
+- **Modificări necesare**: Adăugare constante pentru loading states și transitions
+- **Dependencies**: Niciuna
+- **Impact**: Centralizare texte UI pentru optimizări
+
+### 🎯 TECHNOLOGY STACK VALIDATION
+
+**Framework Stack:**
+- ✅ **React 18.3.1** - suportă useTransition nativ
+- ✅ **TanStack Query v5.76.1** - suportă manual cache updates și prefetchQuery
+- ✅ **TanStack Table v8.21.3** - compatibil cu optimizările
+- ✅ **TypeScript 5.x** - type safety pentru cache updates
+
+**Technology Validation Checkpoints:**
+- ✅ React.useTransition disponibil în versiunea existentă
+- ✅ queryClient.setQueryData funcțional în React Query v5
+- ✅ queryClient.prefetchQuery disponibil
+- ✅ QueryKeys structure identificată în useMonthlyTransactions
+- ✅ Build configuration validată (Vite + TypeScript)
+
+### 📊 IMPLEMENTATION STRATEGY
+
+**🚀 FAZA 1: Manual Cache Updates (45 min)**
+```typescript
+// 1.1 Implementare setQueryData în useCreateTransaction
+const { mutate: createTransaction } = useCreateTransaction({
+  onSuccess: (newTransaction) => {
+    queryClient.setQueryData<MonthlyTransactionsResponse>(
+      queryKeys.transactions.monthly(year, month, userId),
+      (oldData) => ({
+        ...oldData,
+        data: [...(oldData?.data || []), newTransaction]
+      })
+    );
+  }
+});
+
+// 1.2 Implementare pentru useUpdateTransaction
+// 1.3 Implementare pentru useDeleteTransaction
+```
+
+**🎨 FAZA 2: React 18 Transitions (30 min)**
+```typescript
+// 2.1 Implementare useTransition în LunarGridTanStack
+const [isPending, startTransition] = useTransition();
+
+const handleMonthChange = useCallback((newMonth: number) => {
+  startTransition(() => {
+    setMonth(newMonth);
+  });
+}, [setMonth]);
+
+// 2.2 UI indicator pentru transition state
+{isPending && <TransitionIndicator />}
+```
+
+**⚡ FAZA 3: Preload Inteligent (45 min)**
+```typescript
+// 3.1 Preload luna următoare când data curentă se încarcă
+useEffect(() => {
+  if (currentMonthData && !currentMonthData.isLoading) {
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.transactions.monthly(year, month + 1, userId),
+      queryFn: () => fetchMonthlyTransactions(year, month + 1, userId),
+      staleTime: 5 * 60 * 1000 // 5 minute cache
+    });
+    
+    // Preload și luna anterioară
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.transactions.monthly(year, month - 1, userId),
+      queryFn: () => fetchMonthlyTransactions(year, month - 1, userId),
+      staleTime: 5 * 60 * 1000
+    });
+  }
+}, [currentMonthData, month, year]);
+```
+
+**📝 FAZA 4: Shared Constants Updates (15 min)**
+```typescript
+// 4.1 Adăugare în shared-constants/ui.ts
+export const LUNAR_GRID = {
+  LOADING: {
+    TRANSITION: "Schimbare lună...",
+    PRELOAD: "Pregătire date...",
+    CACHE_UPDATE: "Actualizare..."
+  },
+  PERFORMANCE: {
+    CACHE_HIT: "Date din cache",
+    CACHE_MISS: "Încărcare date"
+  }
+} as const;
+```
+
+**🧪 FAZA 5: Data TestID Integration (15 min)**
+```typescript
+// 5.1 Adăugare data-testid pentru monitoring
+<div data-testid="lunar-grid-transition-indicator">
+<div data-testid="lunar-grid-cache-status">
+<button data-testid="lunar-grid-month-nav-prev">
+<button data-testid="lunar-grid-month-nav-next">
+```
+
+### 🔧 TECHNICAL IMPLEMENTATION DETAILS
+
+**Type Safety pentru Cache Updates:**
+```typescript
+type CacheUpdateData = MonthlyTransactionsResponse;
+type TransactionMutationResponse = Transaction;
+
+// Ensure type safety în toate cache operations
+queryClient.setQueryData<CacheUpdateData>(queryKey, (oldData) => {
+  if (!oldData) return oldData;
+  // Type-safe manipulation
+  return {
+    ...oldData,
+    data: [...oldData.data, newTransaction]
+  };
+});
+```
+
+**Performance Monitoring Integration:**
+```typescript
+// Optional: Add performance logging pentru development
+const performanceLogger = useCallback((operation: string, duration: number) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`LunarGrid ${operation}: ${duration}ms`);
+  }
+}, []);
+```
+
+### 🧪 TESTING STRATEGY
+
+**Unit Tests (30 min):**
+- ✅ Test manual cache updates logic
+- ✅ Test preload functionality
+- ✅ Test React Transitions integration
+- ✅ Test TypeScript type safety
+
+**Integration Tests (15 min):**
+- ✅ Test navigare lună cu preload
+- ✅ Test create/update/delete cu cache updates
+- ✅ Test transition states UI
+
+**E2E Tests (15 min):**
+- ✅ Test complete user flow cu optimizări
+- ✅ Test performance cu data-testid selectors
+
+### ⚠️ CHALLENGES & MITIGATIONS
+
+**Challenge 1: Cache invalidation complexity**
+- **Mitigation**: Folosim queryKeys structure existentă, nu inventăm logic nou
+
+**Challenge 2: Race conditions în preload**
+- **Mitigation**: staleTime și deduplication native în React Query
+
+**Challenge 3: Memory usage cu preload**
+- **Mitigation**: Limităm la ±1 lună, garbage collection automată React Query
+
+**Challenge 4: TypeScript complexity în cache updates**
+- **Mitigation**: Type guards și defensive programming
+
+### 📊 SUCCESS METRICS
+
+**Performance KPIs:**
+- ✅ **Re-fetch elimination**: 0 unnecessary requests după mutations
+- ✅ **Navigation speed**: <100ms transition între luni cu preload
+- ✅ **User experience**: Eliminare loading states la navigare
+- ✅ **Memory efficiency**: <5MB additional memory pentru preload cache
+
+**Code Quality KPIs:**
+- ✅ **Type safety**: 100% TypeScript coverage în cache operations
+- ✅ **Shared constants**: 100% UI texts centralizate
+- ✅ **Test coverage**: 100% pentru logica de optimizare
+- ✅ **Data testid**: 100% coverage pentru performance monitoring
+
+### 🎯 CREATIVE PHASES REQUIRED
+
+**❌ Nu sunt necesare Creative Phases**
+- **Justificare**: Optimizările sunt implementări tehnice straightforward
+- **Architecture**: Folosim pattern-uri existente (React Query + TanStack Table)
+- **UI/UX**: Minimal impact - doar transition indicators
+- **Algorithms**: Standard React Query patterns, nu logic complex
+
+### 📋 DEPENDENCIES & INTEGRATION POINTS
+
+**Dependencies:**
+- ✅ useMonthlyTransactions hook (existent)
+- ✅ queryKeys structure (existent)
+- ✅ Transaction types (existente)
+- ✅ @shared-constants alias (existent)
+
+**Integration Points:**
+- ✅ LunarGridTanStack component
+- ✅ Month navigation logic
+- ✅ Transaction mutations
+- ✅ Loading states management
+
+### ⏱️ ESTIMATED TIMELINE
+
+**Total Implementation Time: 3 ore**
+- 🚀 Faza 1 (Manual Cache): 45 min
+- 🎨 Faza 2 (Transitions): 30 min  
+- ⚡ Faza 3 (Preload): 45 min
+- 📝 Faza 4 (Constants): 15 min
+- 🧪 Faza 5 (TestID): 15 min
+- 🧪 Testing: 60 min
+
+**🎯 PLAN STATUS: ✅ COMPLETE - READY FOR IMPLEMENT MODE**
+
+**Technology Validation**: ✅ PASSED  
+**Requirements Analysis**: ✅ COMPLETE  
+**Component Analysis**: ✅ COMPLETE  
+**Implementation Strategy**: ✅ DETAILED  
+**Testing Strategy**: ✅ DEFINED  
+**Dependencies**: ✅ VALIDATED  
+
+**➡️ NEXT RECOMMENDED MODE: IMPLEMENT MODE**
 
 ## TASK ACTIV: REMEDIERE PROBLEME CALITATE COD BUDGET APP
 
