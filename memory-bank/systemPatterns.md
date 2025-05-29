@@ -146,4 +146,39 @@
   ```typescript
   // __mocks__/transactionService.ts
   ```
-- **Beneficii**: Teste mai aproape de realitate, mai puțin fragile. 
+- **Beneficii**: Teste mai aproape de realitate, mai puțin fragile.
+
+## Patternuri Memory Bank
+
+### 1. Date Verification Pattern
+- **Descriere**: Verificarea obligatorie a datei reale din sistem pentru toate actualizările Memory Bank.
+- **Implementare**:
+  ```powershell
+  # Verificare dată din sistem
+  Get-Date -Format "dd/MM/yyyy"
+  
+  # Conversie la format românesc
+  # 29/05/2025 → 29 Mai 2025
+  ```
+- **Beneficii**: Documentație precisă, consistență temporală, evitarea datelor hardcodate.
+
+### 2. Archive File Naming Convention
+- **Descriere**: Convenție standardizată pentru denumirea fișierelor de arhivă.
+- **Implementare**:
+  ```
+  Format: archive-[task-name]_YYYYMMDD.md
+  Example: archive-lunargrid-optimizations_20250529.md
+  ```
+- **Beneficii**: Sortare cronologică automată, identificare ușoară, consistență în arhivă.
+
+### 3. Memory Bank Sync Pattern
+- **Descriere**: Actualizarea sincronizată a tuturor fișierelor Memory Bank cu date consistente.
+- **Implementare**:
+  ```
+  Files to update:
+  - activeContext.md
+  - progress.md  
+  - tasks.md
+  - archive/archive-[name]_YYYYMMDD.md
+  ```
+- **Beneficii**: Consistență completă, evitarea confuziei, tracking precis. 
