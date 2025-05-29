@@ -6,25 +6,18 @@ import {
   Table,
 } from "@tanstack/react-table";
 
-import { TransactionValidated } from "@shared-constants/transaction.schema";
-import { EXCEL_GRID } from "@shared-constants";
-
 // Import stores (doar cele necesare)
 import { useCategoryStore } from "../../../../stores/categoryStore";
 import { useAuthStore } from "../../../../stores/authStore";
 // Folosim direct noul hook specializat pentru încărcarea lunară
 import { useMonthlyTransactions } from "../../../../services/hooks/useMonthlyTransactions";
 
-import type { LunarGridRowData } from "../types";
-
-// Import-uri utilitare din @utils/lunarGrid (via barrel file)
+// Import-uri utilitare din @utils/lunarGrid (via barrel file) - doar cele folosite
 import {
   getDaysInMonth,
   formatCurrency,
   getBalanceStyleClass,
-  transformTransactionsToRowData,
   generateTableColumns,
-  transformToTableData,
 } from "../../../../utils/lunarGrid";
 
 // Interfaces pentru structuri de date
@@ -160,7 +153,6 @@ export function useLunarGridTable(
     transactions: validTransactions,
     isLoading: isLoadingTransactions,
     error: queryError,
-    totalCount,
   } = useMonthlyTransactions(year, month, user?.id, {
     includeAdjacentDays: true,
   });
@@ -197,11 +189,6 @@ export function useLunarGridTable(
     validTransactions.forEach((t) => {
       const cat = t.category;
       const subcat = typeof t.subcategory === "string" ? t.subcategory : "";
-      const day = new Date(t.date).getDate();
-      const amount =
-        t.status === "COMPLETED" && typeof t.actualAmount === "number"
-          ? t.actualAmount
-          : t.amount;
       if (!cat) return;
       // Caută dacă subcategoria există deja în definiție
       const categoryDef = categories.find((c) => c.name === cat);
@@ -426,7 +413,7 @@ export function useLunarGridTable(
       }
       return colConfig as ColumnDef<TransformedTableDataRow>; // Fallback, ar trebui acoperite toate cazurile
     });
-  }, [year, month, stableClickHandlers, formatCurrency, getBalanceStyleClass]);
+  }, [year, month, stableClickHandlers]);
 
   const table = useReactTable({
     data: rawTableData,
@@ -437,7 +424,27 @@ export function useLunarGridTable(
     getRowId: (row) => row.id,
   });
 
-  const dailyBalances = useMemo(() => ({}), [rawTableData]);
+  const dailyBalances = useMemo(() => {
+    const balances: Record<number, number> = {};
+    
+    // Inițializăm cu 0 pentru toate zilele
+    days.forEach((day) => {
+      balances[day] = 0;
+    });
+    
+    // Agregăm sumele din toate categoriile de top-level pentru fiecare zi
+    rawTableData.forEach((categoryRow) => {
+      if (categoryRow.isCategory) {
+        days.forEach((day) => {
+          const dayKey = `day-${day}` as keyof DailyAmount;
+          const dayValue = categoryRow[dayKey] || 0;
+          balances[day] += dayValue;
+        });
+      }
+    });
+    
+    return balances;
+  }, [rawTableData, days]);
 
   // Funcția getSumForCell originală se baza pe LunarGridRowData.
   // O adaptăm sau o eliminăm dacă nu mai e necesară extern.

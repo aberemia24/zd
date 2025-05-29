@@ -8,8 +8,15 @@ const TEXT_CLASSES = {
   NEUTRAL: "text-secondary-400",
 };
 
+// 🎯 Step 3.3: Singleton Intl.NumberFormat pentru optimizare CPU
+const currencyFormatter = new Intl.NumberFormat(LOCALE, {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 /**
  * Formatează o valoare numerică ca monedă RON cu 2 zecimale folosind standardele locale
+ * Optimizat cu singleton formatter pentru performanță
  * @param amount Suma de formatat
  * @returns String formatat (ex: "123,45")
  * @throws {Error} Dacă amount nu este un număr valid
@@ -23,10 +30,7 @@ export function formatCurrency(amount: number): string {
     return "0,00";
   }
 
-  return amount.toLocaleString(LOCALE, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
+  return currencyFormatter.format(amount);
 }
 
 /**

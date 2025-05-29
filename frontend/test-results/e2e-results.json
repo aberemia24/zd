@@ -65,20 +65,20 @@
   },
   "suites": [
     {
-      "title": "suites\\features\\category-editor.spec.ts",
-      "file": "suites/features/category-editor.spec.ts",
+      "title": "suites\\features\\lunargrid-crud.spec.ts",
+      "file": "suites/features/lunargrid-crud.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "CategoryEditor - Test Funcționalități Complete",
-          "file": "suites/features/category-editor.spec.ts",
-          "line": 5,
+          "title": "LunarGrid CRUD Workflow Complete",
+          "file": "suites/features/lunargrid-crud.spec.ts",
+          "line": 4,
           "column": 6,
           "specs": [
             {
-              "title": "accesează CategoryEditor din pagina Options",
+              "title": "flux CRUD complet: add → edit → delete → navigate",
               "ok": false,
               "tags": [
                 "features"
@@ -92,68 +92,68 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 34,
+                      "workerIndex": 8,
                       "parallelIndex": 0,
-                      "status": "timedOut",
-                      "duration": 30077,
+                      "status": "failed",
+                      "duration": 15666,
                       "error": {
-                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
-                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts:16:60",
+                        "location": {
+                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                          "column": 60,
+                          "line": 16
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 14 |\u001b[39m     \n \u001b[90m 15 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat înainte de expandare\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Expandează grid-ul pentru a avea acces la celulele editabile\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mconst\u001b[39m expandButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'toggle-expand-all'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
-                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
-                        },
-                        {
                           "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
-                            "column": 21,
-                            "line": 29
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                            "column": 60,
+                            "line": 16
                           },
-                          "message": "Error: page.waitForSelector: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m\n\u001b[2m    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\u001b[22m\n\u001b[2m    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\u001b[22m\n\u001b[2m    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:153:5\u001b[22m"
+                          "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[0m \u001b[90m 14 |\u001b[39m     \n \u001b[90m 15 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat înainte de expandare\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Expandează grid-ul pentru a avea acces la celulele editabile\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mconst\u001b[39m expandButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'toggle-expand-all'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts:16:60\u001b[22m"
                         }
                       ],
-                      "stdout": [
-                        {
-                          "text": "🧹 Cleanup preventiv...\n"
-                        },
-                        {
-                          "text": "✅ Cleanup preventiv finalizat\n"
-                        },
-                        {
-                          "text": "🚀 Test accesarea CategoryEditor\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:18:54.843Z",
+                      "startTime": "2025-05-29T12:16:53.044Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-b903e-ryEditor-din-pagina-Options-chromium\\test-failed-1.png"
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-lunargrid--771e0--→-edit-→-delete-→-navigate-chromium\\test-failed-1.png"
                         },
                         {
                           "name": "_error-context",
                           "contentType": "application/json",
-                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGhlYWRpbmcgXCJUcmFuemFjyJtpaVwiIFtsZXZlbD0xXVxuLSBmb3JtIFwiYWTEg3VnYXJlIHRyYW56YWPIm2llXCI6XG4gIC0gaGVhZGluZyBcIkFkYXVnxIMgdHJhbnphY8ibaWVcIiBbbGV2ZWw9M11cbiAgLSB0ZXh0OiBcIlRpcCo6XCJcbiAgLSBjb21ib2JveCBcIlRpcFwiOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJWZW5pdFwiXG4gICAgLSBvcHRpb24gXCJDaGVsdHVpYWzEg1wiXG4gICAgLSBvcHRpb24gXCJFY29ub21pc2lyZVwiXG4gIC0gdGV4dDogXCJTdW3Egyo6XCJcbiAgLSBzcGluYnV0dG9uIFwiU3VtxINcIlxuICAtIHRleHQ6IFwiQ2F0ZWdvcmllKjpcIlxuICAtIGNvbWJvYm94IFwiQ2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFN1YmNhdGVnb3JpZVxuICAtIGNvbWJvYm94IFwiU3ViY2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFwiRGF0xIMqOlwiXG4gIC0gdGV4dGJveCBcIkRhdMSDXCJcbiAgLSBjaGVja2JveFxuICAtIHRleHQ6IFJlY3VyZW50PyBGcmVjdmVuyJvEg1xuICAtIGNvbWJvYm94IFwiRnJlY3ZlbsibxINcIiBbZGlzYWJsZWRdOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJaaWxuaWNcIlxuICAgIC0gb3B0aW9uIFwiU8SDcHTEg23Dom5hbFwiXG4gICAgLSBvcHRpb24gXCJMdW5hclwiXG4gICAgLSBvcHRpb24gXCJBbnVhbFwiXG4gIC0gdGV4dDogRGVzY3JpZXJlXG4gIC0gdGV4dGJveCBcIkRlc2NyaWVyZVwiXG4gIC0gYnV0dG9uIFwiQWRhdWfEg1wiIFtkaXNhYmxlZF1cbiAgLSBidXR0b24gXCJBbnVsZWF6xINcIlxuLSBjb21ib2JveDpcbiAgLSBvcHRpb24gXCJBbGVnZSB0aXB1bFwiIFtzZWxlY3RlZF1cbiAgLSBvcHRpb24gXCJWZW5pdFwiXG4gIC0gb3B0aW9uIFwiQ2hlbHR1aWFsxINcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlzaXJlXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4gIC0gb3B0aW9uIFwiVmVuaXR1cmlcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlpXCJcbiAgLSBvcHRpb24gXCJJbmZhdGlzYXJlXCJcbiAgLSBvcHRpb24gXCJFZHVjYXRpZVwiXG4gIC0gb3B0aW9uIFwiQ2FyaWVyYVwiXG4gIC0gb3B0aW9uIFwiU2FuYXRhdGVcIlxuICAtIG9wdGlvbiBcIk51dHJpdGllXCJcbiAgLSBvcHRpb24gXCJMb2N1aW50YVwiXG4gIC0gb3B0aW9uIFwiVGltcCBsaWJlclwiXG4gIC0gb3B0aW9uIFwiQ2FsYXRvcmlpXCJcbiAgLSBvcHRpb24gXCJUcmFuc3BvcnRcIlxuICAtIG9wdGlvbiBcIkludmVzdGl0aWlcIlxuICAtIG9wdGlvbiBcIlRlc3Qg4p6h77iPXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBzdWJjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4tIHRleHRib3ggXCJDYXV0xIMuLi5cIlxuLSBidXR0b24gXCJGaWx0cmUgYXZhbnNhdGVcIlxuLSBidXR0b24gXCJFeHBvcnTEg1wiXG4tIHJlZ2lvbiBcIlRpcCBTdW3Eg1wiOlxuICAtIHRhYmxlOlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIlRpcCBTdW3EgyBDYXRlZ29yaWUgU3ViY2F0ZWdvcmllIERlc2NyaWVyZSBEYXTEgyBSZWN1cmVudCBGcmVjdmVuyJvEg1wiOlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIlRpcFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3VtxINcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkNhdGVnb3JpZVwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3ViY2F0ZWdvcmllXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJEZXNjcmllcmVcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkRhdMSDXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJSZWN1cmVudFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiRnJlY3ZlbsibxINcIlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIklOQ09NRSA5OTk5OS4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxNy4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjk5OTk5LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxNy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDIzLjAwIFJPTiBWRU5JVFVSSSBEaXZpZGVuZGUgMTMuMDYuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIyMy4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJWRU5JVFVSSVwiXG4gICAgICAgIC0gY2VsbCBcIkRpdmlkZW5kZVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxMy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDEyMy4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxMC4wNi4yMDI1IERhIFlFQVJMWVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIxMjMuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVkVOSVRVUklcIlxuICAgICAgICAtIGNlbGwgXCJTYWxhcmlpIC0gTW9kaWZpY2F0IC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjEwLjA2LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJEYVwiXG4gICAgICAgIC0gY2VsbCBcIllFQVJMWVwiXG4gICAgICAtIHJvdyBcIklOQ09NRSAzMi4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAwMi4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjMyLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIwMi4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiRVhQRU5TRSA1NjUuMDAgUk9OIEVEVUNBVElFIFRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmUgMzEuMDUuMjAyNSBEYSBXRUVLTFlcIjpcbiAgICAgICAgLSBjZWxsIFwiRVhQRU5TRVwiXG4gICAgICAgIC0gY2VsbCBcIjU2NS4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFRFVDQVRJRVwiXG4gICAgICAgIC0gY2VsbCBcIlRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzEuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIkRhXCJcbiAgICAgICAgLSBjZWxsIFwiV0VFS0xZXCJcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMTExMS4wMCBST04gRUNPTk9NSUkgRm9uZCBkZSB1cmdlbsibxIMgLSBNb2RpZmljYXQgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJTQVZJTkdcIlxuICAgICAgICAtIGNlbGwgXCIxMjExMTEuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiRUNPTk9NSUlcIlxuICAgICAgICAtIGNlbGwgXCJGb25kIGRlIHVyZ2VuyJvEgyAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMzQ0NDQuMDAgUk9OIEVDT05PTUlJIEZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0IDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzNDQ0NC4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFQ09OT01JSVwiXG4gICAgICAgIC0gY2VsbCBcIkZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgLSByb3cgXCJFWFBFTlNFIDEyMy4wMCBST04gVElNUF9MSUJFUiBNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGUgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJFWFBFTlNFXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlRJTVBfTElCRVJcIlxuICAgICAgICAtIGNlbGwgXCJNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzAuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIk51XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAtIHJvdyBcIkVYUEVOU0UgNTU1LjAwIFJPTiBUSU1QX0xJQkVSIEPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZCAzMC4wNS4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIkVYUEVOU0VcIlxuICAgICAgICAtIGNlbGwgXCI1NTUuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVElNUF9MSUJFUlwiXG4gICAgICAgIC0gY2VsbCBcIkPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDU1NS4wMCBST04gRUNPTk9NSUkgRm9uZCBnZW5lcmFsIDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiNTU1LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIkVDT05PTUlJXCJcbiAgICAgICAgLSBjZWxsIFwiRm9uZCBnZW5lcmFsXCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuLSB0ZXh0OiBTZSBhZmnImWVhesSDIDEwIGRpbiAzMTYgdHJhbnphY8ibaWlcbi0gYnV0dG9uIFwiw45uYWludGVcIiJ9"
+                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGxpbmsgXCLwn5SNIFByb2ZpbGVyIERlYnVnXCI6XG4gIC0gL3VybDogL3Byb2ZpbGVyLWRlYnVnXG4tIGhlYWRpbmcgXCJUcmFuemFjyJtpaVwiIFtsZXZlbD0xXVxuLSBmb3JtIFwiYWTEg3VnYXJlIHRyYW56YWPIm2llXCI6XG4gIC0gaGVhZGluZyBcIkFkYXVnxIMgdHJhbnphY8ibaWVcIiBbbGV2ZWw9M11cbiAgLSB0ZXh0OiBcIlRpcCo6XCJcbiAgLSBjb21ib2JveCBcIlRpcFwiOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJWZW5pdFwiXG4gICAgLSBvcHRpb24gXCJDaGVsdHVpYWzEg1wiXG4gICAgLSBvcHRpb24gXCJFY29ub21pc2lyZVwiXG4gIC0gdGV4dDogXCJTdW3Egyo6XCJcbiAgLSBzcGluYnV0dG9uIFwiU3VtxINcIlxuICAtIHRleHQ6IFwiQ2F0ZWdvcmllKjpcIlxuICAtIGNvbWJvYm94IFwiQ2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFN1YmNhdGVnb3JpZVxuICAtIGNvbWJvYm94IFwiU3ViY2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFwiRGF0xIMqOlwiXG4gIC0gdGV4dGJveCBcIkRhdMSDXCJcbiAgLSBjaGVja2JveFxuICAtIHRleHQ6IFJlY3VyZW50PyBGcmVjdmVuyJvEg1xuICAtIGNvbWJvYm94IFwiRnJlY3ZlbsibxINcIiBbZGlzYWJsZWRdOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJaaWxuaWNcIlxuICAgIC0gb3B0aW9uIFwiU8SDcHTEg23Dom5hbFwiXG4gICAgLSBvcHRpb24gXCJMdW5hclwiXG4gICAgLSBvcHRpb24gXCJBbnVhbFwiXG4gIC0gdGV4dDogRGVzY3JpZXJlXG4gIC0gdGV4dGJveCBcIkRlc2NyaWVyZVwiXG4gIC0gYnV0dG9uIFwiQWRhdWfEg1wiIFtkaXNhYmxlZF1cbiAgLSBidXR0b24gXCJBbnVsZWF6xINcIlxuLSBjb21ib2JveDpcbiAgLSBvcHRpb24gXCJBbGVnZSB0aXB1bFwiIFtzZWxlY3RlZF1cbiAgLSBvcHRpb24gXCJWZW5pdFwiXG4gIC0gb3B0aW9uIFwiQ2hlbHR1aWFsxINcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlzaXJlXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4gIC0gb3B0aW9uIFwiVmVuaXR1cmlcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlpXCJcbiAgLSBvcHRpb24gXCJJbmZhdGlzYXJlXCJcbiAgLSBvcHRpb24gXCJFZHVjYXRpZVwiXG4gIC0gb3B0aW9uIFwiQ2FyaWVyYVwiXG4gIC0gb3B0aW9uIFwiU2FuYXRhdGVcIlxuICAtIG9wdGlvbiBcIk51dHJpdGllXCJcbiAgLSBvcHRpb24gXCJMb2N1aW50YVwiXG4gIC0gb3B0aW9uIFwiVGltcCBsaWJlclwiXG4gIC0gb3B0aW9uIFwiQ2FsYXRvcmlpXCJcbiAgLSBvcHRpb24gXCJUcmFuc3BvcnRcIlxuICAtIG9wdGlvbiBcIkludmVzdGl0aWlcIlxuICAtIG9wdGlvbiBcIlRlc3Qg4p6h77iPXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBzdWJjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4tIHRleHRib3ggXCJDYXV0xIMuLi5cIlxuLSBidXR0b24gXCJGaWx0cmUgYXZhbnNhdGVcIlxuLSBidXR0b24gXCJFeHBvcnTEg1wiXG4tIHJlZ2lvbiBcIlRpcCBTdW3Eg1wiOlxuICAtIHRhYmxlOlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIlRpcCBTdW3EgyBDYXRlZ29yaWUgU3ViY2F0ZWdvcmllIERlc2NyaWVyZSBEYXTEgyBSZWN1cmVudCBGcmVjdmVuyJvEg1wiOlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIlRpcFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3VtxINcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkNhdGVnb3JpZVwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3ViY2F0ZWdvcmllXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJEZXNjcmllcmVcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkRhdMSDXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJSZWN1cmVudFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiRnJlY3ZlbsibxINcIlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIklOQ09NRSA5OTk5OS4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxNy4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjk5OTk5LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxNy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDIzLjAwIFJPTiBWRU5JVFVSSSBEaXZpZGVuZGUgMTMuMDYuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIyMy4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJWRU5JVFVSSVwiXG4gICAgICAgIC0gY2VsbCBcIkRpdmlkZW5kZVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxMy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDEyMy4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxMC4wNi4yMDI1IERhIFlFQVJMWVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIxMjMuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVkVOSVRVUklcIlxuICAgICAgICAtIGNlbGwgXCJTYWxhcmlpIC0gTW9kaWZpY2F0IC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjEwLjA2LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJEYVwiXG4gICAgICAgIC0gY2VsbCBcIllFQVJMWVwiXG4gICAgICAtIHJvdyBcIklOQ09NRSAzMi4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAwMi4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjMyLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIwMi4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiRVhQRU5TRSA1NjUuMDAgUk9OIEVEVUNBVElFIFRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmUgMzEuMDUuMjAyNSBEYSBXRUVLTFlcIjpcbiAgICAgICAgLSBjZWxsIFwiRVhQRU5TRVwiXG4gICAgICAgIC0gY2VsbCBcIjU2NS4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFRFVDQVRJRVwiXG4gICAgICAgIC0gY2VsbCBcIlRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzEuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIkRhXCJcbiAgICAgICAgLSBjZWxsIFwiV0VFS0xZXCJcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMTExMS4wMCBST04gRUNPTk9NSUkgRm9uZCBkZSB1cmdlbsibxIMgLSBNb2RpZmljYXQgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJTQVZJTkdcIlxuICAgICAgICAtIGNlbGwgXCIxMjExMTEuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiRUNPTk9NSUlcIlxuICAgICAgICAtIGNlbGwgXCJGb25kIGRlIHVyZ2VuyJvEgyAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMzQ0NDQuMDAgUk9OIEVDT05PTUlJIEZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0IDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzNDQ0NC4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFQ09OT01JSVwiXG4gICAgICAgIC0gY2VsbCBcIkZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgLSByb3cgXCJFWFBFTlNFIDEyMy4wMCBST04gVElNUF9MSUJFUiBNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGUgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJFWFBFTlNFXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlRJTVBfTElCRVJcIlxuICAgICAgICAtIGNlbGwgXCJNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzAuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIk51XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAtIHJvdyBcIkVYUEVOU0UgNTU1LjAwIFJPTiBUSU1QX0xJQkVSIEPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZCAzMC4wNS4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIkVYUEVOU0VcIlxuICAgICAgICAtIGNlbGwgXCI1NTUuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVElNUF9MSUJFUlwiXG4gICAgICAgIC0gY2VsbCBcIkPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDU1NS4wMCBST04gRUNPTk9NSUkgRm9uZCBnZW5lcmFsIDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiNTU1LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIkVDT05PTUlJXCJcbiAgICAgICAgLSBjZWxsIFwiRm9uZCBnZW5lcmFsXCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuLSB0ZXh0OiBTZSBhZmnImWVhesSDIDEwIGRpbiAzMzQgdHJhbnphY8ibaWlcbi0gYnV0dG9uIFwiw45uYWludGVcIiJ9"
                         }
-                      ]
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                        "column": 60,
+                        "line": 16
+                      }
                     }
                   ],
                   "status": "unexpected"
                 }
               ],
-              "id": "e6c5902f9bf68c18073d-f07206b8cb075f2ae794",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 149,
+              "id": "49e0c6de1898bdf55c3f-78d674b597fdf56238ea",
+              "file": "suites/features/lunargrid-crud.spec.ts",
+              "line": 27,
               "column": 7
             },
             {
-              "title": "închide CategoryEditor cu butonul X",
-              "ok": true,
-              "tags": [],
+              "title": "editare multiplă rapid și gestionarea erorilor",
+              "ok": false,
+              "tags": [
+                "features"
+              ],
               "tests": [
                 {
                   "timeout": 30000,
@@ -163,245 +163,60 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 35,
+                      "workerIndex": 9,
                       "parallelIndex": 0,
-                      "status": "interrupted",
-                      "duration": 9648,
+                      "status": "failed",
+                      "duration": 12312,
                       "error": {
-                        "message": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n",
-                        "stack": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\n    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\n    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:187:5",
+                        "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
+                        "stack": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts:16:60",
                         "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
-                          "column": 21,
-                          "line": 29
+                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                          "column": 60,
+                          "line": 16
                         },
-                        "snippet": "\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m"
+                        "snippet": "\u001b[0m \u001b[90m 14 |\u001b[39m     \n \u001b[90m 15 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat înainte de expandare\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Expandează grid-ul pentru a avea acces la celulele editabile\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mconst\u001b[39m expandButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'toggle-expand-all'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
                       },
                       "errors": [
                         {
                           "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
-                            "column": 21,
-                            "line": 29
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                            "column": 60,
+                            "line": 16
                           },
-                          "message": "Error: page.waitForSelector: Test ended.\nCall log:\n\u001b[2m  - waiting for locator('[data-testid=\"login-form\"]') to be visible\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\AuthPage.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m \u001b[90m   */\u001b[39m\n \u001b[90m 28 |\u001b[39m   \u001b[36masync\u001b[39m waitForPageLoad()\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[36mvoid\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m`[data-testid=\"${SELECTORS.LOGIN_FORM}\"]`\u001b[39m\u001b[33m,\u001b[39m {\n \u001b[90m    |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m       timeout\u001b[33m:\u001b[39m \u001b[33mTIMEOUTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mDEFAULT\u001b[39m\n \u001b[90m 31 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   }\u001b[0m\n\u001b[2m    at AuthPage.waitForPageLoad (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:29:21)\u001b[22m\n\u001b[2m    at AuthPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:22:16)\u001b[22m\n\u001b[2m    at AuthPage.loginWithPrimaryAccount (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts:212:5)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\category-editor.spec.ts:187:5\u001b[22m"
+                          "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[0m \u001b[90m 14 |\u001b[39m     \n \u001b[90m 15 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat înainte de expandare\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'lunar-grid-container'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m10000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m     \n \u001b[90m 18 |\u001b[39m     \u001b[90m// Expandează grid-ul pentru a avea acces la celulele editabile\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mconst\u001b[39m expandButton \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'toggle-expand-all'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts:16:60\u001b[22m"
                         }
                       ],
-                      "stdout": [
-                        {
-                          "text": "🧹 Cleanup preventiv...\n"
-                        },
-                        {
-                          "text": "✅ Cleanup preventiv finalizat\n"
-                        },
-                        {
-                          "text": "❌ Test închidere CategoryEditor cu X\n"
-                        }
-                      ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-28T21:19:27.137Z",
+                      "startTime": "2025-05-29T12:17:10.870Z",
                       "annotations": [],
                       "attachments": [
                         {
                           "name": "screenshot",
                           "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-category-e-a9e8c-CategoryEditor-cu-butonul-X-chromium\\test-failed-1.png"
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\suites-features-lunargrid--d8b49-pid-și-gestionarea-erorilor-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context",
+                          "contentType": "application/json",
+                          "body": "eyJwYWdlU25hcHNob3QiOiItIGxpbmsgXCJUcmFuemFjyJtpaVwiOlxuICAtIC91cmw6IC90cmFuc2FjdGlvbnNcbi0gbGluayBcIkdyaWQgTHVuYXJcIjpcbiAgLSAvdXJsOiAvbHVuYXItZ3JpZFxuLSBsaW5rIFwiRW5oYW5jZWQgTHVuYXJHcmlkIChQaGFzZSA0KVwiOlxuICAtIC91cmw6IC9lbmhhbmNlZC1sdW5hci1ncmlkXG4tIGxpbmsgXCLwn5qAIEx1bmFyR3JpZCBFbmhhbmNlZCAoTW9kYWwgQXJjaGl0ZWN0dXJlKVwiOlxuICAtIC91cmw6IC9sdW5hci1ncmlkLWVuaGFuY2VkXG4tIGxpbmsgXCJPcMibaXVuaVwiOlxuICAtIC91cmw6IC9vcHRpb25zXG4tIGxpbmsgXCLwn5SNIFByb2ZpbGVyIERlYnVnXCI6XG4gIC0gL3VybDogL3Byb2ZpbGVyLWRlYnVnXG4tIGhlYWRpbmcgXCJUcmFuemFjyJtpaVwiIFtsZXZlbD0xXVxuLSBmb3JtIFwiYWTEg3VnYXJlIHRyYW56YWPIm2llXCI6XG4gIC0gaGVhZGluZyBcIkFkYXVnxIMgdHJhbnphY8ibaWVcIiBbbGV2ZWw9M11cbiAgLSB0ZXh0OiBcIlRpcCo6XCJcbiAgLSBjb21ib2JveCBcIlRpcFwiOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJWZW5pdFwiXG4gICAgLSBvcHRpb24gXCJDaGVsdHVpYWzEg1wiXG4gICAgLSBvcHRpb24gXCJFY29ub21pc2lyZVwiXG4gIC0gdGV4dDogXCJTdW3Egyo6XCJcbiAgLSBzcGluYnV0dG9uIFwiU3VtxINcIlxuICAtIHRleHQ6IFwiQ2F0ZWdvcmllKjpcIlxuICAtIGNvbWJvYm94IFwiQ2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFN1YmNhdGVnb3JpZVxuICAtIGNvbWJvYm94IFwiU3ViY2F0ZWdvcmllXCIgW2Rpc2FibGVkXTpcbiAgICAtIG9wdGlvbiBcIkFsZWdlXCIgW3NlbGVjdGVkXVxuICAtIHRleHQ6IFwiRGF0xIMqOlwiXG4gIC0gdGV4dGJveCBcIkRhdMSDXCJcbiAgLSBjaGVja2JveFxuICAtIHRleHQ6IFJlY3VyZW50PyBGcmVjdmVuyJvEg1xuICAtIGNvbWJvYm94IFwiRnJlY3ZlbsibxINcIiBbZGlzYWJsZWRdOlxuICAgIC0gb3B0aW9uIFwiQWxlZ2VcIiBbc2VsZWN0ZWRdXG4gICAgLSBvcHRpb24gXCJaaWxuaWNcIlxuICAgIC0gb3B0aW9uIFwiU8SDcHTEg23Dom5hbFwiXG4gICAgLSBvcHRpb24gXCJMdW5hclwiXG4gICAgLSBvcHRpb24gXCJBbnVhbFwiXG4gIC0gdGV4dDogRGVzY3JpZXJlXG4gIC0gdGV4dGJveCBcIkRlc2NyaWVyZVwiXG4gIC0gYnV0dG9uIFwiQWRhdWfEg1wiIFtkaXNhYmxlZF1cbiAgLSBidXR0b24gXCJBbnVsZWF6xINcIlxuLSBjb21ib2JveDpcbiAgLSBvcHRpb24gXCJBbGVnZSB0aXB1bFwiIFtzZWxlY3RlZF1cbiAgLSBvcHRpb24gXCJWZW5pdFwiXG4gIC0gb3B0aW9uIFwiQ2hlbHR1aWFsxINcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlzaXJlXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4gIC0gb3B0aW9uIFwiVmVuaXR1cmlcIlxuICAtIG9wdGlvbiBcIkVjb25vbWlpXCJcbiAgLSBvcHRpb24gXCJJbmZhdGlzYXJlXCJcbiAgLSBvcHRpb24gXCJFZHVjYXRpZVwiXG4gIC0gb3B0aW9uIFwiQ2FyaWVyYVwiXG4gIC0gb3B0aW9uIFwiU2FuYXRhdGVcIlxuICAtIG9wdGlvbiBcIk51dHJpdGllXCJcbiAgLSBvcHRpb24gXCJMb2N1aW50YVwiXG4gIC0gb3B0aW9uIFwiVGltcCBsaWJlclwiXG4gIC0gb3B0aW9uIFwiQ2FsYXRvcmlpXCJcbiAgLSBvcHRpb24gXCJUcmFuc3BvcnRcIlxuICAtIG9wdGlvbiBcIkludmVzdGl0aWlcIlxuICAtIG9wdGlvbiBcIlRlc3Qg4p6h77iPXCJcbi0gY29tYm9ib3ggW2Rpc2FibGVkXTpcbiAgLSBvcHRpb24gXCJBbGVnZSBzdWJjYXRlZ29yaWFcIiBbc2VsZWN0ZWRdXG4tIHRleHRib3ggXCJDYXV0xIMuLi5cIlxuLSBidXR0b24gXCJGaWx0cmUgYXZhbnNhdGVcIlxuLSBidXR0b24gXCJFeHBvcnTEg1wiXG4tIHJlZ2lvbiBcIlRpcCBTdW3Eg1wiOlxuICAtIHRhYmxlOlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIlRpcCBTdW3EgyBDYXRlZ29yaWUgU3ViY2F0ZWdvcmllIERlc2NyaWVyZSBEYXTEgyBSZWN1cmVudCBGcmVjdmVuyJvEg1wiOlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIlRpcFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3VtxINcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkNhdGVnb3JpZVwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiU3ViY2F0ZWdvcmllXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJEZXNjcmllcmVcIlxuICAgICAgICAtIGNvbHVtbmhlYWRlciBcIkRhdMSDXCJcbiAgICAgICAgLSBjb2x1bW5oZWFkZXIgXCJSZWN1cmVudFwiXG4gICAgICAgIC0gY29sdW1uaGVhZGVyIFwiRnJlY3ZlbsibxINcIlxuICAgIC0gcm93Z3JvdXA6XG4gICAgICAtIHJvdyBcIklOQ09NRSA5OTk5OS4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxNy4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjk5OTk5LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxNy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDIzLjAwIFJPTiBWRU5JVFVSSSBEaXZpZGVuZGUgMTMuMDYuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIyMy4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJWRU5JVFVSSVwiXG4gICAgICAgIC0gY2VsbCBcIkRpdmlkZW5kZVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIxMy4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiSU5DT01FIDEyMy4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAxMC4wNi4yMDI1IERhIFlFQVJMWVwiOlxuICAgICAgICAtIGNlbGwgXCJJTkNPTUVcIlxuICAgICAgICAtIGNlbGwgXCIxMjMuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVkVOSVRVUklcIlxuICAgICAgICAtIGNlbGwgXCJTYWxhcmlpIC0gTW9kaWZpY2F0IC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjEwLjA2LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJEYVwiXG4gICAgICAgIC0gY2VsbCBcIllFQVJMWVwiXG4gICAgICAtIHJvdyBcIklOQ09NRSAzMi4wMCBST04gVkVOSVRVUkkgU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdCAwMi4wNi4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIklOQ09NRVwiXG4gICAgICAgIC0gY2VsbCBcIjMyLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlZFTklUVVJJXCJcbiAgICAgICAgLSBjZWxsIFwiU2FsYXJpaSAtIE1vZGlmaWNhdCAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIwMi4wNi4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiRVhQRU5TRSA1NjUuMDAgUk9OIEVEVUNBVElFIFRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmUgMzEuMDUuMjAyNSBEYSBXRUVLTFlcIjpcbiAgICAgICAgLSBjZWxsIFwiRVhQRU5TRVwiXG4gICAgICAgIC0gY2VsbCBcIjU2NS4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFRFVDQVRJRVwiXG4gICAgICAgIC0gY2VsbCBcIlRheGUgyJljb2xhcmUgfCB1bml2ZXJzaXRhcmVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzEuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIkRhXCJcbiAgICAgICAgLSBjZWxsIFwiV0VFS0xZXCJcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMTExMS4wMCBST04gRUNPTk9NSUkgRm9uZCBkZSB1cmdlbsibxIMgLSBNb2RpZmljYXQgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJTQVZJTkdcIlxuICAgICAgICAtIGNlbGwgXCIxMjExMTEuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiRUNPTk9NSUlcIlxuICAgICAgICAtIGNlbGwgXCJGb25kIGRlIHVyZ2VuyJvEgyAtIE1vZGlmaWNhdFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDEyMzQ0NDQuMDAgUk9OIEVDT05PTUlJIEZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0IDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzNDQ0NC4wMCBST05cIlxuICAgICAgICAtIGNlbGwgXCJFQ09OT01JSVwiXG4gICAgICAgIC0gY2VsbCBcIkZvbmQgZGUgdXJnZW7Im8SDIC0gTW9kaWZpY2F0XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgLSByb3cgXCJFWFBFTlNFIDEyMy4wMCBST04gVElNUF9MSUJFUiBNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGUgMzAuMDUuMjAyNSBOdVwiOlxuICAgICAgICAtIGNlbGwgXCJFWFBFTlNFXCJcbiAgICAgICAgLSBjZWxsIFwiMTIzLjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIlRJTVBfTElCRVJcIlxuICAgICAgICAtIGNlbGwgXCJNdXppY8SDIHwgVmlkZW8gc2F1IGFib25hbWVudGVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgICAgLSBjZWxsIFwiMzAuMDUuMjAyNVwiXG4gICAgICAgIC0gY2VsbCBcIk51XCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAtIHJvdyBcIkVYUEVOU0UgNTU1LjAwIFJPTiBUSU1QX0xJQkVSIEPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZCAzMC4wNS4yMDI1IE51XCI6XG4gICAgICAgIC0gY2VsbCBcIkVYUEVOU0VcIlxuICAgICAgICAtIGNlbGwgXCI1NTUuMDAgUk9OXCJcbiAgICAgICAgLSBjZWxsIFwiVElNUF9MSUJFUlwiXG4gICAgICAgIC0gY2VsbCBcIkPEg3LIm2kgc2F1IGFib25hbWVudGUgY8SDcsibaSAtIE1vZFwiXG4gICAgICAgIC0gY2VsbFxuICAgICAgICAtIGNlbGwgXCIzMC4wNS4yMDI1XCJcbiAgICAgICAgLSBjZWxsIFwiTnVcIlxuICAgICAgICAtIGNlbGxcbiAgICAgIC0gcm93IFwiU0FWSU5HIDU1NS4wMCBST04gRUNPTk9NSUkgRm9uZCBnZW5lcmFsIDMwLjA1LjIwMjUgTnVcIjpcbiAgICAgICAgLSBjZWxsIFwiU0FWSU5HXCJcbiAgICAgICAgLSBjZWxsIFwiNTU1LjAwIFJPTlwiXG4gICAgICAgIC0gY2VsbCBcIkVDT05PTUlJXCJcbiAgICAgICAgLSBjZWxsIFwiRm9uZCBnZW5lcmFsXCJcbiAgICAgICAgLSBjZWxsXG4gICAgICAgIC0gY2VsbCBcIjMwLjA1LjIwMjVcIlxuICAgICAgICAtIGNlbGwgXCJOdVwiXG4gICAgICAgIC0gY2VsbFxuLSB0ZXh0OiBTZSBhZmnImWVhesSDIDEwIGRpbiAzMzQgdHJhbnphY8ibaWlcbi0gYnV0dG9uIFwiw45uYWludGVcIiJ9"
                         }
                       ],
                       "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\AuthPage.ts",
-                        "column": 21,
-                        "line": 29
+                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-crud.spec.ts",
+                        "column": 60,
+                        "line": 16
                       }
                     }
                   ],
-                  "status": "skipped"
+                  "status": "unexpected"
                 }
               ],
-              "id": "e6c5902f9bf68c18073d-ae4f153405a5cac489a0",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 184,
-              "column": 7
-            },
-            {
-              "title": "închide CategoryEditor cu tasta ESC",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-fc4e95a003a87865e6f6",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 204,
-              "column": 7
-            },
-            {
-              "title": "selectează o categorie și verifică afișarea subcategoriilor",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-3a764999d7dcde9bf5ba",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 224,
-              "column": 7
-            },
-            {
-              "title": "redenumește o subcategorie standard",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-a614e1788c00d2d67ab8",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 260,
-              "column": 7
-            },
-            {
-              "title": "adaugă o subcategorie nouă",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-eef019cd2c04f481d1c2",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 330,
-              "column": 7
-            },
-            {
-              "title": "redenumește o subcategorie custom",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-8899af83509441774fd8",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 387,
-              "column": 7
-            },
-            {
-              "title": "șterge o subcategorie custom",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-06ff0ecea246230398d5",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 454,
-              "column": 7
-            },
-            {
-              "title": "verifică că modificările se reflectă în TransactionForm",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-69f69cba706d499065e4",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 508,
-              "column": 7
-            },
-            {
-              "title": "anulează ștergerea unei subcategorii custom",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-571ff2a4a5daacda9b66",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 603,
-              "column": 7
-            },
-            {
-              "title": "cleanup - șterge toate subcategoriile de test create",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [],
-                  "status": "skipped"
-                }
-              ],
-              "id": "e6c5902f9bf68c18073d-5dfc0fd8ef36a1e10650",
-              "file": "suites/features/category-editor.spec.ts",
-              "line": 643,
+              "id": "49e0c6de1898bdf55c3f-58e248539838dd2f6b18",
+              "file": "suites/features/lunargrid-crud.spec.ts",
+              "line": 164,
               "column": 7
             }
           ]
@@ -411,11 +226,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-28T21:18:53.346Z",
-    "duration": 44244.66899999976,
+    "startTime": "2025-05-29T12:16:50.750Z",
+    "duration": 33839.185000000056,
     "expected": 0,
-    "skipped": 10,
-    "unexpected": 1,
+    "skipped": 0,
+    "unexpected": 2,
     "flaky": 0
   }
 }
