@@ -11,7 +11,6 @@ import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/ho
 import { cn } from "../styles/cva/shared/utils";
 import { container } from "../styles/cva/components/layout";
 import { button } from "../styles/cva/components/forms";
-import { useNavigate, useLocation } from "react-router-dom";
 
 /**
  * Pagină dedicată pentru afișarea grid-ului lunar cu TanStack Table
@@ -54,21 +53,6 @@ const LunarGridPage: React.FC = () => {
   const mergeWithDefaults = useCategoryStore(
     (state) => state.mergeWithDefaults,
   );
-
-  // Actualizăm URL-ul când se schimbă luna/anul
-  // Nu mai avem nevoie de logica de fetch, este gestionată de React Query
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (year && month) {
-      const newUrl = `/lunar-grid/${year}/${month}`;
-      
-      if (location.pathname !== newUrl) {
-        navigate(newUrl);
-      }
-    }
-  }, [year, month, navigate, location.pathname]);
 
   /**
    * Funcție de debounce care actualizează luna/anul și invalidează cache-ul cu întârziere
