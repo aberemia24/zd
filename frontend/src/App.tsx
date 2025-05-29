@@ -31,7 +31,8 @@ import { CATEGORIES } from "@shared-constants/categories";
  * mentenabilitatea și facilitând extinderea ulterioară.
  */
 export const App: React.FC = () => {
-  console.log("🔜 App render using react-router-dom");
+  // ✅ FIX: Elimin log-ul repetitiv care cauzează spam în consolă
+  // console.log("🔜 App render using react-router-dom");
 
   const { user, loading, checkUser } = useAuthStore();
 
@@ -83,7 +84,7 @@ export const App: React.FC = () => {
     };
 
     initializeCategories();
-  }, [user, loadCategories, mergeWithDefaults]);
+  }, [user?.id]);
 
   // Afișează spinner în timpul încărcării stării de autentificare
   if (loading) {
