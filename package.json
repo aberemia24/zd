@@ -38,5 +38,7 @@
     "prettier": "^3.2.5",
     "typescript": "4.9.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "task-master-ai": "^0.15.0"
+  }
 }

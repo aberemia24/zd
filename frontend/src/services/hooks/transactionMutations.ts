@@ -354,8 +354,28 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       const response = await supabaseService.updateTransaction(id, transactionData);
       return response;
     },
+    onMutate: async ({ id, transactionData }) => {
+      // 🎯 Step 1.3: Cancel outgoing refetches pentru optimistic update
+      await queryClient.cancelQueries({ queryKey: monthlyQueryKey });
+
+      // Snapshot current data pentru rollback
+      const previousData = queryClient.getQueryData(monthlyQueryKey);
+
+      // 🚀 Optimistic update - actualizăm imediat în cache
+      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+        if (!old) return old;
+        return {
+          data: old.data.map((tx: any) =>
+            tx.id === id ? { ...tx, ...transactionData, updated_at: new Date().toISOString() } : tx
+          ),
+          count: old.count,
+        };
+      });
+
+      return { previousData };
+    },
     onSuccess: (updatedTransaction) => {
-      // Manual cache update cu datele reale din server
+      // Manual cache update cu datele reale din server (înlocuiește optimistic data)
       const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
       
       if (currentData) {
@@ -370,6 +390,12 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       }
       
       // ELIMINAT: Nu mai facem invalidation forțat
+    },
+    onError: (err, variables, context) => {
+      // 🔄 Step 1.3: Rollback la datele anterioare în caz de eroare
+      if (context?.previousData) {
+        queryClient.setQueryData(monthlyQueryKey, context.previousData);
+      }
     },
   });
 };

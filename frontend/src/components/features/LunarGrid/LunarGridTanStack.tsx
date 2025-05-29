@@ -5,6 +5,9 @@ import {
   TransformedTableDataRow,
 } from "./hooks/useLunarGridTable";
 
+// 🎯 Step 1.6: Import toast pentru UX feedback
+import toast from 'react-hot-toast';
+
 // Importuri din stores
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { useAuthStore } from "../../../stores/authStore";
@@ -12,12 +15,14 @@ import { useAuthStore } from "../../../stores/authStore";
 // React Query și hooks pentru tranzacții
 import {
   useCreateTransactionMonthly,
-  type CreateTransactionHookPayload
-} from '../../../services/hooks/useTransactionMutations';
+  useUpdateTransactionMonthly,
+  type CreateTransactionHookPayload,
+  type UpdateTransactionHookPayload
+} from '../../../services/hooks/transactionMutations';
 
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
-import { TransactionType, FrequencyType } from "@shared-constants";
-import { LUNAR_GRID, LUNAR_GRID_MESSAGES } from "@shared-constants";
+import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE } from "@shared-constants";
+import { LUNAR_GRID } from "@shared-constants";
 
 // Import componentele UI
 import Button from "../../primitives/Button/Button";
@@ -85,7 +90,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const { user } = useAuthStore();
 
     // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
-    const { mutate: createTransactionMutation } = useCreateTransactionMonthly(year, month, user?.id);
+    const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
+    const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -104,46 +110,87 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         subcategory: string | undefined,
         day: number,
         value: string | number,
+        transactionId: string | null,
       ): Promise<void> => {
         const numValue = typeof value === "string" ? parseFloat(value) : value;
 
         if (isNaN(numValue) || numValue <= 0) {
-          throw new Error("Valoare invalidă - trebuie să fie un număr pozitiv");
+          const errorMsg = "Valoare invalidă - trebuie să fie un număr pozitiv";
+          // 🎯 Step 1.6: Toast error pentru validare
+          toast.error(errorMsg);
+          throw new Error(errorMsg);
         }
 
-        // Construim data
-        const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
+        // 🐞 Step 1.5: FIX Bug UTC date shift - construim direct string YYYY-MM-DD
+        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-        // Folosim React Query mutation - cache invalidation se face automat în onSuccess
-        const createPayload: CreateTransactionHookPayload = {
-          amount: numValue,
-          category,
-          subcategory: subcategory || undefined,
-          type: determineTransactionType(category),
-          date,
-          recurring: false,
-          frequency: undefined,
-        };
+        // 🚧 Step 1.2: Logic pentru UPDATE vs CREATE (TO BE IMPLEMENTED)
+        if (transactionId) {
+          // 🔄 UPDATE existing transaction
+          console.log(`🔄 UPDATE transaction ${transactionId} with value ${numValue}`);
+          
+          const updatePayload: UpdateTransactionHookPayload = {
+            amount: numValue,
+            // Nu actualizăm categoria/subcategoria/data în editarea simplă inline
+            // doar valoarea
+          };
 
-        try {
-          // React Query mutation face cache invalidation automat - nu mai adăugăm manual
-          await new Promise<void>((resolve, reject) => {
-            createTransactionMutation(createPayload, {
-              onSuccess: () => {
-                resolve();
-              },
-              onError: (error: Error) => {
-                reject(error);
-              },
+          try {
+            await new Promise<void>((resolve, reject) => {
+              updateTransactionMutation.mutate({ id: transactionId, transactionData: updatePayload }, {
+                onSuccess: () => {
+                  // 🎯 Step 1.6: Toast success pentru UPDATE
+                  toast.success(MESAJE.SUCCES_EDITARE);
+                  resolve();
+                },
+                onError: (error: Error) => {
+                  // 🎯 Step 1.6: Toast error pentru UPDATE
+                  toast.error(`${MESAJE.EROARE_SALVARE_TRANZACTIE}: ${error.message}`);
+                  reject(error);
+                },
+              });
             });
-          });
+          } catch (error) {
+            throw error;
+          }
+        } else {
+          // ➕ CREATE new transaction (existing logic)
+          console.log(`➕ CREATE new transaction for ${category}-${subcategory}-${day} with value ${numValue}`);
+          
+          const createPayload: CreateTransactionHookPayload = {
+            amount: numValue,
+            category,
+            subcategory: subcategory || undefined,
+            type: determineTransactionType(category),
+            date,
+            recurring: false,
+            frequency: undefined,
+          };
 
-          // ELIMINAT: Cache invalidation manual - se face automat în mutation onSuccess
-        } catch (error) {
-          throw error;
+          try {
+            // React Query mutation face cache invalidation automat - nu mai adăugăm manual
+            await new Promise<void>((resolve, reject) => {
+              createTransactionMutation.mutate(createPayload, {
+                onSuccess: () => {
+                  // 🎯 Step 1.6: Toast success pentru CREATE
+                  toast.success(MESAJE.SUCCES_ADAUGARE);
+                  resolve();
+                },
+                onError: (error: Error) => {
+                  // 🎯 Step 1.6: Toast error pentru CREATE
+                  toast.error(`${MESAJE.EROARE_ADAUGARE}: ${error.message}`);
+                  reject(error);
+                },
+              });
+            });
+
+            // ELIMINAT: Cache invalidation manual - se face automat în mutation onSuccess
+          } catch (error) {
+            throw error;
+          }
         }
       },
-      [year, month, createTransactionMutation, determineTransactionType],
+      [year, month, createTransactionMutation, determineTransactionType, updateTransactionMutation],
     );
 
     // Handler pentru click pe celulă (doar pentru modal advanced - Shift+Click)
@@ -197,7 +244,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           type: transactionTypeFromPopover,
         } = popover;
 
-        const date = new Date(year, month - 1, day).toISOString().slice(0, 10);
+        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
         const commonPayload = {
           amount: Number(formData.amount),
@@ -209,7 +256,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           frequency: formData.recurring ? formData.frequency : undefined,
         };
 
-        createTransactionMutation(commonPayload, {
+        createTransactionMutation.mutate(commonPayload, {
           onSuccess: () => {
             setPopover(null);
           },
@@ -222,7 +269,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     );
 
     // Interogare tabel optimizată (fără handleri de click/double-click)
-    const { table, isLoading, error, days, dailyBalances, tableContainerRef } =
+    const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
 
     // Render pentru celula editabilă folosind EditableCell component
@@ -234,6 +281,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         currentValue: string | number,
       ) => {
         const cellId = `${category}-${subcategory || "null"}-${day}`;
+        
+        // 🔍 Step 1.1: Identifică transactionId pentru diferențierea CREATE vs UPDATE
+        const transactionKey = `${category}-${subcategory || ''}-${day}`;
+        const transactionId = transactionMap.get(transactionKey) || null;
 
         // Parseaza valoarea existentă corect pentru display
         let displayValue = "";
@@ -255,7 +306,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             value={displayValue}
             onSave={async (value) => {
               try {
-                await handleEditableCellSave(category, subcategory, day, value);
+                // 🎯 Step 1.1: Transmite transactionId la handleEditableCellSave
+                await handleEditableCellSave(category, subcategory, day, value, transactionId);
               } catch (error) {
                 console.error("Eroare la salvarea celulei:", error);
                 throw error; // Re-throw pentru EditableCell să gestioneze eroarea
@@ -267,7 +319,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           />
         );
       },
-      [handleEditableCellSave],
+      [handleEditableCellSave, transactionMap],
     );
 
     // Funcție pentru calcularea sumei totale
