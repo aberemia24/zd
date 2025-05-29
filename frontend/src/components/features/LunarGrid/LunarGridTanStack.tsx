@@ -29,6 +29,9 @@ import Button from "../../primitives/Button/Button";
 import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
 
+// 🎯 Step 3.3: Import singleton formatters pentru performanță
+import { formatCurrency } from "../../../utils/lunarGrid";
+
 // Import CVA styling system
 import { cn } from "../../../styles/cva/shared/utils";
 import {
@@ -50,29 +53,21 @@ interface CategoryStoreItem {
   [key: string]: unknown;
 }
 
-// Helper function pentru formatarea sumelor (memorare globală deoarece este statică)
-const formatMoney = (amount: number): string => {
-  return new Intl.NumberFormat("ro-RO", {
-    style: "decimal",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-};
+// Interfață pentru starea popover-ului de tranzacții
+interface PopoverState {
+  isOpen: boolean;
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  amount: string;
+  type: TransactionType;
+  element: HTMLElement | null;
+  anchorEl?: HTMLElement;
+}
 
 export interface LunarGridTanStackProps {
   year: number;
   month: number;
-}
-
-// Interfața pentru starea popover-ului
-interface PopoverState {
-  id?: string;
-  category: string;
-  subcategory?: string;
-  day: number;
-  type: TransactionType;
-  amount?: string;
-  anchorEl: HTMLElement;
 }
 
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
@@ -127,8 +122,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         // 🚧 Step 1.2: Logic pentru UPDATE vs CREATE (TO BE IMPLEMENTED)
         if (transactionId) {
           // 🔄 UPDATE existing transaction
-          console.log(`🔄 UPDATE transaction ${transactionId} with value ${numValue}`);
-          
           const updatePayload: UpdateTransactionHookPayload = {
             amount: numValue,
             // Nu actualizăm categoria/subcategoria/data în editarea simplă inline
@@ -155,8 +148,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           }
         } else {
           // ➕ CREATE new transaction (existing logic)
-          console.log(`➕ CREATE new transaction for ${category}-${subcategory}-${day} with value ${numValue}`);
-          
           const createPayload: CreateTransactionHookPayload = {
             amount: numValue,
             category,
@@ -220,6 +211,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           day,
           type: determineTransactionType(category),
           amount,
+          isOpen: true,
+          element: null,
           anchorEl,
         });
       },
@@ -562,7 +555,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                           "transition-colors duration-150"
                         )}
                       >
-                        {balance !== 0 ? formatMoney(balance) : "-"}
+                        {balance !== 0 ? formatCurrency(balance) : "-"}
                       </td>
                     );
                   })}
@@ -572,7 +565,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     "font-bold",
                     "transition-colors duration-150"
                   )}>
-                    {formatMoney(monthTotal)}
+                    {formatCurrency(monthTotal)}
                   </td>
                 </tr>
               </tbody>
