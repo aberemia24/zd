@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseService } from "../supabaseService";
 import { PAGINATION } from "@shared-constants";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { useAuthStore } from "../../stores/authStore";
 import { queryKeys, optimizeQueryOptions } from "./reactQueryUtils";
+import { useEffect } from "react";
 
 // Utilitar pentru formatarea datelor
 function pad2(n: number): string {
@@ -138,4 +139,90 @@ export function useMonthlyTransactions(
     totalCount: query.data?.count || 0,
     refetch: query.refetch,
   };
+}
+
+/**
+ * Hook pentru preload inteligent al lunilor adiacente
+ * Preîncarcă datele pentru luna anterioară și următoare pentru navigare fluidă
+ * 
+ * @param currentYear Anul curent afișat
+ * @param currentMonth Luna curentă afișată (1-12)
+ * @param userId ID-ul utilizatorului curent
+ * @param options Opțiuni pentru preload
+ */
+export function useAdjacentMonthsPreload(
+  currentYear: number,
+  currentMonth: number,
+  userId?: string,
+  options: UseMonthlyTransactionsOptions = {},
+): void {
+  const queryClient = useQueryClient();
+  const { user } = useAuthStore();
+  const effectiveUserId = userId || user?.id;
+
+  useEffect(() => {
+    if (!effectiveUserId) return;
+
+    // Calculăm luna anterioară
+    const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+    const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+
+    // Calculăm luna următoare
+    const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+    const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+
+    // Preload pentru luna anterioară
+    const prevMonthQueryKey = queryKeys.transactions.monthly(prevYear, prevMonth, effectiveUserId);
+    queryClient.prefetchQuery({
+      queryKey: prevMonthQueryKey,
+      queryFn: async () => {
+        const monthRange = getMonthRange(prevYear, prevMonth);
+        const result = await supabaseService.fetchTransactions(
+          effectiveUserId,
+          {
+            limit: 1000,
+            sort: "date",
+          },
+          {
+            dateFrom: monthRange.from,
+            dateTo: monthRange.to,
+          },
+        );
+        return {
+          data: result.data,
+          count: result.count,
+        };
+      },
+      staleTime: options.staleTime || 30 * 1000,
+      gcTime: options.gcTime || 5 * 60 * 1000,
+    });
+
+    // Preload pentru luna următoare
+    const nextMonthQueryKey = queryKeys.transactions.monthly(nextYear, nextMonth, effectiveUserId);
+    queryClient.prefetchQuery({
+      queryKey: nextMonthQueryKey,
+      queryFn: async () => {
+        const monthRange = getMonthRange(nextYear, nextMonth);
+        const result = await supabaseService.fetchTransactions(
+          effectiveUserId,
+          {
+            limit: 1000,
+            sort: "date",
+          },
+          {
+            dateFrom: monthRange.from,
+            dateTo: monthRange.to,
+          },
+        );
+        return {
+          data: result.data,
+          count: result.count,
+        };
+      },
+      staleTime: options.staleTime || 30 * 1000,
+      gcTime: options.gcTime || 5 * 60 * 1000,
+    });
+
+    console.log(`Preloaded adjacent months: ${prevYear}-${prevMonth} și ${nextYear}-${nextMonth}`);
+  }, [currentYear, currentMonth, effectiveUserId, queryClient, options.staleTime, options.gcTime]);
 }

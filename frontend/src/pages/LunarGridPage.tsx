@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useCallback, useTransition } from "react";
 import { EXCEL_GRID, UI } from "@shared-constants/ui";
 import LunarGridTanStack from "../components/features/LunarGrid/LunarGridTanStack";
 import { TITLES } from "@shared-constants";
@@ -7,7 +7,7 @@ import { useTransactionStore } from "../stores/transactionStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import { useAuthStore } from "../stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMonthlyTransactions } from "../services/hooks/useMonthlyTransactions";
+import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 import { cn } from "../styles/cva/shared/utils";
 import { container } from "../styles/cva/components/layout";
 import { button } from "../styles/cva/components/forms";
@@ -18,6 +18,9 @@ import { button } from "../styles/cva/components/forms";
  * Cu debounce implementat pentru a evita prea multe cereri API la navigare rapidă
  */
 const LunarGridPage: React.FC = () => {
+  // React 18 Transitions pentru navigare fluidă între luni
+  const [isPending, startTransition] = useTransition();
+
   // Acces la queryClient pentru a gestiona invalidarea cache-ului în mod eficient
   const queryClient = useQueryClient();
 
@@ -34,6 +37,12 @@ const LunarGridPage: React.FC = () => {
   // Folosim React Query prin hook-ul useMonthlyTransactions pentru verificarea stării de loading
   const { isLoading: loading } = useMonthlyTransactions(year, month, user?.id, {
     includeAdjacentDays: true,
+  });
+
+  // Preload inteligent pentru luni adiacente (elimină loading states la navigare)
+  useAdjacentMonthsPreload(year, month, user?.id, {
+    staleTime: 60 * 1000, // 1 minut cache pentru preloaded data
+    gcTime: 10 * 60 * 1000, // 10 minute garbage collection pentru preloaded data
   });
 
   // Funcționalitate pentru categorii personalizate
@@ -90,29 +99,33 @@ const LunarGridPage: React.FC = () => {
     [queryClient],
   );
 
-  // Funcții pentru navigare între luni, acum cu debounce
+  // Funcții pentru navigare între luni, acum cu debounce și transitions
   const goToPreviousMonth = () => {
-    let newMonth = month - 1;
-    let newYear = year;
+    startTransition(() => {
+      let newMonth = month - 1;
+      let newYear = year;
 
-    if (newMonth < 1) {
-      newMonth = 12;
-      newYear--;
-    }
+      if (newMonth < 1) {
+        newMonth = 12;
+        newYear--;
+      }
 
-    setDateWithDebounce(newMonth, newYear);
+      setDateWithDebounce(newMonth, newYear);
+    });
   };
 
   const goToNextMonth = () => {
-    let newMonth = month + 1;
-    let newYear = year;
+    startTransition(() => {
+      let newMonth = month + 1;
+      let newYear = year;
 
-    if (newMonth > 12) {
-      newMonth = 1;
-      newYear++;
-    }
+      if (newMonth > 12) {
+        newMonth = 1;
+        newYear++;
+      }
 
-    setDateWithDebounce(newMonth, newYear);
+      setDateWithDebounce(newMonth, newYear);
+    });
   };
 
   // Formatare nume lună în română
@@ -134,34 +147,15 @@ const LunarGridPage: React.FC = () => {
     return monthNames[month - 1];
   };
 
-  // Handler pentru a actualiza luna și anul - optimizat cu debounce
+  // Handler pentru a actualiza luna și anul - optimizat cu debounce și transitions
   // pentru a evita cereri API multiple când utilizatorul schimbă rapid luna/anul
   const handleMonthChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const newMonth = parseInt(e.target.value, 10);
-      setMonth(newMonth);
+      startTransition(() => {
+        const newMonth = parseInt(e.target.value, 10);
+        setMonth(newMonth);
 
-      // Invalidate cache pentru a forța o nouă cerere cu noile valori
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current);
-      }
-
-      debounceTimerRef.current = window.setTimeout(() => {
-        queryClient.invalidateQueries({
-          queryKey: ["transactions", "monthly"],
-        });
-      }, 100);
-    },
-    [queryClient],
-  );
-
-  // Optimizare similară pentru schimbarea anului
-  const handleYearChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newYear = parseInt(e.target.value, 10);
-      if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
-        setYear(newYear);
-
+        // Invalidate cache pentru a forța o nouă cerere cu noile valori
         if (debounceTimerRef.current) {
           window.clearTimeout(debounceTimerRef.current);
         }
@@ -171,7 +165,30 @@ const LunarGridPage: React.FC = () => {
             queryKey: ["transactions", "monthly"],
           });
         }, 100);
-      }
+      });
+    },
+    [queryClient],
+  );
+
+  // Optimizare similară pentru schimbarea anului cu transitions
+  const handleYearChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      startTransition(() => {
+        const newYear = parseInt(e.target.value, 10);
+        if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
+          setYear(newYear);
+
+          if (debounceTimerRef.current) {
+            window.clearTimeout(debounceTimerRef.current);
+          }
+
+          debounceTimerRef.current = window.setTimeout(() => {
+            queryClient.invalidateQueries({
+              queryKey: ["transactions", "monthly"],
+            });
+          }, 100);
+        }
+      });
     },
     [queryClient],
   );
@@ -192,9 +209,21 @@ const LunarGridPage: React.FC = () => {
   return (
     <div className={cn(container({ size: "xl" }), "pb-10")}>
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {TITLES.GRID_LUNAR}
-        </h1>
+        <div className="flex items-center space-x-3">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {TITLES.GRID_LUNAR}
+          </h1>
+          {/* Indicator pentru React 18 Transitions */}
+          {isPending && (
+            <div 
+              className="flex items-center text-sm text-blue-600"
+              data-testid="transition-loading-indicator"
+            >
+              <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2" />
+              Navigare...
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center space-x-4 mt-4 md:mt-0">
           <select

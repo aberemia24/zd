@@ -4,8 +4,6 @@ import Badge from "../../primitives/Badge/Badge";
 import Spinner from "../../primitives/Spinner/Spinner";
 import {
   TransactionType,
-  CategoryType,
-  FrequencyType,
 } from "../../../shared-constants/enums";
 import { TABLE, BUTTONS, INFO } from "@shared-constants";
 import type { Transaction } from "../../../types/Transaction";
@@ -15,7 +13,6 @@ import {
   tableHeader,
   tableCell,
   flex as flexContainer,
-  container as pageContainer,
 } from "../../../styles/cva";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 
@@ -149,15 +146,18 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     // Creăm un nou observer care va detecta când elementul e vizibil
     const observer = new IntersectionObserver(handleObserver, options);
 
+    // Salvăm o referință locală pentru cleanup
+    const currentBottomRef = bottomRef.current;
+
     // Începem să observăm elementul nostru
-    if (bottomRef.current) {
-      observer.observe(bottomRef.current);
+    if (currentBottomRef) {
+      observer.observe(currentBottomRef);
     }
 
     // Cleanup la unmount
     return () => {
-      if (bottomRef.current) {
-        observer.unobserve(bottomRef.current);
+      if (currentBottomRef) {
+        observer.unobserve(currentBottomRef);
       }
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
@@ -275,36 +275,33 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           className={cn(dataTable({ variant: "striped" }))}
           data-testid="transaction-table"
         >
-          {" "}
           <thead>
-            {" "}
             <tr className="bg-gray-50">
-              {" "}
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.TYPE}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.AMOUNT}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.CATEGORY}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.SUBCATEGORY}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.DESCRIPTION}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.DATE}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.RECURRING}
-              </th>{" "}
+              </th>
               <th className={cn(tableHeader())} scope="col">
                 {TABLE.HEADERS.FREQUENCY}
-              </th>{" "}
-            </tr>{" "}
+              </th>
+            </tr>
           </thead>
           <tbody>
             {isLoading
