@@ -356,7 +356,11 @@ export function useLunarGridTable(
       if (colConfig.accessorKey === "category") {
         return {
           id: "category",
-          header: colConfig.header,
+          header: ({ column }) => (
+            <div className="text-center">
+              {colConfig.header}
+            </div>
+          ),
           accessorFn: (row: TransformedTableDataRow) =>
             row.isCategory ? row.category : row.subcategory,
           cell: ({ row, getValue }) => {
@@ -387,7 +391,7 @@ export function useLunarGridTable(
         return {
           id: colConfig.accessorKey,
           header: ({ column }) => (
-            <div className={colConfig.headerStyle || ""}>
+            <div className={`text-center ${colConfig.headerStyle || ""}`}>
               {colConfig.header}
             </div>
           ),
@@ -407,7 +411,7 @@ export function useLunarGridTable(
             if (isSubcategory && stableClickHandlers) {
               return (
                 <div
-                  className={`text-right ${colorClass} cursor-pointer hover:bg-blue-50 p-2 transition-colors duration-150`}
+                  className={`text-center ${colorClass} cursor-pointer hover:bg-gray-50 p-2 transition-colors duration-150`}
                   onClick={(e) =>
                     stableClickHandlers.handleSingleClick(
                       e,
@@ -437,7 +441,7 @@ export function useLunarGridTable(
             // Pentru categorii (readonly)
             return (
               <div
-                className={`text-right ${colorClass} p-2`}
+                className={`text-center ${colorClass} p-2`}
                 title="Suma calculată automată din subcategorii"
               >
                 {valueDisplay}
@@ -451,13 +455,17 @@ export function useLunarGridTable(
       if (colConfig.accessorKey === "total") {
         return {
           id: "total",
-          header: colConfig.header,
+          header: ({ column }) => (
+            <div className="text-center">
+              {colConfig.header}
+            </div>
+          ),
           accessorKey: colConfig.accessorKey,
           cell: ({ getValue }) => {
             const value = getValue<number>();
             const colorClass = getBalanceStyleClass(value);
             return (
-              <div className={`text-right ${colorClass}`}>
+              <div className={`text-center ${colorClass}`}>
                 {typeof value === "number" && !isNaN(value) && value !== 0
                   ? formatCurrency(value)
                   : "—"}

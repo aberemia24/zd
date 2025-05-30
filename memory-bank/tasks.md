@@ -81,19 +81,19 @@
   - Format: Zi + luna românească pentru claritate maximă
   - UX: User înțelege imediat data din header fără calcule mentale
 
-#### **5. Visual Color Coding System** ✅ **IMPLEMENTED & FIXED**
-- ✅ **Smart Category-Based Color Coding**: Correct implementation per category type
+#### **5. Visual Color Coding System** ✅ **IMPLEMENTED & PERFECTED**
+- ✅ **Smart Category-Based Color Coding**: Perfect implementation cu elegant border styling
   - Location: `frontend/src/utils/lunarGrid/formatters.ts`
   - Implementation: `getCategoryStyleClass(categoryName, value)` function 
-  - Logic: VENITURI → Green, ALL OTHER CATEGORIES → Red, SOLD → Value-based
-- ✅ **LunarGrid Integration**: Proper color coding în toate celulele zilelor
-  - Location: `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.tsx`
-  - Integration: Uses `getCategoryStyleClass(original.category, value)` pentru day cells
-  - Consistency: Balance column uses `getBalanceStyleClass` (value-based) for sold logic
-- ✅ **Fixed Previous Issue**: No longer uses generic value-based coloring for categories
-  - Problem: Previously all category sums showed green regardless of type
-  - Solution: Categories now show correct colors based on income/expense nature
-  - Result: VENITURI = Green, TRANSPORT/ECONOMII/etc = Red, Sold = Value-based
+  - Logic: VENITURI → Green + border, ALL OTHER CATEGORIES → Red + border, SOLD → Value-based intense
+- ✅ **Elegant Border System**: Subtle borders pentru better visibility
+  - Style: `border border-success-200 rounded-sm px-1` pentru venituri
+  - Style: `border border-error-200 rounded-sm px-1` pentru cheltuieli  
+  - Clean: No background - elegant și professional appearance
+- ✅ **Perfect Visual Hierarchy**: Clear differentiation between categories and balance
+  - Categories: Light colors cu subtle borders pentru clarity
+  - Balance (Sold): Intense colors fără border pentru prominence
+  - Result: Professional financial appearance cu perfect readability
 
 #### **6. Current Day Highlighting** ✅ **IMPLEMENTED**
 - ✅ **Date Detection Logic**: Smart current day detection
