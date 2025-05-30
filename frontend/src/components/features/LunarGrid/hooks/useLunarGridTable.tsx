@@ -23,6 +23,7 @@ import {
   getCategoryStyleClass,
   generateTableColumns,
 } from "../../../../utils/lunarGrid";
+import { MESAJE, LUNAR_GRID_MESSAGES } from "@shared-constants";
 
 // Interfaces pentru structuri de date
 interface SubcategoryDefinition {
@@ -348,6 +349,29 @@ export function useLunarGridTable(
     };
   }, [onCellClick, onCellDoubleClick]);
 
+  // Calculez dailyBalances ÎNAINTE de generarea coloanelor
+  const dailyBalances = useMemo(() => {
+    const balances: Record<number, number> = {};
+    
+    // Inițializăm cu 0 pentru toate zilele
+    days.forEach((day) => {
+      balances[day] = 0;
+    });
+    
+    // Agregăm sumele din toate categoriile de top-level pentru fiecare zi
+    rawTableData.forEach((categoryRow) => {
+      if (categoryRow.isCategory) {
+        days.forEach((day) => {
+          const dayKey = `day-${day}` as keyof DailyAmount;
+          const dayValue = categoryRow[dayKey] || 0;
+          balances[day] += dayValue;
+        });
+      }
+    });
+    
+    return balances;
+  }, [rawTableData, days]);
+
   // Generare coloane pentru tabel
   const columns = useMemo<ColumnDef<TransformedTableDataRow>[]>(() => {
     const generatedCols = generateTableColumns(year, month); // Din @utils/lunarGrid/dataTransformers
@@ -388,11 +412,12 @@ export function useLunarGridTable(
 
       if (colConfig.accessorKey?.startsWith("day-")) {
         const dayNumber = parseInt(colConfig.accessorKey.split("-")[1], 10);
+        
         return {
           id: colConfig.accessorKey,
           header: ({ column }) => (
             <div className={`text-center ${colConfig.headerStyle || ""}`}>
-              {colConfig.header}
+              <div className="font-medium">{colConfig.header}</div>
             </div>
           ),
           accessorKey: colConfig.accessorKey,
@@ -487,41 +512,6 @@ export function useLunarGridTable(
     autoResetExpanded: false,
     getRowId: (row) => row.id,
   });
-
-  const dailyBalances = useMemo(() => {
-    const balances: Record<number, number> = {};
-    
-    // Inițializăm cu 0 pentru toate zilele
-    days.forEach((day) => {
-      balances[day] = 0;
-    });
-    
-    // Agregăm sumele din toate categoriile de top-level pentru fiecare zi
-    rawTableData.forEach((categoryRow) => {
-      if (categoryRow.isCategory) {
-        days.forEach((day) => {
-          const dayKey = `day-${day}` as keyof DailyAmount;
-          const dayValue = categoryRow[dayKey] || 0;
-          balances[day] += dayValue;
-        });
-      }
-    });
-    
-    return balances;
-  }, [rawTableData, days]);
-
-  // Funcția getSumForCell originală se baza pe LunarGridRowData.
-  // O adaptăm sau o eliminăm dacă nu mai e necesară extern.
-  // Pentru moment, o comentăm, deoarece LunarGridTanStack nu pare să o folosească direct.
-  /*
-  const getSumForCell = useCallback((category: string, subcategory: string | undefined, day: number) => {
-    const row = rawTableData.find((r: LunarGridRowData) => 
-      r.category === category && 
-      (subcategory ? r.subcategory === subcategory : r.isCategory)
-    );
-    return row ? row.dailyAmounts[day] || 0 : 0;
-  }, [rawTableData]);
-  */
 
   // Funcție pentru a genera un ID unic pentru celule (folosit pentru identificarea celulei în editare)
   const getCellId = useCallback(
