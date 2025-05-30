@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, CSSProperties, memo } from 'react';
+import React, { useCallback, useState, useMemo, CSSProperties, memo, useEffect } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import {
   useLunarGridTable,
@@ -16,6 +16,7 @@ import { useAuthStore } from "../../../stores/authStore";
 import {
   useCreateTransactionMonthly,
   useUpdateTransactionMonthly,
+  useDeleteTransactionMonthly,
   type CreateTransactionHookPayload,
   type UpdateTransactionHookPayload
 } from '../../../services/hooks/transactionMutations';
@@ -103,9 +104,33 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       includeAdjacentDays: true,
     });
 
+    // 🚨 VERIFICARE TEMPORARĂ: Detectează tranzacții fără subcategorie (nu ar trebui să existe)
+    useEffect(() => {
+      if (validTransactions && validTransactions.length > 0) {
+        const transactionsWithoutSubcategory = validTransactions.filter(t => 
+          t.category && (!t.subcategory || t.subcategory.trim() === "")
+        );
+        
+        if (transactionsWithoutSubcategory.length > 0) {
+          console.error("🚨 TRANZACȚII FĂRĂ SUBCATEGORIE DETECTATE (Date murdare):", 
+            transactionsWithoutSubcategory.map(t => ({
+              id: t.id,
+              amount: t.amount,
+              date: t.date,
+              category: t.category,
+              subcategory: t.subcategory,
+              description: t.description
+            }))
+          );
+          console.warn("⚠️ Aceste tranzacții ar trebui șterse sau migrate către subcategorii!");
+        }
+      }
+    }, [validTransactions]);
+
     // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
     const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
     const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
+    const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -327,6 +352,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Interogare tabel optimizată (fără handleri de click/double-click)
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
+
+    // 🚨 FILTRARE TEMPORARĂ: Exclude tranzacții fără subcategorie din procesare
+    const cleanTransactions = useMemo(() => {
+      return validTransactions.filter(t => 
+        t.category && t.subcategory && t.subcategory.trim() !== ""
+      );
+    }, [validTransactions]);
 
     // Render pentru celula editabilă folosind EditableCell component
     const renderEditableCell = useCallback(
@@ -616,6 +648,44 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, handleCancelAddSubcategory, table],
     );
 
+    // Handler pentru ștergerea tranzacțiilor fără subcategorie (DEBUGGING ONLY)
+    const handleCleanOrphanTransactions = useCallback(async () => {
+      if (!user?.id) return;
+      
+      const orphanTransactions = validTransactions.filter(t => 
+        t.category && (!t.subcategory || t.subcategory.trim() === "")
+      );
+      
+      if (orphanTransactions.length === 0) {
+        toast.success("Nu există tranzacții orfane de curățat!");
+        return;
+      }
+      
+      const confirmed = window.confirm(
+        `Sigur vrei să ștergi ${orphanTransactions.length} tranzacții fără subcategorie?\n\n` +
+        `Acestea sunt:\n${orphanTransactions.map(t => 
+          `- ${t.category}: ${t.amount} RON (${t.date})`
+        ).join('\n')}`
+      );
+      
+      if (!confirmed) return;
+      
+      try {
+        console.log("🗑️ Ștergând tranzacții orfane:", orphanTransactions.map(t => t.id));
+        
+        // Șterge fiecare tranzacție folosind hook-ul de delete
+        for (const transaction of orphanTransactions) {
+          await deleteTransactionMutation.mutateAsync(transaction.id);
+          console.log(`✅ Șters: ${transaction.id} (${transaction.category}: ${transaction.amount} RON)`);
+        }
+        
+        toast.success(`${orphanTransactions.length} tranzacții orfane șterse cu succes!`);
+      } catch (error) {
+        console.error("Eroare la ștergerea tranzacțiilor orfane:", error);
+        toast.error("Eroare la ștergerea tranzacțiilor orfane");
+      }
+    }, [validTransactions, user?.id, deleteTransactionMutation]);
+
     // Renderizare (layout principal)
     return (
       <>
@@ -655,6 +725,19 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           >
             {LUNAR_GRID.RESET_EXPANSION}
           </Button>
+          
+          {/* 🚨 BUTON TEMPORAR DEBUGGING: Curățare tranzacții orfane */}
+          {validTransactions.some(t => t.category && (!t.subcategory || t.subcategory.trim() === "")) && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={handleCleanOrphanTransactions}
+              dataTestId="clean-orphan-transactions"
+              title="Șterge tranzacțiile fără subcategorie (date murdare din trecut)"
+            >
+              🗑️ Curăță tranzacții orfane ({validTransactions.filter(t => t.category && (!t.subcategory || t.subcategory.trim() === "")).length})
+            </Button>
+          )}
         </div>
 
         <div 
