@@ -419,7 +419,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     }
                   >
                     {isFirstCell && isCategory ? (
-                      // Celula de categorie clickable pentru expand/collapse
+                      // Celula de categorie clickable pentru expand/collapse (folosește iconițele existente din hook)
                       <div 
                         className="flex items-center cursor-pointer hover:bg-gray-50 rounded px-1 py-1 transition-colors duration-150"
                         onClick={(e) => {
@@ -433,12 +433,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
                         data-testid={`toggle-category-${original.category}`}
                       >
-                        <span className="mr-2 text-gray-500 font-bold">
-                          {row.getIsExpanded() ? '▼' : '▶'}
-                        </span>
-                        <span className="select-none">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
-                        </span>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
                       </div>
                     ) : isDayCell && isSubcategory ? (
                       renderEditableCell(
@@ -514,7 +509,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           ref={tableContainerRef}
           className={cn(
             gridContainer({ size: "full" }),
-            "relative overflow-x-auto rounded-lg border border-gray-200",
+            "relative overflow-auto rounded-lg border border-gray-200",
+            "max-h-[70vh] min-h-[400px]", // Înălțime fixă pentru scroll vertical
             isLoading ? "opacity-60" : "",
             "transition-all duration-150"
           )}
@@ -527,6 +523,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           onClick={(e) => {
             // Previne click-uri nedorite care pot cauza navigație
             e.stopPropagation();
+          }}
+          onWheel={(e) => {
+            // Capturează mouse wheel pentru scroll natural în tabel
+            e.stopPropagation();
+            // Permite scroll-ul natural al browser-ului în container
+          }}
+          tabIndex={0} // Face container-ul focusable pentru keyboard navigation
+          style={{
+            scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
           }}
         >
           {isLoading && (
