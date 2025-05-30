@@ -3,9 +3,13 @@ import { TransactionType, CategoryType } from "@shared-constants/enums";
 // Constante locale pentru formatare
 const LOCALE = "ro-RO";
 const TEXT_CLASSES = {
-  POSITIVE: "text-success-600 font-medium",
-  NEGATIVE: "text-error-600 font-medium",
-  NEUTRAL: "text-secondary-400",
+  POSITIVE: "text-success-600 font-medium", // Pentru sold pozitiv (intens)
+  NEGATIVE: "text-error-600 font-medium",   // Pentru sold negativ (intens)
+  NEUTRAL: "text-gray-400",                 // Pentru valori zero/goale
+  // Culori subtile cu border neutru pentru categorii
+  INCOME_LIGHT: "text-success-500 font-normal border border-gray-200 rounded-sm px-1",    // Verde light cu border neutral
+  EXPENSE_LIGHT: "text-error-400 font-normal border border-gray-200 rounded-sm px-1",     // Roșu mai light cu border neutral
+  SAVINGS_LIGHT: "text-blue-500 font-normal border border-gray-200 rounded-sm px-1",      // Albastru light pentru investiții/savings
 };
 
 // Nume lunilor în română pentru header-urile LunarGrid
@@ -165,7 +169,7 @@ export function isCurrentDay(day: number, month: number, year: number): boolean 
  */
 export function getDayHeaderStyle(day: number, month: number, year: number): string {
   if (isCurrentDay(day, month, year)) {
-    return "bg-blue-100 text-blue-800 font-semibold border-blue-300";
+    return "text-blue-700 font-semibold border-gray-300";
   }
   return ""; // Default styling din CVA
 }
@@ -186,16 +190,21 @@ export function getCategoryStyleClass(categoryName: string, value: number): stri
   // Pentru valori zero, returnează stil neutru indiferent de categorie
   if (value === 0) return TEXT_CLASSES.NEUTRAL;
   
-  // Pentru sold sau cazuri speciale, folosește logica bazată pe valoare
+  // Pentru sold sau cazuri speciale, folosește logica bazată pe valoare (culori intense)
   if (categoryName === "Sold" || categoryName === "SOLD" || categoryName.toLowerCase().includes("sold")) {
     return value > 0 ? TEXT_CLASSES.POSITIVE : TEXT_CLASSES.NEGATIVE;
   }
   
-  // Pentru categorii de venituri, folosește verde
+  // Pentru categorii de venituri, folosește verde light
   if (categoryName === "VENITURI" || categoryName.toLowerCase().includes("venit")) {
-    return TEXT_CLASSES.POSITIVE;
+    return TEXT_CLASSES.INCOME_LIGHT;
   }
   
-  // Pentru toate celelalte categorii (cheltuieli), folosește roșu
-  return TEXT_CLASSES.NEGATIVE;
+  // Pentru investiții/savings, folosește albastru light
+  if (categoryName === "INVESTITII" || categoryName.toLowerCase().includes("investit")) {
+    return TEXT_CLASSES.SAVINGS_LIGHT;
+  }
+  
+  // Pentru toate celelalte categorii (cheltuieli), folosește roșu light
+  return TEXT_CLASSES.EXPENSE_LIGHT;
 }

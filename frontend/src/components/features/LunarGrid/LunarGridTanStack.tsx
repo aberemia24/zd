@@ -537,8 +537,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       className={cn(
                         tableHeader(),
                         header.id === "category" 
-                          ? "sticky left-0 z-20 text-left" 
-                          : "text-right"
+                          ? "sticky left-0 z-20 text-center" 
+                          : "text-center"
                       )}
                       style={{ width: header.getSize() }}
                     >
@@ -557,7 +557,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 )} data-testid="sold-row">
                   <td className={cn(
                     tableCell({ variant: "default" }),
-                    "sticky left-0 bg-gray-100 z-10 font-bold"
+                    "sticky left-0 bg-gray-100 z-10 font-bold text-center"
                   )}>
                     {LUNAR_GRID.TOTAL_BALANCE}
                   </td>
@@ -567,9 +567,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       <td 
                         key={day} 
                         className={cn(
-                          tableCell({ variant: "numeric" }),
+                          tableCell({ variant: "default" }),
                           getBalanceStyleClass(balance),
-                          "transition-colors duration-150"
+                          "transition-colors duration-150 text-center"
                         )}
                       >
                         {balance !== 0 ? formatCurrency(balance) : "-"}
@@ -577,9 +577,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     );
                   })}
                   <td className={cn(
-                    tableCell({ variant: "numeric" }),
+                    tableCell({ variant: "default" }),
                     getBalanceStyleClass(monthTotal),
-                    "font-bold",
+                    "font-bold text-center",
                     "transition-colors duration-150"
                   )}>
                     {formatCurrency(monthTotal)}
