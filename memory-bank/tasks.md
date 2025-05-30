@@ -859,11 +859,17 @@ for (const [key, transactions] of transactionGroups) {
 - **Individual Expand/Collapse Clickable Area**: Întreaga celulă de categorie (nume + iconița ▶/▼) este acum clickable pentru expand/collapse
 - **Location**: Implementat în `LunarGridTanStack.tsx` cu funcționalitate completă pe prima celulă de categorie  
 - **UI Constants**: Adăugate constante în `shared-constants/ui.ts` pentru text consistent
+- **Code Cleanup**: ✅ **COMPLETED** - Eliminat componente duplicate și nefolosite
+  - Șters `MemoizedRow.tsx` (cauza iconițelor duplicate)
+  - Șters componente nefolosite: `CellRenderer.tsx`, `TableFooter.tsx`, `GridCell.tsx`, `HeaderCell.tsx`, `TanStackSubcategoryRows.tsx`
+  - Șters log files de debug
+  - Build verification: ✅ SUCCESS
 - **User Experience**: 
   - Click pe numele categoriei = expand/collapse
   - Click pe iconița ▶/▼ = expand/collapse
   - Hover effect pentru feedback vizual
   - Funcționează independent de butonul global expand/collapse
+  - **NU mai sunt iconițe duplicate** ✅
 - **Visual Feedback**: Hover highlighting și cursor pointer pe categorii
 
 #### **🎨 UI Implementation Details**
