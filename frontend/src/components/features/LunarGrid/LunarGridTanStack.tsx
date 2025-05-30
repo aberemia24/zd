@@ -23,9 +23,6 @@ import {
 // 🎯 PHASE 1: Import useMonthlyTransactions pentru a avea acces direct la validTransactions
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 
-// 🎯 PHASE 1: Import Financial Projections Hook pentru Daily Balance Engine
-import { useFinancialProjections } from '../../../services/hooks/useFinancialProjections';
-
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
 import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE } from "@shared-constants";
 import { LUNAR_GRID } from "@shared-constants";
@@ -240,41 +237,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
 
-    // 🎯 PHASE 1: Financial Projections Integration - Daily Balance Engine  
-    // FIXED: Acum folosim real transactions data în loc de date extrase greșit din table
-    const { 
-      monthlyProjection, 
-      isLoading: isLoadingProjections,
-      error: projectionsError,
-      invalidateCache: invalidateFinancialCache
-    } = useFinancialProjections(
-      year, 
-      month, 
-      validTransactions,
-      {
-        startingBalance: 1000, // TODO: Make configurable from user settings
-        staleTime: 30 * 1000,
-        gcTime: 5 * 60 * 1000
-      }
-    );
-
-    // 🎯 Enhanced Daily Balances cu Running Balance Calculation
-    const enhancedDailyBalances = useMemo(() => {
-      if (!monthlyProjection?.dailyBalances) {
-        // Fallback la existing calculation dacă projections nu sunt ready
-        return dailyBalances;
-      }
-
-      // Transform projection data la existing format pentru compatibilitate
-      const enhanced: Record<number, number> = {};
-      monthlyProjection.dailyBalances.forEach(dayProjection => {
-        const day = new Date(dayProjection.date).getDate();
-        enhanced[day] = dayProjection.balance;
-      });
-
-      return enhanced;
-    }, [monthlyProjection, dailyBalances]);
-
     // Render pentru celula editabilă folosind EditableCell component
     const renderEditableCell = useCallback(
       (
@@ -330,12 +292,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         );
       },
       [handleEditableCellSave, transactionMap],
-    );
-
-    // Funcție pentru calcularea sumei totale
-    const monthTotal = useMemo(
-      () => days.reduce((acc, day) => acc + (enhancedDailyBalances[day] || 0), 0),
-      [days, enhancedDailyBalances],
     );
 
     // Helper pentru stiluri de valori
@@ -410,7 +366,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         editability: cellEditability,
                       }),
                       isFirstCell && level > 0 ? "pl-8" : "",
-                      isFirstCell ? "sticky left-0 bg-inherit z-10" : "",
+                      isFirstCell ? "sticky left-0 bg-inherit z-5" : "",
                     )}
                     title={
                       isCategory && isDayCell
@@ -557,7 +513,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               className={cn(dataTable({ variant: "striped" }))}
               data-testid="lunar-grid-table"
             >
-              <thead className="bg-gray-50 sticky top-0 z-10">
+              <thead className="bg-gray-50 sticky top-0 z-20">
                 <tr>
                   {table.getFlatHeaders().map((header) => (
                     <th
@@ -566,7 +522,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       className={cn(
                         tableHeader(),
                         header.id === "category" 
-                          ? "sticky left-0 z-20 text-center" 
+                          ? "sticky left-0 z-30 text-center" 
                           : "text-center"
                       )}
                       style={{ width: header.getSize() }}
@@ -575,45 +531,67 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     </th>
                   ))}
                 </tr>
+                {/* Rând separat pentru balanțele zilnice */}
+                <tr className="bg-blue-50 border-b-2 border-blue-200">
+                  {table.getFlatHeaders().map((header) => {
+                    if (header.id === "category") {
+                      return (
+                        <th
+                          key={`balance-${header.id}`}
+                          className={cn(
+                            "sticky left-0 z-30 px-4 py-2 text-center font-medium text-gray-700 bg-blue-50"
+                          )}
+                        >
+                          Balanțe zilnice
+                        </th>
+                      );
+                    }
+                    
+                    if (header.id.startsWith("day-")) {
+                      const dayNumber = parseInt(header.id.split("-")[1], 10);
+                      const dailyBalance = dailyBalances[dayNumber] || 0;
+                      
+                      return (
+                        <th
+                          key={`balance-${header.id}`}
+                          className={cn(
+                            "px-2 py-2 text-center text-sm font-medium",
+                            getBalanceStyleClass(dailyBalance)
+                          )}
+                        >
+                          {dailyBalance !== 0 ? formatCurrency(dailyBalance) : "—"}
+                        </th>
+                      );
+                    }
+                    
+                    if (header.id === "total") {
+                      const monthTotal = Object.values(dailyBalances).reduce((sum, val) => sum + val, 0);
+                      return (
+                        <th
+                          key={`balance-${header.id}`}
+                          className={cn(
+                            "px-2 py-2 text-center text-sm font-bold",
+                            getBalanceStyleClass(monthTotal)
+                          )}
+                        >
+                          {monthTotal !== 0 ? formatCurrency(monthTotal) : "—"}
+                        </th>
+                      );
+                    }
+                    
+                    return (
+                      <th
+                        key={`balance-${header.id}`}
+                        className="px-2 py-2"
+                      >
+                        —
+                      </th>
+                    );
+                  })}
+                </tr>
               </thead>
               <tbody>
                 {table.getRowModel().rows.map((row) => renderRow(row))}
-                
-                {/* Rând de total */}
-                <tr className={cn(
-                  "bg-gray-100 font-bold border-t-2 border-gray-300",
-                  "hover:bg-gray-200 transition-colors duration-150"
-                )} data-testid="sold-row">
-                  <td className={cn(
-                    tableCell({ variant: "default" }),
-                    "sticky left-0 bg-gray-100 z-10 font-bold text-center"
-                  )}>
-                    {LUNAR_GRID.TOTAL_BALANCE}
-                  </td>
-                  {days.map((day) => {
-                    const balance = enhancedDailyBalances[day] || 0;
-                    return (
-                      <td 
-                        key={day} 
-                        className={cn(
-                          tableCell({ variant: "default" }),
-                          getBalanceStyleClass(balance),
-                          "transition-colors duration-150 text-center"
-                        )}
-                      >
-                        {balance !== 0 ? formatCurrency(balance) : "-"}
-                      </td>
-                    );
-                  })}
-                  <td className={cn(
-                    tableCell({ variant: "default" }),
-                    getBalanceStyleClass(monthTotal),
-                    "font-bold text-center",
-                    "transition-colors duration-150"
-                  )}>
-                    {formatCurrency(monthTotal)}
-                  </td>
-                </tr>
               </tbody>
             </table>
           )}

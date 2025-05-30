@@ -895,3 +895,92 @@ for (const [key, transactions] of transactionGroups) {
 **🎉 RESULT**: Phase 1 este 100% complet cu toate feature-urile implementate și funcționale.
 
 ---
+
+# LunarGrid Phase 1 Implementation - COMPLETED ✅
+
+## Quick Summary
+- **Status**: ✅ COMPLETED
+- **Date**: 30 Mai 2025
+- **Issues Resolved**: All major UX problems fixed
+- **Build Status**: ✅ Validated successfully
+
+## Major Accomplishments
+
+### ✅ 1. Individual Category Controls Fixed
+- **Problem**: Duplicate arrow icons, category controls not working
+- **Root Cause**: MemoizedRow.tsx contained duplicate implementation 
+- **Solution**: 
+  - Deleted unused components (MemoizedRow.tsx, CellRenderer.tsx, TableFooter.tsx, GridCell.tsx, HeaderCell.tsx, TanStackSubcategoryRows.tsx)
+  - Made entire category cell clickable for expand/collapse
+  - Fixed in LunarGridTanStack.tsx by removing duplicate icons
+
+### ✅ 2. Vertical Scrolling Enhanced  
+- **Problem**: No vertical scroll, mouse wheel scrolled page instead of table
+- **Solution**: 
+  - Added fixed height container (`max-h-[70vh] min-h-[400px]`) with `overflow-auto`
+  - Implemented mouse wheel event capture for natural table scrolling
+  - Made container focusable for keyboard navigation with smooth scrolling
+
+### ✅ 3. Z-index Hierarchy Fixed
+- **Problem**: Fixed category column overlapping header during scroll
+- **Solution**: Fixed z-index hierarchy - header uses z-20/z-30, category cells use z-5
+
+### ✅ 4. Balance Display Enhanced (Latest Update)
+- **Problem**: User feedback - header too thick, no balance visible, poor styling control
+- **Solution**: 
+  - Created separate row for daily balances below header
+  - Clean visual separation with blue background (`bg-blue-50 border-b-2 border-blue-200`)
+  - Proper color coding using `getBalanceStyleClass`
+  - Monthly total in total column
+  - Better styling control and maintainability
+
+### ✅ 🔥 CRITICAL FIX: Instant Balance Updates Restored
+- **Problem**: Balance updates delayed after financial projections integration
+- **Root Cause**: `enhancedDailyBalances` dependency on financial projections cache caused lag
+- **Solution**: 
+  - Reverted to simple `dailyBalances` calculation for instant updates
+  - Removed `useFinancialProjections` hook dependency
+  - Eliminated complex cache invalidation issues
+- **Result**: ✅ Balance updates now instant after transaction edits (no refresh needed)
+
+### ✅ 5. Technical Debt Cleanup
+- **Code Quality**: 
+  - Added LUNAR_GRID constants to shared-constants/ui.ts
+  - Fixed data-testid consistency (error-message → login-error)
+  - Enhanced scroll UX with smooth scrolling behavior
+  - Fixed variable initialization order (`dailyBalances` before `columns`)
+
+## Technical Implementation Details
+
+### Files Modified:
+- `frontend/tests/e2e/debug/test-primary-account.spec.ts`
+- `frontend/tests/e2e/suites/validation/transactions-page-elements.spec.ts`  
+- `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`
+- `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.tsx`
+- `shared-constants/ui.ts`
+
+### Files Cleaned Up:
+- `frontend/src/components/features/LunarGrid/MemoizedRow.tsx` (deleted)
+- `frontend/src/components/features/LunarGrid/CellRenderer.tsx` (deleted)
+- `frontend/src/components/features/LunarGrid/TableFooter.tsx` (deleted)
+- `frontend/src/components/features/LunarGrid/GridCell.tsx` (deleted)
+- `frontend/src/components/features/LunarGrid/HeaderCell.tsx` (deleted)
+- `frontend/src/components/features/LunarGrid/TanStackSubcategoryRows.tsx` (deleted)
+
+### Key Technical Improvements:
+1. **Daily Balance Row**: Separate themed row for daily balances with proper sticky positioning
+2. **Smooth Scrolling**: Enhanced UX with `scrollBehavior: 'smooth'` and proper event handling
+3. **Variable Order**: Fixed `dailyBalances` initialization before `columns` generation
+4. **Color Coding**: Consistent use of `getBalanceStyleClass` for visual feedback
+5. **Accessibility**: Container focusable with proper tabIndex and keyboard navigation
+
+## Validation Results
+- ✅ **Type Check**: Passed without errors
+- ✅ **User Feedback**: All reported issues resolved
+- ✅ **Manual Testing**: Scroll, expand/collapse, balance display all working correctly
+- ✅ **Code Quality**: Clean, maintainable solution with proper separation of concerns
+
+## Next Steps
+Phase 1 implementation is complete and ready for user acceptance. All major UX issues have been resolved with a clean, maintainable approach that provides good styling control for future enhancements.
+
+**RECOMMENDATION**: Proceed to user acceptance testing before moving to Phase 2.
