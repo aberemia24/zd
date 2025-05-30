@@ -8,6 +8,7 @@ import {
   getDaysInMonth,
   resetCalculationsCache,
 } from "./calculations";
+import { formatDayMonth, getDayHeaderStyle } from "./formatters";
 
 // Extrage doar câmpurile necesare din EXCEL_GRID
 const { HEADERS } = EXCEL_GRID;
@@ -153,11 +154,11 @@ export function transformTransactionsToRowData(
 export function generateTableColumns(
   year: number,
   month: number,
-): { accessorKey: string; header: string }[] {
+): Array<{ accessorKey: string; header: string; headerStyle?: string }> {
   const daysInMonth = getDaysInMonth(year, month);
 
   // Coloana pentru categorii
-  const columns = [
+  const columns: Array<{ accessorKey: string; header: string; headerStyle?: string }> = [
     {
       accessorKey: "category",
       header: HEADERS.CATEGORII,
@@ -168,7 +169,8 @@ export function generateTableColumns(
   daysInMonth.forEach((day: number) => {
     columns.push({
       accessorKey: `day-${day}`,
-      header: day.toString(),
+      header: formatDayMonth(day, month),
+      headerStyle: getDayHeaderStyle(day, month, year),
     });
   });
 

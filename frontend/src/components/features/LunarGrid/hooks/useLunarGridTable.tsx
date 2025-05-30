@@ -385,7 +385,11 @@ export function useLunarGridTable(
         const dayNumber = parseInt(colConfig.accessorKey.split("-")[1], 10);
         return {
           id: colConfig.accessorKey,
-          header: colConfig.header,
+          header: ({ column }) => (
+            <div className={colConfig.headerStyle || ""}>
+              {colConfig.header}
+            </div>
+          ),
           accessorKey: colConfig.accessorKey,
           cell: ({ getValue, row }) => {
             const value = getValue<number>();
