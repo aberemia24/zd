@@ -20,6 +20,12 @@ import {
   type UpdateTransactionHookPayload
 } from '../../../services/hooks/transactionMutations';
 
+// 🎯 PHASE 1: Import useMonthlyTransactions pentru a avea acces direct la validTransactions
+import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
+
+// 🎯 PHASE 1: Import Financial Projections Hook pentru Daily Balance Engine
+import { useFinancialProjections } from '../../../services/hooks/useFinancialProjections';
+
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
 import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE } from "@shared-constants";
 import { LUNAR_GRID } from "@shared-constants";
@@ -83,6 +89,19 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
+
+    // 🎯 PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
+    const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
+      includeAdjacentDays: true,
+    });
+
+    // 🐞 DEBUG: Verifică dacă tranzacțiile sunt transmise corect
+    console.log('🎯 [DEBUG] LunarGrid Financial Projections:', {
+      validTransactionsCount: validTransactions.length,
+      validTransactions: validTransactions.slice(0, 3), // Only first 3 for debugging
+      year,
+      month
+    });
 
     // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
     const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
@@ -265,6 +284,51 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
 
+    // 🎯 PHASE 1: Financial Projections Integration - Daily Balance Engine  
+    // FIXED: Acum folosim real transactions data în loc de date extrase greșit din table
+    const { 
+      monthlyProjection, 
+      isLoading: isLoadingProjections,
+      error: projectionsError,
+      invalidateCache: invalidateFinancialCache
+    } = useFinancialProjections(
+      year, 
+      month, 
+      validTransactions,
+      {
+        startingBalance: 1000, // TODO: Make configurable from user settings
+        staleTime: 30 * 1000,
+        gcTime: 5 * 60 * 1000
+      }
+    );
+
+    // 🎯 Enhanced Daily Balances cu Running Balance Calculation
+    const enhancedDailyBalances = useMemo(() => {
+      if (!monthlyProjection?.dailyBalances) {
+        // Fallback la existing calculation dacă projections nu sunt ready
+        return dailyBalances;
+      }
+
+      // 🐞 DEBUG: Verifică dacă projection returnează balanțe diferite  
+      console.log('🎯 [DEBUG] Monthly Projection Daily Balances:', {
+        dailyBalancesCount: monthlyProjection.dailyBalances.length,
+        first5Days: monthlyProjection.dailyBalances.slice(0, 5).map(d => ({
+          date: d.date,
+          balance: d.balance,
+          transactionsCount: d.dayTransactions.length
+        }))
+      });
+
+      // Transform projection data la existing format pentru compatibilitate
+      const enhanced: Record<number, number> = {};
+      monthlyProjection.dailyBalances.forEach(dayProjection => {
+        const day = new Date(dayProjection.date).getDate();
+        enhanced[day] = dayProjection.balance;
+      });
+
+      return enhanced;
+    }, [monthlyProjection, dailyBalances]);
+
     // Render pentru celula editabilă folosind EditableCell component
     const renderEditableCell = useCallback(
       (
@@ -317,8 +381,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Funcție pentru calcularea sumei totale
     const monthTotal = useMemo(
-      () => days.reduce((acc, day) => acc + (dailyBalances[day] || 0), 0),
-      [days, dailyBalances],
+      () => days.reduce((acc, day) => acc + (enhancedDailyBalances[day] || 0), 0),
+      [days, enhancedDailyBalances],
     );
 
     // Helper pentru stiluri de valori
@@ -545,7 +609,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     {LUNAR_GRID.TOTAL_BALANCE}
                   </td>
                   {days.map((day) => {
-                    const balance = dailyBalances[day] || 0;
+                    const balance = enhancedDailyBalances[day] || 0;
                     return (
                       <td 
                         key={day} 
