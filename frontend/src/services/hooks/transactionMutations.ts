@@ -11,6 +11,7 @@ import {
 } from "@shared-constants/transaction.schema";
 import { TransactionStatus } from "@shared-constants";
 import { MESAJE } from "@shared-constants/messages";
+import { syncGlobalTransactionCache } from './cacheSync';
 
 export type CreateTransactionHookPayload = CreateTransaction;
 export type UpdateTransactionHookPayload = Partial<CreateTransaction>;
@@ -334,6 +335,21 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
       }
       
+      // 🔄 NEW: Sync cu global cache pentru consistență între module
+      if (userId) {
+        try {
+          syncGlobalTransactionCache({
+            queryClient,
+            userId,
+            operation: 'create',
+            transaction: savedTransaction
+          });
+        } catch (error) {
+          console.warn('[MONTHLY-CREATE] Global cache sync failed, transaction still saved:', error);
+          // Nu oprește procesul, monthly cache-ul este deja actualizat
+        }
+      }
+      
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, newTransaction, context) => {
@@ -389,6 +405,21 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
       }
       
+      // 🔄 NEW: Sync cu global cache pentru consistență între module
+      if (userId) {
+        try {
+          syncGlobalTransactionCache({
+            queryClient,
+            userId,
+            operation: 'update',
+            transaction: updatedTransaction
+          });
+        } catch (error) {
+          console.warn('[MONTHLY-UPDATE] Global cache sync failed, transaction still updated:', error);
+          // Nu oprește procesul, monthly cache-ul este deja actualizat
+        }
+      }
+      
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, variables, context) => {
@@ -427,8 +458,25 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
 
       return { previousData };
     },
-    onSuccess: () => {
+    onSuccess: (deletedId) => {
       // Cache-ul a fost deja actualizat în onMutate
+      
+      // 🔄 NEW: Sync cu global cache pentru consistență între module  
+      if (userId) {
+        try {
+          syncGlobalTransactionCache({
+            queryClient,
+            userId,
+            operation: 'delete',
+            transaction: {} as TransactionValidated, // Nu e necesar pentru delete
+            deletedId
+          });
+        } catch (error) {
+          console.warn('[MONTHLY-DELETE] Global cache sync failed, transaction still deleted:', error);
+          // Nu oprește procesul, monthly cache-ul este deja actualizat
+        }
+      }
+      
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, deletedId, context) => {
