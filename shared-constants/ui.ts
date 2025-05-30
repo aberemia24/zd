@@ -264,7 +264,10 @@ export const LUNAR_GRID = {
   EXPAND_CATEGORY: 'Extinde',
   COLLAPSE_CATEGORY: 'Restrânge',
   EXPAND_CATEGORY_TITLE: 'Extinde categoria',
-  COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria'
+  COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria',
+  // Constante pentru scroll UX
+  SCROLL_HINT: 'Scroll pentru a vedea mai multe date',
+  STICKY_HEADER_ACTIVE: 'Header fix activ'
 };
 
 // Constante pentru teste - eliminate strings hardcodate
