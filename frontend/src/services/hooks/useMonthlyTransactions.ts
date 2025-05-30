@@ -31,6 +31,10 @@ export interface UseMonthlyTransactionsOptions {
   includeAdjacentDays?: boolean;
   staleTime?: number;
   gcTime?: number;
+  // Opțiuni React Query pentru control refresh behavior
+  refetchOnWindowFocus?: boolean;
+  refetchOnMount?: boolean;
+  refetchOnReconnect?: boolean;
 }
 
 export interface UseMonthlyTransactionsResult {
@@ -65,6 +69,9 @@ export function useMonthlyTransactions(
     includeAdjacentDays = false,
     staleTime = 30 * 1000, // 30 secunde default cache (staleTime)
     gcTime = 5 * 60 * 1000, // 5 minute default pentru garbage collection
+    refetchOnWindowFocus = true, // Default React Query behavior
+    refetchOnMount = true, // Default React Query behavior  
+    refetchOnReconnect = true, // Default React Query behavior
   } = options;
 
   // Utilizăm queryKeys pentru a genera o cheie standardizată
@@ -124,6 +131,10 @@ export function useMonthlyTransactions(
         },
         staleTime,
         gcTime,
+        // Opțiuni pentru control refresh behavior
+        refetchOnWindowFocus,
+        refetchOnMount,
+        refetchOnReconnect,
         // Activăm query-ul doar dacă avem un userId efectiv disponibil și nu este explcit dezactivat
         enabled: true,
       },
