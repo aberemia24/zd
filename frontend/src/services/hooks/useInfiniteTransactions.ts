@@ -4,7 +4,6 @@ import type { TransactionPage, Pagination } from "../supabaseService";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { TransactionType } from "@shared-constants/enums";
 import { useAuthStore } from "../../stores/authStore";
-import type { Transaction } from "../../types/Transaction";
 import { useMemo } from "react";
 
 // Interfață pentru tranzacții raw cu proprietăți opționale pentru transformare
@@ -57,6 +56,10 @@ export function useInfiniteTransactions(
   const { user } = useAuthStore();
   const userId = user?.id;
 
+  console.log('[DEBUG-INFINITE-QUERY] Hook called with:');
+  console.log('[DEBUG-INFINITE-QUERY] userId:', userId);
+  console.log('[DEBUG-INFINITE-QUERY] queryParams:', queryParams);
+
   // Definim dimensiunea paginii pentru încărcarea pagină cu pagină
   const PAGE_SIZE = queryParams.limit || 10;
 
@@ -66,6 +69,9 @@ export function useInfiniteTransactions(
 
   // Construim cheia de query extinsă pentru acest hook specific
   const queryKey = [...TRANSACTIONS_BASE_KEY, "infinite", userId, queryParams];
+
+  console.log('[DEBUG-INFINITE-QUERY] Generated queryKey:', queryKey);
+  console.log('[DEBUG-INFINITE-QUERY] Query enabled:', !!userId);
 
   // Folosim useInfiniteQuery pentru paginare infinită
   const infiniteQuery = useInfiniteQuery<TransactionPage, Error>({
@@ -137,8 +143,11 @@ export function useInfiniteTransactions(
     const allTransactions =
       infiniteQuery.data?.pages.flatMap((page) => page.data) || [];
 
+    console.log('[DEBUG-INFINITE-QUERY] Data changed, processing transactions:', allTransactions.length);
+    console.log('[DEBUG-INFINITE-QUERY] infiniteQuery.data:', infiniteQuery.data);
+
     // Adăugăm userId și id (dacă este necesar) la fiecare tranzacție
-    return allTransactions.map((transaction) => {
+    const processed = allTransactions.map((transaction) => {
       // Folosim tipul specific pentru a evita any
       const rawTransaction = transaction as RawTransactionWithOptionalId;
 
@@ -161,6 +170,9 @@ export function useInfiniteTransactions(
 
       return finalTransaction;
     });
+
+    console.log('[DEBUG-INFINITE-QUERY] Processed transactions:', processed.length);
+    return processed;
   }, [infiniteQuery.data, userId]);
 
   // Calculăm numărul total de tranzacții din rezultatele paginii

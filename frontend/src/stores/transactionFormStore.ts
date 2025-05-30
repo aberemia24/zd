@@ -136,12 +136,18 @@ export const useTransactionFormStore = create<TransactionFormStoreState>()(
 
         // Validare sumă cu mesaj specific
         const amount = parseFloat(form.amount);
+        console.log(`[DEBUG VALIDATION] Suma introdusă: "${form.amount}" → parsed: ${amount}`);
+        console.log(`[DEBUG VALIDATION] Limite: MIN=${VALIDATION.AMOUNT_MIN}, MAX=${VALIDATION.AMOUNT_MAX}`);
+        console.log(`[DEBUG VALIDATION] IsNaN: ${isNaN(amount)}, < MIN: ${amount < VALIDATION.AMOUNT_MIN}, > MAX: ${amount > VALIDATION.AMOUNT_MAX}`);
+        
         if (
           isNaN(amount) ||
           amount < VALIDATION.AMOUNT_MIN ||
           amount > VALIDATION.AMOUNT_MAX
         ) {
-          setError(`Suma trebuie să fie între ${VALIDATION.AMOUNT_MIN} și ${VALIDATION.AMOUNT_MAX}`);
+          const errorMsg = `Suma trebuie să fie între ${VALIDATION.AMOUNT_MIN} și ${VALIDATION.AMOUNT_MAX}`;
+          console.warn(`[DEBUG VALIDATION] Validare sumă eșuată: ${errorMsg}`);
+          setError(errorMsg);
           return false;
         }
 

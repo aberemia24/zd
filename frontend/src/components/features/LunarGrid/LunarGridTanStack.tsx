@@ -93,7 +93,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       (category: string): TransactionType => {
         const categories = useCategoryStore.getState().categories as CategoryStoreItem[];
         const foundCategory = categories.find((c) => c.name === category);
-        return (foundCategory?.type || "expense") as TransactionType;
+        return (foundCategory?.type || TransactionType.EXPENSE) as TransactionType;
       },
       [],
     );

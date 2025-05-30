@@ -1,72 +1,184 @@
 # Scripts Documentation
 
-Acest director conține script-uri utilitare pentru proiectul Budget App.
+Această documentație descrie script-urile utilitare disponibile în proiectul Budget App.
 
-## 📝 Scripts Disponibile
+## 🔍 Verificări și Validări
 
-### 1. `validate-constants.js`
-**Scop**: Validează sincronizarea constants între shared-constants și frontend
-
-**Comanda**: `npm run validate:constants` (din frontend/)
-
-**Funcții**:
-- Verifică existența directorului shared-constants
-- Scanează fișierele test pentru string-uri hardcodate
-- Detectează pattern-uri specifice care trebuie înlocuite cu constante
-
-**Rezultat**: 
-- ✅ PASSED dacă nu sunt găsite string-uri hardcodate
-- ❌ FAILED cu detalii despre string-urile găsite
-
-### 2. `fix-hardcoded-strings.js`
-**Scop**: Automatizează fix-urile pentru string-uri hardcodate în fișierele test
-
-**Comanda**: `npm run fix:hardcoded-strings` (din frontend/)
-
-**Funcții**:
-- Scanează recursiv toate fișierele `*.test.tsx` și `*.test.ts`
-- Detectează 31 pattern-uri comune de string-uri hardcodate
-- Înlocuiește automat cu constante din `TEST_CONSTANTS`
-- Asigură importurile corecte `@shared-constants`
-
-**Pattern-uri detectate**:
-- Mesaje alerte: `"Acesta este un mesaj de alertă"` → `TEST_CONSTANTS.ALERTS.TEST_MESSAGE`
-- Opțiuni select: `"Alege o opțiune"` → `TEST_CONSTANTS.SELECT.PLACEHOLDER`
-- Mesaje eroare: `"Acest câmp este obligatoriu"` → `TEST_CONSTANTS.SELECT.REQUIRED_ERROR`
-- Labels checkbox: `"Acceptă termenii"` → `TEST_CONSTANTS.CHECKBOX.LABEL`
-- Și multe altele...
-
-**Rezultat**: 
-- Raport detaliat cu fișierele modificate
-- Numărul de pattern-uri înlocuite
-- Pași următori pentru validare
-
-## 🚀 Flux de Lucru Recomandat
+### `validate-transaction-types.js`
+**Actualizat** - Verifică că nu se folosesc transaction types hardcodate prin cod.
 
 ```bash
-# 1. Rulează fix-urile automate
-cd frontend && npm run fix:hardcoded-strings
+# Rulare directă
+node scripts/validate-transaction-types.js
 
-# 2. Validează rezultatul
-npm run validate:constants
-
-# 3. Testează că totul funcționează
-npm test
-
-# 4. Commit changes
-git add . && git commit -m "fix: eliminate hardcoded strings din tests"
+# Prin npm script
+npm run check:transaction-types
 ```
 
-## 🔧 Extinderea Script-urilor
+**Ce verifică:**
+- ✅ Detectează string-uri hardcodate: `'expense'`, `'income'`, `'saving'`
+- ✅ Verifică fallback-uri problematice în funcții
+- ✅ Scanează 183+ fișiere și 29k+ linii de cod
+- ✅ Ignoră cazuri legitime (comentarii, CSS class states, teste)
 
-Pentru a adăuga noi pattern-uri în `fix-hardcoded-strings.js`:
+**Exemplu problematic detectat:**
+```typescript
+// ❌ GREȘIT - va fi detectat
+return (foundCategory?.type || "expense") as TransactionType;
 
-1. Adaugă constanta în `shared-constants/ui.ts` în secțiunea `TEST_CONSTANTS`
-2. Actualizează `REPLACEMENTS` object cu noul pattern
-3. Testează script-ul pe un fișier cu string-ul hardcodat
+// ✅ CORECT - nu va fi detectat
+return (foundCategory?.type || TransactionType.EXPENSE) as TransactionType;
+```
 
-Exemplu:
+### `validate-constants.js`
+Verifică consistența constantelor din shared-constants.
+
+```bash
+npm run validate:constants
+```
+
+### `validate-shared-constants-usage.js`
+Verifică utilizarea corectă a constantelor shared între frontend și backend.
+
+```bash
+npm run validate:shared-constants
+```
+
+### `validate-data-testid-consistency.js`
+Verifică consistența data-testid-urilor în componente și teste.
+
+```bash
+npm run validate:data-testid
+```
+
+### `validate-barrel-imports.js`
+Verifică importurile barrel și structura modulelor.
+
+```bash
+npm run validate:barrel-imports
+```
+
+### `validate-console-cleanup.js`
+Verifică că nu rămân console.log-uri în cod pentru production.
+
+```bash
+npm run validate:console-cleanup
+```
+
+### `validate-jsx-extensions.js`
+Verifică că fișierele cu JSX folosesc extensia .tsx corectă.
+
+```bash
+npm run validate:jsx-extensions
+```
+
+### `validate-typescript-quality.js`
+Verifică calitatea codului TypeScript.
+
+```bash
+npm run validate:typescript-quality
+```
+
+### `validate-all-automation.js`
+Rulează toate validările automat.
+
+```bash
+npm run validate:all
+```
+
+## 🔄 Sincronizare
+
+### `sync-shared-constants.js`
+Sincronizează constantele din `shared-constants/` în `frontend/src/shared-constants/`.
+
+```bash
+# Rulare automată la dev/build
+npm run sync-shared-constants
+```
+
+## 🎯 Script-uri Combinate
+
+### `check:all`
+Rulează toate verificările de calitate:
+
+```bash
+npm run check:all
+# Echivalent cu:
+# npm run check:transaction-types && npm run lint
+```
+
+### `validate:all`
+Rulează toate validările automat:
+
+```bash
+npm run validate:all
+# Rulează toate script-urile validate-*
+```
+
+### `validate:quick`
+Rulează validările esențiale rapid:
+
+```bash
+npm run validate:quick
+# Echivalent cu:
+# npm run validate:constants && npm run validate:shared-constants && npm run validate:console-cleanup
+```
+
+## 📋 Rezultate
+
+### ✅ Succes (Exit Code 0)
+Script-ul se termină cu succes, nu au fost găsite probleme.
+
+### ❌ Probleme (Exit Code 1)
+Script-ul raportează probleme și se termină cu exit code 1 pentru CI/CD.
+
+**Exemplu de output cu probleme:**
+```
+❌ PROBLEME GĂSITE:
+
+📄 frontend/src/example.tsx:
+   📍 Linia 95: 'expense' hardcodat
+      🔧 Folosește TransactionType.EXPENSE în loc de 'expense'
+      📖 Cod: return (foundCategory?.type || "expense")
+
+💡 RECOMANDĂRI:
+   1. Înlocuiește string-urile hardcodate cu TransactionType enum
+   2. Importă TransactionType din @shared-constants
+   3. Folosește TransactionType.EXPENSE în loc de "expense"
+   4. Verifică fallback-urile și valorile default
+```
+
+## 🚀 Integrare CI/CD
+
+Script-urile pot fi integrate în pipeline-uri CI/CD:
+
+```yaml
+# Example GitHub Actions
+- name: Validate transaction types
+  run: npm run check:transaction-types
+
+- name: Run all validations
+  run: npm run validate:all
+
+- name: Run quick checks
+  run: npm run validate:quick
+```
+
+## 🔧 Configurare Avansată
+
+Pentru modificarea comportamentului script-urilor, editați configurația din fiecare script:
+
 ```javascript
-// În REPLACEMENTS object
-"'Noul string hardcodat'": 'TEST_CONSTANTS.CATEGORIA.NOUA_CONSTANTA',
-``` 
+// În validate-transaction-types.js
+const CONFIG = {
+  searchDirs: [...],           // Directoare de scanat
+  extensions: [...],           // Extensii de fișiere
+  problematicPatterns: [...],  // Pattern-uri problematice
+  allowedPatterns: [...],      // Pattern-uri permise
+  excludeFiles: [...]          // Fișiere de ignorat
+};
+```
+
+---
+
+💡 **Tip:** Adăugați `npm run validate:all` în pre-commit hooks pentru a preveni automat problemele! 
