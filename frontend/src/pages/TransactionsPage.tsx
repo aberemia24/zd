@@ -107,6 +107,8 @@ const TransactionsPage: React.FC = () => {
   const transactions = useMemo(() => {
     if (!rawTransactions) return [];
 
+    console.log('[DEBUG-TRANSACTIONS-PAGE] rawTransactions changed:', rawTransactions.length);
+
     return rawTransactions.map((transaction) => {
       const processedTransaction = { ...transaction };
 

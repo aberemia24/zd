@@ -56,10 +56,15 @@ export const supabaseService = {
       query = query.eq("user_id", userId);
     }
 
-    if (filters.type) query = query.eq("type", filters.type);
-    if (filters.category) query = query.eq("category", filters.category);
-    if (filters.subcategory)
+    if (filters.type) {
+      query = query.eq("type", filters.type);
+    }
+    if (filters.category) {
+      query = query.eq("category", filters.category);
+    }
+    if (filters.subcategory) {
       query = query.eq("subcategory", filters.subcategory);
+    }
     if (filters.recurring !== undefined)
       query = query.eq("recurring", filters.recurring);
 
@@ -95,7 +100,10 @@ export const supabaseService = {
     }
 
     const { data, count, error } = await query;
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
+    
     return { data: data as TransactionValidated[], count: count || 0 };
   },
 
@@ -107,11 +115,6 @@ export const supabaseService = {
     type?: string,
   ): Promise<ActiveSubcategory[]> {
     try {
-      // Folosim un logging pentru debugging
-      console.log(
-        `[fetchActiveSubcategories] Încep căutarea subcategoriilor active cu: userId=${userId}, category=${category}, type=${type}`,
-      );
-
       // Selectăm toate tranzacțiile pentru a le grupa local
       let query = supabase
         .from(TABLE)
@@ -144,10 +147,6 @@ export const supabaseService = {
         return [];
       }
 
-      console.log(
-        `[fetchActiveSubcategories] Am găsit ${data.length} tranzacții cu subcategorii`,
-      );
-
       // Grupăm rezultatele local pentru a obține contoare
       const groupedData: Record<string, ActiveSubcategory> = {};
 
@@ -168,11 +167,6 @@ export const supabaseService = {
           groupedData[key].count++;
         }
       });
-
-      // Logăm datele pentru debugging
-      console.log(
-        `[fetchActiveSubcategories] Am grupat în ${Object.keys(groupedData).length} subcategorii active`,
-      );
 
       // Transformăm obiectul în array
       const result = Object.values(groupedData);
@@ -245,6 +239,7 @@ export const supabaseService = {
     );
 
     const payloadWithUser = { ...payload, user_id: user.id };
+    
     const { data, error } = await supabase
       .from(TABLE)
       .insert([payloadWithUser])
@@ -355,9 +350,8 @@ export const supabaseService = {
         throw error;
       }
 
-      // Combinăm categoriile predefinite cu cele personalizate
-      // Structura poate varia în funcție de implementarea specifică
-      const mergedCategories = { ...CATEGORIES };
+      // Combinăm categoriile predefinite cu cele personalizate - eliminăm variabila nefolosită
+      // const mergedCategories = { ...CATEGORIES };
 
       // Aici putem adăuga logica de combinare a categoriilor personalizate
       // În funcție de implementarea specifică

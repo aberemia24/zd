@@ -1,11 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import {
   useInfiniteTransactions,
   type TransactionQueryParams,
 } from "./useInfiniteTransactions";
 import { useMemo, useRef } from "react";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
-import type { Transaction } from "../../types/Transaction";
 
 /**
  * Tipul de returnare pentru hook-ul useFilteredTransactions
@@ -64,6 +62,11 @@ export function useFilteredTransactions(
     (isLoading || isFetching) && (!transactions || transactions.length === 0)
       ? previousData.current
       : transactions;
+
+  console.log('[DEBUG-FILTERED-QUERY] useFilteredTransactions data update:');
+  console.log('[DEBUG-FILTERED-QUERY] transactions from infinite:', transactions?.length || 0);
+  console.log('[DEBUG-FILTERED-QUERY] dataToShow:', dataToShow?.length || 0);
+  console.log('[DEBUG-FILTERED-QUERY] isLoading:', isLoading, 'isFetching:', isFetching);
 
   // Verifică dacă filtrele sunt active
   const isFiltered = useMemo(() => {
