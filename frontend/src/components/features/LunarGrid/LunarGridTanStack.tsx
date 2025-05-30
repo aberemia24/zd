@@ -35,7 +35,7 @@ import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
 
 // Import pentru Plus icon pentru butonul de adăugare subcategorie
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
 import { formatCurrency, getBalanceStyleClass } from "../../../utils/lunarGrid";
@@ -129,6 +129,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // State pentru input temporar la adăugarea subcategoriei
     const [addingSubcategory, setAddingSubcategory] = useState<string | null>(null);
     const [newSubcategoryName, setNewSubcategoryName] = useState<string>("");
+
+    // 🎯 LGI-TASK-02: State pentru inline edit/delete subcategory actions
+    const [subcategoryAction, setSubcategoryAction] = useState<{
+      type: 'edit' | 'delete';
+      category: string;
+      subcategory: string;
+    } | null>(null);
+    const [editingSubcategoryName, setEditingSubcategoryName] = useState<string>("");
 
     // 🎯 PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
     // 🚀 FIX: Dezactivez refetchOnWindowFocus pentru a evita refresh automat la focus
@@ -385,6 +393,125 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       setNewSubcategoryName("");
     }, []);
 
+    // 🎯 LGI-TASK-02: Handler pentru rename subcategorie custom
+    const handleRenameSubcategory = useCallback(
+      async (categoryName: string, oldSubcategoryName: string, newSubcategoryName: string) => {
+        if (!user?.id || !newSubcategoryName.trim()) {
+          return;
+        }
+
+        try {
+          // Găsește categoria în store
+          const category = categories.find(cat => cat.name === categoryName);
+          if (!category) {
+            toast.error("Categoria nu a fost găsită");
+            return;
+          }
+
+          // Verifică dacă noul nume deja există
+          if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim() && sub.name !== oldSubcategoryName)) {
+            toast.error("Subcategoria cu acest nume deja există");
+            return;
+          }
+
+          // Creează categoria actualizată cu subcategoria redenumită
+          const updatedCategories = categories.map(cat => {
+            if (cat.name === categoryName) {
+              return {
+                ...cat,
+                subcategories: cat.subcategories.map(sub => 
+                  sub.name === oldSubcategoryName 
+                    ? { ...sub, name: newSubcategoryName.trim() }
+                    : sub
+                )
+              };
+            }
+            return cat;
+          });
+
+          // Salvează în CategoryStore
+          await saveCategories(user.id, updatedCategories);
+          
+          // Reset state
+          setSubcategoryAction(null);
+          setEditingSubcategoryName("");
+          
+          toast.success("Subcategoria a fost redenumită cu succes");
+        } catch (error) {
+          console.error("Eroare la redenumirea subcategoriei:", error);
+          toast.error("Eroare la redenumirea subcategoriei");
+        }
+      },
+      [user?.id, categories, saveCategories],
+    );
+
+    // 🎯 LGI-TASK-02: Handler pentru delete subcategorie custom
+    const handleDeleteSubcategory = useCallback(
+      async (categoryName: string, subcategoryName: string) => {
+        if (!user?.id) {
+          return;
+        }
+
+        try {
+          // Găsește categoria în store
+          const category = categories.find(cat => cat.name === categoryName);
+          if (!category) {
+            toast.error("Categoria nu a fost găsită");
+            return;
+          }
+
+          // Verifică dacă subcategoria este custom
+          const subcategory = category.subcategories.find(sub => sub.name === subcategoryName);
+          if (!subcategory?.isCustom) {
+            toast.error("Doar subcategoriile custom pot fi șterse");
+            return;
+          }
+
+          // Găsește toate tranzacțiile asociate cu această subcategorie
+          const associatedTransactions = validTransactions.filter(t => 
+            t.category === categoryName && t.subcategory === subcategoryName
+          );
+
+          // 🗑️ HARD DELETE: Șterge toate tranzacțiile asociate din baza de date
+          if (associatedTransactions.length > 0) {
+            console.log(`🗑️ Ștergând ${associatedTransactions.length} tranzacții asociate cu subcategoria "${subcategoryName}"`);
+            
+            for (const transaction of associatedTransactions) {
+              await deleteTransactionMutation.mutateAsync(transaction.id);
+              console.log(`✅ Șters: ${transaction.id} (${transaction.amount} RON)`);
+            }
+          }
+
+          // Creează categoria actualizată fără subcategoria ștearsă
+          const updatedCategories = categories.map(cat => {
+            if (cat.name === categoryName) {
+              return {
+                ...cat,
+                subcategories: cat.subcategories.filter(sub => sub.name !== subcategoryName)
+              };
+            }
+            return cat;
+          });
+
+          // Salvează în CategoryStore
+          await saveCategories(user.id, updatedCategories);
+          
+          // Reset state
+          setSubcategoryAction(null);
+          
+          if (associatedTransactions.length > 0) {
+            toast.success(`Subcategoria și ${associatedTransactions.length} tranzacții asociate au fost șterse definitiv`);
+          } else {
+            toast.success("Subcategoria a fost ștearsă cu succes");
+          }
+        } catch (error) {
+          console.error("Eroare la ștergerea subcategoriei:", error);
+          toast.error("Eroare la ștergerea subcategoriei");
+        }
+      },
+      [user?.id, categories, saveCategories, validTransactions, deleteTransactionMutation],
+    );
+
     // Interogare tabel optimizată (fără handleri de click/double-click)
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
@@ -569,20 +696,113 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
                       </div>
                     ) : isFirstCell && isSubcategory ? (
-                      // Celula pentru subcategorie cu badge custom dacă este cazul
-                      <div className="flex items-center gap-2">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
-                        {(() => {
+                      // Celula pentru subcategorie cu badge și hover actions
+                      <div className="flex items-center justify-between gap-2 group">
+                        <div className="flex items-center gap-2">
+                          {/* Verifică dacă e în modul de editare */}
+                          {subcategoryAction?.type === 'edit' && 
+                           subcategoryAction.category === original.category && 
+                           subcategoryAction.subcategory === original.subcategory ? (
+                            // Modul editare - input inline
+                            <div className="flex items-center gap-2 flex-1">
+                              <input
+                                type="text"
+                                value={editingSubcategoryName}
+                                onChange={(e) => setEditingSubcategoryName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" && editingSubcategoryName.trim()) {
+                                    handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName);
+                                  } else if (e.key === "Escape") {
+                                    setSubcategoryAction(null);
+                                    setEditingSubcategoryName("");
+                                  }
+                                }}
+                                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                autoFocus
+                                data-testid={`edit-subcategory-input-${original.subcategory}`}
+                              />
+                              <Button
+                                size="xs"
+                                variant="primary"
+                                onClick={() => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
+                                disabled={!editingSubcategoryName.trim()}
+                                data-testid={`save-edit-subcategory-${original.subcategory}`}
+                              >
+                                ✓
+                              </Button>
+                              <Button
+                                size="xs"
+                                variant="secondary"
+                                onClick={() => {
+                                  setSubcategoryAction(null);
+                                  setEditingSubcategoryName("");
+                                }}
+                                data-testid={`cancel-edit-subcategory-${original.subcategory}`}
+                              >
+                                ✕
+                              </Button>
+                            </div>
+                          ) : (
+                            // Modul normal - text cu badge
+                            <>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                              {(() => {
+                                const categoryData = categories.find(cat => cat.name === original.category);
+                                const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
+                                return subcategoryData?.isCustom ? (
+                                  <Badge
+                                    variant="success"
+                                    size="xs"
+                                    dataTestId={`custom-flag-${original.subcategory}`}
+                                  >
+                                    {FLAGS.CUSTOM}
+                                  </Badge>
+                                ) : null;
+                              })()}
+                            </>
+                          )}
+                        </div>
+                        
+                        {/* Butoane hover pentru subcategorii custom - doar dacă nu e în modul editare */}
+                        {subcategoryAction?.type !== 'edit' && (() => {
                           const categoryData = categories.find(cat => cat.name === original.category);
                           const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
                           return subcategoryData?.isCustom ? (
-                            <Badge
-                              variant="success"
-                              size="xs"
-                              dataTestId={`custom-flag-${original.subcategory}`}
-                            >
-                              {FLAGS.CUSTOM}
-                            </Badge>
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center gap-1">
+                              <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSubcategoryAction({
+                                    type: 'edit',
+                                    category: original.category,
+                                    subcategory: original.subcategory!
+                                  });
+                                  setEditingSubcategoryName(original.subcategory!);
+                                }}
+                                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                                data-testid={`edit-subcategory-btn-${original.subcategory}`}
+                                title="Redenumește subcategoria"
+                              >
+                                <Edit size={12} />
+                              </Button>
+                              <Button
+                                size="xs"
+                                variant="ghost"
+                                onClick={() => {
+                                  setSubcategoryAction({
+                                    type: 'delete',
+                                    category: original.category,
+                                    subcategory: original.subcategory!
+                                  });
+                                }}
+                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                                data-testid={`delete-subcategory-btn-${original.subcategory}`}
+                                title="Șterge subcategoria custom"
+                              >
+                                <Trash2 size={12} />
+                              </Button>
+                            </div>
                           ) : null;
                         })()}
                       </div>
@@ -681,7 +901,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           </React.Fragment>
         );
       },
-      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, handleCancelAddSubcategory, table],
+      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, handleCancelAddSubcategory, table, subcategoryAction, editingSubcategoryName, handleRenameSubcategory],
     );
 
     // Handler pentru ștergerea tranzacțiilor fără subcategorie (DEBUGGING ONLY)
@@ -721,6 +941,54 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         toast.error("Eroare la ștergerea tranzacțiilor orfane");
       }
     }, [validTransactions, user?.id, deleteTransactionMutation]);
+
+    // 🎯 LGI-TASK-02: Confirmation dialog pentru delete subcategory
+    const DeleteSubcategoryConfirmation = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
+      if (!subcategoryAction || subcategoryAction.type !== 'delete') return null;
+
+      // Calculează numărul de tranzacții asociate cu această subcategorie
+      const transactionsCount = validTransactions.filter(t => 
+        t.category === subcategoryAction.category && 
+        t.subcategory === subcategoryAction.subcategory
+      ).length;
+
+      const transactionText = transactionsCount === 0 
+        ? "fără tranzacții"
+        : transactionsCount === 1 
+          ? "1 tranzacție"
+          : `${transactionsCount} tranzacții`;
+
+      const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
+
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="delete-subcategory-confirmation">
+          <div className="bg-white rounded-lg shadow-xl max-w-md mx-4 p-6">
+            <h3 className="text-lg font-semibold text-yellow-800 mb-2">
+              Confirmare ștergere subcategorie
+            </h3>
+            <p className="text-sm text-gray-700 mb-4">{message}</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onCancel}
+                dataTestId="cancel-delete-subcategory"
+              >
+                Anulează
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={onConfirm}
+                dataTestId="confirm-delete-subcategory"
+              >
+                Șterge
+              </Button>
+            </div>
+          </div>
+        </div>
+      );
+    };
 
     // Renderizare (layout principal)
     return (
@@ -935,6 +1203,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             />
           </div>
         )}
+
+        {/* 🎯 LGI-TASK-02: Confirmation dialog pentru delete subcategory */}
+        <DeleteSubcategoryConfirmation
+          onConfirm={() => {
+            if (subcategoryAction?.type === 'delete') {
+              handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
+            }
+          }}
+          onCancel={() => setSubcategoryAction(null)}
+        />
       </>
     );
   },
