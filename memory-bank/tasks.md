@@ -859,6 +859,12 @@ for (const [key, transactions] of transactionGroups) {
 - **Individual Expand/Collapse Clickable Area**: Întreaga celulă de categorie (nume + iconița ▶/▼) este acum clickable pentru expand/collapse
 - **Location**: Implementat în `LunarGridTanStack.tsx` cu funcționalitate completă pe prima celulă de categorie  
 - **UI Constants**: Adăugate constante în `shared-constants/ui.ts` pentru text consistent
+- **Natural Vertical Scrolling**: ✅ **IMPLEMENTED** - Scroll vertical natural pentru tabel
+  - **Height**: Container cu înălțime fixă (`max-h-[70vh] min-h-[400px]`) pentru scroll vertical  
+  - **Mouse Wheel**: Capturat pentru scroll natural în tabel în loc de scroll la pagină
+  - **Smooth Scrolling**: Smooth scroll behavior pentru experiență UX plăcută
+  - **Keyboard Navigation**: Container focusable pentru accesibilitate
+  - **Sticky Header**: Testabil acum cu scroll vertical - header rămâne fix când faci scroll
 - **Code Cleanup**: ✅ **COMPLETED** - Eliminat componente duplicate și nefolosite
   - Șters `MemoizedRow.tsx` (cauza iconițelor duplicate)
   - Șters componente nefolosite: `CellRenderer.tsx`, `TableFooter.tsx`, `GridCell.tsx`, `HeaderCell.tsx`, `TanStackSubcategoryRows.tsx`
@@ -867,9 +873,9 @@ for (const [key, transactions] of transactionGroups) {
 - **User Experience**: 
   - Click pe numele categoriei = expand/collapse
   - Click pe iconița ▶/▼ = expand/collapse
+  - Mouse wheel pe tabel = scroll vertical natural (nu mai scrollează pagina)
   - Hover effect pentru feedback vizual
   - Funcționează independent de butonul global expand/collapse
-  - **NU mai sunt iconițe duplicate** ✅
 - **Visual Feedback**: Hover highlighting și cursor pointer pe categorii
 
 #### **🎨 UI Implementation Details**
