@@ -51,9 +51,9 @@ test.describe('Debug - Primary Account Login', () => {
       console.log(`📍 URL după 5s extra: ${finalUrl}`);
       
       // Verifică dacă există erori
-      const hasError = await page.getByTestId('error-message').isVisible().catch(() => false);
+      const hasError = await page.getByTestId('login-error').isVisible().catch(() => false);
       if (hasError) {
-        const errorText = await page.getByTestId('error-message').textContent();
+        const errorText = await page.getByTestId('login-error').textContent();
         console.log(`❌ Eroare: ${errorText}`);
       }
       
