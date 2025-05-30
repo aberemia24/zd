@@ -3,6 +3,7 @@ import { Row } from '@tanstack/react-table';
 import { TransformedTableDataRow } from './hooks/useLunarGridTable';
 import { cn } from '../../../styles/cva/shared/utils';
 import { tableRow, tableCell } from '../../../styles/cva/data';
+import { LUNAR_GRID } from '@shared-constants';
 import GridCell from './GridCell';
 
 interface MemoizedRowProps {
@@ -71,14 +72,29 @@ const MemoizedRow: React.FC<MemoizedRowProps> = ({
         onClick={isCategory ? handleRowClick : undefined}
         style={{ paddingLeft: isCategory ? undefined : `${20 + level * 16}px` }}
       >
-        <div className="flex items-center">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            {isCategory && (
+              <span className="mr-2 text-gray-500">
+                {row.getIsExpanded() ? '▼' : '▶'}
+              </span>
+            )}
+            {original.category}
+            {isSubcategory && original.subcategory ? ` - ${original.subcategory}` : ''}
+          </div>
           {isCategory && (
-            <span className="mr-2 text-gray-500">
-              {row.getIsExpanded() ? '▼' : '▶'}
-            </span>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleRowExpanded(row.id);
+              }}
+              className="ml-2 px-2 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded transition-colors duration-150"
+              data-testid={`toggle-category-${original.category}`}
+              title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
+            >
+              {row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY : LUNAR_GRID.EXPAND_CATEGORY}
+            </button>
           )}
-          {original.category}
-          {isSubcategory && original.subcategory ? ` - ${original.subcategory}` : ''}
         </div>
       </td>
 
