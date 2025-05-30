@@ -1,18 +1,9 @@
-Tanstack features:
-Ce este deja implementat:
-- tabelul unde apar categoriile colapsavile si sub ele subcategoriile
-- apar cifrele tranzactiilor corespunzatoare subcategoriilor sindatilor in care au fost facute
-- un total pe categorii/zi
-- un sold overall al tuturor categoriilor pentru fiecare zi, undr aduna toate sumele indiferent daca e cheltuiala, venit etc dar momentan nu apare nimic in el for some reason, bug.  
-- butoabe de a expanda/colapsa toate categoriile
-- o modalutate basic de a schimba luna
-- header coloana unde arata zilele lunii
-- tabelul este sincrobizat cu celelalte componente indiferent de unde adaugi tranzactii se reflecta peste tot 
-
-To do's si idei de features noi:
+Implementarile toate ar trebui sa respecte best practices ale proiectului, regulile proiectului. Sa avem grija la type errors, sa punem data-test ID, sa nu folosim texte si clase hardcodate, sa folosim shared constants si sistemul de CVA pentru styling. daca nu exista un text in constante, se adauga acolo mai intai
+NU DORESC PLANNING IN VID si NICI IMPLEMENTARE IN VID. Vreau o analiza thoroigh inainte de planning si dupa planning sa ne asiguram ca nu am ratat absolut nimic din documentul asta si ca este intelease extrem de bine arhitectura si ce trebuie modificat si unde fara a strica nimic aktceva in alta parte. 
+La fel inainte de implementare, doresc sa se verifice thoroigh ce e acolo, ce avem nevoie din shared constants, din CVA, cum sunt implementate celelalte sisteme si sa cum sa facem sa nu le afectam sau mai rau, sa le stergem dracu din greseala. 
 
 
-Implementari propriuzise:
+Implementari propriuzise noi si imbunatatiri pentru componenta de grid lunar. :
 -
 - sa poti adauga categorii noi direct din tabel (un buton adauga subcategorie sub uktima subcategorie din lista unei categorii), dar maxim 5 per categorie (asta fiind o limita care trebuie implementata si in Category editor)
 - mesaj clar ca nu mai poti adauga dupa 5, sau sa dispara butonul efectiv
@@ -35,6 +26,3 @@ o sa trebuiasca sa iti poti pune cati bani ai in conturile bancare undeva si de 
 
 De asmenea nu stiu dac aimi lipsesc alte chestii esentiale de care eu nu stiu. ma ajuti cu o cercetare aprofundata pe ce am deja acum si ce parere ai despre ce am zis mai sus? am nevoie de o parere. 
 
-Implementarile toate ar trebui sa respecte best practices ale proiectului, regulile proiectului. Sa avem grija la type errors, sa punem data-test ID, sa nu folosim texte si clase hardcodate, sa folosim shared constants si sistemul de CVA pentru styling. daca nu exista un text in constante, se adauga acolo mai intai
-NU DORESC PLANNING IN VID si NICI IMPLEMENTARE IN VID. Vreau o analiza thoroigh inainte de planning si dupa planning sa ne asiguram ca nu am ratat absolut nimic din documentul asta si ca este intelease extrem de bine arhitectura si ce trebuie modificat si unde fara a strica nimic aktceva in alta parte. 
-La fel inainte de implementare, doresc sa se verifice thoroigh ce e acolo, ce avem nevoie din shared constants, din CVA, cum sunt implementate celelalte sisteme si sa cum sa facem sa nu le afectam sau mai rau, sa le stergem dracu din greseala. 
