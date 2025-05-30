@@ -81,23 +81,19 @@
   - Format: Zi + luna românească pentru claritate maximă
   - UX: User înțelege imediat data din header fără calcule mentale
 
-#### **5. Visual Color Coding System** ✅ **IMPLEMENTED**
-- ✅ **Color Psychology Implementation**: Green income, red expense, blue savings
+#### **5. Visual Color Coding System** ✅ **IMPLEMENTED & FIXED**
+- ✅ **Smart Category-Based Color Coding**: Correct implementation per category type
   - Location: `frontend/src/utils/lunarGrid/formatters.ts`
-  - Implementation: `getBalanceStyleClass` function cu Tailwind classes
-  - Colors: `text-success-600` (green), `text-error-600` (red), `text-secondary-400` (neutral)
-- ✅ **LunarGrid Integration**: Consistent color coding în toate celulele
-  - Location: `frontend/src/components/features/LunarGrid/LunarGridTanStack.tsx`
-  - Integration: Uses `getBalanceStyleClass` pentru balance display
-  - Consistency: Aceeași funcție folosită în tot LunarGrid
-- ✅ **CellRenderer Advanced Styling**: Transaction type aware styling
-  - Location: `frontend/src/components/features/LunarGrid/CellRenderer.tsx`
-  - Features: Income (green), Expense (red), Saving (blue) cu font-medium
-  - State Management: Different colors pentru hover, selected, editing states
-- ✅ **Professional Financial Appearance**: Trust-building color scheme
-  - Pattern: Industry standard green/red pentru financial data
-  - UX: Instant visual feedback pentru transaction types
-  - Accessibility: High contrast colors pentru readability
+  - Implementation: `getCategoryStyleClass(categoryName, value)` function 
+  - Logic: VENITURI → Green, ALL OTHER CATEGORIES → Red, SOLD → Value-based
+- ✅ **LunarGrid Integration**: Proper color coding în toate celulele zilelor
+  - Location: `frontend/src/components/features/LunarGrid/hooks/useLunarGridTable.tsx`
+  - Integration: Uses `getCategoryStyleClass(original.category, value)` pentru day cells
+  - Consistency: Balance column uses `getBalanceStyleClass` (value-based) for sold logic
+- ✅ **Fixed Previous Issue**: No longer uses generic value-based coloring for categories
+  - Problem: Previously all category sums showed green regardless of type
+  - Solution: Categories now show correct colors based on income/expense nature
+  - Result: VENITURI = Green, TRANSPORT/ECONOMII/etc = Red, Sold = Value-based
 
 #### **6. Current Day Highlighting** ✅ **IMPLEMENTED**
 - ✅ **Date Detection Logic**: Smart current day detection

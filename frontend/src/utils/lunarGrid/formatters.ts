@@ -169,3 +169,33 @@ export function getDayHeaderStyle(day: number, month: number, year: number): str
   }
   return ""; // Default styling din CVA
 }
+
+/**
+ * Returnează clase CSS pentru styling-ul sumelor bazat pe tipul categoriei
+ * Implementează color coding corect: green pentru income, red pentru expense
+ * 
+ * @param categoryName Numele categoriei
+ * @param value Valoarea sumei (pentru cazuri speciale)
+ * @returns String cu clase CSS Tailwind
+ * @example
+ * getCategoryStyleClass("VENITURI", 100) // "text-success-600 font-medium" (verde)
+ * getCategoryStyleClass("TRANSPORT", 50) // "text-error-600 font-medium" (roșu)
+ * getCategoryStyleClass("", 0) // "text-secondary-400" (gri pentru zero)
+ */
+export function getCategoryStyleClass(categoryName: string, value: number): string {
+  // Pentru valori zero, returnează stil neutru indiferent de categorie
+  if (value === 0) return TEXT_CLASSES.NEUTRAL;
+  
+  // Pentru sold sau cazuri speciale, folosește logica bazată pe valoare
+  if (categoryName === "Sold" || categoryName === "SOLD" || categoryName.toLowerCase().includes("sold")) {
+    return value > 0 ? TEXT_CLASSES.POSITIVE : TEXT_CLASSES.NEGATIVE;
+  }
+  
+  // Pentru categorii de venituri, folosește verde
+  if (categoryName === "VENITURI" || categoryName.toLowerCase().includes("venit")) {
+    return TEXT_CLASSES.POSITIVE;
+  }
+  
+  // Pentru toate celelalte categorii (cheltuieli), folosește roșu
+  return TEXT_CLASSES.NEGATIVE;
+}

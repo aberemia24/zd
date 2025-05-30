@@ -20,6 +20,7 @@ import {
   getDaysInMonth,
   formatCurrency,
   getBalanceStyleClass,
+  getCategoryStyleClass,
   generateTableColumns,
 } from "../../../../utils/lunarGrid";
 
@@ -394,7 +395,7 @@ export function useLunarGridTable(
           cell: ({ getValue, row }) => {
             const value = getValue<number>();
             const original = row.original as TransformedTableDataRow;
-            const colorClass = getBalanceStyleClass(value);
+            const colorClass = getCategoryStyleClass(original.category, value);
             const valueDisplay =
               typeof value === "number" && !isNaN(value) && value !== 0
                 ? formatCurrency(value)
