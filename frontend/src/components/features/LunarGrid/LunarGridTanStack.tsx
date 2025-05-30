@@ -366,7 +366,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         editability: cellEditability,
                       }),
                       isFirstCell && level > 0 ? "pl-8" : "",
-                      isFirstCell ? "sticky left-0 bg-inherit z-5" : "",
+                      isFirstCell ? "sticky left-0 bg-white z-5" : "",
                     )}
                     title={
                       isCategory && isDayCell
@@ -464,8 +464,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         <div 
           ref={tableContainerRef}
           className={cn(
-            gridContainer({ size: "full" }),
-            "relative overflow-auto rounded-lg border border-gray-200",
+            "w-full",
+            "relative overflow-auto border border-gray-200",
             "max-h-[70vh] min-h-[400px]", // Înălțime fixă pentru scroll vertical
             isLoading ? "opacity-60" : "",
             "transition-all duration-150"
@@ -510,7 +510,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           
           {!isLoading && !error && table.getRowModel().rows.length > 0 && (
             <table 
-              className={cn(dataTable({ variant: "striped" }))}
+              className={cn(dataTable({ variant: "striped" }), "w-full")}
               data-testid="lunar-grid-table"
             >
               <thead className="bg-gray-50 sticky top-0 z-20">
@@ -522,7 +522,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       className={cn(
                         tableHeader(),
                         header.id === "category" 
-                          ? "sticky left-0 z-30 text-center" 
+                          ? "sticky left-0 z-30 text-center bg-gray-50" 
                           : "text-center"
                       )}
                       style={{ width: header.getSize() }}
