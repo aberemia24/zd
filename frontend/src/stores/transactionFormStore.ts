@@ -1,12 +1,9 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { INITIAL_FORM_STATE, MESAJE } from "@shared-constants";
-import { VALIDATION } from "@shared-constants/validation";
+import { INITIAL_FORM_STATE, MESAJE, VALIDATION, TransactionType, FrequencyType, TransactionStatus, CATEGORIES } from "@shared-constants";
 import { API } from "@shared-constants/api";
 import type { TransactionFormData } from "../components/features/TransactionForm/TransactionForm";
-import { TransactionType, TransactionStatus } from "@shared-constants/enums";
-import { FrequencyType } from "@shared-constants/enums";
-import type { CreateTransaction } from "@shared-constants/transaction.schema";
+import { CreateTransaction } from "@shared-constants/transaction.schema";
 import { useAuthStore } from "./authStore";
 import {
   BaseStoreState,
@@ -137,21 +134,39 @@ export const useTransactionFormStore = create<TransactionFormStoreState>()(
           return false;
         }
 
-        // Validare sumă
+        // Validare sumă cu mesaj specific
         const amount = parseFloat(form.amount);
         if (
           isNaN(amount) ||
           amount < VALIDATION.AMOUNT_MIN ||
           amount > VALIDATION.AMOUNT_MAX
         ) {
-          setError(MESAJE.AVERTISMENT_DATE);
+          setError(`Suma trebuie să fie între ${VALIDATION.AMOUNT_MIN} și ${VALIDATION.AMOUNT_MAX}`);
           return false;
         }
 
-        // Validare dată
+        // Validare dată cu mesaj specific
         if (!VALIDATION.DATE_REGEX.test(form.date)) {
-          setError(MESAJE.AVERTISMENT_DATE);
+          setError("Data introdusă nu este validă. Folosiți formatul YYYY-MM-DD");
           return false;
+        }
+
+        // Validare categorie și subcategorie îmbunătățită
+        if (form.category && form.subcategory) {
+          // Debug logging pentru subcategoriile problematice
+          console.log(`[DEBUG] Validez categoria: "${form.category}", subcategoria: "${form.subcategory}"`);
+          
+          // Verificăm dacă categoria există în CATEGORIES
+          if (!Object.keys(CATEGORIES).includes(form.category)) {
+            console.warn(`[DEBUG] Categoria "${form.category}" nu există în CATEGORIES`);
+            setError(`Categoria "${form.category}" nu este validă`);
+            return false;
+          }
+
+          // Pentru validarea subcategoriilor, acceptăm toate subcategoriile
+          // deoarece utilizatorul poate avea subcategorii personalizate
+          // Validarea completă se face în backend
+          console.log(`[DEBUG] Subcategoria "${form.subcategory}" acceptată pentru categoria "${form.category}" (validare delegată backend-ului)`);
         }
 
         setError(null);
