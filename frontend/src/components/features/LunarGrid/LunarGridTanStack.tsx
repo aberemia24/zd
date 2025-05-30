@@ -24,13 +24,17 @@ import {
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
-import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE } from "@shared-constants";
+import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE, FLAGS } from "@shared-constants";
 import { LUNAR_GRID } from "@shared-constants";
 
 // Import componentele UI
 import Button from "../../primitives/Button/Button";
+import Badge from "../../primitives/Badge/Badge";
 import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
+
+// Import pentru Plus icon pentru butonul de adăugare subcategorie
+import { Plus } from "lucide-react";
 
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
 import { formatCurrency, getBalanceStyleClass } from "../../../utils/lunarGrid";
@@ -86,6 +90,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
+
+    // Hook pentru CategoryStore pentru adăugarea subcategoriilor
+    const { categories, saveCategories } = useCategoryStore();
+
+    // State pentru input temporar la adăugarea subcategoriei
+    const [addingSubcategory, setAddingSubcategory] = useState<string | null>(null);
+    const [newSubcategoryName, setNewSubcategoryName] = useState<string>("");
 
     // 🎯 PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
     const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
@@ -233,6 +244,86 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [popover, year, month, createTransactionMutation],
     );
 
+    // Handler pentru adăugarea unei subcategorii noi
+    const handleAddSubcategory = useCallback(
+      async (categoryName: string) => {
+        if (!user?.id || !newSubcategoryName.trim()) {
+          return;
+        }
+
+        try {
+          // Găsește categoria în store TOATE categoriile disponibile, nu doar custom ones
+          let category = categories.find(cat => cat.name === categoryName);
+          
+          // Dacă categoria nu există în store, o creăm (poate fi o categorie default)
+          if (!category) {
+            category = {
+              name: categoryName,
+              type: TransactionType.EXPENSE, // Default type
+              subcategories: [],
+              isCustom: true
+            };
+          }
+
+          // Verifică limita de 5 subcategorii CUSTOM (nu toate subcategoriile)
+          const customSubcategoriesCount = category.subcategories.filter(sub => sub.isCustom).length;
+          if (customSubcategoriesCount >= 5) {
+            toast.error("Maxim 5 subcategorii custom permise per categorie");
+            return;
+          }
+
+          // Verifică dacă subcategoria deja există
+          if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim())) {
+            toast.error("Subcategoria deja există");
+            return;
+          }
+
+          // Creează categoria actualizată cu noua subcategorie
+          const updatedCategories = [...categories];
+          const categoryIndex = updatedCategories.findIndex(cat => cat.name === categoryName);
+          
+          if (categoryIndex >= 0) {
+            // Actualizează categoria existentă
+            updatedCategories[categoryIndex] = {
+              ...category,
+              subcategories: [
+                ...category.subcategories,
+                { name: newSubcategoryName.trim(), isCustom: true }
+              ]
+            };
+          } else {
+            // Adaugă categoria nouă
+            updatedCategories.push({
+              ...category,
+              subcategories: [
+                ...category.subcategories,
+                { name: newSubcategoryName.trim(), isCustom: true }
+              ]
+            });
+          }
+
+          // Salvează în CategoryStore
+          await saveCategories(user.id, updatedCategories);
+          
+          // Reset state-ul
+          setAddingSubcategory(null);
+          setNewSubcategoryName("");
+          
+          toast.success("Subcategoria a fost adăugată cu succes");
+        } catch (error) {
+          console.error("Eroare la adăugarea subcategoriei:", error);
+          toast.error("Eroare la adăugarea subcategoriei");
+        }
+      },
+      [user?.id, newSubcategoryName, categories, saveCategories],
+    );
+
+    // Handler pentru anularea adăugării subcategoriei
+    const handleCancelAddSubcategory = useCallback(() => {
+      setAddingSubcategory(null);
+      setNewSubcategoryName("");
+    }, []);
+
     // Interogare tabel optimizată (fără handleri de click/double-click)
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
@@ -336,6 +427,24 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         const isCategory = original.isCategory;
         const isSubcategory = !isCategory && original.subcategory;
 
+        // Verifică câte subcategorii CUSTOM are categoria (nu toate subcategoriile)
+        const categoryData = categories.find(cat => cat.name === original.category);
+        const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom)?.length || 0;
+        const canAddSubcategory = isCategory && row.getIsExpanded() && customSubcategoriesCount < 5;
+
+        // DEBUG: Verifică logica pentru subcategoriile custom
+        if (isCategory && row.getIsExpanded()) {
+          console.log('DEBUG Category:', original.category, {
+            totalSubcategories: row.subRows?.length || 0,
+            customSubcategoriesCount,
+            canAdd: canAddSubcategory,
+            categoryData: categoryData ? {
+              name: categoryData.name,
+              subcategories: categoryData.subcategories?.map(sub => ({ name: sub.name, isCustom: sub.isCustom }))
+            } : 'Not found in store'
+          });
+        }
+
         return (
           <React.Fragment key={row.id}>
             <tr
@@ -391,6 +500,24 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       >
                         {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
                       </div>
+                    ) : isFirstCell && isSubcategory ? (
+                      // Celula pentru subcategorie cu badge custom dacă este cazul
+                      <div className="flex items-center gap-2">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                        {(() => {
+                          const categoryData = categories.find(cat => cat.name === original.category);
+                          const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
+                          return subcategoryData?.isCustom ? (
+                            <Badge
+                              variant="success"
+                              size="xs"
+                              dataTestId={`custom-flag-${original.subcategory}`}
+                            >
+                              {FLAGS.CUSTOM}
+                            </Badge>
+                          ) : null;
+                        })()}
+                      </div>
                     ) : isDayCell && isSubcategory ? (
                       renderEditableCell(
                         original.category,
@@ -414,10 +541,79 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               row.subRows &&
               row.subRows.length > 0 &&
               row.subRows.map((subRow) => renderRow(subRow, level + 1))}
+
+            {/* Rând pentru adăugarea subcategoriei - doar dacă categoria poate primi subcategorii noi */}
+            {canAddSubcategory && (
+              <tr className="bg-gray-50/50 border-t border-gray-100">
+                <td 
+                  className={cn(
+                    "sticky left-0 bg-gray-50/50 z-5 pl-8 py-2",
+                    "border-r border-gray-200"
+                  )}
+                >
+                  {addingSubcategory === original.category ? (
+                    // Modul de editare - input pentru numele subcategoriei
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newSubcategoryName}
+                        onChange={(e) => setNewSubcategoryName(e.target.value)}
+                        placeholder="Nume subcategorie..."
+                        className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleAddSubcategory(original.category);
+                          } else if (e.key === "Escape") {
+                            handleCancelAddSubcategory();
+                          }
+                        }}
+                        data-testid={`new-subcategory-input-${original.category}`}
+                      />
+                      <Button
+                        size="sm"
+                        variant="primary"
+                        onClick={() => handleAddSubcategory(original.category)}
+                        disabled={!newSubcategoryName.trim()}
+                        data-testid={`save-subcategory-${original.category}`}
+                      >
+                        ✓
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={handleCancelAddSubcategory}
+                        data-testid={`cancel-subcategory-${original.category}`}
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  ) : (
+                    // Modul normal - buton pentru adăugarea subcategoriei
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setAddingSubcategory(original.category)}
+                      className="flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                      data-testid={`add-subcategory-${original.category}`}
+                    >
+                      <Plus size={14} />
+                      <span className="text-sm">Adaugă subcategorie</span>
+                    </Button>
+                  )}
+                </td>
+                {/* Celule goale pentru restul coloanelor */}
+                {table.getFlatHeaders().slice(1).map((header) => (
+                  <td key={`add-subcategory-${header.id}`} className="py-2">
+                    {/* Celulă goală */}
+                  </td>
+                ))}
+              </tr>
+            )}
           </React.Fragment>
         );
       },
-      [renderEditableCell],
+      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, handleCancelAddSubcategory, table],
     );
 
     // Renderizare (layout principal)
