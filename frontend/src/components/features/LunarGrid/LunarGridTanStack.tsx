@@ -73,6 +73,39 @@ interface PopoverState {
   anchorEl?: HTMLElement;
 }
 
+// Hook pentru persistent expanded state
+const usePersistentExpandedRows = (year: number, month: number) => {
+  const storageKey = `lunarGrid-expanded-${year}-${month}`;
+  
+  // Încarcă starea din localStorage la mount
+  const [expandedRows, setExpandedRowsState] = useState<Record<string, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem(storageKey);
+      return saved ? JSON.parse(saved) : {};
+    } catch (error) {
+      console.warn('Eroare la încărcarea stării expanded din localStorage:', error);
+      return {};
+    }
+  });
+
+  // Salvează starea în localStorage de fiecare dată când se schimbă
+  const setExpandedRows = useCallback((newState: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    setExpandedRowsState(prev => {
+      const finalState = typeof newState === 'function' ? newState(prev) : newState;
+      
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(finalState));
+      } catch (error) {
+        console.warn('Eroare la salvarea stării expanded în localStorage:', error);
+      }
+      
+      return finalState;
+    });
+  }, [storageKey]);
+
+  return [expandedRows, setExpandedRows] as const;
+};
+
 export interface LunarGridTanStackProps {
   year: number;
   month: number;
@@ -84,10 +117,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // State pentru popover (păstrat doar pentru modal advanced)
     const [popover, setPopover] = useState<PopoverState | null>(null);
 
-    // State pentru expanded rows (să nu se colapșeze după salvare)
-    const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>(
-      {},
-    );
+    // State persistent pentru expanded rows (salvat în localStorage)
+    const [expandedRows, setExpandedRows] = usePersistentExpandedRows(year, month);
 
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
@@ -100,8 +131,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const [newSubcategoryName, setNewSubcategoryName] = useState<string>("");
 
     // 🎯 PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
+    // 🚀 FIX: Dezactivez refetchOnWindowFocus pentru a evita refresh automat la focus
     const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
       includeAdjacentDays: true,
+      // Opțiuni pentru a preveni refresh automat la focus
+      refetchOnWindowFocus: false,
+      refetchOnMount: false, // Nu refetch automat la mount dacă datele sunt fresh
+      staleTime: 5 * 60 * 1000, // 5 minute cache pentru a evita refresh-uri inutile
     });
 
     // 🚨 VERIFICARE TEMPORARĂ: Detectează tranzacții fără subcategorie (nu ar trebui să existe)
