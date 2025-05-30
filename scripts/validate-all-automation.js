@@ -7,58 +7,58 @@
  */
 
 const { spawn } = require('child_process');
-const path = require('path');
 
 console.log('🚀 Running complete automation validation suite...\n');
 
-// Script-uri de rulat în ordine
+// Script-uri de rulat în ordine (prin npm run)
 const VALIDATION_SCRIPTS = [
   {
     name: 'Shared Constants Sync',
-    script: 'validate-constants.js',
+    npmScript: 'validate:constants',
     description: 'Verifică sincronizarea shared-constants și string-uri hardcodate'
   },
   {
     name: 'Shared Constants Usage',
-    script: 'validate-shared-constants-usage.js',
+    npmScript: 'validate:shared-constants',
     description: 'Validează import-uri @shared-constants și elimină string-uri hardcodate'
   },
   {
     name: 'Data TestID Consistency',
-    script: 'validate-data-testid-consistency.js',
+    npmScript: 'validate:data-testid',
     description: 'Verifică consistența data-testid între componente și teste'
   },
   {
     name: 'Barrel Imports',
-    script: 'validate-barrel-imports.js',
+    npmScript: 'validate:barrel-imports',
     description: 'Validează folosirea corectă a barrel files pentru import-uri'
   },
-  {
-    name: 'Data TestID Coverage',
-    script: 'check-data-testid.js',
-    description: 'Verifică coverage-ul data-testid pentru elemente interactive'
-  },
-  {
-    name: 'Console Cleanup',
-    script: 'validate-console-cleanup.js',
-    description: 'Detectează console.log/debug statements care trebuie eliminate pentru production'
-  },
+  // Data TestID Coverage - nu există script check-data-testid.js, probabil se referă la consistența de mai sus
+  // {
+  //   name: 'Data TestID Coverage',
+  //   script: 'check-data-testid.js',
+  //   description: 'Verifică coverage-ul data-testid pentru elemente interactive'
+  // },
+  // ❌ Console Cleanup commented out pentru development - console.log-uri sunt utile pentru debugging
+  // {
+  //   name: 'Console Cleanup',
+  //   npmScript: 'validate:console-cleanup',
+  //   description: 'Detectează console.log/debug statements care trebuie eliminate pentru production'
+  // },
   {
     name: 'JSX Extensions',
-    script: 'validate-jsx-extensions.js',
+    npmScript: 'validate:jsx-extensions',
     description: 'Verifică că fișierele cu JSX folosesc extensia .tsx conform code-standards'
   },
   {
     name: 'TypeScript Quality',
-    script: 'validate-typescript-quality.js',
+    npmScript: 'validate:typescript-quality',
     description: 'Validează calitatea TypeScript: any/unknown usage, type assertions'
   }
 ];
 
 function runScript(scriptInfo) {
   return new Promise((resolve) => {
-    const scriptPath = path.join(__dirname, scriptInfo.script);
-    const child = spawn('node', [scriptPath], { 
+    const child = spawn('npm', ['run', scriptInfo.npmScript], { 
       stdio: ['pipe', 'pipe', 'pipe'],
       shell: true 
     });

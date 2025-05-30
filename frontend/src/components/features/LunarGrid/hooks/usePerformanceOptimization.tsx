@@ -6,13 +6,13 @@ import { useMemo, useCallback, useRef } from 'react';
  */
 export function usePerformanceOptimization() {
   // Cache de referințe stable pentru funcții
-  const stableRefs = useRef<Record<string, any>>({});
+  const stableRefs = useRef<Record<string, unknown>>({});
   
   /**
    * Creează o funcție stabilă care nu își schimbă identitatea între re-render-uri
    * Util pentru a evita regenerarea handlerilor în componente
    */
-  const createStableCallback = useCallback(<T extends (...args: any[]) => any>(
+  const createStableCallback = useCallback(<T extends (...args: unknown[]) => unknown>(
     key: string,
     callback: T
   ): T => {
@@ -26,7 +26,7 @@ export function usePerformanceOptimization() {
    * Creează un obiect stabil care nu își schimbă identitatea între re-render-uri
    * Util pentru a evita regenerarea obiectelor folosite în props
    */
-  const createStableObject = useCallback(<T extends Record<string, any>>(
+  const createStableObject = useCallback(<T extends Record<string, unknown>>(
     key: string,
     object: T
   ): T => {
@@ -40,7 +40,7 @@ export function usePerformanceOptimization() {
    * Actualizează o referință stabilă dacă valorile s-au schimbat
    * Returnează referința (posibil actualizată)
    */
-  const updateStableReference = useCallback(<T extends Record<string, any>>(
+  const updateStableReference = useCallback(<T extends Record<string, unknown>>(
     key: string,
     newValue: T,
     compareFunc?: (prev: T, next: T) => boolean
@@ -75,7 +75,7 @@ export function usePerformanceOptimization() {
    * Verifică dacă două obiecte sunt diferite la nivel superficial (shallow diff)
    * Folosit pentru a decide dacă trebuie actualizate referințele
    */
-  const shallowDiff = useCallback(<T extends Record<string, any>>(
+  const shallowDiff = useCallback(<T extends Record<string, unknown>>(
     prevObj: T, 
     nextObj: T
   ): boolean => {
