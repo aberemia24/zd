@@ -14,6 +14,12 @@ interface TransactionPage {
   hasNextPage?: boolean;
 }
 
+// Tip pentru monthly transactions result (folosit în LunarGrid)
+type MonthlyTransactionsResult = {
+  data: TransactionValidated[];
+  count: number;
+};
+
 type CacheSyncOperation = 'create' | 'update' | 'delete';
 
 interface CacheSyncParams {
@@ -181,27 +187,111 @@ export const syncGlobalTransactionCache = ({
     console.log('[DEBUG-CACHE-SYNC] Operation:', operation, 'User ID:', userId);
 
     if (globalCacheKeys.length === 0) {
-      // Nu există global caches loaded, folosim fallback invalidation
-      console.log('[DEBUG-CACHE-SYNC] No global caches found, using fallback invalidation');
+      // Nu există global caches loaded, dar încercăm să updatăm monthly cache direct
+      console.log('[DEBUG-CACHE-SYNC] No global caches found, trying direct monthly cache update');
       
       try {
-        // Invalidăm toate cache-urile global infinite pentru acest user
-        // Aceasta va forța re-fetch când cache-urile vor fi create
+        // 🎯 OPTIMIZED FIX: Update direct monthly cache în loc de invalidation agresiv
+        
+        // Găsim toate monthly cache keys pentru acest user
+        const monthlyCacheKeys = allQueries
+          .filter(query => {
+            const key = query.queryKey;
+            const matches = (
+              Array.isArray(key) &&
+              key.length >= 5 && // Length trebuie să fie cel puțin 5 pentru ['transactions', 'monthly', year, month, userId]
+              key[0] === 'transactions' &&
+              key[1] === 'monthly' &&
+              key[4] === userId // user ID e pe pozitia 4 în monthly cache key: ['transactions', 'monthly', year, month, userId]
+            );
+            
+            if (process.env.NODE_ENV === 'development') {
+              if (matches) {
+                console.log('[DEBUG-CACHE-SYNC] ✅ MATCHED Monthly Key:', key);
+              } else {
+                console.log('[DEBUG-CACHE-SYNC] ❌ NO-MATCH Monthly Key:', key, 'Expected userId on position 4:', userId);
+              }
+            }
+            
+            return matches;
+          })
+          .map(query => query.queryKey);
+
+        console.log('[DEBUG-CACHE-SYNC] Found monthly cache keys:', monthlyCacheKeys);
+
+        if (monthlyCacheKeys.length > 0) {
+          // Actualizăm direct monthly cache-urile găsite
+          let updatedMonthlyCount = 0;
+          
+          monthlyCacheKeys.forEach(queryKey => {
+            try {
+              console.log('[DEBUG-CACHE-SYNC] Updating monthly cache with key:', queryKey);
+              queryClient.setQueryData(queryKey, (oldData: MonthlyTransactionsResult | undefined) => {
+                if (!oldData) return oldData;
+
+                switch (operation) {
+                  case 'create':
+                    updatedMonthlyCount++;
+                    return {
+                      data: [transaction, ...oldData.data],
+                      count: oldData.count + 1,
+                    };
+                    
+                  case 'update':
+                    updatedMonthlyCount++;
+                    return {
+                      data: oldData.data.map((tx: TransactionValidated) =>
+                        tx.id === transaction.id ? transaction : tx
+                      ),
+                      count: oldData.count,
+                    };
+                    
+                  case 'delete':
+                    if (!deletedId) return oldData;
+                    updatedMonthlyCount++;
+                    return {
+                      data: oldData.data.filter((tx: TransactionValidated) => tx.id !== deletedId),
+                      count: oldData.count - 1,
+                    };
+                    
+                  default:
+                    return oldData;
+                }
+              });
+            } catch (error) {
+              console.error('[CACHE-SYNC] Error updating monthly cache for key:', queryKey, error);
+            }
+          });
+
+          console.log(`[DEBUG-CACHE-SYNC] Direct monthly cache update completed for ${updatedMonthlyCount} caches`);
+          
+          // Log direct update success (doar în development)
+          const txId = operation === 'delete' ? deletedId || 'unknown' : transaction.id;
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`[CACHE-SYNC] Direct monthly cache update for ${operation} operation on transaction ${txId}`);
+          }
+          
+          return; // Success - nu mai facem invalidation
+        }
+
+        // Dacă nu găsim monthly cache, atunci da, facem invalidation dar doar pentru global
+        console.log('[DEBUG-CACHE-SYNC] No monthly caches found, using minimal global invalidation');
+        
         queryClient.invalidateQueries({
           queryKey: ['transactions', 'infinite', userId],
           exact: false
         });
         
-        console.log('[DEBUG-CACHE-SYNC] Fallback invalidation executed successfully');
+        console.log('[DEBUG-CACHE-SYNC] Minimal global invalidation executed successfully');
         
         // Log fallback operation (doar în development)
         const txId = operation === 'delete' ? deletedId || 'unknown' : transaction.id;
         if (process.env.NODE_ENV === 'development') {
-          console.warn(`[CACHE-SYNC] Used fallback invalidation for ${operation} operation on transaction ${txId}`);
+          console.warn(`[CACHE-SYNC] Used minimal global invalidation for ${operation} operation on transaction ${txId}`);
         }
         
       } catch (error) {
-        console.error('[CACHE-SYNC] Error în fallback invalidation:', error);
+        console.error('[CACHE-SYNC] Error în direct cache update:', error);
       }
       
       return;
@@ -257,6 +347,84 @@ export const syncGlobalTransactionCache = ({
       }
     });
 
+    // 🎯 CRITICAL FIX: Actualizează și monthly cache chiar dacă există global cache
+    // Monthly cache este folosit de LunarGrid și TREBUIE actualizat
+    try {
+      const monthlyCacheKeys = allQueries
+        .filter(query => {
+          const key = query.queryKey;
+          const matches = (
+            Array.isArray(key) &&
+            key.length >= 5 && // Length trebuie să fie cel puțin 5 pentru ['transactions', 'monthly', year, month, userId]
+            key[0] === 'transactions' &&
+            key[1] === 'monthly' &&
+            key[4] === userId // user ID e pe pozitia 4 în monthly cache key
+          );
+          
+          if (process.env.NODE_ENV === 'development' && matches) {
+            console.log('[DEBUG-CACHE-SYNC] ✅ MATCHED Monthly Key (alongside global):', key);
+          }
+          
+          return matches;
+        })
+        .map(query => query.queryKey);
+
+      console.log('[DEBUG-CACHE-SYNC] Found monthly cache keys (alongside global):', monthlyCacheKeys);
+
+      if (monthlyCacheKeys.length > 0) {
+        let updatedMonthlyCount = 0;
+        
+        monthlyCacheKeys.forEach(queryKey => {
+          try {
+            console.log('[DEBUG-CACHE-SYNC] Updating monthly cache with key:', queryKey);
+            queryClient.setQueryData(queryKey, (oldData: MonthlyTransactionsResult | undefined) => {
+              if (!oldData) return oldData;
+
+              switch (operation) {
+                case 'create':
+                  updatedMonthlyCount++;
+                  return {
+                    data: [transaction, ...oldData.data],
+                    count: oldData.count + 1,
+                  };
+                  
+                case 'update':
+                  updatedMonthlyCount++;
+                  return {
+                    data: oldData.data.map((tx: TransactionValidated) =>
+                      tx.id === transaction.id ? transaction : tx
+                    ),
+                    count: oldData.count,
+                  };
+                  
+                case 'delete':
+                  if (!deletedId) return oldData;
+                  updatedMonthlyCount++;
+                  return {
+                    data: oldData.data.filter((tx: TransactionValidated) => tx.id !== deletedId),
+                    count: oldData.count - 1,
+                  };
+                  
+                default:
+                  return oldData;
+              }
+            });
+          } catch (error) {
+            console.error('[CACHE-SYNC] Error updating monthly cache for key:', queryKey, error);
+          }
+        });
+
+        console.log(`[DEBUG-CACHE-SYNC] Monthly cache update completed for ${updatedMonthlyCount} caches (alongside global)`);
+        
+        if (process.env.NODE_ENV === 'development') {
+          const txId = operation === 'delete' ? deletedId || 'unknown' : transaction.id;
+          console.log(`[CACHE-SYNC] Monthly cache synced alongside global for ${operation} operation on transaction ${txId}`);
+        }
+      }
+    } catch (error) {
+      console.error('[CACHE-SYNC] Error în monthly cache sync alongside global:', error);
+    }
+
     // Log success (doar în development)
     const txId = operation === 'delete' ? deletedId || 'unknown' : transaction.id;
     logSyncOperation(operation, txId, updatedCount);
@@ -281,16 +449,18 @@ export const invalidateGlobalTransactionCache = (
   userId: string
 ): void => {
   try {
-    // Invalidează toate global transaction caches pentru acest user
+    // 🎯 MINIMAL FIX: Invalidează doar global infinite transaction caches pentru acest user
+    // Nu mai invalidăm monthly cache pentru a evita refresh complet al LunarGrid
+    
     queryClient.invalidateQueries({
       queryKey: ['transactions', 'infinite', userId],
       exact: false
     });
 
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[CACHE-SYNC] Fallback invalidation executed for userId:', userId);
+      console.warn('[CACHE-SYNC] Minimal fallback invalidation executed for userId:', userId);
     }
   } catch (error) {
-    console.error('[CACHE-SYNC] Error în fallback invalidation:', error);
+    console.error('[CACHE-SYNC] Error în minimal fallback invalidation:', error);
   }
 }; 

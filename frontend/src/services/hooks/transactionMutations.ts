@@ -391,6 +391,16 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       return { previousData };
     },
     onSuccess: (updatedTransaction) => {
+      // 🐞 DEBUG: Loghez tranzacția actualizată returnată de la server
+      console.log('🔍 [UPDATE-SUCCESS] Transaction returned from server:', {
+        id: updatedTransaction.id,
+        amount: updatedTransaction.amount,
+        category: updatedTransaction.category,
+        subcategory: updatedTransaction.subcategory,
+        date: updatedTransaction.date,
+        timestamp: new Date().toISOString()
+      });
+
       // Manual cache update cu datele reale din server (înlocuiește optimistic data)
       const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
       
@@ -401,6 +411,11 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
           ),
           count: currentData.count,
         };
+        
+        console.log('🔍 [UPDATE-SUCCESS] Updated monthly cache data:', {
+          totalTransactions: updatedResult.data.length,
+          updatedTransactionInCache: updatedResult.data.find(tx => tx.id === updatedTransaction.id)
+        });
         
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
       }
