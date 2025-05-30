@@ -310,7 +310,7 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
         updated_at: new Date().toISOString(),
       };
 
-      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+      queryClient.setQueryData(monthlyQueryKey, (old: MonthlyTransactionsResult | undefined) => {
         if (!old) return { data: [tempTransaction], count: 1 };
         return {
           data: [...old.data, tempTransaction],
@@ -378,10 +378,10 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       const previousData = queryClient.getQueryData(monthlyQueryKey);
 
       // 🚀 Optimistic update - actualizăm imediat în cache
-      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+      queryClient.setQueryData(monthlyQueryKey, (old: MonthlyTransactionsResult | undefined) => {
         if (!old) return old;
         return {
-          data: old.data.map((tx: any) =>
+          data: old.data.map((tx: TransactionValidated) =>
             tx.id === id ? { ...tx, ...transactionData, updated_at: new Date().toISOString() } : tx
           ),
           count: old.count,
@@ -448,10 +448,10 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
       const previousData = queryClient.getQueryData(monthlyQueryKey);
 
       // Optimistic update - eliminăm tranzacția
-      queryClient.setQueryData(monthlyQueryKey, (old: any) => {
+      queryClient.setQueryData(monthlyQueryKey, (old: MonthlyTransactionsResult | undefined) => {
         if (!old) return old;
         return {
-          data: old.data.filter((tx: any) => tx.id !== deletedId),
+          data: old.data.filter((tx: TransactionValidated) => tx.id !== deletedId),
           count: old.count - 1,
         };
       });

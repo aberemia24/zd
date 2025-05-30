@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ProfilerOnRenderCallback } from 'react';
 
 type ProfilerPhase = 'mount' | 'update';
 
@@ -22,27 +22,26 @@ export function useProfilingWrapper() {
   const [showResults, setShowResults] = useState<boolean>(false);
   const maxRendersToKeep = 20;
 
-  // Implementăm handleRender ca un callback normal (fără tipar explicit la ProfilerOnRenderCallback)
-  const handleRender = useCallback((
-    id: string, 
-    phase: ProfilerPhase, 
-    actualDuration: number, 
-    baseDuration: number, 
-    startTime: number, 
-    commitTime: number, 
-    interactions: Set<any>
+  // Implementăm handleRender cu tipul exact din React
+  const handleRender: ProfilerOnRenderCallback = useCallback((
+    id, 
+    phase, 
+    actualDuration, 
+    baseDuration, 
+    startTime, 
+    commitTime
   ) => {
     if (isRecording) {
       setRenders(prev => {
         const newRenders = [
           {
             id,
-            phase,
+            phase: phase as ProfilerPhase,
             actualDuration,
             baseDuration,
             startTime,
             commitTime,
-            interactions
+            interactions: new Set() // Empty set pentru interactions deprecated
           },
           ...prev
         ];
