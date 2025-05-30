@@ -2,11 +2,11 @@
 
 ## 📊 CURRENT STATUS
 
-- **Phase**: 🎨 **CREATIVE PHASE COMPLETE**
+- **Phase**: �� **IMPLEMENT MODE - LGI-TASK-01 IMPLEMENTAT**
 - **Date**: 30 Mai 2025
 - **Project**: **LunarGrid Comprehensive Improvements**
 - **Complexity**: **LEVEL 4 - COMPLEX SYSTEM**
-- **Status**: ✅ **DESIGN DECISIONS COMPLETE - READY FOR IMPLEMENT**
+- **Status**: ✅ **LGI-TASK-01 COMPLETE - TESTING REQUIRED**
 
 ---
 
@@ -66,19 +66,31 @@
 - **Progress**: 0%
 
 ##### **LGI-TASK-01**: Add Subcategory Button Implementation
-- **Description**: Implementare buton "Adaugă subcategorie" în fiecare categorie cu limită 5
-- **Status**: TODO
-- **Assigned To**: TBD
-- **Estimated Effort**: 8h
-- **Dependencies**: Category limit validation system
-- **Risk Assessment**: Medium - UI space constraints
-- **Quality Gates**: Unit tests, integration tests, UX validation
+- **Description**: Implementare buton "Adaugă subcategorie" în fiecare categorie cu limită 5 SUBCATEGORII CUSTOM
+- **Status**: ✅ COMPLETE (cu corectări pentru subcategorii custom)
+- **Implementation**: Row special sub ultima subcategorie cu buton "Adaugă subcategorie"
+- **Features**:
+  - ✅ Buton "+ Adaugă subcategorie" apare sub ultimele subcategorii când categoria e expandată
+  - ✅ Limită 5 SUBCATEGORII CUSTOM enforced - butonul verifică doar subcategoriile custom
+  - ✅ Subcategoriile custom afișate cu Badge verde "custom" exact ca în CategoryEditor
+  - ✅ Input inline cu validare pentru numele subcategoriei noi
+  - ✅ Integrare completă cu CategoryStore folosind saveCategories existent
+  - ✅ Toast notifications pentru succes și erori
+  - ✅ Keyboard shortcuts (Enter = save, Escape = cancel)
+  - ✅ Data-testid pentru toate elementele interactive
+- **UI/UX**: Row discret cu styling consistent, input inline cu butoane save/cancel, subcategorii custom cu Badge verde "custom"
+- **Validări**: 
+  - ✅ Verifică limita de 5 SUBCATEGORII CUSTOM (nu toate subcategoriile)
+  - ✅ Verifică dacă subcategoria deja există
+  - ✅ Validare input gol
+- **Fix Applied**: Corectată logica să conte doar subcategoriile custom, nu toate subcategoriile
+- **Next**: Testing final și validare completă în browser
 
 **Subtasks**:
-- [ ] LGI-SUB-01: Proiectare poziționate buton în UI - Planning
-- [ ] LGI-SUB-02: Implementare logică validare limite - Planning
-- [ ] LGI-SUB-03: Integrare cu CategoryStore - Planning
-- [ ] LGI-SUB-04: Mesaje UX pentru limite - Planning
+- [x] LGI-SUB-01: Proiectare poziționare buton în UI - COMPLETE (row sub subcategorii)
+- [x] LGI-SUB-02: Implementare logică validare limite - COMPLETE (5 subcategorii max)
+- [x] LGI-SUB-03: Integrare cu CategoryStore - COMPLETE (folosește saveCategories)
+- [x] LGI-SUB-04: Mesaje UX pentru limite - COMPLETE (toast notifications)
 
 ##### **LGI-TASK-02**: Inline Subcategory Rename System
 - **Description**: Sistem de redenumire inline pentru toate subcategoriile din tabel
