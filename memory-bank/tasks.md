@@ -943,6 +943,18 @@ for (const [key, transactions] of transactionGroups) {
   - Eliminated complex cache invalidation issues
 - **Result**: ✅ Balance updates now instant after transaction edits (no refresh needed)
 
+### ✅ 🎨 VISUAL FIX: Sticky Header Full Coverage
+- **Problem**: User reported gaps at margins, header and category column not extending to edges
+- **Root Cause**: `rounded-lg` container corners and `bg-inherit` on sticky elements created visual gaps
+- **Solution**: 
+  - Removed `rounded-lg` from container for clean edges
+  - Added explicit `bg-gray-50` to sticky category header
+  - Changed `bg-inherit` to `bg-white` for sticky category cells
+  - **KEY FIX**: Replaced `gridContainer({ size: "full" })` with `w-full` to eliminate container padding
+  - Added explicit `w-full` to table element for complete width coverage
+  - Full coverage without visual intercalation during scroll
+- **Result**: ✅ Clean professional appearance, no gaps at margins, smooth scroll layering
+
 ### ✅ 5. Technical Debt Cleanup
 - **Code Quality**: 
   - Added LUNAR_GRID constants to shared-constants/ui.ts
