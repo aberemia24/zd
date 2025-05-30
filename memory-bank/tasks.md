@@ -856,11 +856,15 @@ for (const [key, transactions] of transactionGroups) {
 **Status**: ✅ **SUCCESSFULLY IMPLEMENTED**
 
 #### **🔧 What Was Implemented**
-- **Individual Expand/Collapse Buttons**: Fiecare categorie are acum propriul buton "Extinde"/"Restrânge"
-- **Location**: Implementat în `MemoizedRow.tsx` cu buton individual pe fiecare rând de categorie  
+- **Individual Expand/Collapse Clickable Area**: Întreaga celulă de categorie (nume + iconița ▶/▼) este acum clickable pentru expand/collapse
+- **Location**: Implementat în `LunarGridTanStack.tsx` cu funcționalitate completă pe prima celulă de categorie  
 - **UI Constants**: Adăugate constante în `shared-constants/ui.ts` pentru text consistent
-- **Functionality**: Funcionează independent de butonul global expand/collapse
-- **User Experience**: Utilizatorii pot controla fiecare categorie separat
+- **User Experience**: 
+  - Click pe numele categoriei = expand/collapse
+  - Click pe iconița ▶/▼ = expand/collapse
+  - Hover effect pentru feedback vizual
+  - Funcționează independent de butonul global expand/collapse
+- **Visual Feedback**: Hover highlighting și cursor pointer pe categorii
 
 #### **🎨 UI Implementation Details**
 - Buton gri mic cu hover effect în partea dreaptă a fiecărei categorii
