@@ -260,15 +260,16 @@
 - [x] **Expense Impact Propagation** - Changes cascade to future dates automatically
 
 ### **UI/UX Enhancement Requirements** ✅
-- [x] **Individual Category Controls** - Fiecare categorie cu propriul expand/collapse (pe lângă global)
-- [x] **Inline Subcategory Management** - Add/delete/rename subcategorii direct din tabel
-- [x] **5-Item Limit Enforcement** - Maxim 5 subcategorii per categorie cu messaging clar
-- [x] **Enhanced Visual Design** - Grid mai mare, compact, Excel-like cu coloana categoriilor fixată
-- [x] **Uniform Cell Sizing** - Toate rândurile și coloanele egale între ele
-- [x] **Simple Dual Interaction Model** - Single click modal + double click inline editing
-- [x] **Keyboard Delete Support** - Tasta Delete pentru ștergerea tranzacțiilor
-- [x] **Hover Action Buttons** - Mini delete/edit iconițe la hover pe celule
-- [x] **Professional Visual Design** - Clean, trustworthy financial planning appearance
+- [x] **Individual Category Controls** - ✅ **IMPLEMENTED** - Fiecare categorie cu propriul buton expand/collapse (pe lângă global)
+- [x] **Table Header Sticky** - ✅ **ALREADY IMPLEMENTED** - Header sticky pentru scroll vertical 
+- [ ] **Inline Subcategory Management** - Add/delete/rename subcategorii direct din tabel
+- [ ] **5-Item Limit Enforcement** - Maxim 5 subcategorii per categorie cu messaging clar
+- [ ] **Enhanced Visual Design** - Grid mai mare, compact, Excel-like cu coloana categoriilor fixată
+- [x] **Uniform Cell Sizing** - ✅ **IMPLEMENTED** - Toate rândurile și coloanele egale între ele
+- [ ] **Simple Dual Interaction Model** - Single click modal + double click inline editing
+- [ ] **Keyboard Delete Support** - Tasta Delete pentru ștergerea tranzacțiilor
+- [ ] **Hover Action Buttons** - Mini delete/edit iconițe la hover pe celule
+- [x] **Professional Visual Design** - ✅ **IMPLEMENTED** - Clean, trustworthy financial planning appearance
 
 ### **Technical Data Requirements** ✅
 - [x] **Enhanced Date Format** - Day + month display (1 - Iunie format)
@@ -422,6 +423,11 @@
 
 ### **Phase 2: Advanced Interactions** (2-3 weeks)
 **Priority**: HIGH - User experience improvements
+
+**✅ COMPLETED în Phase 1:**
+- [x] **Individual Category Controls** - ✅ **IMPLEMENTED** - Fiecare categorie cu propriul buton expand/collapse
+
+**🔥 REMAINING Phase 2 Tasks:**
 1. **Simple Dual Interaction Model**
    - Single click modal editing (suma, descriere, recurent)
    - Double click inline editing (existing functionality)
@@ -433,24 +439,17 @@
    - Cell focus/selection management
    - Testing: Keyboard navigation și hover UX
 
-3. **Individual Category Controls**
-   - Fiecare categorie cu propriul buton expand/collapse (pe lângă butonul global existent)
-   - Control independent pentru fiecare categorie (nu global)
-   - Category state persistence (Food expanded, Transport collapsed etc.)
-   - Testing: State management și performance
-
-4. **Inline Subcategory Management**
+3. **Inline Subcategory Management**
    - Buton "Add Subcategorie" sub ultima subcategorie din fiecare categorie
    - Maxim 5 subcategorii per categorie cu validation
    - Messaging clar când limit este atins (buton dispare sau mesaj)
    - Delete/rename subcategorii custom direct din tabel
    - Testing: Validation logic și user experience
 
-5. **Enhanced Table Visual & Size**
+4. **Enhanced Table Visual & Size**
    - Grid mai mare și mai compact (Excel-like appearance)
    - Wide mode sau fullscreen mode (doar dacă e simplu)
    - Uniform cell sizing - toate rândurile și coloanele egale
-   - Coloana categoriilor fixată by default (sticky pe scroll horizontal)
    - Testing: Visual design și user experience
 
 ### **Phase 3: Advanced Features** (3-4 weeks)

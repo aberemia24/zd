@@ -259,7 +259,12 @@ export const LUNAR_GRID = {
   RESET_EXPANSION: 'Resetează',
   LOADING: 'Se încarcă datele...',
   NO_DATA: 'Nu există date pentru perioada selectată',
-  TOTAL_BALANCE: 'Sold'
+  TOTAL_BALANCE: 'Sold',
+  // Constante pentru controale individuale
+  EXPAND_CATEGORY: 'Extinde',
+  COLLAPSE_CATEGORY: 'Restrânge',
+  EXPAND_CATEGORY_TITLE: 'Extinde categoria',
+  COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria'
 };
 
 // Constante pentru teste - eliminate strings hardcodate
