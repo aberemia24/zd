@@ -418,17 +418,41 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         : undefined
                     }
                   >
-                    {isDayCell && isSubcategory
-                      ? renderEditableCell(
-                          original.category,
-                          original.subcategory,
-                          parseInt(cell.column.id.split("-")[1]),
-                          cell.getValue() as string | number,
-                        )
-                      : (flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        ) as React.ReactNode)}
+                    {isFirstCell && isCategory ? (
+                      // Celula de categorie clickable pentru expand/collapse
+                      <div 
+                        className="flex items-center cursor-pointer hover:bg-gray-50 rounded px-1 py-1 transition-colors duration-150"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          row.toggleExpanded();
+                          setExpandedRows(prev => ({
+                            ...prev,
+                            [row.id]: !row.getIsExpanded()
+                          }));
+                        }}
+                        title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
+                        data-testid={`toggle-category-${original.category}`}
+                      >
+                        <span className="mr-2 text-gray-500 font-bold">
+                          {row.getIsExpanded() ? '▼' : '▶'}
+                        </span>
+                        <span className="select-none">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                        </span>
+                      </div>
+                    ) : isDayCell && isSubcategory ? (
+                      renderEditableCell(
+                        original.category,
+                        original.subcategory,
+                        parseInt(cell.column.id.split("-")[1]),
+                        cell.getValue() as string | number,
+                      )
+                    ) : (
+                      flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      ) as React.ReactNode
+                    )}
                   </td>
                 );
               })}
