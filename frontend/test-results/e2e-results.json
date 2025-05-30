@@ -95,7 +95,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 6217,
+                      "duration": 7831,
                       "errors": [],
                       "stdout": [
                         {
@@ -107,7 +107,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-30T15:17:57.629Z",
+                      "startTime": "2025-05-30T19:19:35.552Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -138,7 +138,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5381,
+                      "duration": 5045,
                       "errors": [],
                       "stdout": [
                         {
@@ -150,7 +150,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-30T15:18:04.192Z",
+                      "startTime": "2025-05-30T19:19:43.522Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -198,7 +198,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1854,
+                      "duration": 1570,
                       "errors": [],
                       "stdout": [
                         {
@@ -210,7 +210,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-30T15:18:09.587Z",
+                      "startTime": "2025-05-30T19:19:48.577Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -241,7 +241,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1616,
+                      "duration": 1464,
                       "errors": [],
                       "stdout": [
                         {
@@ -256,7 +256,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-30T15:18:11.446Z",
+                      "startTime": "2025-05-30T19:19:50.150Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -287,7 +287,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 11569,
+                      "duration": 11364,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('[data-testid*=\"editable-cell\"]').first()\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid*=\"editable-cell\"]').first()\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 10000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: locator('[data-testid*=\"editable-cell\"]').first()\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for locator('[data-testid*=\"editable-cell\"]').first()\u001b[22m\n\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\lunar-grid.smoke.spec.ts:93:29",
@@ -315,7 +315,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-05-30T15:18:13.066Z",
+                      "startTime": "2025-05-30T19:19:51.618Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -351,8 +351,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-05-30T15:17:56.183Z",
-    "duration": 29854.690000000002,
+    "startTime": "2025-05-30T19:19:34.685Z",
+    "duration": 29612.888,
     "expected": 4,
     "skipped": 0,
     "unexpected": 1,
