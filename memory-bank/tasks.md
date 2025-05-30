@@ -84,6 +84,11 @@
   - ✅ Verifică dacă subcategoria deja există
   - ✅ Validare input gol
 - **Fix Applied**: Corectată logica să conte doar subcategoriile custom, nu toate subcategoriile
+- **Clean-up Added**: Detectare și curățare tranzacții orfane (fără subcategorie) - date murdare din trecut
+  - ✅ Detectare automată în consolă
+  - ✅ Buton roșu temporar pentru curățare
+  - ✅ Ștergere reală prin useDeleteTransactionMonthly hook
+  - ✅ Confirmação cu lista completă înainte de ștergere
 - **Next**: Testing final și validare completă în browser
 
 **Subtasks**:
