@@ -36,7 +36,7 @@ import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
 
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
-import { formatCurrency } from "../../../utils/lunarGrid";
+import { formatCurrency, getBalanceStyleClass } from "../../../utils/lunarGrid";
 
 // Import CVA styling system
 import { cn } from "../../../styles/cva/shared/utils";
@@ -568,7 +568,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         key={day} 
                         className={cn(
                           tableCell({ variant: "numeric" }),
-                          getBalanceStyle(balance),
+                          getBalanceStyleClass(balance),
                           "transition-colors duration-150"
                         )}
                       >
@@ -578,7 +578,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                   })}
                   <td className={cn(
                     tableCell({ variant: "numeric" }),
-                    getBalanceStyle(monthTotal),
+                    getBalanceStyleClass(monthTotal),
                     "font-bold",
                     "transition-colors duration-150"
                   )}>

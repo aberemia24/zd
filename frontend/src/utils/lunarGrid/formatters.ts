@@ -8,6 +8,12 @@ const TEXT_CLASSES = {
   NEUTRAL: "text-secondary-400",
 };
 
+// Nume lunilor în română pentru header-urile LunarGrid
+const ROMANIAN_MONTHS = [
+  "Ianuarie", "Februarie", "Martie", "Aprilie", "Mai", "Iunie",
+  "Iulie", "August", "Septembrie", "Octombrie", "Noiembrie", "Decembrie"
+];
+
 // 🎯 Step 3.3: Singleton Intl.NumberFormat pentru optimizare CPU
 const currencyFormatter = new Intl.NumberFormat(LOCALE, {
   minimumFractionDigits: 2,
@@ -101,4 +107,65 @@ export function formatDate(date: string | Date | number): string {
     console.error("Eroare la formatarea datei:", error);
     return "Data invalidă";
   }
+}
+
+/**
+ * Formatează ziua și luna în format românesc pentru header-urile LunarGrid
+ * 
+ * Această funcție creează un format compact dar clar pentru header-urile 
+ * coloanelor zilelor în LunarGrid: "ziua - LunaRomână"
+ * 
+ * @param day Ziua lunii (1-31)
+ * @param month Luna (1-12) 
+ * @returns String formatat în română (ex: "1 - Iunie", "15 - Mai")
+ * @example
+ * formatDayMonth(1, 6)  // "1 - Iunie"
+ * formatDayMonth(15, 5) // "15 - Mai"
+ * formatDayMonth(31, 12) // "31 - Decembrie"
+ */
+export function formatDayMonth(day: number, month: number): string {
+  if (day < 1 || day > 31 || month < 1 || month > 12) {
+    console.warn("formatDayMonth: zi sau lună invalidă", { day, month });
+    return day.toString(); // Fallback la numărul zilei
+  }
+
+  const monthName = ROMANIAN_MONTHS[month - 1]; // month este 1-indexed
+  return `${day} - ${monthName}`;
+}
+
+/**
+ * Verifică dacă o zi specifică este ziua curentă
+ * 
+ * @param day Ziua lunii (1-31)
+ * @param month Luna (1-12)
+ * @param year Anul
+ * @returns true dacă este ziua curentă
+ * @example
+ * isCurrentDay(15, 5, 2025) // true dacă astăzi este 15 Mai 2025
+ */
+export function isCurrentDay(day: number, month: number, year: number): boolean {
+  const today = new Date();
+  return (
+    today.getDate() === day &&
+    today.getMonth() + 1 === month && // getMonth() este 0-indexed
+    today.getFullYear() === year
+  );
+}
+
+/**
+ * Returnează clase CSS pentru styling-ul header-urilor zilelor
+ * Include highlighting pentru ziua curentă
+ * 
+ * @param day Ziua lunii (1-31)
+ * @param month Luna (1-12)
+ * @param year Anul
+ * @returns String cu clase CSS Tailwind
+ * @example
+ * getDayHeaderStyle(15, 5, 2025) // "bg-blue-100 text-blue-800 font-semibold" pentru ziua curentă
+ */
+export function getDayHeaderStyle(day: number, month: number, year: number): string {
+  if (isCurrentDay(day, month, year)) {
+    return "bg-blue-100 text-blue-800 font-semibold border-blue-300";
+  }
+  return ""; // Default styling din CVA
 }
