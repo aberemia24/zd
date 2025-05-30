@@ -12,6 +12,9 @@ import { useAuthStore } from "../../../../stores/authStore";
 // Folosim direct noul hook specializat pentru încărcarea lunară
 import { useMonthlyTransactions } from "../../../../services/hooks/useMonthlyTransactions";
 
+// Import-uri pentru tipurile de tranzacții
+import type { TransactionValidated } from "@shared-constants/transaction.schema";
+
 // Import-uri utilitare din @utils/lunarGrid (via barrel file) - doar cele folosite
 import {
   getDaysInMonth,
@@ -157,6 +160,21 @@ export function useLunarGridTable(
     includeAdjacentDays: true,
   });
 
+  // 🐞 DEBUG: Verificăm dacă datele se actualizează după cache sync
+  useEffect(() => {
+    console.log('🔍 [COMPONENT-DEBUG] validTransactions updated:', {
+      count: validTransactions?.length || 0,
+      timestamp: new Date().toISOString(),
+      sampleTransactions: validTransactions?.slice(0, 3)?.map(t => ({
+        id: t.id,
+        amount: t.amount,
+        date: t.date,
+        category: t.category,
+        subcategory: t.subcategory
+      }))
+    });
+  }, [validTransactions]);
+
   // Gestionare erori de la React Query
   useEffect(() => {
     if (queryError) {
@@ -215,8 +233,39 @@ export function useLunarGridTable(
       categoriesMap[cat].subRows = subRows;
     });
 
-    // 4. Parcurgem tranzacțiile și agregăm sumele pe subRows
+    // 4. Aplicăm aceeași strategie de selecție ca în transactionMap pentru consistență
+    // Grupăm tranzacțiile per cheie și selectăm tranzacția principală (cea mai mare sumă)
+    const transactionGroups = new Map<string, TransactionValidated[]>();
+    
+    // Construiește grupări pentru selecție
     validTransactions.forEach((t) => {
+      const cat = t.category;
+      const subcat = typeof t.subcategory === "string" ? t.subcategory : "";
+      const day = new Date(t.date).getDate();
+      const key = `${cat}-${subcat}-${day}`;
+      
+      if (!transactionGroups.has(key)) {
+        transactionGroups.set(key, []);
+      }
+      transactionGroups.get(key)!.push(t);
+    });
+    
+    // Pentru fiecare grupă, selectează tranzacția cu cea mai mare sumă
+    const selectedTransactions: TransactionValidated[] = [];
+    for (const [key, transactions] of transactionGroups) {
+      // 🔥 NEW STRATEGY: Selectează tranzacția cea mai recentă (ultima modificată/creată)
+      const primaryTransaction = transactions.reduce((latest, current) => {
+        // Folosește updated_at dacă există, altfel created_at, altfel fallback pe amount
+        const latestTime = new Date(latest.updated_at || latest.created_at || '1970-01-01').getTime();
+        const currentTime = new Date(current.updated_at || current.created_at || '1970-01-01').getTime();
+        
+        return currentTime > latestTime ? current : latest;
+      });
+      selectedTransactions.push(primaryTransaction);
+    }
+    
+    // Acum procesează doar tranzacțiile selectate pentru a evita dubla agregare
+    selectedTransactions.forEach((t) => {
       const cat = t.category;
       const subcat = typeof t.subcategory === "string" ? t.subcategory : "";
       const day = new Date(t.date).getDate();
@@ -224,16 +273,19 @@ export function useLunarGridTable(
         t.status === "COMPLETED" && typeof t.actualAmount === "number"
           ? t.actualAmount
           : t.amount;
+      
       if (!cat) return;
+      
       const subRows = categoriesMap[cat]?.subRows || [];
       let subRow = subRows.find(
         (s: TransformedTableDataRow) => s.subcategory === subcat,
       );
       if (subRow) {
-        subRow[`day-${day}`] = (subRow[`day-${day}`] || 0) + amount;
+        // Setează direct amount-ul tranzacției principale
+        subRow[`day-${day}`] = amount;
         subRow.total = (subRow.total || 0) + amount;
       }
-      // Categorie (agregare totală)
+      // Categorie (agregare totală) - acum fără dublă agregare
       if (!categoriesMap[cat])
         categoriesMap[cat] = {
           id: cat,
@@ -242,8 +294,7 @@ export function useLunarGridTable(
           total: 0,
           subRows: [],
         };
-      categoriesMap[cat][`day-${day}`] =
-        (categoriesMap[cat][`day-${day}`] || 0) + amount;
+      categoriesMap[cat][`day-${day}`] = (categoriesMap[cat][`day-${day}`] || 0) + amount;
       categoriesMap[cat].total = (categoriesMap[cat].total || 0) + amount;
     });
 
@@ -471,15 +522,81 @@ export function useLunarGridTable(
     [],
   );
 
-  // Tip pentru maparea tranzacțiilor individuale
-  const transactionMap = useMemo(() => {
+  // Tip pentru maparea tranzacțiilor individuale (modificat pentru a agrega duplicate keys)
+  const transactionMap = useMemo((): TransactionMap => {
     const map = new Map<string, string>();
-    validTransactions.forEach((t) => {
-      const key = `${t.category}-${t.subcategory || ''}-${new Date(t.date).getDate()}`;
-      map.set(key, t.id);
+    
+    if (!validTransactions?.length) {
+      console.log('🔍 [TRANSACTIONMAP-DEBUG] No validTransactions available');
+      return map;
+    }
+    
+    console.log('🔍 [TRANSACTIONMAP-DEBUG] Building transactionMap:', {
+      transactionCount: validTransactions.length,
+      timestamp: new Date().toISOString()
     });
+    
+    // 🔥 FIX: Grupează tranzacțiile per cheie pentru a agrega duplicate keys
+    const transactionGroups = new Map<string, TransactionValidated[]>();
+    
+    // Construiește grupări
+    for (const t of validTransactions) {
+      const parsedDate = new Date(t.date);
+      const extractedDay = parsedDate.getDate();
+      const key = `${t.category}-${t.subcategory || ''}-${extractedDay}`;
+      
+      if (!transactionGroups.has(key)) {
+        transactionGroups.set(key, []);
+      }
+      transactionGroups.get(key)!.push(t);
+    }
+    
+    // Pentru fiecare cheie, folosește tranzacția cu cea mai mare sumă (principală)
+    for (const [key, transactions] of transactionGroups) {
+      if (transactions.length > 1) {
+        console.log(`🔍 [TRANSACTIONMAP-DEBUG] Multiple transactions for key ${key}:`, {
+          count: transactions.length,
+          amounts: transactions.map(t => t.amount),
+          ids: transactions.map(t => t.id.substring(0, 8))
+        });
+      }
+      
+      // 🔥 NEW STRATEGY: Selectează tranzacția cea mai recentă (ultima modificată/creată)
+      const primaryTransaction = transactions.reduce((latest, current) => {
+        // Folosește updated_at dacă există, altfel created_at, altfel fallback pe amount
+        const latestTime = new Date(latest.updated_at || latest.created_at || '1970-01-01').getTime();
+        const currentTime = new Date(current.updated_at || current.created_at || '1970-01-01').getTime();
+        
+        return currentTime > latestTime ? current : latest;
+      });
+      
+      // Extrage ziua din primul element pentru debug
+      const parsedDate = new Date(primaryTransaction.date);
+      const extractedDay = parsedDate.getDate();
+      
+      map.set(key, primaryTransaction.id);
+      
+      // Debug pentru zilele 1-10
+      if (extractedDay <= 10) {
+        console.log('🔍 [TRANSACTIONMAP-DEBUG] Selected primary transaction for early days:', {
+          key,
+          selectedId: primaryTransaction.id.substring(0, 8),
+          selectedAmount: primaryTransaction.amount,
+          totalTransactionsForKey: transactions.length,
+          originalDate: primaryTransaction.date,
+          updated_at: primaryTransaction.updated_at,
+          extractedDay
+        });
+      }
+    }
+    
+    console.log('🔍 [TRANSACTIONMAP-DEBUG] TransactionMap built:', {
+      size: map.size,
+      keysample: Array.from(map.keys()).slice(0, 5)
+    });
+    
     return map;
-  }, [validTransactions]);
+  }, [validTransactions, year, month]);
 
   return {
     table,

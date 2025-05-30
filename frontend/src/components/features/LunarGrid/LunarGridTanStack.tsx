@@ -95,14 +95,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       includeAdjacentDays: true,
     });
 
-    // 🐞 DEBUG: Verifică dacă tranzacțiile sunt transmise corect
-    console.log('🎯 [DEBUG] LunarGrid Financial Projections:', {
-      validTransactionsCount: validTransactions.length,
-      validTransactions: validTransactions.slice(0, 3), // Only first 3 for debugging
-      year,
-      month
-    });
-
     // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
     const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
     const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
@@ -128,79 +120,43 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       ): Promise<void> => {
         const numValue = typeof value === "string" ? parseFloat(value) : value;
 
-        if (isNaN(numValue) || numValue <= 0) {
-          const errorMsg = "Valoare invalidă - trebuie să fie un număr pozitiv";
-          // 🎯 Step 1.6: Toast error pentru validare
-          toast.error(errorMsg);
-          throw new Error(errorMsg);
+        if (isNaN(numValue)) {
+          throw new Error("Valoare invalidă");
         }
 
-        // 🐞 Step 1.5: FIX Bug UTC date shift - construim direct string YYYY-MM-DD
-        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const date = new Date(year, month - 1, day);
+        const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 
-        // 🚧 Step 1.2: Logic pentru UPDATE vs CREATE (TO BE IMPLEMENTED)
         if (transactionId) {
-          // 🔄 UPDATE existing transaction
-          const updatePayload: UpdateTransactionHookPayload = {
-            amount: numValue,
-            // Nu actualizăm categoria/subcategoria/data în editarea simplă inline
-            // doar valoarea
-          };
-
-          try {
-            await new Promise<void>((resolve, reject) => {
-              updateTransactionMutation.mutate({ id: transactionId, transactionData: updatePayload }, {
-                onSuccess: () => {
-                  // 🎯 Step 1.6: Toast success pentru UPDATE
-                  toast.success(MESAJE.SUCCES_EDITARE);
-                  resolve();
-                },
-                onError: (error: Error) => {
-                  // 🎯 Step 1.6: Toast error pentru UPDATE
-                  toast.error(`${MESAJE.EROARE_SALVARE_TRANZACTIE}: ${error.message}`);
-                  reject(error);
-                },
-              });
-            });
-          } catch (error) {
-            throw error;
-          }
+          // UPDATE: Modifică tranzacția existentă
+          await updateTransactionMutation.mutateAsync({
+            id: transactionId,
+            transactionData: {
+              amount: numValue,
+              date: isoDate,
+              category,
+              subcategory: subcategory || undefined,
+              type: TransactionType.EXPENSE,
+            }
+          });
         } else {
-          // ➕ CREATE new transaction (existing logic)
-          const createPayload: CreateTransactionHookPayload = {
+          // CREATE: Creează o tranzacție nouă
+          await createTransactionMutation.mutateAsync({
             amount: numValue,
+            date: isoDate,
             category,
             subcategory: subcategory || undefined,
-            type: determineTransactionType(category),
-            date,
-            recurring: false,
-            frequency: undefined,
-          };
-
-          try {
-            // React Query mutation face cache invalidation automat - nu mai adăugăm manual
-            await new Promise<void>((resolve, reject) => {
-              createTransactionMutation.mutate(createPayload, {
-                onSuccess: () => {
-                  // 🎯 Step 1.6: Toast success pentru CREATE
-                  toast.success(MESAJE.SUCCES_ADAUGARE);
-                  resolve();
-                },
-                onError: (error: Error) => {
-                  // 🎯 Step 1.6: Toast error pentru CREATE
-                  toast.error(`${MESAJE.EROARE_ADAUGARE}: ${error.message}`);
-                  reject(error);
-                },
-              });
-            });
-
-            // ELIMINAT: Cache invalidation manual - se face automat în mutation onSuccess
-          } catch (error) {
-            throw error;
-          }
+            type: TransactionType.EXPENSE,
+            description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
+          });
         }
       },
-      [year, month, createTransactionMutation, determineTransactionType, updateTransactionMutation],
+      [
+        year,
+        month,
+        updateTransactionMutation,
+        createTransactionMutation,
+      ],
     );
 
     // Handler pentru click pe celulă (doar pentru modal advanced - Shift+Click)
@@ -309,16 +265,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         return dailyBalances;
       }
 
-      // 🐞 DEBUG: Verifică dacă projection returnează balanțe diferite  
-      console.log('🎯 [DEBUG] Monthly Projection Daily Balances:', {
-        dailyBalancesCount: monthlyProjection.dailyBalances.length,
-        first5Days: monthlyProjection.dailyBalances.slice(0, 5).map(d => ({
-          date: d.date,
-          balance: d.balance,
-          transactionsCount: d.dayTransactions.length
-        }))
-      });
-
       // Transform projection data la existing format pentru compatibilitate
       const enhanced: Record<number, number> = {};
       monthlyProjection.dailyBalances.forEach(dayProjection => {
@@ -371,8 +317,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               }
             }}
             validationType="amount"
-            className="w-full h-full min-h-[40px]"
+            className={cn(
+              "w-full h-full min-h-[40px]",
+              // 🎯 Visual feedback: diferențiere CREATE vs UPDATE
+              transactionId 
+                ? "ring-1 ring-blue-200 bg-blue-50/30" // Existing transaction (UPDATE)
+                : "ring-1 ring-green-200 bg-green-50/30" // New transaction (CREATE)
+            )}
             data-testid={`editable-cell-${cellId}`}
+            placeholder={transactionId ? "Editează..." : "Adaugă..."}
           />
         );
       },
