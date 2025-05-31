@@ -2,43 +2,59 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 /**
  * GRID.TS - Componente Grid Excel-like cu CVA
- * Migrare de la componentMap cu 100% capability preservation
+ * 🎨 LGI-TASK-08: PROFESSIONAL STYLING OVERHAUL
+ * Enhanced cu modern design patterns și professional appearance
  *
  * Migration Mapping:
  * - grid.ts → gridContainer, gridTable, gridCell variants
  * - table.ts → tableRow, tableHeader, pagination
  *
- * EXCEL-LIKE FEATURES PRESERVED:
- * ✅ Multi-cell selection
- * ✅ Frozen columns/rows (sticky positioning)
- * ✅ Inline editing states
- * ✅ Expandable categories
- * ✅ Cell hover/active/focus states
- * ✅ Sortable headers
- * ✅ Calculate/formula cells
- * ✅ Value type styling (positive/negative)
+ * EXCEL-LIKE FEATURES PRESERVED + PROFESSIONAL ENHANCEMENT:
+ * ✅ Multi-cell selection cu enhanced visual feedback
+ * ✅ Frozen columns/rows (sticky positioning) cu shadow depth
+ * ✅ Inline editing states cu refined focus indicators
+ * ✅ Expandable categories cu smooth animations
+ * ✅ Cell hover/active/focus states cu professional transitions
+ * ✅ Sortable headers cu enhanced UX indicators
+ * ✅ Calculate/formula cells cu refined styling
+ * ✅ Value type styling (positive/negative) cu color psychology
+ * 🎨 NEW: Professional theme variants cu elevated visual hierarchy
+ * 🎨 NEW: Modern spacing și typography system
+ * 🎨 NEW: Refined color palette cu accessibility compliance
  */
 
 // =============================================================================
-// GRID CONTAINER & TABLE - Foundation
+// GRID CONTAINER & TABLE - Foundation cu Professional Enhancement
 // =============================================================================
 
 export const gridContainer = cva(
-  ["overflow-auto rounded-lg h-[600px]", "transition-all duration-150"],
+  ["overflow-auto rounded-lg", "transition-all duration-200 ease-in-out"],
   {
     variants: {
       variant: {
-        default: "bg-white shadow-sm",
-        bordered: "bg-white border border-gray-200 shadow-sm",
-        elevated: "bg-white shadow-md",
+        default: "bg-white shadow-sm border border-gray-200/60",
+        professional: [
+          "bg-white shadow-lg border border-gray-200/80",
+          "hover:shadow-xl transition-shadow duration-300"
+        ],
+        elevated: "bg-white shadow-xl border border-gray-100 ring-1 ring-gray-100/50",
+        minimal: "bg-white border border-gray-100",
+      },
+      size: {
+        compact: "h-[500px]",
+        default: "h-[600px]", 
+        large: "h-[700px]",
+        fullscreen: "h-[calc(100vh-120px)] min-h-[400px]",
       },
       state: {
-        loading: "opacity-75",
-        error: "border-red-500",
+        loading: "opacity-75 pointer-events-none",
+        error: "border-red-200 shadow-red-100",
+        focused: "ring-2 ring-blue-500/20 border-blue-300",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
+      size: "default",
     },
   },
 );
@@ -49,202 +65,301 @@ export const gridTable = cva(
     variants: {
       variant: {
         default: "",
+        professional: "font-medium",
         striped: "border-collapse",
-        bordered: "border border-gray-200",
+        minimal: "border-0",
+      },
+      density: {
+        compact: "text-xs",
+        default: "text-sm",
+        comfortable: "text-sm leading-relaxed",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
+      density: "default",
     },
   },
 );
 
 // =============================================================================
-// GRID HEADERS - Sticky positioning pentru Excel-like behavior
+// GRID HEADERS - Professional sticky positioning
 // =============================================================================
 
 export const gridHeader = cva(
-  ["bg-gray-50 sticky top-0 z-10", "transition-colors duration-150"],
+  [
+    "sticky top-0 z-10", 
+    "transition-all duration-200 ease-in-out",
+    "backdrop-blur-sm"
+  ],
   {
     variants: {
       variant: {
-        default: "",
-        primary: "bg-blue-50",
-        bordered: "border-b border-gray-200",
+        default: "bg-gray-50/95",
+        professional: [
+          "bg-gradient-to-r from-gray-50/98 to-gray-100/98",
+          "border-b border-gray-200/80 shadow-sm"
+        ],
+        minimal: "bg-white/95 border-b border-gray-100",
+        elevated: "bg-white/98 border-b-2 border-gray-200 shadow-md",
       },
     },
     defaultVariants: {
-      variant: "bordered",
+      variant: "professional",
     },
   },
 );
 
 export const gridHeaderCell = cva(
   [
-    "px-4 py-2 font-medium text-gray-700 border-b border-gray-200",
-    "transition-colors duration-150",
+    "px-4 py-3 font-semibold text-gray-700",
+    "transition-all duration-150 ease-in-out",
+    "border-b border-gray-200/60"
   ],
   {
     variants: {
       variant: {
         default: "",
-        sticky: "sticky left-0 z-20 text-left bg-gray-50",
-        numeric: "text-right",
-        sortable: "cursor-pointer hover:bg-gray-100",
+        professional: [
+          "font-semibold text-gray-800 tracking-tight",
+          "hover:bg-gray-50/80"
+        ],
+        sticky: [
+          "sticky left-0 z-20 text-left",
+          "bg-gradient-to-r from-gray-50/98 to-gray-100/98",
+          "shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
+        ],
+        numeric: "text-right font-mono tabular-nums",
+        sortable: [
+          "cursor-pointer select-none",
+          "hover:bg-gray-100/60 active:bg-gray-200/60"
+        ],
       },
       state: {
-        sorted: "bg-gray-200 text-gray-900",
+        sorted: [
+          "bg-blue-50/80 text-blue-900 font-bold",
+          "border-b-2 border-blue-300"
+        ],
+        hovered: "bg-gray-100/50",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
     },
   },
 );
 
 // =============================================================================
-// GRID ROWS - Category și subcategory expansion
+// GRID ROWS - Enhanced category și subcategory styling
 // =============================================================================
 
 export const gridCategoryRow = cva(
-  ["cursor-pointer", "transition-colors duration-150"],
+  [
+    "cursor-pointer group",
+    "transition-all duration-200 ease-in-out"
+  ],
   {
     variants: {
       variant: {
-        default: "bg-gray-100 hover:bg-gray-200",
-        primary: "bg-blue-50 hover:bg-blue-100",
-        expanded: "bg-blue-50",
+        default: "bg-gray-50/80 hover:bg-gray-100/80",
+        professional: [
+          "bg-gradient-to-r from-gray-50/90 to-gray-100/60",
+          "hover:from-gray-100/90 hover:to-gray-150/60",
+          "hover:shadow-sm border-l-4 border-l-transparent",
+          "hover:border-l-blue-400"
+        ],
+        income: [
+          "bg-gradient-to-r from-green-50/90 to-green-100/60",
+          "hover:from-green-100/90 hover:to-green-150/60",
+          "hover:border-l-green-400"
+        ],
+        expense: [
+          "bg-gradient-to-r from-red-50/90 to-red-100/60", 
+          "hover:from-red-100/90 hover:to-red-150/60",
+          "hover:border-l-red-400"
+        ],
+        expanded: [
+          "bg-blue-50/90 border-l-4 border-l-blue-500",
+          "shadow-sm"
+        ],
       },
       state: {
-        selected: "bg-blue-100",
+        selected: [
+          "bg-blue-100/90 border-l-4 border-l-blue-600",
+          "shadow-md ring-1 ring-blue-200/50"
+        ],
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
     },
   },
 );
 
 export const gridSubcategoryRow = cva(
-  ["group border-t border-gray-200", "transition-colors duration-150"],
+  [
+    "group border-t border-gray-100/60", 
+    "transition-all duration-150 ease-in-out"
+  ],
   {
     variants: {
       variant: {
-        default: "hover:bg-gray-50",
-        active: "bg-gray-50",
+        default: "hover:bg-gray-50/60",
+        professional: [
+          "hover:bg-gray-50/80 hover:shadow-sm",
+          "border-l-2 border-l-transparent",
+          "hover:border-l-gray-300"
+        ],
+        active: "bg-gray-50/80 border-l-2 border-l-gray-400",
+        custom: [
+          "bg-blue-50/30 hover:bg-blue-50/60",
+          "border-l-2 border-l-blue-200",
+          "hover:border-l-blue-400"
+        ],
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
     },
   },
 );
 
 export const gridTotalRow = cva(
-  "bg-gray-100 font-bold border-t-2 border-gray-300",
+  [
+    "font-bold border-t-2 transition-all duration-200",
+    "bg-gradient-to-r from-gray-100/90 to-gray-200/60"
+  ],
   {
     variants: {
       variant: {
-        default: "",
-        balance: "bg-gray-200",
+        default: "border-gray-300",
+        professional: [
+          "border-gray-400/80 shadow-sm",
+          "from-gray-100/95 to-gray-200/80"
+        ],
+        balance: [
+          "border-blue-400/80 shadow-md",
+          "from-blue-50/95 to-blue-100/80"
+        ],
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
     },
   },
 );
 
 // =============================================================================
-// GRID CELLS - Excel-like cell behaviors
+// GRID CELLS - Professional Excel-like cell behaviors
 // =============================================================================
 
 export const gridCell = cva(
   [
-    "px-4 py-2 transition-all duration-150",
-    "border-r border-gray-100 last:border-r-0",
+    "px-4 py-2.5 transition-all duration-150 ease-in-out",
+    "border-r border-gray-100/60 last:border-r-0",
+    "relative"
   ],
   {
     variants: {
-      // CELL TYPES pentru diferențiere vizuală
+      // CELL TYPES pentru diferențiere vizuală profesionistă
       type: {
-        header: "font-semibold bg-gray-50 text-gray-900 sticky top-0 z-10",
-        category: [
-          "font-medium bg-gray-50 text-gray-900",
-          "sticky left-0 z-10 cursor-pointer",
+        header: [
+          "font-semibold bg-gray-50/95 text-gray-900",
+          "sticky top-0 z-10 backdrop-blur-sm"
         ],
-        subcategory: ["sticky left-0 z-10 pl-8", "bg-white hover:bg-gray-50"],
-        value: ["text-right cursor-pointer tabular-nums", "hover:bg-blue-50"],
+        category: [
+          "font-semibold text-gray-900 sticky left-0 z-10",
+          "cursor-pointer bg-gradient-to-r from-gray-50/95 to-gray-100/60",
+          "shadow-[2px_0_4px_-2px_rgba(0,0,0,0.05)]"
+        ],
+        subcategory: [
+          "sticky left-0 z-10 pl-8 font-medium text-gray-700",
+          "bg-white/95 hover:bg-gray-50/80 backdrop-blur-sm",
+          "shadow-[1px_0_2px_-1px_rgba(0,0,0,0.03)]"
+        ],
+        value: [
+          "text-right cursor-pointer tabular-nums font-medium",
+          "hover:bg-blue-50/60 focus:bg-blue-100/60",
+          "hover:shadow-inner"
+        ],
         balance: [
           "font-bold text-right tabular-nums",
-          "sticky left-0 bg-gray-100 z-10",
+          "sticky left-0 z-10",
+          "bg-gradient-to-r from-gray-100/95 to-gray-200/60",
+          "shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
         ],
         formula: [
-          "font-mono text-xs bg-blue-50 text-blue-900",
-          "cursor-pointer hover:bg-blue-100",
+          "font-mono text-xs text-blue-900",
+          "bg-gradient-to-r from-blue-50/90 to-blue-100/60",
+          "cursor-pointer hover:from-blue-100/90 hover:to-blue-150/60",
+          "border border-blue-200/60 rounded-sm"
         ],
-        total: ["font-bold text-right tabular-nums", "bg-gray-100"],
+        total: [
+          "font-bold text-right tabular-nums",
+          "bg-gradient-to-r from-gray-100/95 to-gray-200/80"
+        ],
       },
 
-      // CELL STATES pentru Excel-like interactions
+      // CELL STATES pentru enhanced interactions
       state: {
         default: "",
-        hover: "bg-gray-50",
-        active: "bg-blue-50 ring-2 ring-blue-500 ring-inset",
-        editing: [
-          "bg-yellow-50 ring-2 ring-yellow-400 ring-inset",
-          "cursor-text",
+        hover: [
+          "bg-gray-50/80 shadow-inner",
+          "ring-1 ring-gray-200/40"
         ],
-        calculating: "animate-pulse bg-gray-100",
-        selected: "bg-blue-100",
-        multiselect: "bg-indigo-100",
-        error: "bg-red-50 ring-2 ring-red-500 ring-inset",
+        active: [
+          "bg-blue-50/80 shadow-inner",
+          "ring-2 ring-blue-400/60 ring-inset"
+        ],
+        editing: [
+          "bg-yellow-50/90 shadow-lg",
+          "ring-2 ring-yellow-400/80 ring-inset",
+          "cursor-text z-20"
+        ],
+        calculating: [
+          "animate-pulse bg-gradient-to-r from-gray-100 to-gray-200",
+          "before:absolute before:inset-0 before:bg-gradient-to-r",
+          "before:from-transparent before:via-white/60 before:to-transparent",
+          "before:animate-[shimmer_1.5s_ease-in-out_infinite]"
+        ],
+        selected: [
+          "bg-blue-100/80 shadow-inner",
+          "ring-2 ring-blue-500/60 ring-inset"
+        ],
+        multiselect: [
+          "bg-indigo-100/80 shadow-inner",
+          "ring-2 ring-indigo-500/60 ring-inset"
+        ],
+        error: [
+          "bg-red-50/90 text-red-900",
+          "ring-2 ring-red-400/60 ring-inset animate-pulse"
+        ],
+        readonly: [
+          "bg-gray-50/60 text-gray-600 cursor-not-allowed",
+          "opacity-75"
+        ],
+        positive: "text-green-700 font-semibold",
+        negative: "text-red-700 font-semibold",
+        zero: "text-gray-500 font-medium",
+        new: [
+          "bg-green-50/90 text-green-900",
+          "ring-2 ring-green-400/60 ring-inset",
+          "animate-[highlight_2s_ease-out]"
+        ],
       },
 
-      // VALUE TYPES pentru financial styling
-      valueType: {
-        neutral: "text-gray-600",
-        positive: "text-emerald-600 font-medium",
-        negative: "text-red-600 font-medium",
-        zero: "text-gray-400",
-      },
-
-      // FROZEN positioning pentru Excel-like frozen panes
-      frozen: {
-        row: "sticky top-0 z-20 bg-white",
-        column: "sticky left-0 z-10 bg-white",
-        both: "sticky top-0 left-0 z-30 bg-white",
+      // CELL SIZES pentru responsive design
+      size: {
+        compact: "px-2 py-1 text-xs",
+        default: "px-4 py-2.5 text-sm",
+        comfortable: "px-6 py-3 text-sm",
+        large: "px-8 py-4 text-base",
       },
     },
-
-    // COMPOUND VARIANTS pentru comportamente complexe
-    compoundVariants: [
-      {
-        type: "formula",
-        state: "calculating",
-        className: "animate-pulse bg-purple-100 text-purple-900",
-      },
-      {
-        type: "value",
-        valueType: "negative",
-        className: "bg-red-50",
-      },
-      {
-        type: "category",
-        state: "selected",
-        className: "bg-blue-200 font-bold",
-      },
-      {
-        frozen: "column",
-        type: "category",
-        className: "shadow-md border-r-2 border-gray-300",
-      },
-    ],
-
     defaultVariants: {
       type: "value",
       state: "default",
-      valueType: "neutral",
+      size: "default",
     },
   },
 );
@@ -254,66 +369,145 @@ export const gridCell = cva(
 // =============================================================================
 
 export const gridExpandIcon = cva(
-  ["mr-2 transition-transform duration-150", "cursor-pointer"],
+  [
+    "inline-flex items-center justify-center",
+    "transition-all duration-200 ease-in-out",
+    "select-none"
+  ],
   {
     variants: {
+      variant: {
+        default: "text-gray-500 hover:text-gray-700",
+        professional: [
+          "text-gray-600 hover:text-gray-800",
+          "hover:bg-gray-100/60 rounded-sm",
+          "hover:shadow-sm"
+        ],
+        minimal: "text-gray-400 hover:text-gray-600",
+      },
+      size: {
+        sm: "w-4 h-4 p-0.5",
+        default: "w-5 h-5 p-1",
+        lg: "w-6 h-6 p-1.5",
+      },
       state: {
-        expanded: "transform rotate-90",
-        collapsed: "transform rotate-0",
+        expanded: "rotate-90 text-blue-600",
+        collapsed: "rotate-0",
+        disabled: "opacity-50 cursor-not-allowed",
       },
     },
     defaultVariants: {
+      variant: "professional",
+      size: "default",
       state: "collapsed",
     },
   },
 );
 
-export const gridCellActions = cva("hidden group-hover:flex space-x-1", {
-  variants: {
-    position: {
-      default: "",
-      right: "absolute right-0 top-1/2 -translate-y-1/2 mr-2",
-    },
-  },
-  defaultVariants: {
-    position: "default",
-  },
-});
-
-export const gridActionButton = cva(
+export const gridCellActions = cva(
   [
-    "p-1 rounded transition-colors duration-150",
-    "focus:outline-none focus:ring-2 focus:ring-offset-1",
+    "absolute right-0 top-0 bottom-0",
+    "flex items-center gap-1 px-2",
+    "transition-all duration-200 ease-in-out",
+    "bg-gradient-to-l from-white via-white/95 to-transparent"
   ],
   {
     variants: {
       variant: {
-        default: "text-gray-500 hover:text-gray-700 focus:ring-gray-300",
-        edit: "text-gray-500 hover:text-blue-600 focus:ring-blue-300",
-        delete: "text-gray-500 hover:text-red-600 focus:ring-red-300",
+        default: "opacity-0 group-hover:opacity-100",
+        professional: [
+          "opacity-0 group-hover:opacity-100",
+          "backdrop-blur-sm shadow-sm",
+          "border-l border-gray-200/60"
+        ],
+        always: "opacity-100",
+        subtle: "opacity-60 hover:opacity-100",
+      },
+      position: {
+        right: "right-0",
+        left: "left-0 bg-gradient-to-r from-white via-white/95 to-transparent",
+        center: "left-1/2 transform -translate-x-1/2",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
+      position: "right",
+    },
+  },
+);
+
+export const gridActionButton = cva(
+  [
+    "inline-flex items-center justify-center",
+    "rounded transition-all duration-150 ease-in-out",
+    "focus:outline-none focus:ring-2 focus:ring-offset-1"
+  ],
+  {
+    variants: {
+      variant: {
+        default: [
+          "text-gray-500 hover:text-gray-700",
+          "hover:bg-gray-100 focus:ring-gray-300"
+        ],
+        professional: [
+          "text-gray-600 hover:text-gray-800",
+          "hover:bg-gray-100/80 hover:shadow-sm",
+          "focus:ring-blue-300 active:scale-95"
+        ],
+        danger: [
+          "text-red-500 hover:text-red-700",
+          "hover:bg-red-50 focus:ring-red-300"
+        ],
+        success: [
+          "text-green-500 hover:text-green-700", 
+          "hover:bg-green-50 focus:ring-green-300"
+        ],
+        primary: [
+          "text-blue-600 hover:text-blue-800",
+          "hover:bg-blue-50 focus:ring-blue-300"
+        ],
+      },
+      size: {
+        xs: "w-5 h-5 p-0.5 text-xs",
+        sm: "w-6 h-6 p-1 text-sm",
+        default: "w-7 h-7 p-1.5",
+        lg: "w-8 h-8 p-2",
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+      size: "sm",
     },
   },
 );
 
 export const gridPopover = cva(
   [
-    "absolute top-0 left-0 z-50",
-    "bg-white shadow-lg rounded-md border border-gray-200",
-    "transition-opacity duration-150",
+    "absolute z-50 p-4 rounded-lg shadow-lg border",
+    "bg-white transition-all duration-200 ease-in-out",
+    "animate-in fade-in-0 zoom-in-95"
   ],
   {
     variants: {
-      state: {
-        visible: "opacity-100",
-        hidden: "opacity-0 pointer-events-none",
+      variant: {
+        default: "border-gray-200 shadow-md",
+        professional: [
+          "border-gray-200/80 shadow-xl",
+          "backdrop-blur-sm bg-white/98",
+          "ring-1 ring-gray-100/50"
+        ],
+        elevated: "border-gray-100 shadow-2xl",
+        minimal: "border-gray-100 shadow-sm",
+      },
+      size: {
+        sm: "p-3 text-sm",
+        default: "p-4",
+        lg: "p-6 text-lg",
       },
     },
     defaultVariants: {
-      state: "hidden",
+      variant: "professional", 
+      size: "default",
     },
   },
 );
@@ -322,51 +516,194 @@ export const gridPopover = cva(
 // GRID UTILITIES - Messages, actions, overlays
 // =============================================================================
 
-export const gridMessage = cva("text-center py-8", {
-  variants: {
-    variant: {
-      default: "text-gray-600",
-      error: "text-red-600",
-      loading: "text-gray-400",
-      empty: "text-gray-500",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
-});
-
-export const gridActionGroup = cva("flex justify-end space-x-2 mb-4", {
-  variants: {
-    variant: {
-      default: "",
-      compact: "mb-2",
-    },
-  },
-  defaultVariants: {
-    variant: "default",
-  },
-});
-
-export const gridOverlay = cva(
-  "absolute inset-0 flex items-center justify-center z-40",
+export const gridMessage = cva(
+  [
+    "flex items-center gap-2 px-3 py-2 rounded-md",
+    "text-sm transition-all duration-200 ease-in-out"
+  ],
   {
     variants: {
       variant: {
-        default: "bg-white bg-opacity-75",
-        loading: "bg-white bg-opacity-75 pointer-events-none",
-        dark: "bg-gray-900 bg-opacity-75",
-        blur: "backdrop-blur-sm bg-white bg-opacity-30",
+        info: [
+          "bg-blue-50/80 text-blue-800 border border-blue-200/60",
+          "shadow-sm"
+        ],
+        success: [
+          "bg-green-50/80 text-green-800 border border-green-200/60",
+          "shadow-sm"
+        ],
+        warning: [
+          "bg-yellow-50/80 text-yellow-800 border border-yellow-200/60",
+          "shadow-sm"
+        ],
+        error: [
+          "bg-red-50/80 text-red-800 border border-red-200/60",
+          "shadow-sm"
+        ],
+        professional: [
+          "bg-gray-50/80 text-gray-800 border border-gray-200/60",
+          "shadow-sm backdrop-blur-sm"
+        ],
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "professional",
+    },
+  },
+);
+
+export const gridActionGroup = cva(
+  [
+    "flex items-center gap-1",
+    "transition-all duration-200 ease-in-out"
+  ],
+  {
+    variants: {
+      variant: {
+        default: "",
+        professional: "gap-2",
+        compact: "gap-0.5",
+        spaced: "gap-3",
+      },
+      orientation: {
+        horizontal: "flex-row",
+        vertical: "flex-col",
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+      orientation: "horizontal",
+    },
+  },
+);
+
+export const gridOverlay = cva(
+  [
+    "absolute inset-0 flex items-center justify-center",
+    "transition-all duration-300 ease-in-out"
+  ],
+  {
+    variants: {
+      variant: {
+        loading: [
+          "bg-white/80 backdrop-blur-sm",
+          "animate-in fade-in-0"
+        ],
+        error: [
+          "bg-red-50/90 text-red-800",
+          "animate-in fade-in-0 slide-in-from-top-1"
+        ],
+        empty: [
+          "bg-gray-50/60 text-gray-600",
+          "animate-in fade-in-0"
+        ],
+        professional: [
+          "bg-white/90 backdrop-blur-md",
+          "shadow-inner animate-in fade-in-0"
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
     },
   },
 );
 
 // =============================================================================
-// TYPE EXPORTS pentru TypeScript autocomplete
+// PROFESSIONAL BADGE SYSTEM pentru subcategorii și status indicators
+// =============================================================================
+
+export const gridBadge = cva(
+  [
+    "inline-flex items-center gap-1 px-2 py-1",
+    "text-xs font-medium rounded-full",
+    "transition-all duration-150 ease-in-out"
+  ],
+  {
+    variants: {
+      variant: {
+        default: "bg-gray-100 text-gray-700",
+        professional: [
+          "bg-gray-100/80 text-gray-800",
+          "hover:bg-gray-200/80 border border-gray-200/60"
+        ],
+        custom: [
+          "bg-blue-100/80 text-blue-800",
+          "hover:bg-blue-200/80 border border-blue-200/60"
+        ],
+        success: [
+          "bg-green-100/80 text-green-800",
+          "border border-green-200/60"
+        ],
+        warning: [
+          "bg-yellow-100/80 text-yellow-800",
+          "border border-yellow-200/60"
+        ],
+        error: [
+          "bg-red-100/80 text-red-800",
+          "border border-red-200/60"
+        ],
+      },
+      size: {
+        sm: "px-1.5 py-0.5 text-xs",
+        default: "px-2 py-1 text-xs",
+        lg: "px-3 py-1.5 text-sm",
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+      size: "default",
+    },
+  },
+);
+
+// =============================================================================
+// PROFESSIONAL INPUT SYSTEM pentru inline editing
+// =============================================================================
+
+export const gridInput = cva(
+  [
+    "w-full bg-transparent border-0 focus:outline-none",
+    "transition-all duration-150 ease-in-out",
+    "placeholder:text-gray-400"
+  ],
+  {
+    variants: {
+      variant: {
+        default: "text-gray-900",
+        professional: [
+          "text-gray-900 font-medium",
+          "focus:ring-0 focus:border-0"
+        ],
+        numeric: [
+          "text-right tabular-nums font-medium",
+          "text-gray-900"
+        ],
+        text: "text-left",
+      },
+      state: {
+        editing: [
+          "bg-yellow-50/90 rounded px-2 py-1",
+          "ring-2 ring-yellow-400/60"
+        ],
+        valid: [
+          "bg-green-50/90 rounded px-2 py-1",
+          "ring-2 ring-green-400/60"
+        ],
+        invalid: [
+          "bg-red-50/90 rounded px-2 py-1",
+          "ring-2 ring-red-400/60"
+        ],
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+    },
+  },
+);
+
+// =============================================================================
+// TYPE EXPORTS pentru TypeScript support
 // =============================================================================
 
 export type GridContainerProps = VariantProps<typeof gridContainer>;
@@ -384,3 +721,279 @@ export type GridPopoverProps = VariantProps<typeof gridPopover>;
 export type GridMessageProps = VariantProps<typeof gridMessage>;
 export type GridActionGroupProps = VariantProps<typeof gridActionGroup>;
 export type GridOverlayProps = VariantProps<typeof gridOverlay>;
+export type GridBadgeProps = VariantProps<typeof gridBadge>;
+export type GridInputProps = VariantProps<typeof gridInput>;
+
+// =============================================================================
+// 🚨 CVA EXTENSIONS - AUDIT FIX PHASE 1
+// Eliminare clase hardcodate prin CVA components noi
+// =============================================================================
+
+// Modal/Overlay CVA Component pentru eliminarea "fixed inset-0 bg-black bg-opacity-50..."
+export const gridModal = cva(
+  ["fixed inset-0 z-50 flex items-center justify-center"],
+  {
+    variants: {
+      variant: {
+        default: "bg-black/50",
+        professional: "bg-black/60 backdrop-blur-sm",
+        subtle: "bg-gray-900/40",
+        confirmation: "bg-black/70 backdrop-blur-md",
+      },
+      animation: {
+        none: "",
+        fade: "animate-fade-in",
+        scale: "animate-scale-in",
+        slideDown: "animate-slide-down",
+      },
+      state: {
+        open: "opacity-100 pointer-events-auto",
+        closed: "opacity-0 pointer-events-none",
+      },
+      content: {
+        overlay: "",
+        dialog: [
+          "bg-white rounded-lg shadow-xl max-w-md mx-4 p-6",
+          "animate-scale-in"
+        ],
+        header: "text-lg font-semibold text-yellow-800 mb-2",
+        text: "text-sm text-gray-700 mb-4",
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+      animation: "fade",
+      state: "open",
+      content: "overlay",
+    },
+  },
+);
+
+// Layout CVA Component pentru eliminarea "flex items-center gap-3" etc.
+export const gridLayout = cva(
+  ["flex"],
+  {
+    variants: {
+      direction: {
+        row: "flex-row",
+        column: "flex-col",
+        rowReverse: "flex-row-reverse",
+        columnReverse: "flex-col-reverse",
+      },
+      align: {
+        start: "items-start",
+        center: "items-center",
+        end: "items-end",
+        stretch: "items-stretch",
+        baseline: "items-baseline",
+      },
+      justify: {
+        start: "justify-start",
+        center: "justify-center",
+        end: "justify-end",
+        between: "justify-between",
+        around: "justify-around",
+        evenly: "justify-evenly",
+      },
+      gap: {
+        none: "gap-0",
+        xs: "gap-1",
+        sm: "gap-2",
+        md: "gap-3",
+        lg: "gap-4",
+        xl: "gap-6",
+      },
+      width: {
+        auto: "w-auto",
+        full: "w-full",
+        fit: "w-fit",
+        screen: "w-screen",
+      },
+      height: {
+        auto: "h-auto",
+        full: "h-full",
+        fit: "h-fit",
+        screen: "h-screen",
+        min: "min-h-[40px]",
+      },
+      flex: {
+        none: "flex-none",
+        initial: "flex-initial",
+        auto: "flex-auto",
+        1: "flex-1",
+      },
+      wrap: {
+        nowrap: "flex-nowrap",
+        wrap: "flex-wrap",
+        wrapReverse: "flex-wrap-reverse",
+      },
+    },
+    defaultVariants: {
+      direction: "row",
+      align: "center",
+      gap: "md",
+      width: "auto",
+      height: "auto",
+    },
+  },
+);
+
+// Interactive States CVA pentru eliminarea "cursor-pointer interactive hover:..." 
+export const gridInteractive = cva(
+  ["transition-all duration-200 cursor-pointer"],
+  {
+    variants: {
+      variant: {
+        default: "hover:bg-gray-50",
+        professional: [
+          "hover:bg-gray-50/80 active:scale-98",
+          "hover-lift rounded-md"
+        ],
+        button: [
+          "hover:bg-gray-100 active:bg-gray-200",
+          "focus:ring-2 focus:ring-blue-500/20"
+        ],
+        subtle: "hover:bg-gray-50/60",
+        category: "hover:bg-gray-100/80 hover:shadow-sm",
+        subcategory: "hover:bg-gray-50/80",
+        addButton: [
+          "hover:bg-gray-50/80 text-gray-600 hover:text-gray-800",
+          "hover-lift transition-all duration-200"
+        ],
+      },
+      size: {
+        sm: "p-1",
+        md: "p-2",
+        lg: "p-3",
+        auto: "",
+      },
+      state: {
+        active: "bg-gray-100 shadow-sm",
+        disabled: "cursor-not-allowed opacity-50",
+        loading: "cursor-wait opacity-75",
+      },
+      rounded: {
+        none: "",
+        sm: "rounded-sm",
+        md: "rounded-md",
+        lg: "rounded-lg",
+      },
+    },
+    defaultVariants: {
+      variant: "professional",
+      size: "md",
+      rounded: "md",
+    },
+  },
+);
+
+// Value State CVA pentru eliminarea "text-emerald-600" "text-red-600" etc.
+export const gridValueState = cva(
+  ["font-medium transition-colors duration-150"],
+  {
+    variants: {
+      state: {
+        positive: "text-emerald-600",
+        negative: "text-red-600", 
+        neutral: "text-gray-600",
+        empty: "text-gray-400",
+      },
+      background: {
+        none: "",
+        subtle: "",
+        ring: "",
+      },
+      weight: {
+        normal: "font-medium",
+        semibold: "font-semibold",
+        bold: "font-bold",
+      },
+    },
+    compoundVariants: [
+      {
+        state: "positive",
+        background: "subtle",
+        class: "bg-green-50/30",
+      },
+      {
+        state: "negative", 
+        background: "subtle",
+        class: "bg-red-50/30",
+      },
+      {
+        state: "positive",
+        background: "ring",
+        class: "ring-1 ring-green-200 bg-green-50/30",
+      },
+      {
+        state: "negative",
+        background: "ring", 
+        class: "ring-1 ring-red-200 bg-red-50/30",
+      },
+    ],
+    defaultVariants: {
+      state: "neutral",
+      background: "none",
+      weight: "normal",
+    },
+  },
+);
+
+// Transaction Cell State CVA pentru eliminarea "ring-1 ring-blue-200 bg-blue-50/30"
+export const gridTransactionCell = cva(
+  ["w-full h-full min-h-[40px] transition-all duration-150"],
+  {
+    variants: {
+      state: {
+        empty: "",
+        existing: "ring-1 ring-blue-200 bg-blue-50/30",  // Existing transaction (UPDATE)
+        new: "ring-1 ring-green-200 bg-green-50/30",      // New transaction (CREATE)
+        editing: "ring-2 ring-blue-400 bg-blue-50/50",
+        error: "ring-2 ring-red-400 bg-red-50/50",
+      },
+      density: {
+        compact: "min-h-[32px]",
+        normal: "min-h-[40px]",
+        comfortable: "min-h-[48px]",
+      },
+    },
+    defaultVariants: {
+      state: "empty",
+      density: "normal",
+    },
+  },
+);
+
+// Subcategory Row State CVA pentru eliminarea "bg-gray-50/30 animate-slide-down"
+export const gridSubcategoryState = cva(
+  ["transition-all duration-150"],
+  {
+    variants: {
+      variant: {
+        default: "bg-gray-50/30",
+        adding: "bg-gray-50/30 animate-slide-down",
+        editing: "bg-blue-50/30",
+        custom: "bg-blue-50/30",
+      },
+      cell: {
+        normal: "",
+        backdrop: "bg-gray-50/50 backdrop-professional",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      cell: "normal",
+    },
+  },
+);
+
+// =============================================================================
+// TYPE EXPORTS - CVA Extensions
+// =============================================================================
+
+export type GridModalProps = VariantProps<typeof gridModal>;
+export type GridLayoutProps = VariantProps<typeof gridLayout>;
+export type GridInteractiveProps = VariantProps<typeof gridInteractive>;
+export type GridValueStateProps = VariantProps<typeof gridValueState>;
+export type GridTransactionCellProps = VariantProps<typeof gridTransactionCell>;
+export type GridSubcategoryStateProps = VariantProps<typeof gridSubcategoryState>;

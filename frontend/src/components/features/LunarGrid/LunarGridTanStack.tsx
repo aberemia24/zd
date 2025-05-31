@@ -25,7 +25,8 @@ import {
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
-import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE, FLAGS } from "@shared-constants";
+import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE, FLAGS, PLACEHOLDERS, UI, BUTTONS, TITLES, LABELS, EXCEL_GRID } from "@shared-constants";
+import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
 import { LUNAR_GRID } from "@shared-constants";
 
 // Import componentele UI
@@ -40,17 +41,42 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
 import { formatCurrency, getBalanceStyleClass } from "../../../utils/lunarGrid";
 
-// Import CVA styling system
+// Import CVA styling system cu professional enhancements pentru LGI-TASK-08
 import { cn } from "../../../styles/cva/shared/utils";
 import {
+  // 🎨 Professional Grid Components 
+  gridContainer,
+  gridTable,
+  gridHeader,
+  gridHeaderCell,
+  gridCategoryRow,
+  gridSubcategoryRow,
+  gridTotalRow,
+  gridCell,
+  gridExpandIcon,
+  gridCellActions,
+  gridActionButton,
+  gridBadge,
+  gridInput,
+  gridMessage,
+  // 🚨 CVA EXTENSIONS - AUDIT FIX PHASE 1 - New CVA components
+  gridModal,
+  gridLayout,
+  gridInteractive,
+  gridValueState,
+  gridTransactionCell,
+  gridSubcategoryState,
+} from "../../../styles/cva/grid";
+import {
+  // Data Table Components (păstrez din vechiul sistem pentru compatibilitate)
   dataTable,
   tableHeader,
   tableCell,
   tableRow,
 } from "../../../styles/cva/data";
 import {
-  flex as flexContainer,
-  container as gridContainer,
+  flex as flexContainerLayout,
+  container as gridContainerLayout,
   } from "../../../styles/cva/components/layout";
 
 // Interfață pentru categoria din store
@@ -337,51 +363,36 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           // Verifică limita de 5 subcategorii CUSTOM (nu toate subcategoriile)
           const customSubcategoriesCount = category.subcategories.filter(sub => sub.isCustom).length;
           if (customSubcategoriesCount >= 5) {
-            toast.error("Maxim 5 subcategorii custom permise per categorie");
+            toast.error(MESAJE.CATEGORII.MAXIM_SUBCATEGORII);
+            setNewSubcategoryName("");
             return;
           }
 
           // Verifică dacă subcategoria deja există
           if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim())) {
-            toast.error("Subcategoria deja există");
+            toast.error(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
             return;
           }
 
-          // Creează categoria actualizată cu noua subcategorie
-          const updatedCategories = [...categories];
-          const categoryIndex = updatedCategories.findIndex(cat => cat.name === categoryName);
-          
-          if (categoryIndex >= 0) {
-            // Actualizează categoria existentă
-            updatedCategories[categoryIndex] = {
+          await saveCategories(user.id, [
+            ...categories,
+            {
               ...category,
               subcategories: [
                 ...category.subcategories,
                 { name: newSubcategoryName.trim(), isCustom: true }
               ]
-            };
-          } else {
-            // Adaugă categoria nouă
-            updatedCategories.push({
-              ...category,
-              subcategories: [
-                ...category.subcategories,
-                { name: newSubcategoryName.trim(), isCustom: true }
-              ]
-            });
-          }
-
-          // Salvează în CategoryStore
-          await saveCategories(user.id, updatedCategories);
+            }
+          ]);
           
           // Reset state-ul
           setAddingSubcategory(null);
           setNewSubcategoryName("");
           
-          toast.success("Subcategoria a fost adăugată cu succes");
+          toast.success(MESAJE.CATEGORII.SUCCES_ADAUGARE_SUBCATEGORIE);
         } catch (error) {
           console.error("Eroare la adăugarea subcategoriei:", error);
-          toast.error("Eroare la adăugarea subcategoriei");
+          toast.error(MESAJE.CATEGORII.EROARE_ADAUGARE_SUBCATEGORIE);
         }
       },
       [user?.id, newSubcategoryName, categories, saveCategories],
@@ -404,13 +415,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           // Găsește categoria în store
           const category = categories.find(cat => cat.name === categoryName);
           if (!category) {
-            toast.error("Categoria nu a fost găsită");
+            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
             return;
           }
 
           // Verifică dacă noul nume deja există
           if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim() && sub.name !== oldSubcategoryName)) {
-            toast.error("Subcategoria cu acest nume deja există");
+            toast.error(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
             return;
           }
 
@@ -436,10 +447,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           setSubcategoryAction(null);
           setEditingSubcategoryName("");
           
-          toast.success("Subcategoria a fost redenumită cu succes");
+          toast.success(MESAJE.CATEGORII.SUCCES_REDENUMIRE_SUBCATEGORIE);
         } catch (error) {
           console.error("Eroare la redenumirea subcategoriei:", error);
-          toast.error("Eroare la redenumirea subcategoriei");
+          toast.error(MESAJE.CATEGORII.EROARE_REDENUMIRE);
         }
       },
       [user?.id, categories, saveCategories],
@@ -456,14 +467,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           // Găsește categoria în store
           const category = categories.find(cat => cat.name === categoryName);
           if (!category) {
-            toast.error("Categoria nu a fost găsită");
+            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
             return;
           }
 
           // Verifică dacă subcategoria este custom
           const subcategory = category.subcategories.find(sub => sub.name === subcategoryName);
           if (!subcategory?.isCustom) {
-            toast.error("Doar subcategoriile custom pot fi șterse");
+            toast.error(MESAJE.CATEGORII.DOAR_CUSTOM_STERGERE);
             return;
           }
 
@@ -499,14 +510,21 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           // Reset state
           setSubcategoryAction(null);
           
+          const transactionCount = associatedTransactions?.length || 0;
+          const transactionText = transactionCount === 0 
+            ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
+            : transactionCount === 1 
+              ? "1 tranzacție"
+              : `${transactionCount} tranzacții`;
+
           if (associatedTransactions.length > 0) {
             toast.success(`Subcategoria și ${associatedTransactions.length} tranzacții asociate au fost șterse definitiv`);
           } else {
-            toast.success("Subcategoria a fost ștearsă cu succes");
+            toast.success(MESAJE.CATEGORII.SUCCES_STERGERE_SUBCATEGORIE);
           }
         } catch (error) {
           console.error("Eroare la ștergerea subcategoriei:", error);
-          toast.error("Eroare la ștergerea subcategoriei");
+          toast.error(MESAJE.CATEGORII.EROARE_STERGERE_SUBCATEGORIE);
         }
       },
       [user?.id, categories, saveCategories, validTransactions, deleteTransactionMutation],
@@ -566,26 +584,25 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             }}
             validationType="amount"
             className={cn(
-              "w-full h-full min-h-[40px]",
-              // 🎯 Visual feedback: diferențiere CREATE vs UPDATE
-              transactionId 
-                ? "ring-1 ring-blue-200 bg-blue-50/30" // Existing transaction (UPDATE)
-                : "ring-1 ring-green-200 bg-green-50/30" // New transaction (CREATE)
+              gridTransactionCell({
+                state: transactionId ? "existing" : "new"
+              })
             )}
             data-testid={`editable-cell-${cellId}`}
-            placeholder={transactionId ? "Editează..." : "Adaugă..."}
+            placeholder={transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION}
           />
         );
       },
       [handleEditableCellSave, transactionMap],
     );
 
-    // Helper pentru stiluri de valori
+    // Helper pentru stiluri de valori - REFACTORIZAT cu CVA
     const getBalanceStyle = useCallback((value: number): string => {
-      if (!value) return "text-gray-400";
-      return value > 0
-        ? "text-emerald-600 font-medium"
-        : "text-red-600 font-medium";
+      if (!value) return gridValueState({ state: "empty" });
+      return gridValueState({ 
+        state: value > 0 ? "positive" : "negative",
+        weight: "semibold"
+      });
     }, []);
 
     // Gestionarea poziției popover-ului
@@ -642,46 +659,83 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
         return (
           <React.Fragment key={row.id}>
+            {/* 🎨 Professional Row Styling cu enhanced visual hierarchy */}
             <tr
               className={cn(
-                tableRow({
-                  editability: isCategory ? "readonly" : "editable",
-                }),
-                row.getIsExpanded() ? "border-b border-gray-200" : "",
+                isCategory 
+                  ? gridCategoryRow({ 
+                      variant: "professional",
+                      state: row.getIsExpanded() ? "selected" : undefined
+                    })
+                  : gridSubcategoryRow({ 
+                      variant: (() => {
+                        const categoryData = categories.find(cat => cat.name === original.category);
+                        const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
+                        return subcategoryData?.isCustom ? "custom" : "professional";
+                      })()
+                    }),
+                "interactive animate-fade-in-up",
+                row.getIsExpanded() && "border-b border-gray-200/60"
               )}
             >
               {row.getVisibleCells().map((cell, cellIdx) => {
                 const isFirstCell = cellIdx === 0;
                 const isDayCell = cell.column.id.startsWith("day-");
+                const isTotalCell = cell.column.id === "total";
 
-                // Determine cell editability
-                const cellEditability = isCategory
-                  ? "category"
-                  : isDayCell && isSubcategory
-                    ? "editable"
-                    : "readonly";
+                // 🎨 Determine professional cell type și state
+                const cellType = isCategory && isFirstCell ? "category" :
+                               !isCategory && isFirstCell ? "subcategory" :
+                               isDayCell ? "value" :
+                               isTotalCell ? "total" :
+                               "value";
+
+                // 🎨 Professional cell state detection cu enhanced color psychology
+                const cellValue = cell.getValue() as string | number;
+                const cellState = isDayCell && cellValue && cellValue !== "-" && cellValue !== "—" 
+                  ? (typeof cellValue === 'number' && cellValue > 0) || 
+                    (typeof cellValue === 'string' && parseFloat(cellValue.replace(/[^\d,.-]/g, '').replace(',', '.')) > 0)
+                    ? "positive" 
+                    : "negative"
+                  : undefined;
+
+                // 🎨 Phase 4: Enhanced styling classes pentru visual hierarchy
+                const valueClasses = isDayCell && cellValue && cellValue !== "-" && cellValue !== "—" 
+                  ? (typeof cellValue === 'number' && cellValue > 0) || 
+                    (typeof cellValue === 'string' && parseFloat(cellValue.replace(/[^\d,.-]/g, '').replace(',', '.')) > 0)
+                    ? "value-positive font-financial" 
+                    : "value-negative font-financial"
+                  : "";
 
                 return (
                   <td
                     key={cell.id}
                     className={cn(
-                      tableCell({
-                        variant: isDayCell ? "numeric" : "default",
-                        editability: cellEditability,
+                      gridCell({
+                        type: cellType,
+                        state: cellState,
+                        size: "default"
                       }),
-                      isFirstCell && level > 0 ? "pl-8" : "",
-                      isFirstCell ? "sticky left-0 bg-white z-5" : "",
+                      "text-professional",
+                      isFirstCell && level > 0 && "pl-8",
+                      isDayCell && "hover-scale focus-ring",
+                      isTotalCell && "font-semibold tabular-nums",
+                      valueClasses
                     )}
                     title={
                       isCategory && isDayCell
-                        ? "Suma calculată automată din subcategorii"
+                        ? UI.LUNAR_GRID_TOOLTIPS.CALCULATED_SUM
                         : undefined
                     }
                   >
                     {isFirstCell && isCategory ? (
-                      // Celula de categorie clickable pentru expand/collapse (folosește iconițele existente din hook)
+                      // 🎨 Professional Category Cell cu enhanced interactions
                       <div 
-                        className="flex items-center cursor-pointer hover:bg-gray-50 rounded px-1 py-1 transition-colors duration-150"
+                        className={cn(
+                          gridCellActions({ variant: "always", position: "left" }),
+                          "cursor-pointer interactive rounded-md p-2",
+                          "hover:bg-gray-50/80 active:scale-98"
+                        )}
                         onClick={(e) => {
                           e.stopPropagation();
                           row.toggleExpanded();
@@ -693,31 +747,41 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
                         data-testid={`toggle-category-${original.category}`}
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                        <div className={gridLayout({ align: "center", gap: "md" })}>
+                          <div className={cn(
+                            gridExpandIcon({
+                              variant: "professional",
+                              state: row.getIsExpanded() ? "expanded" : "collapsed"
+                            })
+                          )}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                          </div>
+                        </div>
                       </div>
                     ) : isFirstCell && isSubcategory ? (
-                      // Celula pentru subcategorie cu badge și hover actions
-                      <div className="flex items-center justify-between gap-2 group">
-                        <div className="flex items-center gap-2">
-                          {/* Verifică dacă e în modul de editare */}
+                      // 🎨 Professional Subcategory Cell cu enhanced badge și actions
+                      <div className={gridLayout({ justify: "between", gap: "sm", width: "full" })}>
+                        <div className={gridLayout({ align: "center", gap: "md" })}>
+                          {/* 🎨 Editing Mode cu professional styling */}
                           {subcategoryAction?.type === 'edit' && 
                            subcategoryAction.category === original.category && 
                            subcategoryAction.subcategory === original.subcategory ? (
-                            // Modul editare - input inline
-                            <div className="flex items-center gap-2 flex-1">
+                            <div className={gridLayout({ align: "center", gap: "sm", flex: 1 })}>
                               <input
                                 type="text"
                                 value={editingSubcategoryName}
                                 onChange={(e) => setEditingSubcategoryName(e.target.value)}
                                 onKeyDown={(e) => {
-                                  if (e.key === "Enter" && editingSubcategoryName.trim()) {
-                                    handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName);
-                                  } else if (e.key === "Escape") {
-                                    setSubcategoryAction(null);
+                                  if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY && editingSubcategoryName.trim()) {
+                                    handleRenameSubcategory(original.category, original.subcategory!, e.currentTarget.value);
+                                  } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
                                     setEditingSubcategoryName("");
                                   }
                                 }}
-                                className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className={cn(
+                                  gridInput({ variant: "professional", state: "editing" }),
+                                  "flex-1 animate-scale-in focus-ring-primary"
+                                )}
                                 autoFocus
                                 data-testid={`edit-subcategory-input-${original.subcategory}`}
                               />
@@ -727,6 +791,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                 onClick={() => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
                                 disabled={!editingSubcategoryName.trim()}
                                 data-testid={`save-edit-subcategory-${original.subcategory}`}
+                                className="hover-scale"
                               >
                                 ✓
                               </Button>
@@ -738,40 +803,47 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                   setEditingSubcategoryName("");
                                 }}
                                 data-testid={`cancel-edit-subcategory-${original.subcategory}`}
+                                className="hover-scale"
                               >
                                 ✕
                               </Button>
                             </div>
                           ) : (
-                            // Modul normal - text cu badge
-                            <>
-                              {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                            // 🎨 Normal Mode cu professional text și badge
+                            <div className={gridLayout({ align: "center", gap: "md" })}>
+                              <span className="text-professional-body contrast-high">
+                                {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                              </span>
                               {(() => {
                                 const categoryData = categories.find(cat => cat.name === original.category);
                                 const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
                                 return subcategoryData?.isCustom ? (
-                                  <Badge
-                                    variant="success"
-                                    size="xs"
-                                    dataTestId={`custom-flag-${original.subcategory}`}
-                                  >
+                                  <div className={cn(
+                                    gridBadge({ variant: "custom", size: "sm" }),
+                                    "animate-bounce-subtle text-professional-caption"
+                                  )}>
                                     {FLAGS.CUSTOM}
-                                  </Badge>
+                                  </div>
                                 ) : null;
                               })()}
-                            </>
+                            </div>
                           )}
                         </div>
                         
-                        {/* Butoane hover pentru subcategorii custom - doar dacă nu e în modul editare */}
+                        {/* 🎨 Professional Action Buttons cu enhanced hover effects */}
                         {subcategoryAction?.type !== 'edit' && (() => {
                           const categoryData = categories.find(cat => cat.name === original.category);
                           const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
                           return subcategoryData?.isCustom ? (
-                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex items-center gap-1">
-                              <Button
-                                size="xs"
-                                variant="ghost"
+                            <div className={cn(
+                              gridCellActions({ variant: "professional" }),
+                              "animate-fade-in-up"
+                            )}>
+                              <button
+                                className={cn(
+                                  gridActionButton({ variant: "primary", size: "sm" }),
+                                  "hover-lift"
+                                )}
                                 onClick={() => {
                                   setSubcategoryAction({
                                     type: 'edit',
@@ -780,15 +852,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                   });
                                   setEditingSubcategoryName(original.subcategory!);
                                 }}
-                                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
                                 data-testid={`edit-subcategory-btn-${original.subcategory}`}
-                                title="Redenumește subcategoria"
+                                title={UI.SUBCATEGORY_ACTIONS.RENAME_TITLE}
                               >
                                 <Edit size={12} />
-                              </Button>
-                              <Button
-                                size="xs"
-                                variant="ghost"
+                              </button>
+                              <button
+                                className={cn(
+                                  gridActionButton({ variant: "danger", size: "sm" }),
+                                  "hover-lift"
+                                )}
                                 onClick={() => {
                                   setSubcategoryAction({
                                     type: 'delete',
@@ -796,63 +869,74 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                     subcategory: original.subcategory!
                                   });
                                 }}
-                                className="text-red-600 hover:text-red-800 hover:bg-red-50"
                                 data-testid={`delete-subcategory-btn-${original.subcategory}`}
-                                title="Șterge subcategoria custom"
+                                title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
                               >
                                 <Trash2 size={12} />
-                              </Button>
+                              </button>
                             </div>
                           ) : null;
                         })()}
                       </div>
                     ) : isDayCell && isSubcategory ? (
-                      renderEditableCell(
-                        original.category,
-                        original.subcategory,
-                        parseInt(cell.column.id.split("-")[1]),
-                        cell.getValue() as string | number,
-                      )
+                      // 🎨 Professional Editable Cell
+                      <div className="interactive focus-ring">
+                        {renderEditableCell(
+                          original.category,
+                          original.subcategory,
+                          parseInt(cell.column.id.split("-")[1]),
+                          cell.getValue() as string | number,
+                        )}
+                      </div>
                     ) : (
-                      flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      ) as React.ReactNode
+                      // 🎨 Default Professional Cell
+                      <span className="text-professional">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        ) as React.ReactNode}
+                      </span>
                     )}
                   </td>
                 );
               })}
             </tr>
 
-            {/* Rânduri expandate */}
+            {/* 🎨 Professional Expanded Rows */}
             {row.getIsExpanded() &&
               row.subRows &&
               row.subRows.length > 0 &&
               row.subRows.map((subRow) => renderRow(subRow, level + 1))}
 
-            {/* Rând pentru adăugarea subcategoriei - doar dacă categoria poate primi subcategorii noi */}
+            {/* 🎨 Professional Add Subcategory Row */}
             {canAddSubcategory && (
-              <tr className="bg-gray-50/50 border-t border-gray-100">
+              <tr className={cn(
+                gridSubcategoryRow({ variant: "professional" }),
+                gridSubcategoryState({ variant: "adding" })
+              )}>
                 <td 
                   className={cn(
-                    "sticky left-0 bg-gray-50/50 z-5 pl-8 py-2",
-                    "border-r border-gray-200"
+                    gridCell({ type: "subcategory" }),
+                    gridSubcategoryState({ cell: "backdrop" })
                   )}
                 >
                   {addingSubcategory === original.category ? (
-                    // Modul de editare - input pentru numele subcategoriei
-                    <div className="flex items-center gap-2">
+                    // 🎨 Professional Input Mode
+                    <div className={gridLayout({ align: "center", gap: "md" })}>
                       <input
                         type="text"
                         value={newSubcategoryName}
                         onChange={(e) => setNewSubcategoryName(e.target.value)}
-                        placeholder="Nume subcategorie..."
-                        className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder={PLACEHOLDERS.SUBCATEGORY_NAME}
+                        className={cn(
+                          gridInput({ variant: "professional", state: "editing" }),
+                          "flex-1 focus-ring-primary"
+                        )}
                         autoFocus
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
+                          if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY) {
                             handleAddSubcategory(original.category);
-                          } else if (e.key === "Escape") {
+                          } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
                             handleCancelAddSubcategory();
                           }
                         }}
@@ -864,6 +948,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         onClick={() => handleAddSubcategory(original.category)}
                         disabled={!newSubcategoryName.trim()}
                         data-testid={`save-subcategory-${original.category}`}
+                        className="hover-scale"
                       >
                         ✓
                       </Button>
@@ -872,28 +957,35 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         variant="secondary"
                         onClick={handleCancelAddSubcategory}
                         data-testid={`cancel-subcategory-${original.category}`}
+                        className="hover-scale"
                       >
                         ✕
                       </Button>
                     </div>
                   ) : (
-                    // Modul normal - buton pentru adăugarea subcategoriei
+                    // 🎨 Professional Add Button
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => setAddingSubcategory(original.category)}
-                      className="flex items-center gap-1 text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                      className={cn(
+                        gridInteractive({ variant: "addButton", size: "auto" }),
+                        gridLayout({ align: "center", gap: "sm" })
+                      )}
                       data-testid={`add-subcategory-${original.category}`}
                     >
-                      <Plus size={14} />
-                      <span className="text-sm">Adaugă subcategorie</span>
+                      <Plus size={14} className="text-professional-primary" />
+                      <span className="text-professional-body font-medium">{BUTTONS.ADD_SUBCATEGORY}</span>
                     </Button>
                   )}
                 </td>
-                {/* Celule goale pentru restul coloanelor */}
+                {/* 🎨 Professional Empty Cells */}
                 {table.getFlatHeaders().slice(1).map((header) => (
-                  <td key={`add-subcategory-${header.id}`} className="py-2">
-                    {/* Celulă goală */}
+                  <td 
+                    key={`add-subcategory-${header.id}`} 
+                    className={cn(gridCell({ type: "value", state: "readonly" }))}
+                  >
+                    {/* Empty cell cu subtle styling */}
                   </td>
                 ))}
               </tr>
@@ -938,7 +1030,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         toast.success(`${orphanTransactions.length} tranzacții orfane șterse cu succes!`);
       } catch (error) {
         console.error("Eroare la ștergerea tranzacțiilor orfane:", error);
-        toast.error("Eroare la ștergerea tranzacțiilor orfane");
+        toast.error(MESAJE.CATEGORII.EROARE_STERGERE_ORFANE);
       }
     }, [validTransactions, user?.id, deleteTransactionMutation]);
 
@@ -953,7 +1045,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       ).length;
 
       const transactionText = transactionsCount === 0 
-        ? "fără tranzacții"
+        ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
         : transactionsCount === 1 
           ? "1 tranzacție"
           : `${transactionsCount} tranzacții`;
@@ -961,20 +1053,20 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
 
       return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" data-testid="delete-subcategory-confirmation">
-          <div className="bg-white rounded-lg shadow-xl max-w-md mx-4 p-6">
-            <h3 className="text-lg font-semibold text-yellow-800 mb-2">
-              Confirmare ștergere subcategorie
+        <div className={gridModal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
+          <div className={gridModal({ content: "dialog" })}>
+            <h3 className={gridModal({ content: "header" })}>
+              {MESAJE.CATEGORII.CONFIRMARE_STERGERE_TITLE}
             </h3>
-            <p className="text-sm text-gray-700 mb-4">{message}</p>
-            <div className="flex justify-end gap-3">
+            <p className={gridModal({ content: "text" })}>{message}</p>
+            <div className={gridLayout({ justify: "end", gap: "md" })}>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={onCancel}
                 dataTestId="cancel-delete-subcategory"
               >
-                Anulează
+                {BUTTONS.CANCEL}
               </Button>
               <Button
                 variant="danger"
@@ -982,7 +1074,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 onClick={onConfirm}
                 dataTestId="confirm-delete-subcategory"
               >
-                Șterge
+                {BUTTONS.DELETE}
               </Button>
             </div>
           </div>
@@ -993,7 +1085,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Renderizare (layout principal)
     return (
       <>
-        <div className={cn(flexContainer({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
+        <div className={cn(flexContainerLayout({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
           <Button
             variant="secondary"
             size="sm"
@@ -1037,7 +1129,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               size="sm"
               onClick={handleCleanOrphanTransactions}
               dataTestId="clean-orphan-transactions"
-              title="Șterge tranzacțiile fără subcategorie (date murdare din trecut)"
+              title={UI.SUBCATEGORY_ACTIONS.DELETE_ORPHAN_TITLE}
             >
               🗑️ Curăță tranzacții orfane ({validTransactions.filter(t => t.category && (!t.subcategory || t.subcategory.trim() === "")).length})
             </Button>
@@ -1047,11 +1139,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         <div 
           ref={tableContainerRef}
           className={cn(
-            "w-full",
-            "relative overflow-auto border border-gray-200",
-            "max-h-[70vh] min-h-[400px]", // Înălțime fixă pentru scroll vertical
-            isLoading ? "opacity-60" : "",
-            "transition-all duration-150"
+            gridContainer({ 
+              variant: "professional", 
+              size: "default",
+              state: isLoading ? "loading" : undefined 
+            }),
+            "relative",
+            "transition-all duration-200 hover-lift",
+            "focus-ring"
           )}
           data-testid="lunar-grid-container"
           onSubmit={(e) => {
@@ -1073,59 +1168,92 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
           }}
         >
+          {/* 🎨 Professional Loading State */}
           {isLoading && (
-            <div className="flex items-center justify-center p-4 text-gray-600" data-testid="loading-indicator">
-              {LUNAR_GRID.LOADING}
+            <div className={cn(
+              gridMessage({ variant: "professional" }),
+              gridLayout({ align: "center", justify: "center" }),
+              "p-8 animate-fade-in-up"
+            )} 
+            data-testid="loading-indicator">
+              <div className="loading-pulse">
+                {LUNAR_GRID.LOADING}
+              </div>
             </div>
           )}
           
+          {/* 🎨 Professional Error State */}
           {error && (
-            <div className="flex items-center justify-center p-4 text-red-600 bg-red-50 rounded-md" data-testid="error-indicator">
+            <div className={cn(
+              gridMessage({ variant: "error" }),
+              gridLayout({ align: "center", justify: "center" }),
+              "p-8 animate-slide-down"
+            )} 
+            data-testid="error-indicator">
               {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
             </div>
           )}
           
+          {/* 🎨 Professional Empty State */}
           {!isLoading && !error && table.getRowModel().rows.length === 0 && (
-            <div className="flex items-center justify-center p-4 text-gray-600" data-testid="no-data-indicator">
+            <div className={cn(
+              gridMessage({ variant: "info" }),
+              gridLayout({ align: "center", justify: "center" }),
+              "p-8 animate-scale-in"
+            )} 
+            data-testid="no-data-indicator">
               {LUNAR_GRID.NO_DATA}
             </div>
           )}
           
+          {/* 🎨 Professional Grid Table */}
           {!isLoading && !error && table.getRowModel().rows.length > 0 && (
             <table 
-              className={cn(dataTable({ variant: "striped" }), "w-full")}
+              className={cn(gridTable({ variant: "professional", density: "default" }))}
               data-testid="lunar-grid-table"
             >
-              <thead className="bg-gray-50 sticky top-0 z-20">
+              {/* 🎨 Professional Header cu enhanced styling */}
+              <thead className={cn(gridHeader({ variant: "professional" }))}>
                 <tr>
-                  {table.getFlatHeaders().map((header) => (
-                    <th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={cn(
-                        tableHeader(),
-                        header.id === "category" 
-                          ? "sticky left-0 z-30 text-center bg-gray-50" 
-                          : "text-center"
-                      )}
-                      style={{ width: header.getSize() }}
-                    >
-                      {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
-                    </th>
-                  ))}
+                  {table.getFlatHeaders().map((header, index) => {
+                    const isFirstColumn = index === 0;
+                    const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
+                    
+                    return (
+                      <th
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        className={cn(
+                          gridHeaderCell({ 
+                            variant: isFirstColumn ? "sticky" : isNumericColumn ? "numeric" : "professional",
+                          }),
+                          "text-professional-heading contrast-enhanced",
+                          isFirstColumn && "min-w-[200px]",
+                          isNumericColumn && "w-20"
+                        )}
+                        style={{ width: header.getSize() }}
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
+                      </th>
+                    );
+                  })}
                 </tr>
-                {/* Rând separat pentru balanțele zilnice */}
-                <tr className="bg-blue-50 border-b-2 border-blue-200">
-                  {table.getFlatHeaders().map((header) => {
-                    if (header.id === "category") {
+                
+                {/* 🎨 Professional Balance Row cu enhanced styling */}
+                <tr className={cn(gridTotalRow({ variant: "balance" }))}>
+                  {table.getFlatHeaders().map((header, index) => {
+                    const isFirstColumn = index === 0;
+                    
+                    if (isFirstColumn) {
                       return (
                         <th
                           key={`balance-${header.id}`}
                           className={cn(
-                            "sticky left-0 z-30 px-4 py-2 text-center font-medium text-gray-700 bg-blue-50"
+                            gridCell({ type: "balance" }),
+                            "text-professional-heading contrast-enhanced"
                           )}
                         >
-                          Balanțe zilnice
+                          {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
                         </th>
                       );
                     }
@@ -1138,8 +1266,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         <th
                           key={`balance-${header.id}`}
                           className={cn(
-                            "px-2 py-2 text-center text-sm font-medium",
-                            getBalanceStyleClass(dailyBalance)
+                            gridCell({ 
+                              type: "balance", 
+                              state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "zero" 
+                            }),
+                            "text-xs font-financial contrast-high",
+                            dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
                           )}
                         >
                           {dailyBalance !== 0 ? formatCurrency(dailyBalance) : "—"}
@@ -1153,8 +1285,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         <th
                           key={`balance-${header.id}`}
                           className={cn(
-                            "px-2 py-2 text-center text-sm font-bold",
-                            getBalanceStyleClass(monthTotal)
+                            gridCell({ 
+                              type: "balance", 
+                              state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "zero" 
+                            }),
+                            "text-sm font-financial contrast-enhanced",
+                            monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
                           )}
                         >
                           {monthTotal !== 0 ? formatCurrency(monthTotal) : "—"}
@@ -1165,7 +1301,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     return (
                       <th
                         key={`balance-${header.id}`}
-                        className="px-2 py-2"
+                        className={cn(gridCell({ type: "balance" }))}
                       >
                         —
                       </th>

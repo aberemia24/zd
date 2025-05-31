@@ -9,7 +9,24 @@ import { useAuthStore } from "../stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 import { cn } from "../styles/cva/shared/utils";
-import { container } from "../styles/cva/components/layout";
+import { 
+  container,
+  pageHeader,
+  fullscreenIndicator,
+  fullscreenBackdrop,
+  titleSection,
+  pageTitle,
+  transitionLoader,
+  spinner,
+  controlsSection,
+  formSelect,
+  formInput,
+  loadingContainer,
+  loadingText,
+  contentWrapper,
+  responsiveLabel,
+  layoutButton
+} from "../styles/cva/components/layout";
 import { button } from "../styles/cva/components/forms";
 import { Maximize2, Minimize2 } from "lucide-react";
 
@@ -68,7 +85,7 @@ const LunarGridPage: React.FC = () => {
     });
   }, []);
 
-  // 🎯 LGI-TASK-07: Dynamic layout styles bazat pe mode (doar 2 moduri)
+  // 🎯 LGI-TASK-07: Dynamic layout styles bazat pe mode (doar 2 moduri) - REFACTORED cu CVA
   const getLayoutStyles = (mode: LayoutMode): string => {
     switch (mode) {
       case 'full-width':
@@ -80,15 +97,15 @@ const LunarGridPage: React.FC = () => {
     }
   };
 
-  // 🎯 LGI-TASK-07: Layout mode button label (doar 2 moduri)
+  // 🎯 LGI-TASK-07: Layout mode button label cu shared-constants
   const getLayoutModeLabel = (mode: LayoutMode): string => {
     switch (mode) {
       case 'full-width':
-        return 'Lățime completă';
+        return UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH;
       case 'fullscreen':
-        return 'Fullscreen';
+        return UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN;
       default:
-        return 'Lățime completă';
+        return UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH;
     }
   };
 
@@ -102,12 +119,12 @@ const LunarGridPage: React.FC = () => {
     }
   };
 
-  // 🎯 LGI-TASK-07: Fullscreen backdrop pentru professional appearance
+  // 🎯 LGI-TASK-07: Fullscreen backdrop cu CVA professional styling
   const renderFullscreenBackdrop = () => {
     if (layoutMode === 'fullscreen') {
       return (
         <div 
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-all duration-300"
+          className={fullscreenBackdrop()}
           onClick={() => setLayoutMode('full-width')}
           data-testid="fullscreen-backdrop"
         />
@@ -200,21 +217,21 @@ const LunarGridPage: React.FC = () => {
     });
   };
 
-  // Formatare nume lună în română
+  // 🚨 AUDIT FIX - Formatare nume lună cu shared-constants
   const getMonthName = (month: number) => {
     const monthNames = [
-      "Ianuarie",
-      "Februarie",
-      "Martie",
-      "Aprilie",
-      "Mai",
-      "Iunie",
-      "Iulie",
-      "August",
-      "Septembrie",
-      "Octombrie",
-      "Noiembrie",
-      "Decembrie",
+      UI.LUNAR_GRID_PAGE.MONTHS.IANUARIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.FEBRUARIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.MARTIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.APRILIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.MAI,
+      UI.LUNAR_GRID_PAGE.MONTHS.IUNIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.IULIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.AUGUST,
+      UI.LUNAR_GRID_PAGE.MONTHS.SEPTEMBRIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.OCTOMBRIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.NOIEMBRIE,
+      UI.LUNAR_GRID_PAGE.MONTHS.DECEMBRIE,
     ];
     return monthNames[month - 1];
   };
@@ -280,58 +297,63 @@ const LunarGridPage: React.FC = () => {
 
   return (
     <>
-      {/* 🎯 LGI-TASK-07: Fullscreen backdrop pentru professional appearance */}
+      {/* 🎯 LGI-TASK-07: Fullscreen backdrop cu CVA professional styling */}
       {renderFullscreenBackdrop()}
       
       <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-container">
-        {/* 🎯 LGI-TASK-07: Fullscreen mode indicator */}
+        {/* 🎯 LGI-TASK-07: Fullscreen mode indicator cu CVA */}
         {layoutMode === 'fullscreen' && (
-          <div className="absolute top-1 right-1 z-10 text-xs text-gray-500 bg-white/90 px-2 py-1 rounded-md shadow-sm">
-            Press ESC pentru a ieși din fullscreen
+          <div className={fullscreenIndicator({ variant: "pro" })}>
+            {UI.LUNAR_GRID_PAGE.FULLSCREEN_EXIT_HINT}
           </div>
         )}
 
         <div className={cn(
-          "flex flex-col md:flex-row justify-between items-center",
-          layoutMode === 'fullscreen' ? "mb-4" : "mb-6",
-          layoutMode === 'full-width' ? "px-4" : ""
+          pageHeader({ 
+            layout: layoutMode === 'fullscreen' ? "fullscreen" : "default",
+            padding: layoutMode === 'full-width' ? "default" : "none"
+          })
         )}>
-          <div className="flex items-center space-x-3">
-            <h1 className="text-3xl font-bold text-gray-900">
+          <div className={titleSection({ variant: "professional" })}>
+            <h1 className={pageTitle({ variant: "professional" })}>
               {TITLES.GRID_LUNAR}
             </h1>
-            {/* Indicator pentru React 18 Transitions */}
+            {/* Indicator pentru React 18 Transitions cu CVA */}
             {isPending && (
               <div 
-                className="flex items-center text-sm text-blue-600"
+                className={transitionLoader({ variant: "professional" })}
                 data-testid="transition-loading-indicator"
               >
-                <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full mr-2" />
-                Navigare...
+                <div className={spinner({ size: "sm", color: "professional" })} />
+                {UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}
               </div>
             )}
           </div>
 
-          <div className="flex items-center space-x-4 mt-4 md:mt-0">
-            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button */}
+          <div className={controlsSection({ variant: "professional" })}>
+            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA */}
             <button
               onClick={handleLayoutModeToggle}
               className={cn(
                 button({ variant: "outline", size: "sm" }),
-                "flex items-center gap-2 transition-all duration-200 hover:bg-blue-50",
-                layoutMode === 'fullscreen' && "ring-2 ring-blue-300 bg-blue-50"
+                layoutButton({ 
+                  state: layoutMode === 'fullscreen' ? "active" : "default" 
+                })
               )}
-              title={`Comută la modul următor (${layoutMode === 'full-width' ? 'fullscreen' : 'lățime completă'})`}
+              title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
+                '{nextMode}', 
+                layoutMode === 'full-width' ? UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN : UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH
+              )}
               data-testid="layout-mode-toggle"
             >
               {getLayoutModeIcon(layoutMode)}
-              <span className="hidden sm:inline">{getLayoutModeLabel(layoutMode)}</span>
+              <span className={responsiveLabel({ variant: "professional" })}>{getLayoutModeLabel(layoutMode)}</span>
             </button>
 
             <select
               value={month}
               onChange={handleMonthChange}
-              className="form-select rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+              className={formSelect({ variant: "professional" })}
               data-testid="month-selector"
             >
               {monthOptions}
@@ -343,27 +365,32 @@ const LunarGridPage: React.FC = () => {
               onChange={handleYearChange}
               min="1900"
               max="2100"
-              className="form-input w-24 rounded-md border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500"
+              className={formInput({ variant: "professional", width: "md" })}
               data-testid="year-input"
             />
           </div>
         </div>
 
-        {/* Arată Loading state când încărcăm date */}
+        {/* Arată Loading state când încărcăm date cu CVA */}
         {loading ? (
           <div className={cn(
-            "flex justify-center items-center",
-            layoutMode === 'fullscreen' ? "py-8" : "py-8",
-            layoutMode === 'full-width' ? "px-4" : ""
+            loadingContainer({ 
+              layout: layoutMode === 'fullscreen' ? "fullscreen" : "default",
+              spacing: layoutMode === 'full-width' ? "default" : "none"
+            })
           )}>
-            <div className="animate-spin h-8 w-8 border-4 border-primary-500 border-t-transparent rounded-full" />
-            <p className="ml-3 text-gray-700">
-              Se încarcă datele pentru {getMonthName(month)} {year}...
+            <div className={spinner({ size: "lg", color: "professional" })} />
+            <p className={loadingText({ variant: "professional" })}>
+              {UI.LUNAR_GRID_PAGE.LOADING_MESSAGE_TEMPLATE
+                .replace('{month}', getMonthName(month))
+                .replace('{year}', year.toString())}
             </p>
           </div>
         ) : (
           <div className={cn(
-            layoutMode === 'full-width' ? "px-4" : ""
+            contentWrapper({ 
+              padding: layoutMode === 'full-width' ? "default" : "none"
+            })
           )}>
             <LunarGridTanStack year={year} month={month} />
           </div>
