@@ -190,7 +190,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
 
   return (
     <div
-      className={cn(modal({ overlay: "default" }), "p-4")}
+      className={cn(modal({ variant: "default" }), "p-4")}
       onClick={handleBackgroundClick}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -198,7 +198,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       aria-labelledby="transaction-modal-title"
     >
       <div
-        className={cn(modalContent({ size: "md" }), "relative")}
+        className={cn(modalContent({ size: "default" }), "relative")}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Loading overlay cu CVA styling */}

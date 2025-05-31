@@ -703,9 +703,7 @@ export const gridInput = cva(
 );
 
 // =============================================================================
-// TYPE EXPORTS pentru TypeScript support
-// =============================================================================
-
+// Type exports pentru componente grid (exclus cele eliminate prin consolidare)
 export type GridContainerProps = VariantProps<typeof gridContainer>;
 export type GridTableProps = VariantProps<typeof gridTable>;
 export type GridHeaderProps = VariantProps<typeof gridHeader>;
@@ -725,118 +723,11 @@ export type GridBadgeProps = VariantProps<typeof gridBadge>;
 export type GridInputProps = VariantProps<typeof gridInput>;
 
 // =============================================================================
-// 🚨 CVA EXTENSIONS - AUDIT FIX PHASE 1
-// Eliminare clase hardcodate prin CVA components noi
-// =============================================================================
-
-// Modal/Overlay CVA Component pentru eliminarea "fixed inset-0 bg-black bg-opacity-50..."
-export const gridModal = cva(
-  ["fixed inset-0 z-50 flex items-center justify-center"],
-  {
-    variants: {
-      variant: {
-        default: "bg-black/50",
-        professional: "bg-black/60 backdrop-blur-sm",
-        subtle: "bg-gray-900/40",
-        confirmation: "bg-black/70 backdrop-blur-md",
-      },
-      animation: {
-        none: "",
-        fade: "animate-fade-in",
-        scale: "animate-scale-in",
-        slideDown: "animate-slide-down",
-      },
-      state: {
-        open: "opacity-100 pointer-events-auto",
-        closed: "opacity-0 pointer-events-none",
-      },
-      content: {
-        overlay: "",
-        dialog: [
-          "bg-white rounded-lg shadow-xl max-w-md mx-4 p-6",
-          "animate-scale-in"
-        ],
-        header: "text-lg font-semibold text-yellow-800 mb-2",
-        text: "text-sm text-gray-700 mb-4",
-      },
-    },
-    defaultVariants: {
-      variant: "professional",
-      animation: "fade",
-      state: "open",
-      content: "overlay",
-    },
-  },
-);
-
-// Layout CVA Component pentru eliminarea "flex items-center gap-3" etc.
-export const gridLayout = cva(
-  ["flex"],
-  {
-    variants: {
-      direction: {
-        row: "flex-row",
-        column: "flex-col",
-        rowReverse: "flex-row-reverse",
-        columnReverse: "flex-col-reverse",
-      },
-      align: {
-        start: "items-start",
-        center: "items-center",
-        end: "items-end",
-        stretch: "items-stretch",
-        baseline: "items-baseline",
-      },
-      justify: {
-        start: "justify-start",
-        center: "justify-center",
-        end: "justify-end",
-        between: "justify-between",
-        around: "justify-around",
-        evenly: "justify-evenly",
-      },
-      gap: {
-        none: "gap-0",
-        xs: "gap-1",
-        sm: "gap-2",
-        md: "gap-3",
-        lg: "gap-4",
-        xl: "gap-6",
-      },
-      width: {
-        auto: "w-auto",
-        full: "w-full",
-        fit: "w-fit",
-        screen: "w-screen",
-      },
-      height: {
-        auto: "h-auto",
-        full: "h-full",
-        fit: "h-fit",
-        screen: "h-screen",
-        min: "min-h-[40px]",
-      },
-      flex: {
-        none: "flex-none",
-        initial: "flex-initial",
-        auto: "flex-auto",
-        1: "flex-1",
-      },
-      wrap: {
-        nowrap: "flex-nowrap",
-        wrap: "flex-wrap",
-        wrapReverse: "flex-wrap-reverse",
-      },
-    },
-    defaultVariants: {
-      direction: "row",
-      align: "center",
-      gap: "md",
-      width: "auto",
-      height: "auto",
-    },
-  },
-);
+// 🚨 CONSOLIDATION: Interactive și Value State components păstrate dar consolidate
+export type GridInteractiveProps = VariantProps<typeof gridInteractive>;
+export type GridValueStateProps = VariantProps<typeof gridValueState>;
+export type GridTransactionCellProps = VariantProps<typeof gridTransactionCell>;
+export type GridSubcategoryStateProps = VariantProps<typeof gridSubcategoryState>;
 
 // Interactive States CVA pentru eliminarea "cursor-pointer interactive hover:..." 
 export const gridInteractive = cva(
@@ -986,14 +877,3 @@ export const gridSubcategoryState = cva(
     },
   },
 );
-
-// =============================================================================
-// TYPE EXPORTS - CVA Extensions
-// =============================================================================
-
-export type GridModalProps = VariantProps<typeof gridModal>;
-export type GridLayoutProps = VariantProps<typeof gridLayout>;
-export type GridInteractiveProps = VariantProps<typeof gridInteractive>;
-export type GridValueStateProps = VariantProps<typeof gridValueState>;
-export type GridTransactionCellProps = VariantProps<typeof gridTransactionCell>;
-export type GridSubcategoryStateProps = VariantProps<typeof gridSubcategoryState>;

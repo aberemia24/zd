@@ -60,8 +60,6 @@ import {
   gridInput,
   gridMessage,
   // 🚨 CVA EXTENSIONS - AUDIT FIX PHASE 1 - New CVA components
-  gridModal,
-  gridLayout,
   gridInteractive,
   gridValueState,
   gridTransactionCell,
@@ -75,9 +73,11 @@ import {
   tableRow,
 } from "../../../styles/cva/data";
 import {
-  flex as flexContainerLayout,
+  flex,
+  modal,
+  modalContent,
   container as gridContainerLayout,
-  } from "../../../styles/cva/components/layout";
+} from "../../../styles/cva/components/layout";
 
 // Interfață pentru categoria din store
 interface CategoryStoreItem {
@@ -747,7 +747,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
                         data-testid={`toggle-category-${original.category}`}
                       >
-                        <div className={gridLayout({ align: "center", gap: "md" })}>
+                        <div className={flex({ align: "center", gap: "md" })}>
                           <div className={cn(
                             gridExpandIcon({
                               variant: "professional",
@@ -760,13 +760,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       </div>
                     ) : isFirstCell && isSubcategory ? (
                       // 🎨 Professional Subcategory Cell cu enhanced badge și actions
-                      <div className={gridLayout({ justify: "between", gap: "sm", width: "full" })}>
-                        <div className={gridLayout({ align: "center", gap: "md" })}>
+                      <div className={flex({ justify: "between", gap: "sm", width: "full" })}>
+                        <div className={flex({ align: "center", gap: "md" })}>
                           {/* 🎨 Editing Mode cu professional styling */}
                           {subcategoryAction?.type === 'edit' && 
                            subcategoryAction.category === original.category && 
                            subcategoryAction.subcategory === original.subcategory ? (
-                            <div className={gridLayout({ align: "center", gap: "sm", flex: 1 })}>
+                            <div className={flex({ align: "center", gap: "sm" })}>
                               <input
                                 type="text"
                                 value={editingSubcategoryName}
@@ -810,7 +810,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             </div>
                           ) : (
                             // 🎨 Normal Mode cu professional text și badge
-                            <div className={gridLayout({ align: "center", gap: "md" })}>
+                            <div className={flex({ align: "center", gap: "md" })}>
                               <span className="text-professional-body contrast-high">
                                 {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
                               </span>
@@ -922,7 +922,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 >
                   {addingSubcategory === original.category ? (
                     // 🎨 Professional Input Mode
-                    <div className={gridLayout({ align: "center", gap: "md" })}>
+                    <div className={flex({ align: "center", gap: "md" })}>
                       <input
                         type="text"
                         value={newSubcategoryName}
@@ -970,7 +970,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       onClick={() => setAddingSubcategory(original.category)}
                       className={cn(
                         gridInteractive({ variant: "addButton", size: "auto" }),
-                        gridLayout({ align: "center", gap: "sm" })
+                        flex({ align: "center", gap: "sm" })
                       )}
                       data-testid={`add-subcategory-${original.category}`}
                     >
@@ -1053,13 +1053,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
 
       return (
-        <div className={gridModal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
-          <div className={gridModal({ content: "dialog" })}>
-            <h3 className={gridModal({ content: "header" })}>
+        <div className={modal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
+          <div className={modalContent()}>
+            <h3 className={modalContent({ content: "header" })}>
               {MESAJE.CATEGORII.CONFIRMARE_STERGERE_TITLE}
             </h3>
-            <p className={gridModal({ content: "text" })}>{message}</p>
-            <div className={gridLayout({ justify: "end", gap: "md" })}>
+            <p className={modalContent({ content: "text" })}>{message}</p>
+            <div className={flex({ justify: "end", gap: "md" })}>
               <Button
                 variant="secondary"
                 size="sm"
@@ -1085,7 +1085,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Renderizare (layout principal)
     return (
       <>
-        <div className={cn(flexContainerLayout({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
+        <div className={cn(flex({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
           <Button
             variant="secondary"
             size="sm"
@@ -1172,7 +1172,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           {isLoading && (
             <div className={cn(
               gridMessage({ variant: "professional" }),
-              gridLayout({ align: "center", justify: "center" }),
+              flex({ align: "center", justify: "center" }),
               "p-8 animate-fade-in-up"
             )} 
             data-testid="loading-indicator">
@@ -1186,7 +1186,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           {error && (
             <div className={cn(
               gridMessage({ variant: "error" }),
-              gridLayout({ align: "center", justify: "center" }),
+              flex({ align: "center", justify: "center" }),
               "p-8 animate-slide-down"
             )} 
             data-testid="error-indicator">
@@ -1198,7 +1198,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           {!isLoading && !error && table.getRowModel().rows.length === 0 && (
             <div className={cn(
               gridMessage({ variant: "info" }),
-              gridLayout({ align: "center", justify: "center" }),
+              flex({ align: "center", justify: "center" }),
               "p-8 animate-scale-in"
             )} 
             data-testid="no-data-indicator">

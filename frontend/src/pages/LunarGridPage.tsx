@@ -9,26 +9,13 @@ import { useAuthStore } from "../stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 import { cn } from "../styles/cva/shared/utils";
-import { 
-  container,
-  pageHeader,
-  fullscreenIndicator,
-  fullscreenBackdrop,
-  titleSection,
-  pageTitle,
-  transitionLoader,
-  spinner,
-  controlsSection,
-  formSelect,
-  formInput,
-  loadingContainer,
-  loadingText,
-  contentWrapper,
-  responsiveLabel,
-  layoutButton
-} from "../styles/cva/components/layout";
+import { container, modal, flex } from "../styles/cva/components/layout";
 import { button } from "../styles/cva/components/forms";
 import { Maximize2, Minimize2 } from "lucide-react";
+import Badge from "../components/primitives/Badge/Badge";
+import Select from "../components/primitives/Select/Select";
+import Input from "../components/primitives/Input/Input";
+import Spinner from "../components/primitives/Spinner/Spinner";
 
 // 🎯 LGI-TASK-07: Layout modes type pentru Progressive Enhancement Button (doar 2 moduri)
 type LayoutMode = 'full-width' | 'fullscreen';
@@ -124,7 +111,7 @@ const LunarGridPage: React.FC = () => {
     if (layoutMode === 'fullscreen') {
       return (
         <div 
-          className={fullscreenBackdrop()}
+          className={modal({ variant: "subtle" })}
           onClick={() => setLayoutMode('full-width')}
           data-testid="fullscreen-backdrop"
         />
@@ -301,44 +288,56 @@ const LunarGridPage: React.FC = () => {
       {renderFullscreenBackdrop()}
       
       <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-container">
-        {/* 🎯 LGI-TASK-07: Fullscreen mode indicator cu CVA */}
+        {/* 🎯 LGI-TASK-07: Fullscreen mode indicator - CVA Badge primitive */}
         {layoutMode === 'fullscreen' && (
-          <div className={fullscreenIndicator({ variant: "pro" })}>
+          <Badge 
+            variant="secondary" 
+            className="absolute top-1 right-1 z-10"
+          >
             {UI.LUNAR_GRID_PAGE.FULLSCREEN_EXIT_HINT}
-          </div>
+          </Badge>
         )}
 
+        {/* 🚨 CONSOLIDATION - Page header folosind flex composition CVA */}
         <div className={cn(
-          pageHeader({ 
-            layout: layoutMode === 'fullscreen' ? "fullscreen" : "default",
-            padding: layoutMode === 'full-width' ? "default" : "none"
-          })
+          flex({ 
+            direction: "col", 
+            justify: "between", 
+            align: "center", 
+            gap: "md"
+          }),
+          "md:flex-row mb-6",
+          layoutMode === 'full-width' ? "px-4" : ""
         )}>
-          <div className={titleSection({ variant: "professional" })}>
-            <h1 className={pageTitle({ variant: "professional" })}>
+          {/* 🚨 CONSOLIDATION - Title section folosind flex composition CVA */}
+          <div className={flex({ align: "center", gap: "md" })}>
+            <h1 className="text-3xl font-bold text-gray-900">
               {TITLES.GRID_LUNAR}
             </h1>
-            {/* Indicator pentru React 18 Transitions cu CVA */}
+            {/* Indicator pentru React 18 Transitions - CVA Spinner primitive */}
             {isPending && (
               <div 
-                className={transitionLoader({ variant: "professional" })}
+                className={flex({ align: "center", gap: "sm" })}
                 data-testid="transition-loading-indicator"
               >
-                <div className={spinner({ size: "sm", color: "professional" })} />
-                {UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}
+                <Spinner size="sm" />
+                <span className="text-sm text-gray-600">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
               </div>
             )}
           </div>
 
-          <div className={controlsSection({ variant: "professional" })}>
-            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA */}
+          {/* 🚨 CONSOLIDATION - Controls section folosind flex composition CVA */}
+          <div className={cn(
+            flex({ align: "center", gap: "md" }),
+            "mt-4 md:mt-0"
+          )}>
+            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button */}
             <button
               onClick={handleLayoutModeToggle}
               className={cn(
                 button({ variant: "outline", size: "sm" }),
-                layoutButton({ 
-                  state: layoutMode === 'fullscreen' ? "active" : "default" 
-                })
+                flex({ align: "center", gap: "sm" }),
+                layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
               )}
               title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
                 '{nextMode}', 
@@ -347,51 +346,59 @@ const LunarGridPage: React.FC = () => {
               data-testid="layout-mode-toggle"
             >
               {getLayoutModeIcon(layoutMode)}
-              <span className={responsiveLabel({ variant: "professional" })}>{getLayoutModeLabel(layoutMode)}</span>
+              <span className="hidden sm:inline">{getLayoutModeLabel(layoutMode)}</span>
             </button>
 
-            <select
-              value={month}
+            {/* 🚨 CONSOLIDATION - Select primitive CVA cu options */}
+            <Select
+              value={month.toString()}
               onChange={handleMonthChange}
-              className={formSelect({ variant: "professional" })}
+              options={[
+                { value: "1", label: getMonthName(1) },
+                { value: "2", label: getMonthName(2) },
+                { value: "3", label: getMonthName(3) },
+                { value: "4", label: getMonthName(4) },
+                { value: "5", label: getMonthName(5) },
+                { value: "6", label: getMonthName(6) },
+                { value: "7", label: getMonthName(7) },
+                { value: "8", label: getMonthName(8) },
+                { value: "9", label: getMonthName(9) },
+                { value: "10", label: getMonthName(10) },
+                { value: "11", label: getMonthName(11) },
+                { value: "12", label: getMonthName(12) },
+              ]}
               data-testid="month-selector"
-            >
-              {monthOptions}
-            </select>
+            />
 
-            <input
+            {/* 🚨 CONSOLIDATION - Input primitive CVA */}
+            <Input
               type="number"
-              value={year}
+              value={year.toString()}
               onChange={handleYearChange}
               min="1900"
               max="2100"
-              className={formInput({ variant: "professional", width: "md" })}
+              className="w-24"
               data-testid="year-input"
             />
           </div>
         </div>
 
-        {/* Arată Loading state când încărcăm date cu CVA */}
+        {/* Arată Loading state când încărcăm date - CVA Spinner + flex composition */}
         {loading ? (
           <div className={cn(
-            loadingContainer({ 
-              layout: layoutMode === 'fullscreen' ? "fullscreen" : "default",
-              spacing: layoutMode === 'full-width' ? "default" : "none"
-            })
+            flex({ justify: "center", align: "center", gap: "md" }),
+            "py-8",
+            layoutMode === 'full-width' ? "px-4" : ""
           )}>
-            <div className={spinner({ size: "lg", color: "professional" })} />
-            <p className={loadingText({ variant: "professional" })}>
+            <Spinner size="lg" />
+            <p className="text-gray-700">
               {UI.LUNAR_GRID_PAGE.LOADING_MESSAGE_TEMPLATE
                 .replace('{month}', getMonthName(month))
                 .replace('{year}', year.toString())}
             </p>
           </div>
         ) : (
-          <div className={cn(
-            contentWrapper({ 
-              padding: layoutMode === 'full-width' ? "default" : "none"
-            })
-          )}>
+          <div className={layoutMode === 'full-width' ? "px-4" : ""}>
             <LunarGridTanStack year={year} month={month} />
           </div>
         )}
