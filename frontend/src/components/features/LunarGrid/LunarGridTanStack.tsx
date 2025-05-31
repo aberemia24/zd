@@ -42,7 +42,7 @@ import { EditableCell } from "./inline-editing/EditableCell";
 import { Plus, Edit, Trash2, ChevronRight } from "lucide-react";
 
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
-import { formatCurrency, getBalanceStyleClass, formatMonthYear } from "../../../utils/lunarGrid";
+import { formatCurrencyCompact, getBalanceStyleClass, formatMonthYear } from "../../../utils/lunarGrid";
 
 // Import CVA styling system cu professional enhancements pentru LGI-TASK-08
 import { cn } from "../../../styles/cva/shared/utils";
@@ -1699,7 +1699,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                               dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
                             )}
                           >
-                            {dailyBalance !== 0 ? formatCurrency(dailyBalance) : "—"}
+                            {dailyBalance !== 0 ? formatCurrencyCompact(dailyBalance) : "—"}
                           </th>
                         );
                       }
@@ -1718,7 +1718,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                               monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
                             )}
                           >
-                            {monthTotal !== 0 ? formatCurrency(monthTotal) : "—"}
+                            {monthTotal !== 0 ? formatCurrencyCompact(monthTotal) : "—"}
                           </th>
                         );
                       }

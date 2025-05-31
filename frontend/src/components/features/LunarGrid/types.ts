@@ -147,7 +147,7 @@ export interface UseLunarGridTableOptions {
   month: number;
   transactions: TransactionValidated[];
   expandedCategories: Record<string, boolean>;
-  formatCurrency: (amount: number) => string;
+  formatCurrencyCompact: (amount: number) => string;
   getBalanceStyle: (amount: number) => string;
   getTransactionTypeForCategory: (category: string) => TransactionType;
   onToggleCategory: (category: string) => void;
@@ -250,7 +250,7 @@ export interface TanStackSubcategoryRowsProps {
   }>;
   days: number[];
   transactions: TransactionValidated[];
-  formatCurrency: (amount: number) => string;
+  formatCurrencyCompact: (amount: number) => string;
   getBalanceStyle: (amount: number) => string;
   getSumForCell: (category: string, subcategory: string, day: number) => number;
   handleCellClick: (

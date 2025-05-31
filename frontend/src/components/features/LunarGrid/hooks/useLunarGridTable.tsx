@@ -18,10 +18,11 @@ import type { TransactionValidated } from "@shared-constants/transaction.schema"
 // Import-uri utilitare din @utils/lunarGrid (via barrel file) - doar cele folosite
 import {
   getDaysInMonth,
-  formatCurrency,
   getBalanceStyleClass,
   getCategoryStyleClass,
   generateTableColumns,
+  formatCurrencyCompact,
+  formatMonthYear,
 } from "../../../../utils/lunarGrid";
 import { MESAJE, LUNAR_GRID_MESSAGES } from "@shared-constants";
 
@@ -470,7 +471,7 @@ export function useLunarGridTable(
             const colorClass = getCategoryStyleClass(original.category, value);
             const valueDisplay =
               typeof value === "number" && !isNaN(value) && value !== 0
-                ? formatCurrency(value)
+                ? formatCurrencyCompact(value)
                 : "—";
 
             // Adăugăm click handlers doar pentru subcategorii (nu pentru categorii)
@@ -535,7 +536,7 @@ export function useLunarGridTable(
             return (
               <div className={`text-center ${colorClass}`}>
                 {typeof value === "number" && !isNaN(value) && value !== 0
-                  ? formatCurrency(value)
+                  ? formatCurrencyCompact(value)
                   : "—"}
               </div>
             );
