@@ -4,10 +4,18 @@ import { useAuthStore } from "../stores/authStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import { CategoryEditor } from "../components/features/CategoryEditor";
 import { UI } from "@shared-constants/ui";
+import { CATEGORIES } from "@shared-constants/categories";
+import { MESAJE } from "@shared-constants/messages";
+import { TransactionType } from "@shared-constants/enums";
 import { Button } from "../components/primitives/Button";
 import Alert from "../components/primitives/Alert";
+import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";
 import { cn } from "../styles/cva/shared/utils";
 import { container, card, flex } from "../styles/cva/components/layout";
+import { useMonthlyTransactions } from "../services/hooks/useMonthlyTransactions";
+import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
+import { supabaseService } from "../services/supabaseService";
+import { toast } from "react-hot-toast";
 
 /**
  * Pagina de opțiuni a aplicației
@@ -18,11 +26,349 @@ const OptionsPage: React.FC = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
   const categoryStore = useCategoryStore();
+  const { categories, saveCategories } = categoryStore;
   const [showCategoryEditor, setShowCategoryEditor] = React.useState(false);
+  const [isResetting, setIsResetting] = React.useState(false);
+  const [showPromptModal, setShowPromptModal] = React.useState(false);
+  const [promptResolver, setPromptResolver] = React.useState<((value: string | null) => void) | null>(null);
+  const [orphanedTransactions, setOrphanedTransactions] = React.useState<{
+    customSubcategories: string[];
+    transactionCount: number;
+    affectedTransactions: any[];
+  } | null>(null);
 
   // IMPORTANT: Folosim o referință pentru a ține minte starea anterioară a editorului
   // și pentru a preveni buclele infinite, conform memoriei e0d0698c
   const prevEditorStateRef = React.useRef(showCategoryEditor);
+
+  // Hook pentru ștergerea tranzacțiilor
+  const deleteTransactionMutation = useDeleteTransaction();
+
+  // Modal hooks
+  const { modalProps, showConfirmation } = useConfirmationModal();
+
+  // Funcție pentru transformarea categoriilor default din CATEGORIES în formatul store-ului
+  const getDefaultCategories = () => {
+    const defaultCategories: Array<{
+      name: string;
+      type: TransactionType;
+      subcategories: Array<{ name: string; isCustom: boolean }>;
+      isCustom: boolean;
+    }> = [];
+    
+    Object.entries(CATEGORIES).forEach(([categoryName, categoryData]) => {
+      const subcategories: Array<{ name: string; isCustom: boolean }> = [];
+      
+      // Parcurgem toate grupurile din categoria
+      Object.values(categoryData).forEach((group) => {
+        group.forEach((subcategoryName: string) => {
+          subcategories.push({
+            name: subcategoryName,
+            isCustom: false
+          });
+        });
+      });
+      
+      defaultCategories.push({
+        name: categoryName,
+        type: categoryName === 'VENITURI' ? TransactionType.INCOME : categoryName === 'ECONOMII' ? TransactionType.SAVING : TransactionType.EXPENSE,
+        subcategories,
+        isCustom: false
+      });
+    });
+    
+    return defaultCategories;
+  };
+
+  // Funcție pentru verificarea tranzacțiilor ce vor fi șterse
+  const checkTransactionsToBeDeleted = async () => {
+    if (!user?.id) return null;
+
+    try {
+      // Obținem toate tranzacțiile utilizatorului
+      const allTransactions = await supabaseService.fetchTransactions(user.id, { 
+        limit: 10000 
+      });
+
+      // Identificăm subcategoriile custom din store
+      const customSubcategories: string[] = [];
+      categories.forEach(category => {
+        category.subcategories.forEach(subcategory => {
+          if (subcategory.isCustom) {
+            customSubcategories.push(`${category.name}:${subcategory.name}`);
+          }
+        });
+      });
+
+      // Găsim tranzacțiile care vor fi șterse
+      const transactionsToDelete = allTransactions.data.filter(transaction => {
+        const key = `${transaction.category}:${transaction.subcategory}`;
+        return customSubcategories.some(customKey => customKey === key);
+      });
+
+      // Grupăm pe subcategorii pentru a afișa detalii
+      const subcategoryStats: { [key: string]: number } = {};
+      transactionsToDelete.forEach(transaction => {
+        const key = `${transaction.subcategory} (${transaction.category})`;
+        subcategoryStats[key] = (subcategoryStats[key] || 0) + 1;
+      });
+
+      return {
+        customSubcategories,
+        transactionCount: transactionsToDelete.length,
+        transactionsToDelete,
+        subcategoryStats
+      };
+    } catch (error) {
+      console.error("Eroare la verificarea tranzacțiilor:", error);
+      return null;
+    }
+  };
+
+  // Funcție pentru prompt modal
+  const showPrompt = (message: string, expectedValue?: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+      setPromptResolver(() => resolve);
+      setShowPromptModal(true);
+    });
+  };
+
+  // Funcție pentru reset doar subcategorii (simplificată și clară)
+  const handleResetSubcategories = async () => {
+    if (!user?.id || isResetting) return;
+
+    setIsResetting(true);
+    
+    try {
+      // PASUL 1: Identificăm subcategoriile care vor fi resetate
+      const customSubcategories: string[] = [];
+      const modifiedSubcategories: string[] = [];
+      
+      categories.forEach(category => {
+        category.subcategories.forEach(subcategory => {
+          if (subcategory.isCustom) {
+            customSubcategories.push(`${subcategory.name} (${category.name})`);
+          }
+        });
+      });
+
+      // Găsim subcategoriile modificate (care nu sunt în CATEGORIES default)
+      const defaultCategoriesForCheck = getDefaultCategories();
+      categories.forEach(category => {
+        const defaultCategory = defaultCategoriesForCheck.find(def => def.name === category.name);
+        if (defaultCategory) {
+          category.subcategories.forEach(subcategory => {
+            if (!subcategory.isCustom) {
+              const existsInDefault = defaultCategory.subcategories.some(
+                defSub => defSub.name === subcategory.name
+              );
+              if (!existsInDefault) {
+                modifiedSubcategories.push(`${subcategory.name} (${category.name})`);
+              }
+            }
+          });
+        }
+      });
+
+      // PASUL 2: Verificăm ce tranzacții vor fi șterse
+      const deleteInfo = await checkTransactionsToBeDeleted();
+      
+      if (!deleteInfo) {
+        toast.error("Eroare la verificarea tranzacțiilor. Încercați din nou.");
+        return;
+      }
+
+      // PASUL 3: Construim mesajul de confirmare cu toate informațiile
+      let confirmationMessage = "Resetarea subcategoriilor va face următoarele:\n\n";
+      
+      if (customSubcategories.length > 0) {
+        confirmationMessage += `🗑️ Va șterge ${customSubcategories.length} subcategorii custom:\n`;
+        // Adăugăm doar primele 5 pentru a nu încarcat mesajul
+        const displayCustom = customSubcategories.slice(0, 5);
+        confirmationMessage += displayCustom.map(sub => `• ${sub}`).join('\n');
+        if (customSubcategories.length > 5) {
+          confirmationMessage += `\n• ... și încă ${customSubcategories.length - 5} subcategorii`;
+        }
+        confirmationMessage += "\n\n";
+      }
+
+      if (modifiedSubcategories.length > 0) {
+        confirmationMessage += `🔄 Va redenumi ${modifiedSubcategories.length} subcategorii modificate la numele inițiale\n\n`;
+      }
+
+      if (deleteInfo.transactionCount > 0) {
+        confirmationMessage += `⚠️ Va șterge ${deleteInfo.transactionCount} tranzacții de pe subcategoriile custom:\n`;
+        // Afișăm statisticile pe subcategorii
+        const topStats = Object.entries(deleteInfo.subcategoryStats).slice(0, 5);
+        confirmationMessage += topStats.map(([subcategory, count]) => `• ${subcategory}: ${count} tranzacții`).join('\n');
+        if (Object.keys(deleteInfo.subcategoryStats).length > 5) {
+          confirmationMessage += `\n• ... și alte subcategorii`;
+        }
+      } else {
+        confirmationMessage += "✅ Nu vor fi șterse tranzacții (nu există tranzacții pe subcategorii custom)";
+      }
+
+      // Construim lista de detalii pentru modal
+      const details: string[] = [];
+      if (customSubcategories.length > 0) {
+        details.push(`${customSubcategories.length} subcategorii custom vor fi șterse`);
+      }
+      if (modifiedSubcategories.length > 0) {
+        details.push(`${modifiedSubcategories.length} subcategorii vor fi redenumite`);
+      }
+      if (deleteInfo.transactionCount > 0) {
+        details.push(`${deleteInfo.transactionCount} tranzacții vor fi șterse definitiv`);
+      } else {
+        details.push("0 tranzacții vor fi șterse");
+      }
+
+      const shouldContinue = await showConfirmation({
+        title: deleteInfo.transactionCount > 0 ? "⚠️ Resetare Subcategorii + Ștergere Tranzacții" : "🔄 Resetare Subcategorii",
+        message: confirmationMessage,
+        details: details,
+        recommendation: deleteInfo.transactionCount > 0 
+          ? "Înainte de reset, mergeți în LunarGrid și mutați manual tranzacțiile importante pe subcategorii pe care doriți să le păstrați."
+          : "Subcategoriile custom vor fi șterse și cele modificate vor fi redenumite la valorile inițiale.",
+        confirmText: deleteInfo.transactionCount > 0 ? "Resetează și șterge tranzacțiile" : "Resetează subcategoriile",
+        cancelText: "Anulează",
+        variant: deleteInfo.transactionCount > 0 ? "warning" : "default",
+        icon: deleteInfo.transactionCount > 0 ? "⚠️" : "🔄"
+      });
+      
+      if (!shouldContinue) {
+        toast(deleteInfo.transactionCount > 0 
+          ? "Resetarea anulată. Mutați tranzacțiile manual din LunarGrid înainte de reset." 
+          : "Resetarea anulată.", {
+          icon: "💡"
+        });
+        return;
+      }
+
+      // PASUL 4: Dacă avem tranzacții de șters, confirmarea finală
+      if (deleteInfo.transactionCount > 0) {
+        const finalConfirm = await showConfirmation({
+          title: "Confirmarea finală pentru ștergerea tranzacțiilor",
+          message: `Sunteți sigur că doriți să ștergeți ${deleteInfo.transactionCount} tranzacții?\n\nAceastă acțiune NU poate fi anulată!`,
+          confirmText: "Da, șterge tranzacțiile",
+          cancelText: "Nu, anulează",
+          variant: "danger",
+          icon: "🗑️"
+        });
+
+        if (!finalConfirm) {
+          toast("Resetarea anulată.", {
+            icon: "ℹ️"
+          });
+          return;
+        }
+
+        // PASUL 5: Ștergem tranzacțiile de pe subcategoriile custom
+        toast.loading(`Șterge ${deleteInfo.transactionCount} tranzacții...`, { duration: 3000 });
+        
+        for (const transaction of deleteInfo.transactionsToDelete) {
+          await supabaseService.deleteTransaction(transaction.id);
+        }
+        
+        toast.success(`${deleteInfo.transactionCount} tranzacții au fost șterse.`);
+      }
+
+      // PASUL 6: Resetăm categoriile
+      const defaultCategories = getDefaultCategories();
+      await saveCategories(user.id, defaultCategories);
+      
+      const message = deleteInfo.transactionCount > 0 
+        ? `Subcategoriile au fost resetate și ${deleteInfo.transactionCount} tranzacții au fost șterse.`
+        : "Subcategoriile au fost resetate la valorile implicite!";
+      
+      toast.success(message);
+      
+    } catch (error) {
+      console.error("Eroare la resetarea subcategoriilor:", error);
+      toast.error("Eroare la resetarea subcategoriilor. Încercați din nou.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  // Funcție pentru reset complet (subcategorii + tranzacții)
+  const handleResetEverything = async () => {
+    if (!user?.id || isResetting) return;
+
+    // Verificarea inițială
+    const confirmed = await showConfirmation({
+      title: "⚠️ RESETARE COMPLETĂ ⚠️",
+      message: "Sigur doriți să resetați TOTUL la valorile implicite?\n\nAceasta va:\n• Șterge toate subcategoriile custom\n• Redenumi subcategoriile modificate la numele inițiale\n• ȘTERGE DEFINITIV TOATE TRANZACȚIILE din baza de date\n\n⚠️ ACEASTĂ ACȚIUNE NU POATE FI ANULATĂ! ⚠️\nToate datele financiare vor fi pierdute permanent!",
+      confirmText: "Continuă",
+      cancelText: "Anulează",
+      variant: "danger",
+      icon: "💥"
+    });
+
+    if (!confirmed) return;
+
+    // Confirmarea dublă pentru acțiuni periculoase
+    const doubleConfirmed = await showConfirmation({
+      title: "Ultima verificare!",
+      message: "Sunteți absolut sigur că doriți să ștergeți TOATE tranzacțiile?\nScrieți 'ȘTERG TOT' în următorul câmp pentru a confirma.",
+      confirmText: "Continuă la confirmarea finală",
+      cancelText: "Anulează",
+      variant: "danger",
+      icon: "⚠️"
+    });
+
+    if (!doubleConfirmed) return;
+
+    const finalConfirmation = await showPrompt(
+      "Pentru a confirma ștergerea completă, scrieți exact: ȘTERG TOT", 
+      "ȘTERG TOT"
+    );
+
+    if (finalConfirmation !== "ȘTERG TOT") {
+      toast("Confirmarea nu a fost corectă. Resetarea a fost anulată.", {
+        icon: "ℹ️"
+      });
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      // Pasul 1: Obținem toate tranzacțiile pentru numărătoare
+      const allTransactions = await supabaseService.fetchTransactions(user.id, { 
+        limit: 10000 
+      });
+      
+      const transactionCount = allTransactions.count;
+      
+      toast.loading(`Șterge ${transactionCount} tranzacții...`, { duration: 3000 });
+      
+      // Pasul 2: Ștergem toate tranzacțiile (în batches pentru performanță)
+      const batchSize = 50;
+      for (let i = 0; i < allTransactions.data.length; i += batchSize) {
+        const batch = allTransactions.data.slice(i, i + batchSize);
+        await Promise.all(batch.map(transaction => 
+          supabaseService.deleteTransaction(transaction.id)
+        ));
+        
+        // Progress feedback
+        const progress = Math.min(i + batchSize, allTransactions.data.length);
+        console.log(`Șters batch ${Math.ceil(progress / batchSize)} din ${Math.ceil(allTransactions.data.length / batchSize)}`);
+      }
+      
+      // Pasul 3: Reset categorii
+      const defaultCategories = getDefaultCategories();
+      await saveCategories(user.id, defaultCategories);
+      
+      toast.success(`Resetarea completă a fost finalizată! ${transactionCount} tranzacții au fost șterse.`);
+      
+      // Redirecționează utilizatorul la pagina principală
+      navigate("/");
+    } catch (error) {
+      console.error("Eroare la resetarea completă:", error);
+      toast.error("Eroare la resetarea completă. Unele date ar putea nu fi fost șterse.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   // Dacă utilizatorul nu este autentificat, afișăm un mesaj
   if (!user) {
@@ -134,6 +480,85 @@ const OptionsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Secțiunea Reset to Defaults */}
+      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+        <div
+          className={cn(
+            "p-4 border-b border-gray-200 bg-red-50",
+            "rounded-t-lg",
+          )}
+        >
+          <h2 className="text-lg font-semibold text-red-900">
+            ⚠️ Reset la Setările Inițiale
+          </h2>
+        </div>
+        <div className="p-6">
+          <p className="text-gray-600 mb-4">
+            Resetați aplicația la configurația inițială. Alegeți ce doriți să resetați:
+          </p>
+          
+          <div className={cn(flex({ direction: "col", gap: "md" }))}>
+            {/* Reset doar subcategorii */}
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <h3 className="font-semibold text-gray-900 mb-2">
+                🔄 Reset Subcategorii
+              </h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Șterge subcategoriile custom și redenumește toate subcategoriile la numele inițiale. 
+                <strong className="text-red-700"> ATENȚIE:</strong> Tranzacțiile de pe subcategorii custom vor fi 
+                <strong> șterse definitiv</strong>. Veți fi informați exact câte tranzacții vor fi afectate.
+              </p>
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-2 mb-3">
+                <p className="text-xs text-blue-700">
+                  💡 <strong>Recomandare:</strong> Înainte de reset, mutați manual tranzacțiile importante 
+                  din LunarGrid pe subcategorii pe care doriți să le păstrați.
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleResetSubcategories}
+                disabled={isResetting}
+                dataTestId="reset-subcategories-btn"
+              >
+                {isResetting ? "Se resetează..." : "Reset Subcategorii"}
+              </Button>
+            </div>
+
+            {/* Reset complet */}
+            <div className="border border-red-200 rounded-lg p-4 bg-red-50">
+              <h3 className="font-semibold text-red-900 mb-2">
+                💥 Reset Complet (PERICULOS)
+              </h3>
+              <p className="text-sm text-red-700 mb-3">
+                Resetează subcategoriile ȘI șterge <strong>TOATE tranzacțiile</strong> definitiv din baza de date. 
+                <strong> Această acțiune NU poate fi anulată!</strong>
+              </p>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={handleResetEverything}
+                disabled={isResetting}
+                dataTestId="reset-everything-btn"
+              >
+                {isResetting ? "Se resetează..." : "⚠️ Reset Complet"}
+              </Button>
+            </div>
+          </div>
+
+          {isResetting && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                <span className="text-blue-800 text-sm">
+                  Se procesează resetarea... Vă rugăm să așteptați.
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Secțiunea Cont Utilizator */}
       <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
         <div
@@ -189,6 +614,35 @@ const OptionsPage: React.FC = () => {
           );
         }}
         userId={user.id}
+      />
+
+      {/* Modal-uri de confirmare */}
+      <ConfirmationModal {...modalProps} />
+      
+      <PromptModal
+        isOpen={showPromptModal}
+        onClose={() => {
+          if (promptResolver) {
+            promptResolver(null);
+            setPromptResolver(null);
+          }
+          setShowPromptModal(false);
+        }}
+        onConfirm={(value) => {
+          if (promptResolver) {
+            promptResolver(value);
+            setPromptResolver(null);
+          }
+          setShowPromptModal(false);
+        }}
+        title="Confirmarea finală"
+        message="Pentru a confirma ștergerea completă, scrieți exact: ȘTERG TOT"
+        placeholder="Scrieți aici..."
+        expectedValue="ȘTERG TOT"
+        confirmText="Confirm ștergerea"
+        cancelText="Anulează"
+        variant="danger"
+        icon="⚠️"
       />
     </div>
   );

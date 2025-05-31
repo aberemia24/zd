@@ -153,6 +153,29 @@ export function useLunarGridTable(
   const categories = useCategoryStore((state) => state.categories);
   const user = useAuthStore((state) => state.user);
 
+  // 🔍 DEBUG: Tracking categories changes
+  console.log('🔍 [STORE-BASIC-DEBUG] Basic store values:', {
+    categoriesExists: !!categories,
+    categoriesLength: categories?.length || 0,
+    userExists: !!user,
+    userId: user?.id
+  });
+
+  useEffect(() => {
+    console.log('🔍 [CATEGORIES-DEBUG] Categories updated from store:', {
+      count: categories?.length || 0,
+      timestamp: new Date().toISOString(),
+      categories: categories?.map(cat => ({
+        name: cat.name,
+        subcategoriesCount: cat.subcategories?.length || 0,
+        subcategories: cat.subcategories?.map(sub => ({
+          name: sub.name,
+          isCustom: sub.isCustom
+        })) || []
+      }))
+    });
+  }, [categories]);
+
   // Folosim direct noul hook specializat pentru încărcarea lunară
   const {
     transactions: validTransactions,
@@ -190,6 +213,12 @@ export function useLunarGridTable(
 
   // Transformăm în formatul necesar pentru tabel cu subrows native
   const rawTableData = useMemo(() => {
+    console.log('🔍 [RAWTABLE-DEBUG] Starting data transformation with:', {
+      categoriesCount: categories?.length || 0,
+      transactionsCount: validTransactions?.length || 0,
+      categories: categories?.map(cat => cat.name) || []
+    });
+
     // 1. Grupăm tranzacțiile pe categorii și subcategorii
     const categoriesMap: Record<string, TransformedTableDataRow> = {};
     const fallbackRowsMap: Record<string, FallbackRow[]> = {};
@@ -230,9 +259,23 @@ export function useLunarGridTable(
       const categoryDef = categories.find((c) => c.name === cat);
       const subcategories = categoryDef ? categoryDef.subcategories : [];
       const fallbackRows = fallbackRowsMap[cat] || [];
+      
+      console.log(`🔍 [SUBROWS-DEBUG] Building subRows for category "${cat}":`, {
+        subcategoriesFromDef: subcategories?.map(sub => ({
+          name: sub.name,
+          isCustom: sub.isCustom
+        })) || [],
+        fallbackRows: fallbackRows?.map(fb => fb.subcategory) || [],
+        categoryDef: categoryDef ? 'Found' : 'Not found'
+      });
+      
       // Construim subRows UNICE
       const subRows = buildUniqueSubRows(cat, subcategories, fallbackRows);
       categoriesMap[cat].subRows = subRows;
+      
+      console.log(`🔍 [SUBROWS-DEBUG] Built ${subRows.length} subRows for "${cat}":`, 
+        subRows.map(sr => sr.subcategory)
+      );
     });
 
     // 4. Aplicăm aceeași strategie de selecție ca în transactionMap pentru consistență

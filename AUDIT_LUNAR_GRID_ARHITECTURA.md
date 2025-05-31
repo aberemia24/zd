@@ -11,14 +11,15 @@
 
 1. [Overview](#-overview)
 2. [Arhitectura Generală](#-arhitectura-generală)
-3. [Componenta Principală](#-componenta-principală)
-4. [Hook-uri și State Management](#-hook-uri-și-state-management)
-5. [Utilitare și Formatare](#-utilitare-și-formatare)
-6. [Styling (CVA System)](#-styling-cva-system)
-7. [Types și Interfețe](#-types-și-interfețe)
-8. [Pagina LunarGrid](#-pagina-lunargrid)
-9. [Dependențe și Integrări](#-dependențe-și-integrări)
-10. [Fluxul de Date](#-fluxul-de-date)
+3. [**DEPENDENCY TREE COMPLET**](#-dependency-tree-complet) ⭐ **NOU**
+4. [Componenta Principală](#-componenta-principală)
+5. [Hook-uri și State Management](#-hook-uri-și-state-management)
+6. [Utilitare și Formatare](#-utilitare-și-formatare)
+7. [Styling (CVA System)](#-styling-cva-system)
+8. [Types și Interfețe](#-types-și-interfețe)
+9. [Pagina LunarGrid](#-pagina-lunargrid)
+10. [Dependențe și Integrări](#-dependențe-și-integrări)
+11. [Fluxul de Date](#-fluxul-de-date)
 
 ---
 
@@ -64,6 +65,202 @@ graph TD
     style C fill:#e8f5e8
     style L fill:#fff3e0
 ```
+
+---
+
+## 🌳 DEPENDENCY TREE COMPLET
+
+### 📊 **TABEL COMPLET CU TOATE DEPENDENȚELE**
+
+| **Categorie** | **Fișier/Dependență** | **Tip** | **Rol și Funcționalitate** |
+|---------------|------------------------|---------|----------------------------|
+| **🎯 FRAMEWORK & LIBRARIES** |
+| └── React | `React` | External | Framework principal pentru UI components |
+| └── React | `useState` | Hook | State management local în componente |
+| └── React | `useMemo` | Hook | Memoization pentru optimizare performance |
+| └── React | `useCallback` | Hook | Memoization pentru funcții, evită re-renders |
+| └── React | `useEffect` | Hook | Side effects și lifecycle management |
+| └── React | `memo` | HOC | Prevenire re-renderizări inutile pentru componente |
+| └── React | `useRef` | Hook | Referințe DOM și valori persistente |
+| └── React | `useTransition` | Hook | React 18 - transițiuni fără blocking UI |
+| └── TanStack Table | `flexRender` | Function | Renderizare dinamică celule în TanStack Table |
+| └── TanStack Table | `Row` | Type | Tipul pentru rândurile tabelului |
+| └── TanStack Table | `useReactTable` | Hook | Hook principal pentru instanța de tabel |
+| └── TanStack Table | `getCoreRowModel` | Function | Model de bază pentru rânduri |
+| └── TanStack Table | `ColumnDef` | Type | Definire structură coloane |
+| └── TanStack Table | `Table` | Type | Tipul pentru instanța tabelului |
+| └── TanStack Table | `Column` | Type | Tipul pentru coloane individuale |
+| └── React Query | `useQueryClient` | Hook | Access la client pentru cache management |
+| └── React Hot Toast | `toast` | Function | Notificări UX pentru succes/eroare |
+| └── Lucide React | `Plus` | Icon | Icon pentru adăugare subcategorii |
+| └── Lucide React | `Edit` | Icon | Icon pentru editare inline |
+| └── Lucide React | `Trash2` | Icon | Icon pentru ștergere tranzacții |
+| └── Lucide React | `ChevronRight` | Icon | Icon pentru expandare categorii |
+| └── Lucide React | `Maximize2` | Icon | Icon pentru fullscreen mode |
+| └── Lucide React | `Minimize2` | Icon | Icon pentru exit fullscreen |
+| **🏪 STORES & STATE MANAGEMENT** |
+| └── Category Store | `useCategoryStore` | Zustand Hook | Gestionare categorii și subcategorii custom |
+| │   ├── `categories` | Property | Array categorii din store |
+| │   ├── `saveCategories` | Method | Salvare categorii modificate |
+| │   ├── `loadUserCategories` | Method | Încărcare categorii utilizator |
+| │   └── `mergeWithDefaults` | Method | Merge categorii custom cu default |
+| └── Auth Store | `useAuthStore` | Zustand Hook | Autentificare și context utilizator |
+| │   └── `user` | Property | Obiectul utilizator curent |
+| └── Transaction Store | `useTransactionStore` | Zustand Hook | Cache local pentru tranzacții |
+| **📡 REACT QUERY HOOKS** |
+| └── Monthly Transactions | `useMonthlyTransactions` | Custom Hook | Fetch tranzacții pentru luna specifică |
+| └── Preloading | `useAdjacentMonthsPreload` | Custom Hook | Preload luni adiacente pentru UX |
+| └── Create Mutation | `useCreateTransactionMonthly` | Custom Hook | Creare tranzacții noi cu optimistic updates |
+| └── Update Mutation | `useUpdateTransactionMonthly` | Custom Hook | Actualizare tranzacții existente |
+| └── Delete Mutation | `useDeleteTransactionMonthly` | Custom Hook | Ștergere tranzacții cu confirmare |
+| **🎣 CUSTOM HOOKS (LUNARGRID)** |
+| └── Table Hook | `useLunarGridTable` | Custom Hook | Hook principal pentru TanStack Table integration |
+| └── Keyboard Navigation | `useKeyboardNavigation` | Custom Hook | Navigare cu săgeți, shortcuts, focus management |
+| └── Performance | `usePerformanceOptimization` | Custom Hook | Virtualizare, debouncing, memoization |
+| └── Calculations | `useLunarGridCalculations` | Custom Hook | Calcule financiare pentru grid |
+| └── Recurring | `useRecurringTransactions` | Custom Hook | Gestionare tranzacții recurente |
+| **🛠 UTILS & FORMATTERS** |
+| └── Formatters | `formatters.ts` | Utils | |
+| │   ├── `formatCurrency` | Function | Formatare sume monetare cu Intl.NumberFormat |
+| │   ├── `getBalanceStyleClass` | Function | CSS classes pentru sume pozitive/negative |
+| │   ├── `formatMonthYear` | Function | Formatare lună/an în română pentru header |
+| │   ├── `formatDate` | Function | Formatare date zz/ll/aaaa |
+| │   ├── `formatDayMonth` | Function | Formatare zi pentru coloane |
+| │   ├── `isCurrentDay` | Function | Verificare dacă ziua este azi |
+| │   ├── `getDayHeaderStyle` | Function | CSS pentru highlight ziua curentă |
+| │   └── `getCategoryStyleClass` | Function | CSS pentru styling categorii |
+| └── Data Transformers | `dataTransformers.ts` | Utils | |
+| │   ├── `getDaysInMonth` | Function | Calculare număr zile în lună |
+| │   ├── `generateTableColumns` | Function | Generare dinamică coloane TanStack |
+| │   ├── `transformTransactionsToGrid` | Function | Transformare tranzacții în format grid |
+| │   └── `groupByCategory` | Function | Grupare tranzacții pe categorii |
+| └── Calculations | `calculations.ts` | Utils | |
+| │   ├── `calculateDailyBalances` | Function | Calcul balanțe zilnice |
+| │   ├── `calculateCategoryTotals` | Function | Calcul totaluri categorii |
+| │   ├── `calculateMonthlyProjection` | Function | Proiecții lunare |
+| │   └── `validateNumericInput` | Function | Validare input numeric |
+| └── Financial Calc | `financialCalculations.ts` | Utils | |
+| │   ├── `calculateProjections` | Function | Calcule proiecții complexe |
+| │   ├── `analyzeTrends` | Function | Analiză trend-uri financiare |
+| │   ├── `calculatePercentages` | Function | Calcule procente |
+| │   └── `compareMonths` | Function | Comparații între luni |
+| └── Recurring Generator | `recurringTransactionGenerator.ts` | Utils | |
+| │   ├── `detectRecurringPatterns` | Function | Detectare pattern-uri recurente |
+| │   ├── `generateFutureTransactions` | Function | Generare tranzacții viitoare |
+| │   ├── `handleExceptions` | Function | Gestionare excepții (sărbători) |
+| │   └── `validateConsistency` | Function | Validare consistență pattern |
+| **🎨 CVA STYLING SYSTEM** |
+| └── Grid Styles | `grid.ts` | CVA | |
+| │   ├── `gridContainer` | CVA Component | Container principal cu variants (default, professional, elevated) |
+| │   ├── `gridTable` | CVA Component | Tabel cu density variants (compact, default, comfortable) |
+| │   ├── `gridHeader` | CVA Component | Header sticky cu shadow și variants |
+| │   ├── `gridHeaderCell` | CVA Component | Celule header cu sticky, sortable, numeric variants |
+| │   ├── `gridCategoryRow` | CVA Component | Rânduri categorii cu gradients și hover effects |
+| │   ├── `gridSubcategoryRow` | CVA Component | Rânduri subcategorii cu indentare |
+| │   ├── `gridTotalRow` | CVA Component | Rânduri totalizatoare cu emphasis |
+| │   ├── `gridCell` | CVA Component | Celule standard cu hover, editing, selection states |
+| │   ├── `gridExpandIcon` | CVA Component | Icon expandare cu rotație animată |
+| │   ├── `gridCellActions` | CVA Component | Container acțiuni celule |
+| │   ├── `gridActionButton` | CVA Component | Butoane acțiuni cu variants |
+| │   ├── `gridBadge` | CVA Component | Badge-uri cu color variants |
+| │   ├── `gridInput` | CVA Component | Input-uri inline cu focus states |
+| │   ├── `gridMessage` | CVA Component | Mesaje feedback cu variants |
+| │   ├── `gridInteractive` | CVA Component | Zone interactive cu focus |
+| │   ├── `gridValueState` | CVA Component | State-uri valori (positive, negative, zero) |
+| │   ├── `gridTransactionCell` | CVA Component | Celule specializate tranzacții |
+| │   └── `gridSubcategoryState` | CVA Component | State-uri subcategorii |
+| └── Data Styles | `data.ts` | CVA | |
+| │   ├── `dataTable` | CVA Component | Stiluri compatibilitate tabel |
+| │   ├── `tableHeader` | CVA Component | Header compatibilitate |
+| │   ├── `tableCell` | CVA Component | Celule compatibilitate |
+| │   └── `tableRow` | CVA Component | Rânduri compatibilitate |
+| └── Layout Styles | `layout.ts` | CVA | |
+| │   ├── `flex` | CVA Component | Layout flexbox cu direction variants |
+| │   ├── `modal` | CVA Component | Modal overlay cu backdrop variants |
+| │   ├── `modalContent` | CVA Component | Conținut modal cu size variants |
+| │   ├── `container` | CVA Component | Container layout cu spacing |
+| │   └── `button` | CVA Component | Butoane cu variants (primary, secondary) |
+| └── Form Styles | `forms.ts` | CVA | |
+| │   └── `button` | CVA Component | Stiluri butoane form |
+| └── Shared Utils | `shared/utils.ts` | Utils | |
+| │   └── `cn` | Function | Utility pentru combinare clase CSS |
+| **📱 UI PRIMITIVE COMPONENTS** |
+| └── Button | `Button.tsx` | Component | Butoane reutilizabile cu props |
+| └── Badge | `Badge.tsx` | Component | Badge-uri cu variants color |
+| └── Select | `Select.tsx` | Component | Dropdown select cu opțiuni |
+| └── Input | `Input.tsx` | Component | Input controlat cu validare |
+| └── Spinner | `Spinner.tsx` | Component | Loading spinner animat |
+| **🏗 LUNARGRID COMPONENTS** |
+| └── Main Component | `LunarGridTanStack.tsx` | Component | Componenta principală orchestrare |
+| └── Page Container | `LunarGridPage.tsx` | Component | Container pagină cu layout modes |
+| └── Cell Popover | `CellTransactionPopover.tsx` | Component | Popover pentru editare celule |
+| └── Editable Cell | `EditableCell.tsx` | Component | Celule cu editare inline |
+| │   └── Inline Editing | `useInlineCellEdit.tsx` | Hook | Hook pentru logica editării inline |
+| └── Quick Modal | `QuickAddModal.tsx` | Component | Modal pentru adăugare rapidă |
+| └── Transaction Modal | `TransactionModal.tsx` | Component | Modal complex pentru editare |
+| └── Grid Navigation | `useGridNavigation.tsx` | Hook | Navigare între celule cu tastatura |
+| └── Performance Opt | `usePerformanceOptimization.tsx` | Hook | Optimizări performance pentru modals |
+| **📄 TYPES & INTERFACES** |
+| └── Main Types | `types.ts` | Types | |
+| │   ├── `LunarGridRowData` | Interface | Structura rândurilor TanStack |
+| │   ├── `DayColumnDef` | Type | Extensie ColumnDef cu informații zi |
+| │   ├── `TransactionPopoverState` | Interface | State pentru popover editare |
+| │   ├── `SubcategoryEditState` | Interface | State pentru editare subcategorii |
+| │   ├── `UseLunarGridTableOptions` | Interface | Opțiuni pentru hook tabel |
+| │   ├── `UseLunarGridTableResult` | Interface | Rezultat hook tabel |
+| │   ├── `CellRendererProps` | Interface | Props pentru renderer celule |
+| │   ├── `ColumnConfig` | Interface | Configurare coloane |
+| │   └── `TanStackSubcategoryRowsProps` | Interface | Props pentru subcategorii |
+| └── Financial Types | `FinancialCalculations.ts` | Types | |
+| │   ├── `ProjectionData` | Interface | Date pentru proiecții |
+| │   ├── `TrendAnalysis` | Interface | Rezultate analiză trend |
+| │   └── `ComparisonResult` | Interface | Rezultate comparații |
+| └── Recurring Types | `RecurringTransactions.ts` | Types | |
+| │   ├── `RecurringPattern` | Interface | Pattern-uri recurență |
+| │   ├── `FrequencyConfig` | Interface | Configurare frecvență |
+| │   ├── `ExceptionRule` | Interface | Reguli excepții |
+| │   └── `ValidationResult` | Interface | Rezultate validare |
+| **🎯 SHARED CONSTANTS** |
+| └── Enums | `enums.ts` | Constants | |
+| │   ├── `TransactionType` | Enum | INCOME, EXPENSE, SAVING |
+| │   ├── `FrequencyType` | Enum | DAILY, WEEKLY, MONTHLY, YEARLY |
+| │   └── `CategoryType` | Enum | Tipuri categorii predefinite |
+| └── UI Constants | `ui.ts` | Constants | |
+| │   ├── `LUNAR_GRID_MESSAGES` | Object | Mesaje specifice grid |
+| │   ├── `MESAJE` | Object | Mesaje generale aplicație |
+| │   ├── `FLAGS` | Object | Flags pentru stări |
+| │   ├── `PLACEHOLDERS` | Object | Text placeholder pentru input-uri |
+| │   ├── `UI` | Object | Constante interfață utilizator |
+| │   ├── `BUTTONS` | Object | Texte butoane |
+| │   ├── `TITLES` | Object | Titluri secțiuni |
+| │   ├── `LABELS` | Object | Label-uri form |
+| │   ├── `EXCEL_GRID` | Object | Constante specifice grid Excel-like |
+| │   └── `LUNAR_GRID_ACTIONS` | Object | Acțiuni specifice LunarGrid |
+| **🔧 TRANSACTION MUTATIONS** |
+| └── Create Payload | `CreateTransactionHookPayload` | Type | Payload pentru creare tranzacție |
+| └── Update Payload | `UpdateTransactionHookPayload` | Type | Payload pentru actualizare tranzacție |
+| **🗄 LOCAL STORAGE** |
+| └── Expanded State | `lunarGrid-expanded-${year}-${month}` | Storage Key | Persistare stare expandare categorii |
+| **🌐 BROWSER APIs** |
+| └── Local Storage | `localStorage` | API | Persistare date browser |
+| └── Window Timer | `setTimeout/clearTimeout` | API | Debouncing pentru performance |
+| └── Event Listeners | `addEventListener/removeEventListener` | API | Keyboard navigation și escape handlers |
+
+### 📊 **STATISTICI DEPENDENCY TREE**
+
+| **Categorie** | **Număr Dependențe** | **Complexitate** |
+|---------------|----------------------|------------------|
+| Framework & Libraries | 18 | ⭐⭐ |
+| Stores & State Management | 8 | ⭐⭐⭐ |
+| React Query Hooks | 5 | ⭐⭐⭐ |
+| Custom Hooks | 5 | ⭐⭐⭐⭐ |
+| Utils & Formatters | 25+ | ⭐⭐⭐⭐ |
+| CVA Styling System | 20+ | ⭐⭐⭐⭐⭐ |
+| UI Components | 10 | ⭐⭐ |
+| LunarGrid Components | 8 | ⭐⭐⭐⭐⭐ |
+| Types & Interfaces | 15+ | ⭐⭐⭐ |
+| Shared Constants | 15+ | ⭐⭐ |
+| **TOTAL** | **~125+ DEPENDENȚE** | **⭐⭐⭐⭐⭐** |
 
 ---
 
