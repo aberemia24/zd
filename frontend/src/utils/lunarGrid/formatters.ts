@@ -114,18 +114,18 @@ export function formatDate(date: string | Date | number): string {
 }
 
 /**
- * Formatează ziua și luna în format românesc pentru header-urile LunarGrid
+ * Formatează ziua pentru header-urile LunarGrid (doar cifra)
  * 
- * Această funcție creează un format compact dar clar pentru header-urile 
- * coloanelor zilelor în LunarGrid: "ziua - LunaRomână"
+ * Această funcție returnează doar numărul zilei pentru un aspect mai curat
+ * în header-urile coloanelor. Luna și anul sunt afișate separat în header-ul principal.
  * 
  * @param day Ziua lunii (1-31)
- * @param month Luna (1-12) 
- * @returns String formatat în română (ex: "1 - Iunie", "15 - Mai")
+ * @param month Luna (1-12) - folosită pentru validare
+ * @returns String cu numărul zilei (ex: "1", "15", "31")
  * @example
- * formatDayMonth(1, 6)  // "1 - Iunie"
- * formatDayMonth(15, 5) // "15 - Mai"
- * formatDayMonth(31, 12) // "31 - Decembrie"
+ * formatDayMonth(1, 6)  // "1"
+ * formatDayMonth(15, 5) // "15"
+ * formatDayMonth(31, 12) // "31"
  */
 export function formatDayMonth(day: number, month: number): string {
   if (day < 1 || day > 31 || month < 1 || month > 12) {
@@ -133,8 +133,31 @@ export function formatDayMonth(day: number, month: number): string {
     return day.toString(); // Fallback la numărul zilei
   }
 
+  return day.toString(); // Doar cifra zilei
+}
+
+/**
+ * Formatează luna și anul pentru header-ul principal al LunarGrid
+ * 
+ * Această funcție creează un header principal elegant care afișează
+ * luna și anul în format românesc: "LunaRomână - Anul"
+ * 
+ * @param month Luna (1-12)
+ * @param year Anul (ex: 2025)
+ * @returns String formatat în română (ex: "Mai - 2025", "Decembrie - 2024")
+ * @example
+ * formatMonthYear(5, 2025)  // "Mai - 2025"
+ * formatMonthYear(12, 2024) // "Decembrie - 2024"
+ * formatMonthYear(1, 2025)  // "Ianuarie - 2025"
+ */
+export function formatMonthYear(month: number, year: number): string {
+  if (month < 1 || month > 12) {
+    console.warn("formatMonthYear: lună invalidă", { month, year });
+    return `Luna ${month} - ${year}`; // Fallback
+  }
+
   const monthName = ROMANIAN_MONTHS[month - 1]; // month este 1-indexed
-  return `${day} - ${monthName}`;
+  return `${monthName} - ${year}`;
 }
 
 /**
