@@ -165,6 +165,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // LGI TASK 5: State pentru modal single click
     const [modalState, setModalState] = useState<ModalState | null>(null);
 
+    // LGI TASK 5: State pentru highlight-ul celulei în editare în modal
+    const [highlightedCell, setHighlightedCell] = useState<{
+      category: string;
+      subcategory: string | undefined;
+      day: number;
+    } | null>(null);
+
     // State persistent pentru expanded rows (salvat în localStorage)
     const [expandedRows, setExpandedRows] = usePersistentExpandedRows(year, month);
 
@@ -424,6 +431,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           anchorEl: anchorElement,
           position,
         });
+
+        // LGI TASK 5: Setează highlight-ul pentru celula în editare
+        setHighlightedCell({
+          category,
+          subcategory,
+          day,
+        });
       },
       [year, month],
     );
@@ -474,6 +488,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
         // Închide modal-ul după salvare
         setModalState(null);
+        setHighlightedCell(null);
       },
       [modalState, year, month, updateTransactionMutation, createTransactionMutation],
     );
@@ -481,6 +496,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // LGI TASK 5: Handler pentru închiderea modal-ului
     const handleCloseModal = useCallback(() => {
       setModalState(null);
+      setHighlightedCell(null);
     }, []);
 
     // LGI TASK 5: Handler pentru delete transaction din modal
@@ -492,6 +508,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           await deleteTransactionMutation.mutateAsync(modalState.transactionId);
           // Închide modal-ul după delete
           setModalState(null);
+          setHighlightedCell(null);
           toast.success("Tranzacția a fost ștearsă cu succes!");
         } catch (error) {
           console.error("Eroare la ștergerea tranzacției:", error);
@@ -717,6 +734,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         const transactionKey = `${category}-${subcategory || ''}-${day}`;
         const transactionId = transactionMap.get(transactionKey) || null;
 
+        // LGI TASK 5: Verifică dacă celula este highlighted (în editare în modal)
+        const isHighlighted = highlightedCell && 
+          highlightedCell.category === category &&
+          highlightedCell.subcategory === subcategory &&
+          highlightedCell.day === day;
+
         // Parseaza valoarea existentă corect pentru display
         let displayValue = "";
         if (currentValue && currentValue !== "-" && currentValue !== "—") {
@@ -755,7 +778,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             className={cn(
               gridTransactionCell({
                 state: transactionId ? "existing" : "new"
-              })
+              }),
+              // LGI TASK 5: Highlight pentru celula în editare în modal
+              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200"
             )}
             data-testid={`editable-cell-${cellId}`}
             placeholder={transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION}
