@@ -354,4 +354,16 @@ export const LUNAR_GRID_ACTIONS = {
   NO_TRANSACTIONS: 'fără tranzacții',
   ENTER_KEY: 'Enter',
   ESCAPE_KEY: 'Escape',
+  // 🎯 LGI-TASK-06: Mesaje pentru keyboard deletion
+  DELETE_TRANSACTION_SINGLE: 'Ștergi această tranzacție definitiv?',
+  DELETE_TRANSACTION_MULTIPLE: 'Ștergi {count} tranzacții definitiv?',
+  DELETE_SUCCESS_SINGLE: 'Tranzacție ștearsă cu succes',
+  DELETE_SUCCESS_MULTIPLE: '{count} tranzacții șterse cu succes',
+  DELETE_ERROR: 'Eroare la ștergerea tranzacțiilor',
+  NO_TRANSACTIONS_TO_DELETE: 'Nu există tranzacții de șters pentru pozițiile selectate',
+  KEYBOARD_SHORTCUTS: {
+    DELETE_HINT: 'Apasă Delete sau Backspace pentru a șterge tranzacția',
+    NAVIGATION_HINT: 'Folosește săgețile pentru navigare, Space pentru selecție',
+    MULTI_SELECT_HINT: 'Ține Ctrl pentru selecție multiplă, Shift pentru interval',
+  },
 };

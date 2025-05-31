@@ -82,6 +82,9 @@ import {
 // LGI TASK 5: Modal component import
 import { QuickAddModal } from "./modals/QuickAddModal";
 
+// 🎯 LGI-TASK-06: Import keyboard navigation pentru direct transaction deletion
+import { useKeyboardNavigation, type CellPosition } from "./hooks/useKeyboardNavigation";
+
 // Interfață pentru categoria din store
 interface CategoryStoreItem {
   name: string;
@@ -509,7 +512,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           // Închide modal-ul după delete
           setModalState(null);
           setHighlightedCell(null);
-          toast.success("Tranzacția a fost ștearsă cu succes!");
+          toast.success(LUNAR_GRID_ACTIONS.DELETE_SUCCESS_SINGLE);
         } catch (error) {
           console.error("Eroare la ștergerea tranzacției:", error);
           toast.error("Eroare la ștergerea tranzacției. Încercați din nou.");
@@ -709,9 +712,107 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [user?.id, categories, saveCategories, validTransactions, deleteTransactionMutation],
     );
 
+    // 🎯 LGI-TASK-06: Handler pentru delete request din keyboard shortcuts
+    const handleKeyboardDeleteRequest = useCallback(
+      async (positions: CellPosition[]) => {
+        if (!user?.id || positions.length === 0) return;
+
+        try {
+          // Găsește tranzacțiile care există pentru pozițiile selectate
+          const transactionsToDelete: string[] = [];
+          
+          for (const pos of positions) {
+            // Găsește tranzacția pentru această poziție
+            // Convertește day la data completă
+            const targetDate = `${year}-${month.toString().padStart(2, '0')}-${pos.day.toString().padStart(2, '0')}`;
+            
+            const existingTransaction = validTransactions.find(t => 
+              t.category === pos.category &&
+              t.subcategory === pos.subcategory &&
+              t.date === targetDate
+            );
+            
+            if (existingTransaction?.id) {
+              transactionsToDelete.push(existingTransaction.id);
+            }
+          }
+
+          if (transactionsToDelete.length === 0) {
+            toast.error(LUNAR_GRID_ACTIONS.NO_TRANSACTIONS_TO_DELETE);
+            return;
+          }
+
+          // Cerere de confirmare pentru ștergere
+          const confirmMessage = transactionsToDelete.length === 1
+            ? LUNAR_GRID_ACTIONS.DELETE_TRANSACTION_SINGLE
+            : LUNAR_GRID_ACTIONS.DELETE_TRANSACTION_MULTIPLE.replace('{count}', transactionsToDelete.length.toString());
+
+          if (!window.confirm(confirmMessage)) {
+            return;
+          }
+
+          // Șterge tranzacțiile una câte una
+          const deletePromises = transactionsToDelete.map(transactionId => 
+            deleteTransactionMutation.mutateAsync(transactionId)
+          );
+
+          await Promise.all(deletePromises);
+
+          // Success feedback
+          toast.success(
+            transactionsToDelete.length === 1
+              ? LUNAR_GRID_ACTIONS.DELETE_SUCCESS_SINGLE
+              : LUNAR_GRID_ACTIONS.DELETE_SUCCESS_MULTIPLE.replace('{count}', transactionsToDelete.length.toString())
+          );
+
+        } catch (error) {
+          console.error('Eroare la ștergerea tranzacțiilor:', error);
+          toast.error(LUNAR_GRID_ACTIONS.DELETE_ERROR);
+        }
+      },
+      [user?.id, validTransactions, deleteTransactionMutation],
+    );
+
     // Interogare tabel optimizată (fără handleri de click/double-click)
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
+
+    // 🎯 LGI-TASK-06: Prepare data pentru keyboard navigation
+    const navigationRows = useMemo(() => {
+      return table.getRowModel().rows.map(row => ({
+        category: row.original.category,
+        subcategory: row.original.subcategory,
+        isExpanded: row.getIsExpanded(),
+      }));
+    }, [table]);
+
+    // 🎯 LGI-TASK-06: Keyboard navigation hook cu delete support
+    const {
+      focusedPosition,
+      selectedPositions,
+      handleCellClick: navHandleCellClick,
+      handleCellDoubleClick: navHandleCellDoubleClick,
+      isPositionSelected,
+      isPositionFocused,
+      clearSelection,
+    } = useKeyboardNavigation({
+      totalDays: days.length,
+      rows: navigationRows,
+      isActive: !modalState?.isOpen && !popover?.isOpen, // Dezactivează navigation când modal/popover e deschis
+      onDeleteRequest: handleKeyboardDeleteRequest, // 🎯 LGI-TASK-06: Conectează delete handler
+      onEditMode: (position) => {
+        // Trigger inline edit mode pentru poziția selectată
+        // Găsește celula și trigger edit mode similar cu double click
+        const categoryRow = table.getRowModel().rows.find(row => 
+          row.original.category === position.category && 
+          (!position.subcategory || row.original.subcategory === position.subcategory)
+        );
+        if (categoryRow) {
+          // TODO: Implementează edit mode direct pentru pozițiile focalizate
+          console.log('Edit mode for position:', position);
+        }
+      },
+    });
 
     // 🚨 FILTRARE TEMPORARĂ: Exclude tranzacții fără subcategorie din procesare
     const cleanTransactions = useMemo(() => {
@@ -739,6 +840,24 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           highlightedCell.category === category &&
           highlightedCell.subcategory === subcategory &&
           highlightedCell.day === day;
+
+        // 🎯 LGI-TASK-06: Verifică focus și selection pentru keyboard navigation
+        // Calculează rowIndex corect din structure tabel
+        const tableRows = table.getRowModel().rows;
+        const rowIndex = tableRows.findIndex(row => 
+          row.original.category === category && 
+          row.original.subcategory === subcategory
+        );
+        
+        const cellPosition: CellPosition = {
+          category,
+          subcategory,
+          day,
+          rowIndex: Math.max(0, rowIndex), // Fallback la 0 dacă nu găsește
+          colIndex: day - 1,
+        };
+        const isFocused = isPositionFocused(cellPosition);
+        const isSelected = isPositionSelected(cellPosition);
 
         // Parseaza valoarea existentă corect pentru display
         let displayValue = "";
@@ -773,6 +892,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               e.stopPropagation();
               const targetElement = e.currentTarget as HTMLElement;
               handleSingleClickModal(category, subcategory, day, displayValue, transactionId, targetElement);
+              
+              // 🎯 LGI-TASK-06: Update navigation focus
+              navHandleCellClick(cellPosition, {
+                ctrlKey: e.ctrlKey,
+                shiftKey: e.shiftKey,
+                metaKey: e.metaKey,
+              });
             }}
             validationType="amount"
             className={cn(
@@ -780,14 +906,18 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 state: transactionId ? "existing" : "new"
               }),
               // LGI TASK 5: Highlight pentru celula în editare în modal
-              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200"
+              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200",
+              // 🎯 LGI-TASK-06: Keyboard navigation focus și selection styles
+              isFocused && "ring-2 ring-purple-500 ring-opacity-50 bg-purple-50",
+              isSelected && "bg-blue-100 border-blue-300",
+              (isFocused || isSelected) && "transition-all duration-150"
             )}
             data-testid={`editable-cell-${cellId}`}
             placeholder={transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION}
           />
         );
       },
-      [handleEditableCellSave, transactionMap, handleSingleClickModal],
+      [handleEditableCellSave, transactionMap, handleSingleClickModal, navHandleCellClick],
     );
 
     // Helper pentru stiluri de valori - REFACTORIZAT cu CVA
