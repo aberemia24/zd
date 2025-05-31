@@ -36,7 +36,7 @@ import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
 
 // Import pentru Plus icon pentru butonul de adăugare subcategorie
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, ChevronRight } from "lucide-react";
 
 // 🎯 Step 3.3: Import singleton formatters pentru performanță
 import { formatCurrency, getBalanceStyleClass } from "../../../utils/lunarGrid";
@@ -747,15 +747,18 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
                         data-testid={`toggle-category-${original.category}`}
                       >
-                        <div className={flex({ align: "center", gap: "md" })}>
+                        <div className={flex({ align: "center", gap: "sm" })}>
                           <div className={cn(
                             gridExpandIcon({
                               variant: "professional",
                               state: row.getIsExpanded() ? "expanded" : "collapsed"
                             })
                           )}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                            <ChevronRight size={16} />
                           </div>
+                          <span className="text-gray-800 font-medium">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
+                          </span>
                         </div>
                       </div>
                     ) : isFirstCell && isSubcategory ? (

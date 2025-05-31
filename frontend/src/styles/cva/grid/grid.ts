@@ -88,20 +88,19 @@ export const gridTable = cva(
 
 export const gridHeader = cva(
   [
-    "sticky top-0 z-10", 
-    "transition-all duration-200 ease-in-out",
-    "backdrop-blur-sm"
+    "sticky top-0 z-30", 
+    "transition-all duration-200 ease-in-out"
   ],
   {
     variants: {
       variant: {
-        default: "bg-gray-50/95",
+        default: "bg-gray-50",
         professional: [
-          "bg-gradient-to-r from-gray-50/98 to-gray-100/98",
-          "border-b border-gray-200/80 shadow-sm"
+          "bg-white shadow-md",
+          "border-b-2 border-gray-200"
         ],
-        minimal: "bg-white/95 border-b border-gray-100",
-        elevated: "bg-white/98 border-b-2 border-gray-200 shadow-md",
+        minimal: "bg-white border-b border-gray-100",
+        elevated: "bg-white border-b-2 border-gray-200 shadow-lg",
       },
     },
     defaultVariants: {
@@ -114,33 +113,33 @@ export const gridHeaderCell = cva(
   [
     "px-4 py-3 font-semibold text-gray-700",
     "transition-all duration-150 ease-in-out",
-    "border-b border-gray-200/60"
+    "border-b border-gray-200"
   ],
   {
     variants: {
       variant: {
         default: "",
         professional: [
-          "font-semibold text-gray-800 tracking-tight",
-          "hover:bg-gray-50/80"
+          "font-semibold text-gray-900 tracking-tight bg-white",
+          "hover:bg-gray-50"
         ],
         sticky: [
-          "sticky left-0 z-20 text-left",
-          "bg-gradient-to-r from-gray-50/98 to-gray-100/98",
-          "shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
+          "sticky left-0 z-40 text-left bg-white",
+          "shadow-[2px_0_8px_-2px_rgba(0,0,0,0.15)]",
+          "border-r border-gray-200"
         ],
-        numeric: "text-right font-mono tabular-nums",
+        numeric: "text-right font-mono tabular-nums bg-white",
         sortable: [
-          "cursor-pointer select-none",
-          "hover:bg-gray-100/60 active:bg-gray-200/60"
+          "cursor-pointer select-none bg-white",
+          "hover:bg-gray-50 active:bg-gray-100"
         ],
       },
       state: {
         sorted: [
-          "bg-blue-50/80 text-blue-900 font-bold",
+          "bg-blue-50 text-blue-900 font-bold",
           "border-b-2 border-blue-300"
         ],
-        hovered: "bg-gray-100/50",
+        hovered: "bg-gray-50",
       },
     },
     defaultVariants: {
@@ -226,20 +225,18 @@ export const gridSubcategoryRow = cva(
 
 export const gridTotalRow = cva(
   [
-    "font-bold border-t-2 transition-all duration-200",
-    "bg-gradient-to-r from-gray-100/90 to-gray-200/60"
+    "font-bold border-t-2 transition-all duration-200 sticky top-12 z-20",
+    "bg-gray-100"
   ],
   {
     variants: {
       variant: {
         default: "border-gray-300",
         professional: [
-          "border-gray-400/80 shadow-sm",
-          "from-gray-100/95 to-gray-200/80"
+          "border-gray-400 shadow-md bg-white"
         ],
         balance: [
-          "border-blue-400/80 shadow-md",
-          "from-blue-50/95 to-blue-100/80"
+          "border-blue-400 shadow-md bg-blue-50"
         ],
       },
     },
@@ -284,8 +281,7 @@ export const gridCell = cva(
         ],
         balance: [
           "font-bold text-right tabular-nums",
-          "sticky left-0 z-10",
-          "bg-gradient-to-r from-gray-100/95 to-gray-200/60",
+          "sticky left-0 z-20 bg-gray-100",
           "shadow-[2px_0_4px_-2px_rgba(0,0,0,0.1)]"
         ],
         formula: [

@@ -298,45 +298,46 @@ const LunarGridPage: React.FC = () => {
           </Badge>
         )}
 
-        {/* 🚨 CONSOLIDATION - Page header folosind flex composition CVA */}
+        {/* 🚨 CONSOLIDATION - Page header folosind flex composition CVA - COMPACT */}
         <div className={cn(
           flex({ 
-            direction: "col", 
+            direction: "row", 
             justify: "between", 
             align: "center", 
-            gap: "md"
+            gap: "sm"
           }),
-          "md:flex-row mb-6",
+          "mb-4 min-h-[3rem]",
           layoutMode === 'full-width' ? "px-4" : ""
         )}>
-          {/* 🚨 CONSOLIDATION - Title section folosind flex composition CVA */}
-          <div className={flex({ align: "center", gap: "md" })}>
-            <h1 className="text-3xl font-bold text-gray-900">
+          {/* 🚨 CONSOLIDATION - Title section folosind flex composition CVA - COMPACT */}
+          <div className={flex({ align: "center", gap: "sm" })}>
+            <h1 className="text-2xl font-semibold text-gray-900 whitespace-nowrap">
               {TITLES.GRID_LUNAR}
             </h1>
-            {/* Indicator pentru React 18 Transitions - CVA Spinner primitive */}
+            {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
             {isPending && (
               <div 
-                className={flex({ align: "center", gap: "sm" })}
+                className={flex({ align: "center", gap: "xs" })}
                 data-testid="transition-loading-indicator"
               >
                 <Spinner size="sm" />
-                <span className="text-sm text-gray-600">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
+                <span className="text-xs text-gray-600 whitespace-nowrap">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
               </div>
             )}
           </div>
 
-          {/* 🚨 CONSOLIDATION - Controls section folosind flex composition CVA */}
+          {/* 🚨 CONSOLIDATION - Controls section folosind flex composition CVA - NOWRAP */}
           <div className={cn(
-            flex({ align: "center", gap: "md" }),
-            "mt-4 md:mt-0"
+            flex({ align: "center", gap: "sm" }),
+            "flex-shrink-0"
           )}>
-            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button */}
+            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button - COMPACT */}
             <button
               onClick={handleLayoutModeToggle}
               className={cn(
-                button({ variant: "outline", size: "sm" }),
-                flex({ align: "center", gap: "sm" }),
+                button({ variant: "outline", size: "xs" }),
+                flex({ align: "center", gap: "xs" }),
+                "whitespace-nowrap flex-shrink-0",
                 layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
               )}
               title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
@@ -346,10 +347,10 @@ const LunarGridPage: React.FC = () => {
               data-testid="layout-mode-toggle"
             >
               {getLayoutModeIcon(layoutMode)}
-              <span className="hidden sm:inline">{getLayoutModeLabel(layoutMode)}</span>
+              <span className="hidden sm:inline text-xs">{getLayoutModeLabel(layoutMode)}</span>
             </button>
 
-            {/* 🚨 CONSOLIDATION - Select primitive CVA cu options */}
+            {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}
             <Select
               value={month.toString()}
               onChange={handleMonthChange}
@@ -370,28 +371,28 @@ const LunarGridPage: React.FC = () => {
               data-testid="month-selector"
             />
 
-            {/* 🚨 CONSOLIDATION - Input primitive CVA */}
+            {/* 🚨 CONSOLIDATION - Input primitive CVA - COMPACT */}
             <Input
               type="number"
               value={year.toString()}
               onChange={handleYearChange}
               min="1900"
               max="2100"
-              className="w-24"
+              className="w-20 text-sm"
               data-testid="year-input"
             />
           </div>
         </div>
 
-        {/* Arată Loading state când încărcăm date - CVA Spinner + flex composition */}
+        {/* Arată Loading state când încărcăm date - CVA Spinner + flex composition - COMPACT */}
         {loading ? (
           <div className={cn(
-            flex({ justify: "center", align: "center", gap: "md" }),
-            "py-8",
+            flex({ justify: "center", align: "center", gap: "sm" }),
+            "py-6",
             layoutMode === 'full-width' ? "px-4" : ""
           )}>
-            <Spinner size="lg" />
-            <p className="text-gray-700">
+            <Spinner size="md" />
+            <p className="text-gray-700 text-sm">
               {UI.LUNAR_GRID_PAGE.LOADING_MESSAGE_TEMPLATE
                 .replace('{month}', getMonthName(month))
                 .replace('{year}', year.toString())}
