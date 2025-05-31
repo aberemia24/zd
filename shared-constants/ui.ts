@@ -44,6 +44,10 @@ export const PLACEHOLDERS = {
   SEARCH: 'Caută...',
   AMOUNT_MIN_FILTER: 'Suma minimă',
   AMOUNT_MAX_FILTER: 'Suma maximă',
+  // 🚨 AUDIT FIX - Adăugare placeholders hardcodate din LunarGrid
+  EDIT_TRANSACTION: 'Editează...',
+  ADD_TRANSACTION: 'Adaugă...',
+  SUBCATEGORY_NAME: 'Nume subcategorie...',
 };
 
 export const BUTTONS = {
@@ -238,6 +242,44 @@ export const UI = {
     AMOUNT_RANGE: 'Interval sume',
     TEXT_SEARCH: 'Căutare text',
   },
+  
+  // 🚨 AUDIT FIX - Adăugare titles hardcodate din LunarGrid
+  SUBCATEGORY_ACTIONS: {
+    DELETE_CUSTOM_TITLE: 'Șterge subcategoria custom',
+    DELETE_ORPHAN_TITLE: 'Șterge tranzacțiile fără subcategorie (date murdare din trecut)',
+    RENAME_TITLE: 'Redenumește subcategoria',
+  },
+  
+  LUNAR_GRID_TOOLTIPS: {
+    CALCULATED_SUM: 'Suma calculată automată din subcategorii',
+    DAILY_BALANCES: 'Balanțe zilnice',
+  },
+  
+  // 🚨 AUDIT FIX - Texte pentru LunarGridPage
+  LUNAR_GRID_PAGE: {
+    FULLSCREEN_EXIT_HINT: 'Press ESC pentru a ieși din fullscreen',
+    NAVIGATION_LOADING: 'Navigare...',
+    LOADING_MESSAGE_TEMPLATE: 'Se încarcă datele pentru {month} {year}...',
+    LAYOUT_MODES: {
+      FULL_WIDTH: 'Lățime completă', 
+      FULLSCREEN: 'Fullscreen',
+    },
+    LAYOUT_TOGGLE_TOOLTIP: 'Comută la modul următor ({nextMode})',
+    MONTHS: {
+      IANUARIE: 'Ianuarie',
+      FEBRUARIE: 'Februarie', 
+      MARTIE: 'Martie',
+      APRILIE: 'Aprilie',
+      MAI: 'Mai',
+      IUNIE: 'Iunie',
+      IULIE: 'Iulie',
+      AUGUST: 'August',
+      SEPTEMBRIE: 'Septembrie',
+      OCTOMBRIE: 'Octombrie',
+      NOIEMBRIE: 'Noiembrie',
+      DECEMBRIE: 'Decembrie'
+    }
+  },
 };
 
 // Flag pentru subcategoriile custom
@@ -305,4 +347,11 @@ export const TEST_CONSTANTS = {
     LOADING: 'Se încarcă...',
     ERROR_GENERIC: 'Eroare'
   }
+};
+
+// 🚨 AUDIT FIX - Constante suplimentare pentru LunarGrid
+export const LUNAR_GRID_ACTIONS = {
+  NO_TRANSACTIONS: 'fără tranzacții',
+  ENTER_KEY: 'Enter',
+  ESCAPE_KEY: 'Escape',
 };
