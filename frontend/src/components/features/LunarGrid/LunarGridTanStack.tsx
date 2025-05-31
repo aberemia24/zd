@@ -24,6 +24,9 @@ import {
 // 🎯 PHASE 1: Import useMonthlyTransactions pentru a avea acces direct la validTransactions
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 
+// React Query client pentru invalidation
+import { useQueryClient } from '@tanstack/react-query';
+
 // Importăm tipuri și constante din shared-constants (sursa de adevăr)
 import { TransactionType, FrequencyType, LUNAR_GRID_MESSAGES, MESAJE, FLAGS, PLACEHOLDERS, UI, BUTTONS, TITLES, LABELS, EXCEL_GRID } from "@shared-constants";
 import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
@@ -233,6 +236,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
     const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
     const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
+
+    // React Query client pentru invalidation cache
+    const queryClient = useQueryClient();
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -529,17 +535,38 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         }
 
         try {
+          console.log('🔍 [ADD-SUBCATEGORY-DEBUG] Starting subcategory addition:', {
+            categoryName,
+            newSubcategoryName: newSubcategoryName.trim(),
+            currentCategories: categories?.map(cat => ({
+              name: cat.name,
+              subcategories: cat.subcategories?.map(sub => ({
+                name: sub.name,
+                isCustom: sub.isCustom
+              })) || []
+            })) || []
+          });
+
           // Găsește categoria în store TOATE categoriile disponibile, nu doar custom ones
           let category = categories.find(cat => cat.name === categoryName);
           
           // Dacă categoria nu există în store, o creăm (poate fi o categorie default)
           if (!category) {
+            console.log(`🔍 [ADD-SUBCATEGORY-DEBUG] Category "${categoryName}" not found in store, creating new one`);
             category = {
               name: categoryName,
               type: TransactionType.EXPENSE, // Default type
               subcategories: [],
               isCustom: true
             };
+          } else {
+            console.log(`🔍 [ADD-SUBCATEGORY-DEBUG] Found existing category "${categoryName}":`, {
+              subcategoriesCount: category.subcategories?.length || 0,
+              subcategories: category.subcategories?.map(sub => ({
+                name: sub.name,
+                isCustom: sub.isCustom
+              })) || []
+            });
           }
 
           // Verifică limita de 5 subcategorii CUSTOM (nu toate subcategoriile)
@@ -556,16 +583,45 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             return;
           }
 
-          await saveCategories(user.id, [
-            ...categories,
-            {
-              ...category,
-              subcategories: [
-                ...category.subcategories,
-                { name: newSubcategoryName.trim(), isCustom: true }
-              ]
+          // Construiește categoria actualizată
+          const updatedCategory = {
+            ...category,
+            subcategories: [
+              ...category.subcategories,
+              { name: newSubcategoryName.trim(), isCustom: true }
+            ]
+          };
+
+          // Construiește lista completă de categorii actualizată
+          const updatedCategories = categories.map(cat => 
+            cat.name === categoryName ? updatedCategory : cat
+          );
+
+          // Dacă categoria era nouă, o adaugă
+          if (!categories.find(cat => cat.name === categoryName)) {
+            updatedCategories.push(updatedCategory);
+          }
+
+          console.log('🔍 [ADD-SUBCATEGORY-DEBUG] About to save categories:', {
+            totalCategories: updatedCategories.length,
+            updatedCategory: {
+              name: updatedCategory.name,
+              subcategoriesCount: updatedCategory.subcategories?.length || 0,
+              subcategories: updatedCategory.subcategories?.map(sub => ({
+                name: sub.name,
+                isCustom: sub.isCustom
+              })) || []
             }
-          ]);
+          });
+
+          await saveCategories(user.id, updatedCategories);
+          
+          console.log('🔍 [ADD-SUBCATEGORY-DEBUG] Categories saved successfully, invalidating React Query cache');
+          
+          // 🔄 FORCE INVALIDATION: Invalidează cache-ul React Query pentru a forța re-fetch
+          queryClient.invalidateQueries({
+            queryKey: ["transactions", year, month, user.id],
+          });
           
           // Reset state-ul
           setAddingSubcategory(null);
@@ -577,7 +633,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error(MESAJE.CATEGORII.EROARE_ADAUGARE_SUBCATEGORIE);
         }
       },
-      [user?.id, newSubcategoryName, categories, saveCategories],
+      [user?.id, newSubcategoryName, categories, saveCategories, queryClient, year, month],
     );
 
     // Handler pentru anularea adăugării subcategoriei
@@ -998,7 +1054,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         return subcategoryData?.isCustom ? "custom" : "professional";
                       })()
                     }),
-                "interactive animate-fade-in-up",
+                "interactive animate-fade-in-up group",
                 row.getIsExpanded() && "border-b border-gray-200/60"
               )}
             >
@@ -1115,7 +1171,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                               <Button
                                 size="xs"
                                 variant="primary"
-                                onClick={() => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
+                                onClick={(e) => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
                                 disabled={!editingSubcategoryName.trim()}
                                 data-testid={`save-edit-subcategory-${original.subcategory}`}
                                 className="hover-scale"
@@ -1161,11 +1217,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         {subcategoryAction?.type !== 'edit' && (() => {
                           const categoryData = categories.find(cat => cat.name === original.category);
                           const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
-                          return subcategoryData?.isCustom ? (
+                          const isCustom = subcategoryData?.isCustom;
+                          
+                          // Afișăm buttons pentru TOATE subcategoriile
+                          return (
                             <div className={cn(
                               gridCellActions({ variant: "professional" }),
                               "animate-fade-in-up"
                             )}>
+                              {/* Edit button pentru TOATE subcategoriile */}
                               <button
                                 className={cn(
                                   gridActionButton({ variant: "primary", size: "sm" }),
@@ -1184,25 +1244,29 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                               >
                                 <Edit size={12} />
                               </button>
-                              <button
-                                className={cn(
-                                  gridActionButton({ variant: "danger", size: "sm" }),
-                                  "hover-lift"
-                                )}
-                                onClick={() => {
-                                  setSubcategoryAction({
-                                    type: 'delete',
-                                    category: original.category,
-                                    subcategory: original.subcategory!
-                                  });
-                                }}
-                                data-testid={`delete-subcategory-btn-${original.subcategory}`}
-                                title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
-                              >
-                                <Trash2 size={12} />
-                              </button>
+                              
+                              {/* Delete button DOAR pentru subcategoriile custom */}
+                              {isCustom && (
+                                <button
+                                  className={cn(
+                                    gridActionButton({ variant: "danger", size: "sm" }),
+                                    "hover-lift"
+                                  )}
+                                  onClick={() => {
+                                    setSubcategoryAction({
+                                      type: 'delete',
+                                      category: original.category,
+                                      subcategory: original.subcategory!
+                                    });
+                                  }}
+                                  data-testid={`delete-subcategory-btn-${original.subcategory}`}
+                                  title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              )}
                             </div>
-                          ) : null;
+                          );
                         })()}
                       </div>
                     ) : isDayCell && isSubcategory ? (
@@ -1262,6 +1326,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                         autoFocus
                         onKeyDown={(e) => {
                           if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY) {
+                            console.log('🔍 [ENTER-KEY-DEBUG] Enter key pressed in subcategory input:', {
+                              category: original.category,
+                              subcategoryName: newSubcategoryName,
+                              timestamp: new Date().toISOString()
+                            });
                             handleAddSubcategory(original.category);
                           } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
                             handleCancelAddSubcategory();
@@ -1272,7 +1341,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       <Button
                         size="sm"
                         variant="primary"
-                        onClick={() => handleAddSubcategory(original.category)}
+                        onClick={() => {
+                          console.log('🔍 [SAVE-BUTTON-DEBUG] Save subcategory button clicked:', {
+                            category: original.category,
+                            subcategoryName: newSubcategoryName,
+                            timestamp: new Date().toISOString()
+                          });
+                          handleAddSubcategory(original.category);
+                        }}
                         disabled={!newSubcategoryName.trim()}
                         data-testid={`save-subcategory-${original.category}`}
                         className="hover-scale"
@@ -1294,7 +1370,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setAddingSubcategory(original.category)}
+                      onClick={() => {
+                        console.log('🔍 [ADD-BUTTON-DEBUG] Add subcategory button clicked:', {
+                          category: original.category,
+                          timestamp: new Date().toISOString()
+                        });
+                        setAddingSubcategory(original.category);
+                      }}
                       className={cn(
                         gridInteractive({ variant: "addButton", size: "auto" }),
                         flex({ align: "center", gap: "sm" })
@@ -1408,6 +1490,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         </div>
       );
     };
+
+    // 🔍 DEBUG: Basic categories store check
+    console.log('🔍 [LUNARGRID-STORE-DEBUG] LunarGrid categories store:', {
+      categoriesExists: !!categories,
+      categoriesLength: categories?.length || 0,
+      userExists: !!user,
+      timestamp: new Date().toISOString()
+    });
 
     // Renderizare (layout principal)
     return (
