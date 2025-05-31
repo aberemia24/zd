@@ -42,8 +42,8 @@ export const gridContainer = cva(
       },
       size: {
         compact: "h-[500px]",
-        default: "h-[600px]", 
-        large: "h-[700px]",
+        default: "h-[790px]", 
+        large: "h-[1000px]",
         fullscreen: "h-[calc(100vh-120px)] min-h-[400px]",
       },
       state: {
