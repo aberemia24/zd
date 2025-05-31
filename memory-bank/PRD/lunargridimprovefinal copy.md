@@ -11,7 +11,7 @@ Implementari propriuzise noi si imbunatatiri pentru componenta de grid lunar. :
 - sa poti redenumi direct din tabel toate subcategoriile
 - tabelul ar trebui sa fie mai mare sau sa avem un mod de marit pe latimea paginii si unul de full screen sau ceva de genul. e mult prea mic acum si ar trebui sa fie si mai compact putin
 
-- la un click nornal pe celula sa se deschida un modal sau ceva unde ai dat click unde sa ai camp cu suma, descriere, bifa de recurent sau nu, cu butonul de adauga disabled pana nu este corect tot ce faci acolo. Sa mearga sa dai ok si cu tasta enter
+- la un click nornal pe celula sa se deschida un modal sau ceva unde ai dat click unde sa ai camp cu suma, descriere, bifa de recurent sau nu, cu butonul de adauga diVAN fa reset la memory bank, vreau sa fac altcevasabled pana nu este corect tot ce faci acolo. Sa mearga sa dai ok si cu tasta enter
 - la dublu click pe o celula sa poti sa scrii direct in celula, cu posibilitatea sa o poti face recurenta dupa aceea daca dai simplu click pe ea sau sa ii adaugi descriere. acum aceasta implementare este la single click, nu avem modal deloc.  
 - sa poti sa stergi direct o suma dintr-o celula, ori dand click si sa ai si o optiune de delete sau clear sau apasand delete sau backspace.  
 - toate randurile sau coloanele ar trebui sa fie egale intre ele
