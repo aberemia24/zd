@@ -26,6 +26,7 @@ export interface EditableCellProps {
   onKeyDown?: (e: React.KeyboardEvent) => void;
   onStartEdit?: () => void;
   onCancel?: () => void;
+  onSingleClick?: (e: React.MouseEvent) => void; // LGI TASK 5: Handler pentru single click modal
   "data-testid"?: string;
 }
 
@@ -88,6 +89,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
   onKeyDown,
   onStartEdit,
   onCancel,
+  onSingleClick,
   "data-testid": testId,
 }) => {
   const {
@@ -229,15 +231,15 @@ export const EditableCell: React.FC<EditableCellProps> = ({
       e.stopPropagation();
     }
 
-    if (!isEditing && !isReadonly) {
-      // Single click activează editarea conform Creative Phase 1 decisions
-      if (onStartEdit) {
-        onStartEdit();
+    // LGI TASK 5: Single click NU mai activează editarea inline
+    // În schimb, va fi folosit pentru modal (implementat în parent component)
+    if (!isEditing) {
+      // Dacă avem handler pentru single click modal, îl apelăm
+      if (onSingleClick && e) {
+        onSingleClick(e);
       } else {
-        startEdit();
+        onFocus?.();
       }
-    } else if (!isEditing) {
-      onFocus?.();
     }
   };
 
@@ -273,7 +275,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     handleCombinedKeyDown(e);
   };
 
-  // Handle double click pentru start edit
+  // Handle double click pentru start edit - LGI TASK 5: DOUBLE CLICK = INLINE EDITING
   const handleCellDoubleClick = (e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
@@ -281,6 +283,7 @@ export const EditableCell: React.FC<EditableCellProps> = ({
     }
 
     if (!isEditing && !isReadonly) {
+      // LGI TASK 5: Double click activează inline editing
       if (onStartEdit) {
         onStartEdit();
       } else {

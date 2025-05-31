@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, CSSProperties, memo, useEffect } from 'react';
+import React, { useCallback, useState, useMemo, CSSProperties, memo, useEffect, useRef } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import {
   useLunarGridTable,
@@ -79,6 +79,9 @@ import {
   container as gridContainerLayout,
 } from "../../../styles/cva/components/layout";
 
+// LGI TASK 5: Modal component import
+import { QuickAddModal } from "./modals/QuickAddModal";
+
 // Interfață pentru categoria din store
 interface CategoryStoreItem {
   name: string;
@@ -97,6 +100,22 @@ interface PopoverState {
   type: TransactionType;
   element: HTMLElement | null;
   anchorEl?: HTMLElement;
+}
+
+// LGI TASK 5: Interface pentru modal state
+interface ModalState {
+  isOpen: boolean;
+  mode: 'add' | 'edit';
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  year: number;
+  month: number;
+  existingValue?: string | number;
+  transactionId?: string | null;
+  // Poziționare relativă la element
+  anchorEl?: HTMLElement;
+  position?: { top: number; left: number };
 }
 
 // Hook pentru persistent expanded state
@@ -142,6 +161,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
   ({ year, month }) => {
     // State pentru popover (păstrat doar pentru modal advanced)
     const [popover, setPopover] = useState<PopoverState | null>(null);
+
+    // LGI TASK 5: State pentru modal single click
+    const [modalState, setModalState] = useState<ModalState | null>(null);
 
     // State persistent pentru expanded rows (salvat în localStorage)
     const [expandedRows, setExpandedRows] = usePersistentExpandedRows(year, month);
@@ -337,6 +359,146 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         });
       },
       [popover, year, month, createTransactionMutation],
+    );
+
+    // LGI TASK 5: Handler pentru single click modal
+    const handleSingleClickModal = useCallback(
+      (
+        category: string,
+        subcategory: string | undefined,
+        day: number,
+        currentValue: string | number,
+        transactionId: string | null,
+        anchorElement?: HTMLElement,
+      ) => {
+        // Determină modul: edit dacă există tranzacție, add altfel
+        const mode = transactionId ? 'edit' : 'add';
+        
+        // Calculează poziția pentru modal dacă avem elementul anchor
+        let position: { top: number; left: number } | undefined;
+        if (anchorElement) {
+          const rect = anchorElement.getBoundingClientRect();
+          const scrollY = window.scrollY || document.documentElement.scrollTop;
+          const scrollX = window.scrollX || document.documentElement.scrollLeft;
+          
+          // Dimensiuni estimate ale modal-ului
+          const modalWidth = 320; // 80 * 4 = 320px (w-80)
+          const modalHeight = 384; // max-h-96 = ~384px
+          
+          // Verifică dacă modal-ul ar ieși din viewport
+          const viewportWidth = window.innerWidth;
+          const viewportHeight = window.innerHeight;
+          
+          let top = rect.bottom + scrollY + 8; // 8px offset sub element
+          let left = rect.left + scrollX;
+          
+          // Ajustează horizontal dacă ar ieși din viewport
+          if (left + modalWidth > viewportWidth) {
+            left = Math.max(16, viewportWidth - modalWidth - 16); // 16px margin
+          }
+          
+          // Ajustează vertical dacă ar ieși din viewport
+          if (top + modalHeight > viewportHeight + scrollY) {
+            // Plasează modal-ul deasupra elementului
+            top = rect.top + scrollY - modalHeight - 8;
+            
+            // Dacă tot nu încape, plasează-l în centrul viewport-ului
+            if (top < scrollY + 16) {
+              top = scrollY + (viewportHeight - modalHeight) / 2;
+            }
+          }
+          
+          position = { top, left };
+        }
+        
+        setModalState({
+          isOpen: true,
+          mode,
+          category,
+          subcategory,
+          day,
+          year,
+          month,
+          existingValue: currentValue,
+          transactionId,
+          anchorEl: anchorElement,
+          position,
+        });
+      },
+      [year, month],
+    );
+
+    // LGI TASK 5: Handler pentru salvarea din modal
+    const handleSaveModal = useCallback(
+      async (data: {
+        amount: string;
+        description: string;
+        recurring: boolean;
+        frequency?: FrequencyType;
+      }) => {
+        if (!modalState) return;
+
+        const { category, subcategory, day, transactionId, mode } = modalState;
+        const numValue = parseFloat(data.amount);
+        
+        if (isNaN(numValue)) {
+          throw new Error("Valoare invalidă");
+        }
+
+        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+        if (mode === 'edit' && transactionId) {
+          // UPDATE: Modifică tranzacția existentă
+          await updateTransactionMutation.mutateAsync({
+            id: transactionId,
+            transactionData: {
+              amount: numValue,
+              date,
+              category,
+              subcategory: subcategory || undefined,
+              type: TransactionType.EXPENSE,
+              description: data.description,
+            }
+          });
+        } else {
+          // CREATE: Creează o tranzacție nouă  
+          await createTransactionMutation.mutateAsync({
+            amount: numValue,
+            date,
+            category,
+            subcategory: subcategory || undefined,
+            type: TransactionType.EXPENSE,
+            description: data.description || `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
+          });
+        }
+
+        // Închide modal-ul după salvare
+        setModalState(null);
+      },
+      [modalState, year, month, updateTransactionMutation, createTransactionMutation],
+    );
+
+    // LGI TASK 5: Handler pentru închiderea modal-ului
+    const handleCloseModal = useCallback(() => {
+      setModalState(null);
+    }, []);
+
+    // LGI TASK 5: Handler pentru delete transaction din modal
+    const handleDeleteFromModal = useCallback(
+      async () => {
+        if (!modalState || !modalState.transactionId) return;
+
+        try {
+          await deleteTransactionMutation.mutateAsync(modalState.transactionId);
+          // Închide modal-ul după delete
+          setModalState(null);
+          toast.success("Tranzacția a fost ștearsă cu succes!");
+        } catch (error) {
+          console.error("Eroare la ștergerea tranzacției:", error);
+          toast.error("Eroare la ștergerea tranzacției. Încercați din nou.");
+        }
+      },
+      [modalState, deleteTransactionMutation],
     );
 
     // Handler pentru adăugarea unei subcategorii noi
@@ -582,6 +744,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 throw error; // Re-throw pentru EditableCell să gestioneze eroarea
               }
             }}
+            onSingleClick={(e) => {
+              // LGI TASK 5: Single click deschide modal-ul
+              e.preventDefault();
+              e.stopPropagation();
+              const targetElement = e.currentTarget as HTMLElement;
+              handleSingleClickModal(category, subcategory, day, displayValue, transactionId, targetElement);
+            }}
             validationType="amount"
             className={cn(
               gridTransactionCell({
@@ -593,7 +762,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           />
         );
       },
-      [handleEditableCellSave, transactionMap],
+      [handleEditableCellSave, transactionMap, handleSingleClickModal],
     );
 
     // Helper pentru stiluri de valori - REFACTORIZAT cu CVA
@@ -1352,6 +1521,25 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           }}
           onCancel={() => setSubcategoryAction(null)}
         />
+
+        {/* LGI TASK 5: QuickAddModal pentru single click */}
+        {modalState && (
+          <QuickAddModal
+            cellContext={{
+              category: modalState.category,
+              subcategory: modalState.subcategory,
+              day: modalState.day,
+              month: modalState.month,
+              year: modalState.year,
+            }}
+            prefillAmount={modalState.existingValue ? String(modalState.existingValue) : ""}
+            mode={modalState.mode}
+            position={modalState.position}
+            onSave={handleSaveModal}
+            onCancel={handleCloseModal}
+            onDelete={modalState.mode === 'edit' ? handleDeleteFromModal : undefined}
+          />
+        )}
       </>
     );
   },
