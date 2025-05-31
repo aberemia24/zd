@@ -39,6 +39,9 @@ export interface KeyboardNavigationOptions {
   /** Callback pentru selecție */
   onSelection?: (positions: CellPosition[], isMultiple: boolean) => void;
 
+  /** Callback pentru ștergerea tranzacțiilor din celule */
+  onDeleteRequest?: (positions: CellPosition[]) => void;
+
   /** Dacă grid-ul este activ pentru keyboard input */
   isActive?: boolean;
 }
@@ -50,6 +53,7 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
     onFocusChange,
     onEditMode,
     onSelection,
+    onDeleteRequest,
     isActive = true,
   } = options;
 
@@ -174,6 +178,12 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
           onEditMode?.(focusedPosition);
           break;
 
+        case "Delete":
+        case "Backspace":
+          e.preventDefault();
+          onDeleteRequest?.(selectedPositions);
+          break;
+
         case " ":
           e.preventDefault();
           // Space pentru selecție (toggle)
@@ -219,6 +229,8 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
       onFocusChange,
       onEditMode,
       onSelection,
+      onDeleteRequest,
+      selectedPositions,
     ],
   );
 
