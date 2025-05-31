@@ -44,6 +44,68 @@ export function formatCurrency(amount: number): string {
 }
 
 /**
+ * Formatează o valoare numerică în format compact (K, M, B) pentru spațiu redus
+ * Optimizat pentru afișare în grid-uri unde spațiul este limitat
+ * @param amount Suma de formatat
+ * @param threshold Pragul minim pentru formatare compactă (default: 10000)
+ * @returns String formatat compact (ex: "1.23M", "15.1K", "987")
+ * @example
+ * formatCurrencyCompact(1234567) // "1.23M"
+ * formatCurrencyCompact(15158) // "15.1K"
+ * formatCurrencyCompact(987) // "987"
+ * formatCurrencyCompact(-1500000) // "-1.50M"
+ */
+export function formatCurrencyCompact(amount: number, threshold: number = 10000): string {
+  if (typeof amount !== "number" || isNaN(amount)) {
+    console.warn("formatCurrencyCompact: amount trebuie să fie un număr valid");
+    return "0";
+  }
+
+  const absAmount = Math.abs(amount);
+  const sign = amount < 0 ? "-" : "";
+
+  // Pentru sume sub pragul specificat, afișează formatarea tradițională fără zecimale
+  if (absAmount < threshold) {
+    return sign + Math.round(absAmount).toLocaleString("ro-RO");
+  }
+
+  // Definire unități și praguri
+  const units = [
+    { value: 1e9, suffix: "B" }, // Miliarde
+    { value: 1e6, suffix: "M" }, // Milioane  
+    { value: 1e3, suffix: "K" }  // Mii
+  ];
+
+  // Găsește unitatea potrivită
+  for (const unit of units) {
+    if (absAmount >= unit.value) {
+      const compactValue = absAmount / unit.value;
+      
+      // Logica pentru zecimale:
+      // - Pentru valori >= 100: fără zecimale (ex: 123M)
+      // - Pentru valori >= 10: 1 zecimală (ex: 15.1K)
+      // - Pentru valori < 10: 2 zecimale (ex: 1.23M)
+      let decimals = 2;
+      if (compactValue >= 100) {
+        decimals = 0;
+      } else if (compactValue >= 10) {
+        decimals = 1;
+      }
+
+      const formatted = compactValue.toLocaleString("ro-RO", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+      
+      return `${sign}${formatted}${unit.suffix}`;
+    }
+  }
+
+  // Fallback pentru valori foarte mici
+  return sign + Math.round(absAmount).toLocaleString("ro-RO");
+}
+
+/**
  * Returnează clasa CSS Tailwind pentru stilizarea sumelor (+/-) bazat pe valoarea numerică
  *
  * Această funcție aplică style-uri consistente în toată aplicația pentru sumele pozitive,
