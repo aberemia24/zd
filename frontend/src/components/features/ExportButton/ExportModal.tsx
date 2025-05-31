@@ -108,7 +108,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   return (
     <div
       className={cn(
-        modal({ overlay: "default" }),
+        modal({ variant: "default" }),
         "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
       )}
       onClick={handleOverlayClick}

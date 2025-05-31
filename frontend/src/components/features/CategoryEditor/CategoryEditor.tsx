@@ -176,7 +176,7 @@ export const CategoryEditor: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        modal({ overlay: "default" }),
+        modal({ variant: "default" }),
         "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
         modalState.visible ? "opacity-100 visible" : "opacity-0 invisible",
         "transition-all duration-300 ease-in-out",

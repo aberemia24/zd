@@ -61,39 +61,56 @@ export const cardFooter = cva([
 export const modal = cva(
   [
     "fixed inset-0 z-50 flex items-center justify-center",
-    "transition-opacity duration-300 ease-out",
+    "transition-all duration-300 ease-in-out"
   ],
   {
     variants: {
-      overlay: {
-        default: "bg-black bg-opacity-50",
-        blur: "backdrop-blur-sm bg-black bg-opacity-30",
+      variant: {
+        default: "bg-black/50 backdrop-blur-sm",
+        subtle: "bg-black/30 backdrop-blur-sm",
+        strong: "bg-black/70 backdrop-blur-md",
+        confirmation: "bg-black/50 backdrop-blur-sm",
+        professional: "bg-black/50 backdrop-blur-sm",
+      },
+      animation: {
+        fade: "animate-in fade-in-0 duration-300",
+        scale: "animate-in fade-in-0 zoom-in-95 duration-300",
+        slideDown: "animate-in fade-in-0 slide-in-from-top-4 duration-300",
+        slideUp: "animate-in fade-in-0 slide-in-from-bottom-4 duration-300",
       },
     },
     defaultVariants: {
-      overlay: "default",
+      variant: "default",
+      animation: "fade",
     },
   },
 );
 
 export const modalContent = cva(
   [
-    "bg-white rounded-lg shadow-2xl max-h-[90vh] overflow-auto",
-    "transform transition-all duration-300 ease-out",
-    "scale-100 opacity-100 translate-y-0",
+    "relative bg-white rounded-lg shadow-xl",
+    "max-w-md w-full mx-4",
+    "transition-all duration-300 ease-in-out"
   ],
   {
     variants: {
       size: {
-        sm: "w-full max-w-md",
-        md: "w-full max-w-lg",
-        lg: "w-full max-w-2xl",
-        xl: "w-full max-w-4xl",
-        full: "w-full max-w-full h-full rounded-none",
+        sm: "max-w-sm",
+        default: "max-w-md",
+        lg: "max-w-lg",
+        xl: "max-w-xl",
+        full: "max-w-full h-full",
+      },
+      content: {
+        dialog: "p-6",
+        header: "text-lg font-semibold text-gray-900 mb-4",
+        text: "text-gray-600 mb-6",
+        compact: "p-4",
       },
     },
     defaultVariants: {
-      size: "md",
+      size: "default",
+      content: "dialog",
     },
   },
 );
@@ -140,30 +157,54 @@ export const flex = cva("flex", {
     direction: {
       row: "flex-row",
       col: "flex-col",
+      "row-reverse": "flex-row-reverse",
+      "col-reverse": "flex-col-reverse",
     },
-    align: {
-      start: "items-start",
-      center: "items-center",
-      end: "items-end",
+    wrap: {
+      wrap: "flex-wrap",
+      nowrap: "flex-nowrap",
+      "wrap-reverse": "flex-wrap-reverse",
     },
     justify: {
       start: "justify-start",
-      center: "justify-center",
       end: "justify-end",
+      center: "justify-center",
       between: "justify-between",
       around: "justify-around",
+      evenly: "justify-evenly",
+    },
+    align: {
+      start: "items-start",
+      end: "items-end", 
+      center: "items-center",
+      baseline: "items-baseline",
+      stretch: "items-stretch",
     },
     gap: {
-      sm: "gap-1",
-      md: "gap-2",
-      lg: "gap-4",
-      xl: "gap-6",
+      none: "",
+      xs: "gap-1",
+      sm: "gap-2",
+      md: "gap-4",
+      lg: "gap-6",
+      xl: "gap-8",
+      "2xl": "gap-12",
+    },
+    width: {
+      auto: "",
+      full: "w-full",
+      screen: "w-screen",
+      fit: "w-fit",
+    },
+    height: {
+      auto: "",
+      full: "h-full",
+      screen: "h-screen",
+      fit: "h-fit",
     },
   },
   defaultVariants: {
     direction: "row",
-    align: "center",
-    gap: "md",
+    gap: "none",
   },
 });
 
@@ -297,319 +338,22 @@ export const paginationItem = cva(
 );
 
 // =============================================================================
-// LUNAR GRID PAGE COMPONENTS - New components pentru LunarGridPage audit fix
+// 🚨 CONSOLIDATION: Componentele de mai jos au fost eliminate și înlocuite cu composition
+// În loc de pageHeader -> folosește flex({ justify: "between", align: "center" }) + spacing
+// În loc de titleSection -> folosește flex({ align: "center", gap: "md" })
+// În loc de controlsSection -> folosește flex({ align: "center", gap: "md" })
+// În loc de fullscreenIndicator -> folosește badge() sau button() cu positioning
+// În loc de spinner -> folosește Loading primitive cu size variants
 // =============================================================================
 
-/**
- * Header principal pentru pagina LunarGrid cu variante pentru different states
- */
-export const pageHeader = cva("", {
-  variants: {
-    layout: {
-      default: "flex flex-col md:flex-row justify-between items-center mb-6",
-      fullscreen: "flex flex-col md:flex-row justify-between items-center mb-4",
-      compact: "flex flex-col md:flex-row justify-between items-center mb-4"
-    },
-    padding: {
-      default: "px-4",
-      none: "",
-      sm: "px-2",
-      lg: "px-6"
-    }
-  },
-  defaultVariants: {
-    layout: "default",
-    padding: "default"
-  }
-});
-
-/**
- * Indicator pentru fullscreen mode cu professional styling
- */
-export const fullscreenIndicator = cva([
-  "absolute top-1 right-1 z-10 text-xs text-gray-500 bg-white/90 px-2 py-1 rounded-md shadow-sm",
-  "transition-all duration-200"
-], {
-  variants: {
-    variant: {
-      default: "",
-      pro: "backdrop-blur-sm border border-gray-200/60"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Backdrop pentru fullscreen mode
- */
-export const fullscreenBackdrop = cva([
-  "fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-all duration-300"
-], {
-  variants: {
-    variant: {
-      default: "",
-      subtle: "bg-black/10",
-      strong: "bg-black/30"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Container pentru title și loading indicator
- */
-export const titleSection = cva("flex items-center space-x-3", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "flex items-center gap-3"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Styling pentru page title
- */
-export const pageTitle = cva("text-3xl font-bold text-gray-900", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "text-professional-heading contrast-enhanced",
-      large: "text-4xl"
-    },
-    weight: {
-      normal: "font-semibold",
-      bold: "font-bold",
-      heavy: "font-black"
-    }
-  },
-  defaultVariants: {
-    variant: "default",
-    weight: "bold"
-  }
-});
-
-/**
- * Loading indicator pentru transitions
- */
-export const transitionLoader = cva("flex items-center text-sm text-blue-600", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "flex items-center gap-2 text-professional-body",
-      subtle: "text-gray-500"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Spinner pentru loading states
- */
-export const spinner = cva("animate-spin rounded-full border-2 border-t-transparent", {
-  variants: {
-    size: {
-      xs: "h-3 w-3",
-      sm: "h-4 w-4",
-      md: "h-6 w-6",
-      lg: "h-8 w-8",
-      xl: "h-12 w-12"
-    },
-    color: {
-      primary: "border-blue-600",
-      professional: "border-primary-500",
-      gray: "border-gray-400"
-    }
-  },
-  defaultVariants: {
-    size: "sm",
-    color: "primary"
-  }
-});
-
-/**
- * Controls section pentru navigare și layout toggle
- */
-export const controlsSection = cva("flex items-center space-x-4 mt-4 md:mt-0", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "flex items-center gap-4 mt-4 md:mt-0",
-      compact: "flex items-center gap-2 mt-2 md:mt-0"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Form elements styling pentru selectors
- */
-export const formSelect = cva([
-  "form-select rounded-md border-gray-300 text-sm",
-  "focus:border-primary-500 focus:ring-primary-500",
-  "transition-colors duration-150"
-], {
-  variants: {
-    variant: {
-      default: "",
-      professional: "border-gray-200 bg-white shadow-sm hover:border-gray-300",
-      minimal: "border-transparent bg-gray-50"
-    },
-    size: {
-      sm: "text-xs py-1 px-2",
-      md: "text-sm py-2 px-3",
-      lg: "text-base py-3 px-4"
-    }
-  },
-  defaultVariants: {
-    variant: "default",
-    size: "md"
-  }
-});
-
-export const formInput = cva([
-  "form-input rounded-md border-gray-300 text-sm",
-  "focus:border-primary-500 focus:ring-primary-500",
-  "transition-colors duration-150"
-], {
-  variants: {
-    variant: {
-      default: "",
-      professional: "border-gray-200 bg-white shadow-sm hover:border-gray-300",
-      minimal: "border-transparent bg-gray-50"
-    },
-    size: {
-      sm: "text-xs py-1 px-2",
-      md: "text-sm py-2 px-3", 
-      lg: "text-base py-3 px-4"
-    },
-    width: {
-      auto: "",
-      sm: "w-16",
-      md: "w-24",
-      lg: "w-32",
-      full: "w-full"
-    }
-  },
-  defaultVariants: {
-    variant: "default",
-    size: "md",
-    width: "auto"
-  }
-});
-
-/**
- * Loading state container
- */
-export const loadingContainer = cva("flex justify-center items-center", {
-  variants: {
-    padding: {
-      sm: "py-4",
-      md: "py-8",
-      lg: "py-12"
-    },
-    layout: {
-      default: "",
-      fullscreen: "py-8",
-      compact: "py-4"
-    },
-    spacing: {
-      default: "px-4",
-      none: "",
-      auto: ""
-    }
-  },
-  defaultVariants: {
-    padding: "md",
-    layout: "default",
-    spacing: "default"
-  }
-});
-
-/**
- * Loading message text
- */
-export const loadingText = cva("ml-3 text-gray-700", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "text-professional-body",
-      muted: "text-gray-500"
-    },
-    size: {
-      sm: "text-sm",
-      md: "text-base",
-      lg: "text-lg"
-    }
-  },
-  defaultVariants: {
-    variant: "default",
-    size: "md"
-  }
-});
-
-/**
- * Content wrapper cu padding condițional
- */
-export const contentWrapper = cva("", {
-  variants: {
-    padding: {
-      default: "px-4",
-      none: "",
-      conditional: "" // va fi setat dinamic
-    }
-  },
-  defaultVariants: {
-    padding: "default"
-  }
-});
-
-/**
- * Label responsiv pentru text scurt pe dispozitive mici
- */
-export const responsiveLabel = cva("hidden sm:inline", {
-  variants: {
-    variant: {
-      default: "",
-      professional: "text-professional-body font-medium"
-    }
-  },
-  defaultVariants: {
-    variant: "default"
-  }
-});
-
-/**
- * Button styling extensions pentru layout modes
- */
-export const layoutButton = cva("flex items-center gap-2 transition-all duration-200", {
-  variants: {
-    state: {
-      default: "hover:bg-blue-50",
-      active: "ring-2 ring-blue-300 bg-blue-50",
-      professional: "hover:bg-gray-50 focus:ring-2 focus:ring-primary-200"
-    }
-  },
-  defaultVariants: {
-    state: "default"
-  }
-});
+// Note: Componentele de mai jos au fost consolidate în componentele principale
+// pentru a evita bloating-ul sistemului CVA conform principiului de composition
 
 // =============================================================================
 // TYPE EXPORTS pentru TypeScript autocomplete
 // =============================================================================
 
+// Type exports pentru componentele de bază
 export type CardProps = VariantProps<typeof card>;
 export type ModalProps = VariantProps<typeof modal>;
 export type ModalContentProps = VariantProps<typeof modalContent>;
@@ -623,19 +367,11 @@ export type SidebarProps = VariantProps<typeof sidebar>;
 export type BreadcrumbItemProps = VariantProps<typeof breadcrumbItem>;
 export type PaginationItemProps = VariantProps<typeof paginationItem>;
 
-// Type exports pentru noile componente LunarGridPage
-export type PageHeaderProps = VariantProps<typeof pageHeader>;
-export type FullscreenIndicatorProps = VariantProps<typeof fullscreenIndicator>;
-export type FullscreenBackdropProps = VariantProps<typeof fullscreenBackdrop>;
-export type TitleSectionProps = VariantProps<typeof titleSection>;
-export type PageTitleProps = VariantProps<typeof pageTitle>;
-export type TransitionLoaderProps = VariantProps<typeof transitionLoader>;
-export type SpinnerProps = VariantProps<typeof spinner>;
-export type ControlsSectionProps = VariantProps<typeof controlsSection>;
-export type FormSelectProps = VariantProps<typeof formSelect>;
-export type FormInputProps = VariantProps<typeof formInput>;
-export type LoadingContainerProps = VariantProps<typeof loadingContainer>;
-export type LoadingTextProps = VariantProps<typeof loadingText>;
-export type ContentWrapperProps = VariantProps<typeof contentWrapper>;
-export type ResponsiveLabelProps = VariantProps<typeof responsiveLabel>;
-export type LayoutButtonProps = VariantProps<typeof layoutButton>;
+// 🚨 CONSOLIDATION NOTE: 
+// Type exports pentru componentele specifice eliminate - folosiți composition cu:
+// - pageHeader -> flex({ justify: "between", align: "center" })
+// - titleSection -> flex({ align: "center", gap: "md" })
+// - controlsSection -> flex({ align: "center", gap: "md" })
+// - fullscreenIndicator -> badge() + absolute positioning
+// - spinner -> Loading primitive
+// - formSelect/formInput -> Select/Input primitives
