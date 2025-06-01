@@ -21,7 +21,7 @@ import {
   getBalanceStyleClass,
   getCategoryStyleClass,
   generateTableColumns,
-  formatCurrencyCompact,
+  formatCurrencyForGrid,
   formatMonthYear,
 } from "../../../../utils/lunarGrid";
 import { MESAJE, LUNAR_GRID_MESSAGES } from "@shared-constants";
@@ -471,7 +471,7 @@ export function useLunarGridTable(
             const colorClass = getCategoryStyleClass(original.category, value);
             const valueDisplay =
               typeof value === "number" && !isNaN(value) && value !== 0
-                ? formatCurrencyCompact(value)
+                ? formatCurrencyForGrid(value)
                 : "—";
 
             // Adăugăm click handlers doar pentru subcategorii (nu pentru categorii)
@@ -536,7 +536,7 @@ export function useLunarGridTable(
             return (
               <div className={`text-center ${colorClass}`}>
                 {typeof value === "number" && !isNaN(value) && value !== 0
-                  ? formatCurrencyCompact(value)
+                  ? formatCurrencyForGrid(value)
                   : "—"}
               </div>
             );
