@@ -1,57 +1,67 @@
 import React from 'react';
-import Button from '../../../primitives/Button/Button';
-import { modal, modalContent, flex } from '../../../../styles/cva'; // Ajustează calea dacă e necesar
-import { MESAJE, BUTTONS, TABLE } from '@shared-constants';
+import { cn } from "../../../../styles/cva/shared/utils";
+import { modal, modalContent, flex } from "../../../../styles/cva/components/layout";
+import Button from "../../../primitives/Button/Button";
 
-// Presupunem că tipurile pentru subcategoryAction și validTransactions sunt definite și importate undeva
-// sau le definim aici sumar pentru componentă.
-interface SubcategoryAction {
-  type: 'delete' | 'edit' | string | null; // Poate fi și null sau alte tipuri
-  category: string;
-  subcategory: string;
-}
+// Import constante din shared-constants
+import { MESAJE, BUTTONS, LUNAR_GRID_ACTIONS } from "@shared-constants";
 
-interface Transaction {
-  category?: string;
-  subcategory?: string;
-  // alte proprietăți ale tranzacției
-}
-
-interface DeleteSubcategoryModalProps {
-  subcategoryAction: SubcategoryAction | null;
-  validTransactions: Transaction[];
+// Interfață pentru props-urile componentei
+export interface DeleteSubcategoryModalProps {
+  /** Determină dacă modal-ul este vizibil */
+  isOpen: boolean;
+  /** Numele subcategoriei de șters */
+  subcategoryName: string;
+  /** Numele categoriei părinte */
+  categoryName: string;
+  /** Numărul de tranzacții asociate cu subcategoria */
+  transactionsCount: number;
+  /** Handler pentru confirmarea ștergerii */
   onConfirm: () => void;
+  /** Handler pentru anularea ștergerii */
   onCancel: () => void;
 }
 
+/**
+ * Modal de confirmare pentru ștergerea unei subcategorii custom.
+ * Afișează informații despre subcategoria ce va fi ștearsă și numărul de tranzacții asociate.
+ * 
+ * @param props - Props-urile componentei
+ * @returns Modal de confirmare pentru ștergerea subcategoriei
+ */
 const DeleteSubcategoryModal: React.FC<DeleteSubcategoryModalProps> = ({
-  subcategoryAction,
-  validTransactions,
+  isOpen,
+  subcategoryName,
+  categoryName,
+  transactionsCount,
   onConfirm,
   onCancel,
 }) => {
-  if (!subcategoryAction || subcategoryAction.type !== 'delete') return null;
+  // Nu renderiza modal-ul dacă nu este deschis
+  if (!isOpen) return null;
 
-  const transactionsCount = validTransactions.filter(t => 
-    t.category === subcategoryAction.category && 
-    t.subcategory === subcategoryAction.subcategory
-  ).length;
-
+  // Generează textul pentru numărul de tranzacții
   const transactionText = transactionsCount === 0 
-    ? TABLE.NO_TRANSACTIONS
+    ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
     : transactionsCount === 1 
       ? "1 tranzacție"
       : `${transactionsCount} tranzacții`;
 
-  const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
+  // Generează mesajul de confirmare
+  const message = `Sigur doriți să ștergeți subcategoria "${subcategoryName}" din categoria "${categoryName}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
 
   return (
-    <div className={modal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
+    <div 
+      className={modal({ variant: "confirmation", animation: "fade" })} 
+      data-testid="delete-subcategory-confirmation"
+    >
       <div className={modalContent()}>
         <h3 className={modalContent({ content: "header" })}>
           {MESAJE.CATEGORII.CONFIRMARE_STERGERE_TITLE}
         </h3>
-        <p className={modalContent({ content: "text" })}>{message}</p>
+        <p className={modalContent({ content: "text" })}>
+          {message}
+        </p>
         <div className={flex({ justify: "end", gap: "md" })}>
           <Button
             variant="secondary"

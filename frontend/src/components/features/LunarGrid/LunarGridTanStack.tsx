@@ -41,6 +41,9 @@ import { EditableCell } from "./inline-editing/EditableCell";
 // 🔧 TASK-01: Import LunarGridToolbar component pentru Phase 1 refactoring
 import LunarGridToolbar from "./components/LunarGridToolbar";
 
+// 🔧 TASK-02: Import DeleteSubcategoryModal component pentru Phase 1 refactoring  
+import DeleteSubcategoryModal from "./components/DeleteSubcategoryModal";
+
 // Import pentru Plus icon pentru butonul de adăugare subcategorie
 import { Plus, Edit, Trash2, ChevronRight } from "lucide-react";
 
@@ -1446,54 +1449,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       }
     }, [validTransactions, user?.id, deleteTransactionMutation]);
 
-    // 🎯 LGI-TASK-02: Confirmation dialog pentru delete subcategory
-    const DeleteSubcategoryConfirmation = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => {
-      if (!subcategoryAction || subcategoryAction.type !== 'delete') return null;
-
-      // Calculează numărul de tranzacții asociate cu această subcategorie
-      const transactionsCount = validTransactions.filter(t => 
-        t.category === subcategoryAction.category && 
-        t.subcategory === subcategoryAction.subcategory
-      ).length;
-
-      const transactionText = transactionsCount === 0 
-        ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
-        : transactionsCount === 1 
-          ? "1 tranzacție"
-          : `${transactionsCount} tranzacții`;
-
-      const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
-
-      return (
-        <div className={modal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
-          <div className={modalContent()}>
-            <h3 className={modalContent({ content: "header" })}>
-              {MESAJE.CATEGORII.CONFIRMARE_STERGERE_TITLE}
-            </h3>
-            <p className={modalContent({ content: "text" })}>{message}</p>
-            <div className={flex({ justify: "end", gap: "md" })}>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onCancel}
-                dataTestId="cancel-delete-subcategory"
-              >
-                {BUTTONS.CANCEL}
-              </Button>
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={onConfirm}
-                dataTestId="confirm-delete-subcategory"
-              >
-                {BUTTONS.DELETE}
-              </Button>
-            </div>
-          </div>
-        </div>
-      );
-    };
-
     // 🔍 DEBUG: Basic categories store check
     console.log('🔍 [LUNARGRID-STORE-DEBUG] LunarGrid categories store:', {
       categoriesExists: !!categories,
@@ -1746,10 +1701,21 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           </div>
         )}
 
-        {/* 🎯 LGI-TASK-02: Confirmation dialog pentru delete subcategory */}
-        <DeleteSubcategoryConfirmation
+        {/* 🎯 LGI-TASK-02: DeleteSubcategoryModal component extraction - Phase 1 Safe Extraction */}
+        <DeleteSubcategoryModal
+          isOpen={subcategoryAction?.type === 'delete'}
+          subcategoryName={subcategoryAction?.subcategory || ''}
+          categoryName={subcategoryAction?.category || ''}
+          transactionsCount={
+            subcategoryAction?.type === 'delete' 
+              ? validTransactions.filter(t => 
+                  t.category === subcategoryAction.category && 
+                  t.subcategory === subcategoryAction.subcategory
+                ).length
+              : 0
+          }
           onConfirm={() => {
-            if (subcategoryAction?.type === 'delete') {
+            if (subcategoryAction) {
               handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
             }
           }}

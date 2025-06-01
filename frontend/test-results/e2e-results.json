@@ -93,7 +93,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 8155,
+                      "duration": 8237,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:36:5",
@@ -127,7 +127,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-06-01T13:35:14.040Z",
+                      "startTime": "2025-06-01T19:33:01.717Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -172,7 +172,7 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 7557,
+                      "duration": 7616,
                       "error": {
                         "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
                         "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:164:5",
@@ -200,7 +200,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-06-01T13:35:23.644Z",
+                      "startTime": "2025-06-01T19:33:11.319Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -236,8 +236,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-06-01T13:35:13.270Z",
-    "duration": 18341.611999999997,
+    "startTime": "2025-06-01T19:33:00.987Z",
+    "duration": 18326.251999999997,
     "expected": 0,
     "skipped": 0,
     "unexpected": 2,
