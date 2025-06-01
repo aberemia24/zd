@@ -2,7 +2,7 @@
 
 export const VALIDATION = {
   AMOUNT_MIN: 0.01, // Suma minimă permisă (centralizată)
-  AMOUNT_MAX: 1000000, // Suma maximă permisă (centralizată)
+  AMOUNT_MAX: 9999999, // Suma maximă permisă (centralizată) - până la 9,999,999
   DATE_REGEX: /^\d{4}-\d{2}-\d{2}$/, // Format dată YYYY-MM-DD (centralizat)
 } as const;
 

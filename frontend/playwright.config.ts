@@ -13,9 +13,11 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: 1,
+  /* Output directory for test results */
+  outputDir: 'test-results/artifacts',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'test-results/html-report' }],
+    ['html', { outputFolder: 'test-results/playwright-report' }],
     ['json', { outputFile: 'test-results/e2e-results.json' }]
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */

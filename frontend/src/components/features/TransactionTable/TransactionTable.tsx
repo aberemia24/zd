@@ -15,6 +15,7 @@ import {
   flex as flexContainer,
 } from "../../../styles/cva";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
 
 export type { Transaction };
 
@@ -77,7 +78,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     [],
   );
 
-  // Memoizăm formatorul pentru valori monetare
+  // Memoizăm formatorul pentru valori monetare cu detecție inteligentă a zecimalelor
   const formatAmount = useCallback(
     (amount: number | string | undefined): string => {
       if (amount === undefined || amount === null) return "";
@@ -87,8 +88,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
       if (isNaN(numericAmount)) return String(amount);
 
-      // Adaugă simbolul RON și formatare cu 2 zecimale
-      return numericAmount.toFixed(2) + " RON";
+      // Folosește formatarea inteligentă cu zecimale când este necesar și adaugă simbolul RON
+      return formatCurrencyForGrid(numericAmount, 10000) + " RON";
     },
     [],
   );

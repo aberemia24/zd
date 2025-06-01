@@ -48,14 +48,16 @@ export function formatCurrency(amount: number): string {
  * Optimizat pentru afișare în grid-uri unde spațiul este limitat
  * @param amount Suma de formatat
  * @param threshold Pragul minim pentru formatare compactă (default: 10000)
- * @returns String formatat compact (ex: "1.23M", "15.1K", "987")
+ * @param showDecimals Forțează afișarea zecimalelor pentru sume sub prag (default: false)
+ * @returns String formatat compact (ex: "1.23M", "15.1K", "987.50")
  * @example
  * formatCurrencyCompact(1234567) // "1.23M"
  * formatCurrencyCompact(15158) // "15.1K"
- * formatCurrencyCompact(987) // "987"
+ * formatCurrencyCompact(987.50, 10000, true) // "987,50"
+ * formatCurrencyCompact(987.50, 10000, false) // "988"
  * formatCurrencyCompact(-1500000) // "-1.50M"
  */
-export function formatCurrencyCompact(amount: number, threshold: number = 10000): string {
+export function formatCurrencyCompact(amount: number, threshold: number = 10000, showDecimals: boolean = false): string {
   if (typeof amount !== "number" || isNaN(amount)) {
     console.warn("formatCurrencyCompact: amount trebuie să fie un număr valid");
     return "0";
@@ -64,9 +66,18 @@ export function formatCurrencyCompact(amount: number, threshold: number = 10000)
   const absAmount = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";
 
-  // Pentru sume sub pragul specificat, afișează formatarea tradițională fără zecimale
+  // Pentru sume sub pragul specificat
   if (absAmount < threshold) {
-    return sign + Math.round(absAmount).toLocaleString("ro-RO");
+    if (showDecimals || (amount % 1 !== 0)) {
+      // Afișează cu zecimale dacă sunt forțate sau dacă numărul are zecimale
+      return sign + amount.toLocaleString("ro-RO", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    } else {
+      // Afișează fără zecimale pentru numere întregi
+      return sign + Math.round(absAmount).toLocaleString("ro-RO");
+    }
   }
 
   // Definire unități și praguri
@@ -102,7 +113,43 @@ export function formatCurrencyCompact(amount: number, threshold: number = 10000)
   }
 
   // Fallback pentru valori foarte mici
+  if (showDecimals || (amount % 1 !== 0)) {
+    return sign + absAmount.toLocaleString("ro-RO", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
   return sign + Math.round(absAmount).toLocaleString("ro-RO");
+}
+
+/**
+ * Formatează o valoare numerică în format compact pentru LunarGrid cu detecție inteligentă a zecimalelor
+ * Wrapper peste formatCurrencyCompact care afișează automat zecimalele când sunt relevante
+ * @param amount Suma de formatat
+ * @param threshold Pragul minim pentru formatare compactă (default: 10000)
+ * @returns String formatat compact cu zecimale când este necesar
+ * @example
+ * formatCurrencyForGrid(1234567.89) // "1.23M" (zecimalele se pierd la nivel M)
+ * formatCurrencyForGrid(987.50) // "987,50" (zecimale vizibile pentru sume mici)
+ * formatCurrencyForGrid(1000.00) // "1.000" (întreg fără zecimale)
+ * formatCurrencyForGrid(1000.25) // "1.000,25" (cu zecimale)
+ */
+export function formatCurrencyForGrid(amount: number, threshold: number = 10000): string {
+  if (typeof amount !== "number" || isNaN(amount)) {
+    console.warn("formatCurrencyForGrid: amount trebuie să fie un număr valid");
+    return "0";
+  }
+
+  const absAmount = Math.abs(amount);
+  
+  // Pentru sume sub pragul specificat, verifică dacă are zecimale relevante
+  if (absAmount < threshold) {
+    const hasRelevantDecimals = (amount % 1 !== 0) && Math.abs(amount % 1) >= 0.01;
+    return formatCurrencyCompact(amount, threshold, hasRelevantDecimals);
+  }
+  
+  // Pentru sume mari, folosește formatarea compactă standard
+  return formatCurrencyCompact(amount, threshold, false);
 }
 
 /**
