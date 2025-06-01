@@ -14,6 +14,7 @@
 export * from "./formatters";
 export * from "./calculations";
 export * from "./dataTransformers";
+export * from "./lunarGridHelpers";
 
 // Re-export types for convenience
 export type { LunarGridRowData } from "../../components/features/LunarGrid/types";

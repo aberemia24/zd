@@ -94,13 +94,18 @@ import { QuickAddModal } from "./modals/QuickAddModal";
 // 🎯 LGI-TASK-06: Import keyboard navigation pentru direct transaction deletion
 import { useKeyboardNavigation, type CellPosition } from "./hooks/useKeyboardNavigation";
 
-// Interfață pentru categoria din store
-interface CategoryStoreItem {
-  name: string;
-  type: TransactionType;
-  subcategories: Array<{ name: string; [key: string]: unknown }>;
-  [key: string]: unknown;
-}
+// 🔧 TASK-03: Import helper functions pentru Phase 1 refactoring
+import { 
+  getBalanceStyle, 
+  calculatePopoverPosition, 
+  findCategoryByName, 
+  findSubcategoryInCategory,
+  countCustomSubcategories,
+  canAddSubcategory,
+  getSubcategoryVariant,
+  getCellValueState,
+  type CategoryStoreItem
+} from "../../../utils/lunarGrid/lunarGridHelpers";
 
 // Interfață pentru starea popover-ului de tranzacții
 interface PopoverState {
@@ -982,37 +987,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [handleEditableCellSave, transactionMap, handleSingleClickModal, navHandleCellClick],
     );
 
-    // Helper pentru stiluri de valori - REFACTORIZAT cu CVA
-    const getBalanceStyle = useCallback((value: number): string => {
-      if (!value) return gridValueState({ state: "empty" });
-      return gridValueState({ 
-        state: value > 0 ? "positive" : "negative",
-        weight: "semibold"
-      });
-    }, []);
-
-    // Gestionarea poziției popover-ului
+    // Gestionarea poziției popover-ului - REFACTORIZAT cu helper
     const popoverStyle = useMemo((): CSSProperties => {
-      if (!popover || !popover.anchorEl) return {};
-
-      // Verifică dacă elementul este încă în DOM
-      try {
-        const rect = popover.anchorEl.getBoundingClientRect();
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const scrollX = window.scrollX || document.documentElement.scrollLeft;
-
-        return {
-          position: "absolute",
-          top: `${rect.top + scrollY}px`,
-          left: `${rect.left + scrollX}px`,
-        };
-      } catch (error) {
-        console.warn(
-          "Could not get bounding rect for popover anchor element:",
-          error,
-        );
-        return {};
-      }
+      return calculatePopoverPosition(popover?.anchorEl || null);
     }, [popover]);
 
     // Funcție helper pentru randarea recursivă a rândurilor
@@ -1026,16 +1003,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         const isSubcategory = !isCategory && original.subcategory;
 
         // Verifică câte subcategorii CUSTOM are categoria (nu toate subcategoriile)
-        const categoryData = categories.find(cat => cat.name === original.category);
-        const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom)?.length || 0;
-        const canAddSubcategory = isCategory && row.getIsExpanded() && customSubcategoriesCount < 5;
+        const categoryData = findCategoryByName(categories, original.category);
+        const customSubcategoriesCount = categoryData ? countCustomSubcategories(categoryData) : 0;
+        const canAddSubcategoryToCategory = isCategory && row.getIsExpanded() && categoryData && canAddSubcategory(categoryData);
 
         // DEBUG: Verifică logica pentru subcategoriile custom
         if (isCategory && row.getIsExpanded()) {
           console.log('DEBUG Category:', original.category, {
             totalSubcategories: row.subRows?.length || 0,
             customSubcategoriesCount,
-            canAdd: canAddSubcategory,
+            canAdd: canAddSubcategoryToCategory,
             categoryData: categoryData ? {
               name: categoryData.name,
               subcategories: categoryData.subcategories?.map(sub => ({ name: sub.name, isCustom: sub.isCustom }))
@@ -1306,7 +1283,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               row.subRows.map((subRow) => renderRow(subRow, level + 1))}
 
             {/* 🎨 Professional Add Subcategory Row */}
-            {canAddSubcategory && (
+            {canAddSubcategoryToCategory && (
               <tr className={cn(
                 gridSubcategoryRow({ variant: "professional" }),
                 gridSubcategoryState({ variant: "adding" })
