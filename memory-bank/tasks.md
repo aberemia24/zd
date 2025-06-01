@@ -2,10 +2,341 @@
 
 ## 📊 CURRENT STATUS
 
-- **Date**: 31 Mai 2025
-- **Status**: ✅ **TASK ARCHIVED & COMPLETE**
-- **Project**: Budget App - LunarGrid Bug Fixes & Reset System  
-- **Mode**: 🆕 **READY FOR NEXT TASK** (VAN MODE)
+- **Date**: 01 Iunie 2025
+- **Status**: 📋 **PLAN MODE ACTIVE - LEVEL 4 PLANNING**
+- **Project**: Budget App - LunarGrid Refactoring  
+- **Mode**: 🎯 **ARCHITECTURAL PLANNING COMPLETED**
+
+---
+
+## 🏗️ **[LGR-SYSTEM]: LUNARGRID ARCHITECTURE REFACTORING SYSTEM**
+
+### **System Overview**
+- **Purpose**: Refactorizarea componentei monolitice LunarGridTanStack.tsx (1806 linii) în arhitectură modulară pentru îmbunătățirea mentenabilității și scalabilității
+- **Architectural Alignment**: Respectă principiile Clean Architecture, Single Responsibility, și Component Composition
+- **Status**: 📋 Planning Complete
+- **Complexity Level**: **LEVEL 4 - COMPLEX SYSTEM**
+
+### **System Milestones**
+- **MILE-01**: Architecture Planning Complete - 01 Iunie 2025 - ✅ Complete
+- **MILE-02**: Technology Stack Validated - 01 Iunie 2025 - ✅ Complete  
+- **MILE-03**: Component Extraction Phase Complete - Target: 02 Iunie 2025 - ⏳ Pending
+- **MILE-04**: State Management Consolidation - Target: 02 Iunie 2025 - ⏳ Pending
+- **MILE-05**: Integration Testing Complete - Target: 02 Iunie 2025 - ⏳ Pending
+- **MILE-06**: Refactoring Complete & Validated - Target: 02 Iunie 2025 - ⏳ Pending
+
+### **Technology Stack**
+- **Framework**: React 18+ cu TypeScript
+- **Build Tool**: Vite (existing)
+- **Language**: TypeScript cu strict mode
+- **Styling**: CVA (Class Variance Authority) system (existing)
+- **State Management**: React State + Zustand stores (existing)
+- **Data Layer**: TanStack React Query + Supabase (existing)
+
+### **Technology Validation Checkpoints**
+- [x] **Framework Verification**: React + TypeScript environment confirmed functional
+- [x] **Build Configuration**: Vite build system validated și functional  
+- [x] **Dependency Check**: All required packages (TanStack Table, CVA, etc.) installed
+- [x] **Hello World Verification**: Component compilation și rendering verified
+- [x] **Test Build**: Application builds successfully fără errors
+- [x] **Development Environment**: Hot reload și TypeScript checking functional
+
+## **Components**
+
+### **[COMP-01]: UI Component Extraction**
+- **Purpose**: Extragerea componentelor UI independente din monolith pentru reusability
+- **Status**: 📋 Planning Complete
+- **Dependencies**: None (first extraction phase)
+- **Responsible**: Development Team
+
+#### **[FEAT-01]: Toolbar Component Extraction**
+- **Description**: Extragerea toolbar-ului cu butoanele Expand All, Collapse All, Reset și Clean Orphans
+- **Status**: 📋 Planning Complete
+- **Priority**: High
+- **Related Requirements**: Separation of Concerns, Reusability
+- **Quality Criteria**: Zero functional change, same UI behavior, independent component
+- **Progress**: 0%
+- **Risk Assessment**: Low - componentă izolată cu interface clear
+
+**[TASK-01]: Extract LunarGridToolbar Component**
+- **Description**: Mută toolbar JSX în LunarGridToolbar.tsx cu props interface
+- **Status**: TODO
+- **Assigned To**: Developer
+- **Estimated Effort**: 45 minutes
+- **Dependencies**: None
+- **Quality Gates**: UI identical, functionality preserved, TypeScript no errors
+- **Implementation Notes**: Props: isAllExpanded, onToggleExpandAll, onResetExpanded, orphanTransactionsCount, onCleanOrphans
+
+**Subtasks**:
+- [ ] [SUB-01.1]: Create LunarGridToolbar.tsx structure - TODO  
+- [ ] [SUB-01.2]: Define props interface și exports - TODO
+- [ ] [SUB-01.3]: Move toolbar JSX from main component - TODO
+- [ ] [SUB-01.4]: Update imports în main component - TODO
+- [ ] [SUB-01.5]: Test functionality preservation - TODO
+
+### **Risk Assessment și Mitigations**
+
+#### **Risk RISK-01: State Management Complexity**
+- **Description**: Multiple state variables cu complex interdependencies poate cause bugs during extraction
+- **Probability**: High
+- **Impact**: High - could break core functionality
+- **Mitigation**: Incremental extraction cu testing after each step, comprehensive state interface design
+
+#### **Risk RISK-02: Props Drilling**
+- **Description**: Complex component hierarchy might require excessive props passing
+- **Probability**: Medium
+- **Impact**: Medium - affects maintainability
+- **Mitigation**: Use composition patterns, minimize props interfaces, consider context for deeply nested data
+
+#### **Risk RISK-03: Performance Impact**
+- **Description**: Component extraction might introduce unnecessary re-renders sau overhead
+- **Probability**: Low
+- **Impact**: Medium - could affect user experience
+- **Mitigation**: Use React.memo appropriately, optimize props interfaces, performance testing before/after
+
+### **Implementation Strategy - Baby Steps Approach**
+
+#### **Phase 1: Safe Extractions (Low Risk)**
+1. **LunarGridToolbar** - completely isolated UI component
+2. **DeleteSubcategoryModal** - internal component, easy extraction
+3. **Helper Functions** - pure functions, no state dependencies
+
+#### **Phase 2: Complex UI Extractions (Medium Risk)**  
+4. **LunarGridModals** - container component cu moderate props complexity
+5. **LunarGridSubcategoryRow** - business logic component cu state dependencies
+
+#### **Phase 3: Core Functionality (High Risk)**
+6. **LunarGridCell** - core functionality extraction requiring careful testing
+7. **State Consolidation** - complex state management refactoring
+
+#### **Phase 4: Integration și Validation**
+8. **Integration Testing** - validate complete functionality preservation
+9. **Performance Testing** - ensure no performance regression
+10. **Final Cleanup** - code organization și documentation
+
+### **Quality Gates și Validation Criteria**
+
+#### **Component-Level Quality Gates**
+- ✅ **TypeScript Compilation**: No TypeScript errors în extracted components
+- ✅ **Functional Preservation**: Component behavior identical to original
+- ✅ **Props Interface**: Clear, well-typed props interface documented
+- ✅ **Independence**: Component can be tested în isolation
+- ✅ **Size Target**: Component under 200 lines
+
+#### **System-Level Quality Gates**
+- ✅ **Functionality Preservation**: All LunarGrid features work identically
+- ✅ **Performance Preservation**: No performance degradation measurable
+- ✅ **Main Component Size**: LunarGridTanStack.tsx under 400 lines
+- ✅ **TypeScript Clean**: Zero TypeScript errors în entire system
+- ✅ **Integration Success**: All components work together seamlessly
+
+## **Progress Summary**
+- **Overall Progress**: 100% Planning, 0% Implementation
+- **UI Components**: 0% - Ready for extraction
+- **Business Logic Components**: 0% - Ready for extraction  
+- **Utilities**: 0% - Ready for extraction
+- **State Management**: 0% - Ready for consolidation
+
+## **Latest Updates**
+- **01 Iunie 2025**: Architecture planning completed
+- **01 Iunie 2025**: Technology stack validation completed successfully
+- **01 Iunie 2025**: Comprehensive task breakdown și dependency mapping completed
+- **01 Iunie 2025**: **PLANNING PHASE COMPLETE - READY FOR IMPLEMENT MODE**
+
+---
+
+## **Creative Phases Required**
+
+### **Creative Phase Not Required**
+This refactoring task does not require creative phases as:
+- **Architecture is Well-Defined**: Component extraction follows established React patterns
+- **UI/UX Unchanged**: No design decisions needed, preserving existing interface
+- **Technology Stack Fixed**: Using existing React, TypeScript, CVA setup
+- **Patterns Established**: Following Single Responsibility și Separation of Concerns principles
+
+The task is primarily a **code organization și structure improvement** rather than creative design work.
+
+---
+
+## **Status Summary**
+
+### ✅ **PLANNING PHASE COMPLETED**:
+- [x] **Architecture Analysis**: Component structure și dependencies analyzed
+- [x] **Technology Stack**: Validated existing React + TypeScript + CVA stack
+- [x] **Risk Assessment**: High-risk areas identified cu mitigation strategies
+- [x] **Task Breakdown**: Comprehensive WBS cu dependency mapping
+- [x] **Implementation Strategy**: Baby steps approach cu incremental validation
+- [x] **Quality Gates**: Clear success criteria pentru each component și system level
+
+### ⏳ **NEXT PHASE REQUIRED**: 
+**IMPLEMENT MODE** - Ready pentru component extraction following the planned approach
+
+---
+
+**Task Planning**: 01 Iunie 2025  
+**PRD Reference**: `memory-bank/PRD/refactorlunargridtanstack.md`  
+**Status**: ✅ **PLANNING COMPLETE - READY FOR IMPLEMENTATION**  
+**Next Mode**: **IMPLEMENT MODE** pentru executing the refactoring plan
+
+---
+
+## 🎯 **NEW TASK INITIALIZED: LUNARGRID REFACTORING**
+
+### 📋 **TASK OVERVIEW**:
+**Title**: LunarGrid Architecture Refactoring  
+**Complexity**: **LEVEL 4 - COMPLEX SYSTEM**  
+**Source**: PRD Document `memory-bank/PRD/refactorlunargridtanstack.md`  
+**Current State**: 1806 linii în LunarGridTanStack.tsx  
+**Target State**: < 400 linii + modular component structure  
+
+### 🏗️ **REFACTORING SCOPE**:
+**Objective**: Spargerea componentei monolitice în 8-10 componente specializate
+```
+Target Structure:
+├── LunarGridTanStack.tsx (< 400 linii - orchestrator)
+├── components/
+│   ├── LunarGridToolbar.tsx
+│   ├── LunarGridCell.tsx  
+│   ├── LunarGridModals.tsx
+│   ├── LunarGridSubcategoryRow.tsx
+│   └── DeleteSubcategoryModal.tsx
+├── hooks/
+│   └── useLunarGridState.ts
+└── utils/
+    └── lunarGridHelpers.ts
+```
+
+### 📊 **COMPLEXITY ASSESSMENT RESULTS**:
+✅ **Architectural Impact**: Complete restructuring of monolithic component  
+✅ **Multiple Components**: 8-10 new specialized components needed  
+✅ **Risk Level**: HIGH - Complex refactoring with potential for introducing bugs  
+✅ **Time Estimate**: ~9 hours according to PRD guidelines  
+✅ **Dependencies**: State management, props flow, imports restructuring  
+
+---
+
+## 🚫 **VAN MODE BLOCKED - CRITICAL TRANSITION**
+
+### **COMPLEXITY DETERMINATION**: 
+**NIVEL 4 TASK DETECTAT**
+
+```
+🚫 LEVEL 4 TASK DETECTED
+Implementation in VAN mode is BLOCKED
+This task REQUIRES PLAN mode
+You MUST switch to PLAN mode for proper documentation and planning
+Type 'PLAN' to switch to planning mode
+```
+
+### **Why PLAN Mode Required**:
+- **Architectural Complexity**: Requires detailed planning și structured approach
+- **Risk Management**: HIGH risk refactoring needs careful dependency mapping
+- **Modular Design**: Component interfaces need proper documentation
+- **Baby Steps Strategy**: PRD emphasizes incremental approach with testing
+
+---
+
+## 📋 **VAN MODE CHECKPOINT STATUS**
+
+### ✅ **COMPLETED VAN PROCESSES**:
+- [x] **Platform Detection**: Windows PowerShell environment confirmed
+- [x] **Memory Bank Verification**: Existing structure functional și updated
+- [x] **File Verification**: LunarGridTanStack.tsx located și analyzed (1806 lines)
+- [x] **Complexity Determination**: **LEVEL 4 - COMPLEX SYSTEM** identified
+
+### ❌ **BLOCKED VAN PROCESSES**:
+- [ ] **VAN Implementation**: **BLOCKED** - requires structured planning
+- [ ] **Direct Implementation**: **NOT PERMITTED** for Level 4 complexity
+
+---
+
+## 📚 **PRD FOUNDATION ANALYSIS**
+
+### **PRD Key Guidelines Identified**:
+- **🔴 Red Flags**: NU muta business logic și UI împreună
+- **✅ Best Practices**: Un singur request per chat, testează după fiecare pas
+- **🎯 Success Metrics**: < 400 linii componenta principală, < 200 linii per child
+- **⚠️ Risk Management**: Baby steps approach, commit după fiecare pas
+
+### **Phased Approach Outlined în PRD**:
+1. **FAZA 1**: Pregătire și Structură (30 min)
+2. **FAZA 2**: Toolbar Component (45 min) 
+3. **FAZA 3**: Delete Confirmation Modal (30 min)
+4. **FAZA 4**: Helper Functions (30 min)
+5. **FAZA 5**: Transaction Modals Container (1 oră)
+6. **FAZA 6**: Subcategory Management (1.5 ore)
+7. **FAZA 7**: Cell Rendering (2 ore)
+8. **FAZA 8**: State Consolidation (2 ore)
+9. **FAZA 9**: Final Cleanup (1 oră)
+
+---
+
+## 🎯 **PLAN MODE OBJECTIVES** 
+
+### **Required Planning Deliverables**:
+1. **📋 Architecture Documentation**: Component interfaces și responsibilities
+2. **🔄 Risk Assessment**: Breaking points identification și mitigation strategies  
+3. **📊 Implementation Strategy**: Step-by-step refactoring cu validation checkpoints
+4. **🎯 Success Metrics**: Measurable outcomes pentru each refactoring phase
+5. **🚫 Rollback Plan**: Safety measures în case of critical issues
+
+### **PLAN Mode Focus Areas**:
+- **State Management Strategy**: How to preserve React state during refactoring
+- **Props Flow Design**: Interface definitions pentru component communication
+- **Testing Strategy**: Validation approach după fiecare refactoring step
+- **Import Dependencies**: Managing module restructuring fără breaking changes
+
+---
+
+## 🔄 **MODE TRANSITION REQUIREMENTS**
+
+### **Current Status**: 
+**VAN MODE** → **PLAN MODE TRANSITION PENDING**
+
+### **User Action Required**:
+```
+Type 'PLAN' to switch to planning mode
+```
+
+### **Next Mode Objectives**:
+- Load PLAN mode visual process map
+- Execute Level 4 comprehensive planning workflow  
+- Generate detailed refactoring strategy
+- Create structured implementation roadmap
+
+---
+
+## 💡 **FOUNDATION CONTEXT AVAILABLE**
+
+### **Previous Task Learnings Available**:
+- 🏗️ **Modal System Foundation**: Reusable confirmation patterns established
+- 🔍 **Debug Methodologies**: Proven approaches for complex state debugging
+- 📊 **Documentation Patterns**: Comprehensive tracking templates available
+- 🗃️ **Database Tools**: Direct DB access patterns for data integrity
+
+### **Technical Context for Refactoring**:
+- **Environment**: Clean development state, no blocking issues
+- **Codebase**: Enhanced foundation cu modal system și debug patterns
+- **Knowledge Base**: Archived insights from previous complex implementations  
+- **Quality Standards**: TypeScript strict, CVA compliance, testing approaches
+
+---
+
+## 📋 **TASK INITIALIZATION CHECKLIST**
+
+- [x] **Task Identified**: LunarGrid Architecture Refactoring
+- [x] **PRD Located**: `memory-bank/PRD/refactorlunargridtanstack.md`
+- [x] **Complexity Assessed**: LEVEL 4 - COMPLEX SYSTEM
+- [x] **VAN Mode Executed**: Platform detection, file verification, complexity determination
+- [x] **Transition Triggered**: PLAN mode requirement identified
+- [ ] **PLAN Mode Activated**: ⏳ **PENDING USER ACTION**
+
+---
+
+**Task Initialization**: 01 Iunie 2025  
+**PRD Reference**: `memory-bank/PRD/refactorlunargridtanstack.md`  
+**Status**: ⏳ **AWAITING PLAN MODE TRANSITION**  
+**Required Action**: User must type 'PLAN' to proceed cu Level 4 task planning
 
 ---
 
@@ -592,3 +923,44 @@ frontend/src/components/primitives/ConfirmationModal/
 **Status**: ✅ **COMPLETE & BEAUTIFUL** - Ready for use în toate componentele!
 
 **🎨 NEXT**: Sistemul poate fi extins cu alte tipuri de modal-uri (info, success, etc.) când e nevoie. 
+
+## 📋 **CURRENT IMPLEMENTATION PROGRESS**
+
+### **Phase 1 Progress**:
+- **TASK-01: LunarGridToolbar** - ✅ **COMPLETE** (100% - Successfully extracted și integrated)
+- **TASK-02: DeleteSubcategoryModal** - ⏳ Pending (depends on TASK-01)
+- **TASK-03: Helper Functions** - ⏳ Pending (pure functions, low risk)
+
+### **TASK-01 Implementation Details**:
+**Status**: ✅ **SUCCESSFULLY COMPLETED**
+**Duration**: ~45 minutes (as estimated)
+**Risk Level**: Low - No issues encountered
+
+#### **Completed Subtasks**:
+- [x] **[SUB-01.1]**: Create LunarGridToolbar.tsx structure - ✅ **COMPLETE**
+- [x] **[SUB-01.2]**: Define props interface și exports - ✅ **COMPLETE**
+- [x] **[SUB-01.3]**: Move toolbar JSX from main component - ✅ **COMPLETE**
+- [x] **[SUB-01.4]**: Update imports în main component - ✅ **COMPLETE**
+- [x] **[SUB-01.5]**: Test functionality preservation - ✅ **COMPLETE**
+
+#### **Quality Gates Achievement**:
+- ✅ **UI Identical**: Toolbar looks și behaves exactly the same
+- ✅ **Functionality Preserved**: All toolbar buttons work identically
+- ✅ **TypeScript Clean**: No new compilation errors introduced
+- ✅ **Component Independence**: Toolbar can be tested în isolation
+- ✅ **Props Interface Clear**: Well-documented, typed props
+- ✅ **Application Running**: Confirmed app runs on localhost:3002
+
+#### **Implementation Summary**:
+- **Component Extracted**: `components/LunarGridToolbar.tsx` (55 lines, under 200 line target)
+- **Props Interface**: Clean interface cu 5 props (onToggleExpandAll, onResetExpanded, orphanTransactionsCount, onCleanOrphans, getIsAllRowsExpanded)
+- **JSX Replacement**: Successfully replaced 40+ lines of inline JSX cu single component usage
+- **Import Integration**: Added import și used component în main LunarGridTanStack component
+- **Zero Breaking Changes**: All original functionality preserved exactly
+
+### **System Progress**:
+- **Overall**: 11% Implementation (1/9 major tasks completed), 100% Planning Complete
+- **UI Components**: 33% - LunarGridToolbar extracted successfully
+- **Business Logic**: 0% - Waiting for Phase 2
+- **State Management**: 0% - Waiting for Phase 3
+- **Integration**: 0% - Waiting for Phase 4

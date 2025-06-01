@@ -38,6 +38,9 @@ import Badge from "../../primitives/Badge/Badge";
 import CellTransactionPopover from "./CellTransactionPopover";
 import { EditableCell } from "./inline-editing/EditableCell";
 
+// 🔧 TASK-01: Import LunarGridToolbar component pentru Phase 1 refactoring
+import LunarGridToolbar from "./components/LunarGridToolbar";
+
 // Import pentru Plus icon pentru butonul de adăugare subcategorie
 import { Plus, Edit, Trash2, ChevronRight } from "lucide-react";
 
@@ -1502,56 +1505,33 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Renderizare (layout principal)
     return (
       <>
-        <div className={cn(flex({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              const isCurrentlyExpanded = table.getIsAllRowsExpanded();
-              const newExpandedState: Record<string, boolean> = {};
-              
-              if (!isCurrentlyExpanded) {
-                // Expandează toate
-                table.getRowModel().rows.forEach(row => {
-                  if (row.getCanExpand()) {
-                    newExpandedState[row.id] = true;
-                  }
-                });
-              }
-              // Dacă se colapsează, lăsăm newExpandedState gol (toate false)
-              
-              setExpandedRows(newExpandedState);
-              table.toggleAllRowsExpanded(!isCurrentlyExpanded);
-            }}
-            dataTestId="toggle-expand-all"
-          >
-            {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setExpandedRows({});
-              table.resetExpanded();
-            }}
-            dataTestId="reset-expanded"
-          >
-            {LUNAR_GRID.RESET_EXPANSION}
-          </Button>
-          
-          {/* 🚨 BUTON TEMPORAR DEBUGGING: Curățare tranzacții orfane */}
-          {validTransactions.some(t => t.category && (!t.subcategory || t.subcategory.trim() === "")) && (
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={handleCleanOrphanTransactions}
-              dataTestId="clean-orphan-transactions"
-              title={UI.SUBCATEGORY_ACTIONS.DELETE_ORPHAN_TITLE}
-            >
-              🗑️ Curăță tranzacții orfane ({validTransactions.filter(t => t.category && (!t.subcategory || t.subcategory.trim() === "")).length})
-            </Button>
-          )}
-        </div>
+        {/* 🔧 TASK-01: LunarGridToolbar component extraction - Phase 1 Safe Extraction */}
+        <LunarGridToolbar
+          onToggleExpandAll={() => {
+            const isCurrentlyExpanded = table.getIsAllRowsExpanded();
+            const newExpandedState: Record<string, boolean> = {};
+            
+            if (!isCurrentlyExpanded) {
+              // Expandează toate
+              table.getRowModel().rows.forEach(row => {
+                if (row.getCanExpand()) {
+                  newExpandedState[row.id] = true;
+                }
+              });
+            }
+            // Dacă se colapsează, lăsăm newExpandedState gol (toate false)
+            
+            setExpandedRows(newExpandedState);
+            table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+          }}
+          onResetExpanded={() => {
+            setExpandedRows({});
+            table.resetExpanded();
+          }}
+          orphanTransactionsCount={validTransactions.filter(t => t.category && (!t.subcategory || t.subcategory.trim() === "")).length}
+          onCleanOrphans={handleCleanOrphanTransactions}
+          getIsAllRowsExpanded={() => table.getIsAllRowsExpanded()}
+        />
 
         {/* 🎯 HEADER PRINCIPAL GLOBAL: Luna și anul în română - COMPLET FIX deasupra tabelului */}
         {!isLoading && !error && table.getRowModel().rows.length > 0 && (
