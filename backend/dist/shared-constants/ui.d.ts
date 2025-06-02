@@ -35,6 +35,9 @@ export declare const PLACEHOLDERS: {
     SEARCH: string;
     AMOUNT_MIN_FILTER: string;
     AMOUNT_MAX_FILTER: string;
+    EDIT_TRANSACTION: string;
+    ADD_TRANSACTION: string;
+    SUBCATEGORY_NAME: string;
 };
 export declare const BUTTONS: {
     RENAME: string;
@@ -205,6 +208,39 @@ export declare const UI: {
         AMOUNT_RANGE: string;
         TEXT_SEARCH: string;
     };
+    SUBCATEGORY_ACTIONS: {
+        DELETE_CUSTOM_TITLE: string;
+        DELETE_ORPHAN_TITLE: string;
+        RENAME_TITLE: string;
+    };
+    LUNAR_GRID_TOOLTIPS: {
+        CALCULATED_SUM: string;
+        DAILY_BALANCES: string;
+    };
+    LUNAR_GRID_PAGE: {
+        FULLSCREEN_EXIT_HINT: string;
+        NAVIGATION_LOADING: string;
+        LOADING_MESSAGE_TEMPLATE: string;
+        LAYOUT_MODES: {
+            FULL_WIDTH: string;
+            FULLSCREEN: string;
+        };
+        LAYOUT_TOGGLE_TOOLTIP: string;
+        MONTHS: {
+            IANUARIE: string;
+            FEBRUARIE: string;
+            MARTIE: string;
+            APRILIE: string;
+            MAI: string;
+            IUNIE: string;
+            IULIE: string;
+            AUGUST: string;
+            SEPTEMBRIE: string;
+            OCTOMBRIE: string;
+            NOIEMBRIE: string;
+            DECEMBRIE: string;
+        };
+    };
 };
 export declare const FLAGS: {
     CUSTOM: string;
@@ -221,6 +257,12 @@ export declare const LUNAR_GRID: {
     LOADING: string;
     NO_DATA: string;
     TOTAL_BALANCE: string;
+    EXPAND_CATEGORY: string;
+    COLLAPSE_CATEGORY: string;
+    EXPAND_CATEGORY_TITLE: string;
+    COLLAPSE_CATEGORY_TITLE: string;
+    SCROLL_HINT: string;
+    STICKY_HEADER_ACTIVE: string;
 };
 export declare const TEST_CONSTANTS: {
     ALERTS: {
@@ -255,5 +297,21 @@ export declare const TEST_CONSTANTS: {
         TEST_MESSAGE: string;
         LOADING: string;
         ERROR_GENERIC: string;
+    };
+};
+export declare const LUNAR_GRID_ACTIONS: {
+    NO_TRANSACTIONS: string;
+    ENTER_KEY: string;
+    ESCAPE_KEY: string;
+    DELETE_TRANSACTION_SINGLE: string;
+    DELETE_TRANSACTION_MULTIPLE: string;
+    DELETE_SUCCESS_SINGLE: string;
+    DELETE_SUCCESS_MULTIPLE: string;
+    DELETE_ERROR: string;
+    NO_TRANSACTIONS_TO_DELETE: string;
+    KEYBOARD_SHORTCUTS: {
+        DELETE_HINT: string;
+        NAVIGATION_HINT: string;
+        MULTI_SELECT_HINT: string;
     };
 };

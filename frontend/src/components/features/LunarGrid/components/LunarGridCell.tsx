@@ -11,8 +11,8 @@ export interface LunarGridCellProps {
   currentValue: string | number;
   transactionId: string | null;
   isHighlighted?: boolean; // Pentru highlight la editare din modal
-  isFocused?: boolean;     // Pentru navigația cu tastatura
-  isSelected?: boolean;    // Pentru navigația cu tastatura
+  isFocused?: boolean;     // Pentru navigația cu tastatura - boolean simplu
+  isSelected?: boolean;    // Pentru navigația cu tastatura - boolean simplu
   onSave: (value: string | number) => Promise<void>;
   onSingleClick: (event: React.MouseEvent<Element, MouseEvent>) => void;
 }

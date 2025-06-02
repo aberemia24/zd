@@ -3,7 +3,7 @@ import { cn, flex } from '../../../../styles/cva'; // Corectat: import din barre
 import { gridBadge, gridCellActions, gridActionButton, gridInput } from '../../../../styles/cva/grid'; // Cale relativă ajustată
 import Button from '../../../primitives/Button/Button'; // Import default corectat
 import { Edit, Trash2, Check, X } from 'lucide-react';
-import { UI, FLAGS, LUNAR_GRID_ACTIONS, BUTTONS as ButtonLabels, PLACEHOLDERS } from '@shared-constants';
+import { UI, FLAGS, LUNAR_GRID_ACTIONS, BUTTONS, PLACEHOLDERS } from '@shared-constants';
 import { flexRender, CellContext } from '@tanstack/react-table'; // Import necesar
 
 interface LunarGridSubcategoryRowProps {
@@ -64,7 +64,7 @@ const LunarGridSubcategoryRow: React.FC<LunarGridSubcategoryRowProps> = ({
           disabled={!editingSubcategoryName.trim() || editingSubcategoryName.trim() === subcategoryName}
           data-testid={`save-edit-subcategory-btn-${subcategoryName}`}
           className="hover-scale p-1.5"
-          title={ButtonLabels.SAVE}
+          title={BUTTONS.SAVE}
         >
           <Check size={14} />
         </Button>
@@ -74,7 +74,7 @@ const LunarGridSubcategoryRow: React.FC<LunarGridSubcategoryRowProps> = ({
           onClick={onCancelEdit}
           data-testid={`cancel-edit-subcategory-btn-${subcategoryName}`}
           className="hover-scale p-1.5"
-          title={ButtonLabels.CANCEL}
+          title={BUTTONS.CANCEL}
         >
           <X size={14} />
         </Button>

@@ -3,7 +3,7 @@ import { Plus, Check, X } from 'lucide-react';
 import { cn, flex } from '../../../../styles/cva';
 import { gridSubcategoryRow, gridSubcategoryState, gridCell, gridInput, gridInteractive } from '../../../../styles/cva/grid';
 import Button from '../../../primitives/Button/Button';
-import { PLACEHOLDERS, LUNAR_GRID_ACTIONS, BUTTONS as ButtonLabels } from '@shared-constants';
+import { PLACEHOLDERS, LUNAR_GRID_ACTIONS, BUTTONS } from '@shared-constants';
 
 interface LunarGridAddSubcategoryRowProps {
   categoryName: string;
@@ -68,7 +68,7 @@ const LunarGridAddSubcategoryRow: React.FC<LunarGridAddSubcategoryRowProps> = ({
               disabled={!newSubcategoryName.trim()}
               data-testid={`save-subcategory-btn-${categoryName}`}
               className="hover-scale p-1.5"
-              title={ButtonLabels.SAVE}
+              title={BUTTONS.SAVE}
             >
               <Check size={14} />
             </Button>
@@ -78,7 +78,7 @@ const LunarGridAddSubcategoryRow: React.FC<LunarGridAddSubcategoryRowProps> = ({
               onClick={onCancelNewSubcategory}
               data-testid={`cancel-subcategory-btn-${categoryName}`}
               className="hover-scale p-1.5"
-              title={ButtonLabels.CANCEL}
+              title={BUTTONS.CANCEL}
             >
               <X size={14} />
             </Button>
@@ -90,12 +90,13 @@ const LunarGridAddSubcategoryRow: React.FC<LunarGridAddSubcategoryRowProps> = ({
             onClick={onStartAddNewSubcategory}
             className={cn(
               gridInteractive({ variant: "addButton", size: "auto" }),
-              flex({ align: "center", gap: "sm" })
+              "flex items-center gap-2 text-gray-600 hover:text-gray-800"
             )}
             data-testid={`add-subcategory-btn-${categoryName}`}
+            title={BUTTONS.ADD_SUBCATEGORY}
           >
             <Plus size={14} className="text-professional-primary" />
-            <span className="text-professional-body font-medium">{ButtonLabels.ADD_SUBCATEGORY}</span>
+            <span className="text-professional-body font-medium">{BUTTONS.ADD_SUBCATEGORY}</span>
           </Button>
         )}
       </td>

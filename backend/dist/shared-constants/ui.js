@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TEST_CONSTANTS = exports.LUNAR_GRID = exports.INFO = exports.FLAGS = exports.UI = exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
+exports.LUNAR_GRID_ACTIONS = exports.TEST_CONSTANTS = exports.LUNAR_GRID = exports.INFO = exports.FLAGS = exports.UI = exports.OPTIONS = exports.EXCEL_GRID = exports.LOADER = exports.TABLE = exports.BUTTONS = exports.PLACEHOLDERS = exports.TITLES = exports.LABELS = void 0;
 const enums_1 = require("./enums");
 exports.LABELS = {
     TYPE: 'Tip',
@@ -38,6 +38,9 @@ exports.PLACEHOLDERS = {
     SEARCH: 'Caută...',
     AMOUNT_MIN_FILTER: 'Suma minimă',
     AMOUNT_MAX_FILTER: 'Suma maximă',
+    EDIT_TRANSACTION: 'Editează...',
+    ADD_TRANSACTION: 'Adaugă...',
+    SUBCATEGORY_NAME: 'Nume subcategorie...',
 };
 exports.BUTTONS = {
     RENAME: 'Redenumește',
@@ -212,6 +215,39 @@ exports.UI = {
         AMOUNT_RANGE: 'Interval sume',
         TEXT_SEARCH: 'Căutare text',
     },
+    SUBCATEGORY_ACTIONS: {
+        DELETE_CUSTOM_TITLE: 'Șterge subcategoria custom',
+        DELETE_ORPHAN_TITLE: 'Șterge tranzacțiile fără subcategorie (date murdare din trecut)',
+        RENAME_TITLE: 'Redenumește subcategoria',
+    },
+    LUNAR_GRID_TOOLTIPS: {
+        CALCULATED_SUM: 'Suma calculată automată din subcategorii',
+        DAILY_BALANCES: 'Balanțe zilnice',
+    },
+    LUNAR_GRID_PAGE: {
+        FULLSCREEN_EXIT_HINT: 'Press ESC pentru a ieși din fullscreen',
+        NAVIGATION_LOADING: 'Navigare...',
+        LOADING_MESSAGE_TEMPLATE: 'Se încarcă datele pentru {month} {year}...',
+        LAYOUT_MODES: {
+            FULL_WIDTH: 'Lățime completă',
+            FULLSCREEN: 'Fullscreen',
+        },
+        LAYOUT_TOGGLE_TOOLTIP: 'Comută la modul următor ({nextMode})',
+        MONTHS: {
+            IANUARIE: 'Ianuarie',
+            FEBRUARIE: 'Februarie',
+            MARTIE: 'Martie',
+            APRILIE: 'Aprilie',
+            MAI: 'Mai',
+            IUNIE: 'Iunie',
+            IULIE: 'Iulie',
+            AUGUST: 'August',
+            SEPTEMBRIE: 'Septembrie',
+            OCTOMBRIE: 'Octombrie',
+            NOIEMBRIE: 'Noiembrie',
+            DECEMBRIE: 'Decembrie'
+        }
+    },
 };
 exports.FLAGS = {
     CUSTOM: 'custom',
@@ -227,7 +263,13 @@ exports.LUNAR_GRID = {
     RESET_EXPANSION: 'Resetează',
     LOADING: 'Se încarcă datele...',
     NO_DATA: 'Nu există date pentru perioada selectată',
-    TOTAL_BALANCE: 'Sold'
+    TOTAL_BALANCE: 'Sold',
+    EXPAND_CATEGORY: 'Extinde',
+    COLLAPSE_CATEGORY: 'Restrânge',
+    EXPAND_CATEGORY_TITLE: 'Extinde categoria',
+    COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria',
+    SCROLL_HINT: 'Scroll pentru a vedea mai multe date',
+    STICKY_HEADER_ACTIVE: 'Header fix activ'
 };
 exports.TEST_CONSTANTS = {
     ALERTS: {
@@ -263,5 +305,21 @@ exports.TEST_CONSTANTS = {
         LOADING: 'Se încarcă...',
         ERROR_GENERIC: 'Eroare'
     }
+};
+exports.LUNAR_GRID_ACTIONS = {
+    NO_TRANSACTIONS: 'fără tranzacții',
+    ENTER_KEY: 'Enter',
+    ESCAPE_KEY: 'Escape',
+    DELETE_TRANSACTION_SINGLE: 'Ștergi această tranzacție definitiv?',
+    DELETE_TRANSACTION_MULTIPLE: 'Ștergi {count} tranzacții definitiv?',
+    DELETE_SUCCESS_SINGLE: 'Tranzacție ștearsă cu succes',
+    DELETE_SUCCESS_MULTIPLE: '{count} tranzacții șterse cu succes',
+    DELETE_ERROR: 'Eroare la ștergerea tranzacțiilor',
+    NO_TRANSACTIONS_TO_DELETE: 'Nu există tranzacții de șters pentru pozițiile selectate',
+    KEYBOARD_SHORTCUTS: {
+        DELETE_HINT: 'Apasă Delete sau Backspace pentru a șterge tranzacția',
+        NAVIGATION_HINT: 'Folosește săgețile pentru navigare, Space pentru selecție',
+        MULTI_SELECT_HINT: 'Ține Ctrl pentru selecție multiplă, Shift pentru interval',
+    },
 };
 //# sourceMappingURL=ui.js.map

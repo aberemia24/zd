@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VALIDATION_MESSAGES = exports.VALIDATION = void 0;
 exports.VALIDATION = {
     AMOUNT_MIN: 0.01,
-    AMOUNT_MAX: 1000000,
+    AMOUNT_MAX: 9999999,
     DATE_REGEX: /^\d{4}-\d{2}-\d{2}$/,
 };
 exports.VALIDATION_MESSAGES = {

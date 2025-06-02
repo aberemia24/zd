@@ -1,6 +1,6 @@
 export declare const VALIDATION: {
     readonly AMOUNT_MIN: 0.01;
-    readonly AMOUNT_MAX: 1000000;
+    readonly AMOUNT_MAX: 9999999;
     readonly DATE_REGEX: RegExp;
 };
 export declare const VALIDATION_MESSAGES: {
