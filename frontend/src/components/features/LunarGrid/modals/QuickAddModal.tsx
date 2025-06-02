@@ -63,6 +63,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     if (prefillAmount && !form.data.amount) {
       form.updateData({ amount: prefillAmount });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillAmount]); // Eliminat form din dependințe pentru a preveni bucla infinită
 
   // Handle save action
@@ -115,7 +116,12 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
   // Handle keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && e.ctrlKey) {
+      if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+        // Previne Enter doar dacă este într-un textarea (pentru new lines)
+        const target = e.target as HTMLElement;
+        if (target?.tagName?.toLowerCase() === 'textarea') {
+          return; // Permite Enter în textarea pentru new lines
+        }
         e.preventDefault();
         handleSave();
       }
@@ -357,7 +363,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
             >
               {loading.isLoading 
                 ? BUTTONS.LOADING 
-                : (position ? "OK" : `${EXCEL_GRID.ACTIONS.SAVE_CHANGES} (Ctrl+Enter)`)
+                : (position ? "OK" : `${EXCEL_GRID.ACTIONS.SAVE_CHANGES} (Enter)`)
               }
             </Button>
           </div>

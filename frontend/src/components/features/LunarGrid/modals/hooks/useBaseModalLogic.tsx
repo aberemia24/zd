@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { VALIDATION } from "@shared-constants";
 
 // Types pentru modal context
 export interface CellContext {
@@ -53,6 +54,14 @@ export const useBaseModalLogic = (cellContext: CellContext) => {
 
     if (numericAmount <= 0) {
       return "Suma trebuie să fie pozitivă";
+    }
+
+    if (numericAmount < VALIDATION.AMOUNT_MIN) {
+      return `Suma trebuie să fie cel puțin ${VALIDATION.AMOUNT_MIN} RON`;
+    }
+
+    if (numericAmount > VALIDATION.AMOUNT_MAX) {
+      return `Suma nu poate depăși ${VALIDATION.AMOUNT_MAX.toLocaleString('ro-RO')} RON`;
     }
 
     return undefined;
