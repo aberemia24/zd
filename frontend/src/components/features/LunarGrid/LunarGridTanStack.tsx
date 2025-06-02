@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
-import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 // Constants și shared (@shared-constants)
@@ -27,10 +26,10 @@ import {
 } from "./hooks/useLunarGridTable";
 import { useKeyboardNavigation, type CellPosition } from "./hooks/useKeyboardNavigation";
 import { useLunarGridState } from "./hooks/useLunarGridState";
+import { useTransactionOperations } from "./hooks/useTransactionOperations";
+import { useSubcategoryOperations } from "./hooks/useSubcategoryOperations";
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 import {
-  useCreateTransactionMonthly,
-  useUpdateTransactionMonthly,
   useDeleteTransactionMonthly
 } from '../../../services/hooks/transactionMutations';
 
@@ -74,8 +73,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
 
-    // Hook pentru CategoryStore pentru adăugarea subcategoriilor
-    const { categories, saveCategories } = useCategoryStore();
+    // State pentru subcategorii și modal
+    const { categories } = useCategoryStore();
 
     // Hook consolidat pentru toate LunarGrid state-urile
     const {
@@ -112,13 +111,20 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       staleTime: 5 * 60 * 1000, // 5 minute cache pentru a evita refresh-uri inutile
     });
 
-    // Hooks pentru mutații de tranzacții cu cache optimization  
-    const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
-    const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
-    const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
+    // Hooks pentru operații specializate
+    const transactionOps = useTransactionOperations({ year, month, userId: user?.id });
+    const subcategoryOps = useSubcategoryOperations({
+      year,
+      month,
+      userId: user?.id,
+      newSubcategoryName,
+      setNewSubcategoryName,
+      setAddingSubcategory,
+      clearSubcategoryAction,
+    });
 
-    // React Query client pentru invalidation cache
-    const queryClient = useQueryClient();
+    // Hook pentru bulk delete operations (păstrat pentru keyboard navigation)
+    const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -139,44 +145,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         value: string | number,
         transactionId: string | null,
       ): Promise<void> => {
-        const numValue = typeof value === "string" ? parseFloat(value) : value;
-
-        if (isNaN(numValue)) {
-          throw new Error("Valoare invalidă");
-        }
-
-        const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-
-        if (transactionId) {
-          // UPDATE: Modifică tranzacția existentă
-          await updateTransactionMutation.mutateAsync({
-            id: transactionId,
-            transactionData: {
-              amount: numValue,
-              date: isoDate,
-              category,
-              subcategory: subcategory || undefined,
-              type: TransactionType.EXPENSE,
-            }
-          });
-        } else {
-          // CREATE: Creează o tranzacție nouă
-          await createTransactionMutation.mutateAsync({
-            amount: numValue,
-            date: isoDate,
-            category,
-            subcategory: subcategory || undefined,
-            type: TransactionType.EXPENSE,
-            description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
-          });
-        }
+        await transactionOps.handleEditableCellSave(category, subcategory, day, value, transactionId);
       },
-      [
-        year,
-        month,
-        updateTransactionMutation,
-        createTransactionMutation,
-      ],
+      [transactionOps],
     );
 
     // Handler pentru click pe celulă (doar pentru modal advanced - Shift+Click)
@@ -220,39 +191,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         recurring: boolean;
         frequency?: FrequencyType;
       }) => {
-        if (!popover) {
-          return;
+        try {
+          await transactionOps.handleSavePopover(popover, formData);
+          // UI cleanup după salvare
+          setPopover(null);
+        } catch (error) {
+          // Error handling is already in the hook
+          setPopover(null);
         }
-
-        const {
-          category,
-          subcategory,
-          day,
-          type: transactionTypeFromPopover,
-        } = popover;
-
-        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-        const commonPayload = {
-          amount: Number(formData.amount),
-          category,
-          subcategory: subcategory || undefined,
-          type: transactionTypeFromPopover as TransactionType,
-          date,
-          recurring: formData.recurring,
-          frequency: formData.recurring ? (formData.frequency as FrequencyType) : undefined,
-        };
-
-        createTransactionMutation.mutate(commonPayload, {
-          onSuccess: () => {
-            setPopover(null);
-          },
-          onError: () => {
-            setPopover(null);
-          },
-        });
       },
-      [popover, year, month, createTransactionMutation, setPopover],
+      [transactionOps, popover, setPopover],
     );
 
     // Handler pentru single click modal
@@ -329,7 +277,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [year, month, setModalState, setHighlightedCell],
     );
 
-    // LGI TASK 5: Handler pentru salvarea din modal
+    // Wrapper handlers - combină logica business din hook-uri cu UI management
     const handleSaveModal = useCallback(
       async (data: {
         amount: string;
@@ -337,47 +285,30 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         recurring: boolean;
         frequency?: FrequencyType;
       }) => {
-        if (!modalState) return;
-
-        const { category, subcategory, day, transactionId, mode } = modalState;
-        const numValue = parseFloat(data.amount);
-        
-        if (isNaN(numValue)) {
-          throw new Error("Valoare invalidă");
+        try {
+          await transactionOps.handleSaveModal(modalState, data);
+          // UI cleanup după salvare
+          setModalState(null);
+          setHighlightedCell(null);
+        } catch (error) {
+          // Error handling is already in the hook
         }
-
-        const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-        if (mode === 'edit' && transactionId) {
-          // UPDATE: Modifică tranzacția existentă
-          await updateTransactionMutation.mutateAsync({
-            id: transactionId,
-            transactionData: {
-              amount: numValue,
-              date,
-              category,
-              subcategory: subcategory || undefined,
-              type: TransactionType.EXPENSE,
-              description: data.description,
-            }
-          });
-        } else {
-          // CREATE: Creează o tranzacție nouă  
-          await createTransactionMutation.mutateAsync({
-            amount: numValue,
-            date,
-            category,
-            subcategory: subcategory || undefined,
-            type: TransactionType.EXPENSE,
-            description: data.description || `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
-          });
-        }
-
-        // Închide modal-ul după salvare
-        setModalState(null);
-        setHighlightedCell(null);
       },
-      [modalState, year, month, updateTransactionMutation, createTransactionMutation, setModalState, setHighlightedCell],
+      [transactionOps, modalState, setModalState, setHighlightedCell],
+    );
+
+    const handleDeleteFromModal = useCallback(
+      async () => {
+        try {
+          await transactionOps.handleDeleteFromModal(modalState);
+          // UI cleanup după delete
+          setModalState(null);
+          setHighlightedCell(null);
+        } catch (error) {
+          // Error handling is already in the hook
+        }
+      },
+      [transactionOps, modalState, setModalState, setHighlightedCell],
     );
 
     // Handler pentru închiderea modal-ului
@@ -386,202 +317,28 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       setHighlightedCell(null);
     }, [setModalState, setHighlightedCell]);
 
-    // Handler pentru delete transaction din modal
-    const handleDeleteFromModal = useCallback(
-      async () => {
-        if (!modalState || !modalState.transactionId) return;
-
-        try {
-          await deleteTransactionMutation.mutateAsync(modalState.transactionId);
-          // Închide modal-ul după delete
-          setModalState(null);
-          setHighlightedCell(null);
-          toast.success(LUNAR_GRID_ACTIONS.DELETE_SUCCESS_SINGLE);
-        } catch (error) {
-          toast.error("Eroare la ștergerea tranzacției. Încercați din nou.");
-        }
-      },
-      [modalState, deleteTransactionMutation, setModalState, setHighlightedCell],
-    );
-
     // Handler pentru ștergerea unei subcategorii custom
     const handleDeleteSubcategory = useCallback(
       async (categoryName: string, subcategoryName: string) => {
-        if (!user?.id) {
-          return;
-        }
-
-        try {
-          // Găsește categoria în store
-          const category = categories.find(cat => cat.name === categoryName);
-          if (!category) {
-            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
-            return;
-          }
-
-          // Găsește subcategoria și verifică că este custom
-          const subcategoryToDelete = category.subcategories.find(sub => sub.name === subcategoryName);
-          if (!subcategoryToDelete) {
-            toast.error("Subcategoria nu a fost găsită");
-            return;
-          }
-
-          if (!subcategoryToDelete.isCustom) {
-            toast.error("Nu se pot șterge subcategoriile predefinite");
-            return;
-          }
-
-          // Creează categoria actualizată cu subcategoria eliminată
-          const updatedCategories = categories.map(cat => {
-            if (cat.name === categoryName) {
-              return {
-                ...cat,
-                subcategories: cat.subcategories.filter(sub => sub.name !== subcategoryName)
-              };
-            }
-            return cat;
-          });
-
-          // Salvează în CategoryStore
-          await saveCategories(user.id, updatedCategories);
-          
-          // 🔄 FORCE INVALIDATION: Invalidează cache-ul React Query pentru a forța re-fetch
-          queryClient.invalidateQueries({
-            queryKey: ["transactions", year, month, user.id],
-          });
-          
-          // Reset state
-          clearSubcategoryAction();
-          
-          toast.success(MESAJE.CATEGORII.SUCCES_STERGERE_SUBCATEGORIE);
-        } catch (error) {
-          toast.error(MESAJE.CATEGORII.EROARE_STERGERE_SUBCATEGORIE);
-        }
+        await subcategoryOps.handleDeleteSubcategory(categoryName, subcategoryName);
       },
-      [user?.id, categories, saveCategories, queryClient, year, month, clearSubcategoryAction],
+      [subcategoryOps],
     );
 
     // Handler pentru adăugarea unei subcategorii noi
     const handleAddSubcategory = useCallback(
       async (categoryName: string) => {
-        if (!user?.id || !newSubcategoryName.trim()) {
-          return;
-        }
-
-        try {
-          // Găsește categoria în store TOATE categoriile disponibile, nu doar custom ones
-          let category = categories.find(cat => cat.name === categoryName);
-          
-          // Dacă categoria nu există în store, o creăm (poate fi o categorie default)
-          if (!category) {
-            category = {
-              name: categoryName,
-              type: TransactionType.EXPENSE, // Default type
-              subcategories: [],
-              isCustom: true
-            };
-          }
-
-          // Verifică limita de 5 subcategorii CUSTOM (nu toate subcategoriile)
-          const customSubcategoriesCount = category.subcategories.filter(sub => sub.isCustom).length;
-          if (customSubcategoriesCount >= 5) {
-            toast.error(MESAJE.CATEGORII.MAXIM_SUBCATEGORII);
-            setNewSubcategoryName("");
-            return;
-          }
-
-          // Verifică dacă subcategoria deja există
-          if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim())) {
-            toast.error(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
-            return;
-          }
-
-          // Construiește categoria actualizată
-          const updatedCategory = {
-            ...category,
-            subcategories: [
-              ...category.subcategories,
-              { name: newSubcategoryName.trim(), isCustom: true }
-            ]
-          };
-
-          // Construiește lista completă de categorii actualizată
-          const updatedCategories = categories.map(cat => 
-            cat.name === categoryName ? updatedCategory : cat
-          );
-
-          // Dacă categoria era nouă, o adaugă
-          if (!categories.find(cat => cat.name === categoryName)) {
-            updatedCategories.push(updatedCategory);
-          }
-
-          await saveCategories(user.id, updatedCategories);
-          
-          // 🔄 FORCE INVALIDATION: Invalidează cache-ul React Query pentru a forța re-fetch
-          queryClient.invalidateQueries({
-            queryKey: ["transactions", year, month, user.id],
-          });
-          
-          // Reset state-ul
-          setAddingSubcategory(null);
-          setNewSubcategoryName("");
-          
-          toast.success(MESAJE.CATEGORII.SUCCES_ADAUGARE_SUBCATEGORIE);
-        } catch (error) {
-          toast.error(MESAJE.CATEGORII.EROARE_ADAUGARE_SUBCATEGORIE);
-        }
+        await subcategoryOps.handleAddSubcategory(categoryName);
       },
-      [user?.id, newSubcategoryName, categories, saveCategories, queryClient, year, month, setAddingSubcategory, setNewSubcategoryName],
+      [subcategoryOps],
     );
 
     // Handler pentru rename subcategorie custom
     const handleRenameSubcategory = useCallback(
       async (categoryName: string, oldSubcategoryName: string, newSubcategoryName: string) => {
-        if (!user?.id || !newSubcategoryName.trim()) {
-          return;
-        }
-
-        try {
-          // Găsește categoria în store
-          const category = categories.find(cat => cat.name === categoryName);
-          if (!category) {
-            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
-            return;
-          }
-
-          // Verifică dacă noul nume deja există
-          if (category.subcategories.some(sub => sub.name === newSubcategoryName.trim() && sub.name !== oldSubcategoryName)) {
-            toast.error(MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA);
-            return;
-          }
-
-          // Creează categoria actualizată cu subcategoria redenumită
-          const updatedCategories = categories.map(cat => {
-            if (cat.name === categoryName) {
-              return {
-                ...cat,
-                subcategories: cat.subcategories.map(sub => 
-                  sub.name === oldSubcategoryName 
-                    ? { ...sub, name: newSubcategoryName.trim() }
-                    : sub
-                )
-              };
-            }
-            return cat;
-          });
-
-          // Salvează în CategoryStore
-          await saveCategories(user.id, updatedCategories);
-          
-          // Reset state
-          clearSubcategoryAction();
-          
-          toast.success(MESAJE.CATEGORII.SUCCES_REDENUMIRE_SUBCATEGORIE);
-        } catch (error) {
-          toast.error(MESAJE.CATEGORII.EROARE_REDENUMIRE);
-        }
+        await subcategoryOps.handleRenameSubcategory(categoryName, oldSubcategoryName, newSubcategoryName);
       },
-      [user?.id, categories, saveCategories, clearSubcategoryAction],
+      [subcategoryOps],
     );
 
     // Interogare tabel optimizată (fără handleri de click/double-click)
