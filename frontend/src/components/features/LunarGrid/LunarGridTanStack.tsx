@@ -87,6 +87,12 @@ import { QuickAddModal } from "./modals/QuickAddModal";
 
 // 🎯 LGI-TASK-06: Import keyboard navigation pentru direct transaction deletion
 import { useKeyboardNavigation, type CellPosition } from "./hooks/useKeyboardNavigation";
+import { useLunarGridState } from "./hooks/useLunarGridState";
+
+// Import LunarGridModals component
+import LunarGridModals from "./components/LunarGridModals";
+import LunarGridAddSubcategoryRow from "./components/LunarGridAddSubcategoryRow";
+import LunarGridSubcategoryRowCell from "./components/LunarGridSubcategoryRowCell";
 
 // Interfață pentru categoria din store
 interface CategoryStoreItem {
@@ -187,19 +193,24 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Hook pentru CategoryStore pentru adăugarea subcategoriilor
     const { categories, saveCategories } = useCategoryStore();
 
-    // State pentru input temporar la adăugarea subcategoriei
-    const [addingSubcategory, setAddingSubcategory] = useState<string | null>(null);
-    const [newSubcategoryName, setNewSubcategoryName] = useState<string>("");
+    // TASK 9+11: Hook pentru subcategory management (înlocuiește state-urile individuale)
+    const {
+      addingSubcategory,
+      setAddingSubcategory,
+      newSubcategoryName,
+      setNewSubcategoryName,
+      subcategoryAction,
+      setSubcategoryAction,
+      editingSubcategoryName,
+      setEditingSubcategoryName,
+      startAddingSubcategory,
+      cancelAddingSubcategory,
+      startEditingSubcategory,
+      startDeletingSubcategory,
+      clearSubcategoryAction,
+    } = useLunarGridState();
 
-    // 🎯 LGI-TASK-02: State pentru inline edit/delete subcategory actions
-    const [subcategoryAction, setSubcategoryAction] = useState<{
-      type: 'edit' | 'delete';
-      category: string;
-      subcategory: string;
-    } | null>(null);
-    const [editingSubcategoryName, setEditingSubcategoryName] = useState<string>("");
-
-    // 🎯 PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
+    //  PHASE 1: Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
     // 🚀 FIX: Dezactivez refetchOnWindowFocus pentru a evita refresh automat la focus
     const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
       includeAdjacentDays: true,
@@ -636,12 +647,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [user?.id, newSubcategoryName, categories, saveCategories, queryClient, year, month],
     );
 
-    // Handler pentru anularea adăugării subcategoriei
-    const handleCancelAddSubcategory = useCallback(() => {
-      setAddingSubcategory(null);
-      setNewSubcategoryName("");
-    }, []);
-
     // 🎯 LGI-TASK-02: Handler pentru rename subcategorie custom
     const handleRenameSubcategory = useCallback(
       async (categoryName: string, oldSubcategoryName: string, newSubcategoryName: string) => {
@@ -682,8 +687,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           await saveCategories(user.id, updatedCategories);
           
           // Reset state
-          setSubcategoryAction(null);
-          setEditingSubcategoryName("");
+          clearSubcategoryAction();
           
           toast.success(MESAJE.CATEGORII.SUCCES_REDENUMIRE_SUBCATEGORIE);
         } catch (error) {
@@ -746,7 +750,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           await saveCategories(user.id, updatedCategories);
           
           // Reset state
-          setSubcategoryAction(null);
+          clearSubcategoryAction();
           
           const transactionCount = associatedTransactions?.length || 0;
           const transactionText = transactionCount === 0 
@@ -1143,132 +1147,32 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       </div>
                     ) : isFirstCell && isSubcategory ? (
                       // 🎨 Professional Subcategory Cell cu enhanced badge și actions
-                      <div className={flex({ justify: "between", gap: "sm", width: "full" })}>
-                        <div className={flex({ align: "center", gap: "md" })}>
-                          {/* 🎨 Editing Mode cu professional styling */}
-                          {subcategoryAction?.type === 'edit' && 
-                           subcategoryAction.category === original.category && 
-                           subcategoryAction.subcategory === original.subcategory ? (
-                            <div className={flex({ align: "center", gap: "sm" })}>
-                              <input
-                                type="text"
-                                value={editingSubcategoryName}
-                                onChange={(e) => setEditingSubcategoryName(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY && editingSubcategoryName.trim()) {
-                                    handleRenameSubcategory(original.category, original.subcategory!, e.currentTarget.value);
-                                  } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
-                                    setEditingSubcategoryName("");
-                                  }
-                                }}
-                                className={cn(
-                                  gridInput({ variant: "professional", state: "editing" }),
-                                  "flex-1 animate-scale-in focus-ring-primary"
-                                )}
-                                autoFocus
-                                data-testid={`edit-subcategory-input-${original.subcategory}`}
-                              />
-                              <Button
-                                size="xs"
-                                variant="primary"
-                                onClick={(e) => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
-                                disabled={!editingSubcategoryName.trim()}
-                                data-testid={`save-edit-subcategory-${original.subcategory}`}
-                                className="hover-scale"
-                              >
-                                ✓
-                              </Button>
-                              <Button
-                                size="xs"
-                                variant="secondary"
-                                onClick={() => {
-                                  setSubcategoryAction(null);
-                                  setEditingSubcategoryName("");
-                                }}
-                                data-testid={`cancel-edit-subcategory-${original.subcategory}`}
-                                className="hover-scale"
-                              >
-                                ✕
-                              </Button>
-                            </div>
-                          ) : (
-                            // 🎨 Normal Mode cu professional text și badge
-                            <div className={flex({ align: "center", gap: "md" })}>
-                              <span className="text-professional-body contrast-high">
-                                {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
-                              </span>
-                              {(() => {
-                                const categoryData = categories.find(cat => cat.name === original.category);
-                                const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
-                                return subcategoryData?.isCustom ? (
-                                  <div className={cn(
-                                    gridBadge({ variant: "custom", size: "sm" }),
-                                    "animate-bounce-subtle text-professional-caption"
-                                  )}>
-                                    {FLAGS.CUSTOM}
-                                  </div>
-                                ) : null;
-                              })()}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* 🎨 Professional Action Buttons cu enhanced hover effects */}
-                        {subcategoryAction?.type !== 'edit' && (() => {
+                      <LunarGridSubcategoryRowCell
+                        category={original.category}
+                        subcategory={original.subcategory!}
+                        isCustom={(() => {
                           const categoryData = categories.find(cat => cat.name === original.category);
                           const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
-                          const isCustom = subcategoryData?.isCustom;
-                          
-                          // Afișăm buttons pentru TOATE subcategoriile
-                          return (
-                            <div className={cn(
-                              gridCellActions({ variant: "professional" }),
-                              "animate-fade-in-up"
-                            )}>
-                              {/* Edit button pentru TOATE subcategoriile */}
-                              <button
-                                className={cn(
-                                  gridActionButton({ variant: "primary", size: "sm" }),
-                                  "hover-lift"
-                                )}
-                                onClick={() => {
-                                  setSubcategoryAction({
-                                    type: 'edit',
-                                    category: original.category,
-                                    subcategory: original.subcategory!
-                                  });
-                                  setEditingSubcategoryName(original.subcategory!);
-                                }}
-                                data-testid={`edit-subcategory-btn-${original.subcategory}`}
-                                title={UI.SUBCATEGORY_ACTIONS.RENAME_TITLE}
-                              >
-                                <Edit size={12} />
-                              </button>
-                              
-                              {/* Delete button DOAR pentru subcategoriile custom */}
-                              {isCustom && (
-                                <button
-                                  className={cn(
-                                    gridActionButton({ variant: "danger", size: "sm" }),
-                                    "hover-lift"
-                                  )}
-                                  onClick={() => {
-                                    setSubcategoryAction({
-                                      type: 'delete',
-                                      category: original.category,
-                                      subcategory: original.subcategory!
-                                    });
-                                  }}
-                                  data-testid={`delete-subcategory-btn-${original.subcategory}`}
-                                  title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
-                                >
-                                  <Trash2 size={12} />
-                                </button>
-                              )}
-                            </div>
-                          );
+                          return subcategoryData?.isCustom || false;
                         })()}
-                      </div>
+                        isEditing={
+                          subcategoryAction?.type === 'edit' && 
+                          subcategoryAction.category === original.category && 
+                          subcategoryAction.subcategory === original.subcategory
+                        }
+                        editingValue={editingSubcategoryName}
+                        onEditingValueChange={setEditingSubcategoryName}
+                        onSaveEdit={() => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
+                        onCancelEdit={() => {
+                          clearSubcategoryAction();
+                        }}
+                        onStartEdit={() => {
+                          startEditingSubcategory(original.category, original.subcategory!);
+                        }}
+                        onStartDelete={() => {
+                          startDeletingSubcategory(original.category, original.subcategory!);
+                        }}
+                      />
                     ) : isDayCell && isSubcategory ? (
                       // 🎨 Professional Editable Cell
                       <div className="interactive focus-ring">
@@ -1301,108 +1205,21 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
             {/* 🎨 Professional Add Subcategory Row */}
             {canAddSubcategory && (
-              <tr className={cn(
-                gridSubcategoryRow({ variant: "professional" }),
-                gridSubcategoryState({ variant: "adding" })
-              )}>
-                <td 
-                  className={cn(
-                    gridCell({ type: "subcategory" }),
-                    gridSubcategoryState({ cell: "backdrop" })
-                  )}
-                >
-                  {addingSubcategory === original.category ? (
-                    // 🎨 Professional Input Mode
-                    <div className={flex({ align: "center", gap: "md" })}>
-                      <input
-                        type="text"
-                        value={newSubcategoryName}
-                        onChange={(e) => setNewSubcategoryName(e.target.value)}
-                        placeholder={PLACEHOLDERS.SUBCATEGORY_NAME}
-                        className={cn(
-                          gridInput({ variant: "professional", state: "editing" }),
-                          "flex-1 focus-ring-primary"
-                        )}
-                        autoFocus
-                        onKeyDown={(e) => {
-                          if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY) {
-                            console.log('🔍 [ENTER-KEY-DEBUG] Enter key pressed in subcategory input:', {
-                              category: original.category,
-                              subcategoryName: newSubcategoryName,
-                              timestamp: new Date().toISOString()
-                            });
-                            handleAddSubcategory(original.category);
-                          } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
-                            handleCancelAddSubcategory();
-                          }
-                        }}
-                        data-testid={`new-subcategory-input-${original.category}`}
-                      />
-                      <Button
-                        size="sm"
-                        variant="primary"
-                        onClick={() => {
-                          console.log('🔍 [SAVE-BUTTON-DEBUG] Save subcategory button clicked:', {
-                            category: original.category,
-                            subcategoryName: newSubcategoryName,
-                            timestamp: new Date().toISOString()
-                          });
-                          handleAddSubcategory(original.category);
-                        }}
-                        disabled={!newSubcategoryName.trim()}
-                        data-testid={`save-subcategory-${original.category}`}
-                        className="hover-scale"
-                      >
-                        ✓
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={handleCancelAddSubcategory}
-                        data-testid={`cancel-subcategory-${original.category}`}
-                        className="hover-scale"
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ) : (
-                    // 🎨 Professional Add Button
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        console.log('🔍 [ADD-BUTTON-DEBUG] Add subcategory button clicked:', {
-                          category: original.category,
-                          timestamp: new Date().toISOString()
-                        });
-                        setAddingSubcategory(original.category);
-                      }}
-                      className={cn(
-                        gridInteractive({ variant: "addButton", size: "auto" }),
-                        flex({ align: "center", gap: "sm" })
-                      )}
-                      data-testid={`add-subcategory-${original.category}`}
-                    >
-                      <Plus size={14} className="text-professional-primary" />
-                      <span className="text-professional-body font-medium">{BUTTONS.ADD_SUBCATEGORY}</span>
-                    </Button>
-                  )}
-                </td>
-                {/* 🎨 Professional Empty Cells */}
-                {table.getFlatHeaders().slice(1).map((header) => (
-                  <td 
-                    key={`add-subcategory-${header.id}`} 
-                    className={cn(gridCell({ type: "value", state: "readonly" }))}
-                  >
-                    {/* Empty cell cu subtle styling */}
-                  </td>
-                ))}
-              </tr>
+              <LunarGridAddSubcategoryRow
+                category={original.category}
+                isAdding={addingSubcategory === original.category}
+                inputValue={newSubcategoryName}
+                totalColumns={table.getFlatHeaders().length}
+                onInputChange={setNewSubcategoryName}
+                onSave={() => handleAddSubcategory(original.category)}
+                onCancel={cancelAddingSubcategory}
+                onStartAdd={() => setAddingSubcategory(original.category)}
+              />
             )}
           </React.Fragment>
         );
       },
-      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, handleCancelAddSubcategory, table, subcategoryAction, editingSubcategoryName, handleRenameSubcategory],
+      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, table, subcategoryAction, editingSubcategoryName, handleRenameSubcategory, cancelAddingSubcategory],
     );
 
     // Handler pentru ștergerea tranzacțiilor fără subcategorie (DEBUGGING ONLY)
@@ -1773,7 +1590,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
             }
           }}
-          onCancel={() => setSubcategoryAction(null)}
+          onCancel={() => clearSubcategoryAction()}
         />
 
         {/* LGI TASK 5: QuickAddModal pentru single click */}
