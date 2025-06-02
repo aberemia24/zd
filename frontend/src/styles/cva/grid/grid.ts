@@ -83,6 +83,78 @@ export const gridTable = cva(
 );
 
 // =============================================================================
+// GRID RESIZE COMPONENTS - Professional resizing cu smooth transitions
+// =============================================================================
+
+export const gridResizeContainer = cva(
+  [
+    "relative transition-all duration-300 ease-in-out",
+    "overflow-auto rounded-lg"
+  ],
+  {
+    variants: {
+      mode: {
+        normal: [
+          "bg-white shadow-lg border border-gray-200/80",
+          "hover:shadow-xl transition-shadow duration-300",
+          "h-[790px]"
+        ],
+        fullscreen: [
+          "fixed inset-0 z-50 bg-white",
+          "h-screen w-screen overflow-auto",
+          "shadow-2xl"
+        ],
+      },
+      state: {
+        transitioning: "pointer-events-none opacity-90",
+        ready: "pointer-events-auto opacity-100",
+      },
+    },
+    defaultVariants: {
+      mode: "normal",
+      state: "ready",
+    },
+  },
+);
+
+export const gridResizeButton = cva(
+  [
+    "absolute top-4 right-4 z-40",
+    "flex items-center justify-center",
+    "w-10 h-10 rounded-lg",
+    "transition-all duration-200 ease-in-out",
+    "focus:outline-none focus:ring-2 focus:ring-offset-2"
+  ],
+  {
+    variants: {
+      mode: {
+        normal: [
+          "bg-white/90 hover:bg-white",
+          "border border-gray-300/60 hover:border-gray-400",
+          "shadow-md hover:shadow-lg",
+          "text-gray-600 hover:text-gray-800",
+          "focus:ring-blue-500"
+        ],
+        fullscreen: [
+          "bg-gray-800/90 hover:bg-gray-900",
+          "border border-gray-600/60 hover:border-gray-500",
+          "shadow-lg hover:shadow-xl",
+          "text-white hover:text-gray-100",
+          "focus:ring-white"
+        ],
+      },
+      state: {
+        active: "scale-95 shadow-inner",
+        hover: "scale-105 shadow-lg",
+      },
+    },
+    defaultVariants: {
+      mode: "normal",
+    },
+  },
+);
+
+// =============================================================================
 // GRID HEADERS - Professional sticky positioning
 // =============================================================================
 

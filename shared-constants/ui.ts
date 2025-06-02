@@ -337,7 +337,15 @@ export const LUNAR_GRID = {
   COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria',
   // Constante pentru scroll UX
   SCROLL_HINT: 'Scroll pentru a vedea mai multe date',
-  STICKY_HEADER_ACTIVE: 'Header fix activ'
+  STICKY_HEADER_ACTIVE: 'Header fix activ',
+  // Constante pentru redimensionare tabel
+  RESIZE: {
+    TOGGLE_FULLSCREEN: 'Comută fullscreen',
+    EXIT_FULLSCREEN: 'Ieși din fullscreen',
+    RESIZE_BUTTON_TITLE: 'Redimensionează tabelul',
+    FULLSCREEN_MODE: 'Mod fullscreen activ',
+    NORMAL_MODE: 'Mod normal'
+  }
 };
 
 // Constante pentru teste - eliminate strings hardcodate

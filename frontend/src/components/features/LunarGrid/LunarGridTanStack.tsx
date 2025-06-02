@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import toast from 'react-hot-toast';
+import { Maximize2, Minimize2 } from 'lucide-react';
 
 // Constants și shared (@shared-constants)
 import { 
@@ -28,6 +29,7 @@ import { useKeyboardNavigation, type CellPosition } from "./hooks/useKeyboardNav
 import { useLunarGridState } from "./hooks/useLunarGridState";
 import { useTransactionOperations } from "./hooks/useTransactionOperations";
 import { useSubcategoryOperations } from "./hooks/useSubcategoryOperations";
+import { useTableResize } from "./hooks/useTableResize";
 import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransactions';
 import {
   useDeleteTransactionMonthly
@@ -49,6 +51,8 @@ import {
   gridTotalRow,
   gridCell,
   gridMessage,
+  gridResizeContainer,
+  gridResizeButton,
 } from "../../../styles/cva/grid";
 import {
   flex,
@@ -125,6 +129,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Hook pentru bulk delete operations (păstrat pentru keyboard navigation)
     const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
+
+    // Hook pentru redimensionare tabel și mod fullscreen
+    const { isFullscreen, toggleFullscreen } = useTableResize();
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -507,16 +514,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         <div 
           ref={tableContainerRef}
           className={cn(
-            gridContainer({ 
-              variant: "professional", 
-              size: "fullscreen",
-              state: isLoading ? "loading" : undefined 
+            gridResizeContainer({ 
+              mode: isFullscreen ? "fullscreen" : "normal",
+              state: "ready"
             }),
-            "relative",
             "transition-all duration-200 hover-lift",
             "focus-ring"
           )}
-          data-testid="lunar-grid-container"
+          data-testid="lunar-grid-resize-container"
           onSubmit={(e) => {
             // Previne form submission care cauzează page refresh
             e.preventDefault();
@@ -536,152 +541,186 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
           }}
         >
-          {/* 🎨 Professional Loading State */}
-          {isLoading && (
-            <div className={cn(
-              gridMessage({ variant: "professional" }),
-              flex({ align: "center", justify: "center" }),
-              "p-8 animate-fade-in-up"
-            )} 
-            data-testid="loading-indicator">
-              <div className="loading-pulse">
-                {LUNAR_GRID.LOADING}
+          {/* Buton resize fullscreen */}
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className={cn(
+              gridResizeButton({ 
+                mode: isFullscreen ? "fullscreen" : "normal"
+              })
+            )}
+            title={isFullscreen ? LUNAR_GRID.RESIZE.EXIT_FULLSCREEN : LUNAR_GRID.RESIZE.TOGGLE_FULLSCREEN}
+            data-testid="grid-resize-button"
+            aria-label={LUNAR_GRID.RESIZE.RESIZE_BUTTON_TITLE}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-5 h-5" />
+            ) : (
+              <Maximize2 className="w-5 h-5" />
+            )}
+          </button>
+
+          {/* Container interior cu overflow-auto pentru scroll */}
+          <div 
+            className={cn(
+              gridContainer({ 
+                variant: "professional", 
+                size: "fullscreen",
+                state: isLoading ? "loading" : undefined 
+              }),
+              "relative overflow-auto scroll-smooth",
+              isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
+            )}
+            data-testid="lunar-grid-container"
+          >
+            {/* 🎨 Professional Loading State */}
+            {isLoading && (
+              <div className={cn(
+                gridMessage({ variant: "professional" }),
+                flex({ align: "center", justify: "center" }),
+                "p-8 animate-fade-in-up"
+              )} 
+              data-testid="loading-indicator">
+                <div className="loading-pulse">
+                  {LUNAR_GRID.LOADING}
+                </div>
               </div>
-            </div>
-          )}
-          
-          {/* 🎨 Professional Error State */}
-          {error && (
-            <div className={cn(
-              gridMessage({ variant: "error" }),
-              flex({ align: "center", justify: "center" }),
-              "p-8 animate-slide-down"
-            )} 
-            data-testid="error-indicator">
-              {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
-            </div>
-          )}
-          
-          {/* 🎨 Professional Empty State */}
-          {!isLoading && !error && table.getRowModel().rows.length === 0 && (
-            <div className={cn(
-              gridMessage({ variant: "info" }),
-              flex({ align: "center", justify: "center" }),
-              "p-8 animate-scale-in"
-            )} 
-            data-testid="no-data-indicator">
-              {LUNAR_GRID.NO_DATA}
-            </div>
-          )}
-          
-          {/* 🎨 Professional Grid Table - FĂRĂ header luna/anul în interior */}
-          {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-            <table 
-              className={cn(gridTable({ variant: "professional", density: "default" }))}
-              data-testid="lunar-grid-table"
-            >
-              {/* 🎨 Professional Header cu enhanced styling */}
-              <thead className={cn(gridHeader({ variant: "professional" }))}>
-                <tr>
-                  {table.getFlatHeaders().map((header, index) => {
-                    const isFirstColumn = index === 0;
-                    const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
-                    
-                    return (
-                      <th
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        className={cn(
-                          gridHeaderCell({ 
-                            variant: isFirstColumn ? "sticky" : isNumericColumn ? "numeric" : "professional",
-                          }),
-                          "text-professional-heading contrast-enhanced",
-                          isFirstColumn && "min-w-[200px]",
-                          isNumericColumn && "w-20"
-                        )}
-                        style={{ width: header.getSize() }}
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
-                      </th>
-                    );
-                  })}
-                </tr>
-                
-                {/* 🎨 Professional Balance Row cu enhanced styling */}
-                <tr className={cn(gridTotalRow({ variant: "balance" }))}>
-                  {table.getFlatHeaders().map((header, index) => {
-                    const isFirstColumn = index === 0;
-                    
-                    if (isFirstColumn) {
+            )}
+            
+            {/* 🎨 Professional Error State */}
+            {error && (
+              <div className={cn(
+                gridMessage({ variant: "error" }),
+                flex({ align: "center", justify: "center" }),
+                "p-8 animate-slide-down"
+              )} 
+              data-testid="error-indicator">
+                {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
+              </div>
+            )}
+            
+            {/* 🎨 Professional Empty State */}
+            {!isLoading && !error && table.getRowModel().rows.length === 0 && (
+              <div className={cn(
+                gridMessage({ variant: "info" }),
+                flex({ align: "center", justify: "center" }),
+                "p-8 animate-scale-in"
+              )} 
+              data-testid="no-data-indicator">
+                {LUNAR_GRID.NO_DATA}
+              </div>
+            )}
+            
+            {/* 🎨 Professional Grid Table - FĂRĂ header luna/anul în interior */}
+            {!isLoading && !error && table.getRowModel().rows.length > 0 && (
+              <table 
+                className={cn(gridTable({ variant: "professional", density: "default" }))}
+                data-testid="lunar-grid-table"
+              >
+                {/* 🎨 Professional Header cu enhanced styling */}
+                <thead className={cn(gridHeader({ variant: "professional" }))}>
+                  <tr>
+                    {table.getFlatHeaders().map((header, index) => {
+                      const isFirstColumn = index === 0;
+                      const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
+                      
                       return (
                         <th
-                          key={`balance-${header.id}`}
+                          key={header.id}
+                          colSpan={header.colSpan}
                           className={cn(
-                            gridCell({ type: "balance" }),
-                            "text-professional-heading contrast-enhanced"
+                            gridHeaderCell({ 
+                              variant: isFirstColumn ? "sticky" : isNumericColumn ? "numeric" : "professional",
+                            }),
+                            "text-professional-heading contrast-enhanced",
+                            isFirstColumn && "min-w-[200px]",
+                            isNumericColumn && "w-20"
                           )}
+                          style={{ width: header.getSize() }}
                         >
-                          {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
+                          {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
                         </th>
                       );
-                    }
-                    
-                    if (header.id.startsWith("day-")) {
-                      const dayNumber = parseInt(header.id.split("-")[1], 10);
-                      const dailyBalance = dailyBalances[dayNumber] || 0;
+                    })}
+                  </tr>
+                  
+                  {/* 🎨 Professional Balance Row cu enhanced styling */}
+                  <tr className={cn(gridTotalRow({ variant: "balance" }))}>
+                    {table.getFlatHeaders().map((header, index) => {
+                      const isFirstColumn = index === 0;
+                      
+                      if (isFirstColumn) {
+                        return (
+                          <th
+                            key={`balance-${header.id}`}
+                            className={cn(
+                              gridCell({ type: "balance" }),
+                              "text-professional-heading contrast-enhanced"
+                            )}
+                          >
+                            {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
+                          </th>
+                        );
+                      }
+                      
+                      if (header.id.startsWith("day-")) {
+                        const dayNumber = parseInt(header.id.split("-")[1], 10);
+                        const dailyBalance = dailyBalances[dayNumber] || 0;
+                        
+                        return (
+                          <th
+                            key={`balance-${header.id}`}
+                            className={cn(
+                              gridCell({ 
+                                type: "balance", 
+                                state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "zero" 
+                              }),
+                              "text-xs font-financial contrast-high",
+                              dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
+                            )}
+                          >
+                            {dailyBalance !== 0 ? formatCurrencyForGrid(dailyBalance) : "—"}
+                          </th>
+                        );
+                      }
+                      
+                      if (header.id === "total") {
+                        const monthTotal = Object.values(dailyBalances).reduce((sum, val) => sum + val, 0);
+                        return (
+                          <th
+                            key={`balance-${header.id}`}
+                            className={cn(
+                              gridCell({ 
+                                type: "balance", 
+                                state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "zero" 
+                              }),
+                              "text-sm font-financial contrast-enhanced",
+                              monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
+                            )}
+                          >
+                            {monthTotal !== 0 ? formatCurrencyForGrid(monthTotal) : "—"}
+                          </th>
+                        );
+                      }
                       
                       return (
                         <th
                           key={`balance-${header.id}`}
-                          className={cn(
-                            gridCell({ 
-                              type: "balance", 
-                              state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "zero" 
-                            }),
-                            "text-xs font-financial contrast-high",
-                            dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
-                          )}
+                          className={cn(gridCell({ type: "balance" }))}
                         >
-                          {dailyBalance !== 0 ? formatCurrencyForGrid(dailyBalance) : "—"}
+                          —
                         </th>
                       );
-                    }
-                    
-                    if (header.id === "total") {
-                      const monthTotal = Object.values(dailyBalances).reduce((sum, val) => sum + val, 0);
-                      return (
-                        <th
-                          key={`balance-${header.id}`}
-                          className={cn(
-                            gridCell({ 
-                              type: "balance", 
-                              state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "zero" 
-                            }),
-                            "text-sm font-financial contrast-enhanced",
-                            monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
-                          )}
-                        >
-                          {monthTotal !== 0 ? formatCurrencyForGrid(monthTotal) : "—"}
-                        </th>
-                      );
-                    }
-                    
-                    return (
-                      <th
-                        key={`balance-${header.id}`}
-                        className={cn(gridCell({ type: "balance" }))}
-                      >
-                        —
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {table.getRowModel().rows.map((row) => renderRow(row))}
-              </tbody>
-            </table>
-          )}
+                    })}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.map((row) => renderRow(row))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
         
         {/* Toate modal-urile și popover-urile consolidate */}
