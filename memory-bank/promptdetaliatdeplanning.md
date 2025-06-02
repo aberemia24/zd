@@ -1,0 +1,4 @@
+nu vreau default le lasam ca acum daca e. ideea e ca vreau taskurile astea super detaliate gen vezi aivi @refactorgrid2.md 
+ar trebui sa facem asta pe toate taskurile. daca ai nevoie sa faci research ptr ele si sa treci prin cod sau sa cauti best practices. ideea e ca nu vrrau planning in vid, vreau sa ne asiguram ca avem idee despre toate constantele, functiile, parametrii, clasele etc pe care urmeaza sa le folosim nu sa le presupunem sa sa le inventam. mai mult, sa ne asiguram ca modificarile sunt safe, nu afecteaza negativ resrul aplicatiei sau mai rau sa scoatem functionalitate existenta. daia trebuie luat totul mega atent si incremental
+
+Si cand zic best practices, nu over engineering, nu enterprise level shit. sa fie robust, usor de implementat si util.

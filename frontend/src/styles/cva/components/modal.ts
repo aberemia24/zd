@@ -40,6 +40,7 @@ export const transactionModalContent = cva(
       },
       mode: {
         "quick-add": "w-96 max-h-[400px]",
+        "quick-add-positioned": "w-80 max-h-96 pointer-events-auto shadow-xl animate-in fade-in-0 zoom-in-95 ease-out",
         "advanced-edit": "w-[500px] max-h-[600px]",
         "recurring-setup": "w-[600px] max-h-[700px]",
         "bulk-operations": "w-[800px] max-h-[800px]",
@@ -107,9 +108,14 @@ export const transactionModalBody = cva(
         md: "px-6 py-4",
         lg: "px-8 py-6",
       },
+      mode: {
+        default: "",
+        positioned: "px-3 py-2 space-y-2",
+      },
     },
     defaultVariants: {
       padding: "md",
+      mode: "default",
     },
   },
 );
@@ -130,9 +136,14 @@ export const transactionModalFooter = cva(
         right: "justify-end",
         between: "justify-between",
       },
+      mode: {
+        default: "",
+        positioned: "px-3 py-1.5 flex justify-between items-center",
+      },
     },
     defaultVariants: {
       alignment: "right",
+      mode: "default",
     },
   },
 );

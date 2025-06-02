@@ -142,7 +142,144 @@ Sold rămas în cont: 4800 RON
 ### **TASK VIITOR:**
 **"Manager Conturi Multiple"**
 - Interfață pe modelul CategoryEditor
-- Tracking conturi separate
+- Tracking conturi separate, poti adauga mai multe conturi, inclusiv cash etc. poate punem o limita eventual. 
+La final toate aceste onturi se aduna iar suma lor devine soldul in grid. 
 - Suma totală în grid
 
-Să continuăm cu task-urile existente sau să prioritizăm acest sistem de sold? 
+┌─────────────────────────────────┐
+│ 💰 Configurare Sold Inițial    │
+├─────────────────────────────────┤
+│ Sold cont principal: [5000] RON │
+│ Data început:       [  1  ] ▼   │
+│ Luna/An:           [Ian 2025] ▼ │
+│                                 │
+│ [Salvează] [Anulează]          │
+└─────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ 💳 Gestionare Conturi                  │
+├─────────────────────────────────────────┤
+│ ✅ Cont Curent BCR     | 3,500.00 RON   │
+│ ✅ Cash Portofel      |   500.00 RON   │
+│ ✅ Economii ING       | 10,000.00 RON  │
+│ ❌ Card Revolut       |     0.00 RON   │
+│                                         │
+│ Total sold disponibil: 14,000.00 RON   │
+│                                         │
+│ [+ Adaugă Cont] [Exportă Lista]        │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ 📅 Configurare Sold Luna Ian 2025      │
+├─────────────────────────────────────────┤
+│ Sold total conturi: 14,000.00 RON      │ <- Din conturi
+│ Data începere:     [15] ▼ Ianuarie     │ <- Configurabil  
+│                                         │
+│ ✅ Transfer automat din Dec 2024        │
+│ Sold anterior:     13,450.00 RON       │
+│                                         │
+│ [Confirmă] [Resetează la conturi]      │
+└─────────────────────────────────────────┘
+
+                     15   16   17   18   19   20  ...
+Venituri            +0  +3000  +0    +0   +0   +0  ...
+Cheltuieli         -200  -150 -300  -100 -500 -50  ...
+Sold disponibil   13800 16650 16350 16250 15750 15700 ...
+                  🟢    🟢    🟢    🟢    🟢    🟢
+
+
+                     28   29   30   31
+Sold disponibil    -150  -200 -300  -500
+                   🔴⚠️  🔴⚠️  🔴⚠️  🔴⚠️
+                   
+Tooltip: "Atenție: Sold negativ! Verifică tranzacțiile."
+
+
+ACCOUNT_MANAGEMENT: {
+  TITLE: 'Gestionare Conturi',
+  ADD_ACCOUNT: 'Adaugă Cont Nou',
+  EDIT_ACCOUNT: 'Editează Cont', 
+  DELETE_ACCOUNT: 'Șterge Cont',
+  ACCOUNT_TYPES: {
+    BANK: 'Cont bancar',
+    CASH: 'Numerar',
+    INVESTMENT: 'Investiții', 
+    OTHER: 'Altele'
+  },
+  TOTAL_BALANCE: 'Total sold disponibil',
+  MAX_ACCOUNTS_REACHED: 'Maxim 10 conturi permise'
+},
+
+MONTHLY_BALANCE: {
+  SETUP_TITLE: 'Configurare Sold Luna',
+  START_DATE: 'Data începere planificare',
+  INITIAL_BALANCE: 'Sold inițial',
+  AUTO_TRANSFER: 'Transfer automat din luna anterioară',
+  CONFIRM_SETUP: 'Confirmă configurarea',
+  DAILY_BALANCE_ROW: 'Sold disponibil'
+},
+Constante necesare (să adaug în shared-constants):
+
+BALANCE_WARNINGS: {
+  NEGATIVE_BALANCE: 'Atenție: Sold negativ!',
+  LOW_BALANCE: 'Atenție: Sold scăzut!',
+  CHECK_TRANSACTIONS: 'Verifică tranzacțiile.'
+}
+
+
+ PROBLEMA IDENTIFICATĂ:
+Investițiile = Banii "ies" din cont DAR rămân ca active
+Economisirile = Banii "ies" din cont DAR rămân în posesie
+Cheltuielile pure = Banii "ies" și sunt consumați definitiv
+💡 PROPUNERE SOLUȚIE HIBRIDĂ:
+✅ INCLUDEM în calculul soldului (banii chiar ies din cont)
+- Sold ziua 1: 5000 RON
+- Investiție ziua 5: -1000 RON → Sold rămas: 4000 RON
+- Economisire ziua 10: -500 RON → Sold rămas: 3500 RON
+
+2. Pentru Categorii și Vizualizare:
+📊 MARCĂM SPECIAL cu tipuri distincte:
+- 🔴 Cheltuieli pure (mâncare, facturi, etc.)
+- 🟡 Investiții (crypto, acțiuni, etc.) 
+- 🟢 Economisiri (depozite, cash reserves, etc.)
+
+3. Pentru Flexibilitate:
+⚙️ OPȚIUNI în Settings:
+□ Include investițiile în calculul soldului
+□ Include economisirile în calculul soldului
+□ Afișează doar "cheltuielile pure" în overview
+
+
+ Vrei să vezi separat "cheltuieli pure" vs "active accumulate"?
+Recuperare: Vrei opțiunea să "recuperezi" investițiile/economisirile mai târziu?
+Categorii default: Vrei categorii pre-populate pentru investiții comune?
+Ce părere ai despre această abordare? Să dezvoltăm mai mult partea de categorii sau să ne concentrăm pe calculul soldului?
+da , avem deja culori diferite sunt cu albastru investitiile, poate mai discutam si asta dar poate ramande asa for now.
+
+in rapoarte ar fi bine sa fie diferite, da
+
+nu vreau sa recuperez nimic, poate sa le pune la venituri cand le scoate din investitii,
+
+1. Culori și Vizualizare:
+🔵 Investiții = ALBASTRU (deja implementat)
+🔴 Cheltuieli = ROȘU (deja implementat)
+🟢 Venituri = VERDE (deja implementat)
+
+2. Calculul Soldului:
+Sold zilnic = Sold inițial + Σ(Venituri) - Σ(Cheltuieli) - Σ(Investiții)
+- Investiț
+
+CLARIFICĂRI CONFIRMATE:
+💰 Tratarea Investițiilor:
+✅ Scad din sold zilnic (banii chiar ies din cont)
+✅ Albastru în grid (deja implementat)
+✅ Separate în rapoarte ca "active accumulate"
+❌ Fără recuperare automată - manual ca venituri
+📊 Rapoarte:
+🔴 Cheltuieli pure vs 🔵 Active accumulate (investiții + economisiri)
+📈 Vizibilitate clară bani "pierduți" vs "investiți"
+⚙️ Funcționalități:
+✅ Sold negativ permis + alertă vizuală
+🔄 Transfer automat între luni
+📅 Data start configurabilă
+🏦 Conturi multiple (temporar în Settings)
