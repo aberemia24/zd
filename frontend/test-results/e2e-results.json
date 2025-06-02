@@ -48,7 +48,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 60000
+        "timeout": 30000
       }
     ],
     "shard": null,
@@ -65,25 +65,27 @@
   },
   "suites": [
     {
-      "title": "suites\\features\\lunargrid-simple-flow.spec.ts",
-      "file": "suites/features/lunargrid-simple-flow.spec.ts",
+      "title": "smoke\\critical-auth.smoke.spec.ts",
+      "file": "smoke/critical-auth.smoke.spec.ts",
       "column": 0,
       "line": 0,
       "specs": [],
       "suites": [
         {
-          "title": "LunarGrid - Flux Simplu E2E",
-          "file": "suites/features/lunargrid-simple-flow.spec.ts",
-          "line": 6,
+          "title": "Smoke: Critical Authentication",
+          "file": "smoke/critical-auth.smoke.spec.ts",
+          "line": 5,
           "column": 6,
           "specs": [
             {
-              "title": "fluxul complet: login → expand → adaugă subcategorie → redenumește → adaugă tranzacții → șterge → schimbă luna",
-              "ok": false,
-              "tags": [],
+              "title": "login cu contul principal funcționează",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
@@ -92,141 +94,231 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 8155,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:36:5",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                          "column": 87,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39msupport\\pages\\LunarGridPage.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[33mLUNAR_GRID_TEST_DATA\u001b[39m\u001b[33m.\u001b[39m\u001b[33mGRID_ELEMENTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mCONTAINER\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m   }\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[90m/**\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                            "column": 87,
-                            "line": 14
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\LunarGridPage.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[33mLUNAR_GRID_TEST_DATA\u001b[39m\u001b[33m.\u001b[39m\u001b[33mGRID_ELEMENTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mCONTAINER\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m   }\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:36:5\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 3107,
+                      "errors": [],
                       "stdout": [
                         {
-                          "text": "🔐 Pasul 1: Login cu credențiale existente\n"
+                          "text": "🔍 Smoke Test: Login principal\n"
                         },
                         {
-                          "text": "✅ Login reușit\n"
-                        },
-                        {
-                          "text": "🗓️ Pasul 2: Navigare la LunarGrid\n"
+                          "text": "✅ Smoke Test: Login principal - SUCCESS\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-06-01T13:35:14.040Z",
+                      "startTime": "2025-06-02T08:38:12.736Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\suites-features-lunargrid--bb24b-ții-→-șterge-→-schimbă-luna-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context-0",
-                          "contentType": "text/markdown",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\suites-features-lunargrid--bb24b-ții-→-șterge-→-schimbă-luna-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                        "column": 87,
-                        "line": 14
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "c523c62309eea9656e18-069dfa29685f391c04bb",
-              "file": "suites/features/lunargrid-simple-flow.spec.ts",
-              "line": 23,
+              "id": "e126e6d08fe12245c665-5ec09a80a7663343ac60",
+              "file": "smoke/critical-auth.smoke.spec.ts",
+              "line": 6,
               "column": 7
             },
             {
-              "title": "verificare preliminară - elementele necesare sunt prezente",
-              "ok": false,
-              "tags": [],
+              "title": "navigarea între pagini funcționează",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
               "tests": [
                 {
-                  "timeout": 60000,
+                  "timeout": 30000,
                   "annotations": [],
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7557,
-                      "error": {
-                        "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n",
-                        "stack": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:164:5",
-                        "location": {
-                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                          "column": 87,
-                          "line": 14
-                        },
-                        "snippet": "\u001b[90m   at \u001b[39msupport\\pages\\LunarGridPage.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[33mLUNAR_GRID_TEST_DATA\u001b[39m\u001b[33m.\u001b[39m\u001b[33mGRID_ELEMENTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mCONTAINER\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m   }\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[90m/**\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                            "column": 87,
-                            "line": 14
-                          },
-                          "message": "Error: \u001b[31mTimed out 5000ms waiting for \u001b[39m\u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m\n\nLocator: getByTestId('lunar-grid-container')\nExpected: visible\nReceived: <element(s) not found>\nCall log:\n\u001b[2m  - expect.toBeVisible with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('lunar-grid-container')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\LunarGridPage.ts:14\n\n\u001b[0m \u001b[90m 12 |\u001b[39m     \n \u001b[90m 13 |\u001b[39m     \u001b[90m// Verifică că grid-ul s-a încărcat\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 14 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[33mLUNAR_GRID_TEST_DATA\u001b[39m\u001b[33m.\u001b[39m\u001b[33mGRID_ELEMENTS\u001b[39m\u001b[33m.\u001b[39m\u001b[33mCONTAINER\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 15 |\u001b[39m   }\n \u001b[90m 16 |\u001b[39m\n \u001b[90m 17 |\u001b[39m   \u001b[90m/**\u001b[39m\u001b[0m\n\u001b[2m    at LunarGridPage.goto (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts:14:87)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\suites\\features\\lunargrid-simple-flow.spec.ts:164:5\u001b[22m"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 5777,
+                      "errors": [],
                       "stdout": [
                         {
-                          "text": "🔍 Test preliminar: Verifică că toate elementele necesare sunt prezente\n"
+                          "text": "🔍 Smoke Test: Basic Navigation\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Basic Navigation - SUCCESS\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-06-01T13:35:23.644Z",
+                      "startTime": "2025-06-02T08:38:15.927Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\suites-features-lunargrid--79da0-tele-necesare-sunt-prezente-chromium\\test-failed-1.png"
-                        },
-                        {
-                          "name": "_error-context-0",
-                          "contentType": "text/markdown",
-                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\suites-features-lunargrid--79da0-tele-necesare-sunt-prezente-chromium\\error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\LunarGridPage.ts",
-                        "column": 87,
-                        "line": 14
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
-              "id": "c523c62309eea9656e18-81dbfacf97b1fa2a1d9f",
-              "file": "suites/features/lunargrid-simple-flow.spec.ts",
-              "line": 155,
+              "id": "e126e6d08fe12245c665-f6f2215ebf7ef84e5be5",
+              "file": "smoke/critical-auth.smoke.spec.ts",
+              "line": 34,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "smoke\\lunar-grid.smoke.spec.ts",
+      "file": "smoke/lunar-grid.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Smoke: LunarGrid Basic Functionality",
+          "file": "smoke/lunar-grid.smoke.spec.ts",
+          "line": 4,
+          "column": 6,
+          "specs": [
+            {
+              "title": "LunarGrid se deschide și afișează grid-ul",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1619,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🔍 Smoke Test: LunarGrid Loading\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: LunarGrid Loading - SUCCESS\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-02T08:38:21.716Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ca675092496f716193df-033cd2ceea04cd2186f4",
+              "file": "smoke/lunar-grid.smoke.spec.ts",
+              "line": 15,
+              "column": 7
+            },
+            {
+              "title": "expand/collapse categorii funcționează",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5398,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🔍 Smoke Test: Expand/Collapse\n"
+                        },
+                        {
+                          "text": "📊 Celule înainte: 0\n"
+                        },
+                        {
+                          "text": "📊 Celule după expandare: 3090\n"
+                        },
+                        {
+                          "text": "📊 Celule după reset: 0\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Expand/Collapse - SUCCESS\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-02T08:38:23.339Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ca675092496f716193df-6662e7ad35de96b47d53",
+              "file": "smoke/lunar-grid.smoke.spec.ts",
+              "line": 27,
+              "column": 7
+            },
+            {
+              "title": "celulele grid-ului răspund la click",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6986,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "🔍 Smoke Test: Cell Interaction\n"
+                        },
+                        {
+                          "text": "📊 Celule după expandare: 3090\n"
+                        },
+                        {
+                          "text": "✅ Smoke Test: Cell Interaction - SUCCESS\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-02T08:38:28.740Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "ca675092496f716193df-d7001f026a035a26fb10",
+              "file": "smoke/lunar-grid.smoke.spec.ts",
+              "line": 67,
               "column": 7
             }
           ]
@@ -236,11 +328,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-06-01T13:35:13.270Z",
-    "duration": 18341.611999999997,
-    "expected": 0,
+    "startTime": "2025-06-02T08:38:09.820Z",
+    "duration": 27370.342,
+    "expected": 5,
     "skipped": 0,
-    "unexpected": 2,
+    "unexpected": 0,
     "flaky": 0
   }
 }
