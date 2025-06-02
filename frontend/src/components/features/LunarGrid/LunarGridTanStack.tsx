@@ -25,6 +25,7 @@ import { EditableCell } from "./inline-editing/EditableCell";
 import { QuickAddModal } from "./modals/QuickAddModal";
 import LunarGridAddSubcategoryRow from "./components/LunarGridAddSubcategoryRow";
 import LunarGridSubcategoryRowCell from "./components/LunarGridSubcategoryRowCell";
+import LunarGridCell from "./components/LunarGridCell";
 
 // Hooks specializate
 import {
@@ -48,6 +49,7 @@ import { useAuthStore } from "../../../stores/authStore";
 
 // Utilitare și styling
 import { formatCurrencyForGrid, formatMonthYear } from "../../../utils/lunarGrid";
+import { calculatePopoverStyle } from "../../../utils/lunarGrid/lunarGridHelpers";
 import { cn } from "../../../styles/cva/shared/utils";
 import {
   gridContainer,
@@ -824,24 +826,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     );
 
     // Gestionarea poziției popover-ului
-    const popoverStyle = useMemo((): CSSProperties => {
-      if (!popover || !popover.anchorEl) return {};
-
-      // Verifică dacă elementul este încă în DOM
-      try {
-        const rect = popover.anchorEl.getBoundingClientRect();
-        const scrollY = window.scrollY || document.documentElement.scrollTop;
-        const scrollX = window.scrollX || document.documentElement.scrollLeft;
-
-        return {
-          position: "absolute",
-          top: `${rect.top + scrollY}px`,
-          left: `${rect.left + scrollX}px`,
-        };
-      } catch (error) {
-        return {};
-      }
-    }, [popover]);
+    const popoverStyle = calculatePopoverStyle(popover);
 
     // Funcție helper pentru randarea recursivă a rândurilor
     const renderRow = useCallback(
@@ -993,12 +978,112 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     ) : isDayCell && isSubcategory ? (
                       // 🎨 Professional Editable Cell
                       <div className="interactive focus-ring">
-                        {renderEditableCell(
-                          original.category,
-                          original.subcategory,
-                          parseInt(cell.column.id.split("-")[1]),
-                          cell.getValue() as string | number,
-                        )}
+                        <LunarGridCell
+                          cellId={`${original.category}-${original.subcategory || "null"}-${parseInt(cell.column.id.split("-")[1])}`}
+                          value={(() => {
+                            const currentValue = cell.getValue() as string | number;
+                            let displayValue = "";
+                            if (currentValue && currentValue !== "-" && currentValue !== "—") {
+                              if (typeof currentValue === "string") {
+                                // Elimină formatarea pentru editing
+                                displayValue = currentValue
+                                  .replace(/[^\d,.-]/g, "")
+                                  .replace(/\./g, "")
+                                  .replace(",", ".");
+                              } else {
+                                displayValue = String(currentValue);
+                              }
+                            }
+                            return displayValue;
+                          })()}
+                          onSave={async (value) => {
+                            const day = parseInt(cell.column.id.split("-")[1]);
+                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
+                            const transactionId = transactionMap.get(transactionKey) || null;
+                            await handleEditableCellSave(original.category, original.subcategory, day, value, transactionId);
+                          }}
+                          onSingleClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const day = parseInt(cell.column.id.split("-")[1]);
+                            const currentValue = cell.getValue() as string | number;
+                            let displayValue = "";
+                            if (currentValue && currentValue !== "-" && currentValue !== "—") {
+                              if (typeof currentValue === "string") {
+                                displayValue = currentValue
+                                  .replace(/[^\d,.-]/g, "")
+                                  .replace(/\./g, "")
+                                  .replace(",", ".");
+                              } else {
+                                displayValue = String(currentValue);
+                              }
+                            }
+                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
+                            const transactionId = transactionMap.get(transactionKey) || null;
+                            const targetElement = e.currentTarget as HTMLElement;
+                            handleSingleClickModal(original.category, original.subcategory, day, displayValue, transactionId, targetElement);
+                            
+                            // Update navigation focus
+                            const cellPosition: CellPosition = {
+                              category: original.category,
+                              subcategory: original.subcategory,
+                              day,
+                              rowIndex: Math.max(0, table.getRowModel().rows.findIndex(row => 
+                                row.original.category === original.category && 
+                                row.original.subcategory === original.subcategory
+                              )),
+                              colIndex: day - 1,
+                            };
+                            navHandleCellClick(cellPosition, {
+                              ctrlKey: e.ctrlKey,
+                              shiftKey: e.shiftKey,
+                              metaKey: e.metaKey,
+                            });
+                          }}
+                          className={(() => {
+                            const day = parseInt(cell.column.id.split("-")[1]);
+                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
+                            const transactionId = transactionMap.get(transactionKey) || null;
+                            
+                            // LGI TASK 5: Verifică dacă celula este highlighted (în editare în modal)
+                            const isHighlighted = highlightedCell && 
+                              highlightedCell.category === original.category &&
+                              highlightedCell.subcategory === original.subcategory &&
+                              highlightedCell.day === day;
+
+                            // Verifică focus și selection pentru keyboard navigation
+                            const cellPosition: CellPosition = {
+                              category: original.category,
+                              subcategory: original.subcategory,
+                              day,
+                              rowIndex: Math.max(0, table.getRowModel().rows.findIndex(row => 
+                                row.original.category === original.category && 
+                                row.original.subcategory === original.subcategory
+                              )),
+                              colIndex: day - 1,
+                            };
+                            const isFocused = isPositionFocused(cellPosition);
+                            const isSelected = isPositionSelected(cellPosition);
+
+                            return cn(
+                              gridTransactionCell({
+                                state: transactionId ? "existing" : "new"
+                              }),
+                              // LGI TASK 5: Highlight pentru celula în editare în modal
+                              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200",
+                              // Keyboard navigation focus și selection styles
+                              isFocused && "ring-2 ring-purple-500 ring-opacity-50 bg-purple-50",
+                              isSelected && "bg-blue-100 border-blue-300",
+                              (isFocused || isSelected) && "transition-all duration-150"
+                            );
+                          })()}
+                          placeholder={(() => {
+                            const day = parseInt(cell.column.id.split("-")[1]);
+                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
+                            const transactionId = transactionMap.get(transactionKey) || null;
+                            return transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION;
+                          })()}
+                        />
                       </div>
                     ) : (
                       // 🎨 Default Professional Cell
