@@ -51,13 +51,16 @@ const usePersistentExpandedRows = (year: number, month: number) => {
     }
   });
 
-  const setExpandedRows = (newState: Record<string, boolean>) => {
-    setExpandedRowsState(newState);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(newState));
-    } catch (error) {
-      console.warn('Nu s-a putut salva starea expanded rows:', error);
-    }
+  const setExpandedRows = (newState: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
+    setExpandedRowsState(prev => {
+      const finalState = typeof newState === 'function' ? newState(prev) : newState;
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(finalState));
+      } catch (error) {
+        console.warn('Nu s-a putut salva starea expanded rows:', error);
+      }
+      return finalState;
+    });
   };
 
   return { expandedRows, setExpandedRows };
@@ -202,27 +205,9 @@ export const useLunarGridSubcategoryState = () => {
 
 // 🎯 TASK 13: Master Hook pentru toate LunarGrid state-urile
 export const useLunarGridState = (year: number, month: number) => {
-  // Editing states
-  const [popover, setPopover] = useState<PopoverState>({
-    isOpen: false,
-    category: "",
-    subcategory: undefined,
-    day: 1,
-    amount: "",
-    type: "income",
-    element: null,
-  });
-
-  const [modalState, setModalState] = useState<ModalState>({
-    isOpen: false,
-    mode: 'add',
-    category: "",
-    subcategory: undefined,
-    day: 1,
-    year,
-    month,
-  });
-
+  // Editing states (folosesc null pentru compatibilitate cu LunarGridTanStack)
+  const [popover, setPopover] = useState<PopoverState | null>(null);
+  const [modalState, setModalState] = useState<ModalState | null>(null);
   const [highlightedCell, setHighlightedCell] = useState<HighlightedCell | null>(null);
 
   // Subcategory states
@@ -233,24 +218,8 @@ export const useLunarGridState = (year: number, month: number) => {
 
   // Helper functions pentru editing
   const clearAllEditing = () => {
-    setPopover({
-      isOpen: false,
-      category: "",
-      subcategory: undefined,
-      day: 1,
-      amount: "",
-      type: "income",
-      element: null,
-    });
-    setModalState({
-      isOpen: false,
-      mode: 'add',
-      category: "",
-      subcategory: undefined,
-      day: 1,
-      year,
-      month,
-    });
+    setPopover(null);
+    setModalState(null);
     setHighlightedCell(null);
   };
 
