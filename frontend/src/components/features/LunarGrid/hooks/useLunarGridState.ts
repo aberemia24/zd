@@ -1,5 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
-import { TransactionType } from '@shared-constants';
+import { useState, useCallback } from 'react';
+import { usePersistentExpandedRows } from '../../../../utils/lunarGrid/lunarGridHelpers';
+import { TransactionType } from "@shared-constants";
 
 // Interfațe pentru state management
 interface PopoverState {
@@ -8,7 +9,7 @@ interface PopoverState {
   subcategory: string | undefined;
   day: number;
   amount: string;
-  type: string;
+  type: TransactionType;
   element: HTMLElement | null;
   anchorEl?: HTMLElement;
 }
@@ -38,33 +39,6 @@ interface SubcategoryAction {
   category: string;
   subcategory: string;
 }
-
-const usePersistentExpandedRows = (year: number, month: number) => {
-  const storageKey = `lunar-grid-expanded-${year}-${month}`;
-  
-  const [expandedRows, setExpandedRowsState] = useState<Record<string, boolean>>(() => {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
-
-  const setExpandedRows = (newState: Record<string, boolean> | ((prev: Record<string, boolean>) => Record<string, boolean>)) => {
-    setExpandedRowsState(prev => {
-      const finalState = typeof newState === 'function' ? newState(prev) : newState;
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(finalState));
-      } catch (error) {
-        console.warn('Nu s-a putut salva starea expanded rows:', error);
-      }
-      return finalState;
-    });
-  };
-
-  return { expandedRows, setExpandedRows };
-};
 
 /**
  * Hook custom pentru gestionarea state-urilor de editing în LunarGrid
@@ -214,7 +188,7 @@ export const useLunarGridState = (year: number, month: number) => {
   const subcategory = useLunarGridSubcategoryState();
 
   // Expanded rows state
-  const { expandedRows, setExpandedRows } = usePersistentExpandedRows(year, month);
+  const [expandedRows, setExpandedRows] = usePersistentExpandedRows(year, month);
 
   // Helper functions pentru editing
   const clearAllEditing = () => {

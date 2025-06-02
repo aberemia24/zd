@@ -1,8 +1,7 @@
-import React, { useCallback, useMemo, CSSProperties, memo, useEffect } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, ChevronRight } from "lucide-react";
 
 // Constants și shared (@shared-constants)
 import { 
@@ -10,22 +9,16 @@ import {
   FrequencyType, 
   LUNAR_GRID_MESSAGES, 
   MESAJE, 
-  FLAGS, 
-  PLACEHOLDERS, 
   UI, 
-  BUTTONS, 
   LUNAR_GRID 
 } from "@shared-constants";
 import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
 
 // Componente UI și features
-import Button from "../../primitives/Button/Button";
-import CellTransactionPopover from "./CellTransactionPopover";
-import { EditableCell } from "./inline-editing/EditableCell";
-import { QuickAddModal } from "./modals/QuickAddModal";
-import LunarGridAddSubcategoryRow from "./components/LunarGridAddSubcategoryRow";
-import LunarGridSubcategoryRowCell from "./components/LunarGridSubcategoryRowCell";
-import LunarGridCell from "./components/LunarGridCell";
+import LunarGridRow from "./components/LunarGridRow";
+import LunarGridToolbar from "./components/LunarGridToolbar";
+import LunarGridModals from "./components/LunarGridModals";
+import DeleteSubcategoryModal from "./components/DeleteSubcategoryModal";
 
 // Hooks specializate
 import {
@@ -38,9 +31,7 @@ import { useMonthlyTransactions } from '../../../services/hooks/useMonthlyTransa
 import {
   useCreateTransactionMonthly,
   useUpdateTransactionMonthly,
-  useDeleteTransactionMonthly,
-  type CreateTransactionHookPayload,
-  type UpdateTransactionHookPayload
+  useDeleteTransactionMonthly
 } from '../../../services/hooks/transactionMutations';
 
 // Store-uri
@@ -56,25 +47,12 @@ import {
   gridTable,
   gridHeader,
   gridHeaderCell,
-  gridCategoryRow,
-  gridSubcategoryRow,
   gridTotalRow,
   gridCell,
-  gridExpandIcon,
-  gridCellActions,
-  gridActionButton,
-  gridBadge,
-  gridInput,
   gridMessage,
-  gridInteractive,
-  gridValueState,
-  gridTransactionCell,
-  gridSubcategoryState,
 } from "../../../styles/cva/grid";
 import {
   flex,
-  modal,
-  modalContent,
 } from "../../../styles/cva/components/layout";
 
 // Interfețe TypeScript
@@ -99,7 +77,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Hook pentru CategoryStore pentru adăugarea subcategoriilor
     const { categories, saveCategories } = useCategoryStore();
 
-    // TASK 13.2: Hook consolidat pentru toate LunarGrid state-urile
+    // Hook consolidat pentru toate LunarGrid state-urile
     const {
       // Editing states
       popover,
@@ -108,18 +86,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       setModalState,
       highlightedCell,
       setHighlightedCell,
-      clearAllEditing,
-      
       // Subcategory states (din useLunarGridSubcategoryState)
       addingSubcategory,
       setAddingSubcategory,
       newSubcategoryName,
       setNewSubcategoryName,
       subcategoryAction,
-      setSubcategoryAction,
       editingSubcategoryName,
       setEditingSubcategoryName,
-      startAddingSubcategory,
       cancelAddingSubcategory,
       startEditingSubcategory,
       startDeletingSubcategory,
@@ -128,9 +102,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       // Expanded rows state
       expandedRows,
       setExpandedRows,
-      
-      // Global clear
-      clearAllState,
     } = useLunarGridState(year, month);
 
     // Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
@@ -141,7 +112,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       staleTime: 5 * 60 * 1000, // 5 minute cache pentru a evita refresh-uri inutile
     });
 
-    // FAZA 1: Hooks pentru mutații de tranzacții cu cache optimization  
+    // Hooks pentru mutații de tranzacții cu cache optimization  
     const createTransactionMutation = useCreateTransactionMonthly(year, month, user?.id);
     const updateTransactionMutation = useUpdateTransactionMonthly(year, month, user?.id);
     const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
@@ -174,7 +145,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           throw new Error("Valoare invalidă");
         }
 
-        const date = new Date(year, month - 1, day);
         const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
 
         if (transactionId) {
@@ -240,7 +210,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           anchorEl,
         });
       },
-      [determineTransactionType],
+      [determineTransactionType, setPopover],
     );
 
     // Handler pentru salvarea tranzacției din popover
@@ -282,10 +252,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           },
         });
       },
-      [popover, year, month, createTransactionMutation],
+      [popover, year, month, createTransactionMutation, setPopover],
     );
 
-    // LGI TASK 5: Handler pentru single click modal
+    // Handler pentru single click modal
     const handleSingleClickModal = useCallback(
       (
         category: string,
@@ -356,7 +326,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           day,
         });
       },
-      [year, month],
+      [year, month, setModalState, setHighlightedCell],
     );
 
     // LGI TASK 5: Handler pentru salvarea din modal
@@ -407,16 +377,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         setModalState(null);
         setHighlightedCell(null);
       },
-      [modalState, year, month, updateTransactionMutation, createTransactionMutation],
+      [modalState, year, month, updateTransactionMutation, createTransactionMutation, setModalState, setHighlightedCell],
     );
 
-    // LGI TASK 5: Handler pentru închiderea modal-ului
+    // Handler pentru închiderea modal-ului
     const handleCloseModal = useCallback(() => {
       setModalState(null);
       setHighlightedCell(null);
-    }, []);
+    }, [setModalState, setHighlightedCell]);
 
-    // LGI TASK 5: Handler pentru delete transaction din modal
+    // Handler pentru delete transaction din modal
     const handleDeleteFromModal = useCallback(
       async () => {
         if (!modalState || !modalState.transactionId) return;
@@ -431,7 +401,64 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error("Eroare la ștergerea tranzacției. Încercați din nou.");
         }
       },
-      [modalState, deleteTransactionMutation],
+      [modalState, deleteTransactionMutation, setModalState, setHighlightedCell],
+    );
+
+    // Handler pentru ștergerea unei subcategorii custom
+    const handleDeleteSubcategory = useCallback(
+      async (categoryName: string, subcategoryName: string) => {
+        if (!user?.id) {
+          return;
+        }
+
+        try {
+          // Găsește categoria în store
+          const category = categories.find(cat => cat.name === categoryName);
+          if (!category) {
+            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
+            return;
+          }
+
+          // Găsește subcategoria și verifică că este custom
+          const subcategoryToDelete = category.subcategories.find(sub => sub.name === subcategoryName);
+          if (!subcategoryToDelete) {
+            toast.error("Subcategoria nu a fost găsită");
+            return;
+          }
+
+          if (!subcategoryToDelete.isCustom) {
+            toast.error("Nu se pot șterge subcategoriile predefinite");
+            return;
+          }
+
+          // Creează categoria actualizată cu subcategoria eliminată
+          const updatedCategories = categories.map(cat => {
+            if (cat.name === categoryName) {
+              return {
+                ...cat,
+                subcategories: cat.subcategories.filter(sub => sub.name !== subcategoryName)
+              };
+            }
+            return cat;
+          });
+
+          // Salvează în CategoryStore
+          await saveCategories(user.id, updatedCategories);
+          
+          // 🔄 FORCE INVALIDATION: Invalidează cache-ul React Query pentru a forța re-fetch
+          queryClient.invalidateQueries({
+            queryKey: ["transactions", year, month, user.id],
+          });
+          
+          // Reset state
+          clearSubcategoryAction();
+          
+          toast.success(MESAJE.CATEGORII.SUCCES_STERGERE_SUBCATEGORIE);
+        } catch (error) {
+          toast.error(MESAJE.CATEGORII.EROARE_STERGERE_SUBCATEGORIE);
+        }
+      },
+      [user?.id, categories, saveCategories, queryClient, year, month, clearSubcategoryAction],
     );
 
     // Handler pentru adăugarea unei subcategorii noi
@@ -504,7 +531,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error(MESAJE.CATEGORII.EROARE_ADAUGARE_SUBCATEGORIE);
         }
       },
-      [user?.id, newSubcategoryName, categories, saveCategories, queryClient, year, month],
+      [user?.id, newSubcategoryName, categories, saveCategories, queryClient, year, month, setAddingSubcategory, setNewSubcategoryName],
     );
 
     // Handler pentru rename subcategorie custom
@@ -554,82 +581,32 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error(MESAJE.CATEGORII.EROARE_REDENUMIRE);
         }
       },
-      [user?.id, categories, saveCategories],
+      [user?.id, categories, saveCategories, clearSubcategoryAction],
     );
 
-    // Handler pentru delete subcategorie custom
-    const handleDeleteSubcategory = useCallback(
-      async (categoryName: string, subcategoryName: string) => {
-        if (!user?.id) {
-          return;
-        }
+    // Interogare tabel optimizată (fără handleri de click/double-click)
+    const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
+      useLunarGridTable(year, month, expandedRows, handleCellClick);
 
-        try {
-          // Găsește categoria în store
-          const category = categories.find(cat => cat.name === categoryName);
-          if (!category) {
-            toast.error(MESAJE.CATEGORII.CATEGORIA_NEGASITA);
-            return;
-          }
+    // Prepare data pentru keyboard navigation
+    const navigationRows = useMemo(() => {
+      return table.getRowModel().rows.map(row => ({
+        category: row.original.category,
+        subcategory: row.original.subcategory,
+        isExpanded: row.getIsExpanded(),
+      }));
+    }, [table]);
 
-          // Verifică dacă subcategoria este custom
-          const subcategory = category.subcategories.find(sub => sub.name === subcategoryName);
-          if (!subcategory?.isCustom) {
-            toast.error(MESAJE.CATEGORII.DOAR_CUSTOM_STERGERE);
-            return;
-          }
-
-          // Găsește toate tranzacțiile asociate cu această subcategorie
-          const associatedTransactions = validTransactions.filter(t => 
-            t.category === categoryName && t.subcategory === subcategoryName
-          );
-
-          // Șterge toate tranzacțiile asociate din baza de date
-          if (associatedTransactions.length > 0) {
-            for (const transaction of associatedTransactions) {
-              await deleteTransactionMutation.mutateAsync(transaction.id);
-            }
-          }
-
-          // Creează categoria actualizată fără subcategoria ștearsă
-          const updatedCategories = categories.map(cat => {
-            if (cat.name === categoryName) {
-              return {
-                ...cat,
-                subcategories: cat.subcategories.filter(sub => sub.name !== subcategoryName)
-              };
-            }
-            return cat;
-          });
-
-          // Salvează în CategoryStore
-          await saveCategories(user.id, updatedCategories);
-          
-          // Reset state
-          clearSubcategoryAction();
-          
-          const transactionCount = associatedTransactions?.length || 0;
-          const transactionText = transactionCount === 0 
-            ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
-            : transactionCount === 1 
-              ? "1 tranzacție"
-              : `${transactionCount} tranzacții`;
-
-          if (associatedTransactions.length > 0) {
-            toast.success(`Subcategoria și ${associatedTransactions.length} tranzacții asociate au fost șterse definitiv`);
-          } else {
-            toast.success(MESAJE.CATEGORII.SUCCES_STERGERE_SUBCATEGORIE);
-          }
-        } catch (error) {
-          toast.error(MESAJE.CATEGORII.EROARE_STERGERE_SUBCATEGORIE);
-        }
-      },
-      [user?.id, categories, saveCategories, validTransactions, deleteTransactionMutation],
-    );
-
-    // Handler pentru delete request din keyboard shortcuts
-    const handleKeyboardDeleteRequest = useCallback(
-      async (positions: CellPosition[]) => {
+    // Keyboard navigation hook cu delete support
+    const {
+      handleCellClick: navHandleCellClick,
+      isPositionSelected,
+      isPositionFocused,
+    } = useKeyboardNavigation({
+      totalDays: days.length,
+      rows: navigationRows,
+      isActive: !modalState?.isOpen && !popover?.isOpen, // Dezactivează navigation când modal/popover e deschis
+      onDeleteRequest: async (positions: CellPosition[]) => {
         if (!user?.id || positions.length === 0) return;
 
         try {
@@ -684,36 +661,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error(LUNAR_GRID_ACTIONS.DELETE_ERROR);
         }
       },
-      [user?.id, validTransactions, deleteTransactionMutation],
-    );
-
-    // Interogare tabel optimizată (fără handleri de click/double-click)
-    const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
-      useLunarGridTable(year, month, expandedRows, handleCellClick);
-
-    // Prepare data pentru keyboard navigation
-    const navigationRows = useMemo(() => {
-      return table.getRowModel().rows.map(row => ({
-        category: row.original.category,
-        subcategory: row.original.subcategory,
-        isExpanded: row.getIsExpanded(),
-      }));
-    }, [table]);
-
-    // Keyboard navigation hook cu delete support
-    const {
-      focusedPosition,
-      selectedPositions,
-      handleCellClick: navHandleCellClick,
-      handleCellDoubleClick: navHandleCellDoubleClick,
-      isPositionSelected,
-      isPositionFocused,
-      clearSelection,
-    } = useKeyboardNavigation({
-      totalDays: days.length,
-      rows: navigationRows,
-      isActive: !modalState?.isOpen && !popover?.isOpen, // Dezactivează navigation când modal/popover e deschis
-      onDeleteRequest: handleKeyboardDeleteRequest, // Conectează delete handler
       onEditMode: (position) => {
         // Trigger inline edit mode pentru poziția selectată
         // Găsește celula și trigger edit mode similar cu double click
@@ -727,443 +674,69 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       },
     });
 
-    // Render pentru celula editabilă folosind EditableCell component
-    const renderEditableCell = useCallback(
-      (
-        category: string,
-        subcategory: string | undefined,
-        day: number,
-        currentValue: string | number,
-      ) => {
-        const cellId = `${category}-${subcategory || "null"}-${day}`;
-        
-        // Identifică transactionId pentru diferențierea CREATE vs UPDATE
-        const transactionKey = `${category}-${subcategory || ''}-${day}`;
-        const transactionId = transactionMap.get(transactionKey) || null;
-
-        // LGI TASK 5: Verifică dacă celula este highlighted (în editare în modal)
-        const isHighlighted = highlightedCell && 
-          highlightedCell.category === category &&
-          highlightedCell.subcategory === subcategory &&
-          highlightedCell.day === day;
-
-        // Verifică focus și selection pentru keyboard navigation
-        // Calculează rowIndex corect din structure tabel
-        const tableRows = table.getRowModel().rows;
-        const rowIndex = tableRows.findIndex(row => 
-          row.original.category === category && 
-          row.original.subcategory === subcategory
-        );
-        
-        const cellPosition: CellPosition = {
-          category,
-          subcategory,
-          day,
-          rowIndex: Math.max(0, rowIndex), // Fallback la 0 dacă nu găsește
-          colIndex: day - 1,
-        };
-        const isFocused = isPositionFocused(cellPosition);
-        const isSelected = isPositionSelected(cellPosition);
-
-        // Parseaza valoarea existentă corect pentru display
-        let displayValue = "";
-        if (currentValue && currentValue !== "-" && currentValue !== "—") {
-          if (typeof currentValue === "string") {
-            // Elimină formatarea pentru editing
-            displayValue = currentValue
-              .replace(/[^\d,.-]/g, "")
-              .replace(/\./g, "")
-              .replace(",", ".");
-          } else {
-            displayValue = String(currentValue);
-          }
-        }
-
-        return (
-          <EditableCell
-            cellId={cellId}
-            value={displayValue}
-            onSave={async (value) => {
-              try {
-                // Transmite transactionId la handleEditableCellSave
-                await handleEditableCellSave(category, subcategory, day, value, transactionId);
-              } catch (error) {
-                throw error; // Re-throw pentru EditableCell să gestioneze eroarea
-              }
-            }}
-            onSingleClick={(e) => {
-              // LGI TASK 5: Single click deschide modal-ul
-              e.preventDefault();
-              e.stopPropagation();
-              const targetElement = e.currentTarget as HTMLElement;
-              handleSingleClickModal(category, subcategory, day, displayValue, transactionId, targetElement);
-              
-              // Update navigation focus
-              navHandleCellClick(cellPosition, {
-                ctrlKey: e.ctrlKey,
-                shiftKey: e.shiftKey,
-                metaKey: e.metaKey,
-              });
-            }}
-            validationType="amount"
-            className={cn(
-              gridTransactionCell({
-                state: transactionId ? "existing" : "new"
-              }),
-              // LGI TASK 5: Highlight pentru celula în editare în modal
-              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200",
-              // Keyboard navigation focus și selection styles
-              isFocused && "ring-2 ring-purple-500 ring-opacity-50 bg-purple-50",
-              isSelected && "bg-blue-100 border-blue-300",
-              (isFocused || isSelected) && "transition-all duration-150"
-            )}
-            data-testid={`editable-cell-${cellId}`}
-            placeholder={transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION}
-          />
-        );
-      },
-      [handleEditableCellSave, transactionMap, handleSingleClickModal, navHandleCellClick],
-    );
-
     // Gestionarea poziției popover-ului
     const popoverStyle = calculatePopoverStyle(popover);
 
-    // Funcție helper pentru randarea recursivă a rândurilor
+    // Simplified render pentru row folosind LunarGridRow component  
     const renderRow = useCallback(
-      (
-        row: Row<TransformedTableDataRow>,
-        level: number = 0,
-      ): React.ReactNode => {
-        const { original } = row;
-        const isCategory = original.isCategory;
-        const isSubcategory = !isCategory && original.subcategory;
-
-        // Verifică câte subcategorii CUSTOM are categoria (nu toate subcategoriile)
-        const categoryData = categories.find(cat => cat.name === original.category);
-        const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom)?.length || 0;
-        const canAddSubcategory = isCategory && row.getIsExpanded() && customSubcategoriesCount < 5;
-
+      (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
         return (
-          <React.Fragment key={row.id}>
-            {/* 🎨 Professional Row Styling cu enhanced visual hierarchy */}
-            <tr
-              className={cn(
-                isCategory 
-                  ? gridCategoryRow({ 
-                      variant: "professional",
-                      state: row.getIsExpanded() ? "selected" : undefined
-                    })
-                  : gridSubcategoryRow({ 
-                      variant: (() => {
-                        const categoryData = categories.find(cat => cat.name === original.category);
-                        const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
-                        return subcategoryData?.isCustom ? "custom" : "professional";
-                      })()
-                    }),
-                "interactive animate-fade-in-up group",
-                row.getIsExpanded() && "border-b border-gray-200/60"
-              )}
-            >
-              {row.getVisibleCells().map((cell, cellIdx) => {
-                const isFirstCell = cellIdx === 0;
-                const isDayCell = cell.column.id.startsWith("day-");
-                const isTotalCell = cell.column.id === "total";
-
-                // 🎨 Determine professional cell type și state
-                const cellType = isCategory && isFirstCell ? "category" :
-                               !isCategory && isFirstCell ? "subcategory" :
-                               isDayCell ? "value" :
-                               isTotalCell ? "total" :
-                               "value";
-
-                // 🎨 Professional cell state detection cu enhanced color psychology
-                const cellValue = cell.getValue() as string | number;
-                const cellState = isDayCell && cellValue && cellValue !== "-" && cellValue !== "—" 
-                  ? (typeof cellValue === 'number' && cellValue > 0) || 
-                    (typeof cellValue === 'string' && parseFloat(cellValue.replace(/[^\d,.-]/g, '').replace(',', '.')) > 0)
-                    ? "positive" 
-                    : "negative"
-                  : undefined;
-
-                // 🎨 Phase 4: Enhanced styling classes pentru visual hierarchy
-                const valueClasses = isDayCell && cellValue && cellValue !== "-" && cellValue !== "—" 
-                  ? (typeof cellValue === 'number' && cellValue > 0) || 
-                    (typeof cellValue === 'string' && parseFloat(cellValue.replace(/[^\d,.-]/g, '').replace(',', '.')) > 0)
-                    ? "value-positive font-financial" 
-                    : "value-negative font-financial"
-                  : "";
-
-                return (
-                  <td
-                    key={cell.id}
-                    className={cn(
-                      gridCell({
-                        type: cellType,
-                        state: cellState,
-                        size: "default"
-                      }),
-                      "text-professional",
-                      isFirstCell && level > 0 && "pl-8",
-                      isDayCell && "hover-scale focus-ring",
-                      isTotalCell && "font-semibold tabular-nums",
-                      valueClasses
-                    )}
-                    title={
-                      isCategory && isDayCell
-                        ? UI.LUNAR_GRID_TOOLTIPS.CALCULATED_SUM
-                        : undefined
-                    }
-                  >
-                    {isFirstCell && isCategory ? (
-                      // 🎨 Professional Category Cell cu enhanced interactions
-                      <div 
-                        className={cn(
-                          gridCellActions({ variant: "always", position: "left" }),
-                          "cursor-pointer interactive rounded-md p-2",
-                          "hover:bg-gray-50/80 active:scale-98"
-                        )}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          row.toggleExpanded();
-                          setExpandedRows(prev => ({
-                            ...prev,
-                            [row.id]: !row.getIsExpanded()
-                          }));
-                        }}
-                        title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
-                        data-testid={`toggle-category-${original.category}`}
-                      >
-                        <div className={flex({ align: "center", gap: "sm" })}>
-                          <div className={cn(
-                            gridExpandIcon({
-                              variant: "professional",
-                              state: row.getIsExpanded() ? "expanded" : "collapsed"
-                            })
-                          )}>
-                            <ChevronRight size={16} />
-                          </div>
-                          <span className="text-gray-800 font-medium">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext()) as React.ReactNode}
-                          </span>
-                        </div>
-                      </div>
-                    ) : isFirstCell && isSubcategory ? (
-                      // 🎨 Professional Subcategory Cell cu enhanced badge și actions
-                      <LunarGridSubcategoryRowCell
-                        category={original.category}
-                        subcategory={original.subcategory!}
-                        isCustom={(() => {
-                          const categoryData = categories.find(cat => cat.name === original.category);
-                          const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
-                          return subcategoryData?.isCustom || false;
-                        })()}
-                        isEditing={
-                          subcategoryAction?.type === 'edit' && 
-                          subcategoryAction.category === original.category && 
-                          subcategoryAction.subcategory === original.subcategory
-                        }
-                        editingValue={editingSubcategoryName}
-                        onEditingValueChange={setEditingSubcategoryName}
-                        onSaveEdit={() => handleRenameSubcategory(original.category, original.subcategory!, editingSubcategoryName)}
-                        onCancelEdit={() => {
-                          clearSubcategoryAction();
-                        }}
-                        onStartEdit={() => {
-                          startEditingSubcategory(original.category, original.subcategory!);
-                        }}
-                        onStartDelete={() => {
-                          startDeletingSubcategory(original.category, original.subcategory!);
-                        }}
-                      />
-                    ) : isDayCell && isSubcategory ? (
-                      // 🎨 Professional Editable Cell
-                      <div className="interactive focus-ring">
-                        <LunarGridCell
-                          cellId={`${original.category}-${original.subcategory || "null"}-${parseInt(cell.column.id.split("-")[1])}`}
-                          value={(() => {
-                            const currentValue = cell.getValue() as string | number;
-                            let displayValue = "";
-                            if (currentValue && currentValue !== "-" && currentValue !== "—") {
-                              if (typeof currentValue === "string") {
-                                // Elimină formatarea pentru editing
-                                displayValue = currentValue
-                                  .replace(/[^\d,.-]/g, "")
-                                  .replace(/\./g, "")
-                                  .replace(",", ".");
-                              } else {
-                                displayValue = String(currentValue);
-                              }
-                            }
-                            return displayValue;
-                          })()}
-                          onSave={async (value) => {
-                            const day = parseInt(cell.column.id.split("-")[1]);
-                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                            const transactionId = transactionMap.get(transactionKey) || null;
-                            await handleEditableCellSave(original.category, original.subcategory, day, value, transactionId);
-                          }}
-                          onSingleClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const day = parseInt(cell.column.id.split("-")[1]);
-                            const currentValue = cell.getValue() as string | number;
-                            let displayValue = "";
-                            if (currentValue && currentValue !== "-" && currentValue !== "—") {
-                              if (typeof currentValue === "string") {
-                                displayValue = currentValue
-                                  .replace(/[^\d,.-]/g, "")
-                                  .replace(/\./g, "")
-                                  .replace(",", ".");
-                              } else {
-                                displayValue = String(currentValue);
-                              }
-                            }
-                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                            const transactionId = transactionMap.get(transactionKey) || null;
-                            const targetElement = e.currentTarget as HTMLElement;
-                            handleSingleClickModal(original.category, original.subcategory, day, displayValue, transactionId, targetElement);
-                            
-                            // Update navigation focus
-                            const cellPosition: CellPosition = {
-                              category: original.category,
-                              subcategory: original.subcategory,
-                              day,
-                              rowIndex: Math.max(0, table.getRowModel().rows.findIndex(row => 
-                                row.original.category === original.category && 
-                                row.original.subcategory === original.subcategory
-                              )),
-                              colIndex: day - 1,
-                            };
-                            navHandleCellClick(cellPosition, {
-                              ctrlKey: e.ctrlKey,
-                              shiftKey: e.shiftKey,
-                              metaKey: e.metaKey,
-                            });
-                          }}
-                          className={(() => {
-                            const day = parseInt(cell.column.id.split("-")[1]);
-                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                            const transactionId = transactionMap.get(transactionKey) || null;
-                            
-                            // LGI TASK 5: Verifică dacă celula este highlighted (în editare în modal)
-                            const isHighlighted = highlightedCell && 
-                              highlightedCell.category === original.category &&
-                              highlightedCell.subcategory === original.subcategory &&
-                              highlightedCell.day === day;
-
-                            // Verifică focus și selection pentru keyboard navigation
-                            const cellPosition: CellPosition = {
-                              category: original.category,
-                              subcategory: original.subcategory,
-                              day,
-                              rowIndex: Math.max(0, table.getRowModel().rows.findIndex(row => 
-                                row.original.category === original.category && 
-                                row.original.subcategory === original.subcategory
-                              )),
-                              colIndex: day - 1,
-                            };
-                            const isFocused = isPositionFocused(cellPosition);
-                            const isSelected = isPositionSelected(cellPosition);
-
-                            return cn(
-                              gridTransactionCell({
-                                state: transactionId ? "existing" : "new"
-                              }),
-                              // LGI TASK 5: Highlight pentru celula în editare în modal
-                              isHighlighted && "ring-2 ring-blue-500 ring-opacity-75 bg-blue-50 shadow-lg transform scale-105 transition-all duration-200",
-                              // Keyboard navigation focus și selection styles
-                              isFocused && "ring-2 ring-purple-500 ring-opacity-50 bg-purple-50",
-                              isSelected && "bg-blue-100 border-blue-300",
-                              (isFocused || isSelected) && "transition-all duration-150"
-                            );
-                          })()}
-                          placeholder={(() => {
-                            const day = parseInt(cell.column.id.split("-")[1]);
-                            const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                            const transactionId = transactionMap.get(transactionKey) || null;
-                            return transactionId ? PLACEHOLDERS.EDIT_TRANSACTION : PLACEHOLDERS.ADD_TRANSACTION;
-                          })()}
-                        />
-                      </div>
-                    ) : (
-                      // 🎨 Default Professional Cell
-                      <span className="text-professional">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        ) as React.ReactNode}
-                      </span>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-
-            {/* 🎨 Professional Expanded Rows */}
-            {row.getIsExpanded() &&
-              row.subRows &&
-              row.subRows.length > 0 &&
-              row.subRows.map((subRow) => renderRow(subRow, level + 1))}
-
-            {/* 🎨 Professional Add Subcategory Row */}
-            {canAddSubcategory && (
-              <LunarGridAddSubcategoryRow
-                category={original.category}
-                isAdding={addingSubcategory === original.category}
-                inputValue={newSubcategoryName}
-                totalColumns={table.getFlatHeaders().length}
-                onInputChange={setNewSubcategoryName}
-                onSave={() => handleAddSubcategory(original.category)}
-                onCancel={cancelAddingSubcategory}
-                onStartAdd={() => setAddingSubcategory(original.category)}
-              />
-            )}
-          </React.Fragment>
+          <LunarGridRow
+            key={row.id}
+            row={row}
+            level={level}
+            categories={categories}
+            expandedRows={expandedRows}
+            subcategoryAction={subcategoryAction}
+            editingSubcategoryName={editingSubcategoryName}
+            highlightedCell={highlightedCell}
+            addingSubcategory={addingSubcategory}
+            newSubcategoryName={newSubcategoryName}
+            table={table}
+            transactionMap={transactionMap}
+            onExpandToggle={(rowId, isExpanded) => {
+              setExpandedRows(prev => ({
+                ...prev,
+                [rowId]: isExpanded
+              }));
+            }}
+            onSubcategoryEdit={handleRenameSubcategory}
+            onSubcategoryDelete={(category, subcategory) => {
+              // Setează modalul pentru confirmare delete
+              startDeletingSubcategory(category, subcategory);
+            }}
+            onEditingValueChange={setEditingSubcategoryName}
+            onClearSubcategoryAction={clearSubcategoryAction}
+            onStartEditingSubcategory={startEditingSubcategory}
+            onStartDeletingSubcategory={startDeletingSubcategory}
+            onCellSave={handleEditableCellSave}
+            onSingleClickModal={handleSingleClickModal}
+            onCellClick={navHandleCellClick}
+            onAddSubcategory={handleAddSubcategory}
+            onCancelAddingSubcategory={cancelAddingSubcategory}
+            onSetAddingSubcategory={setAddingSubcategory}
+            onSetNewSubcategoryName={setNewSubcategoryName}
+            isPositionFocused={(position) => Boolean(isPositionFocused(position))}
+            isPositionSelected={(position) => Boolean(isPositionSelected(position))}
+          />
         );
       },
-      [renderEditableCell, categories, addingSubcategory, newSubcategoryName, handleAddSubcategory, table, subcategoryAction, editingSubcategoryName, handleRenameSubcategory, cancelAddingSubcategory],
+      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, handleRenameSubcategory, setEditingSubcategoryName, clearSubcategoryAction, startEditingSubcategory, startDeletingSubcategory, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected],
     );
 
     // Renderizare (layout principal)
     return (
       <>
-        <div className={cn(flex({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              const isCurrentlyExpanded = table.getIsAllRowsExpanded();
-              const newExpandedState: Record<string, boolean> = {};
-              
-              if (!isCurrentlyExpanded) {
-                // Expandează toate
-                table.getRowModel().rows.forEach(row => {
-                  if (row.getCanExpand()) {
-                    newExpandedState[row.id] = true;
-                  }
-                });
-              }
-              // Dacă se colapsează, lăsăm newExpandedState gol (toate false)
-              
-              setExpandedRows(newExpandedState);
-              table.toggleAllRowsExpanded(!isCurrentlyExpanded);
-            }}
-            dataTestId="toggle-expand-all"
-          >
-            {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setExpandedRows({});
-              table.resetExpanded();
-            }}
-            dataTestId="reset-expanded"
-          >
-            {LUNAR_GRID.RESET_EXPANSION}
-          </Button>
-        </div>
+        <LunarGridToolbar
+          table={table}
+          expandedRows={expandedRows}
+          setExpandedRows={setExpandedRows}
+          validTransactions={validTransactions}
+          onCleanOrphanTransactions={() => {
+            // TODO: Implementează curățarea tranzacțiilor orfane
+            console.log("Clean orphan transactions");
+          }}
+        />
 
         {/* Header principal global: Luna și anul în română - fix deasupra tabelului */}
         {!isLoading && !error && table.getRowModel().rows.length > 0 && (
@@ -1354,48 +927,31 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           )}
         </div>
         
-        {/* Popover pentru editare tranzacție */}
-        {popover && (
-          <div 
-            className={cn(
-              "fixed z-50 shadow-lg rounded-lg",
-              "animate-fadeIn transition-all duration-150"
-            )}
-            style={popoverStyle}
-            data-testid="transaction-popover"
-          >
-            <CellTransactionPopover
-              initialAmount={popover.amount || ""}
-              day={popover.day}
-              month={month}
-              year={year}
-              category={popover.category}
-              subcategory={popover.subcategory || ""}
-              type={popover.type}
-              onSave={handleSavePopover}
-              onCancel={() => setPopover(null)}
-            />
-          </div>
-        )}
+        {/* Toate modal-urile și popover-urile consolidate */}
+        <LunarGridModals
+          popover={popover}
+          popoverStyle={popoverStyle}
+          year={year}
+          month={month}
+          onSavePopover={handleSavePopover}
+          onCancelPopover={() => setPopover(null)}
+          modalState={modalState}
+          onSaveModal={handleSaveModal}
+          onCancelModal={handleCloseModal}
+          onDeleteFromModal={handleDeleteFromModal}
+        />
 
-        {/* LGI TASK 5: QuickAddModal pentru single click */}
-        {modalState && (
-          <QuickAddModal
-            cellContext={{
-              category: modalState.category,
-              subcategory: modalState.subcategory,
-              day: modalState.day,
-              month: modalState.month,
-              year: modalState.year,
-            }}
-            prefillAmount={modalState.existingValue ? String(modalState.existingValue) : ""}
-            mode={modalState.mode}
-            position={modalState.position}
-            onSave={handleSaveModal}
-            onCancel={handleCloseModal}
-            onDelete={modalState.mode === 'edit' ? handleDeleteFromModal : undefined}
-          />
-        )}
+        {/* DeleteSubcategoryModal pentru delete subcategory */}
+        <DeleteSubcategoryModal
+          subcategoryAction={subcategoryAction}
+          validTransactions={validTransactions}
+          onConfirm={() => {
+            if (subcategoryAction && subcategoryAction.type === 'delete') {
+              handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
+            }
+          }}
+          onCancel={clearSubcategoryAction}
+        />
       </>
     );
   },
