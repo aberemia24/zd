@@ -48,6 +48,8 @@ export const PLACEHOLDERS = {
   EDIT_TRANSACTION: 'Editează...',
   ADD_TRANSACTION: 'Adaugă...',
   SUBCATEGORY_NAME: 'Nume subcategorie...',
+  // 🚨 TASK 5.4 - Placeholder pentru amount field în QuickAddModal
+  AMOUNT_PLACEHOLDER: '0.00',
 };
 
 export const BUTTONS = {
@@ -154,9 +156,35 @@ export const EXCEL_GRID = {
     LEGACY_TABLE: 'Tabel clasic',
     VERSION: 'Versiune'
   },
+  // 🚨 TASK 5.4 - Constante noi pentru QuickAddModal
+  MODAL: {
+    // Labels pentru position mode
+    FREQUENCY_SHORT: 'Frecv.',
+    FINANCIAL_IMPACT_SHORT: 'Impact:',
+    FINANCIAL_IMPACT_FULL: 'Impact financiar:',
+    // Button text pentru position mode  
+    SAVE_SHORT: 'OK',
+    // Loading și status messages
+    SAVING_MESSAGE: 'Se salvează tranzacția...',
+    // ARIA labels pentru accessibility
+    CLOSE_MODAL_ARIA: 'Închide modalul',
+    // Confirmation dialog texte
+    DELETE_CONFIRMATION_TITLE: 'Confirmați ștergerea tranzacției',
+    DELETE_CONFIRMATION_MESSAGE: 'Sigur doriți să ștergeți această tranzacție? Acțiunea nu poate fi anulată.',
+    DELETE_CONFIRM_BUTTON: 'Șterge',
+    DELETE_CANCEL_BUTTON: 'Anulează'
+  },
+  // 🚨 TASK 5.4 - Error messages pentru modal operations
+  ERROR_MESSAGES: {
+    SAVE_TRANSACTION_GENERIC: 'Eroare la salvarea tranzacției. Încercați din nou.',
+    SAVE_TRANSACTION_PREFIX: 'Eroare la salvarea tranzacției: ',
+    DELETE_TRANSACTION_GENERIC: 'Eroare la ștergerea tranzacției. Încercați din nou.',
+    DELETE_TRANSACTION_PREFIX: 'Eroare la ștergerea tranzacției: '
+  },
   // Constante pentru inline editing system
   INLINE_EDITING: {
     EDIT_HINT: 'Apasă F2 pentru editare',
+    SAVING: 'Se salvează...',
     VALIDATION_ERRORS: {
       EMPTY_VALUE: 'Valoarea nu poate fi goală',
       INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',
