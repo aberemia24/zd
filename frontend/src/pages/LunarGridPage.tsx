@@ -287,7 +287,7 @@ const LunarGridPage: React.FC = () => {
       {/* 🎯 LGI-TASK-07: Fullscreen backdrop cu CVA professional styling */}
       {renderFullscreenBackdrop()}
       
-      <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-container">
+      <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-page-container">
         {/* 🎯 LGI-TASK-07: Fullscreen mode indicator - CVA Badge primitive */}
         {layoutMode === 'fullscreen' && (
           <Badge 
