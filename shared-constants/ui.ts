@@ -1,5 +1,67 @@
 import { TransactionType, CategoryType, FrequencyType } from './enums';
 
+// 🚀 PHASE 2.1 - Loading Message Templates System
+// Template-based system pentru toate mesajele de loading din aplicație
+export const LOADING_MESSAGES = {
+  GENERIC: 'Se încarcă...',
+  WITH_CONTEXT: (context: string) => `Se încarcă ${context}...`,
+  DATA: 'Se încarcă datele...',
+  MORE: 'Se încarcă mai multe...',
+  TRANSACTIONS: 'Se încarcă mai multe tranzacții...',
+  NAVIGATION: 'Navigare...',
+  SAVING: 'Se salvează...',
+  SAVING_TRANSACTION: 'Se salvează tranzacția...',
+  SPECIFIC: (item: string) => `Se încarcă ${item}...`,
+  DATE_CONTEXT: (month: string, year: string) => `Se încarcă datele pentru ${month} ${year}...`
+};
+
+// 🚀 PHASE 2.2 - Empty State Message Templates System  
+// Template-based system pentru toate mesajele de stare goală
+export const EMPTY_STATE_MESSAGES = {
+  NO_ITEMS: (entity: string) => `Nu există ${entity}`,
+  NO_DATA_FILTER: (filter: string) => `Nu există date pentru ${filter}`,
+  NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
+  NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
+  GENERIC: 'Nu există date disponibile',
+  NO_SELECTION: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
+  NO_FILTERS: 'Nu există filtre active',
+  EMPTY_TRANSACTION_LIST: 'Nicio tranzacție'
+};
+
+// 🚀 PHASE 2.3 - Design Tokens System
+// Consolidarea magic numbers și design constants
+export const DESIGN_TOKENS = {
+  SIZES: {
+    SPINNER: { 
+      SMALL: 16, 
+      MEDIUM: 32, 
+      LARGE: 48, 
+      XLARGE: 64 
+    },
+    BREAKPOINTS: {
+      SM: 640,
+      MD: 768, 
+      LG: 1024,
+      XL: 1280
+    },
+    SPACING: {
+      GRID_GAP: 16,
+      MODAL_PADDING: 24,
+      CARD_PADDING: 16
+    }
+  },
+  DATE_RANGES: {
+    MIN_YEAR: 2020,
+    MAX_YEAR: 2030,
+    DEFAULT_RANGE: 10
+  },
+  TRANSITIONS: {
+    DEFAULT: 'transition-all duration-200 ease-in-out',
+    FAST: 'transition-all duration-100 ease-in-out',
+    SLOW: 'transition-all duration-300 ease-in-out'
+  }
+};
+
 // Toate textele UI vizibile
 export const LABELS = {
   TYPE: 'Tip',
@@ -86,22 +148,22 @@ export const TABLE = {
     FREQUENCY: 'Frecvență',
     DESCRIPTION: 'Descriere',
   },
-  EMPTY: 'Nicio tranzacție',
-  LOADING: 'Se încarcă...',
-  LOADING_MORE: 'Se încarcă mai multe tranzacții...',
+  EMPTY: EMPTY_STATE_MESSAGES.EMPTY_TRANSACTION_LIST,
+  LOADING: LOADING_MESSAGES.GENERIC,
+  LOADING_MORE: LOADING_MESSAGES.TRANSACTIONS,
   PAGE_INFO: 'Pagina {current} din {total}',
   SHOWING_INFO: 'Se afișează {shown} din {total} tranzacții',
   BOOL: {
     YES: 'Da',
     NO: 'Nu',
   },
-  NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
-  NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
+  NO_TRANSACTIONS: EMPTY_STATE_MESSAGES.NO_TRANSACTIONS,
+  NO_SUBCATEGORIES: EMPTY_STATE_MESSAGES.NO_SUBCATEGORIES,
 };
 
 // Texte pentru componenta de încărcare (Loader)
 export const LOADER = {
-  TEXT: 'Se încarcă...'
+  TEXT: LOADING_MESSAGES.GENERIC
 };
 
 // Texte pentru componenta ExcelGrid
@@ -125,8 +187,8 @@ export const EXCEL_GRID = {
   },
   // Numărul de zile pentru fiecare lună (ianuarie = index 0)
   DAYS_IN_MONTH: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-  NO_DATA: 'Nu există date disponibile',
-  LOADING: 'Se încarcă datele...',
+  NO_DATA: EMPTY_STATE_MESSAGES.GENERIC,
+  LOADING: LOADING_MESSAGES.DATA,
   PROMPTS: {
     ENTER_AMOUNT: 'Introduceți suma:',
     SELECT_CATEGORY: 'Selectați o categorie',
@@ -145,8 +207,7 @@ export const EXCEL_GRID = {
     COLLAPSE_ALL: 'Restrânge toate categoriile',
     SAVE_CHANGES: 'Salvează modificările',
     CANCEL: 'Anulează',
-    CONFIRM: 'Confirmă',
-    CLOSE: 'Închide'
+    CONFIRM: 'Confirmă'
   },
   // Constante pentru controalele tabelului TanStack
   TABLE_CONTROLS: {
@@ -165,7 +226,7 @@ export const EXCEL_GRID = {
     // Button text pentru position mode  
     SAVE_SHORT: 'OK',
     // Loading și status messages
-    SAVING_MESSAGE: 'Se salvează tranzacția...',
+    SAVING_MESSAGE: LOADING_MESSAGES.SAVING_TRANSACTION,
     // ARIA labels pentru accessibility
     CLOSE_MODAL_ARIA: 'Închide modalul',
     // Confirmation dialog texte
@@ -184,7 +245,7 @@ export const EXCEL_GRID = {
   // Constante pentru inline editing system
   INLINE_EDITING: {
     EDIT_HINT: 'Apasă F2 pentru editare',
-    SAVING: 'Se salvează...',
+    SAVING: LOADING_MESSAGES.SAVING,
     VALIDATION_ERRORS: {
       EMPTY_VALUE: 'Valoarea nu poate fi goală',
       INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',
@@ -251,7 +312,7 @@ export const UI = {
     DELETE_BUTTON: 'Șterge',
     ADD_PLACEHOLDER: 'Adaugă subcategorie nouă',
     ADD_BUTTON: 'Adaugă',
-    NO_SELECTION: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
+    NO_SELECTION: EMPTY_STATE_MESSAGES.NO_SELECTION,
     DELETE_CONFIRMATION_TITLE: 'Confirmare ștergere',
     DELETE_CONFIRMATION_TEXT: 'Ești sigur că vrei să ștergi subcategoria {subcat} din {cat}?',
     DELETE_WARNING: 'Atenție: Există {count} tranzacții care folosesc această subcategorie.',
@@ -265,7 +326,7 @@ export const UI = {
     TITLE: 'Filtre',
     SHOW_ADVANCED: 'Filtre avansate',
     HIDE_ADVANCED: 'Ascunde filtre avansate',
-    NO_FILTERS: 'Nu există filtre active',
+    NO_FILTERS: EMPTY_STATE_MESSAGES.NO_FILTERS,
     DATE_RANGE: 'Interval date',
     AMOUNT_RANGE: 'Interval sume',
     TEXT_SEARCH: 'Căutare text',
@@ -286,8 +347,8 @@ export const UI = {
   // 🚨 AUDIT FIX - Texte pentru LunarGridPage
   LUNAR_GRID_PAGE: {
     FULLSCREEN_EXIT_HINT: 'Press ESC pentru a ieși din fullscreen',
-    NAVIGATION_LOADING: 'Navigare...',
-    LOADING_MESSAGE_TEMPLATE: 'Se încarcă datele pentru {month} {year}...',
+    NAVIGATION_LOADING: LOADING_MESSAGES.NAVIGATION,
+    LOADING_MESSAGE_TEMPLATE: LOADING_MESSAGES.DATE_CONTEXT,
     LAYOUT_MODES: {
       FULL_WIDTH: 'Lățime completă', 
       FULLSCREEN: 'Fullscreen',
@@ -317,9 +378,9 @@ export const FLAGS = {
 
 // Mesaj informativ pentru starea goală a editorului de categorii
 export const INFO = {
-  CATEGORY_EDITOR_EMPTY: 'Selectează o categorie pentru a vedea și edita subcategoriile.',
-  NO_TRANSACTIONS: 'Nu există tranzacții pentru criteriile selectate. Încercați să modificați filtrele sau adăugați o tranzacție nouă.',
-  NO_SUBCATEGORIES: 'Nu există tranzacții pentru această categorie',
+  CATEGORY_EDITOR_EMPTY: EMPTY_STATE_MESSAGES.NO_SELECTION,
+  NO_TRANSACTIONS: EMPTY_STATE_MESSAGES.NO_TRANSACTIONS,
+  NO_SUBCATEGORIES: EMPTY_STATE_MESSAGES.NO_SUBCATEGORIES,
 };
 
 // Constante pentru LunarGrid
@@ -327,9 +388,10 @@ export const LUNAR_GRID = {
   COLLAPSE_ALL: 'Restrânge tot',
   EXPAND_ALL: 'Extinde tot',
   RESET_EXPANSION: 'Resetează',
-  LOADING: 'Se încarcă datele...',
-  NO_DATA: 'Nu există date pentru perioada selectată',
-  TOTAL_BALANCE: 'Sold',
+  LOADING: LOADING_MESSAGES.DATA,
+  NO_DATA: EMPTY_STATE_MESSAGES.GENERIC,
+  // 🚨 DUPLICATE FIX - Folosesc BALANCE_LABELS.SOLD în loc de string hardcodat
+  get TOTAL_BALANCE() { return BALANCE_LABELS.SOLD; },
   // Constante pentru controale individuale
   EXPAND_CATEGORY: 'Extinde',
   COLLAPSE_CATEGORY: 'Restrânge',
@@ -397,9 +459,135 @@ export const LUNAR_GRID_ACTIONS = {
   DELETE_SUCCESS_MULTIPLE: '{count} tranzacții șterse cu succes',
   DELETE_ERROR: 'Eroare la ștergerea tranzacțiilor',
   NO_TRANSACTIONS_TO_DELETE: 'Nu există tranzacții de șters pentru pozițiile selectate',
-  KEYBOARD_SHORTCUTS: {
-    DELETE_HINT: 'Apasă Delete sau Backspace pentru a șterge tranzacția',
-    NAVIGATION_HINT: 'Folosește săgețile pentru navigare, Space pentru selecție',
-    MULTI_SELECT_HINT: 'Ține Ctrl pentru selecție multiplă, Shift pentru interval',
+};
+
+// 🆕 Account Management Constants - pentru sistem conturi multiple
+export const ACCOUNT_MANAGEMENT = {
+  MAX_ACCOUNTS: 10,
+  
+  // UI Labels
+  LABELS: {
+    ACCOUNT_NAME: 'Nume cont',
+    ACCOUNT_TYPE: 'Tip cont', 
+    INITIAL_BALANCE: 'Sold inițial',
+    CURRENT_BALANCE: 'Sold curent',
+    ACCOUNT_DESCRIPTION: 'Descriere cont',
+    DEFAULT_ACCOUNT: 'Cont principal',
+    ACTIVE_STATUS: 'Activ',
   },
+  
+  // Validation Messages
+  VALIDATION: {
+    NAME_REQUIRED: 'Numele contului este obligatoriu',
+    NAME_TOO_LONG: 'Numele contului nu poate depăși 50 de caractere',
+    TYPE_REQUIRED: 'Tipul contului este obligatoriu',
+    INITIAL_BALANCE_REQUIRED: 'Soldul inițial este obligatoriu',
+    INITIAL_BALANCE_INVALID: 'Soldul inițial trebuie să fie un număr valid',
+    MAX_ACCOUNTS_REACHED: `Nu puteți avea mai mult de ${10} conturi`,
+    DUPLICATE_NAME: 'Există deja un cont cu acest nume',
+    CANNOT_DELETE_LAST: 'Nu puteți șterge ultimul cont activ',
+    CANNOT_DELETE_WITH_TRANSACTIONS: 'Nu puteți șterge un cont care are tranzacții',
+  },
+  
+  // Action Messages  
+  ACTIONS: {
+    ADD_ACCOUNT: 'Adaugă cont nou',
+    EDIT_ACCOUNT: 'Editează cont',
+    DELETE_ACCOUNT: 'Șterge cont',
+    SET_DEFAULT: 'Setează ca principal',
+    ACTIVATE_ACCOUNT: 'Activează cont',
+    DEACTIVATE_ACCOUNT: 'Dezactivează cont',
+  },
+  
+  // Status Messages
+  STATUS: {
+    ACCOUNT_CREATED: 'Cont creat cu succes',
+    ACCOUNT_UPDATED: 'Cont actualizat cu succes', 
+    ACCOUNT_DELETED: 'Cont șters cu succes',
+    ACCOUNT_SET_DEFAULT: 'Cont setat ca principal',
+  },
+};
+
+// 🆕 Balance Display Constants - pentru afișarea soldului și calculări
+export const BALANCE_DISPLAY = {
+  // Formatting Rules
+  CURRENCY: 'RON',
+  DECIMAL_PLACES: 2,
+  THOUSAND_SEPARATOR: '.',
+  DECIMAL_SEPARATOR: ',',
+  
+  // Labels
+  LABELS: {
+    AVAILABLE_BALANCE: 'Sold disponibil',
+    SAVINGS_BALANCE: 'Sold economii', 
+    TOTAL_BALANCE: 'Sold total',
+    PROJECTED_BALANCE: 'Sold proiectat',
+    DAILY_BALANCE: 'Sold zilnic',
+    BALANCE_CHANGE: 'Schimbare sold',
+    BALANCE_TREND: 'Tendință sold',
+  },
+  
+  // Colors pentru Transaction Types (CSS classes pentru TailwindCSS)
+  COLORS: {
+    INCOME: 'text-green-600 bg-green-50 border-green-200',      // Verde pentru venituri
+    EXPENSE: 'text-red-600 bg-red-50 border-red-200',         // Roșu pentru cheltuieli  
+    SAVING: 'text-blue-600 bg-blue-50 border-blue-200',       // Albastru pentru economii/investiții
+    POSITIVE: 'text-green-600',                               // Pentru solduri pozitive
+    NEGATIVE: 'text-red-600',                                 // Pentru solduri negative
+    NEUTRAL: 'text-gray-600',                                 // Pentru solduri zero/neutrale
+  },
+  
+  // Grid Styles pentru balance rows
+  GRID_STYLES: {
+    BALANCE_ROW: 'font-semibold bg-gray-50',
+    BALANCE_CELL: 'text-right font-mono text-sm',
+    BALANCE_TOTAL: 'border-t-2 border-gray-300 font-bold',
+    BALANCE_PROJECTION: 'bg-blue-50 border-blue-200',
+  },
+  
+  // Status indicators 
+  STATUS: {
+    CALCULATED: 'Calculat automat',
+    MANUAL_OVERRIDE: 'Suprascris manual',
+    PROJECTED: 'Valoare proiectată', 
+    CONFIRMED: 'Confirmat',
+  },
+};
+
+// 🆕 Modal Variants pentru balance system
+export const BALANCE_MODALS = {
+  // Account Management Modals
+  ACCOUNT: {
+    CREATE_TITLE: 'Adaugă cont nou',
+    EDIT_TITLE: 'Editează cont',
+    DELETE_TITLE: 'Șterge cont',
+    TRANSFER_TITLE: 'Transfer între conturi',
+  },
+  
+  // Balance Adjustment Modals  
+  BALANCE: {
+    ADJUST_TITLE: 'Ajustează sold',
+    RECONCILE_TITLE: 'Reconciliere sold',
+    PROJECTION_TITLE: 'Proiecție sold',
+    HISTORY_TITLE: 'Istoric sold',
+  },
+  
+  // Confirmation Messages
+  CONFIRMATIONS: {
+    DELETE_ACCOUNT: 'Ștergeți contul și toate datele asociate?',
+    ADJUST_BALANCE: 'Confirmați ajustarea soldului?',
+    TRANSFER_FUNDS: 'Confirmați transferul de fonduri?',
+    RECONCILE: 'Confirmați reconcilierea soldului?',
+  },
+};
+
+// 🚨 DUPLICATE FIX - Consolidez SOLD related constants
+export const BALANCE_LABELS = {
+  SOLD: 'Sold',                    // ✅ Consolidat din LABELS.SOLD (linia 113)
+  TOTAL_BALANCE: 'Sold total',     // ✅ Înlocuiește LUNAR_GRID.TOTAL_BALANCE (linia 331)
+  DAILY_BALANCES: 'Balanțe zilnice', // ✅ Existent deja în UI
+  BALANCE: 'Balanță',
+  AVAILABLE: 'Disponibil',
+  SAVINGS: 'Economii',
+  INVESTMENTS: 'Investiții',
 };

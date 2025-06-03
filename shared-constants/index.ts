@@ -1,8 +1,15 @@
 // index barrel pentru shared-constants
-export { TransactionType, CategoryType, FrequencyType } from './enums';
+export { TransactionType, CategoryType, FrequencyType, AccountType, BalanceImpactType } from './enums';
 export * from './messages';
 export { MESAJE, LUNAR_GRID_MESSAGES, EXPORT_MESSAGES, URL_PERSISTENCE } from './messages';
-export { LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS, UI, FLAGS, INFO, LUNAR_GRID, TEST_CONSTANTS } from './ui';
+export { 
+  LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS, UI, FLAGS, INFO, LUNAR_GRID, TEST_CONSTANTS,
+  // 🆕 Balance System Constants 
+  ACCOUNT_MANAGEMENT, BALANCE_DISPLAY, BALANCE_MODALS, BALANCE_LABELS,
+  // 🚀 Phase 2 Template Systems
+  LOADING_MESSAGES, EMPTY_STATE_MESSAGES, DESIGN_TOKENS,
+  LUNAR_GRID_ACTIONS
+} from './ui';
 export * from './transaction.schema';
 export * from './defaults';
 export * from './enums';

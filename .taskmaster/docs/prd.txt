@@ -1,0 +1,256 @@
+# BUDGET APP - PRODUCT REQUIREMENTS DOCUMENT COMPLET
+
+## CONTEXT
+
+### Overview
+Budget App este o aplicație avansată de management financiar cu focus pe planificarea și tracking-ul cheltuielilor folosind un sistem de grid interactiv (LunarGrid) și un sistem complex de sold zilnic cu tratare specială pentru investiții și economisiri.
+
+### Problem Statement
+Utilizatorii au nevoie de o soluție comprehensivă pentru:
+- Tracking sold zilnic cu vizibilitate asupra activelor vs cheltuielilor consumate
+- Management categorii și subcategorii cu planificare detaliată
+- Sistem grid interactiv pentru introducerea și editarea tranzacțiilor
+- Separarea clară între cheltuieli pure, investiții și economisiri
+- Synchronizare perfectă între componente pentru consistență datelor
+
+### Value Proposition
+- Sistem de sold cumulativ zilnic cu alerting pentru sold negativ
+- LunarGrid profesional cu editing inline și modal enhancement
+- Arhitectură robustă CVA pentru consistency și profesionalism
+- Research-backed implementation pentru toate feature-urile
+
+## CORE FEATURES
+
+### 1. SISTEM SOLD ZILNIC ȘI INVESTIȚII
+
+#### 1.1 Calculator Sold Cumulativ
+- **Funcționalitate**: Sold Initial + Venituri - Cheltuieli Pure - Investiții - Economisiri = Sold Rămas
+- **Tratare Specială**: Investițiile și economisirile "ies" din cont dar rămân ca active
+- **Vizualizare**: Coloană sold zilnic în grid cu alerting pentru sold negativ
+- **Transfer Automat**: Sold final luna curentă → sold inițial luna următoare
+
+#### 1.2 Management Conturi Multiple  
+- **Interface**: Pe modelul CategoryEditor pentru add/edit/delete conturi
+- **Tipuri Cont**: Bancă, Cash, Investiții, Altele cu limite configurabile (max 10)
+- **Calcul Total**: Suma tuturor conturilor = sold inițial în grid
+- **Configurare**: Settings per grid cu data început și sold inițial
+
+#### 1.3 Sistem Categorii cu Culori
+- **Cheltuieli Pure**: Roșu (consumate definitiv)
+- **Investiții**: Albastru (active păstrate) - PĂSTRAT din implementarea existentă
+- **Economisiri**: Verde (bani păstrați)
+- **Venituri**: Verde
+- **Flexibilitate**: Opțiuni în Settings pentru incluadere/excludere în calculul soldului
+
+### 2. LUNARGRID ENHANCEMENT SYSTEM
+
+#### 2.1 Modal Edit Enhancement
+- **Arhitectură Existentă**: QuickAddModal.tsx complet funcțional cu toate props-urile
+- **Enhancement**: Keyboard shortcuts, accessibility improvements, position-based modal
+- **Integrare**: useBaseModalLogic hook cu validation completă
+- **CVA Styling**: transactionModalOverlay cu blur variants standardizate
+
+#### 2.2 Inline Editing Enhancement
+- **Funcționalitate**: EditableCell.tsx cu double-click activation EXISTĂ
+- **Enhancement**: Visual feedback îmbunătățit, keyboard navigation
+- **Constants**: INLINE_EDITING section completă în shared-constants
+- **Integration**: CVA cell editing styles în grid system
+
+#### 2.3 Sistem Redimensionare Tabel
+- **Pattern Existent**: LunarGridPage.tsx cu fullscreen mode și escape key handler
+- **Implementation**: useTableResize hook cu toggle fullscreen/normal
+- **CVA Extensions**: gridResizeContainer și gridResizeButton variants
+- **Icons**: Maximize2/Minimize2 cu conditional rendering
+
+#### 2.4 Data Validation și Operațiuni
+- **Subcategory Operations**: useSubcategoryOperations hook complet
+- **Validation**: Multiple validation hooks cu shared-constants/validation.ts
+- **Error Handling**: Standardized error messages și visual feedback
+- **Integration**: Form validation în modal și inline editing
+
+#### 2.5 Sistem Recurență Avansat
+- **Arhitectură Template-Based**: RecurringTransactions.ts cu interface completă
+- **Generator**: recurringTransactionGenerator.ts cu algoritmi complecși
+- **Features**: calculateNextOccurrence, conflict resolution, preview generation
+- **Limite**: 1-year limit implementation cu user confirmation flow
+
+#### 2.6 Synchronizare Perfect cu Transaction Table
+- **Data Flow**: React Query cache consistency cu invalidation triggers
+- **Hooks**: useMonthlyTransactions ca shared data source
+- **Sync Issues**: Event bus implementation pentru cross-component sync
+- **Optimization**: State consistency hooks și cache strategy enhancement
+
+### 3. DESIGN ȘI UX PROFESSIONAL
+
+#### 3.1 CVA Design System
+- **Professional Theme**: shadow-lg, hover:shadow-xl consistency
+- **Animation Standards**: transition-all duration-200 ease-in-out
+- **Typography**: font-financial pentru numere, contrast-enhanced headers
+- **Color Psychology**: value-positive/negative/neutral cu accessibility
+
+#### 3.2 Responsive Design
+- **Grid Adaptability**: fullscreen, large, default, compact variants
+- **Mobile Considerations**: touch-friendly sizing cu hover states
+- **Keyboard Navigation**: focus-ring cu tabIndex management
+- **Loading States**: animate-fade-in-up cu loading-pulse
+
+## TECHNICAL ARCHITECTURE
+
+### Stack Technology
+- **Frontend**: React + TypeScript + Zustand + TailwindCSS + CVA
+- **Backend**: NestJS + Supabase
+- **Shared-Constants**: Sursă unică pentru constante, enums, mesaje
+- **Testing**: Jest + React Testing Library + Playwright
+
+### Data Models
+
+#### BalanceSystem Model
+```typescript
+interface DailyBalance {
+  date: string;
+  initialBalance: number;
+  dailyIncome: number;
+  dailyExpenses: number;
+  dailyInvestments: number;
+  dailySavings: number;
+  remainingBalance: number;
+  isNegative: boolean;
+}
+
+interface Account {
+  id: string;
+  name: string;
+  type: 'bank' | 'cash' | 'investment' | 'other';
+  balance: number;
+  isActive: boolean;
+}
+```
+
+#### Enhanced Transaction Model
+```typescript
+interface Transaction {
+  // Existing fields...
+  balanceImpact: number;
+  isRecurring: boolean;
+  recurringTemplateId?: string;
+  subcategoryId?: string;
+}
+
+interface RecurringTemplate {
+  id: string;
+  frequency: FrequencyType;
+  startDate: string;
+  endDate?: string;
+  generatedCount: number;
+  maxGenerations: number;
+}
+```
+
+### API Extensions
+- **Balance Endpoints**: `/api/balance/daily`, `/api/balance/monthly`
+- **Account Management**: `/api/accounts` CRUD operations
+- **Recurring System**: `/api/recurring/templates`, `/api/recurring/generate`
+- **Sync Endpoints**: `/api/sync/transaction-table`
+
+### Performance Considerations
+- **React Query Cache**: Optimistic updates cu rollback mechanisms
+- **Virtual Scrolling**: Pentru large datasets în grid
+- **Debounced Validation**: Real-time validation cu performance
+- **Memory Management**: Cleanup pentru recurring generation
+
+## DEVELOPMENT ROADMAP
+
+### MVP Phase 1: Sistem Sold Fundamental
+- Settings pentru sold inițial și conturi
+- Calculator sold zilnic cu logică cumulativă
+- Display sold în grid cu alerting negativ
+- Transfer automat între luni
+- **Estimare**: Complex - requires new hooks, CVA components, settings integration
+
+### MVP Phase 2: LunarGrid Enhancement Core
+- Modal edit enhancement cu keyboard shortcuts
+- Inline editing enhancement cu visual feedback
+- Sistem redimensionare cu fullscreen mode
+- Data validation enhancement
+- **Estimare**: Medium - build on existing architecture
+
+### MVP Phase 3: Recurență și Sync
+- Sistem recurență cu template-based generation
+- Preview și confirmation flow pentru recurring
+- Synchronizare perfectă cu Transaction Table
+- Event bus implementation
+- **Estimare**: Complex - algoritmi avansați și sync logic
+
+### Phase 4: Management Conturi și UX Final
+- Interface management conturi multiple
+- Design și UX polish cu CVA enhancements
+- Performance optimization și testing
+- Advanced filtering și reporting
+- **Estimare**: Medium - UI focused cu existing patterns
+
+## LOGICAL DEPENDENCY CHAIN
+
+### Foundation Layer (Must be built first)
+1. **Shared-Constants Extension**: Toate constantele pentru balance, accounts, enhanced UI
+2. **CVA System Enhancement**: Grid styles, modal variants, balance display
+3. **Settings Infrastructure**: Account management și balance configuration
+
+### Core Functionality Layer
+4. **Balance Calculator**: useBalanceCalculator hook cu daily computation
+5. **Account Management**: CRUD operations cu CategoryEditor pattern
+6. **Enhanced Modal System**: QuickAddModal improvements cu keyboard support
+
+### Integration Layer  
+7. **Grid Integration**: Balance display în LunarGrid cu alerts
+8. **Inline Editing Enhancement**: Visual feedback și keyboard navigation
+9. **Resize System**: Fullscreen toggle cu escape key handling
+
+### Advanced Features Layer
+10. **Recurring System**: Template generation cu preview flow
+11. **Sync Optimization**: Event bus și state consistency
+12. **Data Validation**: Enhanced validation cu error handling
+
+### Polish Layer
+13. **Design Enhancement**: Professional theme consistency
+14. **Performance Optimization**: Cache strategy și memory management
+15. **Testing Coverage**: Unit tests, integration tests, E2E coverage
+
+## RISKS AND MITIGATIONS
+
+### Technical Challenges
+- **Complexity Risk**: Sistem sold complex cu multiple edge cases
+  - *Mitigation*: Phased implementation cu extensive testing
+- **State Sync Risk**: Desync între LunarGrid și Transaction Table
+  - *Mitigation*: Event bus cu centralized state management
+- **Performance Risk**: Large datasets cu recursive calculations
+  - *Mitigation*: Virtual scrolling și optimized algorithms
+
+### MVP Definition
+- **Core MVP**: Sold zilnic cu alerting + modal/inline enhancements
+- **Extended MVP**: + sistem recurență + account management
+- **Full Feature Set**: + sync optimization + design polish
+
+### Resource Constraints
+- **Development Time**: Estimare 8-12 săptămâni pentru MVP complet
+- **Testing Coverage**: Unit + Integration + E2E pentru toate features
+- **Documentation**: CVA patterns, API documentation, user guides
+
+## APPENDIX
+
+### Research Foundation
+- **Complete Research**: 14 taskuri cu arhitectură existentă mapată
+- **CVA Analysis**: 876 linii grid styling cu professional patterns
+- **Hook Architecture**: Existing hooks identified cu extension points
+- **Performance Benchmarks**: React Query patterns cu optimization targets
+
+### Technical Specifications
+- **Constants Structure**: shared-constants organization cu zero hardcoding
+- **CVA Patterns**: Professional theme cu animation standards
+- **Hook Patterns**: useBaseModalLogic ca foundation pentru enhancements
+- **Testing Strategy**: Jest + RTL pentru units, Playwright pentru E2E
+
+### Implementation Notes
+- **Research-Backed**: Toate taskurile au research complet cu cod analysis
+- **Architecture Respect**: Build on existing CVA și hook patterns
+- **Zero Breaking Changes**: Enhancements care păstrează funcționalitatea existentă
+- **Professional Standards**: CVA consistency cu animation și typography standards 
