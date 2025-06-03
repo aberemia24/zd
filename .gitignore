@@ -4,31 +4,38 @@ node_modules/
 .DS_Store
 /dist
 /build
-coverage/
 
-# Ignoră seed script și chei locale
-frontend/src/scripts/seedTransactions.ts
-frontend/src/scripts/seedTransactions.js
-.env*
+# ===== FIȘIERE SENSIBILE ===== 
+# API Keys și configurări secrete
+.cursor/mcp.json
+.cursor/settings.json
+*.env*
 .env.local
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\jest-e2e.json
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\transaction.e2e-spec.ts
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\app.e2e-spec.ts
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\transaction.e2e-spec.ts
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\transaction.e2e-spec.ts
-C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\transaction.e2e-spec.ts
-frontend/src/components/MonthlyGridPreview.tsx
-deprecated_globalrules.md
+.env.production
 
-# windsurf rules
-.windsurfrules
+# ===== RAPOARTE DE TESTE ===== 
+# Coverage reports
+coverage/
+lcov-report/
+frontend/coverage/
+frontend/lcov-report/
 
-# Test persistence files
-frontend/tests/e2e/support/.mailslurp-accounts.json
+# Test results și artefacte
+test-results/
+frontend/test-results/
+**/test-results/
+**/artifacts/
+**/playwright-report/
 
-# Added by Claude Task Master
+# ===== FIȘIERE DE BUILD ===== 
+# Build directories
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+
+# ===== LOGS ===== 
 # Logs
 logs
 *.log
@@ -36,8 +43,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 dev-debug.log
-# Dependency directories
-# Environment variables
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===== EDITOR ===== 
 # Editor directories and files
 .idea
 .vscode
@@ -46,10 +55,43 @@ dev-debug.log
 *.njsproj
 *.sln
 *.sw?
+
+# ===== OS SPECIFIC ===== 
 # OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== DEPRECATED/LEGACY ===== 
+# Ignoră seed script și chei locale
+frontend/src/scripts/seedTransactions.ts
+frontend/src/scripts/seedTransactions.js
+frontend/src/components/MonthlyGridPreview.tsx
+deprecated_globalrules.md
+
+# Deprecated paths (absolut paths - din istoric)
+C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated
+C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test
+C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\jest-e2e.json
+C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\transaction.e2e-spec.ts
+C:\Users\abere\CascadeProjects\budget-app\backend\src\deprecated\test\app.e2e-spec.ts
+
+# ===== TOOLING ===== 
+# windsurf rules
+.windsurfrules
+
+# Test persistence files
+frontend/tests/e2e/support/.mailslurp-accounts.json
+
+# ===== TASK MANAGEMENT ===== 
 # Task files
 tasks.json
 tasks/ 
 
+# ===== SEPARATE PROJECTS ===== 
 # Ignore cursor-memory-bank directory (separate project)
 cursor-memory-bank/ 
