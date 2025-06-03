@@ -52,7 +52,7 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
         message: "",
       },
     });
-  }, [modalState.resolver]);
+  }, [modalState]);
 
   const handleConfirm = useCallback(() => {
     if (modalState.resolver) {
@@ -65,7 +65,7 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
         message: "",
       },
     });
-  }, [modalState.resolver]);
+  }, [modalState]);
 
   const modalProps: Omit<ConfirmationModalProps, "onConfirm" | "onClose"> = {
     isOpen: modalState.isOpen,

@@ -336,7 +336,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     } else {
       setHasUnsavedChanges(false);
     }
-  }, [isEditing, value]);
+  }, [isEditing, value, inputRef]);
 
   // ENHANCED CONTROLLED MODE BLUR HANDLER - Pattern din QuickAddModal
   const handleControlledBlur = useCallback(async () => {
@@ -459,66 +459,60 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     setAriaAnnouncement(`Auto-saved ${validationType} value on blur.`);
   }, [isControlled, handleControlledBlur, handleBlur, validationType]);
 
-  // OPTIMIZARE: useCallback pentru handlers - Pattern din QuickAddModal UPDATED
+  // Handle keyboard events cu enhanced shortcuts și focus trap
   const handleCombinedKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Aplicăm focus trap ÎNAINTE de orice altă logică în edit mode
-    if (isEditing) {
-      handleFocusTrap(e);
-    }
-
-    // Handle F2 key pentru start edit (Excel behavior) cu ARIA announcement
-    if (e.key === "F2" && !isEditing && !isReadonly) {
+    // Previne form submission în toate cazurile
+    if (e.key === "Enter") {
       e.preventDefault();
-      announceEditActivation('f2');
-      if (onStartEdit) {
-        onStartEdit();
-      } else {
-        startEdit();
-      }
-      return;
+      e.stopPropagation();
     }
-
-    // Handle Enter key pentru start edit când selected cu ARIA announcement
-    if (
-      e.key === "Enter" &&
-      !isEditing &&
-      (isSelected || isFocused) &&
-      !isReadonly
-    ) {
-      e.preventDefault();
-      announceEditActivation('f2'); // Same announcement for Enter as F2
-      if (onStartEdit) {
-        onStartEdit();
-      } else {
-        startEdit();
-      }
-      return;
-    }
-
-    // Handle Escape în edit mode cu enhanced focus restoration
+    
+    // Enhanced keyboard shortcuts pentru toate stările
     if (e.key === "Escape" && isEditing) {
       e.preventDefault();
+      e.stopPropagation();
       handleEnhancedEscape(e);
-      return;
     }
-
-    // Pass to inline edit handler dacă editing
-    if (isEditing) {
-      if (isControlled && e.key === "Enter") {
-        // Enhanced Enter handling cu validation în controlled mode
-        handleEnhancedEnter(e);
-        return;
-      } else if (!isControlled && e.key === "Enter") {
-        // Enhanced Enter handling cu validation în uncontrolled mode
-        handleEnhancedEnter(e);
-        return;
+    
+    if (e.key === "Enter" && isEditing && !e.shiftKey) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleEnhancedEnter(e);
+    }
+    
+    // Focus management și activare editing
+    if (!isEditing && !isReadonly) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (isSelected || isFocused) {
+          announceEditActivation('f2');
+          if (onStartEdit) {
+            onStartEdit();
+          } else {
+            startEdit();
+          }
+        }
+      }
+    }
+    
+    // Enhanced focus trap în grid pentru editing mode
+    if (isEditing && e.key === "Tab") {
+      handleFocusTrap(e);
+    }
+    
+    // Inline key handler pentru editing
+    if (isEditing && isControlled) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
       }
       inlineKeyDown(e);
     }
 
     // Pass to parent handler
     onKeyDown?.(e);
-  }, [isEditing, isReadonly, isSelected, isFocused, onStartEdit, startEdit, handleEnhancedEscape, isControlled, inputRef, validationType, onSave, handleEditExit, inlineKeyDown, onKeyDown, handleFocusTrap, handleEnhancedEnter, announceEditActivation]);
+  }, [isEditing, isReadonly, isSelected, isFocused, onStartEdit, startEdit, handleEnhancedEscape, isControlled, inlineKeyDown, onKeyDown, handleFocusTrap, handleEnhancedEnter, announceEditActivation]);
 
   // Handle cell click pentru focus și start edit (single click activation)
   const handleCellClick = useCallback((e?: React.MouseEvent) => {
@@ -628,26 +622,18 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     );
   }, [error]);
 
-  // ENHANCED LOADING FEEDBACK STATES - Pattern din QuickAddModal
-  const [loadingProgress, setLoadingProgress] = useState<number>(0);
-  
-  // Simulate loading progress pentru enhanced UX - USING loadingProgress
+  // Simulate loading progress pentru enhanced UX
   useEffect(() => {
     if (isSaving) {
-      setLoadingProgress(0);
+      let progressValue = 0;
       const progressInterval = setInterval(() => {
-        setLoadingProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90; // Nu ajunge la 100% până nu se finalizează cu adevărat
-          }
-          return prev + 10;
-        });
+        progressValue += 10;
+        if (progressValue >= 90) {
+          clearInterval(progressInterval);
+        }
       }, 100);
       
       return () => clearInterval(progressInterval);
-    } else {
-      setLoadingProgress(0);
     }
   }, [isSaving]);
 
@@ -662,6 +648,14 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       return () => clearTimeout(timer);
     }
   }, [isSaving, showSuccessFeedback]);
+
+  // Enhanced focus management pentru input editing
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing, inputRef]);
 
   // DEVELOPMENT VALIDATION ENHANCED - Pattern din QuickAddModal cu metrici
   useEffect(() => {
@@ -710,28 +704,6 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       }
     }
   }, [cellId, onSave, validationType, propIsEditing, propError, propIsSaving, value, isControlled, cellState, isEditing, error, isSaving]);
-
-  // ENHANCED ERROR HANDLING - Pattern din QuickAddModal cu ConfirmationModal integration ready
-  const [enhancedError, setEnhancedError] = useState<string | null>(null);
-  
-  // Enhanced error handler cu categorization
-  const handleEnhancedError = useCallback((errorMsg: string, errorType: 'validation' | 'save' | 'network' = 'save') => {
-    const enhancedMsg = `[${errorType.toUpperCase()}] ${errorMsg}`;
-    setEnhancedError(enhancedMsg);
-    setAriaAnnouncement(`Error occurred: ${errorMsg}`);
-    
-    if (process.env.NODE_ENV === "development") {
-      console.error(`[EditableCell] ${cellId} error:`, { type: errorType, message: errorMsg, cellState });
-    }
-    
-    // Clear error după 5 secunde
-    setTimeout(() => {
-      setEnhancedError(null);
-    }, 5000);
-  }, [cellId, cellState]);
-
-  // Display error prioritization: enhanced > prop > internal
-  const finalError = enhancedError || error;
 
   if (isEditing) {
     return (
@@ -793,7 +765,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
           </div>
         )}
         {/* ENHANCED ERROR DISPLAY - Pattern din QuickAddModal cu enhanced ARIA */}
-        {finalError && (
+        {error && (
           <div
             id={ariaIds.error}
             className={errorDisplayClass}
@@ -801,7 +773,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
             role="alert"
             aria-live="assertive"
           >
-            {finalError}
+            {error}
           </div>
         )}
         {/* ARIA LIVE ANNOUNCEMENTS REGION - Pattern din QuickAddModal */}

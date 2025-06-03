@@ -5,6 +5,7 @@ import Textarea from "../../../primitives/Textarea/Textarea";
 import Checkbox from "../../../primitives/Checkbox/Checkbox";
 import Select from "../../../primitives/Select/Select";
 import ConfirmationModal from "../../../primitives/ConfirmationModal/ConfirmationModal";
+import { useConfirmationModal } from "../../../primitives/ConfirmationModal/useConfirmationModal";
 import {
   transactionModalOverlay,
   transactionModalContent,
@@ -91,13 +92,14 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   const { form, validation, loading, calculations } =
     useBaseModalLogic(cellContext);
 
+  // Professional confirmation modal pentru UX consistent
+  const { modalProps, showConfirmation } = useConfirmationModal();
+
   // Local state pentru modal-specific logic
   const [showRecurringOptions, setShowRecurringOptions] = useState(false);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   // Focus management references
   const firstFocusableRef = React.useRef<HTMLInputElement>(null);
-  const lastFocusableRef = React.useRef<HTMLButtonElement>(null);
 
   // Initialize form cu prefilled amount și focus management
   useEffect(() => {
@@ -105,7 +107,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       form.updateData({ amount: prefillAmount });
     }
 
-    // Focus management - focus primul input când se deschide modalul
+    // Focus management - focus primul input când se deschide modalul DOAR o dată
     if (autoFocus && firstFocusableRef.current) {
       // Delay mic pentru a se asigura că modalul s-a randat complet
       const timeoutId = setTimeout(() => {
@@ -114,7 +116,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       return () => clearTimeout(timeoutId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefillAmount, form.updateData, autoFocus]);
+  }, [prefillAmount, autoFocus]);
 
   // Handle save action cu enhanced error handling
   const handleSave = useCallback(async () => {
@@ -125,13 +127,14 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
     }
 
     if (!form.validate()) {
+      // NU mai facem focus automat - lăsăm utilizatorul să continue să tape
       // Focus primul input cu eroare pentru UX îmbunătățit
-      const errorFields = ['amount', 'description', 'frequency'];
-      const firstErrorField = errorFields.find(field => validation.errors[field as keyof typeof validation.errors]);
-      
-      if (firstErrorField === 'amount' && firstFocusableRef.current) {
-        firstFocusableRef.current.focus();
-      }
+      // const errorFields = ['amount', 'description', 'frequency'];
+      // const firstErrorField = errorFields.find(field => validation.errors[field as keyof typeof validation.errors]);
+      // 
+      // if (firstErrorField === 'amount' && firstFocusableRef.current) {
+      //   firstFocusableRef.current.focus();
+      // }
       return;
     }
 
@@ -154,30 +157,28 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
         ? `${EXCEL_GRID.ERROR_MESSAGES.SAVE_TRANSACTION_PREFIX}${error.message}`
         : EXCEL_GRID.ERROR_MESSAGES.SAVE_TRANSACTION_GENERIC;
         
-      validation.setErrors({
-        general: errorMessage,
-      });
+      validation.setErrors('general', errorMessage);
     } finally {
       loading.setIsLoading(false);
     }
-  }, [form, loading, validation, onSave, firstFocusableRef]);
+  }, [form, loading, validation, onSave]);
 
   // LGI TASK 5: Handler pentru delete action cu ConfirmationModal
   const handleDelete = useCallback(async () => {
     if (!onDelete) return;
-    setShowDeleteConfirmation(true);
-  }, [onDelete]);
+    
+    const confirmed = await showConfirmation({
+      title: EXCEL_GRID.MODAL.DELETE_CONFIRMATION_TITLE,
+      message: EXCEL_GRID.MODAL.DELETE_CONFIRMATION_MESSAGE,
+      confirmText: EXCEL_GRID.MODAL.DELETE_CONFIRM_BUTTON,
+      cancelText: EXCEL_GRID.MODAL.DELETE_CANCEL_BUTTON,
+      variant: "danger",
+      icon: "🗑️"
+    });
 
-  // Enhanced error handling pentru delete cu validation
-  const handleConfirmDelete = useCallback(async () => {
-    if (!onDelete) {
-      console.warn('QuickAddModal: Delete attempted without onDelete handler');
-      return;
-    }
+    if (!confirmed) return;
 
     loading.setIsLoading(true);
-    setShowDeleteConfirmation(false);
-
     try {
       await onDelete();
       // Modal se închide automat după delete success
@@ -188,18 +189,70 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
         ? `${EXCEL_GRID.ERROR_MESSAGES.DELETE_TRANSACTION_PREFIX}${error.message}`
         : EXCEL_GRID.ERROR_MESSAGES.DELETE_TRANSACTION_GENERIC;
         
-      validation.setErrors({
-        general: errorMessage,
-      });
+      validation.setErrors('general', errorMessage);
     } finally {
       loading.setIsLoading(false);
     }
-  }, [onDelete, loading, validation]);
+  }, [onDelete, showConfirmation, loading, validation]);
 
-  // Cancel delete handler
-  const handleCancelDelete = useCallback(() => {
-    setShowDeleteConfirmation(false);
-  }, []);
+  // Detectez dacă sunt modificări în formular (dirty state)
+  const isDirty = useMemo(() => {
+    return (
+      form.data.amount.trim() !== "" ||
+      form.data.description.trim() !== "" ||
+      form.data.recurring ||
+      form.data.frequency !== undefined
+    );
+  }, [form.data]);
+
+  // Outside click handler cu dirty state detection
+  const handleOutsideClick = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
+    // Verifică că click-ul a fost pe overlay, nu pe modal content
+    if (e.target === e.currentTarget) {
+      if (isDirty) {
+        // Sunt modificări - cere confirmare
+        const confirmed = await showConfirmation({
+          title: "Modificări nesalvate",
+          message: "Aveți modificări nesalvate. Doriți să închideți modalul și să pierdeți aceste modificări?",
+          confirmText: "Da, închide modalul",
+          cancelText: "Nu, continuă editarea",
+          variant: "warning",
+          icon: "⚠️"
+        });
+
+        if (confirmed) {
+          onCancel();
+        }
+        // Dacă nu confirmă, nu face nimic (modalul rămâne deschis)
+      } else {
+        // Nu sunt modificări - închide direct
+        onCancel();
+      }
+    }
+  }, [isDirty, onCancel, showConfirmation]);
+
+  // Enhanced Escape handler cu dirty state detection
+  const handleEscape = useCallback(async () => {
+    if (isDirty) {
+      // Sunt modificări - cere confirmare
+      const confirmed = await showConfirmation({
+        title: "Modificări nesalvate",
+        message: "Aveți modificări nesalvate. Doriți să închideți modalul și să pierdeți aceste modificări?",
+        confirmText: "Da, închide modalul",
+        cancelText: "Nu, continuă editarea",
+        variant: "warning",
+        icon: "⚠️"
+      });
+
+      if (confirmed) {
+        onCancel();
+      }
+      // Dacă nu confirmă, nu face nimic (modalul rămâne deschis)
+    } else {
+      // Nu sunt modificări - închide direct
+      onCancel();
+    }
+  }, [isDirty, onCancel, showConfirmation]);
 
   // Handle keyboard shortcuts cu optimized dependencies și focus trap
   useEffect(() => {
@@ -215,7 +268,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       }
       if (e.key === "Escape") {
         e.preventDefault();
-        onCancel();
+        handleEscape();
       }
       
       // Focus trap logic pentru Tab navigation
@@ -245,7 +298,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleSave, onCancel]);
+  }, [handleSave, handleEscape]);
 
   // Memoize styled objects pentru position mode pentru a preveni re-creation
   const positionedStyle = useMemo(() => {
@@ -258,12 +311,25 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
     };
   }, [position]);
 
-  // Memoize financial impact calculation pentru performance
+  // Memoize financial impact calculation pentru performance - cu validare pentru NaN
   const financialImpact = useMemo(() => {
-    return form.data.amount
-      ? calculations.calculateFinancialImpact(Number(form.data.amount))
+    const numericValue = parseFloat(form.data.amount.replace(',', '.'));
+    return form.data.amount && !isNaN(numericValue) && numericValue > 0
+      ? calculations.calculateFinancialImpact(numericValue)
       : null;
-  }, [form.data.amount, calculations.calculateFinancialImpact]);
+  }, [form.data.amount, calculations]);
+
+  // Handler pentru input numeric - permite doar cifre, punct și virgulă
+  const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Permite doar cifre, punct, virgulă și este gol
+    const numericPattern = /^[0-9]*[.,]?[0-9]*$/;
+    
+    if (value === '' || numericPattern.test(value)) {
+      form.updateData({ amount: value });
+    }
+    // Dacă nu respectă pattern-ul, nu actualizează valoarea (input-ul nu se schimbă)
+  }, [form]);
 
   // Cleanup și validation la unmount
   useEffect(() => {
@@ -276,287 +342,334 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   }, [loading.isLoading]);
 
   return (
-    <div 
-      className={position ? "fixed inset-0 z-50 pointer-events-none" : transactionModalOverlay({ blur: false })}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="quick-add-modal-title"
-      aria-describedby="quick-add-modal-description"
-    >
+    <>
+      {/* Overlay pentru positioned modal - separat pentru a permite click outside */}
+      {position && (
+        <div 
+          className="fixed inset-0 z-40 bg-black bg-opacity-25"
+          onClick={handleOutsideClick}
+        />
+      )}
+      
       <div 
         className={position 
-          ? transactionModalContent({ mode: "quick-add-positioned" })
-          : transactionModalContent({ mode: "quick-add" })
+          ? "fixed z-50 pointer-events-none" 
+          : transactionModalOverlay({ blur: false })
         }
-        style={positionedStyle}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="quick-add-modal-title"
+        aria-describedby="quick-add-modal-description"
+        onClick={position ? undefined : handleOutsideClick}
+        style={position ? { inset: 0 } : undefined}
       >
-        {/* Modal Header - foarte compact pentru pozitionat */}
-        {position ? (
-          // Header minimal pentru modal poziționat
-          <div className="px-3 py-1 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-            <span 
-              id="quick-add-modal-title"
-              className="text-xs font-medium text-slate-700"
-            >
-              {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
-            </span>
-            <button
-              className="text-slate-400 hover:text-slate-600 text-sm p-1"
-              onClick={onCancel}
-              data-testid="quick-add-modal-close"
-              aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
-            >
-              ✕
-            </button>
-          </div>
-        ) : (
-          // Header normal pentru modal centrat
-          <div className={transactionModalHeader({ variant: "primary" })}>
-            <h2 
-              id="quick-add-modal-title"
-              className={transactionModalTitle({ variant: "primary" })}
-            >
-              {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
-            </h2>
-            <button
-              className={transactionModalCloseButton()}
-              onClick={onCancel}
-              data-testid="quick-add-modal-close"
-              aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
-        {/* Modal Body */}
-        <div className={position 
-          ? transactionModalBody({ mode: "positioned" })
-          : transactionModalBody()
-        }>
-          {/* Context Info */}
-          <div 
-            id="quick-add-modal-description"
-            className={position 
-              ? "text-xs text-slate-600 bg-blue-50 p-1.5 rounded"
-              : "text-sm text-slate-600 bg-blue-50 p-3 rounded-md"
-            }
-          >
-            <strong>{cellContext.category}</strong>
-            {cellContext.subcategory && ` → ${cellContext.subcategory}`}
-            <br />
-            <span>
-              {cellContext.day}/{cellContext.month}/{cellContext.year}
-            </span>
-          </div>
-          {/* Amount Input */}
-          <div>
-            <Input
-              ref={firstFocusableRef}
-              label={position ? LABELS.AMOUNT : `${LABELS.AMOUNT} (RON)`}
-              type="text"
-              value={form.data.amount}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                form.updateData({ amount: e.target.value })
-              }
-              error={validation.errors.amount}
-              autoFocus={autoFocus}
-              data-testid="quick-add-amount-input"
-              placeholder={PLACEHOLDERS.AMOUNT_PLACEHOLDER}
-              pattern="[0-9]+([,.][0-9]{1,2})?"
-              size={position ? "sm" : "md"}
-              aria-describedby={validation.errors.amount ? "amount-error" : undefined}
-            />
-            {validation.errors.amount && (
-              <div id="amount-error" className="sr-only">
-                {validation.errors.amount}
-              </div>
-            )}
-          </div>
-          {/* Description Input - foarte compact pentru pozitionat */}
+        <div 
+          className={position 
+            ? transactionModalContent({ mode: "quick-add-positioned" })
+            : transactionModalContent({ mode: "quick-add" })
+          }
+          style={positionedStyle}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Modal Header - foarte compact pentru pozitionat */}
           {position ? (
-            // Input simplu pentru modal poziționat să economisesc spațiu
-            <div>
-              <input
-                type="text"
-                value={form.data.description}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  form.updateData({ description: e.target.value })
-                }
-                placeholder={PLACEHOLDERS.DESCRIPTION}
-                className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
-                data-testid="quick-add-description-input"
-              />
-              {validation.errors.description && (
-                <div className="text-xs text-red-600 mt-1">{validation.errors.description}</div>
-              )}
+            // Header minimal pentru modal poziționat
+            <div className="px-3 py-1 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+              <span 
+                id="quick-add-modal-title"
+                className="text-xs font-medium text-slate-700"
+              >
+                {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
+              </span>
+              <button
+                className="text-slate-400 hover:text-slate-600 text-sm p-1"
+                onClick={onCancel}
+                data-testid="quick-add-modal-close"
+                aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
+              >
+                ✕
+              </button>
             </div>
           ) : (
-            // Textarea normal pentru modal centrat
-            <div>
-              <Textarea
-                label={LABELS.DESCRIPTION}
-                value={form.data.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  form.updateData({ description: e.target.value })
-                }
-                error={validation.errors.description}
-                data-testid="quick-add-description-input"
-                placeholder={PLACEHOLDERS.DESCRIPTION}
-                rows={2}
-                size="md"
-              />
+            // Header normal pentru modal centrat
+            <div className={transactionModalHeader({ variant: "primary" })}>
+              <h2 
+                id="quick-add-modal-title"
+                className={transactionModalTitle({ variant: "primary" })}
+              >
+                {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
+              </h2>
+              <button
+                className={transactionModalCloseButton()}
+                onClick={onCancel}
+                data-testid="quick-add-modal-close"
+                aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
+              >
+                ✕
+              </button>
             </div>
           )}
-          {/* Recurring Checkbox */}
-          <div>
-            <Checkbox
-              label={LABELS.RECURRING}
-              checked={form.data.recurring}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const checked = e.target.checked;
-                form.updateData({ recurring: checked });
-                setShowRecurringOptions(checked);
-                if (!checked) {
-                  form.updateData({ frequency: undefined });
-                }
-              }}
-              data-testid="quick-add-recurring-checkbox"
-              size={position ? "sm" : "md"}
-            />
-          </div>
-          {/* Recurring Options */}
-          {showRecurringOptions && (
+
+          {/* Modal Body */}
+          <div className={position 
+            ? transactionModalBody({ mode: "positioned" })
+            : transactionModalBody()
+          }>
+            {/* Context Info */}
             <div 
+              id="quick-add-modal-description"
               className={position 
-                ? "pl-3 border-l border-blue-200 animate-in slide-in-from-left-1 duration-300" 
-                : "pl-6 border-l-2 border-blue-200 animate-in slide-in-from-left-2 duration-300"
+                ? "text-xs text-slate-600 bg-blue-50 p-1.5 rounded"
+                : "text-sm text-slate-600 bg-blue-50 p-3 rounded-md"
               }
             >
-              <Select
-                label={position ? EXCEL_GRID.MODAL.FREQUENCY_SHORT : LABELS.FREQUENCY}
-                value={form.data.frequency || ""}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  form.updateData({ frequency: e.target.value })
-                }
-                options={OPTIONS.FREQUENCY}
-                error={validation.errors.frequency}
-                data-testid="quick-add-frequency-select"
-                placeholder={position ? PLACEHOLDERS.SELECT : `${PLACEHOLDERS.SELECT} ${LABELS.FREQUENCY.toLowerCase()}`}
+              <strong>{cellContext.category}</strong>
+              {cellContext.subcategory && ` → ${cellContext.subcategory}`}
+              <br />
+              <span>
+                {cellContext.day}/{cellContext.month}/{cellContext.year}
+              </span>
+            </div>
+            {/* Amount Input */}
+            <div>
+              <Input
+                ref={firstFocusableRef}
+                label={position ? LABELS.AMOUNT : `${LABELS.AMOUNT} (RON)`}
+                type="text"
+                value={form.data.amount}
+                onChange={handleAmountChange}
+                error={validation.errors.amount}
+                autoFocus={autoFocus}
+                data-testid="quick-add-amount-input"
+                placeholder={PLACEHOLDERS.AMOUNT_PLACEHOLDER}
+                pattern="[0-9]+([,.][0-9]{1,2})?"
                 size={position ? "sm" : "md"}
-                aria-describedby={validation.errors.frequency ? "frequency-error" : undefined}
+                aria-describedby={validation.errors.amount ? "amount-error" : undefined}
               />
-              {validation.errors.frequency && (
-                <div id="frequency-error" className="sr-only">
-                  {validation.errors.frequency}
+              {validation.errors.amount && (
+                <div id="amount-error" className="sr-only">
+                  {validation.errors.amount}
                 </div>
               )}
             </div>
-          )}
-          {/* Financial Impact Preview */}
-          {financialImpact && (
-            <div className={position 
-              ? "bg-slate-50 p-1.5 rounded text-xs"
-              : "bg-slate-50 p-3 rounded-md text-sm"
-            }>
-              <div className="flex justify-between items-center">
-                <span>{position ? EXCEL_GRID.MODAL.FINANCIAL_IMPACT_SHORT : EXCEL_GRID.MODAL.FINANCIAL_IMPACT_FULL}</span>
-                <span
-                  className={`font-semibold ${
-                    financialImpact.isPositive
-                      ? "text-emerald-600"
-                      : "text-red-600"
-                  }`}
-                >
-                  {financialImpact.isPositive ? "+" : ""}
-                  {financialImpact.amount} RON
-                </span>
+            {/* Description Input - foarte compact pentru pozitionat */}
+            {position ? (
+              // Input simplu pentru modal poziționat să economisesc spațiu
+              <div>
+                <input
+                  type="text"
+                  value={form.data.description}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const newValue = e.target.value;
+                    form.updateData({ description: newValue });
+                    // Validează în timp real pentru feedback instant
+                    validation.validateField('description', newValue, 'description');
+                  }}
+                  placeholder={PLACEHOLDERS.DESCRIPTION}
+                  maxLength={100}
+                  className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  data-testid="quick-add-description-input"
+                />
+                {/* Character counter pentru modal poziționat */}
+                <div className="flex justify-between items-center text-xs mt-1">
+                  {validation.errors.description ? (
+                    <div className="text-red-600 flex-1">{validation.errors.description}</div>
+                  ) : validation.warnings.description ? (
+                    <div className="text-amber-600 flex-1">{validation.warnings.description[0]}</div>
+                  ) : (
+                    <div className={`flex-1 ${
+                      form.data.description.length >= 100 
+                        ? 'text-red-600 font-medium' 
+                        : form.data.description.length >= 85 
+                        ? 'text-amber-600' 
+                        : 'text-gray-500'
+                    }`}>
+                      {form.data.description.length >= 100 
+                        ? '🚫 Limită atinsă' 
+                        : form.data.description.length >= 85 
+                        ? '⚠️ Aproape de limită' 
+                        : ''}
+                    </div>
+                  )}
+                  <div className={`text-right font-mono ${
+                    form.data.description.length >= 100 
+                      ? 'text-red-600 font-bold' 
+                      : form.data.description.length >= 85 
+                      ? 'text-amber-600 font-medium' 
+                      : 'text-gray-500'
+                  }`}>
+                    {form.data.description.length}/100
+                  </div>
+                </div>
               </div>
+            ) : (
+              // Textarea normal pentru modal centrat cu character counter îmbunătățit
+              <div>
+                <Textarea
+                  label={LABELS.DESCRIPTION}
+                  value={form.data.description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    const newValue = e.target.value;
+                    form.updateData({ description: newValue });
+                    // Validează în timp real pentru feedback instant
+                    validation.validateField('description', newValue, 'description');
+                  }}
+                  error={validation.errors.description}
+                  data-testid="quick-add-description-input"
+                  placeholder={PLACEHOLDERS.DESCRIPTION}
+                  rows={2}
+                  size="md"
+                  maxLength={100}
+                  withCharacterCount={true}
+                />
+                {/* Hint pentru caractere permise - afișat doar când există eroare */}
+                {validation.errors.description && (
+                  <div className="text-xs text-blue-600 mt-1 bg-blue-50 p-2 rounded">
+                    💡 Tip: Folosiți doar litere, cifre, spații și punctuația de bază (. , ! ? - ( ) & % + : ;)
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Recurring Checkbox */}
+            <div>
+              <Checkbox
+                label={LABELS.RECURRING}
+                checked={form.data.recurring}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const checked = e.target.checked;
+                  form.updateData({ recurring: checked });
+                  setShowRecurringOptions(checked);
+                  if (!checked) {
+                    form.updateData({ frequency: undefined });
+                  }
+                }}
+                data-testid="quick-add-recurring-checkbox"
+                size={position ? "sm" : "md"}
+              />
             </div>
-          )}
-          {/* General Error */}
-          {validation.errors.general && (
-            <div className={position 
-              ? "text-red-600 text-xs bg-red-50 p-1.5 rounded"
-              : "text-red-600 text-sm bg-red-50 p-3 rounded-md"
-            }>
-              {validation.errors.general}
-            </div>
-          )}
-        </div>
-
-        {/* Modal Footer */}
-        <div className={position 
-          ? transactionModalFooter({ mode: "positioned" })
-          : transactionModalFooter()
-        }>
-          {/* LGI TASK 5: Buton Delete pentru edit mode */}
-          {mode === 'edit' && onDelete && (
-            <Button
-              variant="danger"
-              size="xs"
-              onClick={handleDelete}
-              disabled={loading.isLoading}
-              data-testid="quick-add-delete-button"
-              className={position ? "" : "mr-auto"}
-            >
-              {loading.isLoading 
-                ? BUTTONS.LOADING 
-                : (position ? BUTTONS.DELETE : BUTTONS.DELETE)
-              }
-            </Button>
-          )}
-          
-          <div className={position ? "flex space-x-1.5 ml-auto" : "flex space-x-3"}>
-            <Button
-              variant="secondary"
-              size="xs"
-              onClick={onCancel}
-              disabled={loading.isLoading}
-              data-testid="quick-add-cancel-button"
-            >
-              {position ? BUTTONS.CANCEL : BUTTONS.CANCEL}
-            </Button>
-            <Button
-              variant="primary"
-              size="xs"
-              onClick={handleSave}
-              disabled={loading.isLoading || !form.data.amount}
-              data-testid="quick-add-save-button"
-              aria-describedby={loading.isLoading ? "save-loading-status" : undefined}
-            >
-              {loading.isLoading 
-                ? (
-                  <span className="flex items-center space-x-1">
-                    <span className="animate-spin">⏳</span>
-                    <span>{BUTTONS.LOADING}</span>
+            {/* Recurring Options */}
+            {showRecurringOptions && (
+              <div 
+                className={position 
+                  ? "pl-3 border-l border-blue-200 animate-in slide-in-from-left-1 duration-300" 
+                  : "pl-6 border-l-2 border-blue-200 animate-in slide-in-from-left-2 duration-300"
+                }
+              >
+                <Select
+                  label={position ? EXCEL_GRID.MODAL.FREQUENCY_SHORT : LABELS.FREQUENCY}
+                  value={form.data.frequency || ""}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    form.updateData({ frequency: e.target.value })
+                  }
+                  options={OPTIONS.FREQUENCY}
+                  error={validation.errors.frequency}
+                  data-testid="quick-add-frequency-select"
+                  placeholder={position ? PLACEHOLDERS.SELECT : `${PLACEHOLDERS.SELECT} ${LABELS.FREQUENCY.toLowerCase()}`}
+                  size={position ? "sm" : "md"}
+                  aria-describedby={validation.errors.frequency ? "frequency-error" : undefined}
+                />
+                {validation.errors.frequency && (
+                  <div id="frequency-error" className="sr-only">
+                    {validation.errors.frequency}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Financial Impact Preview */}
+            {financialImpact && (
+              <div className={position 
+                ? "bg-slate-50 p-1.5 rounded text-xs"
+                : "bg-slate-50 p-3 rounded-md text-sm"
+              }>
+                <div className="flex justify-between items-center">
+                  <span>{position ? EXCEL_GRID.MODAL.FINANCIAL_IMPACT_SHORT : EXCEL_GRID.MODAL.FINANCIAL_IMPACT_FULL}</span>
+                  <span
+                    className={`font-semibold ${
+                      financialImpact.isPositive
+                        ? "text-emerald-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {financialImpact.isPositive ? "+" : ""}
+                    {financialImpact.amount} RON
                   </span>
-                )
-                : (position ? EXCEL_GRID.MODAL.SAVE_SHORT : `${EXCEL_GRID.ACTIONS.SAVE_CHANGES} (Enter)`)
-              }
-            </Button>
-            {loading.isLoading && (
-              <div id="save-loading-status" className="sr-only" aria-live="polite">
-                {EXCEL_GRID.MODAL.SAVING_MESSAGE}
+                </div>
+              </div>
+            )}
+            {/* General Error */}
+            {validation.errors.general && (
+              <div className={position 
+                ? "text-red-600 text-xs bg-red-50 p-1.5 rounded"
+                : "text-red-600 text-sm bg-red-50 p-3 rounded-md"
+              }>
+                {validation.errors.general}
               </div>
             )}
           </div>
+
+          {/* Modal Footer */}
+          <div className={position 
+            ? transactionModalFooter({ mode: "positioned" })
+            : transactionModalFooter()
+          }>
+            {/* LGI TASK 5: Buton Delete pentru edit mode */}
+            {mode === 'edit' && onDelete && (
+              <Button
+                variant="danger"
+                size="xs"
+                onClick={handleDelete}
+                disabled={loading.isLoading}
+                data-testid="quick-add-delete-button"
+                className={position ? "" : "mr-auto"}
+              >
+                {loading.isLoading 
+                  ? BUTTONS.LOADING 
+                  : (position ? BUTTONS.DELETE : BUTTONS.DELETE)
+                }
+              </Button>
+            )}
+            
+            <div className={position ? "flex space-x-1.5 ml-auto" : "flex space-x-3"}>
+              <Button
+                variant="secondary"
+                size="xs"
+                onClick={onCancel}
+                disabled={loading.isLoading}
+                data-testid="quick-add-cancel-button"
+              >
+                {position ? BUTTONS.CANCEL : BUTTONS.CANCEL}
+              </Button>
+              <Button
+                variant="primary"
+                size="xs"
+                onClick={handleSave}
+                disabled={loading.isLoading || !form.data.amount}
+                data-testid="quick-add-save-button"
+                aria-describedby={loading.isLoading ? "save-loading-status" : undefined}
+              >
+                {loading.isLoading 
+                  ? (
+                    <span className="flex items-center space-x-1">
+                      <span className="animate-spin">⏳</span>
+                      <span>{BUTTONS.LOADING}</span>
+                    </span>
+                  )
+                  : (position ? EXCEL_GRID.MODAL.SAVE_SHORT : `${EXCEL_GRID.ACTIONS.SAVE_CHANGES} (Enter)`)
+                }
+              </Button>
+              {loading.isLoading && (
+                <div id="save-loading-status" className="sr-only" aria-live="polite">
+                  {EXCEL_GRID.MODAL.SAVING_MESSAGE}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-      {showDeleteConfirmation && (
-        <ConfirmationModal
-          isOpen={showDeleteConfirmation}
-          title={EXCEL_GRID.MODAL.DELETE_CONFIRMATION_TITLE}
-          message={EXCEL_GRID.MODAL.DELETE_CONFIRMATION_MESSAGE}
-          onConfirm={handleConfirmDelete}
-          onClose={handleCancelDelete}
-          variant="danger"
-          icon="🗑️"
-          confirmText={EXCEL_GRID.MODAL.DELETE_CONFIRM_BUTTON}
-          cancelText={EXCEL_GRID.MODAL.DELETE_CANCEL_BUTTON}
-        />
-      )}
-    </div>
+      
+      {/* Professional Confirmation Modal - consistent cu UX-ul din OptionsPage */}
+      <ConfirmationModal {...modalProps} />
+    </>
   );
 }, (prevProps, nextProps) => {
   // Custom comparison pentru optimizarea re-renders

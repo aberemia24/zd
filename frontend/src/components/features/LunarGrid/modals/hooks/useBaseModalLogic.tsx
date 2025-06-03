@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { VALIDATION } from "@shared-constants";
+import { useValidation } from "../../../../../hooks/useValidation";
 
 // Types pentru modal context
 export interface CellContext {
@@ -8,14 +8,6 @@ export interface CellContext {
   day: number;
   month: number;
   year: number;
-}
-
-export interface ValidationErrors {
-  amount?: string;
-  description?: string;
-  frequency?: string;
-  endDate?: string;
-  general?: string;
 }
 
 // Helper function pentru formatare currency
@@ -27,10 +19,20 @@ const formatMoney = (amount: number): string => {
   }).format(amount);
 };
 
-// Base modal logic hook (simplified pentru PHASE 2.1)
+/**
+ * Enhanced Base modal logic hook cu validare centralizată
+ * 
+ * FEATURES:
+ * - Validare centralizată folosind useValidation hook
+ * - Error handling enhanced cu feedback instant
+ * - Validări pentru amount, description, frequency
+ * - UX îmbunătățit cu warnings și context
+ */
 export const useBaseModalLogic = (cellContext: CellContext) => {
-  // Form validation și error handling
-  const [errors, setErrors] = useState<ValidationErrors>({});
+  // Enhanced: Validare centralizată
+  const validation = useValidation('useBaseModalLogic');
+
+  // Loading state
   const [isLoading, setIsLoading] = useState(false);
 
   // Form data state
@@ -41,83 +43,69 @@ export const useBaseModalLogic = (cellContext: CellContext) => {
     frequency: undefined as string | undefined,
   });
 
-  // Validation functions
+  /**
+   * Enhanced: Validare amount folosind validatorul centralizat
+   */
   const validateAmount = useCallback((amount: string): string | undefined => {
-    if (!amount || amount.trim() === "") {
-      return "Suma este obligatorie";
-    }
+    const result = validation.validators.amount(amount);
+    return result.error;
+  }, [validation.validators]);
 
-    const numericAmount = Number(amount);
-    if (isNaN(numericAmount)) {
-      return "Suma trebuie să fie un număr valid";
-    }
+  /**
+   * Enhanced: Validare description folosind validatorul centralizat
+   */
+  const validateDescription = useCallback((description: string): string | undefined => {
+    const result = validation.validators.description(description, { allowEmpty: true });
+    return result.error;
+  }, [validation.validators]);
 
-    if (numericAmount <= 0) {
-      return "Suma trebuie să fie pozitivă";
-    }
-
-    if (numericAmount < VALIDATION.AMOUNT_MIN) {
-      return `Suma trebuie să fie cel puțin ${VALIDATION.AMOUNT_MIN} RON`;
-    }
-
-    if (numericAmount > VALIDATION.AMOUNT_MAX) {
-      return `Suma nu poate depăși ${VALIDATION.AMOUNT_MAX.toLocaleString('ro-RO')} RON`;
-    }
-
-    return undefined;
-  }, []);
-
-  const validateDescription = useCallback(
-    (description: string): string | undefined => {
-      if (description && description.length > 255) {
-        return "Descrierea nu poate depăși 255 de caractere";
-      }
-      return undefined;
-    },
-    [],
-  );
-
+  /**
+   * Enhanced: Validare formular complet cu feedback instant
+   */
   const validateForm = useCallback(() => {
-    const newErrors: ValidationErrors = {};
+    const fields = [
+      {
+        name: 'amount',
+        value: formData.amount,
+        type: 'amount' as const,
+      },
+      {
+        name: 'description',
+        value: formData.description,
+        type: 'description' as const,
+        options: { allowEmpty: true },
+      },
+    ];
 
-    const amountError = validateAmount(formData.amount);
-    if (amountError) newErrors.amount = amountError;
-
-    const descriptionError = validateDescription(formData.description);
-    if (descriptionError) newErrors.description = descriptionError;
-
+    // Validare frecvență pentru tranzacții recurente
     if (formData.recurring && !formData.frequency) {
-      newErrors.frequency =
-        "Frecvența este obligatorie pentru tranzacții recurente";
+      validation.setCustomError('frequency', 'Frecvența este obligatorie pentru tranzacții recurente');
+      return false;
+    } else {
+      validation.clearFieldError('frequency');
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData, validateAmount, validateDescription]);
+    // Validare folosind sistemul centralizat
+    const isValid = validation.validateForm(fields);
+    
+    return isValid;
+  }, [formData, validation]);
 
-  // Update form data helper
+  /**
+   * Enhanced: Update form data cu cleararea erorilor automate
+   */
   const updateFormData = useCallback((updates: Partial<typeof formData>) => {
     setFormData((prev) => ({ ...prev, ...updates }));
 
-    // Clear related errors when updating
-    setErrors((prev) => {
-      const newErrors = { ...prev };
-
-      if (updates.amount !== undefined && newErrors.amount) {
-        delete newErrors.amount;
-      }
-      if (updates.description !== undefined && newErrors.description) {
-        delete newErrors.description;
-      }
-      if (updates.frequency !== undefined && newErrors.frequency) {
-        delete newErrors.frequency;
-      }
-
-      return newErrors;
+    // Clear related errors when updating (feedback instant)
+    Object.keys(updates).forEach(field => {
+      validation.clearFieldError(field);
     });
-  }, []);
+  }, [validation]);
 
-  // Financial impact calculation (simplified)
+  /**
+   * Enhanced: Financial impact calculation cu format îmbunătățit
+   */
   const calculateFinancialImpact = useCallback(
     (transactionAmount: number) => {
       const currentDate = new Date(
@@ -126,17 +114,33 @@ export const useBaseModalLogic = (cellContext: CellContext) => {
         cellContext.day,
       );
 
-      // Basic impact calculation
+      // Enhanced calculation cu context
       const formattedAmount = formatMoney(transactionAmount);
+      const isLargeAmount = transactionAmount > 10000;
+      const isVeryLargeAmount = transactionAmount > 100000;
 
       return {
         amount: formattedAmount,
         date: currentDate,
         isPositive: transactionAmount > 0,
+        isLargeAmount,
+        isVeryLargeAmount,
+        warnings: isVeryLargeAmount 
+          ? ['Sumă foarte mare - verifică dacă este corectă'] 
+          : isLargeAmount 
+          ? ['Sumă mare - verifică dacă este corectă'] 
+          : [],
       };
     },
     [cellContext],
   );
+
+  /**
+   * Enhanced: Reset validation state la cleanup
+   */
+  const resetValidation = useCallback(() => {
+    validation.reset();
+  }, [validation]);
 
   return {
     // Form state management
@@ -144,14 +148,22 @@ export const useBaseModalLogic = (cellContext: CellContext) => {
       data: formData,
       updateData: updateFormData,
       validate: validateForm,
+      reset: resetValidation,
     },
 
-    // Validation și error handling
+    // Enhanced: Validare centralizată cu toate funcționalitățile
     validation: {
-      errors,
-      setErrors,
+      errors: validation.state.errors,
+      warnings: validation.state.warnings,
+      hasErrors: validation.state.hasErrors,
+      isValidating: validation.state.isValidating,
+      setErrors: validation.setCustomError,
+      clearError: validation.clearFieldError,
+      clearAllErrors: validation.clearAllErrors,
+      touchField: validation.touchField,
       validateAmount,
       validateDescription,
+      validateField: validation.validateField,
     },
 
     // Loading state
@@ -160,7 +172,7 @@ export const useBaseModalLogic = (cellContext: CellContext) => {
       setIsLoading,
     },
 
-    // Basic calculations
+    // Enhanced calculations cu context
     calculations: {
       formatMoney,
       calculateFinancialImpact,

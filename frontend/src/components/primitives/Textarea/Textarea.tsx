@@ -11,7 +11,6 @@ import {
   inputWrapper,
   label,
   type TextareaProps as CVATextareaProps,
-  type LabelProps,
 } from "../../../styles/cva/components/forms";
 
 export interface TextareaProps
@@ -127,8 +126,32 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
           {/* Character counter, dacă este activat și maxLength este specificat */}
           {withCharacterCount && rest.maxLength && (
-            <div className="text-xs text-gray-500 text-right mt-1">
-              {currentLength} / {rest.maxLength}
+            <div className="flex justify-between items-center text-xs mt-1">
+              {/* Mesaj progresiv în funcție de procentaj */}
+              <div className={`flex-1 ${
+                currentLength >= rest.maxLength 
+                  ? 'text-red-600 font-medium' 
+                  : currentLength >= Math.floor(rest.maxLength * 0.85) 
+                  ? 'text-amber-600' 
+                  : 'text-gray-500'
+              }`}>
+                {currentLength >= rest.maxLength 
+                  ? '🚫 Limită atinsă' 
+                  : currentLength >= Math.floor(rest.maxLength * 0.85) 
+                  ? '⚠️ Aproape de limită' 
+                  : ''}
+              </div>
+              
+              {/* Counter cu culori progresive */}
+              <div className={`text-right font-mono ${
+                currentLength >= rest.maxLength 
+                  ? 'text-red-600 font-bold' 
+                  : currentLength >= Math.floor(rest.maxLength * 0.85) 
+                  ? 'text-amber-600 font-medium' 
+                  : 'text-gray-500'
+              }`}>
+                {currentLength} / {rest.maxLength}
+              </div>
             </div>
           )}
         </div>

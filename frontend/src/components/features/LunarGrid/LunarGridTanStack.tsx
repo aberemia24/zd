@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, memo } from 'react';
+import React, { useCallback, useMemo, memo, useEffect } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import toast from 'react-hot-toast';
 import { Maximize2, Minimize2 } from 'lucide-react';
@@ -8,7 +8,6 @@ import {
   TransactionType, 
   FrequencyType, 
   LUNAR_GRID_MESSAGES, 
-  MESAJE, 
   UI, 
   LUNAR_GRID 
 } from "@shared-constants";
@@ -132,6 +131,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Hook pentru redimensionare tabel și mod fullscreen
     const { isFullscreen, toggleFullscreen } = useTableResize();
+
+    // Ref pentru container-ul interior care face scrollul efectiv (nu tableContainerRef care e exterior)
+    const scrollableContainerRef = React.useRef<HTMLDivElement>(null);
 
     // Funcție pentru determinarea tipului de tranzacție
     const determineTransactionType = useCallback(
@@ -438,6 +440,56 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       },
     });
 
+    // Blocare scroll când modalul este deschis - UX Enhancement (doar scroll, nu operațiuni)
+    useEffect(() => {
+      const scrollableContainer = scrollableContainerRef.current;
+      if (!scrollableContainer) return;
+
+      if (modalState?.isOpen) {
+        // Salvează poziția actuală de scroll pentru tabel
+        const currentScrollTop = scrollableContainer.scrollTop;
+        const currentScrollLeft = scrollableContainer.scrollLeft;
+        
+        // Salvează poziția actuală de scroll pentru pagină
+        const currentPageScrollY = window.scrollY;
+        const currentPageScrollX = window.scrollX;
+        
+        // Blochează scrollul tabelului
+        scrollableContainer.style.overflow = 'hidden';
+        scrollableContainer.style.position = 'relative';
+        
+        // Blochează scrollul paginii cu stil profesional
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${currentPageScrollY}px`;
+        document.body.style.left = `-${currentPageScrollX}px`;
+        document.body.style.width = '100%';
+        document.body.style.height = '100%';
+        
+        // Cleanup - restabilește scrollul când modalul se închide
+        return () => {
+          if (scrollableContainer) {
+            // Restabilește scrollul tabelului
+            scrollableContainer.style.overflow = 'auto';
+            scrollableContainer.style.position = '';
+            scrollableContainer.scrollTop = currentScrollTop;
+            scrollableContainer.scrollLeft = currentScrollLeft;
+          }
+          
+          // Restabilește scrollul paginii
+          document.body.style.overflow = '';
+          document.body.style.position = '';
+          document.body.style.top = '';
+          document.body.style.left = '';
+          document.body.style.width = '';
+          document.body.style.height = '';
+          
+          // Restabilește poziția de scroll a paginii
+          window.scrollTo(currentPageScrollX, currentPageScrollY);
+        };
+      }
+    }, [modalState?.isOpen]);
+
     // Gestionarea poziției popover-ului
     const popoverStyle = calculatePopoverStyle(popover);
 
@@ -563,6 +615,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
           {/* Container interior cu overflow-auto pentru scroll */}
           <div 
+            ref={scrollableContainerRef}
             className={cn(
               gridContainer({ 
                 variant: "professional", 
