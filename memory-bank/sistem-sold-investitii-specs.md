@@ -283,3 +283,84 @@ CLARIFICĂRI CONFIRMATE:
 🔄 Transfer automat între luni
 📅 Data start configurabilă
 🏦 Conturi multiple (temporar în Settings)
+
+
+# Task ID: 10
+# Title: Sistem Sold Inițial și Calcul Continuu
+# Status: pending
+# Dependencies: 1, 2
+# Priority: high
+# Description: Implementare sistem complet de sold cu calcul zilnic cumulativ, gestionare conturi multiple, transfer automat între luni și tratare specială pentru investiții/economisiri
+# Details:
+Sistem complet de sold care include: sold inițial configurabil per cont, calcul automat zilnic cumulativ, transfer automat sold final → sold inițial luna următoare, data start configurabilă, gestionare conturi multiple cu sumă totală, alerting pentru sold negativ, și tratare diferențiată pentru investiții (albastru) și economisiri (verde) care scad din sold dar sunt separate în rapoarte.
+
+# Test Strategy:
+Test propagare sold zilnic, recalcul la modificări tranzacții, transfer automat între luni, alerting sold negativ, funcționalitate conturi multiple, și separare corectă investiții/economisiri în rapoarte.
+
+# Subtasks:
+## 10.1. Creează shared-constants pentru sold [pending]
+### Dependencies: None
+### Description: Adăugare constante UI pentru sistemul de sold în shared-constants/ui.ts
+### Details:
+În shared-constants/ui.ts, după LUNAR_GRID, adaugă BALANCE_SYSTEM cu: INITIAL_BALANCE, DAILY_BALANCE, STARTING_DATE, ACCOUNT_NAME, ADD_ACCOUNT, TOTAL_BALANCE, BALANCE_WARNING, CONFIGURE_BALANCE, NEGATIVE_BALANCE_ALERT
+
+## 10.2. Adaugă enums pentru balance [pending]
+### Dependencies: None
+### Description: Creează enums pentru tipuri de alertă și conturi în shared-constants/enums.ts
+### Details:
+În shared-constants/enums.ts adaugă: BalanceAlertType (NEGATIVE, LOW, NORMAL) și AccountType (CHECKING, SAVINGS, CASH, CREDIT)
+
+## 10.3. Creează types pentru balance system [pending]
+### Dependencies: None
+### Description: Implementare types TypeScript pentru sistemul de sold în frontend/src/types/balance.ts
+### Details:
+Creează types: Account, DailyBalance, BalanceCalculation, BalanceSettings cu toate proprietățile necesare pentru gestionarea soldului și conturilor
+
+## 10.4. Creează balance store [pending]
+### Dependencies: None
+### Description: Implementare Zustand store pentru gestionarea stării sistemului de sold
+### Details:
+Creează frontend/src/stores/balanceStore.ts cu: state pentru accounts/settings/dailyBalances, actions pentru CRUD accounts, calculare sold, helpers pentru total balance și reset, persistență cu zustand/persist
+
+## 10.5. Creează balance calculator hook [pending]
+### Dependencies: None
+### Description: Implementare hook pentru calcularea soldului zilnic cu logică de categorii speciale
+### Details:
+Creează frontend/src/hooks/useBalanceCalculator.ts care calculează sold zilnic: sold inițial + venituri - cheltuieli - investiții(albastru) - economisiri(verde), cu alerting pentru sold negativ
+
+## 10.6. Adaugă coloană balance în grid [pending]
+### Dependencies: None
+### Description: Integrare coloană sold în grid-ul principal LunarGrid cu formatare și culori
+### Details:
+În useLunarGridTable.ts: import useBalanceCalculator, adaugă columnHelper.accessor pentru balance cu formatare monetară, culori roșu bold pentru negativ, text-center pentru afișare
+
+## 10.7. Integrează în LunarGrid principal [pending]
+### Dependencies: None
+### Description: Adăugare alertă vizuală pentru sold negativ în componenta principală LunarGrid
+### Details:
+În LunarGridTanStack.tsx: import useBalanceCalculator, adaugă alertă vizuală înainte de tabel pentru hasNegativeBalance cu styling roșu, iconiță atenționare și mesaj din constants
+
+## 10.8. Settings modul pentru configurare sold inițial [pending]
+### Dependencies: None
+### Description: Implementare interfață în Settings pentru configurarea soldului inițial per cont și data de start a lunii
+### Details:
+Adăugare în Settings/Options: câmpuri pentru sold inițial per cont, selector data start luna (nu obligatoriu ziua 1), salvare în localStorage/storage persistent
+
+## 10.9. Gestionare conturi multiple în Settings [pending]
+### Dependencies: None
+### Description: Implementare editor conturi multiple pe modelul CategoryEditor cu limite și validări
+### Details:
+Component similar CategoryEditor pentru adăugare/editare/ștergere conturi, validări nume unic, limite rezonabile număr conturi, interfață intuitivă
+
+## 10.10. Transfer automat sold între luni [pending]
+### Dependencies: None
+### Description: Implementare transfer automat sold final ultima zi → sold inițial prima zi luna următoare
+### Details:
+Logică automată: la schimbarea lunii, soldul final din ultima zi a lunii precedente devine sold inițial pentru prima zi a lunii curente, respectând data start configurată
+
+## 10.11. Integrare sistem sold cu rapoarte existente [pending]
+### Dependencies: None
+### Description: Modificare rapoarte pentru separarea cheltuielilor pure de activele accumulate (investiții + economisiri)
+### Details:
+Update rapoarte să separe: cheltuieli pure (categorii normale) vs active accumulate (investiții + economisiri), păstrare funcționalitate existentă, adăugare secțiuni noi pentru claritate
+
