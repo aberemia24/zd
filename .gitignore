@@ -13,6 +13,29 @@ node_modules/
 .env.local
 .env.production
 
+# Environment files specifice
+frontend/.env.local
+frontend/.env.test
+backend/.env*
+
+# ===== FIȘIERE TEMPORARE ===== 
+# Debug files și screenshots
+debug-*.png
+debug-*.jpg
+debug-*.jpeg
+screenshot-*.png
+*.png.tmp
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+*.old
+package*.backup
+tsconfig*.backup
+dependency-backup-log.txt
+dependency-versions-before.txt
+
 # ===== RAPOARTE DE TESTE ===== 
 # Coverage reports
 coverage/
@@ -45,6 +68,12 @@ yarn-error.log*
 dev-debug.log
 pnpm-debug.log*
 lerna-debug.log*
+
+# Localhost logs (hooks debugging)
+localhost-*.log
+**/localhost-*.log
+frontend/src/services/hooks/localhost-*.log
+memory-bank/PRD/localhost-*.log
 
 # ===== EDITOR ===== 
 # Editor directories and files
@@ -95,3 +124,15 @@ tasks/
 # ===== SEPARATE PROJECTS ===== 
 # Ignore cursor-memory-bank directory (separate project)
 cursor-memory-bank/ 
+
+# ===== EXTENSII IDE ===== 
+# VS Code extensions
+*.vsix
+*.vsix.tmp
+
+# IDE-specific temp files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/tasks.json
+.idea/workspace.xml
+.idea/tasks.xml 
