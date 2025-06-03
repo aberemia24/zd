@@ -1,9 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { EXCEL_GRID } from "@shared-constants";
+import { useValidation, ValidationType } from "../../../../hooks/useValidation";
 
 /**
- * Hook pentru gestionarea inline editing în celule
- * Implementează logica de editare, validare și salvare
+ * Enhanced Hook pentru gestionarea inline editing în celule cu validare centralizată
+ * 
+ * FEATURES:
+ * - Validare centralizată folosind useValidation hook
+ * - Feedback instant cu warnings și context
+ * - Error handling enhanced
+ * - Support pentru toate tipurile de validare
  */
 
 export interface UseInlineCellEditProps {
@@ -42,63 +47,43 @@ export const useInlineCellEdit = ({
   const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  // Enhanced: Validare centralizată
+  const validation = useValidation('useInlineCellEdit');
+
   // Update value when initialValue changes
   useEffect(() => {
     setValue(String(initialValue));
   }, [initialValue]);
 
-  // Validate value based on type
+  /**
+   * Enhanced: Validare folosind sistemul centralizat
+   */
   const validateValue = useCallback(
     (val: string): string | null => {
-      const stringVal = String(val).trim();
-      if (!stringVal) {
-        return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.EMPTY_VALUE;
+      // Map validation type la tipul centralizat
+      const validationTypeMap: Record<string, ValidationType> = {
+        amount: 'amount',
+        text: 'text',
+        percentage: 'percentage',
+        date: 'date',
+      };
+
+      const mappedType = validationTypeMap[validationType];
+      if (!mappedType) {
+        return 'Tip de validare necunoscut';
       }
 
-      switch (validationType) {
-        case "amount":
-          // Acceptăm numere cu punct (450.5) - standard international
-          const numVal = parseFloat(stringVal);
-          if (isNaN(numVal)) {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_NUMBER;
-          }
-          if (numVal < 0) {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.NEGATIVE_VALUE;
-          }
-          break;
+      // Validare folosind sistemul centralizat
+      const result = validation.validateField(
+        cellId, 
+        val, 
+        mappedType, 
+        { allowEmpty: false }
+      );
 
-        case "percentage":
-          const percentVal = parseFloat(stringVal);
-          if (isNaN(percentVal)) {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS
-              .INVALID_PERCENTAGE;
-          }
-          if (percentVal < 0 || percentVal > 100) {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.PERCENTAGE_RANGE;
-          }
-          break;
-
-        case "date":
-          try {
-            const dateVal = new Date(stringVal);
-            if (isNaN(dateVal.getTime())) {
-              return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_DATE;
-            }
-          } catch {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.INVALID_DATE;
-          }
-          break;
-
-        case "text":
-          if (stringVal.length > 255) {
-            return EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.TEXT_TOO_LONG;
-          }
-          break;
-      }
-
-      return null;
+      return result.error || null;
     },
-    [validationType],
+    [validationType, validation, cellId],
   );
 
   // Start editing mode
@@ -107,15 +92,18 @@ export const useInlineCellEdit = ({
 
     setIsEditing(true);
     setError(null);
+    validation.clearFieldError(cellId);
 
     // Focus input after state update
     setTimeout(() => {
       inputRef.current?.focus();
       inputRef.current?.select();
     }, 0);
-  }, [isReadonly]);
+  }, [isReadonly, validation, cellId]);
 
-  // Save value cu error handling îmbunătățit
+  /**
+   * Enhanced: Save value cu error handling îmbunătățit și warnings
+   */
   const saveValue = useCallback(async () => {
     const currentValue = value.trim();
 
@@ -123,6 +111,7 @@ export const useInlineCellEdit = ({
     if (!currentValue) {
       setIsEditing(false);
       setValue(String(initialValue));
+      validation.clearFieldError(cellId);
       return;
     }
 
@@ -148,19 +137,38 @@ export const useInlineCellEdit = ({
 
       await onSave(convertedValue);
       setIsEditing(false);
+      validation.clearFieldError(cellId);
+
+      // Enhanced: Log warnings pentru sume mari
+      if (validationType === 'amount' && typeof convertedValue === 'number') {
+        const warnings = validation.state.warnings[cellId];
+        if (warnings && warnings.length > 0) {
+          console.info(`[InlineEdit] ${cellId} warnings:`, warnings);
+        }
+      }
+
     } catch (err: unknown) {
-      // Show the actual error message from the network
+      // Enhanced: Error handling cu context
       const errorMessage = err instanceof Error 
         ? err.message 
         : typeof err === 'string' 
         ? err 
-        : EXCEL_GRID.INLINE_EDITING.SAVE_ERROR;
+        : 'Eroare la salvare. Încearcă din nou.';
+      
       setError(errorMessage);
-      console.error("Save error:", err);
+      validation.setCustomError(cellId, errorMessage);
+      
+      console.error(`[InlineEdit] Save error for ${cellId}:`, {
+        error: err,
+        cellId,
+        value: currentValue,
+        validationType,
+        timestamp: new Date().toISOString()
+      });
     } finally {
       setIsSaving(false);
     }
-  }, [value, validateValue, onSave, validationType, initialValue]);
+  }, [value, validateValue, onSave, validationType, initialValue, validation, cellId]);
 
   // Cancel editing cu reset complet
   const cancelEdit = useCallback(() => {
@@ -168,9 +176,10 @@ export const useInlineCellEdit = ({
     setValue(String(initialValue)); // Reset la valoarea inițială
     setError(null);
     setIsSaving(false);
-  }, [initialValue]);
+    validation.clearFieldError(cellId);
+  }, [initialValue, validation, cellId]);
 
-  // Handle keyboard events cu Escape fix
+  // Handle keyboard events cu Escape fix și validare îmbunătățită
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       e.stopPropagation(); // Previne propagarea care poate cauza page refresh
@@ -199,9 +208,11 @@ export const useInlineCellEdit = ({
               const currentIndex = Array.from(cells).findIndex((cell) =>
                 cell.contains(e.target as HTMLElement),
               );
-              if (currentIndex >= 0 && currentIndex < cells.length - 1) {
-                (cells[currentIndex + 1] as HTMLElement).focus();
-                (cells[currentIndex + 1] as HTMLElement).click();
+              const nextCell = cells[currentIndex + 1] as HTMLElement;
+              if (nextCell) {
+                nextCell.focus();
+                // Trigger double click to start editing
+                nextCell.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
               }
             }
           });
@@ -211,14 +222,18 @@ export const useInlineCellEdit = ({
     [saveValue, cancelEdit],
   );
 
-  // Handle blur (auto-save)
+  // Handle blur cu salvare automată îmbunătățită
   const handleBlur = useCallback(() => {
-    if (isEditing) {
+    // Enhanced: Salvează automat doar dacă valoarea s-a schimbat
+    if (value.trim() !== String(initialValue).trim()) {
       saveValue();
+    } else {
+      // Anulează editarea dacă nu s-a schimbat nimic
+      cancelEdit();
     }
-  }, [isEditing, saveValue]);
+  }, [value, initialValue, saveValue, cancelEdit]);
 
-  // Handle double click
+  // Handle double click pentru start editing
   const handleDoubleClick = useCallback(() => {
     startEdit();
   }, [startEdit]);

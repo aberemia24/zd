@@ -12,6 +12,7 @@ import {
 import { TransactionStatus } from "@shared-constants";
 import { MESAJE } from "@shared-constants/messages";
 import { syncGlobalTransactionCache } from './cacheSync';
+import { useMutationErrorHandler } from '../../hooks/useErrorHandler';
 
 export type CreateTransactionHookPayload = CreateTransaction;
 export type UpdateTransactionHookPayload = Partial<CreateTransaction>;
@@ -36,6 +37,7 @@ type MonthlyTransactionsResult = {
  */
 export function useCreateTransaction() {
   const queryClient = useQueryClient();
+  const handleMutationError = useMutationErrorHandler('create', 'transaction', 'TransactionMutations');
 
   return useMutation<
     TransactionValidated,
@@ -80,6 +82,9 @@ export function useCreateTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
@@ -93,6 +98,7 @@ export function useCreateTransaction() {
  */
 export function useUpdateTransaction() {
   const queryClient = useQueryClient();
+  const handleMutationError = useMutationErrorHandler('update', 'transaction', 'TransactionMutations');
 
   return useMutation<
     TransactionValidated,
@@ -141,6 +147,9 @@ export function useUpdateTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
@@ -154,6 +163,7 @@ export function useUpdateTransaction() {
  */
 export function useDeleteTransaction() {
   const queryClient = useQueryClient();
+  const handleMutationError = useMutationErrorHandler('delete', 'transaction', 'TransactionMutations');
 
   return useMutation<void, Error, string, MutationContext>({
     mutationFn: async (transactionId) => {
@@ -198,6 +208,9 @@ export function useDeleteTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
@@ -211,6 +224,7 @@ export function useDeleteTransaction() {
  */
 export function useUpdateTransactionStatus() {
   const queryClient = useQueryClient();
+  const handleMutationError = useMutationErrorHandler('update', 'transaction_status', 'TransactionMutations');
 
   return useMutation<
     TransactionValidated,
@@ -278,9 +292,8 @@ export function useUpdateTransactionStatus() {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
 
-      throw new Error(
-        MESAJE.EROARE_SALVARE_TRANZACTIE || "Eroare la actualizarea statusului",
-      );
+      // Enhanced error handling cu context complet (înlocuiește throw new Error)
+      handleMutationError(err);
     },
   });
 }
@@ -289,6 +302,7 @@ export function useUpdateTransactionStatus() {
 export const useCreateTransactionMonthly = (year: number, month: number, userId?: string) => {
   const queryClient = useQueryClient();
   const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+  const handleMutationError = useMutationErrorHandler('create', 'transaction_monthly', 'TransactionMutationsMonthly');
 
   return useMutation({
     mutationFn: async (payload: CreateTransactionHookPayload) => {
@@ -357,6 +371,9 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
   });
 };
@@ -364,6 +381,7 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
 export const useUpdateTransactionMonthly = (year: number, month: number, userId?: string) => {
   const queryClient = useQueryClient();
   const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+  const handleMutationError = useMutationErrorHandler('update', 'transaction_monthly', 'TransactionMutationsMonthly');
 
   return useMutation({
     mutationFn: async ({ id, transactionData }: { id: string; transactionData: UpdateTransactionHookPayload }) => {
@@ -442,6 +460,9 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
   });
 };
@@ -449,6 +470,7 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
 export const useDeleteTransactionMonthly = (year: number, month: number, userId?: string) => {
   const queryClient = useQueryClient();
   const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+  const handleMutationError = useMutationErrorHandler('delete', 'transaction_monthly', 'TransactionMutationsMonthly');
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -467,16 +489,14 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
         if (!old) return old;
         return {
           data: old.data.filter((tx: TransactionValidated) => tx.id !== deletedId),
-          count: old.count - 1,
+          count: Math.max(0, old.count - 1),
         };
       });
 
       return { previousData };
     },
     onSuccess: (deletedId) => {
-      // Cache-ul a fost deja actualizat în onMutate
-      
-      // 🔄 NEW: Sync cu global cache pentru consistență între module  
+      // 🔄 NEW: Sync cu global cache pentru consistență între module
       if (userId) {
         try {
           syncGlobalTransactionCache({
@@ -495,10 +515,13 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, deletedId, context) => {
-      // Revert la datele anterioare în caz de eroare
+      // Rollback
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
     },
   });
 }; 
