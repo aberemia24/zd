@@ -1,0 +1,80 @@
+---
+description: 
+globs: frontend/src/components/**
+alwaysApply: false
+---
+
+<hook_rules>
+**CRITIC**: Hook-urile React trebuie apelate identic la fiecare render
+INTERZIS: Nu apela hook-uri în `if`, `?:`, bucle, return condiționat
+OBLIGATORIU: Hook-uri mereu în același număr și ordine
+CORECT: Condiții În INTERIORUL hook-urilor, nu în jurul lor
+PREFERAT: Funcții simple în loc de useCallback pentru handleri condiționați
+</hook_rules>
+
+<best_patterns>
+Inițializați toate hook-urile la început grupate logic
+Extrageți componente/funcții separate pentru a evita apeluri condiționate
+Validare în handler-uri, nu în hook-uri condiționate
+Nu schimbați numărul de hook-uri între renderuri
+</best_patterns>
+
+<aria_accessibility>
+INTERZIS: Atribute ARIA pe elemente incompatibile
+- `aria-selected`: NU pe `<button>` → folosiți `aria-pressed`/`aria-expanded`
+EVITAȚI: Roluri implicite redundante (ex: `role="list"` pe `<ul>`)
+PREFERAT: Elemente semantice native în loc de `div`-uri cu roluri
+</aria_accessibility>
+
+<examples>
+// ✅ CORECT
+const GoodComponent = () => {
+  const [isActive, setIsActive] = useState(false); // Hook mereu apelat
+  
+  // Condiția În INTERIORUL hook-ului
+  useEffect(() => {
+    if (isActive) { doSomething(); }
+  }, [isActive]);
+  
+  // Funcție simplă pentru handler condiționat
+  const handleAction = (id) => { /*...*/ };
+  
+  return (
+    <ul> {/* Fără role redundant */}
+      <li>
+        {isActive && (
+          <button aria-pressed={true}> {/* NU aria-selected */}
+            Acțiune
+          </button>
+        )}
+      </li>
+    </ul>
+  );
+};
+
+// ❌ GREȘIT
+const BadComponent = () => {
+  const [isActive, setIsActive] = useState(false);
+  
+  if (isActive) { // INTERZIS: Hook condiționat
+    useEffect(() => { /*...*/ }, []);
+  }
+  
+  return (
+    <ul role="list"> {/* Redundant */}
+      <li>
+        <button aria-selected={true}> {/* Incompatibil */}
+          Acțiune
+        </button>
+      </li>
+    </ul>
+  );
+};
+</examples>
+
+<hook_errors>
+Pentru "Rendered more hooks than during previous render":
+1. Extrage funcționalitatea ce folosea useCallback/useMemo în funcții simple
+2. Menține toate hook-urile la început, fără condiții
+3. Verifică if-uri/switch/?: care ar putea schimba ordinea hook-urilor
+</hook_errors>
