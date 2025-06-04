@@ -19,7 +19,7 @@ import {
   cn,
   modal,
   card
-} from "../../../styles/cva/unified-cva";
+} from "../../../styles/cva-v2";
 
 import { useCategoryEditorState } from "./useCategoryEditorState";
 

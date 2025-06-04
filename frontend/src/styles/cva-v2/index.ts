@@ -98,7 +98,10 @@ export {
   gridRow, 
   gridHeader, 
   gridExpandIcon, 
-  gridInput 
+  gridInput,
+  gridSubcategoryRow,
+  gridSubcategoryState,
+  gridInteractive
 } from './compositions/grid';
 export type { 
   GridContainerProps, 
@@ -106,7 +109,10 @@ export type {
   GridRowProps, 
   GridHeaderProps, 
   GridExpandIconProps, 
-  GridInputProps 
+  GridInputProps,
+  GridSubcategoryRowProps,
+  GridSubcategoryStateProps,
+  GridInteractiveProps
 } from './compositions/grid';
 
 export { 

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Select from "../../primitives/Select/Select";
-import { cn } from "../../../styles/cva/unified-cva";
+import { cn } from "../../../styles/cva-v2";
 import type { ExportFormat } from "../../../utils/ExportManager";
 import { BUTTONS, EXPORT_MESSAGES } from "@shared-constants";
 import { EXPORT_UI } from "@shared-constants/ui";

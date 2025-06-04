@@ -6,11 +6,12 @@ import Button from "../../primitives/Button/Button";
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from "@shared-constants";
 import { FrequencyType } from "@shared-constants/enums";
 
-// CVA styling imports
+// CVA styling imports - MIGRATED TO CVA-V2
 import { 
   cn,
-  card
-} from "../../../styles/cva/unified-cva";
+  card,
+  textProfessional
+} from "../../../styles/cva-v2";
 
 interface CellTransactionPopoverProps {
   initialAmount: string;
@@ -98,7 +99,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
         <div className="flex flex-row justify-between items-center">
           <label
             htmlFor="amount-input"
-            className="text-sm font-medium text-gray-700"
+            className={textProfessional({ variant: "body", contrast: "enhanced" })}
           >
             {LABELS.AMOUNT}*
           </label>
@@ -123,7 +124,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
         <div className="flex flex-row justify-between items-center">
           <label
             htmlFor="description-input"
-            className="text-sm font-medium text-gray-700"
+            className={textProfessional({ variant: "body", contrast: "enhanced" })}
           >
             {LABELS.DESCRIPTION}
           </label>

@@ -18,7 +18,7 @@ import { TITLES } from "@shared-constants";
 import { useDarkMode } from "./hooks/useDarkMode";
 
 // CVA styling imports
-import { cn, dashboard } from "./styles/cva/unified-cva";
+import { cn, dashboard } from "./styles/cva-v2";
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from "./stores/authStore";
@@ -114,7 +114,7 @@ export const App: React.FC = () => {
     return (
       <div
         className={cn(
-          dashboard({ layout: "single" }),
+          dashboard({ layout: "compact" }),
           "min-h-screen flex items-center justify-center",
         )}
       >
@@ -145,7 +145,7 @@ export const App: React.FC = () => {
       }}
     >
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className={dashboard({ layout: "single" })}>
+      <div className={dashboard({ layout: "compact" })}>
         {user /* Afișează navigarea doar dacă utilizatorul este logat */ && (
           <div
             className={cn(

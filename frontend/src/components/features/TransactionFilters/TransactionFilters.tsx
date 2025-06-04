@@ -14,7 +14,7 @@ import { useActiveSubcategories } from "../../../services/hooks/useActiveSubcate
 import { 
   cn,
   card
-} from "../../../styles/cva/unified-cva";
+} from "../../../styles/cva-v2";
 
 export interface TransactionFiltersProps {
   type?: TransactionType | "" | string;

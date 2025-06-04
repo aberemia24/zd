@@ -2,7 +2,7 @@ import React, { CSSProperties } from 'react';
 import CellTransactionPopover from "../CellTransactionPopover";
 import { QuickAddModal } from "../modals/QuickAddModal";
 import { FrequencyType, TransactionType } from "@shared-constants";
-import { cn } from "../../../../styles/cva/unified-cva";
+import { cn } from "../../../../styles/cva-v2";
 
 interface PopoverState {
   isOpen: boolean;

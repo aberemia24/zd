@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import Button from "../../../primitives/Button/Button";
 import { Edit, Trash2 } from "lucide-react";
 
-// CVA styling imports - UNIFIED MIGRATION COMPLETE
+// CVA styling imports - MIGRATED TO CVA-V2
 import { 
   cn,
   gridCell,
@@ -14,7 +14,7 @@ import {
   hoverScale,
   focusRing,
   animations
-} from "../../../../styles/cva/unified-cva";
+} from "../../../../styles/cva-v2";
 
 import { 
   UI, 

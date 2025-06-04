@@ -14,7 +14,7 @@ import LunarGridCell from "./LunarGridCell";
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
 import { CellPosition } from "../hooks/useKeyboardNavigation";
 
-// Utilities - MIGRATED TO UNIFIED CVA SYSTEM
+// Utilities - MIGRATED TO CVA-V2
 import { 
   cn,
   gridRow,
@@ -27,7 +27,7 @@ import {
   type GridRowProps,
   type GridCellProps,
   type GridExpandIconProps
-} from "../../../../styles/cva/unified-cva";
+} from "../../../../styles/cva-v2";
 
 interface LunarGridRowProps {
   row: Row<TransformedTableDataRow>;

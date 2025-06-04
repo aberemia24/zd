@@ -10,7 +10,7 @@ import Alert from "../components/primitives/Alert";
 import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";
 
 // CVA styling imports
-import { cn, dashboard, card } from "../styles/cva/unified-cva";
+import { cn, dashboard, card } from "../styles/cva-v2";
 
 import { useMonthlyTransactions } from "../services/hooks/useMonthlyTransactions";
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
@@ -374,7 +374,7 @@ const OptionsPage: React.FC = () => {
   if (!user) {
     return (
       <div
-        className={cn(dashboard({ layout: "single" }), "min-h-screen pt-8")}
+        className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
         data-testid="options-page-not-logged"
       >
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
@@ -404,7 +404,7 @@ const OptionsPage: React.FC = () => {
 
   return (
     <div
-      className={cn(dashboard({ layout: "single" }), "min-h-screen pt-8")}
+      className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
       data-testid="options-page"
     >
       <h1

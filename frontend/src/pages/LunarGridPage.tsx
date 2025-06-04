@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 
 // CVA styling imports
-import { cn, dashboard, modal, button } from "../styles/cva/unified-cva";
+import { cn, dashboard, modal, button } from "../styles/cva-v2";
 
 import { Maximize2, Minimize2 } from "lucide-react";
 import Badge from "../components/primitives/Badge/Badge";

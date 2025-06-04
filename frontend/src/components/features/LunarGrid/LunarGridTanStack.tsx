@@ -41,6 +41,7 @@ import { useAuthStore } from "../../../stores/authStore";
 // Utilitare și styling - MIGRATED TO UNIFIED CVA SYSTEM
 import { formatCurrencyForGrid, formatMonthYear } from "../../../utils/lunarGrid";
 import { calculatePopoverStyle } from "../../../utils/lunarGrid/lunarGridHelpers";
+// CVA styling imports - MIGRATED TO CVA-V2
 import { 
   cn,
   gridContainer,
@@ -55,7 +56,7 @@ import {
   type GridContainerProps,
   type GridCellProps,
   type GridHeaderProps
-} from "../../../styles/cva/unified-cva";
+} from "../../../styles/cva-v2";
 
 // Interfețe TypeScript
 interface CategoryStoreItem {
@@ -673,7 +674,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 data-testid="lunar-grid-table"
               >
                 {/* 🎨 Professional Header cu enhanced styling */}
-                <thead className={cn(gridHeader({ variant: "professional" }))}>
+                <thead className={cn(gridHeader({ sortable: false }))}>
                   <tr>
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
@@ -686,7 +687,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                           className={cn(
                             gridCell({ 
                               type: "header",
-                              size: "default"
+                              size: "md"
                             }),
                             textProfessional({ variant: "heading", contrast: "enhanced" }),
                             isFirstColumn && "min-w-[200px]",

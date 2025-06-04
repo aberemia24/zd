@@ -15,7 +15,7 @@ import {
   card,
   badge,
   button
-} from "../../../styles/cva/unified-cva";
+} from "../../../styles/cva-v2";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
 

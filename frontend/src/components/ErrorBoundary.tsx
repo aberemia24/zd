@@ -2,7 +2,7 @@ import React from "react";
 import { MESAJE } from "@shared-constants";
 
 // CVA styling imports - UNIFIED MIGRATION
-import { cn, button } from "../styles/cva/unified-cva";
+import { cn, button } from "../styles/cva-v2";
 
 import Alert from "./primitives/Alert/Alert";
 import { handleComponentError, EnhancedError } from "../utils/errorHandling";

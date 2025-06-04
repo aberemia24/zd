@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from "react";
-import { cn } from "../../../../styles/cva/unified-cva";
+import { cn } from "../../../../styles/cva-v2";
 import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@shared-constants";

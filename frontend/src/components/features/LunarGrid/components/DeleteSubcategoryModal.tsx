@@ -6,7 +6,7 @@ import {
   modal,
   card,
   badge
-} from "../../../../styles/cva/unified-cva";
+} from "../../../../styles/cva-v2";
 
 interface SubcategoryAction {
   type: 'edit' | 'delete';

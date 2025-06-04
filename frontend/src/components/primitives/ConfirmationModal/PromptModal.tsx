@@ -7,7 +7,7 @@ import {
   input,
   badge,
   type ModalProps
-} from "../../../styles/cva/unified-cva";
+} from "../../../styles/cva-v2";
 
 export interface PromptModalProps {
   isOpen: boolean;

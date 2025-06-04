@@ -1,25 +1,24 @@
 import React from 'react';
 import Button from "../../../primitives/Button/Button";
 import { Plus, Check, X } from "lucide-react";
-import { cn } from "../../../../styles/cva/unified-cva";
-import {
-  gridSubcategoryRow,
-  gridSubcategoryState,
-  gridCell,
-  gridInput,
-  gridInteractive
-} from "../../../../styles/cva/grid";
-import { BUTTONS, PLACEHOLDERS, LUNAR_GRID_ACTIONS } from "@shared-constants";
+// CVA styling imports - MIGRATED TO CVA-V2
 import { 
-  gridRow,
+  cn,
   button,
   badge,
   textProfessional,
   focusRing,
   hoverScale,
   input,
-  flex
-} from "../../../../styles/cva/unified-cva";
+  flex,
+  gridRow,
+  gridCell,
+  gridInput,
+  gridSubcategoryRow,
+  gridSubcategoryState,
+  gridInteractive
+} from "../../../../styles/cva-v2";
+import { BUTTONS, PLACEHOLDERS, LUNAR_GRID_ACTIONS } from "@shared-constants";
 
 interface AddSubcategoryRowProps {
   category: string;
@@ -108,8 +107,8 @@ const LunarGridAddSubcategoryRow: React.FC<AddSubcategoryRowProps> = ({
             )}
             data-testid={`add-subcategory-${category}`}
           >
-            <Plus size={14} className="text-professional-primary" />
-            <span className="text-professional-body font-medium">{BUTTONS.ADD_SUBCATEGORY}</span>
+            <Plus size={14} className={textProfessional({ variant: "primary" })} />
+            <span className={textProfessional({ variant: "body", contrast: "enhanced" })}>{BUTTONS.ADD_SUBCATEGORY}</span>
           </Button>
         )}
       </td>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Table } from '@tanstack/react-table';
 
-// CVA styling imports - UNIFIED MIGRATION
-import { cn, button } from "../../../../styles/cva/unified-cva";
+// CVA styling imports - MIGRATED TO CVA-V2
+import { cn, button } from "../../../../styles/cva-v2";
 
 import Button from "../../../primitives/Button/Button";
 import { LUNAR_GRID, UI } from "@shared-constants";

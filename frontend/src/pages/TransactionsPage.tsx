@@ -11,7 +11,7 @@ import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 import { useAuthStore } from "../stores/authStore";
 
 // CVA styling imports
-import { cn, card, dashboard } from "../styles/cva/unified-cva";
+import { cn, card, dashboard } from "../styles/cva-v2";
 
 import { PAGINATION } from "@shared-constants";
 import { TITLES } from "@shared-constants";
@@ -179,7 +179,7 @@ const TransactionsPage: React.FC = () => {
   );
 
   return (
-    <div className={cn(dashboard({ layout: "single" }), "space-y-6")}>
+    <div className={cn(dashboard({ layout: "default" }), "space-y-6")}>
       {/* Titlu pagină cu efect de gradient subtil */}
       <h1
         className="text-3xl font-bold text-gray-900 mb-6"
