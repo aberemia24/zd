@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import CategoryEditor from "../components/features/CategoryEditor/CategoryEditor";
-import { ExportButton } from "../components/features/ExportButton/ExportButton";
-import { UI, CATEGORIES, MESAJE, TransactionType } from "@shared-constants";
+import { UI, CATEGORIES, TransactionType } from "@shared-constants";
 import { Button } from "../components/primitives/Button";
 import Alert from "../components/primitives/Alert";
 import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";
+import { Container } from "../components/primitives";
 
 // CVA styling imports
 import { cn, dashboard, card } from "../styles/cva-v2";
 
-import { useMonthlyTransactions } from "../services/hooks/useMonthlyTransactions";
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
 import { supabaseService } from "../services/supabaseService";
 import { toast } from "react-hot-toast";
@@ -31,11 +30,7 @@ const OptionsPage: React.FC = () => {
   const [isResetting, setIsResetting] = React.useState(false);
   const [showPromptModal, setShowPromptModal] = React.useState(false);
   const [promptResolver, setPromptResolver] = React.useState<((value: string | null) => void) | null>(null);
-  const [orphanedTransactions, setOrphanedTransactions] = React.useState<{
-    customSubcategories: string[];
-    transactionCount: number;
-    affectedTransactions: any[];
-  } | null>(null);
+
 
   // IMPORTANT: Folosim o referință pentru a ține minte starea anterioară a editorului
   // și pentru a preveni buclele infinite, conform memoriei e0d0698c
@@ -373,21 +368,23 @@ const OptionsPage: React.FC = () => {
   // Dacă utilizatorul nu este autentificat, afișăm un mesaj
   if (!user) {
     return (
-      <div
-        className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
-        data-testid="options-page-not-logged"
-      >
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">
-          {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
-        </h1>
-        <Alert
-          variant="warning"
-          data-testid="options-alert-not-logged"
+      <Container maxWidth="7xl" padding="lg">
+        <div
+          className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
+          data-testid="options-page-not-logged"
         >
-          {UI.LOGIN_REQUIRED ||
-            "Trebuie să fiți autentificat pentru a accesa această pagină."}
-        </Alert>
-      </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+            {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
+          </h1>
+          <Alert
+            variant="warning"
+            data-testid="options-alert-not-logged"
+          >
+            {UI.LOGIN_REQUIRED ||
+              "Trebuie să fiți autentificat pentru a accesa această pagină."}
+          </Alert>
+        </div>
+      </Container>
     );
   }
 
@@ -403,246 +400,266 @@ const OptionsPage: React.FC = () => {
   };
 
   return (
-    <div
-      className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
-      data-testid="options-page"
-    >
-      <h1
-        className="text-3xl font-bold text-gray-900 mb-8"
-        data-testid="options-title"
+    <Container maxWidth="7xl" padding="lg">
+      <div
+        className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
+        data-testid="options-page"
       >
-        {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
-      </h1>
-
-      {/* Secțiunea de gestionare categorii */}
-      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-        <div
-          className={cn(
-            "p-4 border-b border-gray-200 bg-gray-50",
-            "rounded-t-lg",
-          )}
+        <h1
+          className="text-3xl font-bold text-gray-900 mb-8"
+          data-testid="options-title"
         >
-          <h2 className="text-lg font-semibold text-gray-900">
-            {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
-          </h2>
-        </div>
-        <div className="p-6">
-          <p className="text-gray-600 mb-4">
-            {UI.CATEGORY_MANAGEMENT_DESCRIPTION ||
-              "Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare."}
-          </p>
-          <Button
-            variant="primary"
-            size="md"
-            data-testid="open-category-editor-btn"
-            onClick={() => setShowCategoryEditor(true)}
+          {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
+        </h1>
+
+        {/* Secțiunea de gestionare categorii */}
+        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
+          <div
+            className={cn(
+              "p-4 border-b border-gray-200 bg-gray-50",
+              "rounded-t-lg",
+            )}
           >
-            {UI.MANAGE_CATEGORIES || "Gestionare categorii"}
-          </Button>
+            <h2 className="text-lg font-semibold text-gray-900">
+              {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
+            </h2>
+          </div>
+          <div className="p-6">
+            <p className="text-gray-600 mb-4">
+              {UI.CATEGORY_MANAGEMENT_DESCRIPTION ||
+                "Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare."}
+            </p>
+            <Button
+              variant="primary"
+              size="md"
+              data-testid="open-category-editor-btn"
+              onClick={() => setShowCategoryEditor(true)}
+            >
+              {UI.MANAGE_CATEGORIES || "Gestionare categorii"}
+            </Button>
+          </div>
         </div>
-      </div>
 
-      {/* Alte secțiuni de opțiuni */}
-      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-        <div
-          className={cn(
-            "p-4 border-b border-gray-200 bg-gray-50",
-            "rounded-t-lg",
-          )}
-        >
-          <h2 className="text-lg font-semibold text-gray-900">
-            {UI.DISPLAY_OPTIONS || "Opțiuni de afișare"}
-          </h2>
+        {/* Alte secțiuni de opțiuni */}
+        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
+          <div
+            className={cn(
+              "p-4 border-b border-gray-200 bg-gray-50",
+              "rounded-t-lg",
+            )}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">
+              {UI.DISPLAY_OPTIONS || "Opțiuni de afișare"}
+            </h2>
+          </div>
+          <div className="p-6">
+            <p className="text-gray-500 italic">
+              {UI.COMING_SOON || "În curând"}
+            </p>
+          </div>
         </div>
-        <div className="p-6">
-          <p className="text-gray-500 italic">
-            {UI.COMING_SOON || "În curând"}
-          </p>
-        </div>
-      </div>
 
-      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-        <div
-          className={cn(
-            "p-4 border-b border-gray-200 bg-gray-50",
-            "rounded-t-lg",
-          )}
-        >
-          <h2 className="text-lg font-semibold text-gray-900">
-            {UI.DATA_EXPORT || "Export date"}
-          </h2>
+        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
+          <div
+            className={cn(
+              "p-4 border-b border-gray-200 bg-gray-50",
+              "rounded-t-lg",
+            )}
+          >
+            <h2 className="text-lg font-semibold text-gray-900">
+              {UI.DATA_EXPORT || "Export date"}
+            </h2>
+          </div>
+          <div className="p-6">
+            <p className="text-gray-500 italic">
+              {UI.COMING_SOON || "În curând"}
+            </p>
+          </div>
         </div>
-        <div className="p-6">
-          <p className="text-gray-500 italic">
-            {UI.COMING_SOON || "În curând"}
-          </p>
-        </div>
-      </div>
 
-      {/* Secțiunea Reset to Defaults */}
-      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-        <div
-          className={cn(
-            "p-4 border-b border-gray-200 bg-red-50",
-            "rounded-t-lg",
-          )}
-        >
-          <h2 className="text-lg font-semibold text-red-900">
-            ⚠️ Reset la Setările Inițiale
-          </h2>
+        {/* Secțiunea Reset to Defaults */}
+        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
+          <div
+            className={cn(
+              "p-4 border-b border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20",
+              "rounded-t-lg",
+            )}
+          >
+            <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
+              ⚠️ Reset la Setările Inițiale
+            </h2>
+          </div>
+          <div className="p-6">
+            <p className="text-carbon-600 dark:text-carbon-400 mb-4">
+              Resetați aplicația la configurația inițială. Alegeți ce doriți să resetați:
+            </p>
+            
+            <div className="flex flex-col gap-4">
+              {/* Reset doar subcategorii */}
+              <div className="border border-carbon-200 dark:border-carbon-700 rounded-lg p-4 bg-carbon-50 dark:bg-carbon-900">
+                <h3 className="font-semibold text-carbon-900 dark:text-carbon-100 mb-2">
+                  🔄 Reset Subcategorii
+                </h3>
+                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                  Șterge subcategoriile custom și redenumește toate subcategoriile la numele inițiale. 
+                  <strong className="text-red-700 dark:text-red-400"> ATENȚIE:</strong> Tranzacțiile de pe subcategorii custom vor fi 
+                  <strong> șterse definitiv</strong>. Veți fi informați exact câte tranzacții vor fi afectate.
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 p-2 mb-3">
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    💡 <strong>Recomandare:</strong> Înainte de reset, mutați manual tranzacțiile importante 
+                    din LunarGrid pe subcategorii pe care doriți să le păstrați.
+                  </p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleResetSubcategories}
+                  disabled={isResetting}
+                  data-testid="reset-subcategories-btn"
+                >
+                  {isResetting ? "Se resetează..." : "Reset Subcategorii"}
+                </Button>
+              </div>
+
+              {/* Reset complet */}
+              <div className="border border-red-200 dark:border-red-700 rounded-lg p-4 bg-red-50 dark:bg-red-900/20">
+                <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+                  💥 Reset Complet (PERICULOS)
+                </h3>
+                <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                  Resetează subcategoriile ȘI șterge <strong>TOATE tranzacțiile</strong> definitiv din baza de date. 
+                  <strong> Această acțiune NU poate fi anulată!</strong>
+                </p>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleResetEverything}
+                  disabled={isResetting}
+                  data-testid="reset-everything-btn"
+                >
+                  {isResetting ? "Se resetează..." : "⚠️ Reset Complet"}
+                </Button>
+              </div>
+            </div>
+
+            {isResetting && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                  <span className="text-blue-800 text-sm">
+                    Se procesează resetarea... Vă rugăm să așteptați.
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="p-6">
-          <p className="text-gray-600 mb-4">
-            Resetați aplicația la configurația inițială. Alegeți ce doriți să resetați:
-          </p>
-          
-          <div className="flex flex-col gap-4">
-            {/* Reset doar subcategorii */}
-            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                🔄 Reset Subcategorii
-              </h3>
-              <p className="text-sm text-gray-600 mb-3">
-                Șterge subcategoriile custom și redenumește toate subcategoriile la numele inițiale. 
-                <strong className="text-red-700"> ATENȚIE:</strong> Tranzacțiile de pe subcategorii custom vor fi 
-                <strong> șterse definitiv</strong>. Veți fi informați exact câte tranzacții vor fi afectate.
-              </p>
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-2 mb-3">
-                <p className="text-xs text-blue-700">
-                  💡 <strong>Recomandare:</strong> Înainte de reset, mutați manual tranzacțiile importante 
-                  din LunarGrid pe subcategorii pe care doriți să le păstrați.
+
+        {/* Secțiunea Cont Utilizator */}
+        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
+          <div
+            className={cn(
+              "p-4 border-b border-carbon-200 dark:border-carbon-700 bg-carbon-50 dark:bg-carbon-900",
+              "rounded-t-lg",
+            )}
+          >
+            <h2 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100">
+              {UI.ACCOUNT_SETTINGS || "Setări Cont"}
+            </h2>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              <div className="border border-carbon-200 dark:border-carbon-700 rounded-lg p-4 bg-carbon-50 dark:bg-carbon-900">
+                <h3 className="font-semibold text-carbon-900 dark:text-carbon-100 mb-2">
+                  👤 Informații cont
+                </h3>
+                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                  <strong>Email:</strong> {user.email || "Nu este disponibil"}
+                </p>
+                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                  <strong>ID Utilizator:</strong> {user.id || "Nu este disponibil"}
                 </p>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleResetSubcategories}
-                disabled={isResetting}
-                data-testid="reset-subcategories-btn"
-              >
-                {isResetting ? "Se resetează..." : "Reset Subcategorii"}
-              </Button>
-            </div>
 
-            {/* Reset complet */}
-            <div className="border border-red-200 rounded-lg p-4 bg-red-50">
-              <h3 className="font-semibold text-red-900 mb-2">
-                💥 Reset Complet (PERICULOS)
-              </h3>
-              <p className="text-sm text-red-700 mb-3">
-                Resetează subcategoriile ȘI șterge <strong>TOATE tranzacțiile</strong> definitiv din baza de date. 
-                <strong> Această acțiune NU poate fi anulată!</strong>
-              </p>
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={handleResetEverything}
-                disabled={isResetting}
-                data-testid="reset-everything-btn"
-              >
-                {isResetting ? "Se resetează..." : "⚠️ Reset Complet"}
-              </Button>
-            </div>
-          </div>
-
-          {isResetting && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                <span className="text-blue-800 text-sm">
-                  Se procesează resetarea... Vă rugăm să așteptați.
-                </span>
+              <div className="border border-orange-200 dark:border-orange-700 rounded-lg p-4 bg-orange-50 dark:bg-orange-900/20">
+                <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-2">
+                  🚪 Delogare
+                </h3>
+                <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                  Delogați-vă din aplicație și reveniți la pagina de autentificare.
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleLogout}
+                  data-testid="logout-btn"
+                >
+                  Delogare
+                </Button>
               </div>
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Modal pentru editarea categoriilor */}
+        <CategoryEditor
+          open={showCategoryEditor}
+          onClose={() => {
+            // Salvăm starea anterioară înainte de a o modifica
+            prevEditorStateRef.current = showCategoryEditor;
+            setShowCategoryEditor(false);
+
+            // IMPORTANT: În loc să folosim evenimente care pot cauza bucle infinite,
+            // salvăm un timestamp în localStorage pentru a notifica alte componente
+            // despre schimbările în categorii. Această abordare respectă recomandările
+            // din memoria critică d7b6eb4b-0702-4b0a-b074-3915547a2544 și pattern-urile
+            // din memoria e0d0698c-ac6d-444f-8811-b1a3936df71b
+            console.log(
+              "[OptionsPage] Notificarea componentelor despre schimbări în categorii",
+            );
+            const timestamp = Date.now();
+            localStorage.setItem(
+              "budget-app-last-category-update",
+              timestamp.toString(),
+            );
+            console.log(
+              "[OptionsPage] Timestamp salvat:",
+              new Date(timestamp).toISOString(),
+            );
+          }}
+          userId={user.id}
+        />
+
+        {/* Modal-uri de confirmare */}
+        <ConfirmationModal {...modalProps} />
+        
+        <PromptModal
+          isOpen={showPromptModal}
+          onClose={() => {
+            if (promptResolver) {
+              promptResolver(null);
+              setPromptResolver(null);
+            }
+            setShowPromptModal(false);
+          }}
+          onConfirm={(value) => {
+            if (promptResolver) {
+              promptResolver(value);
+              setPromptResolver(null);
+            }
+            setShowPromptModal(false);
+          }}
+          title="Confirmarea finală"
+          message="Pentru a confirma ștergerea completă, scrieți exact: ȘTERG TOT"
+          placeholder="Scrieți aici..."
+          confirmText="Confirm ștergerea"
+          cancelText="Anulează"
+          variant="danger"
+          required={true}
+        />
       </div>
-
-      {/* Secțiunea Cont Utilizator */}
-      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-        <div
-          className={cn(
-            "p-4 border-b border-gray-200 bg-gray-50",
-            "rounded-t-lg",
-          )}
-        >
-          <h2 className="text-lg font-semibold text-gray-900">
-            {UI.ACCOUNT_SETTINGS || "Setări Cont"}
-          </h2>
-        </div>
-        <div className="p-6">
-          <p className="text-gray-600 mb-4">
-            {UI.ACCOUNT_LOGOUT_DESCRIPTION ||
-              "Deconectează-te de la contul tău."}
-          </p>
-          <Button
-            variant="danger"
-            size="md"
-            dataTestId="logout-btn"
-            onClick={handleLogout}
-          >
-            {UI.LOGOUT_BUTTON || "Logout"}
-          </Button>
-        </div>
-      </div>
-
-      {/* Modal pentru editarea categoriilor */}
-      <CategoryEditor
-        open={showCategoryEditor}
-        onClose={() => {
-          // Salvăm starea anterioară înainte de a o modifica
-          prevEditorStateRef.current = showCategoryEditor;
-          setShowCategoryEditor(false);
-
-          // IMPORTANT: În loc să folosim evenimente care pot cauza bucle infinite,
-          // salvăm un timestamp în localStorage pentru a notifica alte componente
-          // despre schimbările în categorii. Această abordare respectă recomandările
-          // din memoria critică d7b6eb4b-0702-4b0a-b074-3915547a2544 și pattern-urile
-          // din memoria e0d0698c-ac6d-444f-8811-b1a3936df71b
-          console.log(
-            "[OptionsPage] Notificarea componentelor despre schimbări în categorii",
-          );
-          const timestamp = Date.now();
-          localStorage.setItem(
-            "budget-app-last-category-update",
-            timestamp.toString(),
-          );
-          console.log(
-            "[OptionsPage] Timestamp salvat:",
-            new Date(timestamp).toISOString(),
-          );
-        }}
-        userId={user.id}
-      />
-
-      {/* Modal-uri de confirmare */}
-      <ConfirmationModal {...modalProps} />
-      
-      <PromptModal
-        isOpen={showPromptModal}
-        onClose={() => {
-          if (promptResolver) {
-            promptResolver(null);
-            setPromptResolver(null);
-          }
-          setShowPromptModal(false);
-        }}
-        onConfirm={(value) => {
-          if (promptResolver) {
-            promptResolver(value);
-            setPromptResolver(null);
-          }
-          setShowPromptModal(false);
-        }}
-        title="Confirmarea finală"
-        message="Pentru a confirma ștergerea completă, scrieți exact: ȘTERG TOT"
-        placeholder="Scrieți aici..."
-        confirmText="Confirm ștergerea"
-        cancelText="Anulează"
-        variant="danger"
-        required={true}
-      />
-    </div>
+    </Container>
   );
 };
 

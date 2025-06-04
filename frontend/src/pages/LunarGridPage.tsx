@@ -15,6 +15,7 @@ import Badge from "../components/primitives/Badge/Badge";
 import Select from "../components/primitives/Select/Select";
 import Input from "../components/primitives/Input/Input";
 import Spinner from "../components/primitives/Spinner/Spinner";
+import { Container } from "../components/primitives";
 
 // 🎯 LGI-TASK-07: Layout modes type pentru Progressive Enhancement Button (doar 2 moduri)
 type LayoutMode = 'full-width' | 'fullscreen';
@@ -286,116 +287,118 @@ const LunarGridPage: React.FC = () => {
       {/* 🎯 LGI-TASK-07: Fullscreen backdrop cu CVA professional styling */}
       {renderFullscreenBackdrop()}
       
-      <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-page-container">
-        {/* 🎯 LGI-TASK-07: Fullscreen mode indicator - CVA Badge primitive */}
-        {layoutMode === 'fullscreen' && (
-          <Badge 
-            variant="secondary" 
-            className="absolute top-1 right-1 z-10"
-          >
-            {UI.LUNAR_GRID_PAGE.FULLSCREEN_EXIT_HINT}
-          </Badge>
-        )}
-
-        {/* 🚨 CONSOLIDATION - Page header folosind flexbox manual - COMPACT */}
-        <div className={cn(
-          "flex flex-row justify-between items-center gap-4",
-          "mb-4 min-h-[3rem]",
-          layoutMode === 'full-width' ? "px-4" : ""
-        )}>
-          {/* 🚨 CONSOLIDATION - Title section folosind flexbox manual - COMPACT */}
-          <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-semibold text-gray-900 whitespace-nowrap">
-              {TITLES.GRID_LUNAR}
-            </h1>
-            {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
-            {isPending && (
-              <div 
-                className="flex items-center gap-2"
-                data-testid="transition-loading-indicator"
-              >
-                <Spinner size="sm" />
-                <span className="text-xs text-gray-600 whitespace-nowrap">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
-              </div>
-            )}
-          </div>
-
-          {/* 🚨 CONSOLIDATION - Controls section folosind flexbox manual - NOWRAP */}
-          <div className={cn(
-            "flex items-center gap-4",
-            "flex-shrink-0"
-          )}>
-            {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button - COMPACT */}
-            <button
-              onClick={handleLayoutModeToggle}
-              className={cn(
-                button({ variant: "outline", size: "sm" }),
-                "flex items-center gap-2",
-                "whitespace-nowrap flex-shrink-0",
-                layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
-              )}
-              title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
-                '{nextMode}', 
-                layoutMode === 'full-width' ? UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN : UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH
-              )}
-              data-testid="layout-mode-toggle"
+      <Container maxWidth="7xl" padding="lg">
+        <div className={getLayoutStyles(layoutMode)} data-testid="lunar-grid-page-container">
+          {/* 🎯 LGI-TASK-07: Fullscreen mode indicator - CVA Badge primitive */}
+          {layoutMode === 'fullscreen' && (
+            <Badge 
+              variant="secondary" 
+              className="absolute top-1 right-1 z-10"
             >
-              {getLayoutModeIcon(layoutMode)}
-              <span className="hidden sm:inline text-xs">{getLayoutModeLabel(layoutMode)}</span>
-            </button>
+              {UI.LUNAR_GRID_PAGE.FULLSCREEN_EXIT_HINT}
+            </Badge>
+          )}
 
-            {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}
-            <Select
-              value={month.toString()}
-              onChange={handleMonthChange}
-              options={[
-                { value: "1", label: getMonthName(1) },
-                { value: "2", label: getMonthName(2) },
-                { value: "3", label: getMonthName(3) },
-                { value: "4", label: getMonthName(4) },
-                { value: "5", label: getMonthName(5) },
-                { value: "6", label: getMonthName(6) },
-                { value: "7", label: getMonthName(7) },
-                { value: "8", label: getMonthName(8) },
-                { value: "9", label: getMonthName(9) },
-                { value: "10", label: getMonthName(10) },
-                { value: "11", label: getMonthName(11) },
-                { value: "12", label: getMonthName(12) },
-              ]}
-              data-testid="month-selector"
-            />
-
-            {/* 🚨 CONSOLIDATION - Input primitive CVA - COMPACT */}
-            <Input
-              type="number"
-              value={year.toString()}
-              onChange={handleYearChange}
-              min="1900"
-              max="2100"
-              className="w-20 text-sm"
-              data-testid="year-input"
-            />
-          </div>
-        </div>
-
-        {/* Arată Loading state când încărcăm date - CVA Spinner + flexbox manual - COMPACT */}
-        {loading ? (
+          {/* 🚨 CONSOLIDATION - Page header folosind flexbox manual - COMPACT */}
           <div className={cn(
-            "flex justify-center items-center gap-4",
-            "py-6",
+            "flex flex-row justify-between items-center gap-4",
+            "mb-4 min-h-[3rem]",
             layoutMode === 'full-width' ? "px-4" : ""
           )}>
-            <Spinner size="md" />
-            <p className="text-gray-700 text-sm">
-              {`Încărcăm datele pentru ${getMonthName(month)} ${year}...`}
-            </p>
+            {/* 🚨 CONSOLIDATION - Title section folosind flexbox manual - COMPACT */}
+            <div className="flex items-center gap-4">
+              <h1 className="text-2xl font-semibold text-gray-900 whitespace-nowrap">
+                {TITLES.GRID_LUNAR}
+              </h1>
+              {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
+              {isPending && (
+                <div 
+                  className="flex items-center gap-2"
+                  data-testid="transition-loading-indicator"
+                >
+                  <Spinner size="sm" />
+                  <span className="text-xs text-gray-600 whitespace-nowrap">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
+                </div>
+              )}
+            </div>
+
+            {/* 🚨 CONSOLIDATION - Controls section folosind flexbox manual - NOWRAP */}
+            <div className={cn(
+              "flex items-center gap-4",
+              "flex-shrink-0"
+            )}>
+              {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button - COMPACT */}
+              <button
+                onClick={handleLayoutModeToggle}
+                className={cn(
+                  button({ variant: "outline", size: "sm" }),
+                  "flex items-center gap-2",
+                  "whitespace-nowrap flex-shrink-0",
+                  layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
+                )}
+                title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
+                  '{nextMode}', 
+                  layoutMode === 'full-width' ? UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN : UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH
+                )}
+                data-testid="layout-mode-toggle"
+              >
+                {getLayoutModeIcon(layoutMode)}
+                <span className="hidden sm:inline text-xs">{getLayoutModeLabel(layoutMode)}</span>
+              </button>
+
+              {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}
+              <Select
+                value={month.toString()}
+                onChange={handleMonthChange}
+                options={[
+                  { value: "1", label: getMonthName(1) },
+                  { value: "2", label: getMonthName(2) },
+                  { value: "3", label: getMonthName(3) },
+                  { value: "4", label: getMonthName(4) },
+                  { value: "5", label: getMonthName(5) },
+                  { value: "6", label: getMonthName(6) },
+                  { value: "7", label: getMonthName(7) },
+                  { value: "8", label: getMonthName(8) },
+                  { value: "9", label: getMonthName(9) },
+                  { value: "10", label: getMonthName(10) },
+                  { value: "11", label: getMonthName(11) },
+                  { value: "12", label: getMonthName(12) },
+                ]}
+                data-testid="month-selector"
+              />
+
+              {/* 🚨 CONSOLIDATION - Input primitive CVA - COMPACT */}
+              <Input
+                type="number"
+                value={year.toString()}
+                onChange={handleYearChange}
+                min="1900"
+                max="2100"
+                className="w-20 text-sm"
+                data-testid="year-input"
+              />
+            </div>
           </div>
-        ) : (
-          <div className={layoutMode === 'full-width' ? "px-4" : ""}>
-            <LunarGridTanStack year={year} month={month} />
-          </div>
-        )}
-      </div>
+
+          {/* Arată Loading state când încărcăm date - CVA Spinner + flexbox manual - COMPACT */}
+          {loading ? (
+            <div className={cn(
+              "flex justify-center items-center gap-4",
+              "py-6",
+              layoutMode === 'full-width' ? "px-4" : ""
+            )}>
+              <Spinner size="md" />
+              <p className="text-gray-700 text-sm">
+                {`Încărcăm datele pentru ${getMonthName(month)} ${year}...`}
+              </p>
+            </div>
+          ) : (
+            <div className={layoutMode === 'full-width' ? "px-4" : ""}>
+              <LunarGridTanStack year={year} month={month} />
+            </div>
+          )}
+        </div>
+      </Container>
     </>
   );
 };

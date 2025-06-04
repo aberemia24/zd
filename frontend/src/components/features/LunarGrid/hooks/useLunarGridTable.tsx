@@ -2,6 +2,7 @@ import { useMemo, useRef, useCallback, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
+  getExpandedRowModel,
   ColumnDef,
   Table,
 } from "@tanstack/react-table";
@@ -25,6 +26,9 @@ import {
   formatMonthYear,
 } from "../../../../utils/lunarGrid";
 import { MESAJE, LUNAR_GRID_MESSAGES } from "@shared-constants";
+
+// CVA styling imports
+import { cn, hoverBackground } from "../../../../styles/cva-v2";
 
 // Interfaces pentru structuri de date
 interface SubcategoryDefinition {
@@ -480,7 +484,7 @@ export function useLunarGridTable(
             if (isSubcategory && stableClickHandlers) {
               return (
                 <div
-                  className={`text-center ${colorClass} cursor-pointer hover:bg-gray-50 p-2 transition-colors duration-150`}
+                  className={cn("text-center cursor-pointer p-2", colorClass, hoverBackground({ variant: "subtle" }))}
                   onClick={(e) =>
                     stableClickHandlers.handleSingleClick(
                       e,
@@ -552,6 +556,7 @@ export function useLunarGridTable(
     data: rawTableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getExpandedRowModel: getExpandedRowModel(), // 🔥 FIX: Adăugat pentru funcționalitatea de expandare
     getSubRows: (row) => row.subRows || [],
     autoResetExpanded: false,
     getRowId: (row) => row.id,

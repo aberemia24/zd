@@ -5,7 +5,7 @@
  */
 
 import React, { ReactNode, useCallback } from 'react';
-import { cn } from '../../../styles/cva-v2';
+import { cn, hoverBackground } from '../../../styles/cva-v2';
 import { list, listItem, badge, type ListProps, type ListItemProps } from '../../../styles/cva-v2/primitives';
 import { formatCurrencyRON, formatDateRON } from '../../../utils/financial';
 import type { FinancialListItem, CategoryListItem } from '../../../types/financial';
@@ -44,7 +44,7 @@ const ListItemActions: React.FC<ListItemActionsProps> = ({
           className={cn(
             buttonSize,
             'flex items-center justify-center rounded-md',
-            'hover:bg-carbon-200 dark:hover:bg-carbon-700',
+            hoverBackground({ variant: "medium" }),
             'text-carbon-600 hover:text-carbon-900 dark:text-carbon-400 dark:hover:text-carbon-100',
             'transition-colors duration-150'
           )}
@@ -62,7 +62,7 @@ const ListItemActions: React.FC<ListItemActionsProps> = ({
           className={cn(
             buttonSize,
             'flex items-center justify-center rounded-md',
-            'hover:bg-copper-200 dark:hover:bg-copper-800',
+            hoverBackground({ variant: "primary" }),
             'text-copper-600 hover:text-copper-900 dark:text-copper-400 dark:hover:text-copper-100',
             'transition-colors duration-150'
           )}
@@ -80,7 +80,7 @@ const ListItemActions: React.FC<ListItemActionsProps> = ({
           className={cn(
             buttonSize,
             'flex items-center justify-center rounded-md',
-            'hover:bg-ruby-200 dark:hover:bg-ruby-800',
+            hoverBackground({ variant: "danger" }),
             'text-ruby-600 hover:text-ruby-900 dark:text-ruby-400 dark:hover:text-ruby-100',
             'transition-colors duration-150'
           )}

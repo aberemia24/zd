@@ -47,6 +47,10 @@ export type { TextProfessionalProps, FontFinancialProps } from './foundations/ty
 export { hoverScale, focusRing, animations } from './foundations/animations';
 export type { HoverScaleProps, FocusRingProps, AnimationsProps } from './foundations/animations';
 
+// Interactive states și hover effects
+export { hoverBackground, interactiveText, interactiveBorder } from './foundations/interactive';
+export type { HoverBackgroundProps, InteractiveTextProps, InteractiveBorderProps } from './foundations/interactive';
+
 export { ambientGlow, glassEffect } from './foundations/effects';
 export type { AmbientGlowProps, GlassEffectProps } from './foundations/effects';
 

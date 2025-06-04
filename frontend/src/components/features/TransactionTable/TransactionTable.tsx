@@ -14,7 +14,8 @@ import {
   cn,
   card,
   badge,
-  button
+  button,
+  hoverBackground
 } from "../../../styles/cva-v2";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
@@ -342,7 +343,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   : transactions.map((t, idx) => (
                       <tr
                         key={`${t.id}-${idx}`}
-                        className="hover:bg-gray-50 transition-colors duration-150"
+                        className={hoverBackground({ variant: "subtle" })}
                         data-testid={`transaction-item-${t.id || idx}`}
                       >
                         <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">

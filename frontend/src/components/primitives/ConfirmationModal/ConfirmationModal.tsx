@@ -1,16 +1,16 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "../Button";
+import { cn } from "../../../styles/cva-v2";
 import { 
-  cn,
   modal,
-  card,
-  badge,
-  type ModalProps
-} from "../../../styles/cva-v2";
+  modalContent,
+  modalContainer
+} from "../../../styles/cva-v2/primitives/modal";
+import { createPortal } from 'react-dom';
 
 export interface ConfirmationModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onCancel: () => void;
   onConfirm: () => void;
   title: string;
   message: string;
@@ -20,15 +20,16 @@ export interface ConfirmationModalProps {
   icon?: string;
   details?: string[];
   recommendation?: string;
+  confirmButtonClass?: string;
 }
 
 /**
  * ConfirmationModal component pentru confirmări importante
- * Bazat pe noul sistem CVA v2 modular cu Carbon Copper palette
+ * Folosește noul sistem CVA v2 simplificat cu pattern-ul din ExportModal
  */
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
-  onClose,
+  onCancel,
   onConfirm,
   title,
   message,
@@ -38,126 +39,147 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   icon,
   details,
   recommendation,
+  confirmButtonClass = '',
 }) => {
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  // Professional scroll lock with scrollbar compensation
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Save focus for restoration
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
+    // Save current scroll positions for restoration
+    const currentPageScrollY = window.scrollY;
+    const currentPageScrollX = window.scrollX;
+    
+    // Get scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Save original styles for restoration
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    
+    // Apply scroll lock with scrollbar compensation
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    
+    // Cleanup function - restore scroll when modal closes
+    return () => {
+      // Restore original styles
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      
+      // Restore scroll position precisely
+      window.scrollTo(currentPageScrollX, currentPageScrollY);
+      
+      // Restore focus
+      if (previousActiveElement.current && previousActiveElement.current.focus) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [isOpen]);
+
+  // Enhanced escape key handler with capture
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        onCancel();
+      }
+    };
+
+    // Use capture to ensure it fires first
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [isOpen, onCancel]);
+
   if (!isOpen) return null;
 
-  // Map variant la badge colors pentru header styling
-  const getBadgeVariant = () => {
-    switch (variant) {
-      case "warning": return "warning";
-      case "danger": return "warning"; // Folosim warning pentru danger
-      default: return "secondary"; // Carbon pentru default
-    }
-  };
-
-  // Map variant la text colors
-  const getTextColor = () => {
-    switch (variant) {
-      case "warning": return "text-amber-600 dark:text-amber-400";
-      case "danger": return "text-red-600 dark:text-red-400"; 
-      default: return "text-carbon-600 dark:text-carbon-400";
-    }
-  };
-
-  return (
-    <div className={cn(modal({ variant: "default" }))}>
-      <div 
-        className={cn(
-          card({ variant: "elevated" }),
-          "max-w-md w-full max-h-[90vh] overflow-y-auto mx-4",
-          "animate-theme-fade" // Smooth theme transition
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header cu Carbon Copper styling */}
-        <div className={cn(
-          "p-4 border-b border-carbon-200/50 dark:border-carbon-700/50 rounded-t-lg",
-          "bg-carbon-50 dark:bg-carbon-900"
-        )}>
-          <div className="flex items-center space-x-3">
+  return createPortal(
+    <div 
+      className={cn(modal({ variant: "overlay" }))}
+      onClick={onCancel}
+    >
+      <div className={cn(modalContainer())}>
+        <div 
+          className={cn(modalContent({ size: "sm", padding: "md" }))}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-start space-x-3">
             {icon && (
-              <div className={cn("text-2xl", getTextColor())}>
-                {icon}
-              </div>
+              <div className="text-2xl">{icon}</div>
             )}
-            <h2 className={cn(
-              "text-lg font-semibold",
-              "text-carbon-900 dark:text-carbon-100"
-            )}>
-              {title}
-            </h2>
-            {/* Visual indicator cu badge pentru variant */}
-            <div className={cn(
-              badge({ variant: getBadgeVariant() }),
-              "ml-auto"
-            )}>
-              {variant === "danger" ? "⚠️" : variant === "warning" ? "⚠️" : "ℹ️"}
-            </div>
-          </div>
-        </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold text-carbon-900 dark:text-copper-100">
+                {title}
+              </h2>
+              
+              <p className="text-carbon-700 dark:text-copper-300 mt-2">
+                {message}
+              </p>
 
-        {/* Body cu enhanced Carbon Copper styling */}
-        <div className="p-6">
-          <div className="text-carbon-700 dark:text-carbon-300 mb-4 whitespace-pre-line">
-            {message}
-          </div>
-
-          {/* Details List cu dark mode support */}
-          {details && details.length > 0 && (
-            <div className={cn(
-              "bg-carbon-100/50 dark:bg-carbon-800/50 border border-carbon-200/50 dark:border-carbon-700/50",
-              "rounded-lg p-3 mb-4"
-            )}>
-              <ul className="text-sm text-carbon-600 dark:text-carbon-400 space-y-1">
-                {details.map((detail, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-carbon-400 dark:text-carbon-500 mr-2">•</span>
-                    <span>{detail}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Recommendation cu copper accent color */}
-          {recommendation && (
-            <div className={cn(
-              "bg-copper-50/50 dark:bg-copper-900/20 border-l-4 border-copper-500 dark:border-copper-400",
-              "p-3 mb-4 rounded-r-lg"
-            )}>
-              <div className="flex items-start">
-                <div className="text-copper-600 dark:text-copper-400 mr-2">💡</div>
-                <div className="text-sm text-copper-800 dark:text-copper-200">
-                  <strong>Recomandare:</strong> {recommendation}
+              {details && details.length > 0 && (
+                <div className="mt-4 p-3 bg-carbon-50 dark:bg-copper-900 rounded">
+                  <h4 className="text-sm font-medium text-carbon-900 dark:text-copper-100 mb-2">
+                    Details:
+                  </h4>
+                  <ul className="text-sm text-carbon-700 dark:text-copper-300 space-y-1">
+                    {details.map((detail: string, index: number) => (
+                      <li key={index} className="flex items-start">
+                        <span className="mr-2">•</span>
+                        {detail}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Actions cu Button component styling */}
-          <div className="flex space-x-3 justify-end">
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={onClose}
+              {recommendation && (
+                <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded border-l-4 border-blue-400">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>Recommendation:</strong> {recommendation}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              onClick={onCancel}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-md",
+                "bg-carbon-100 hover:bg-carbon-200 text-carbon-900",
+                "dark:bg-copper-800 dark:hover:bg-copper-700 dark:text-copper-100",
+                "transition-colors"
+              )}
             >
               {cancelText}
-            </Button>
-            <Button
-              variant={variant === "danger" ? "primary" : "primary"}
-              size="md"
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              className={variant === "danger" ? "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600" : ""}
+            </button>
+            
+            <button
+              onClick={onConfirm}
+              className={cn(
+                "px-4 py-2 text-sm font-medium rounded-md",
+                variant === 'danger' 
+                  ? "bg-red-600 hover:bg-red-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white",
+                "transition-colors",
+                confirmButtonClass
+              )}
             >
               {confirmText}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

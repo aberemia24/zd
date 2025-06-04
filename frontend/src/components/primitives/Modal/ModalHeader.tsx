@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../../styles/cva-v2';
+import { cn, hoverBackground } from '../../../styles/cva-v2';
 import { useModalContext } from './Modal';
 import type { ModalHeaderProps } from './types';
 
@@ -43,7 +43,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           className={cn(
             "ml-4 p-2 rounded-lg",
             "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
-            "hover:bg-gray-100 dark:hover:bg-gray-800",
+            hoverBackground({ variant: "light" }),
             "transition-colors duration-200",
             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           )}

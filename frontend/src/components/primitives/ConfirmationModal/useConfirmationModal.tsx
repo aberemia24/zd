@@ -67,7 +67,7 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
     });
   }, [modalState]);
 
-  const modalProps: Omit<ConfirmationModalProps, "onConfirm" | "onClose"> = {
+  const modalProps: Omit<ConfirmationModalProps, "onConfirm" | "onCancel"> = {
     isOpen: modalState.isOpen,
     title: modalState.options.title,
     message: modalState.options.message,
@@ -83,7 +83,7 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
     modalProps: {
       ...modalProps,
       onConfirm: handleConfirm,
-      onClose: hideModal,
+      onCancel: hideModal,
     },
     showConfirmation,
     hideModal,

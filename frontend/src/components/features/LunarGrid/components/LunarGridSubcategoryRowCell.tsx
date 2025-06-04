@@ -13,7 +13,8 @@ import {
   textProfessional,
   hoverScale,
   focusRing,
-  animations
+  animations,
+  interactiveText
 } from "../../../../styles/cva-v2";
 
 import { 
@@ -133,7 +134,7 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
             <button
               onClick={onStartDelete}
               className={cn(
-                "p-1 text-warning",
+                cn("p-1", interactiveText({ variant: "warning" })),
                 hoverScale({ intensity: "subtle" })
               )}
               title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}

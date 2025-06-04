@@ -33,4 +33,8 @@ export type {
 
 // Visual Effects
 export { ambientGlow, glassEffect } from './effects';
-export type { AmbientGlowProps, GlassEffectProps } from './effects'; 
+export type { AmbientGlowProps, GlassEffectProps } from './effects';
+
+// Interactive States
+export { hoverBackground, interactiveText, interactiveBorder } from './interactive';
+export type { HoverBackgroundProps, InteractiveTextProps, InteractiveBorderProps } from './interactive'; 

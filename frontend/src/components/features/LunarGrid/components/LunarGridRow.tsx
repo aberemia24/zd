@@ -24,6 +24,7 @@ import {
   textProfessional,
   hoverScale,
   focusRing,
+  interactiveText,
   type GridRowProps,
   type GridCellProps,
   type GridExpandIconProps
@@ -184,14 +185,14 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
             return 'default';
           };
 
-          // Value classes for backward compatibility
+          // Value classes using CVA-v2 interactive text
           const getValueClasses = () => {
             const cellValue = flexRender(cell.column.columnDef.cell, cell.getContext());
             if (typeof cellValue === 'string' || typeof cellValue === 'number') {
               const numValue = parseFloat(cellValue.toString());
               if (!isNaN(numValue)) {
-                if (numValue > 0) return "text-success dark:text-success-300";
-                if (numValue < 0) return "text-warning dark:text-warning-300";
+                if (numValue > 0) return interactiveText({ variant: "success" });
+                if (numValue < 0) return interactiveText({ variant: "warning" });
               }
             }
             return "";
@@ -203,8 +204,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
               className={cn(
                 gridCell({
                   type: getCellType(),
-                  state: getCellState(),
-                  size: "default"
+                  state: getCellState()
                 }),
                 textProfessional({ variant: "default" }),
                 isFirstCell && level > 0 && "pl-8",
@@ -238,8 +238,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     className={cn(
                       gridExpandIcon({ 
                         variant: "professional",
-                        size: "default",
-                        state: row.getIsExpanded() ? "expanded" : "collapsed"
+                        expanded: row.getIsExpanded()
                       })
                     )}
                   />
@@ -330,7 +329,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       onSingleClickModal(original.category, original.subcategory, day, safeValue, transactionId, e.currentTarget as HTMLElement);
                     }}
                     className={cn(
-                      gridInput({ variant: "numeric" }),
+                      gridInput({ variant: "default", type: "number" }),
                       "text-center min-h-[40px] flex items-center justify-center"
                     )}
                     placeholder="0"

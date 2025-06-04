@@ -12,6 +12,7 @@ import { useAuthStore } from "../stores/authStore";
 
 // CVA styling imports
 import { cn, card, dashboard } from "../styles/cva-v2";
+import { Container } from "../components/primitives";
 
 import { PAGINATION } from "@shared-constants";
 import { TITLES } from "@shared-constants";
@@ -179,79 +180,81 @@ const TransactionsPage: React.FC = () => {
   );
 
   return (
-    <div className={cn(dashboard({ layout: "default" }), "space-y-6")}>
-      {/* Titlu pagină cu efect de gradient subtil */}
-      <h1
-        className="text-3xl font-bold text-gray-900 mb-6"
-        data-testid="transactions-title"
-      >
-        {TITLES.TRANZACTII}
-      </h1>
-
-      {/* Afișăm alerte pentru erori de fetch */}
-      {fetchError && (
-        <Alert
-          variant="error"
-          className="mb-4"
+    <Container maxWidth="7xl" padding="lg">
+      <div className={cn(dashboard({ layout: "default" }), "space-y-6")}>
+        {/* Titlu pagină cu efect de gradient subtil */}
+        <h1
+          className="text-3xl font-bold text-gray-900 mb-6"
+          data-testid="transactions-title"
         >
-          <strong>Eroare la încărcarea tranzacțiilor:</strong> {fetchError.message}
-        </Alert>
-      )}
+          {TITLES.TRANZACTII}
+        </h1>
 
-      {/* Card pentru formular cu styling elegant */}
-      <div className={cn(card({ variant: "default" }), "mb-6")}>
-        <TransactionForm />
-      </div>
+        {/* Afișăm alerte pentru erori de fetch */}
+        {fetchError && (
+          <Alert
+            variant="error"
+            className="mb-4"
+          >
+            <strong>Eroare la încărcarea tranzacțiilor:</strong> {fetchError.message}
+          </Alert>
+        )}
 
-      {/* Card pentru filtre cu styling consistent */}
-      <div className={cn(card({ variant: "default" }), "mb-6")}>
-        <TransactionFilters
-          type={filterType}
-          category={filterCategory}
-          subcategory={filterSubcategory}
-          dateFrom={dateFrom}
-          dateTo={dateTo}
-          amountMin={amountMin}
-          amountMax={amountMax}
-          searchText={searchText}
-          onTypeChange={(type) => setFilterType(type as TransactionType | "")}
-          onCategoryChange={(category) =>
-            setFilterCategory(category as CategoryType | "")
-          }
-          onSubcategoryChange={handleSubcategoryChange}
-          onDateFromChange={setDateFrom}
-          onDateToChange={setDateTo}
-          onAmountMinChange={setAmountMin}
-          onAmountMaxChange={setAmountMax}
-          onSearchTextChange={setSearchText}
-        />
-      </div>
+        {/* Card pentru formular cu styling elegant */}
+        <div className={cn(card({ variant: "default" }), "mb-6")}>
+          <TransactionForm />
+        </div>
 
-      {/* Card pentru export cu styling și layout consistent */}
-      <div className={cn(card({ variant: "default" }), "mb-6")}>
-        <ExportButton
-          transactions={(transactions as Transaction[]) || []}
-          disabled={isLoading || !transactions?.length}
-        />
-      </div>
+        {/* Card pentru filtre cu styling consistent */}
+        <div className={cn(card({ variant: "default" }), "mb-6")}>
+          <TransactionFilters
+            type={filterType}
+            category={filterCategory}
+            subcategory={filterSubcategory}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            amountMin={amountMin}
+            amountMax={amountMax}
+            searchText={searchText}
+            onTypeChange={(type) => setFilterType(type as TransactionType | "")}
+            onCategoryChange={(category) =>
+              setFilterCategory(category as CategoryType | "")
+            }
+            onSubcategoryChange={handleSubcategoryChange}
+            onDateFromChange={setDateFrom}
+            onDateToChange={setDateTo}
+            onAmountMinChange={setAmountMin}
+            onAmountMaxChange={setAmountMax}
+            onSearchTextChange={setSearchText}
+          />
+        </div>
 
-      {/* Tabelul cu tranzacții */}
-      <div
-        className="flex flex-col space-y-4"
-        data-testid="transaction-table-container"
-      >
-        <TransactionTable
-          transactions={transactions || []}
-          total={totalTransactions || 0}
-          isLoading={isLoading}
-          hasNextPage={hasNextPage}
-          fetchNextPage={fetchNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          isFiltered={isFiltered}
-          isFetching={isFetching}
-        />
+        {/* Card pentru export cu styling și layout consistent */}
+        <div className={cn(card({ variant: "default" }), "mb-6")}>
+          <ExportButton
+            transactions={(transactions as Transaction[]) || []}
+            disabled={isLoading || !transactions?.length}
+          />
+        </div>
+
+        {/* Tabelul cu tranzacții */}
+        <div
+          className="flex flex-col space-y-4"
+          data-testid="transaction-table-container"
+        >
+          <TransactionTable
+            transactions={transactions || []}
+            total={totalTransactions || 0}
+            isLoading={isLoading}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            isFiltered={isFiltered}
+            isFetching={isFetching}
+          />
+        </div>
       </div>
-    </div>
+    </Container>
   );
 };
 

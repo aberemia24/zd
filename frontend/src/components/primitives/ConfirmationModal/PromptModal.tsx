@@ -3,10 +3,11 @@ import { Button } from "../Button";
 import { 
   cn,
   modal,
+  modalContent,
   card,
   input,
   badge,
-  type ModalProps
+  interactiveText
 } from "../../../styles/cva-v2";
 
 export interface PromptModalProps {
@@ -84,19 +85,19 @@ const PromptModal: React.FC<PromptModalProps> = ({
   // Map variant la text colors
   const getTextColor = () => {
     switch (variant) {
-      case "warning": return "text-warning dark:text-warning-300";
-      case "danger": return "text-warning dark:text-warning-300"; 
+          case "warning": return interactiveText({ variant: "warning" });
+    case "danger": return interactiveText({ variant: "warning" }); 
       default: return "text-secondary dark:text-secondary-300";
     }
   };
 
   return (
-    <div className={cn(modal({ variant: "default" }))}>
+    <div className={cn(modal({ variant: "centered", size: "sm" }))}>
       <div 
         className={cn(
+          modalContent({ variant: "elevated" }),
           card({ variant: "elevated" }),
-          "max-w-md w-full mx-4",
-          "animate-theme-fade" // Smooth theme transition
+          "p-6"
         )}
         onClick={(e) => e.stopPropagation()}
       >
@@ -165,7 +166,7 @@ const PromptModal: React.FC<PromptModalProps> = ({
               size="md"
               onClick={handleConfirm}
               disabled={required && !inputValue.trim()}
-              className={variant === "danger" ? "bg-warning hover:bg-warning-600 dark:bg-warning-400 dark:hover:bg-warning-500" : ""}
+              className={variant === "danger" ? cn(interactiveText({ variant: "warning" }), "bg-warning hover:bg-warning-600 dark:bg-warning-400 dark:hover:bg-warning-500") : ""}
             >
               {confirmText}
             </Button>

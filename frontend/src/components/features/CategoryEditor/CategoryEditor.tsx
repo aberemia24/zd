@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
+import { createPortal } from 'react-dom';
 import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS, MESAJE } from "@shared-constants";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
@@ -18,8 +19,10 @@ import Alert from "../../primitives/Alert/Alert";
 import { 
   cn,
   modal,
-  card
+  card,
+  hoverBackground
 } from "../../../styles/cva-v2";
+import { modalContent, modalContainer } from "../../../styles/cva-v2/primitives/modal";
 
 import { useCategoryEditorState } from "./useCategoryEditorState";
 
@@ -66,14 +69,36 @@ const CategoryEditorComponent: React.FC<Props> = ({
     initialMode,
   });
 
-  // Memoizăm starea modală pentru tranziții fluide
-  const modalState = useMemo(
-    () => ({
-      visible: open,
-      animationClass: open ? "modal-visible" : "modal-hidden",
-    }),
-    [open],
-  );
+  // Professional scroll lock implementation from LunarGrid
+  useEffect(() => {
+    if (!open) return;
+
+    // Save current scroll positions for restoration
+    const currentPageScrollY = window.scrollY;
+    const currentPageScrollX = window.scrollX;
+    
+    // Apply scroll lock with professional styling
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${currentPageScrollY}px`;
+    document.body.style.left = `-${currentPageScrollX}px`;
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    // Cleanup function - restore scroll when modal closes
+    return () => {
+      // Restore page scroll
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      
+      // Restore scroll position precisely
+      window.scrollTo(currentPageScrollX, currentPageScrollY);
+    };
+  }, [open]);
 
   // validare subcategorie - memoizată pentru a evita recrearea la fiecare render
   const isValidSubcat = useCallback(
@@ -84,22 +109,21 @@ const CategoryEditorComponent: React.FC<Props> = ({
     [],
   );
 
-  // Adaugă event listener pentru tasta Escape
+  // Adaugă event listener pentru tasta Escape - enhanced implementation
   useEffect(() => {
     if (!open) return;
 
-    const handleEsc = (event: KeyboardEvent): void => {
-      if (event.key === "Escape") {
+    const handleKeyDown = (event: Event) => {
+      const keyboardEvent = event as globalThis.KeyboardEvent;
+      if (keyboardEvent.key === "Escape") {
+        keyboardEvent.preventDefault();
+        keyboardEvent.stopPropagation();
         onClose();
       }
     };
 
-    document.addEventListener("keydown", handleEsc as unknown as EventListener);
-    return () =>
-      document.removeEventListener(
-        "keydown",
-        handleEsc as unknown as EventListener,
-      );
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [open, onClose]);
 
   // Nu renderizăm nimic dacă modalul nu este deschis
@@ -118,341 +142,271 @@ const CategoryEditorComponent: React.FC<Props> = ({
     ) : null;
   };
 
-  // Componenta pentru confirmarea ștergerii
-  const DeleteConfirmation = ({
-    cat,
-    subcat,
-    onConfirm,
-    onCancel,
-  }: {
-    cat: string;
-    subcat: string;
-    onConfirm: () => void;
-    onCancel: () => void;
-  }): React.ReactElement => {
-    const message = `Sigur doriți să ștergeți subcategoria ${subcat} din categoria ${cat}? Această acțiune nu poate fi anulată.`;
-
-    return (
-      <div
-        className={cn(
-          card({ variant: "elevated" }),
-          "bg-yellow-50 border-yellow-200 border-l-4 border-l-yellow-500",
-          "p-4 rounded-lg",
-        )}
-        data-testid="delete-confirmation"
-        tabIndex={0}
-        role="dialog"
-        aria-labelledby="delete-confirmation-title"
-      >
-        <h3
-          id="delete-confirmation-title"
-          className="text-lg font-semibold text-yellow-800 mb-2"
-        >
-          {UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TITLE}
-        </h3>
-        <p className="text-sm text-yellow-700 mb-4">{message}</p>
-        <div className="flex flex-row gap-4 justify-end">
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={onConfirm}
-            data-testid="confirm-delete-btn"
-          >
-            {BUTTONS.DELETE}
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onCancel}
-            data-testid="cancel-delete-btn"
-          >
-            {BUTTONS.CANCEL}
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
-  return (
+  return createPortal(
     <div
-      className={cn(
-        modal({ variant: "default" }),
-        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
-        modalState.visible ? "opacity-100 visible" : "opacity-0 invisible",
-        "transition-all duration-300 ease-in-out",
-      )}
+      className={cn(modal({ variant: "overlay" }))}
       role="dialog"
       aria-modal="true"
       aria-labelledby="category-editor-title"
       data-testid="category-editor-modal"
+      onClick={onClose}
     >
-      <div
-        className={cn(
-          "bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden",
-          modalState.visible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4",
-          "transition-all duration-300 ease-in-out transform",
-        )}
-      >
-        <div className="flex justify-between items-center p-6 border-b border-gray-200 bg-gray-50">
-          <h2
-            id="category-editor-title"
-            className="text-xl font-bold text-gray-900"
-          >
-            {UI.CATEGORY_EDITOR.TITLE}
-          </h2>
-          <button
-            onClick={onClose}
-            className={cn(
-              "text-gray-400 hover:text-gray-600",
-              "transition-colors duration-150",
-              "p-2 rounded-md hover:bg-gray-100",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1",
-            )}
-            aria-label="Închide"
-            data-testid="close-category-editor"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          {error && (
-            <Alert
-              variant="error"
-              data-testid="error-message"
-              className="mb-4"
-            >
-              {error}
-            </Alert>
+      <div className={cn(modalContainer())}>
+        <div
+          className={cn(
+            modalContent({ 
+              size: "xl",
+              padding: "none",
+              maxHeight: "default"
+            })
           )}
-          <div className="flex flex-row gap-8 justify-between h-full">
-            <div
-              className={cn(card({ variant: "default" }), "flex-1")}
-              data-testid="categories-section"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className={cn(
+            "flex justify-between items-center p-6",
+            "border-b border-carbon-200 dark:border-carbon-700",
+            "bg-carbon-50 dark:bg-carbon-900 rounded-t-lg"
+          )}>
+            <h2
+              id="category-editor-title"
+              className="text-xl font-bold text-carbon-900 dark:text-carbon-100"
             >
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                {UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}
-              </h3>
-              <div
-                style={{ maxHeight: 300 }}
-                className="overflow-y-auto border border-gray-200 rounded-lg"
-                data-testid="categories-scroll-wrapper"
-              >
-                <ul className="divide-y divide-gray-200">
-                  {categories.map((cat) => (
-                    <li
-                      key={cat.name}
-                      className={cn(
-                        "p-3 hover:bg-gray-50 transition-colors duration-150",
-                        selectedCategory === cat.name &&
-                          "bg-primary-50 border-r-2 border-r-primary-500",
-                      )}
-                      data-testid={`category-item-${cat.name}`}
-                    >
-                      <button
-                        onClick={() => {
-                          setSelectedCategory(cat.name);
-                          setError(null);
-                          setNewSubcat("");
-                        }}
-                        aria-pressed={selectedCategory === cat.name}
-                        aria-controls="subcategories-section"
-                        data-testid={`cat-select-${cat.name}`}
-                        className={cn(
-                          "w-full text-left text-sm font-medium transition-colors duration-150",
-                          selectedCategory === cat.name
-                            ? "text-primary-700"
-                            : "text-gray-700 hover:text-gray-900",
-                        )}
-                      >
-                        {cat.name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div
-              className={cn(card({ variant: "default" }), "flex-1")}
-              data-testid="subcategories-section"
-              id="subcategories-section"
-            >
-              {/* Dialog de confirmare ștergere, arată doar când subcatAction.type === 'delete' */}
-              {subcatAction?.type === "delete" && (
-                <DeleteConfirmation
-                  cat={subcatAction.cat}
-                  subcat={subcatAction.subcat}
-                  onConfirm={async () => {
-                    try {
-                      if (
-                        isValidDeleteRequest(
-                          subcatAction.cat,
-                          subcatAction.subcat,
-                        )
-                      ) {
-                        await handleDelete(
-                          subcatAction.cat,
-                          subcatAction.subcat,
-                        );
-                      }
-                    } catch (error) {
-                      setError(MESAJE.CATEGORII.EROARE_STERGERE);
-                    }
-                  }}
-                  onCancel={() => setSubcatAction(null)}
-                />
+              {UI.CATEGORY_EDITOR.TITLE}
+            </h2>
+            <button
+              onClick={onClose}
+              className={cn(
+                "text-carbon-400 dark:text-carbon-500 hover:text-carbon-600 dark:hover:text-carbon-300",
+                "transition-colors duration-150",
+                "p-2 rounded-md hover:bg-carbon-100 dark:hover:bg-carbon-800",
+                "focus:outline-none focus:ring-2 focus:ring-copper-500 focus:ring-offset-1",
               )}
-              {selectedCategory ? (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    {UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{" "}
-                    <span className="text-primary-600 font-normal">
-                      {selectedCategory}
-                    </span>
-                  </h3>
-                  <div
-                    style={{ maxHeight: 300 }}
-                    className="overflow-y-auto border border-gray-200 rounded-lg mb-4"
-                    data-testid="subcategories-scroll-wrapper"
-                  >
-                    <ul
-                      className="divide-y divide-gray-200"
-                      aria-label={
-                        UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE
-                      }
+              aria-label="Închide"
+              data-testid="close-category-editor"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="p-6">
+            {error && (
+              <Alert
+                variant="error"
+                data-testid="error-message"
+                className="mb-4"
+              >
+                {error}
+              </Alert>
+            )}
+            <div className="flex flex-row gap-12 justify-between h-full">
+              <div
+                className={cn(card({ variant: "default" }), "flex-1")}
+                data-testid="categories-section"
+              >
+                <h3 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100 mb-4">
+                  {UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}
+                </h3>
+                <div
+                  style={{ maxHeight: 400 }}
+                  className={cn(
+                    "overflow-y-auto border border-carbon-200 dark:border-carbon-700 rounded-lg",
+                    "bg-carbon-50 dark:bg-carbon-900"
+                  )}
+                  data-testid="categories-scroll-wrapper"
+                >
+                  <ul className="divide-y divide-carbon-200 dark:divide-carbon-700">
+                    {categories.map((cat) => (
+                      <li
+                        key={cat.name}
+                        className={cn(
+                          "p-3 hover:bg-carbon-100 dark:hover:bg-carbon-800 transition-colors duration-150",
+                          selectedCategory === cat.name &&
+                            "bg-copper-50 dark:bg-copper-900/20 border-r-2 border-r-copper-500 dark:border-r-copper-400",
+                        )}
+                        data-testid={`category-item-${cat.name}`}
+                      >
+                        <button
+                          onClick={() => {
+                            setSelectedCategory(cat.name);
+                            setError(null);
+                            setNewSubcat("");
+                          }}
+                          aria-pressed={selectedCategory === cat.name}
+                          aria-controls="subcategories-section"
+                          data-testid={`cat-select-${cat.name}`}
+                          className={cn(
+                            "w-full text-left text-sm font-medium transition-colors duration-150",
+                            selectedCategory === cat.name
+                              ? "text-copper-700 dark:text-copper-300"
+                              : "text-carbon-700 dark:text-carbon-300 hover:text-carbon-900 dark:hover:text-carbon-100",
+                          )}
+                        >
+                          {cat.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div
+                className={cn(card({ variant: "default" }), "flex-1")}
+                data-testid="subcategories-section"
+                id="subcategories-section"
+              >
+                {selectedCategory ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100 mb-4">
+                      {UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{" "}
+                      <span className="text-copper-600 dark:text-copper-400 font-normal">
+                        {selectedCategory}
+                      </span>
+                    </h3>
+                    <div
+                      style={{ maxHeight: 400 }}
+                      className={cn(
+                        "overflow-y-auto border border-carbon-200 dark:border-carbon-700 rounded-lg mb-4",
+                        "bg-carbon-50 dark:bg-carbon-900"
+                      )}
+                      data-testid="subcategories-scroll-wrapper"
                     >
-                      {categories
-                        .find((cat) => cat.name === selectedCategory)
-                        ?.subcategories.map((sc) => (
-                          <li
-                            key={sc.name}
-                            className="p-3 hover:bg-gray-50 transition-colors duration-150 group"
-                            data-testid={`subcat-item-${sc.name}`}
-                          >
-                            {subcatAction?.type === "edit" &&
-                            subcatAction.cat === selectedCategory &&
-                            subcatAction.subcat === sc.name ? (
-                              <div
-                                className={cn(
-                                  "flex flex-row gap-sm items-center",
-                                )}
-                              >
-                                <Input
-                                  type="text"
-                                  value={renameValue}
-                                  onChange={(
-                                    e: ChangeEvent<HTMLInputElement>,
-                                  ) => setRenameValue(e.target.value)}
-                                  onKeyDown={(
-                                    e: KeyboardEvent<HTMLInputElement>,
-                                  ) => {
-                                    if (
-                                      e.key === "Enter" &&
-                                      isValidSubcat(renameValue)
-                                    )
+                      <ul
+                        className="divide-y divide-carbon-200 dark:divide-carbon-700"
+                        aria-label={
+                          UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE
+                        }
+                      >
+                        {categories
+                          .find((cat) => cat.name === selectedCategory)
+                          ?.subcategories.map((sc) => (
+                            <li
+                              key={sc.name}
+                              className={cn("p-3 group", hoverBackground({ variant: "subtle" }))}
+                              data-testid={`subcat-item-${sc.name}`}
+                            >
+                              {subcatAction?.type === "edit" &&
+                              subcatAction.cat === selectedCategory &&
+                              subcatAction.subcat === sc.name ? (
+                                <div
+                                  className={cn(
+                                    "flex flex-row gap-sm items-center",
+                                  )}
+                                >
+                                  <Input
+                                    type="text"
+                                    value={renameValue}
+                                    onChange={(
+                                      e: ChangeEvent<HTMLInputElement>,
+                                    ) => setRenameValue(e.target.value)}
+                                    onKeyDown={(
+                                      e: KeyboardEvent<HTMLInputElement>,
+                                    ) => {
+                                      if (
+                                        e.key === "Enter" &&
+                                        isValidSubcat(renameValue)
+                                      )
+                                        handleRename(
+                                          selectedCategory,
+                                          sc.name,
+                                          renameValue,
+                                        );
+                                      if (e.key === "Escape") {
+                                        setSubcatAction(null);
+                                        setRenameValue("");
+                                      }
+                                    }}
+                                    autoFocus
+                                    className="flex-grow"
+                                    data-testid={`rename-input-${sc.name}`}
+                                    maxLength={32}
+                                  />
+                                  <Button
+                                    variant="primary"
+                                    size="sm"
+                                    disabled={!isValidSubcat(renameValue)}
+                                    data-testid={`confirm-rename-${sc.name}`}
+                                    type="button"
+                                    onClick={() =>
                                       handleRename(
                                         selectedCategory,
                                         sc.name,
                                         renameValue,
-                                      );
-                                    if (e.key === "Escape") {
+                                      )
+                                    }
+                                    className="min-w-[90px] flex-shrink-0"
+                                  >
+                                    {BUTTONS.DONE}
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    data-testid={`cancel-rename-${sc.name}`}
+                                    type="button"
+                                    onClick={() => {
                                       setSubcatAction(null);
                                       setRenameValue("");
-                                    }
-                                  }}
-                                  autoFocus
-                                  className="flex-grow"
-                                  data-testid={`rename-input-${sc.name}`}
-                                  maxLength={32}
-                                />
-                                <Button
-                                  variant="primary"
-                                  size="sm"
-                                  disabled={!isValidSubcat(renameValue)}
-                                  data-testid={`confirm-rename-${sc.name}`}
-                                  type="button"
-                                  onClick={() =>
-                                    handleRename(
-                                      selectedCategory,
-                                      sc.name,
-                                      renameValue,
-                                    )
-                                  }
-                                  className="min-w-[90px] flex-shrink-0"
-                                >
-                                  {BUTTONS.DONE}
-                                </Button>
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  data-testid={`cancel-rename-${sc.name}`}
-                                  type="button"
-                                  onClick={() => {
-                                    setSubcatAction(null);
-                                    setRenameValue("");
-                                  }}
-                                  className="min-w-[90px] flex-shrink-0"
-                                >
-                                  {BUTTONS.CANCEL}
-                                </Button>
-                              </div>
-                            ) : (
-                              <div
-                                className={cn(
-                                  "flex flex-row justify-between items-center",
-                                )}
-                              >
-                                <span className="text-sm text-gray-700 font-medium">
-                                  {sc.name}
-                                </span>
+                                    }}
+                                    className="min-w-[90px] flex-shrink-0"
+                                  >
+                                    {BUTTONS.CANCEL}
+                                  </Button>
+                                </div>
+                              ) : (
                                 <div
                                   className={cn(
-                                    "flex flex-row gap-sm items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150",
+                                    "flex flex-row justify-between items-center",
                                   )}
                                 >
-                                  {sc.isCustom && (
-                                    <Badge
-                                      variant="success"
-                                      data-testid={`custom-flag-${sc.name}`}
-                                    >
-                                      {FLAGS.CUSTOM}
-                                    </Badge>
-                                  )}
-                                  {badge(selectedCategory, sc.name)}
-                                  <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => {
-                                      setSubcatAction({
-                                        type: "edit",
-                                        cat: selectedCategory,
-                                        subcat: sc.name,
-                                      });
-                                      setRenameValue(sc.name);
-                                    }}
-                                    data-testid={`edit-subcat-btn-${sc.name}`}
-                                    aria-label={`${UI.CATEGORY_EDITOR.RENAME_BUTTON} ${sc.name}`}
+                                  <span className="text-sm text-carbon-700 dark:text-carbon-300 font-medium">
+                                    {sc.name}
+                                  </span>
+                                  <div
+                                    className={cn(
+                                      "flex flex-row gap-sm items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150",
+                                    )}
                                   >
-                                    {UI.CATEGORY_EDITOR.RENAME_BUTTON}
-                                  </Button>
-                                  {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
-                                  {sc.isCustom && (
+                                    {sc.isCustom && (
+                                      <Badge
+                                        variant="success"
+                                        data-testid={`custom-flag-${sc.name}`}
+                                      >
+                                        {FLAGS.CUSTOM}
+                                      </Badge>
+                                    )}
+                                    {badge(selectedCategory, sc.name)}
                                     <Button
-                                      variant="primary"
-                                      size="sm"
+                                      variant="secondary"
+                                      size="xs"
+                                      data-testid={`edit-${sc.name}`}
+                                      type="button"
+                                      onClick={() => {
+                                        setSubcatAction({
+                                          type: "edit",
+                                          cat: selectedCategory,
+                                          subcat: sc.name,
+                                        });
+                                        setRenameValue(sc.name);
+                                      }}
+                                    >
+                                      {BUTTONS.RENAME}
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="xs"
+                                      data-testid={`delete-${sc.name}`}
+                                      type="button"
                                       onClick={() =>
                                         setSubcatAction({
                                           type: "delete",
@@ -460,89 +414,88 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                           subcat: sc.name,
                                         })
                                       }
-                                      data-testid={`delete-subcat-btn-${sc.name}`}
-                                      aria-label={`${UI.CATEGORY_EDITOR.DELETE_BUTTON} ${sc.name}`}
                                     >
-                                      {UI.CATEGORY_EDITOR.DELETE_BUTTON}
+                                      {BUTTONS.DELETE}
                                     </Button>
-                                  )}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
-                          </li>
-                        ))}
-                    </ul>
-                  </div>
-                  <div
-                    className={cn(
-                      card({ variant: "elevated" }),
-                      "bg-gray-50 border border-gray-200 p-4",
-                    )}
-                  >
-                    <div className="flex flex-row gap-sm items-center">
-                      <Input
-                        type="text"
-                        value={newSubcat}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                          setNewSubcat(e.target.value)
-                        }
-                        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                          if (e.key === "Enter" && isValidSubcat(newSubcat)) {
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                    <div
+                      className={cn(
+                        card({ variant: "elevated" }),
+                        "bg-carbon-100 dark:bg-carbon-800 border border-carbon-200 dark:border-carbon-700 p-4",
+                      )}
+                    >
+                      <div className="flex flex-row gap-sm items-center">
+                        <Input
+                          type="text"
+                          value={newSubcat}
+                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                            setNewSubcat(e.target.value)
+                          }
+                          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                            if (e.key === "Enter" && isValidSubcat(newSubcat)) {
+                              const selectedCat = categories.find(
+                                (cat) => cat.name === selectedCategory,
+                              );
+                              if (selectedCat) handleAdd(selectedCat);
+                            }
+                            if (e.key === "Escape") setNewSubcat("");
+                          }}
+                          placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
+                          className="flex-grow"
+                          data-testid="add-subcat-input"
+                          maxLength={32}
+                        />
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          disabled={!isValidSubcat(newSubcat)}
+                          data-testid="add-subcat-btn"
+                          type="button"
+                          onClick={() => {
                             const selectedCat = categories.find(
                               (cat) => cat.name === selectedCategory,
                             );
-                            if (selectedCat) handleAdd(selectedCat);
-                          }
-                          if (e.key === "Escape") setNewSubcat("");
-                        }}
-                        placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
-                        className="flex-grow"
-                        data-testid="add-subcat-input"
-                        maxLength={32}
-                      />
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        disabled={!isValidSubcat(newSubcat)}
-                        data-testid="add-subcat-btn"
-                        type="button"
-                        onClick={() => {
-                          const selectedCat = categories.find(
-                            (cat) => cat.name === selectedCategory,
-                          );
-                          if (selectedCat && isValidSubcat(newSubcat))
-                            handleAdd(selectedCat);
-                        }}
-                        className="min-w-[90px]"
-                      >
-                        {BUTTONS.ADD}
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        data-testid="cancel-add-subcat-btn"
-                        type="button"
-                        onClick={() => setNewSubcat("")}
-                        className="min-w-[90px]"
-                      >
-                        {BUTTONS.CANCEL}
-                      </Button>
+                            if (selectedCat && isValidSubcat(newSubcat))
+                              handleAdd(selectedCat);
+                          }}
+                          className="min-w-[90px]"
+                        >
+                          {BUTTONS.ADD}
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          data-testid="cancel-add-subcat-btn"
+                          type="button"
+                          onClick={() => setNewSubcat("")}
+                          className="min-w-[90px]"
+                        >
+                          {BUTTONS.CANCEL}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </>
-              ) : (
-                <Alert
-                  variant="default"
-                  data-testid="no-cat-msg"
-                >
-                  {INFO.CATEGORY_EDITOR_EMPTY}
-                </Alert>
-              )}
+                  </>
+                ) : (
+                  <Alert
+                    variant="default"
+                    data-testid="no-cat-msg"
+                  >
+                    {INFO.CATEGORY_EDITOR_EMPTY}
+                  </Alert>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

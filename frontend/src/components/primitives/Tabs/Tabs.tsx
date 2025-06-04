@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from 'react';
 import { tab, type TabProps as CVATabProps } from '../../../styles/cva/components/layout';
-import { cn } from '../../../styles/cva-v2';
+import { cn, hoverBackground } from '../../../styles/cva-v2';
 import { NAVIGATION } from '@shared-constants';
 
 /**
@@ -201,7 +201,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
       {isCloseable && (
         <button
           type="button"
-          className="ml-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                          className={cn("ml-2 p-1 rounded-full", hoverBackground({ variant: "light" }))}
           onClick={handleClose}
           aria-label={NAVIGATION.TABS.CLOSE_TAB}
           data-testid={testId ? `${testId}-close-${id}` : `close-tab-${id}`}

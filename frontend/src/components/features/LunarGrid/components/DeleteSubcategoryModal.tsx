@@ -54,6 +54,8 @@ const DeleteSubcategoryModal: React.FC<DeleteSubcategoryModalProps> = ({
     ? "Pentru a șterge această subcategorie, ștergeți mai întâi toate tranzacțiile asociate sau reasignați-le la o altă subcategorie."
     : undefined;
 
+  const handleConfirm = hasRelatedTransactions ? onCancel : onConfirm;
+
   return (
     <ConfirmationModal
       isOpen={true}
@@ -65,8 +67,8 @@ const DeleteSubcategoryModal: React.FC<DeleteSubcategoryModalProps> = ({
       icon={hasRelatedTransactions ? "⚠️" : "🗑️"}
       details={details}
       recommendation={recommendation}
-      onConfirm={hasRelatedTransactions ? onCancel : onConfirm}
-      onClose={onCancel}
+      onConfirm={handleConfirm}
+      onCancel={onCancel}
     />
   );
 };
