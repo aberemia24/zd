@@ -1,7 +1,12 @@
 import React from "react";
 import { Button } from "../Button";
-import { cn } from "../../../styles/cva/shared/utils";
-import { card } from "../../../styles/cva/components/layout";
+import { 
+  cn,
+  modal,
+  card,
+  badge,
+  type ModalProps
+} from "../../../styles/cva-v2";
 
 export interface ConfirmationModalProps {
   isOpen: boolean;
@@ -17,6 +22,10 @@ export interface ConfirmationModalProps {
   recommendation?: string;
 }
 
+/**
+ * ConfirmationModal component pentru confirmări importante
+ * Bazat pe noul sistem CVA v2 modular cu Carbon Copper palette
+ */
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   onClose,
@@ -32,72 +41,77 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const variantStyles = {
-    default: {
-      border: "border-blue-200",
-      bg: "bg-blue-50",
-      iconColor: "text-blue-600",
-      titleColor: "text-blue-900"
-    },
-    warning: {
-      border: "border-orange-200", 
-      bg: "bg-orange-50",
-      iconColor: "text-orange-600",
-      titleColor: "text-orange-900"
-    },
-    danger: {
-      border: "border-red-200",
-      bg: "bg-red-50", 
-      iconColor: "text-red-600",
-      titleColor: "text-red-900"
+  // Map variant la badge colors pentru header styling
+  const getBadgeVariant = () => {
+    switch (variant) {
+      case "warning": return "warning";
+      case "danger": return "warning"; // Folosim warning pentru danger
+      default: return "secondary"; // Carbon pentru default
     }
   };
 
-  const currentVariant = variantStyles[variant];
+  // Map variant la text colors
+  const getTextColor = () => {
+    switch (variant) {
+      case "warning": return "text-amber-600 dark:text-amber-400";
+      case "danger": return "text-red-600 dark:text-red-400"; 
+      default: return "text-carbon-600 dark:text-carbon-400";
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className={cn(modal({ variant: "default" }))}>
       <div 
         className={cn(
-          card({ variant: "elevated", size: "lg" }),
-          "max-w-md w-full max-h-[90vh] overflow-y-auto"
+          card({ variant: "elevated" }),
+          "max-w-md w-full max-h-[90vh] overflow-y-auto mx-4",
+          "animate-theme-fade" // Smooth theme transition
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header cu Carbon Copper styling */}
         <div className={cn(
-          "p-4 border-b border-gray-200 rounded-t-lg",
-          currentVariant.bg,
-          currentVariant.border
+          "p-4 border-b border-carbon-200/50 dark:border-carbon-700/50 rounded-t-lg",
+          "bg-carbon-50 dark:bg-carbon-900"
         )}>
           <div className="flex items-center space-x-3">
             {icon && (
-              <div className={cn("text-2xl", currentVariant.iconColor)}>
+              <div className={cn("text-2xl", getTextColor())}>
                 {icon}
               </div>
             )}
             <h2 className={cn(
               "text-lg font-semibold",
-              currentVariant.titleColor
+              "text-carbon-900 dark:text-carbon-100"
             )}>
               {title}
             </h2>
+            {/* Visual indicator cu badge pentru variant */}
+            <div className={cn(
+              badge({ variant: getBadgeVariant() }),
+              "ml-auto"
+            )}>
+              {variant === "danger" ? "⚠️" : variant === "warning" ? "⚠️" : "ℹ️"}
+            </div>
           </div>
         </div>
 
-        {/* Body */}
+        {/* Body cu enhanced Carbon Copper styling */}
         <div className="p-6">
-          <div className="text-gray-700 mb-4 whitespace-pre-line">
+          <div className="text-carbon-700 dark:text-carbon-300 mb-4 whitespace-pre-line">
             {message}
           </div>
 
-          {/* Details List */}
+          {/* Details List cu dark mode support */}
           {details && details.length > 0 && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-              <ul className="text-sm text-gray-600 space-y-1">
+            <div className={cn(
+              "bg-carbon-100/50 dark:bg-carbon-800/50 border border-carbon-200/50 dark:border-carbon-700/50",
+              "rounded-lg p-3 mb-4"
+            )}>
+              <ul className="text-sm text-carbon-600 dark:text-carbon-400 space-y-1">
                 {details.map((detail, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="text-gray-400 mr-2">•</span>
+                    <span className="text-carbon-400 dark:text-carbon-500 mr-2">•</span>
                     <span>{detail}</span>
                   </li>
                 ))}
@@ -105,19 +119,22 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </div>
           )}
 
-          {/* Recommendation */}
+          {/* Recommendation cu copper accent color */}
           {recommendation && (
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-3 mb-4">
+            <div className={cn(
+              "bg-copper-50/50 dark:bg-copper-900/20 border-l-4 border-copper-500 dark:border-copper-400",
+              "p-3 mb-4 rounded-r-lg"
+            )}>
               <div className="flex items-start">
-                <div className="text-blue-400 mr-2">💡</div>
-                <div className="text-sm text-blue-700">
+                <div className="text-copper-600 dark:text-copper-400 mr-2">💡</div>
+                <div className="text-sm text-copper-800 dark:text-copper-200">
                   <strong>Recomandare:</strong> {recommendation}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Actions */}
+          {/* Actions cu Button component styling */}
           <div className="flex space-x-3 justify-end">
             <Button
               variant="secondary"
@@ -127,12 +144,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {cancelText}
             </Button>
             <Button
-              variant={variant === "danger" ? "danger" : "primary"}
+              variant={variant === "danger" ? "primary" : "primary"}
               size="md"
               onClick={() => {
                 onConfirm();
                 onClose();
               }}
+              className={variant === "danger" ? "bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600" : ""}
             >
               {confirmText}
             </Button>

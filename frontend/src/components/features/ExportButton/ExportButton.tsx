@@ -16,7 +16,7 @@ interface ExportButtonProps {
  * Componentă pentru exportul tranzacțiilor în diverse formate
  * Oferă UI pentru selecția formatului și opțiunilor de export
  */
-export const ExportButton: React.FC<ExportButtonProps> = ({
+const ExportButtonComponent: React.FC<ExportButtonProps> = ({
   transactions,
   disabled = false,
   className = "",
@@ -78,3 +78,6 @@ export const ExportButton: React.FC<ExportButtonProps> = ({
     </>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+export const ExportButton = React.memo(ExportButtonComponent);

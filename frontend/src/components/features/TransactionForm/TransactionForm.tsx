@@ -13,9 +13,11 @@ import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS, EXCEL_GRID } from "@shared-cons
 import { MESAJE } from "@shared-constants";
 import { useTransactionFormStore } from "../../../stores/transactionFormStore";
 import { useCategoryStore } from "../../../stores/categoryStore";
-import { cn } from "../../../styles/cva/shared/utils";
-import { formGroup } from "../../../styles/cva/components/feedback";
-import { flex as flexContainer } from "../../../styles/cva/components/layout";
+import { 
+  cn,
+  formGroup,
+  flex
+} from "../../../styles/cva-v2";
 
 /**
  * Returnează un mesaj bazat pe o cheie, suportând și acces la proprietăți imbricate.
@@ -73,7 +75,7 @@ interface TransactionFormProps {
   onCancel?: () => void;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({
+const TransactionFormComponent: React.FC<TransactionFormProps> = ({
   onSave,
   onCancel,
 }) => {
@@ -221,11 +223,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       {/* Bara de titlu cu efect de gradient */}
       <div
         className={cn(
-          flexContainer({
-            direction: "row",
-            justify: "between",
-            align: "center",
-          }),
+          "flex flex-row justify-between items-center"
         )}
       >
         <h3 className="text-lg font-medium text-gray-900">
@@ -235,7 +233,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         </h3>
         {/* Indicator status formular */}
         {loading && (
-          <Badge variant="warning" size="sm">
+          <Badge variant="warning">
             Se procesează...
           </Badge>
         )}
@@ -251,7 +249,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           aria-label={LABELS.TYPE}
           options={OPTIONS.TYPE}
           placeholder={PLACEHOLDERS.SELECT}
-          dataTestId="type-select"
+          data-testid="type-select"
           variant="default"
           size="md"
         />
@@ -271,7 +269,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               ? (error as Record<string, string>).amount
               : undefined
           }
-          dataTestId="amount-input"
+          data-testid="amount-input"
           variant="default"
           size="md"
         />
@@ -285,7 +283,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           options={optiuniCategorie}
           disabled={!form.type || optiuniCategorie.length === 0}
           placeholder={PLACEHOLDERS.SELECT}
-          dataTestId="category-select"
+          data-testid="category-select"
           variant="default"
           size="md"
         />
@@ -299,7 +297,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           options={optiuniSubcategorie}
           disabled={!form.category || optiuniSubcategorie.length === 0}
           placeholder={PLACEHOLDERS.SELECT}
-          dataTestId="subcategory-select"
+          data-testid="subcategory-select"
           variant="default"
           size="md"
         />
@@ -316,7 +314,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               ? (error as Record<string, string>).date
               : undefined
           }
-          dataTestId="date-input"
+          data-testid="date-input"
           variant="default"
           size="md"
         />
@@ -327,13 +325,13 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
             label={LABELS.RECURRING + "?"}
             checked={form.recurring}
             onChange={handleChange}
-            dataTestId="recurring-checkbox"
+            data-testid="recurring-checkbox"
             variant="default"
             size="md"
           />
 
           {form.recurring && (
-            <Badge variant="primary" size="sm">
+            <Badge variant="primary">
               Recurent
             </Badge>
           )}
@@ -348,7 +346,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           options={OPTIONS.FREQUENCY}
           disabled={!form.recurring}
           placeholder={PLACEHOLDERS.SELECT}
-          dataTestId="frequency-select"
+          data-testid="frequency-select"
           variant="default"
           size="md"
         />
@@ -363,7 +361,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
             onChange={handleChange}
             aria-label={LABELS.DESCRIPTION}
             placeholder={PLACEHOLDERS.DESCRIPTION}
-            dataTestId="description-input"
+            data-testid="description-input"
             variant="default"
             size="md"
           />
@@ -373,11 +371,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       {/* Butoane de acțiune cu efecte vizuale moderne */}
       <div
         className={cn(
-          flexContainer({
-            direction: "row",
-            justify: "between",
-            align: "center",
-          }),
+          "flex flex-row justify-between items-center"
         )}
       >
         {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
@@ -396,10 +390,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               isFormValid={isFormValid}
               size="md"
               isLoading={Boolean(loading)}
-              dataTestId="add-transaction-button"
+              data-testid="add-transaction-button"
               aria-label={BUTTONS.ADD}
               submitText={BUTTONS.ADD}
-            />
+            >
+              {BUTTONS.ADD}
+            </ValidatedSubmitButton>
           );
         })()}
 
@@ -407,7 +403,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           type="button"
           variant="secondary"
           size="md"
-          dataTestId="cancel-btn"
+          data-testid="cancel-btn"
           onClick={() => {
             resetForm();
             onCancel?.();
@@ -420,23 +416,26 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       {/* Mesaje de eroare și succes cu stiluri rafinate */}
       {error && typeof error === "string" && (
         <Alert
-          type="error"
-          message={safeMessage(error)}
-          dataTestId="error-message"
-          size="md"
-        />
+          variant="error"
+          data-testid="error-message"
+        >
+          {safeMessage(error)}
+        </Alert>
       )}
 
       {success && (
         <Alert
-          type="success"
-          message={safeMessage(success)}
-          dataTestId="success-message"
-          size="md"
-        />
+          variant="success"
+          data-testid="success-message"
+        >
+          {safeMessage(success)}
+        </Alert>
       )}
     </form>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+const TransactionForm = React.memo(TransactionFormComponent);
 
 export default TransactionForm;

@@ -1,141 +1,150 @@
 import React, { forwardRef } from "react";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
+import { 
+  cn,
   select,
   inputWrapper,
   label,
   type SelectProps as CVASelectProps,
-  type LabelProps,
-} from "../../../styles/cva/components/forms";
+  type LabelProps as CVALabelProps,
+  type InputWrapperProps as CVAInputWrapperProps
+} from "../../../styles/cva-v2";
 
-// Omitem proprietatea 'size' din props pentru a evita conflictul
-// Props custom pentru Select. Nu dublăm props native HTML (ex: value, label)!
-export interface SelectProps
-  extends Omit<
-      React.SelectHTMLAttributes<HTMLSelectElement>,
-      "size" | "data-testid"
-    >,
-    CVASelectProps {
-  /** Eticheta de deasupra selectului */
-  label?: string;
-  /** Mesaj de eroare sub select */
-  error?: string;
-  /** Clasă suplimentară pentru wrapper */
-  wrapperClassName?: string;
-  /** Opțiuni disponibile */
-  options: Array<{ value: string; label: string; disabled?: boolean }>;
-  /** Placeholder pentru select */
-  placeholder?: string;
-  /** Pentru testare */
-  dataTestId?: string;
-  /** Indicator de stare loading */
-  isLoading?: boolean;
-
-  // Simplified props - kept only essential
-  /** Adaugă icon custom în loc de săgeata standard */
-  withCustomIcon?: React.ReactNode;
+export interface SelectOption {
+  value: string;
+  label: string;
+  disabled?: boolean;
 }
 
+export interface SelectProps
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size">,
+    CVASelectProps {
+  label?: string;
+  error?: string;
+  success?: string;
+  hint?: string;
+  options?: SelectOption[];
+  placeholder?: string;
+  className?: string;
+  fullWidth?: boolean;
+  wrapperVariant?: CVAInputWrapperProps["variant"];
+  labelVariant?: CVALabelProps["variant"];
+  required?: boolean;
+}
+
+/**
+ * Select component cu suport pentru validare și multiple variante
+ * Bazat pe noul sistem CVA v2 modular cu select dedicat
+ */
 const Select = forwardRef<HTMLSelectElement, SelectProps>(
   (
     {
       label: labelText,
       error,
-      className,
-      wrapperClassName,
-      options,
+      success,
+      hint,
+      options = [],
       placeholder,
-      id,
       variant = "default",
       size = "md",
-      disabled = false,
-      isLoading = false,
-      dataTestId,
-      withCustomIcon,
-      ...rest
+      fullWidth = false,
+      wrapperVariant = "default",
+      labelVariant,
+      required = false,
+      className,
+      id,
+      children,
+      ...props
     },
-    ref,
+    ref
   ) => {
-    // Determine variant based on error state
-    const selectVariant = error ? "error" : variant;
+    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const hasError = !!error;
+    
+    // Determine label variant based on state
+    const determinedLabelVariant = labelVariant || (hasError ? "error" : success ? "success" : "default");
 
     return (
-      <div className={cn(inputWrapper({ size }), wrapperClassName)}>
+      <div className={cn(inputWrapper({ variant: wrapperVariant }), fullWidth && "w-full")}>
         {labelText && (
           <label
-            htmlFor={id || rest.name}
-            className={label({
-              variant: error ? "error" : "default",
-              size,
-            })}
+            htmlFor={selectId}
+            className={cn(label({ variant: determinedLabelVariant, required }))}
           >
             {labelText}
           </label>
         )}
+        
         <div className="relative">
           <select
             ref={ref}
-            id={id || rest.name}
+            id={selectId}
             className={cn(
-              select({
-                variant: selectVariant,
-                size,
-              }),
-              className,
+              select({ variant, size }),
+              "pr-10 appearance-none cursor-pointer", // Space for dropdown arrow
+              fullWidth && "w-full",
+              className
             )}
-            value={
-              options.some((opt) => opt.value === rest.value) ? rest.value : ""
-            }
-            data-testid={
-              dataTestId ||
-              `select-${selectVariant}-${size}${error ? "-error" : ""}${disabled ? "-disabled" : ""}`
-            }
-            disabled={disabled || isLoading}
-            {...rest}
+            {...props}
           >
-            {placeholder && <option value="">{placeholder}</option>}
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value} disabled={opt.disabled}>
-                {opt.label}
+            {placeholder && (
+              <option value="" disabled>
+                {placeholder}
+              </option>
+            )}
+            
+            {/* Render options din prop-uri */}
+            {options.map((option, index) => (
+              <option
+                key={`${option.value}-${index}`}
+                value={option.value}
+                disabled={option.disabled}
+              >
+                {option.label}
               </option>
             ))}
+            
+            {/* Render children pentru opțiuni custom */}
+            {children}
           </select>
-
-          {/* Icon personalizat, loading spinner sau icon standard */}
-          <div className="absolute inset-y-0 right-0 flex items-center pointer-events-none pr-2">
-            {isLoading ? (
-              // Spinner de loading când isLoading este true
-              <svg
-                className="animate-spin h-4 w-4 text-blue-600"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            ) : withCustomIcon ? (
-              withCustomIcon
-            ) : // CVA select already has built-in arrow, no need for custom icon
-            null}
+          
+          {/* Dropdown arrow icon */}
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg
+              className="h-4 w-4 text-neutral-400 dark:text-neutral-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
           </div>
         </div>
 
-        {error && <div className="text-sm text-red-600 mt-1">{error}</div>}
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        
+        {success && !error && (
+          <p className="text-sm text-emerald-600 dark:text-emerald-400">
+            {success}
+          </p>
+        )}
+        
+        {hint && !error && !success && (
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            {hint}
+          </p>
+        )}
       </div>
     );
-  },
+  }
 );
 
 Select.displayName = "Select";

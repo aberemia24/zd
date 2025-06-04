@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useState } from "react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import Button from "../../../primitives/Button/Button";
 import { Edit, Trash2 } from "lucide-react";
-import { cn } from "../../../../styles/cva/shared/utils";
-import {
+
+// CVA styling imports - UNIFIED MIGRATION COMPLETE
+import { 
+  cn,
   gridCell,
   gridInput,
-  gridBadge,
-  gridCellActions,
-  gridActionButton
-} from "../../../../styles/cva/grid";
-import { flex } from "../../../../styles/cva/components/layout";
-import { FLAGS, UI } from "@shared-constants";
-import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
+  badge,
+  button,
+  textProfessional,
+  hoverScale,
+  focusRing,
+  animations
+} from "../../../../styles/cva/unified-cva";
+
+import { 
+  UI, 
+  LUNAR_GRID_ACTIONS,
+  FLAGS
+} from "@shared-constants";
 
 interface SubcategoryRowCellProps {
   category: string;
@@ -38,25 +47,29 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
   onStartEdit,
   onStartDelete
 }) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY && editingValue.trim()) {
+      onSaveEdit();
+    } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
+      onCancelEdit();
+    }
+  };
+
   return (
-    <div className={flex({ justify: "between", gap: "sm", width: "full" })}>
-      <div className={flex({ align: "center", gap: "md" })}>
+    <div className="flex justify-between items-center gap-2 w-full">
+      <div className="flex items-center gap-3">
         {isEditing ? (
-          <div className={flex({ align: "center", gap: "sm" })}>
+          <div className="flex items-center gap-2">
             <input
               type="text"
               value={editingValue}
               onChange={(e) => onEditingValueChange(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY && editingValue.trim()) {
-                  onSaveEdit();
-                } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
-                  onCancelEdit();
-                }
-              }}
+              onKeyDown={handleKeyDown}
+              onBlur={onCancelEdit}
               className={cn(
-                gridInput({ variant: "professional", state: "editing" }),
-                "flex-1 animate-scale-in focus-ring-primary"
+                "flex-1",
+                animations({ type: "scale-in" }),
+                focusRing({ variant: "primary" })
               )}
               autoFocus
               data-testid={`edit-subcategory-input-${subcategory}`}
@@ -82,17 +95,20 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
             </Button>
           </div>
         ) : (
-          <div className={flex({ align: "center", gap: "md" })}>
-            <span className="text-professional-body contrast-high">
+          <div className="flex justify-between items-center gap-2 w-full">
+            <span className={cn(
+              textProfessional({ variant: "body", contrast: "high" })
+            )}>
               {subcategory}
             </span>
             {isCustom && (
-              <div className={cn(
-                gridBadge({ variant: "custom", size: "sm" }),
-                "animate-bounce-subtle text-professional-caption"
+              <span className={cn(
+                "text-xs",
+                animations({ type: "bounce-subtle" }),
+                textProfessional({ variant: "caption" })
               )}>
                 {FLAGS.CUSTOM}
-              </div>
+              </span>
             )}
           </div>
         )}
@@ -100,31 +116,29 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
       
       {!isEditing && (
         <div className={cn(
-          gridCellActions({ variant: "professional" }),
+          "flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
           "animate-fade-in-up"
         )}>
           <button
-            className={cn(
-              gridActionButton({ variant: "primary", size: "sm" }),
-              "hover-lift"
-            )}
             onClick={onStartEdit}
-            data-testid={`edit-subcategory-btn-${subcategory}`}
+            className={cn(
+              "p-1",
+              hoverScale({ intensity: "subtle" })
+            )}
             title={UI.SUBCATEGORY_ACTIONS.RENAME_TITLE}
           >
-            <Edit size={12} />
+            <Edit size={14} />
           </button>
           {isCustom && (
             <button
-              className={cn(
-                gridActionButton({ variant: "danger", size: "sm" }),
-                "hover-lift"
-              )}
               onClick={onStartDelete}
-              data-testid={`delete-subcategory-btn-${subcategory}`}
+              className={cn(
+                "p-1 text-warning",
+                hoverScale({ intensity: "subtle" })
+              )}
               title={UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
             >
-              <Trash2 size={12} />
+              <Trash2 size={14} />
             </button>
           )}
         </div>

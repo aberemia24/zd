@@ -1,5 +1,6 @@
-// Definirea design tokens pentru Budget App
-// Acesta este entrypoint-ul pentru toate variabilele de stil
+// Definirea design tokens pentru Budget App - CARBON COPPER EDITION
+// 🖤🔶 Carbon Copper Extended Palette - Premium Fintech Design
+// Perfect balance între profesionist și memorabil pentru aplicații fintech
 
 import type { Theme } from "./themeTypes";
 
@@ -18,125 +19,207 @@ export const theme: Theme = {
       },
     },
     input: {
-      error: "border-error-500",
+      error: "border-ruby-600",
       states: {
-        error: "border-error-500",
-        disabled: "bg-gray-100 cursor-not-allowed",
+        error: "border-ruby-600",
+        disabled: "bg-carbon-200 cursor-not-allowed",
       },
     },
     formGroup: "flex flex-col mb-2",
-    formLabel: "block mb-1 font-medium text-secondary-700",
-    formError: "text-error-600 text-xs mt-1",
+    formLabel: "block mb-1 font-medium text-carbon-700",
+    formError: "text-ruby-600 text-xs mt-1",
     checkbox: {
-      base: "accent-accent",
-      error: "accent-error",
-      label: "ml-2 text-secondary-700",
+      base: "accent-copper-500",
+      error: "accent-ruby-600",
+      label: "ml-2 text-carbon-700",
     },
     badge: {
       base: "inline-block px-2 py-0.5 rounded text-xs font-semibold",
       variants: {
-        primary: "bg-primary-500 text-white",
-        success: "bg-success-500 text-white",
-        error: "bg-error-500 text-white",
-        warning: "bg-warning-500 text-white",
+        primary: "bg-copper-500 text-carbon-950",
+        success: "bg-emerald-600 text-white",
+        error: "bg-ruby-600 text-white",
+        warning: "bg-amber-500 text-carbon-950",
       },
     },
     alert: {
       base: "border rounded p-4 my-2 text-center",
       variants: {
-        success: "bg-success-50 border-success-200 text-success-700",
-        error: "bg-error-50 border-error-200 text-error-700",
-        warning: "bg-warning-50 border-warning-200 text-warning-700",
+        success: "bg-emerald-50 border-emerald-200 text-emerald-700",
+        error: "bg-red-50 border-ruby-200 text-ruby-700",
+        warning: "bg-amber-50 border-amber-200 text-amber-700",
       },
     },
     loader: {
       container: "flex justify-center items-center py-8",
-      svg: "animate-spin h-8 w-8 text-primary-500",
+      svg: "animate-spin h-8 w-8 text-copper-500",
       circle: "opacity-25",
       path: "opacity-75",
-      text: "ml-3 text-gray-700 text-sm",
+      text: "ml-3 text-carbon-700 text-sm",
     },
   },
   colors: {
-    // Primary - Forest Green (înlocuiește blue-ul actual)
+    // Carbon Scale (Premium Carbon Black scale - înlocuiește gray boring)
+    // Rich, sophisticated blacks și grays pentru trust profesional
+    carbon: {
+      50: "#FAFAF9",   // Warm White
+      100: "#F5F5F4",  // Off White  
+      200: "#E7E5E4",  // Light Stone
+      300: "#D6D3D1",  // Medium Light
+      400: "#78716C",  // Muted Carbon
+      500: "#57534E",  // Medium Carbon
+      600: "#44403C",  // Medium Dark
+      700: "#292524",  // Dark Stone
+      800: "#1C1917",  // Charcoal
+      900: "#0C0A09",  // Rich Black
+      950: "#0A0908",  // True Black
+    },
+    // Copper Accents (Star of the show - vedeta paletei)
+    // Perfect warmth pentru fintech - mental association cu money
+    copper: {
+      50: "#FFF7ED",   // Lightest copper
+      100: "#FED7AA",  // Pale Peach
+      200: "#FED7B0",  // Light Peach
+      300: "#FB923C",  // Soft Peach
+      400: "#F97316",  // Light Orange
+      500: "#EA580C",  // Bright Orange - main copper
+      600: "#C2410C",  // Deep Copper
+      700: "#9A3412",  // Darker Copper
+      800: "#7C2D12",  // Very Dark Copper
+      900: "#431407",  // Darkest Copper
+    },
+    // Supporting Cast Colors
+    // Success - Emerald (stays green pentru financial positive)
+    emerald: {
+      50: "#ECFDF5",
+      100: "#D1FAE5",
+      200: "#A7F3D0",
+      300: "#6EE7B7",
+      400: "#34D399",
+      500: "#10B981",
+      600: "#059669",  // Main success color
+      700: "#047857",
+      800: "#065F46",
+      900: "#064E3B",
+    },
+    // Error - Ruby (warm red pentru errors)
+    ruby: {
+      50: "#FEF2F2",
+      100: "#FEE2E2",
+      200: "#FECACA",
+      300: "#FCA5A5",
+      400: "#F87171",
+      500: "#EF4444",
+      600: "#DC2626",  // Main error color
+      700: "#B91C1C",
+      800: "#991B1B",
+      900: "#7F1D1D",
+    },
+    // Warning - Amber (golden pentru warnings)
+    amber: {
+      50: "#FFFBEB",
+      100: "#FEF3C7",
+      200: "#FDE68A",
+      300: "#FCD34D",
+      400: "#FBBF24",
+      500: "#F59E0B",  // Main warning color
+      600: "#D97706",
+      700: "#B45309",
+      800: "#92400E",
+      900: "#78350F",
+    },
+    
+    // Alias pentru compatibilitate cu codul existent
     primary: {
-      50: "#f0fdf4",
-      100: "#dcfce7",
-      200: "#bbf7d0",
-      300: "#86efac",
-      400: "#4ade80",
-      500: "#16a34a", // Main forest green
-      600: "#15803d",
-      700: "#166534",
-      800: "#14532d",
-      900: "#052e16",
+      50: "#FFF7ED",
+      100: "#FED7AA",
+      200: "#FED7B0",
+      300: "#FB923C",
+      400: "#F97316",
+      500: "#EA580C",  // Copper main
+      600: "#C2410C",
+      700: "#9A3412",
+      800: "#7C2D12",
+      900: "#431407",
     },
-    // Secondary - Navy Blue
     secondary: {
-      50: "#f8fafc",
-      100: "#f1f5f9",
-      200: "#e2e8f0",
-      300: "#cbd5e1",
-      400: "#94a3b8",
-      500: "#334155", // Navy blue
-      600: "#1e293b",
-      700: "#0f172a",
-      800: "#020617",
-      900: "#020617",
+      50: "#FAFAF9",
+      100: "#F5F5F4",
+      200: "#E7E5E4",
+      300: "#D6D3D1",
+      400: "#78716C",
+      500: "#57534E",  // Carbon medium
+      600: "#44403C",
+      700: "#292524",
+      800: "#1C1917",
+      900: "#0C0A09",
     },
-    // Success - Păstrează verde pentru venituri
+    accent: {
+      50: "#FFF7ED",
+      100: "#FED7AA",
+      200: "#FED7B0",
+      300: "#FB923C",
+      400: "#F97316",
+      500: "#EA580C",  // Copper accent
+      600: "#C2410C",
+      700: "#9A3412",
+      800: "#7C2D12",
+      900: "#431407",
+    },
     success: {
-      50: "#ecfdf5",
-      100: "#d1fae5",
-      200: "#a7f3d0",
-      300: "#6ee7b7",
-      400: "#34d399",
-      500: "#059669", // Darker green pentru contrast
-      600: "#047857",
-      700: "#065f46",
-      800: "#064e3b",
-      900: "#022c22",
+      50: "#ECFDF5",
+      100: "#D1FAE5",
+      200: "#A7F3D0",
+      300: "#6EE7B7",
+      400: "#34D399",
+      500: "#10B981",
+      600: "#059669",  // Emerald
+      700: "#047857",
+      800: "#065F46",
+      900: "#064E3B",
     },
-    // Warning - Accent Gold (înlocuiește yellow)
     warning: {
-      50: "#fffdf7",
-      100: "#fffaeb",
-      200: "#fef3c7",
-      300: "#fde68a",
-      400: "#fcd34d",
-      500: "#f59e0b", // Deep gold
-      600: "#d97706",
-      700: "#b45309",
-      800: "#92400e",
-      900: "#78350f",
+      50: "#FFFBEB",
+      100: "#FEF3C7",
+      200: "#FDE68A",
+      300: "#FCD34D",
+      400: "#FBBF24",
+      500: "#F59E0B",  // Amber
+      600: "#D97706",
+      700: "#B45309",
+      800: "#92400E",
+      900: "#78350F",
     },
-    // Error - Earth Red (păstrat dar ajustat)
     error: {
-      50: "#fef2f2",
-      100: "#fee2e2",
-      200: "#fecdd3",
-      300: "#fca5a5",
-      400: "#f87171",
-      500: "#dc2626", // Earth red
-      600: "#991b1b",
-      700: "#7f1d1d",
-      800: "#650a0a",
-      900: "#450a0a",
+      50: "#FEF2F2",
+      100: "#FEE2E2",
+      200: "#FECACA",
+      300: "#FCA5A5",
+      400: "#F87171",
+      500: "#EF4444",
+      600: "#DC2626",  // Ruby
+      700: "#B91C1C",
+      800: "#991B1B",
+      900: "#7F1D1D",
     },
-    // Gray - Warm grays (înlocuiește cold grays)
+    // Neutral folosește carbon scale
     gray: {
-      50: "#fafaf9",
-      100: "#f5f5f4",
-      200: "#e7e5e4",
-      300: "#d6d3d1",
-      400: "#a8a29e",
-      500: "#78716c",
-      600: "#57534e",
-      700: "#44403c",
-      800: "#292524",
-      900: "#1c1917",
+      50: "#FAFAF9",
+      100: "#F5F5F4",
+      200: "#E7E5E4",
+      300: "#D6D3D1",
+      400: "#78716C",
+      500: "#57534E",
+      600: "#44403C",
+      700: "#292524",
+      800: "#1C1917",
+      900: "#0C0A09",
     },
-    // Păstrează white și black
+    
+    // Background - Carbon warm pentru premium feel
+    background: "#FAFAF9", // Carbon warm white
+    
+    // Păstrează white și black pentru contrast maxim
     white: "#ffffff",
     black: "#000000",
   },
@@ -153,10 +236,14 @@ export const theme: Theme = {
   },
   shadows: {
     none: "none",
-    sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-    md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    // Carbon Copper ambient shadows pentru sophisticated depth
+    sm: "0 1px 2px 0 rgba(10, 9, 8, 0.05)",
+    md: "0 4px 6px -1px rgba(10, 9, 8, 0.1), 0 2px 4px -1px rgba(10, 9, 8, 0.06)",
+    lg: "0 10px 15px -3px rgba(10, 9, 8, 0.1), 0 4px 6px -2px rgba(10, 9, 8, 0.05)",
+    xl: "0 20px 25px -5px rgba(10, 9, 8, 0.1), 0 10px 10px -5px rgba(10, 9, 8, 0.04)",
+    // Copper glow variants pentru interactive elements și highlights
+    glow: "0 8px 32px rgba(234, 88, 12, 0.16)",
+    "glow-lg": "0 16px 64px rgba(234, 88, 12, 0.24)",
   },
   borderRadius: {
     none: "0",
@@ -164,6 +251,7 @@ export const theme: Theme = {
     md: "0.375rem", // 6px
     lg: "0.5rem", // 8px
     xl: "0.75rem", // 12px
+    "2xl": "1rem", // 16px - enhanced for modern look
     full: "9999px",
   },
   typography: {

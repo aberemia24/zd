@@ -1,5 +1,9 @@
 import React from "react";
 import { MESAJE } from "@shared-constants";
+
+// CVA styling imports - UNIFIED MIGRATION
+import { cn, button } from "../styles/cva/unified-cva";
+
 import Alert from "./primitives/Alert/Alert";
 import { handleComponentError, EnhancedError } from "../utils/errorHandling";
 
@@ -91,20 +95,23 @@ class ErrorBoundary extends React.Component<
       return (
         <div className="error-boundary-container p-4">
           <Alert
-            type="error"
+            variant="error"
             title={MESAJE.EROARE_TITLU}
-            message={this.state.error.userMessage}
             className="my-8"
-            size="lg"
-            dataTestId="error-boundary-alert"
-          />
+            data-testid="error-boundary-alert"
+          >
+            {this.state.error.userMessage}
+          </Alert>
           
           {/* Recovery Controls */}
           <div className="mt-4 flex gap-4 justify-center">
             {canRetry && (
               <button
                 onClick={this.handleRetry}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                className={cn(
+                  button({ variant: "primary", size: "md" }),
+                  "transition-colors"
+                )}
                 data-testid="error-boundary-retry"
               >
                 🔄 Încearcă din nou ({this.maxRetries - this.retryCount} încercări rămase)
@@ -113,7 +120,10 @@ class ErrorBoundary extends React.Component<
             
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className={cn(
+                button({ variant: "secondary", size: "md" }),
+                "transition-colors"
+              )}
               data-testid="error-boundary-reload"
             >
               🔄 Reîncarcă pagina

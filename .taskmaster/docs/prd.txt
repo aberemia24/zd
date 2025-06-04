@@ -1,256 +1,437 @@
-# BUDGET APP - PRODUCT REQUIREMENTS DOCUMENT COMPLET
+# Budget App - Product Requirements Document (PRD) - Web-First Edition
 
-## CONTEXT
+## ⚠️ CRITICAL IMPLEMENTATION DIRECTIVE
 
-### Overview
-Budget App este o aplicație avansată de management financiar cu focus pe planificarea și tracking-ul cheltuielilor folosind un sistem de grid interactiv (LunarGrid) și un sistem complex de sold zilnic cu tratare specială pentru investiții și economisiri.
+**SAFE INCREMENTAL IMPLEMENTATION FRAMEWORK:**
 
-### Problem Statement
-Utilizatorii au nevoie de o soluție comprehensivă pentru:
-- Tracking sold zilnic cu vizibilitate asupra activelor vs cheltuielilor consumate
-- Management categorii și subcategorii cu planificare detaliată
-- Sistem grid interactiv pentru introducerea și editarea tranzacțiilor
-- Separarea clară între cheltuieli pure, investiții și economisiri
-- Synchronizare perfectă între componente pentru consistență datelor
+🚨 **OBLIGATORIU pentru TOATE task-urile și dezvoltările viitoare în Budget App:**
 
-### Value Proposition
-- Sistem de sold cumulativ zilnic cu alerting pentru sold negativ
-- LunarGrid profesional cu editing inline și modal enhancement
-- Arhitectură robustă CVA pentru consistency și profesionalism
-- Research-backed implementation pentru toate feature-urile
+### 1. ZERO PLANNING ÎN VID
+- **Concret planning**: Să știm exact toate constantele, funcțiile, parametrii, clasele pe care le vom folosi
+- **NU presupunem, NU inventăm**: Auditul și research-ul trebuie să precedă orice implementare
+- **Verificare existentă**: Înainte să creăm, verificăm ce există deja în proiect
 
-## CORE FEATURES
+### 2. MODIFICĂRI SAFE
+- **Non-breaking changes**: Modificările să nu afecteze negativ restul aplicației
+- **Funcționalitate preservată**: NU scoatem funcționalitate existentă
+- **Backward compatibility**: Toate upgrade-urile să fie compatibile cu codul existent
 
-### 1. SISTEM SOLD ZILNIC ȘI INVESTIȚII
+### 3. IMPLEMENTARE MEGA ATENTĂ și INCREMENTALĂ
+- **Pas cu pas**: Fiecare modificare în iterații mici și verificabile
+- **Verificare continuă**: După fiecare pas, validăm că totul funcționează
+- **Rollback capability**: Orice modificare să poată fi revenită rapid
 
-#### 1.1 Calculator Sold Cumulativ
-- **Funcționalitate**: Sold Initial + Venituri - Cheltuieli Pure - Investiții - Economisiri = Sold Rămas
-- **Tratare Specială**: Investițiile și economisirile "ies" din cont dar rămân ca active
-- **Vizualizare**: Coloană sold zilnic în grid cu alerting pentru sold negativ
-- **Transfer Automat**: Sold final luna curentă → sold inițial luna următoare
+### 4. BEST PRACTICES FĂRĂ OVER-ENGINEERING
+- **Robust dar simplu**: Soluții solide dar nu complicate
+- **Ușor de implementat**: Evităm "enterprise level shit" 
+- **Util și practic**: Fiecare feature să aibă valoare reală pentru utilizatori
 
-#### 1.2 Management Conturi Multiple  
-- **Interface**: Pe modelul CategoryEditor pentru add/edit/delete conturi
-- **Tipuri Cont**: Bancă, Cash, Investiții, Altele cu limite configurabile (max 10)
-- **Calcul Total**: Suma tuturor conturilor = sold inițial în grid
-- **Configurare**: Settings per grid cu data început și sold inițial
+---
 
-#### 1.3 Sistem Categorii cu Culori
-- **Cheltuieli Pure**: Roșu (consumate definitiv)
-- **Investiții**: Albastru (active păstrate) - PĂSTRAT din implementarea existentă
-- **Economisiri**: Verde (bani păstrați)
-- **Venituri**: Verde
-- **Flexibilitate**: Opțiuni în Settings pentru incluadere/excludere în calculul soldului
+## 🖥️ WEB-FIRST ORIENTATION (CRITICAL UPDATE)
 
-### 2. LUNARGRID ENHANCEMENT SYSTEM
+**Budget App este o aplicație WEB-FIRST pentru desktop financial planning workflows cu focus pe professional desktop users care gestionează bugete complexe.**
 
-#### 2.1 Modal Edit Enhancement
-- **Arhitectură Existentă**: QuickAddModal.tsx complet funcțional cu toate props-urile
-- **Enhancement**: Keyboard shortcuts, accessibility improvements, position-based modal
-- **Integrare**: useBaseModalLogic hook cu validation completă
-- **CVA Styling**: transactionModalOverlay cu blur variants standardizate
+### Target Users PRIMARI (Desktop-First)
+- **Power users pe desktop/laptop** care lucrează zilnic cu planificare financiară
+- **Professional layouts pentru ecrane mari (1920x1080+)**
+- **Keyboard shortcuts și right-click context menus**
+- **Data-dense interfaces** pentru maximum efficiency
 
-#### 2.2 Inline Editing Enhancement
-- **Funcționalitate**: EditableCell.tsx cu double-click activation EXISTĂ
-- **Enhancement**: Visual feedback îmbunătățit, keyboard navigation
-- **Constants**: INLINE_EDITING section completă în shared-constants
-- **Integration**: CVA cell editing styles în grid system
+### Target Users SECUNDARI (Mobile Fallback)
+- **Quick mobile entry** pentru tranzacții când nu sunt la desktop
+- **Basic mobile access** pentru emergency checking
 
-#### 2.3 Sistem Redimensionare Tabel
-- **Pattern Existent**: LunarGridPage.tsx cu fullscreen mode și escape key handler
-- **Implementation**: useTableResize hook cu toggle fullscreen/normal
-- **CVA Extensions**: gridResizeContainer și gridResizeButton variants
-- **Icons**: Maximize2/Minimize2 cu conditional rendering
+### WEB-FIRST Design Principles
+- **Desktop workflows PRIMUL PRIORITY**
+- **Keyboard navigation și shortcuts**
+- **Right-click context menus pentru power users**
+- **Dense data layouts pentru large screens**
+- **Professional export și print capabilities**
+- **Mobile responsiveness SECUNDAR**
 
-#### 2.4 Data Validation și Operațiuni
-- **Subcategory Operations**: useSubcategoryOperations hook complet
-- **Validation**: Multiple validation hooks cu shared-constants/validation.ts
-- **Error Handling**: Standardized error messages și visual feedback
-- **Integration**: Form validation în modal și inline editing
+---
 
-#### 2.5 Sistem Recurență Avansat
-- **Arhitectură Template-Based**: RecurringTransactions.ts cu interface completă
-- **Generator**: recurringTransactionGenerator.ts cu algoritmi complecși
-- **Features**: calculateNextOccurrence, conflict resolution, preview generation
-- **Limite**: 1-year limit implementation cu user confirmation flow
+## Executive Summary
+Budget App este într-o stare critică după o refactorizare agresivă a sistemului CVA (Class Variance Authority) care a cauzat:
+- Pierderea funcționalității aplicației
+- Aspect vizual foarte urât 
+- Duplicate și importuri inconsistente
+- Performanță degradată
+- Blocarea completă a dezvoltării ulterioare
 
-#### 2.6 Synchronizare Perfect cu Transaction Table
-- **Data Flow**: React Query cache consistency cu invalidation triggers
-- **Hooks**: useMonthlyTransactions ca shared data source
-- **Sync Issues**: Event bus implementation pentru cross-component sync
-- **Optimization**: State consistency hooks și cache strategy enhancement
+Acest PRD definește planul complet de remediere și stabilirea unui sistem CVA standardizat, performant și ușor de întreținut **cu orientare WEB-FIRST**.
 
-### 3. DESIGN ȘI UX PROFESSIONAL
+## Problem Statement
+### Starea Actuală Critică
+1. **Unified CVA (883 linii)** - Un monstru monolitic cu funcționalitate mixtă
+2. **Fișiere CVA Duplicate** - Rămân forms.ts, layout.ts, feedback.ts, modal.ts, grid.ts
+3. **Importuri Inconsistente** - Unele componente folosesc unified-cva, altele importă din fișiere vechi
+4. **Funcționalitate Pierdută** - Componente care arată urât sau nu funcționează
+5. **Mocha Mousse Theme** - Implementat incomplet sau incorect
+6. **Clase CSS Hardcodate** - Rămân pe tot în aplicație
+7. **Performanță Degradată** - Bundle size și loading performance afectate
 
-#### 3.1 CVA Design System
-- **Professional Theme**: shadow-lg, hover:shadow-xl consistency
-- **Animation Standards**: transition-all duration-200 ease-in-out
-- **Typography**: font-financial pentru numere, contrast-enhanced headers
-- **Color Psychology**: value-positive/negative/neutral cu accessibility
+### Impact Business
+- **MAJOR BLOCKER** - Dezvoltarea este complet oprită
+- User Experience foarte urât
+- Potențiale bug-uri în production
+- Echipa nu poate lucra la alte task-uri
+- Credibilitatea aplicației afectată
 
-#### 3.2 Responsive Design
-- **Grid Adaptability**: fullscreen, large, default, compact variants
-- **Mobile Considerations**: touch-friendly sizing cu hover states
-- **Keyboard Navigation**: focus-ring cu tabIndex management
-- **Loading States**: animate-fade-in-up cu loading-pulse
+## Solution Requirements
 
-## TECHNICAL ARCHITECTURE
+### 1. CVA Architecture Research & Best Practices
+- Research extensiv despre organizarea sistemelor CVA în aplicații medii/mari
+- Definirea clear a best practices pentru monorepo cu React + TailwindCSS
+- Strategia de file organization optimă (monolitic vs modular)
+- Performance implications și bundle optimization
 
-### Stack Technology
-- **Frontend**: React + TypeScript + Zustand + TailwindCSS + CVA
-- **Backend**: NestJS + Supabase
-- **Shared-Constants**: Sursă unică pentru constante, enums, mesaje
-- **Testing**: Jest + React Testing Library + Playwright
+### 2. Complete CVA System Audit  
+- Inventar complet al fișierelor CVA existente
+- Mapping exact al componentelor definite vs folosite
+- Identificarea duplicărilor și conflictelor
+- Lista exhaustivă a importurilor inconsistente
+- Assessment funcționalitate pierdută/afectată
 
-### Data Models
+### 3. Design System Standards Definition - WEB-FIRST
+- Standardizarea paletei de culori Mocha Mousse 2025 **pentru desktop-first design**
+- Definirea clear a dark mode strategy **pentru professional users**
+- Typography system consistent **optimizat pentru large screens**
+- Spacing și sizing standards **pentru dense desktop layouts**
+- Interactive states (hover, focus, disabled) **cu keyboard navigation priority**
+- Animation și transition standards **non-intrusive pentru desktop workflows**
 
-#### BalanceSystem Model
-```typescript
-interface DailyBalance {
-  date: string;
-  initialBalance: number;
-  dailyIncome: number;
-  dailyExpenses: number;
-  dailyInvestments: number;
-  dailySavings: number;
-  remainingBalance: number;
-  isNegative: boolean;
+### 4. CVA System Redesign & Implementation - SAFE INCREMENTAL
+- Arhitectura finală optimizată (modular approach recomandat) **cu AUDIT COMPLET înainte**
+- Component organization hierarchy clară **cu verificare dependencies existente**
+- Shared utilities și base styles consolidate **cu BACKWARD COMPATIBILITY**
+- Type safety completă cu VariantProps **cu ZERO TypeScript errors**
+- Tree-shaking optimization pentru bundle size **cu performance monitoring**
+
+### 5. Component Migration & Cleanup - MEGA ATENT
+- Migration completă de la fișiere vechi la arhitectura nouă **PAS CU PAS**
+- Eliminarea duplicărilor și dead code **cu VERIFICARE că nu strică funcționalitate**
+- Update imports în toată aplicația **cu ROLLBACK CAPABILITY**
+- Verificarea funcționalității fiecărei componente **după FIECARE modificare**
+- Visual regression testing **la fiecare pas incremental**
+
+### 6. Quality Assurance & Testing
+- Comprehensive visual testing
+- Component behavior verification  
+- Performance benchmarking
+- Cross-browser compatibility check
+- Dark mode functionality verification
+
+## Technical Specifications - WEB-FIRST
+
+### Tech Stack Requirements - Desktop-Optimized
+- **CVA (Class Variance Authority)** - Versiunea actuală **cu desktop-first variants**
+- **TailwindCSS** - Cu design tokens custom **pentru large screen layouts**
+- **TypeScript** - Type safety complet **cu keyboard navigation types**
+- **React** - Componente moderne cu hooks **optimizate pentru desktop performance**
+- **twMerge + clsx** - Class merging optimization **pentru dense data layouts**
+
+### Performance Requirements - Desktop-First
+- Bundle size reduction cu minim 30% **pentru fast desktop loading**
+- Loading time improvement **<2 secunde pe desktop broadband**
+- Tree-shaking support complet **pentru efficient desktop bundles**
+- CSS-in-JS overhead minim **pentru long desktop sessions**
+- Development experience optimizat **pentru power user workflows**
+
+### WEB-FIRST Design Specifications
+- **Primary breakpoint**: 1920x1080+ (Desktop base)
+- **Secondary breakpoint**: 1024px+ (Large tablet adaptation)
+- **Fallback breakpoint**: 768px+ (Mobile minimum)
+- **Keyboard shortcuts**: Comprehensive support în toate components
+- **Right-click context menus**: Available pentru toate interactive elements
+- **Dense layouts**: Maximum data visibility pe large screens
+- **Professional aesthetics**: Business-appropriate pentru financial planning
+
+### Color Palette - Mocha Mousse 2025 System
+- Primary: #8B4513 (Mocha Mousse base)
+- Secondary: #4C5578 (Future Dusk)  
+- Accent: #EDEAB1 (Celestial Yellow)
+- Success: #71ADBA (Ethereal Blue)
+- Warning: #FF654F (Neon Flare)
+- Neutral: #9CA3AF (Moonlit Grey)
+- Background: #F5F2E9 (Wheatfield Beige)
+
+### Dark Mode Implementation  
+- Sophisticated night theme preserving brand identity
+- Professional color strategy: darker backgrounds, lighter text/accents
+- Enhanced financial data readability in dark mode
+- Theme persistence și system preference detection
+- Smooth transitions între themes
+
+## Success Criteria
+
+### Functional Requirements
+1. **Zero Broken Components** - Toate componentele funcționează perfect **pe desktop-first**
+2. **Visual Consistency** - Design system coherent **optimizat pentru large screens**  
+3. **Performance Restored** - Bundle size și loading times optimizate **pentru desktop workflows**
+4. **Development Velocity** - Echipa poate continua dezvoltarea **cu web-first orientation**
+5. **Maintainability** - Sistem ușor de înțeles și actualizat **cu desktop priority**
+
+### Desktop-First Technical Metrics (New)
+- Bundle size reduction: -30% minimum **pentru desktop loading**
+- Component loading time: <100ms **pe desktop broadband**
+- Import resolution time: <50ms **pentru development velocity**
+- Zero TypeScript errors **cu keyboard navigation types**
+- 100% component test coverage **including keyboard navigation**
+- Zero console warnings/errors **în desktop workflows**
+
+### Desktop-First Quality Gates (New)
+- **Keyboard navigation tests** pass 100% - toate componentele navigabile
+- **Right-click context menu** functionality verified în toate componentele
+- **Large dataset performance** verified - smooth cu 10,000+ items
+- **Multi-monitor compatibility** tested și functional
+- **Professional export** capabilities verified și tested
+- **Dense layout optimization** confirmed pentru 1920x1080+ screens
+
+### Quality Gates
+- Visual regression tests pass 100%
+- Cross-browser compatibility verified
+- Dark mode functionality complete
+- Documentation updated și comprehensive
+- Team sign-off pentru development readiness
+
+## Deliverables
+
+### Phase 1: Research & Assessment (Priority: Critical)
+1. CVA best practices research report
+2. Complete system audit document
+3. Migration strategy document
+4. Performance benchmark baseline
+
+### Phase 2: Architecture & Design (Priority: Critical)  
+1. Final CVA architecture specification
+2. Design system documentation complete
+3. Component library structure
+4. Migration plan detailed
+
+### Phase 3: Implementation (Priority: Critical)
+1. New CVA system implemented
+2. All components migrated
+3. Dead code eliminated
+4. Imports standardized
+
+### Phase 4: Testing & Validation (Priority: High)
+1. Comprehensive testing suite
+2. Performance validation
+3. Visual regression verification
+4. Documentation finalized
+
+## Timeline & Priority
+**URGENT** - This is blocking all other development work
+
+### Critical Path (Est. 3-5 days intensive work)
+- Day 1: Research & audit complete
+- Day 2: Architecture design & planning
+- Day 3-4: Implementation & migration
+- Day 5: Testing & quality assurance
+
+### Dependencies
+- Full team focus pe această problemă
+- Freeze pe alte development tasks
+- Access la toate environment-urile pentru testing
+
+## Risk Assessment
+
+### High Risk Items
+1. **Further functionality loss** - Migration poate cauza bug-uri suplimentare
+2. **Performance regression** - Sistema nouă poate fi mai lentă
+3. **Development delays** - Procesul poate dura mai mult decât estimat
+
+### Mitigation Strategies  
+1. Incremental migration cu rollback capability
+2. Comprehensive testing la fiecare pas
+3. Performance monitoring continuous
+4. Backup complet al stării actuale
+
+## Conclusion
+Acest proiect este esențial pentru supraviețuirea aplicației Budget App. Starea actuală este insustenabilă și blochează complet dezvoltarea ulterioară. Implementarea unui sistem CVA robust și standardizat va restabili funcționalitatea, va îmbunătăți performanța și va permite echipei să continue cu încredere dezvoltarea features-urilor planificate.
+
+**Success Message**: "CVA system restored to fully functional, performant, and maintainable state - development can resume at full velocity."
+
+## SAFE IMPLEMENTATION PROTOCOLS - OBLIGATORIU
+
+### Pre-Implementation Checklist (ZERO EXCEPȚII)
+Înaintea oricărei modificări CVA, verificați:
+
+#### 1. Audit Existent ✅
+- [ ] Ce fișiere CVA există deja în proiect?
+- [ ] Ce componente sunt definite în fiecare fișier?
+- [ ] Unde sunt folosite aceste componente în aplicație?
+- [ ] Ce dependencies au componentele existente?
+
+#### 2. Planning Concret ✅  
+- [ ] Lista exactă a variants care vor fi implementate
+- [ ] Numele și path-urile exacte ale fișierelor care vor fi modificate
+- [ ] Importurile și exporturile care trebuie schimbate
+- [ ] Tipurile TypeScript necesare pentru noi variants
+
+#### 3. Impact Assessment ✅
+- [ ] Ce componente existente vor fi afectate?
+- [ ] Ce funcționalitate ar putea fi pierdută?
+- [ ] Ce teste trebuie actualizate?
+- [ ] Ce documentație trebuie modificată?
+
+#### 4. Rollback Plan ✅
+- [ ] Backup al stării actuale
+- [ ] Step-by-step rollback procedure
+- [ ] Testing plan pentru verificarea rollback-ului
+- [ ] Communication plan pentru echipă
+
+### Implementation Steps - MEGA INCREMENTAL
+
+#### Step 1: Safe Foundation ✅
+1. **Backup complet** al stării actuale
+2. **Create branch** dedicated pentru CVA changes
+3. **Document current state** - exact ce funcționează acum
+4. **Establish baseline** - performance și functionality metrics
+
+#### Step 2: Minimal Viable Changes ✅
+1. **Start cu o singură componentă** - cea mai simplă
+2. **Implement ONE variant** pe rând
+3. **Test imediat** după fiecare variant
+4. **Validate** că totul funcționează înainte să continui
+
+#### Step 3: Incremental Expansion ✅
+1. **Add variants gradually** - nu mai mult de 2-3 pe sesiune
+2. **Test între adăugiri** - functional și visual testing
+3. **Monitor performance** - bundle size și loading times
+4. **Document changes** - ce s-a modificat și de ce
+
+#### Step 4: Integration Validation ✅
+1. **Test cu toate componentele** care folosesc CVA modificat
+2. **Cross-browser testing** - Chrome, Firefox, Safari, Edge
+3. **Performance benchmarking** - înainte vs după
+4. **Visual regression testing** - screenshot comparison
+
+### Validation Checkpoints - NON-NEGOTIABLE
+
+#### După fiecare modificare:
+- [ ] **Zero TypeScript errors** - build must succeed
+- [ ] **Zero console warnings** - clean development experience
+- [ ] **Existing functionality unchanged** - regression testing
+- [ ] **New functionality works** - feature testing
+- [ ] **Performance maintained** - no degradation în loading
+
+#### După completion:
+- [ ] **Full application smoke test** - toate paginile se încarcă
+- [ ] **All existing tests pass** - no broken functionality
+- [ ] **Visual consistency maintained** - design system intact
+- [ ] **Documentation updated** - reflects current state
+- [ ] **Team review completed** - sign-off pentru deployment 
+
+## Primary User Personas (Desktop-Focused) - CRITICAL CONTEXT
+
+### 1. David - Financial Analyst Freelancer (32 ani)
+- **Environment**: Dual monitor setup, 8+ hours pe zi în aplicații financiare
+- **Obiective**: Separare categorii client-specifice, export pentru contabilitate
+- **Workflow**: Bulk data entry, advanced filtering, professional reports
+- **Frustrări**: Interfețe mobile-first care îl încetinesc în workflow-uri repetitive
+
+### 2. Maria și Andrei - Cuplu cu Planificare Financiară Avansată (29-34 ani)
+- **Environment**: Shared desktop pentru financial planning sessions
+- **Obiective**: Budgeting multi-categorial, goal tracking, expense analysis
+- **Workflow**: Weekly planning sessions cu data analysis și projections
+- **Frustrări**: Lipsa de screen real estate și advanced sorting options
+
+### 3. Alexandra - Consultant Independent (38 ani)
+- **Environment**: Business laptop principal, usage intensiv zilnic
+- **Obiective**: Expense tracking pentru deduceri fiscale, client separation
+- **Workflow**: Rapid categorization, bulk operations, quarterly reports
+- **Frustrări**: Slow workflows în aplicații optimizate pentru mobile
+
+## Desktop-First User Flows - IMPLEMENTATION TARGETS
+
+### 1. Daily Professional Workflow (2-5 minute) - HIGH PRIORITY
+1. **Keyboard shortcut access** (Ctrl+N pentru new transaction)
+2. **Rapid categorization** cu auto-complete și recent categories
+3. **Bulk operation mode** pentru multiple similar transactions
+4. **Contextual validation** cu immediate feedback
+5. **Session auto-save** pentru continuitate workflow
+
+### 2. Weekly Financial Analysis (15-30 minute) - HIGH PRIORITY
+1. **Multi-month comparison view** pentru trend identification
+2. **Advanced filtering** cu saved filter presets
+3. **Data export** cu custom column selection
+4. **Professional report generation** pentru planning sessions
+5. **Goal tracking updates** cu variance analysis
+
+## Desktop-Optimized Design Principles - OBLIGATORIU
+
+### Performance Targets (Desktop-Focused)
+- **Initial load**: <2 secunde pe connection-uri desktop broadband
+- **Interaction responsiveness**: <50ms pentru keyboard/mouse interactions
+- **Large dataset handling**: Smooth operation cu 10,000+ transactions
+- **Memory efficiency**: <200MB pentru long-running desktop sessions
+- **Concurrent data operations**: Bulk updates fără UI blocking
+
+### Component Architecture Priority pentru CVA
+
+#### 1. Desktop-First Components (High Priority) - FOCUS CVA
+- **Professional Tables**: Sortable, resizable, bulk-selection enabled
+- **Advanced Forms**: Keyboard navigation, auto-complete, validation
+- **Dashboard Layouts**: Multi-panel views pentru comprehensive overview
+- **Navigation Systems**: Persistent sidebars, breadcrumbs, tabs
+
+#### 2. Cross-Platform Components (Medium Priority)  
+- **Charts & Visualizations**: Responsive dar optimized pentru desktop hover
+- **Modal Dialogs**: Keyboard accessible, desktop-sized by default
+- **Notification Systems**: Non-intrusive pentru long desktop sessions
+
+#### 3. Mobile-Adaptation Components (Low Priority)
+- **Simplified Entry Forms**: Pentru rapid mobile input
+- **Touch-Optimized Navigation**: Hamburger menus ca fallback
+- **Mobile-Specific Layouts**: Minimum viable pentru mobile access
+
+### Desktop-First Responsive Strategy pentru CVA
+```css
+/* Primary: Desktop-first breakpoints - APLICABILE ÎN CVA */
+.container {
+  width: 100%;           /* Large desktop base */
+  max-width: 1440px;     /* Primary target */
+  padding: 2rem;         /* Desktop spacing */
 }
 
-interface Account {
-  id: string;
-  name: string;
-  type: 'bank' | 'cash' | 'investment' | 'other';
-  balance: number;
-  isActive: boolean;
+/* Secondary: Tablet adaptation */
+@media (max-width: 1024px) {
+  .container {
+    padding: 1.5rem;      /* Tablet adjustment */
+    max-width: 100%;
+  }
+}
+
+/* Fallback: Mobile compatibility */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;        /* Mobile minimum */
+  }
 }
 ```
 
-#### Enhanced Transaction Model
-```typescript
-interface Transaction {
-  // Existing fields...
-  balanceImpact: number;
-  isRecurring: boolean;
-  recurringTemplateId?: string;
-  subcategoryId?: string;
-}
+### CVA Design System Requirements - INTEGRATED FROM COMPREHENSIVE PRD
 
-interface RecurringTemplate {
-  id: string;
-  frequency: FrequencyType;
-  startDate: string;
-  endDate?: string;
-  generatedCount: number;
-  maxGenerations: number;
-}
-```
+#### Desktop-Optimized Features for CVA Implementation
+- **Keyboard-first interaction**: Toate acțiunile accesibile via keyboard
+- **Mouse precision**: Right-click menus, hover states, drag & drop
+- **Multi-tasking support**: Tab switching, window state management
+- **Professional aesthetics**: Clean, business-appropriate styling
 
-### API Extensions
-- **Balance Endpoints**: `/api/balance/daily`, `/api/balance/monthly`
-- **Account Management**: `/api/accounts` CRUD operations
-- **Recurring System**: `/api/recurring/templates`, `/api/recurring/generate`
-- **Sync Endpoints**: `/api/sync/transaction-table`
+#### Accessibility (Desktop-Enhanced) - OBLIGATORIU în CVA
+- **Comprehensive keyboard navigation**: Toate features accesibile via keyboard
+- **Screen reader optimization**: Semantic HTML și ARIA pentru tools profesionale
+- **High contrast support** pentru utilizare prelungită
+- **Zoom compatibility**: Funcțional la 200% zoom pentru readability
+- **Focus management**: Clear focus indicators pentru keyboard users
 
-### Performance Considerations
-- **React Query Cache**: Optimistic updates cu rollback mechanisms
-- **Virtual Scrolling**: Pentru large datasets în grid
-- **Debounced Validation**: Real-time validation cu performance
-- **Memory Management**: Cleanup pentru recurring generation
-
-## DEVELOPMENT ROADMAP
-
-### MVP Phase 1: Sistem Sold Fundamental
-- Settings pentru sold inițial și conturi
-- Calculator sold zilnic cu logică cumulativă
-- Display sold în grid cu alerting negativ
-- Transfer automat între luni
-- **Estimare**: Complex - requires new hooks, CVA components, settings integration
-
-### MVP Phase 2: LunarGrid Enhancement Core
-- Modal edit enhancement cu keyboard shortcuts
-- Inline editing enhancement cu visual feedback
-- Sistem redimensionare cu fullscreen mode
-- Data validation enhancement
-- **Estimare**: Medium - build on existing architecture
-
-### MVP Phase 3: Recurență și Sync
-- Sistem recurență cu template-based generation
-- Preview și confirmation flow pentru recurring
-- Synchronizare perfectă cu Transaction Table
-- Event bus implementation
-- **Estimare**: Complex - algoritmi avansați și sync logic
-
-### Phase 4: Management Conturi și UX Final
-- Interface management conturi multiple
-- Design și UX polish cu CVA enhancements
-- Performance optimization și testing
-- Advanced filtering și reporting
-- **Estimare**: Medium - UI focused cu existing patterns
-
-## LOGICAL DEPENDENCY CHAIN
-
-### Foundation Layer (Must be built first)
-1. **Shared-Constants Extension**: Toate constantele pentru balance, accounts, enhanced UI
-2. **CVA System Enhancement**: Grid styles, modal variants, balance display
-3. **Settings Infrastructure**: Account management și balance configuration
-
-### Core Functionality Layer
-4. **Balance Calculator**: useBalanceCalculator hook cu daily computation
-5. **Account Management**: CRUD operations cu CategoryEditor pattern
-6. **Enhanced Modal System**: QuickAddModal improvements cu keyboard support
-
-### Integration Layer  
-7. **Grid Integration**: Balance display în LunarGrid cu alerts
-8. **Inline Editing Enhancement**: Visual feedback și keyboard navigation
-9. **Resize System**: Fullscreen toggle cu escape key handling
-
-### Advanced Features Layer
-10. **Recurring System**: Template generation cu preview flow
-11. **Sync Optimization**: Event bus și state consistency
-12. **Data Validation**: Enhanced validation cu error handling
-
-### Polish Layer
-13. **Design Enhancement**: Professional theme consistency
-14. **Performance Optimization**: Cache strategy și memory management
-15. **Testing Coverage**: Unit tests, integration tests, E2E coverage
-
-## RISKS AND MITIGATIONS
-
-### Technical Challenges
-- **Complexity Risk**: Sistem sold complex cu multiple edge cases
-  - *Mitigation*: Phased implementation cu extensive testing
-- **State Sync Risk**: Desync între LunarGrid și Transaction Table
-  - *Mitigation*: Event bus cu centralized state management
-- **Performance Risk**: Large datasets cu recursive calculations
-  - *Mitigation*: Virtual scrolling și optimized algorithms
-
-### MVP Definition
-- **Core MVP**: Sold zilnic cu alerting + modal/inline enhancements
-- **Extended MVP**: + sistem recurență + account management
-- **Full Feature Set**: + sync optimization + design polish
-
-### Resource Constraints
-- **Development Time**: Estimare 8-12 săptămâni pentru MVP complet
-- **Testing Coverage**: Unit + Integration + E2E pentru toate features
-- **Documentation**: CVA patterns, API documentation, user guides
-
-## APPENDIX
-
-### Research Foundation
-- **Complete Research**: 14 taskuri cu arhitectură existentă mapată
-- **CVA Analysis**: 876 linii grid styling cu professional patterns
-- **Hook Architecture**: Existing hooks identified cu extension points
-- **Performance Benchmarks**: React Query patterns cu optimization targets
-
-### Technical Specifications
-- **Constants Structure**: shared-constants organization cu zero hardcoding
-- **CVA Patterns**: Professional theme cu animation standards
-- **Hook Patterns**: useBaseModalLogic ca foundation pentru enhancements
-- **Testing Strategy**: Jest + RTL pentru units, Playwright pentru E2E
-
-### Implementation Notes
-- **Research-Backed**: Toate taskurile au research complet cu cod analysis
-- **Architecture Respect**: Build on existing CVA și hook patterns
-- **Zero Breaking Changes**: Enhancements care păstrează funcționalitatea existentă
-- **Professional Standards**: CVA consistency cu animation și typography standards 
+#### Bundle Optimization pentru Desktop (CVA Performance)
+- **Code splitting** pentru fast initial load desktop
+- **Aggressive caching** pentru repeat desktop sessions
+- **Tree-shaking optimization** pentru efficient desktop bundles
+- **Memory management**: Efficient cleanup pentru long-running sessions
+``` 
+</rewritten_file>

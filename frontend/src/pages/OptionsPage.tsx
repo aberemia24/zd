@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { useCategoryStore } from "../stores/categoryStore";
-import { CategoryEditor } from "../components/features/CategoryEditor";
-import { UI } from "@shared-constants/ui";
-import { CATEGORIES } from "@shared-constants/categories";
-import { MESAJE } from "@shared-constants/messages";
-import { TransactionType } from "@shared-constants/enums";
+import CategoryEditor from "../components/features/CategoryEditor/CategoryEditor";
+import { ExportButton } from "../components/features/ExportButton/ExportButton";
+import { UI, CATEGORIES, MESAJE, TransactionType } from "@shared-constants";
 import { Button } from "../components/primitives/Button";
 import Alert from "../components/primitives/Alert";
 import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";
-import { cn } from "../styles/cva/shared/utils";
-import { container, card, flex } from "../styles/cva/components/layout";
+
+// CVA styling imports
+import { cn, dashboard, card } from "../styles/cva/unified-cva";
+
 import { useMonthlyTransactions } from "../services/hooks/useMonthlyTransactions";
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
 import { supabaseService } from "../services/supabaseService";
@@ -374,20 +374,19 @@ const OptionsPage: React.FC = () => {
   if (!user) {
     return (
       <div
-        className={cn(container({ size: "lg" }), "min-h-screen pt-8")}
+        className={cn(dashboard({ layout: "single" }), "min-h-screen pt-8")}
         data-testid="options-page-not-logged"
       >
         <h1 className="text-3xl font-bold text-gray-900 mb-6">
           {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
         </h1>
         <Alert
-          type="warning"
-          message={
-            UI.LOGIN_REQUIRED ||
-            "Trebuie să fiți autentificat pentru a accesa această pagină."
-          }
-          dataTestId="options-alert-not-logged"
-        />
+          variant="warning"
+          data-testid="options-alert-not-logged"
+        >
+          {UI.LOGIN_REQUIRED ||
+            "Trebuie să fiți autentificat pentru a accesa această pagină."}
+        </Alert>
       </div>
     );
   }
@@ -405,7 +404,7 @@ const OptionsPage: React.FC = () => {
 
   return (
     <div
-      className={cn(container({ size: "lg" }), "min-h-screen pt-8")}
+      className={cn(dashboard({ layout: "single" }), "min-h-screen pt-8")}
       data-testid="options-page"
     >
       <h1
@@ -416,7 +415,7 @@ const OptionsPage: React.FC = () => {
       </h1>
 
       {/* Secțiunea de gestionare categorii */}
-      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
         <div
           className={cn(
             "p-4 border-b border-gray-200 bg-gray-50",
@@ -435,7 +434,7 @@ const OptionsPage: React.FC = () => {
           <Button
             variant="primary"
             size="md"
-            dataTestId="open-category-editor-btn"
+            data-testid="open-category-editor-btn"
             onClick={() => setShowCategoryEditor(true)}
           >
             {UI.MANAGE_CATEGORIES || "Gestionare categorii"}
@@ -444,7 +443,7 @@ const OptionsPage: React.FC = () => {
       </div>
 
       {/* Alte secțiuni de opțiuni */}
-      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
         <div
           className={cn(
             "p-4 border-b border-gray-200 bg-gray-50",
@@ -462,7 +461,7 @@ const OptionsPage: React.FC = () => {
         </div>
       </div>
 
-      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
         <div
           className={cn(
             "p-4 border-b border-gray-200 bg-gray-50",
@@ -481,7 +480,7 @@ const OptionsPage: React.FC = () => {
       </div>
 
       {/* Secțiunea Reset to Defaults */}
-      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
         <div
           className={cn(
             "p-4 border-b border-gray-200 bg-red-50",
@@ -497,7 +496,7 @@ const OptionsPage: React.FC = () => {
             Resetați aplicația la configurația inițială. Alegeți ce doriți să resetați:
           </p>
           
-          <div className={cn(flex({ direction: "col", gap: "md" }))}>
+          <div className="flex flex-col gap-4">
             {/* Reset doar subcategorii */}
             <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
               <h3 className="font-semibold text-gray-900 mb-2">
@@ -519,7 +518,7 @@ const OptionsPage: React.FC = () => {
                 size="sm"
                 onClick={handleResetSubcategories}
                 disabled={isResetting}
-                dataTestId="reset-subcategories-btn"
+                data-testid="reset-subcategories-btn"
               >
                 {isResetting ? "Se resetează..." : "Reset Subcategorii"}
               </Button>
@@ -535,11 +534,11 @@ const OptionsPage: React.FC = () => {
                 <strong> Această acțiune NU poate fi anulată!</strong>
               </p>
               <Button
-                variant="danger"
+                variant="primary"
                 size="sm"
                 onClick={handleResetEverything}
                 disabled={isResetting}
-                dataTestId="reset-everything-btn"
+                data-testid="reset-everything-btn"
               >
                 {isResetting ? "Se resetează..." : "⚠️ Reset Complet"}
               </Button>
@@ -560,7 +559,7 @@ const OptionsPage: React.FC = () => {
       </div>
 
       {/* Secțiunea Cont Utilizator */}
-      <div className={cn(card({ variant: "elevated", size: "lg" }), "mb-6")}>
+      <div className={cn(card({ variant: "elevated" }), "mb-6")}>
         <div
           className={cn(
             "p-4 border-b border-gray-200 bg-gray-50",
@@ -638,11 +637,10 @@ const OptionsPage: React.FC = () => {
         title="Confirmarea finală"
         message="Pentru a confirma ștergerea completă, scrieți exact: ȘTERG TOT"
         placeholder="Scrieți aici..."
-        expectedValue="ȘTERG TOT"
         confirmText="Confirm ștergerea"
         cancelText="Anulează"
         variant="danger"
-        icon="⚠️"
+        required={true}
       />
     </div>
   );

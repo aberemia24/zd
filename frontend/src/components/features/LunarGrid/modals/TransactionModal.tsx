@@ -1,18 +1,18 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { TransactionType } from "@shared-constants";
 
 // CVA styling imports
-import { cn } from "../../../../styles/cva/shared/utils";
-import { modal, modalContent } from "../../../../styles/cva/components/layout";
-import {
+import { 
+  cn,
+  modal,
   button,
   input,
   select,
   textarea,
   checkbox,
   label,
-  inputWrapper,
-} from "../../../../styles/cva/components/forms";
+  inputWrapper
+} from "../../../../styles/cva-v2";
 
 /**
  * TransactionModal pentru LunarGrid - Phase 2.2
@@ -57,7 +57,7 @@ export interface TransactionModalProps {
   mode?: "add" | "edit";
 }
 
-export const TransactionModal: React.FC<TransactionModalProps> = ({
+const TransactionModalComponent: React.FC<TransactionModalProps> = ({
   isOpen,
   onClose,
   cellPosition,
@@ -180,13 +180,27 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     [onClose],
   );
 
+  // Memoized computations pentru performance
+  const modalTitle = useMemo(() => 
+    mode === "edit" ? "Editează Tranzacție" : "Adaugă Tranzacție", 
+    [mode]
+  );
+  
+  const hasError = useMemo(() => !!validationError, [validationError]);
+  
+  const formattedDate = useMemo(() => 
+    new Date(date).toLocaleDateString("ro-RO"), 
+    [date]
+  );
+  
+  const categoryDisplay = useMemo(() => 
+    `${cellPosition.category}${cellPosition.subcategory ? ` → ${cellPosition.subcategory}` : ''}`,
+    [cellPosition.category, cellPosition.subcategory]
+  );
+
   if (!isOpen) {
     return null;
   }
-
-  const modalTitle =
-    mode === "edit" ? "Editează Tranzacție" : "Adaugă Tranzacție";
-  const hasError = !!validationError;
 
   return (
     <div
@@ -198,30 +212,29 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
       aria-labelledby="transaction-modal-title"
     >
       <div
-        className={cn(modalContent({ size: "default" }), "relative")}
+        className={cn(
+          "bg-white dark:bg-surface-dark rounded-lg shadow-xl max-w-md w-full mx-auto relative"
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Loading overlay cu CVA styling */}
         {isLoading && (
-          <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10 rounded-lg">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <div className="absolute inset-0 bg-white/80 dark:bg-surface-dark/80 flex items-center justify-center z-10 rounded-lg">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary dark:border-primary-400"></div>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Modal Header */}
-          <div className="border-b border-gray-200 pb-4">
+          <div className="border-b border-neutral/20 dark:border-neutral-600/30 pb-4">
             <h2
               id="transaction-modal-title"
-              className="text-lg font-semibold text-gray-900"
+              className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
             >
               {modalTitle}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
-              {cellPosition.category}
-              {cellPosition.subcategory &&
-                ` → ${cellPosition.subcategory}`} •{" "}
-              {new Date(date).toLocaleDateString("ro-RO")}
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              {categoryDisplay} • {formattedDate}
             </p>
           </div>
 
@@ -230,12 +243,10 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             {/* Amount Input */}
             <div className={cn(inputWrapper())}>
               <label
-                className={cn(
-                  label({
-                    variant: hasError ? "error" : "default",
-                    required: true,
-                  }),
-                )}
+                className={cn(label({ 
+                  variant: hasError ? "error" : "default",
+                  required: true 
+                }))}
                 htmlFor="amount-input"
               >
                 Sumă (RON)
@@ -250,17 +261,14 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 min="0.01"
                 required
                 autoFocus
-                className={cn(
-                  input({
-                    variant: hasError ? "error" : "default",
-                    size: "md",
-                  }),
-                )}
+                className={cn(input({
+                  variant: hasError ? "default" : "default",
+                }))}
                 aria-describedby={hasError ? "amount-error" : undefined}
                 data-testid="transaction-amount-input"
               />
               {hasError && (
-                <p id="amount-error" className="text-sm text-red-600 mt-1">
+                <p id="amount-error" className="text-sm text-warning dark:text-warning-400 mt-1">
                   {validationError}
                 </p>
               )}
@@ -277,22 +285,21 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               <select
                 id="type-select"
                 value={transactionType}
-                onChange={(e) =>
-                  setTransactionType(e.target.value as TransactionType)
-                }
-                required
-                className={cn(select({ size: "md" }))}
+                onChange={(e) => setTransactionType(e.target.value as TransactionType)}
+                className={cn(select({ variant: "default" }))}
                 data-testid="transaction-type-select"
               >
-                <option value={TransactionType.INCOME}>Venit</option>
-                <option value={TransactionType.EXPENSE}>Cheltuială</option>
-                <option value={TransactionType.SAVING}>Economie</option>
+                <option value="cheltuieli">Cheltuieli</option>
+                <option value="venituri">Venituri</option>
               </select>
             </div>
 
             {/* Description Textarea */}
             <div className={cn(inputWrapper())}>
-              <label className={cn(label())} htmlFor="description-textarea">
+              <label 
+                className={cn(label())}
+                htmlFor="description-textarea"
+              >
                 Descriere
               </label>
               <textarea
@@ -302,10 +309,10 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 placeholder="Detalii opționale despre tranzacție..."
                 rows={2}
                 maxLength={200}
-                className={cn(textarea({ size: "md" }))}
+                className={cn(textarea({ variant: "default", size: "sm" }))}
                 data-testid="transaction-description"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
                 {description.length}/200 caractere
               </p>
             </div>
@@ -317,17 +324,17 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 type="checkbox"
                 checked={isRecurring}
                 onChange={(e) => setIsRecurring(e.target.checked)}
-                className={cn(checkbox())}
+                className={cn(checkbox({ variant: "default", size: "md" }))}
                 data-testid="transaction-recurring"
               />
               <div className="grid gap-1.5 leading-none">
                 <label
                   htmlFor="recurring-checkbox"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className={cn(label())}
                 >
                   Tranzacție recurentă
                 </label>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400">
                   Se va repeta automat în lunile următoare
                 </p>
               </div>
@@ -335,7 +342,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
           </div>
 
           {/* Modal Actions cu CVA button styling */}
-          <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
+          <div className="flex gap-3 justify-end pt-4 border-t border-neutral/20 dark:border-neutral-600/30">
             <button
               type="button"
               onClick={onClose}
@@ -367,7 +374,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         </form>
 
         {/* Keyboard shortcuts hint */}
-        <div className="px-6 pb-4 text-xs text-gray-500 border-t border-gray-100">
+        <div className="px-6 pb-4 text-xs text-neutral-500 dark:text-neutral-400 border-t border-neutral/10 dark:border-neutral-600/20">
           <span className="font-mono">Esc</span> pentru anulare •
           <span className="font-mono">Ctrl+Enter</span> pentru salvare
         </div>
@@ -375,5 +382,21 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
     </div>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+export const TransactionModal = React.memo(TransactionModalComponent, (prevProps, nextProps) => {
+  // Custom comparison pentru props critice la performance
+  return (
+    prevProps.isOpen === nextProps.isOpen &&
+    prevProps.mode === nextProps.mode &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.date === nextProps.date &&
+    prevProps.cellPosition.category === nextProps.cellPosition.category &&
+    prevProps.cellPosition.subcategory === nextProps.cellPosition.subcategory &&
+    prevProps.cellPosition.day === nextProps.cellPosition.day &&
+    JSON.stringify(prevProps.existingTransaction) === JSON.stringify(nextProps.existingTransaction)
+    // onClose și onSave sunt callback-uri și se vor schimba în mod normal
+  );
+});
 
 export default TransactionModal;

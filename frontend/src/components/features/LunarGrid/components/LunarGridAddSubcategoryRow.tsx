@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from "../../../primitives/Button/Button";
-import { Plus } from "lucide-react";
-import { cn } from "../../../../styles/cva/shared/utils";
+import { Plus, Check, X } from "lucide-react";
+import { cn } from "../../../../styles/cva/unified-cva";
 import {
   gridSubcategoryRow,
   gridSubcategoryState,
@@ -9,9 +9,17 @@ import {
   gridInput,
   gridInteractive
 } from "../../../../styles/cva/grid";
-import { flex } from "../../../../styles/cva/components/layout";
-import { BUTTONS, PLACEHOLDERS } from "@shared-constants";
-import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
+import { BUTTONS, PLACEHOLDERS, LUNAR_GRID_ACTIONS } from "@shared-constants";
+import { 
+  gridRow,
+  button,
+  badge,
+  textProfessional,
+  focusRing,
+  hoverScale,
+  input,
+  flex
+} from "../../../../styles/cva/unified-cva";
 
 interface AddSubcategoryRowProps {
   category: string;
@@ -51,8 +59,9 @@ const LunarGridAddSubcategoryRow: React.FC<AddSubcategoryRowProps> = ({
               onChange={(e) => onInputChange(e.target.value)}
               placeholder={PLACEHOLDERS.SUBCATEGORY_NAME}
               className={cn(
-                gridInput({ variant: "professional", state: "editing" }),
-                "flex-1 focus-ring-primary"
+                gridInput({ variant: "default", state: "editing" }),
+                "flex-1",
+                focusRing({ variant: "primary" })
               )}
               autoFocus
               onKeyDown={(e) => {
@@ -64,25 +73,29 @@ const LunarGridAddSubcategoryRow: React.FC<AddSubcategoryRowProps> = ({
               }}
               data-testid={`new-subcategory-input-${category}`}
             />
-            <Button
-              size="sm"
-              variant="primary"
+            <button
+              type="button"
               onClick={onSave}
+              className={cn(
+                button({ variant: "ghost", size: "sm" }),
+                hoverScale({ intensity: "subtle" })
+              )}
               disabled={!inputValue.trim()}
-              data-testid={`save-subcategory-${category}`}
-              className="hover-scale"
+              title={BUTTONS.DONE}
             >
-              ✓
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
+              <Check size={14} />
+            </button>
+            <button
+              type="button"
               onClick={onCancel}
-              data-testid={`cancel-subcategory-${category}`}
-              className="hover-scale"
+              className={cn(
+                button({ variant: "ghost", size: "sm" }),
+                hoverScale({ intensity: "subtle" })
+              )}
+              title={BUTTONS.CANCEL}
             >
-              ✕
-            </Button>
+              <X size={14} />
+            </button>
           </div>
         ) : (
           <Button
@@ -90,7 +103,7 @@ const LunarGridAddSubcategoryRow: React.FC<AddSubcategoryRowProps> = ({
             variant="ghost"
             onClick={onStartAdd}
             className={cn(
-              gridInteractive({ variant: "addButton", size: "auto" }),
+              gridInteractive({ variant: "button", size: "auto" }),
               flex({ align: "center", gap: "sm" })
             )}
             data-testid={`add-subcategory-${category}`}

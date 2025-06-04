@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Select from "../../primitives/Select/Select";
-import { cn } from "../../../styles/cva/shared/utils";
-import { modal } from "../../../styles/cva/components/layout";
+import { cn } from "../../../styles/cva/unified-cva";
 import type { ExportFormat } from "../../../utils/ExportManager";
-import { BUTTONS } from "@shared-constants/ui";
-import { EXPORT_MESSAGES } from "@shared-constants/messages";
+import { BUTTONS, EXPORT_MESSAGES } from "@shared-constants";
+import { EXPORT_UI } from "@shared-constants/ui";
+
+import { useCategoryStore } from "../../../stores/categoryStore";
 
 export interface ExportState {
   isExporting: boolean;
@@ -54,10 +55,11 @@ const EXPORT_FORMATS: Array<{
 
 /**
  * Modal pentru configurarea opțiunilor de export
- * Permite selecția formatului și configurarea parametrilor
+ * Permite selecția formatului și configurarea parametrilor  
  * Migrated la CVA styling system pentru consistență
+ * OPTIMIZED cu React.memo pentru performance
  */
-export const ExportModal: React.FC<ExportModalProps> = ({
+const ExportModalComponent: React.FC<ExportModalProps> = ({
   isOpen,
   onClose,
   onExport,
@@ -65,24 +67,50 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   transactionCount,
 }) => {
   const [format, setFormat] = useState<ExportFormat>("csv");
-  const [filename, setFilename] = useState("");
   const [title, setTitle] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [month, setMonth] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [customFilename, setCustomFilename] = useState("");
 
-  // Închide modalul la apăsarea pe overlay
-  const handleOverlayClick = (e: React.MouseEvent) => {
+  // Generate options in correct format for Select component - MEMOIZED pentru performance
+  const yearOptions = useMemo(() => 
+    Array.from({ length: 10 }, (_, i) => ({
+      value: (i + 2024).toString(),
+      label: (i + 2024).toString()
+    })), []
+  );
+  
+  const monthOptions = useMemo(() => 
+    Array.from({ length: 12 }, (_, i) => ({
+      value: (i + 1).toString(),
+      label: (i + 1).toString()
+    })), []
+  );
+
+  const categories = useCategoryStore((state) => state.categories);
+  const categoryOptions = useMemo(() => 
+    categories.map((category) => ({
+      value: category.name,
+      label: category.name
+    })), [categories]
+  );
+
+  // Închide modalul la apăsarea pe overlay - OPTIMIZED cu useCallback
+  const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
-  };
+  }, [onClose]);
 
-  // Gestionează exportul
-  const handleExport = () => {
+  // Gestionează exportul - OPTIMIZED cu useCallback
+  const handleExport = useCallback(() => {
     const options: Parameters<typeof onExport>[1] = {};
 
-    if (filename.trim()) {
-      options.filename = filename.trim();
+    if (customFilename.trim()) {
+      options.filename = customFilename.trim();
     }
 
     if (title.trim()) {
@@ -94,13 +122,19 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     }
 
     onExport(format, options);
-  };
+  }, [format, customFilename, title, dateFrom, dateTo, onExport]);
 
-  // Generează numele implicit al fișierului
-  const getDefaultFilename = () => {
-    const today = new Date().toISOString().split("T")[0];
-    return `tranzactii-${today}`;
-  };
+  const handleYearChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setYear(Number(e.target.value));
+  }, []);
+
+  const handleMonthChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setMonth(Number(e.target.value));
+  }, []);
+
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  }, []);
 
   // Returnează null dacă modalul nu este deschis
   if (!isOpen) return null;
@@ -108,29 +142,27 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   return (
     <div
       className={cn(
-        modal({ variant: "default" }),
         "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
       )}
       onClick={handleOverlayClick}
       data-testid="export-modal-overlay"
     >
-      {" "}
       <div
         className={cn(
-          "bg-white rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg",
+          "bg-white dark:bg-surface-dark rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg",
           "transform transition-all duration-300 ease-out",
         )}
         data-testid="export-modal"
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
             Export Tranzacții
           </h3>
           <button
             onClick={onClose}
             className={cn(
-              "text-gray-400 hover:text-gray-600",
+              "text-gray-400 hover:text-gray-600 dark:text-neutral-400 dark:hover:text-neutral-200",
               "transition-colors duration-150",
               "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1",
               "rounded-md p-1",
@@ -156,146 +188,157 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         {/* Progress Bar - afișat doar în timpul exportului */}
         {exportState.isExporting && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm text-gray-600 dark:text-neutral-300 mb-2">
               {exportState.status ||
                 EXPORT_MESSAGES.IN_PROGRES.replace(
                   "{progress}",
                   exportState.progress.toString(),
                 )}
             </p>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-4 shadow-sm">
-              {" "}
+            <div className="w-full bg-gray-200 dark:bg-neutral-600 rounded-full h-2 mb-4 shadow-sm">
               <div
-                className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+                className="bg-primary-500 dark:bg-primary-400 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${exportState.progress}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              {exportState.progress}% complet
+          </div>
+        )}
+
+        {/* Error Display */}
+        {exportState.error && (
+          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+            <p className="text-sm text-red-800 dark:text-red-300">
+              {exportState.error}
             </p>
           </div>
         )}
 
-        {/* Formă pentru configurarea exportului */}
-        <div className="space-y-4">
-          {/* Selecția formatului */}
+        {/* Informații despre export */}
+        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+          <p className="text-sm text-blue-800 dark:text-blue-300">
+            Se vor exporta {transactionCount} tranzacții.
+          </p>
+        </div>
+
+        {/* Form de configurare export */}
+        <div className="space-y-4 mb-6">
+          {/* Format Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Format
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              Format export:
             </label>
             <Select
               value={format}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setFormat(e.target.value as ExportFormat)
-              }
-              options={EXPORT_FORMATS.map((fmt) => ({
-                value: fmt.value,
-                label: fmt.label,
-              }))}
-              placeholder="Selectează format"
+              onChange={(e) => setFormat(e.target.value as ExportFormat)}
+              options={EXPORT_FORMATS}
               disabled={exportState.isExporting}
-              dataTestId="export-format-select"
+              data-testid="export-format-select"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {EXPORT_FORMATS.find((fmt) => fmt.value === format)?.description}
-            </p>
           </div>
 
-          {/* Numele fișierului */}
+          {/* Year Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nume fișier
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {EXPORT_UI.YEAR_LABEL}
+            </label>
+            <Select
+              value={year.toString()}
+              onChange={handleYearChange}
+              options={yearOptions}
+              disabled={exportState.isExporting}
+              data-testid="export-year-select"
+            />
+          </div>
+
+          {/* Month Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {EXPORT_UI.MONTH_LABEL}
+            </label>
+            <Select
+              value={month?.toString() || ""}
+              onChange={handleMonthChange}
+              options={monthOptions}
+              placeholder="Toate lunile"
+              disabled={exportState.isExporting}
+              data-testid="export-month-select"
+            />
+          </div>
+
+          {/* Category Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {EXPORT_UI.CATEGORY_FILTER_LABEL}
+            </label>
+            <Select
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+              options={categoryOptions}
+              placeholder="Toate categoriile"
+              disabled={exportState.isExporting}
+              data-testid="export-category-select"
+            />
+          </div>
+
+          {/* Custom Filename */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              {EXPORT_UI.FILENAME_LABEL}
             </label>
             <Input
               type="text"
-              value={filename}
-              onChange={(e) => setFilename(e.target.value)}
-              placeholder={getDefaultFilename()}
+              value={customFilename}
+              onChange={(e) => setCustomFilename(e.target.value)}
+              placeholder={EXPORT_UI.FILENAME_PLACEHOLDER}
               disabled={exportState.isExporting}
-              dataTestId="export-filename-input"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Lăsați gol pentru nume automat
-            </p>
-          </div>
-
-          {/* Titlul raportului */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Titlu raport
-            </label>
-            <Input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Raport Tranzacții"
-              disabled={exportState.isExporting}
-              dataTestId="export-title-input"
+              data-testid="export-filename-input"
             />
           </div>
 
-          {/* Intervalul de date (opțional) */}
+          {/* Date Range */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                De la data
+              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+                De la data:
               </label>
               <Input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
                 disabled={exportState.isExporting}
-                dataTestId="export-date-from"
+                data-testid="export-date-from"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Până la data
+              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+                Până la data:
               </label>
               <Input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
                 disabled={exportState.isExporting}
-                dataTestId="export-date-to"
+                data-testid="export-date-to"
               />
             </div>
           </div>
-
-          {/* Info despre tranzacțiile care vor fi exportate */}
-          <div className="bg-primary-50 border border-primary-200 rounded-md p-3">
-            <p className="text-sm text-primary-800">
-              Se vor exporta {transactionCount} tranzacții
-            </p>
-          </div>
-
-          {/* Mesajul de eroare */}
-          {exportState.error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-3">
-              <p className="text-sm text-red-800">{exportState.error}</p>
-            </div>
-          )}
         </div>
 
-        {/* Footer cu butoane */}
-        <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-3">
           <Button
+            variant="ghost"
             onClick={onClose}
-            variant="secondary"
-            size="md"
             disabled={exportState.isExporting}
-            className="flex-1"
-            dataTestId="export-modal-cancel"
+            data-testid="export-cancel-button"
           >
             {BUTTONS.CANCEL}
           </Button>
           <Button
-            onClick={handleExport}
             variant="primary"
-            size="md"
-            disabled={exportState.isExporting || transactionCount === 0}
-            className="flex-1"
-            dataTestId="export-modal-confirm"
+            onClick={handleExport}
+            disabled={exportState.isExporting}
+            data-testid="export-confirm-button"
           >
             {exportState.isExporting ? "Se exportă..." : BUTTONS.EXPORT}
           </Button>
@@ -304,3 +347,17 @@ export const ExportModal: React.FC<ExportModalProps> = ({
     </div>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+export const ExportModal = React.memo(ExportModalComponent, (prevProps, nextProps) => {
+  // Custom comparison pentru props critice la performance
+  return (
+    prevProps.isOpen === nextProps.isOpen &&
+    prevProps.transactionCount === nextProps.transactionCount &&
+    prevProps.exportState.isExporting === nextProps.exportState.isExporting &&
+    prevProps.exportState.progress === nextProps.exportState.progress &&
+    prevProps.exportState.error === nextProps.exportState.error &&
+    prevProps.exportState.status === nextProps.exportState.status
+    // onClose și onExport sunt callback-uri și se vor schimba în mod normal
+  );
+});

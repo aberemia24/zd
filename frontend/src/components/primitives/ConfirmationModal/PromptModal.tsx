@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button } from "../Button";
-import Input from "../Input";
-import { cn } from "../../../styles/cva/shared/utils";
-import { card } from "../../../styles/cva/components/layout";
+import { 
+  cn,
+  modal,
+  card,
+  input,
+  badge,
+  type ModalProps
+} from "../../../styles/cva/unified-cva";
 
 export interface PromptModalProps {
   isOpen: boolean;
@@ -10,12 +15,12 @@ export interface PromptModalProps {
   onConfirm: (value: string) => void;
   title: string;
   message: string;
+  initialValue?: string;
   placeholder?: string;
-  expectedValue?: string;
   confirmText?: string;
   cancelText?: string;
   variant?: "default" | "warning" | "danger";
-  icon?: string;
+  required?: boolean;
 }
 
 const PromptModal: React.FC<PromptModalProps> = ({
@@ -24,127 +29,143 @@ const PromptModal: React.FC<PromptModalProps> = ({
   onConfirm,
   title,
   message,
-  placeholder = "",
-  expectedValue,
+  initialValue = "",
+  placeholder = "Introduceți valoarea...",
   confirmText = "OK",
   cancelText = "Anulează",
   variant = "default",
-  icon,
+  required = false,
 }) => {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialValue);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Reset input value when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setInputValue(initialValue);
+      // Focus input after modal animation
+      setTimeout(() => {
+        inputRef.current?.focus();
+        inputRef.current?.select(); // Select all text for easy overwriting
+      }, 100);
+    }
+  }, [isOpen, initialValue]);
+
+  // Handle keyboard shortcuts
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && (!required || inputValue.trim())) {
+      handleConfirm();
+    } else if (e.key === 'Escape') {
+      onClose();
+    }
+  };
+
+  const handleConfirm = () => {
+    if (required && !inputValue.trim()) {
+      // Focus input if required value is missing
+      inputRef.current?.focus();
+      return;
+    }
+    onConfirm(inputValue);
+    onClose();
+  };
 
   if (!isOpen) return null;
 
-  const variantStyles = {
-    default: {
-      border: "border-blue-200",
-      bg: "bg-blue-50",
-      iconColor: "text-blue-600",
-      titleColor: "text-blue-900"
-    },
-    warning: {
-      border: "border-orange-200", 
-      bg: "bg-orange-50",
-      iconColor: "text-orange-600",
-      titleColor: "text-orange-900"
-    },
-    danger: {
-      border: "border-red-200",
-      bg: "bg-red-50", 
-      iconColor: "text-red-600",
-      titleColor: "text-red-900"
+  // Map variant la badge colors
+  const getBadgeVariant = () => {
+    switch (variant) {
+      case "warning": return "warning";
+      case "danger": return "warning";
+      default: return "secondary";
     }
   };
 
-  const currentVariant = variantStyles[variant];
-  const isValidInput = !expectedValue || inputValue === expectedValue;
-
-  const handleConfirm = () => {
-    if (isValidInput) {
-      onConfirm(inputValue);
-      onClose();
-      setInputValue("");
+  // Map variant la text colors
+  const getTextColor = () => {
+    switch (variant) {
+      case "warning": return "text-warning dark:text-warning-300";
+      case "danger": return "text-warning dark:text-warning-300"; 
+      default: return "text-secondary dark:text-secondary-300";
     }
-  };
-
-  const handleClose = () => {
-    onClose();
-    setInputValue("");
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className={cn(modal({ variant: "default" }))}>
       <div 
         className={cn(
-          card({ variant: "elevated", size: "lg" }),
-          "max-w-md w-full"
+          card({ variant: "elevated" }),
+          "max-w-md w-full mx-4",
+          "animate-theme-fade" // Smooth theme transition
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* Header cu Mocha Mousse 2025 styling */}
         <div className={cn(
-          "p-4 border-b border-gray-200 rounded-t-lg",
-          currentVariant.bg,
-          currentVariant.border
+          "p-4 border-b border-neutral/20 dark:border-neutral-600/30 rounded-t-lg",
+          "bg-background dark:bg-surface-dark"
         )}>
           <div className="flex items-center space-x-3">
-            {icon && (
-              <div className={cn("text-2xl", currentVariant.iconColor)}>
-                {icon}
-              </div>
-            )}
             <h2 className={cn(
               "text-lg font-semibold",
-              currentVariant.titleColor
+              "text-neutral-900 dark:text-neutral-100"
             )}>
               {title}
             </h2>
+            {/* Visual indicator cu badge pentru variant */}
+            <div className={cn(
+              badge({ variant: getBadgeVariant() }),
+              "ml-auto"
+            )}>
+              {variant === "danger" ? "⚠️" : variant === "warning" ? "⚠️" : "💬"}
+            </div>
           </div>
         </div>
 
-        {/* Body */}
+        {/* Body cu enhanced styling */}
         <div className="p-6">
-          <div className="text-gray-700 mb-4 whitespace-pre-line">
+          {/* Message */}
+          <div className="text-neutral-700 dark:text-neutral-300 mb-4">
             {message}
           </div>
 
-          {/* Input */}
-          <div className="mb-4">
-            <Input
+          {/* Input field cu unified CVA styling */}
+          <div className="mb-6">
+            <input
+              ref={inputRef}
+              type="text"
               value={inputValue}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder={placeholder}
-              autoFocus
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === "Enter" && isValidInput) {
-                  handleConfirm();
-                }
-                if (e.key === "Escape") {
-                  handleClose();
-                }
-              }}
+              className={cn(
+                input({ variant: "default" }),
+                "w-full"
+              )}
+              required={required}
             />
-            {expectedValue && !isValidInput && inputValue.length > 0 && (
-              <p className="text-sm text-red-600 mt-2">
-                Trebuie să scrieți exact: <strong>{expectedValue}</strong>
+            {required && (
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                * Câmp obligatoriu
               </p>
             )}
           </div>
 
-          {/* Actions */}
+          {/* Actions cu Button styling */}
           <div className="flex space-x-3 justify-end">
             <Button
               variant="secondary"
               size="md"
-              onClick={handleClose}
+              onClick={onClose}
             >
               {cancelText}
             </Button>
             <Button
-              variant={variant === "danger" ? "danger" : "primary"}
+              variant="primary"
               size="md"
               onClick={handleConfirm}
-              disabled={!isValidInput}
+              disabled={required && !inputValue.trim()}
+              className={variant === "danger" ? "bg-warning hover:bg-warning-600 dark:bg-warning-400 dark:hover:bg-warning-500" : ""}
             >
               {confirmText}
             </Button>

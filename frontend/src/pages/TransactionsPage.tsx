@@ -9,11 +9,10 @@ import { TransactionType, CategoryType } from "@shared-constants";
 import { useFilteredTransactions } from "../services/hooks/useFilteredTransactions";
 import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 import { useAuthStore } from "../stores/authStore";
-import { cn } from "../styles/cva/shared/utils";
-import {
-  card,
-  container as pageContainer,
-} from "../styles/cva/components/layout";
+
+// CVA styling imports
+import { cn, card, dashboard } from "../styles/cva/unified-cva";
+
 import { PAGINATION } from "@shared-constants";
 import { TITLES } from "@shared-constants";
 import type { Transaction } from "../types/Transaction";
@@ -180,7 +179,7 @@ const TransactionsPage: React.FC = () => {
   );
 
   return (
-    <div className={cn(pageContainer({ size: "lg" }), "space-y-6")}>
+    <div className={cn(dashboard({ layout: "single" }), "space-y-6")}>
       {/* Titlu pagină cu efect de gradient subtil */}
       <h1
         className="text-3xl font-bold text-gray-900 mb-6"
@@ -192,26 +191,20 @@ const TransactionsPage: React.FC = () => {
       {/* Afișăm alerte pentru erori de fetch */}
       {fetchError && (
         <Alert
-          type="error"
-          title="Eroare la încărcarea tranzacțiilor"
-          message={fetchError.message}
-          size="md"
-        />
+          variant="error"
+          className="mb-4"
+        >
+          <strong>Eroare la încărcarea tranzacțiilor:</strong> {fetchError.message}
+        </Alert>
       )}
 
-      {/* Formularul pentru adăugarea tranzacțiilor */}
-      <div
-        className={cn(card({ variant: "elevated", size: "md" }))}
-        data-testid="transaction-form-container"
-      >
+      {/* Card pentru formular cu styling elegant */}
+      <div className={cn(card({ variant: "default" }), "mb-6")}>
         <TransactionForm />
       </div>
 
-      {/* Filtrele pentru tranzacții cu state-ul din Zustand store */}
-      <div
-        className={cn(card({ variant: "default", size: "md" }))}
-        data-testid="transaction-filters-container"
-      >
+      {/* Card pentru filtre cu styling consistent */}
+      <div className={cn(card({ variant: "default" }), "mb-6")}>
         <TransactionFilters
           type={filterType}
           category={filterCategory}
@@ -225,7 +218,7 @@ const TransactionsPage: React.FC = () => {
           onCategoryChange={(category) =>
             setFilterCategory(category as CategoryType | "")
           }
-          onSubcategoryChange={setFilterSubcategory}
+          onSubcategoryChange={handleSubcategoryChange}
           onDateFromChange={setDateFrom}
           onDateToChange={setDateTo}
           onAmountMinChange={setAmountMin}
@@ -234,11 +227,8 @@ const TransactionsPage: React.FC = () => {
         />
       </div>
 
-      {/* Export Button */}
-      <div
-        className={cn(card({ variant: "default", size: "md" }))}
-        data-testid="export-button-container"
-      >
+      {/* Card pentru export cu styling și layout consistent */}
+      <div className={cn(card({ variant: "default" }), "mb-6")}>
         <ExportButton
           transactions={(transactions as Transaction[]) || []}
           disabled={isLoading || !transactions?.length}

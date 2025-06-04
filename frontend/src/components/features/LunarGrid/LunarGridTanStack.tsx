@@ -38,24 +38,24 @@ import {
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { useAuthStore } from "../../../stores/authStore";
 
-// Utilitare și styling
+// Utilitare și styling - MIGRATED TO UNIFIED CVA SYSTEM
 import { formatCurrencyForGrid, formatMonthYear } from "../../../utils/lunarGrid";
 import { calculatePopoverStyle } from "../../../utils/lunarGrid/lunarGridHelpers";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
+import { 
+  cn,
   gridContainer,
-  gridTable,
-  gridHeader,
-  gridHeaderCell,
-  gridTotalRow,
   gridCell,
-  gridMessage,
-  gridResizeContainer,
-  gridResizeButton,
-} from "../../../styles/cva/grid";
-import {
+  gridHeader,
+  gridRow,
+  button,
+  textProfessional,
+  fontFinancial,
+  focusRing,
   flex,
-} from "../../../styles/cva/components/layout";
+  type GridContainerProps,
+  type GridCellProps,
+  type GridHeaderProps
+} from "../../../styles/cva/unified-cva";
 
 // Interfețe TypeScript
 interface CategoryStoreItem {
@@ -566,12 +566,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         <div 
           ref={tableContainerRef}
           className={cn(
-            gridResizeContainer({ 
-              mode: isFullscreen ? "fullscreen" : "normal",
-              state: "ready"
+            gridContainer({ 
+              variant: "professional",
+              size: isFullscreen ? "fullscreen" : "default"
             }),
             "transition-all duration-200 hover-lift",
-            "focus-ring"
+            focusRing({ variant: "default" })
           )}
           data-testid="lunar-grid-resize-container"
           onSubmit={(e) => {
@@ -598,9 +598,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             type="button"
             onClick={toggleFullscreen}
             className={cn(
-              gridResizeButton({ 
-                mode: isFullscreen ? "fullscreen" : "normal"
-              })
+              button({ 
+                variant: "outline",
+                size: "md"
+              }),
+              "absolute top-2 right-2 z-10"
             )}
             title={isFullscreen ? LUNAR_GRID.RESIZE.EXIT_FULLSCREEN : LUNAR_GRID.RESIZE.TOGGLE_FULLSCREEN}
             data-testid="grid-resize-button"
@@ -619,8 +621,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             className={cn(
               gridContainer({ 
                 variant: "professional", 
-                size: "fullscreen",
-                state: isLoading ? "loading" : undefined 
+                size: "fullscreen"
               }),
               "relative overflow-auto scroll-smooth",
               isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
@@ -630,9 +631,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             {/* 🎨 Professional Loading State */}
             {isLoading && (
               <div className={cn(
-                gridMessage({ variant: "professional" }),
+                "text-center p-8 text-gray-600",
                 flex({ align: "center", justify: "center" }),
-                "p-8 animate-fade-in-up"
+                "animate-fade-in-up"
               )} 
               data-testid="loading-indicator">
                 <div className="loading-pulse">
@@ -644,9 +645,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             {/* 🎨 Professional Error State */}
             {error && (
               <div className={cn(
-                gridMessage({ variant: "error" }),
+                "text-center p-8 text-red-600",
                 flex({ align: "center", justify: "center" }),
-                "p-8 animate-slide-down"
+                "animate-slide-down"
               )} 
               data-testid="error-indicator">
                 {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
@@ -656,9 +657,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             {/* 🎨 Professional Empty State */}
             {!isLoading && !error && table.getRowModel().rows.length === 0 && (
               <div className={cn(
-                gridMessage({ variant: "info" }),
+                "text-center p-8 text-gray-500",
                 flex({ align: "center", justify: "center" }),
-                "p-8 animate-scale-in"
+                "animate-scale-in"
               )} 
               data-testid="no-data-indicator">
                 {LUNAR_GRID.NO_DATA}
@@ -668,7 +669,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             {/* 🎨 Professional Grid Table - FĂRĂ header luna/anul în interior */}
             {!isLoading && !error && table.getRowModel().rows.length > 0 && (
               <table 
-                className={cn(gridTable({ variant: "professional", density: "default" }))}
+                className="w-full border-collapse table-auto"
                 data-testid="lunar-grid-table"
               >
                 {/* 🎨 Professional Header cu enhanced styling */}
@@ -683,10 +684,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                           key={header.id}
                           colSpan={header.colSpan}
                           className={cn(
-                            gridHeaderCell({ 
-                              variant: isFirstColumn ? "sticky" : isNumericColumn ? "numeric" : "professional",
+                            gridCell({ 
+                              type: "header",
+                              size: "default"
                             }),
-                            "text-professional-heading contrast-enhanced",
+                            textProfessional({ variant: "heading", contrast: "enhanced" }),
                             isFirstColumn && "min-w-[200px]",
                             isNumericColumn && "w-20"
                           )}
@@ -699,7 +701,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                   </tr>
                   
                   {/* 🎨 Professional Balance Row cu enhanced styling */}
-                  <tr className={cn(gridTotalRow({ variant: "balance" }))}>
+                  <tr className={cn(gridRow({ type: "total" }))}>
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
                       
@@ -709,7 +711,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             key={`balance-${header.id}`}
                             className={cn(
                               gridCell({ type: "balance" }),
-                              "text-professional-heading contrast-enhanced"
+                              textProfessional({ variant: "heading", contrast: "enhanced" })
                             )}
                           >
                             {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
@@ -727,9 +729,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             className={cn(
                               gridCell({ 
                                 type: "balance", 
-                                state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "zero" 
+                                state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "default" 
                               }),
-                              "text-xs font-financial contrast-high",
+                              fontFinancial({ size: "xs", weight: "medium" }),
+                              "contrast-high",
                               dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
                             )}
                           >
@@ -746,9 +749,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             className={cn(
                               gridCell({ 
                                 type: "balance", 
-                                state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "zero" 
+                                state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "default" 
                               }),
-                              "text-sm font-financial contrast-enhanced",
+                              fontFinancial({ size: "xs", weight: "medium" }),
+                              "contrast-high",
                               monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
                             )}
                           >

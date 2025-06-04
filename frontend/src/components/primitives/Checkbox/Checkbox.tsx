@@ -1,95 +1,108 @@
 import React, { forwardRef } from "react";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
+import { 
+  cn,
   checkbox,
   inputWrapper,
   label,
   type CheckboxProps as CVACheckboxProps,
-  type LabelProps,
-} from "../../../styles/cva/components/forms";
+  type LabelProps as CVALabelProps,
+  type InputWrapperProps as CVAInputWrapperProps
+} from "../../../styles/cva-v2";
 
 export interface CheckboxProps
-  extends Omit<
-      React.InputHTMLAttributes<HTMLInputElement>,
-      "data-testid" | "size"
-    >,
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
     CVACheckboxProps {
   label?: string;
   error?: string;
-  wrapperClassName?: string;
-  dataTestId?: string;
-  labelPosition?: "right" | "left";
-  size?: "sm" | "md" | "lg"; // Pentru label și wrapper sizing (nu pentru checkbox)
+  success?: string;
+  hint?: string;
+  className?: string;
+  wrapperVariant?: CVAInputWrapperProps["variant"];
+  labelVariant?: CVALabelProps["variant"];
+  required?: boolean;
 }
 
+/**
+ * Checkbox component cu suport pentru validare și multiple variante
+ * Bazat pe noul sistem CVA v2 modular cu checkbox dedicat
+ */
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
       label: labelText,
       error,
-      variant = "default",
+      success,
+      hint,
       size = "md",
+      variant = "default",
+      wrapperVariant = "default",
+      labelVariant,
+      required = false,
       className,
-      wrapperClassName,
-      dataTestId,
-      labelPosition = "right",
-      disabled = false,
-      ...rest
+      id,
+      disabled,
+      ...props
     },
-    ref,
+    ref
   ) => {
-    // Determine variant based on error state
-    const checkboxVariant = error ? "error" : variant;
+    const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+    const hasError = !!error;
+    
+    // Determine label variant based on state
+    const determinedLabelVariant = labelVariant || (hasError ? "error" : success ? "success" : "default");
 
     return (
-      <div
-        className={cn(
-          inputWrapper({ size }),
-          // Flex arrangement based on label position
-          labelPosition === "left"
-            ? "flex-row-reverse justify-between"
-            : "flex-row",
-          "flex items-center",
-          wrapperClassName,
-        )}
-      >
-        <input
-          ref={ref}
-          type="checkbox"
-          className={cn(
-            checkbox({
-              variant: checkboxVariant,
-              // Note: checkbox CVA nu are size variant
-            }),
-            className,
+      <div className={cn(inputWrapper({ variant: wrapperVariant }))}>
+        <div className="flex items-start">
+          <div className="flex items-center">
+            <input
+              ref={ref}
+              type="checkbox"
+              id={checkboxId}
+              disabled={disabled}
+              className={cn(
+                checkbox({ variant, size }),
+                error && "border-red-500 focus:ring-red-500 dark:border-red-400 dark:focus:ring-red-400",
+                className
+              )}
+              {...props}
+            />
+          </div>
+          
+          {labelText && (
+            <label
+              htmlFor={checkboxId}
+              className={cn(
+                label({ variant: determinedLabelVariant, required }),
+                "ml-2 cursor-pointer",
+                disabled && "cursor-not-allowed opacity-50"
+              )}
+            >
+              {labelText}
+            </label>
           )}
-          disabled={disabled}
-          data-testid={
-            dataTestId ||
-            `checkbox-${checkboxVariant}${error ? "-error" : ""}${disabled ? "-disabled" : ""}`
-          }
-          {...rest}
-        />
-        {labelText && (
-          <label
-            htmlFor={rest.id || rest.name}
-            className={cn(
-              label({
-                variant: error ? "error" : "default",
-                size,
-              }),
-              labelPosition === "right" ? "ml-2" : "mr-2",
-            )}
-          >
-            {labelText}
-          </label>
-        )}
+        </div>
+
         {error && (
-          <div className="text-sm text-red-600 mt-1 w-full">{error}</div>
+          <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            {error}
+          </p>
+        )}
+        
+        {success && !error && (
+          <p className="text-sm text-emerald-600 dark:text-emerald-400">
+            {success}
+          </p>
+        )}
+        
+        {hint && !error && !success && (
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            {hint}
+          </p>
         )}
       </div>
     );
-  },
+  }
 );
 
 Checkbox.displayName = "Checkbox";

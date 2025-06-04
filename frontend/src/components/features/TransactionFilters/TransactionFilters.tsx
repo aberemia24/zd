@@ -3,19 +3,18 @@ import Button from "../../primitives/Button/Button";
 import Select from "../../primitives/Select/Select";
 import Badge from "../../primitives/Badge/Badge";
 import Input from "../../primitives/Input/Input";
-import { OPTIONS, LABELS, PLACEHOLDERS } from "@shared-constants";
-import type { TransactionType, CategoryType } from "@shared-constants";
+import { 
+  OPTIONS, LABELS, PLACEHOLDERS, TransactionType, CategoryType,
+  BUTTONS, UI, TABLE, LOADER, INFO, MESAJE 
+} from "@shared-constants";
 import { useCategoryStore } from "../../../stores/categoryStore";
 
-import { BUTTONS, UI, TABLE, LOADER, INFO } from "@shared-constants/ui";
 import classNames from "classnames";
 import { useActiveSubcategories } from "../../../services/hooks/useActiveSubcategories";
-import { MESAJE } from "@shared-constants/messages";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
-  flex as flexContainer,
-  card,
-} from "../../../styles/cva/components/layout";
+import { 
+  cn,
+  card
+} from "../../../styles/cva/unified-cva";
 
 export interface TransactionFiltersProps {
   type?: TransactionType | "" | string;
@@ -346,27 +345,17 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     [onAmountMaxChange],
   );
 
-  // Utilizăm flexContainer și card în loc de useThemeEffects
+  // Utilizăm CVA unified system și clase CSS manuale
   return (
     <div
       className={cn(
-        flexContainer({
-          direction: "row",
-          justify: "between",
-          align: "center",
-          gap: "md",
-        }),
+        "flex flex-row justify-between items-center gap-4"
       )}
     >
       {/* Bara de filtre compactă, pe o singură linie */}
       <div
         className={cn(
-          flexContainer({
-            direction: "row",
-            justify: "start",
-            align: "center",
-            gap: "md",
-          }),
+          "flex flex-row justify-start items-center gap-4"
         )}
       >
         {/* Filtru tip tranzacție */}
@@ -406,19 +395,13 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
               : PLACEHOLDERS.SELECT + " subcategoria"
           }
           disabled={!category || subcategoryOptions.length === 0}
-          isLoading={isLoadingSubcategories}
           size="sm"
         />
       </div>
       {/* Acțiuni și searchbox la finalul barei */}
       <div
         className={cn(
-          flexContainer({
-            direction: "row",
-            justify: "end",
-            align: "center",
-            gap: "md",
-          }),
+          "flex flex-row justify-end items-center gap-4"
         )}
       >
         {/* Searchbox compact */}
@@ -462,7 +445,7 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
       </div>
       {/* Filtre avansate - rămân sub bară, vizibile doar dacă sunt activate */}
       {showAdvancedFilters && (
-        <div className={cn(card({ variant: "flat", size: "md" }), "mt-4")}>
+        <div className={cn(card({ variant: "default" }), "mt-4 p-4 space-y-4")}>
           <Input
             name="date-from-filter"
             label={LABELS.DATE_FROM_FILTER}

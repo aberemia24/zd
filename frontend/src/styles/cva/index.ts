@@ -18,32 +18,15 @@ export * from "./grid";
 // Data domain (display components, category styling)
 export * from "./data";
 
-// Shared utilities (cn function, effects, helpers)
-export * from "./shared";
+// NOTA: Shared utilities au fost consolidate în unified-cva.ts
+// export * from "./shared"; // REMOVED - nu mai conține funcția cn()
 
 /**
  * Quick access to common components
  * For convenience și backward compatibility
+ * 
+ * NOTE: Forms components au fost migrate în unified-cva.ts
  */
-
-// Forms & Actions (17 exports)
-export {
-  button,
-  buttonGroup,
-  input,
-  inputWrapper,
-  select,
-  textarea,
-  checkbox,
-  label,
-  type ButtonProps,
-  type ButtonGroupProps,
-  type InputProps,
-  type SelectProps,
-  type TextareaProps,
-  type CheckboxProps,
-  type LabelProps,
-} from "./components/forms";
 
 // Feedback & Utilities (18 exports)
 export {
@@ -185,4 +168,4 @@ export {
 } from "./data/display";
 
 // Core utilities
-export { cn } from "./shared/utils";
+export { cn } from "./unified-cva";

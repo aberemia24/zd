@@ -4,16 +4,18 @@ import Badge from "../../primitives/Badge/Badge";
 import Spinner from "../../primitives/Spinner/Spinner";
 import {
   TransactionType,
-} from "../../../shared-constants/enums";
+  CategoryType,
+  FrequencyType,
+  TransactionStatus,
+} from "@shared-constants";
 import { TABLE, BUTTONS, INFO } from "@shared-constants";
 import type { Transaction } from "../../../types/Transaction";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
-  dataTable,
-  tableHeader,
-  tableCell,
-  flex as flexContainer,
-} from "../../../styles/cva";
+import { 
+  cn,
+  card,
+  badge,
+  button
+} from "../../../styles/cva/unified-cva";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
 
@@ -169,17 +171,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <tr data-testid="transaction-table-loading">
         <td
           colSpan={8}
-          className={cn(tableCell({ variant: "default" }))}
+          className={cn(
+            "p-4 text-center border-b border-neutral/20 dark:border-neutral-600/30"
+          )}
           aria-live="polite"
         >
           <div
             className={cn(
-              flexContainer({
-                direction: "row",
-                justify: "center",
-                align: "center",
-                gap: "sm",
-              }),
+              "flex flex-row justify-center items-center gap-2"
             )}
           >
             <Spinner size="sm" />
@@ -197,21 +196,20 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <tr data-testid="transaction-table-loading-more">
         <td
           colSpan={8}
-          className={cn(tableCell({ variant: "default" }))}
+          className={cn(
+            "p-4 text-center border-b border-neutral/20 dark:border-neutral-600/30"
+          )}
           aria-live="polite"
         >
           <div
             className={cn(
-              flexContainer({
-                direction: "row",
-                justify: "center",
-                align: "center",
-                gap: "sm",
-              }),
+              "flex flex-row justify-center items-center gap-2"
             )}
           >
             <Spinner size="sm" />
-            <span data-testid="table-loading-more-text">{TABLE.LOADING_MORE}</span>
+            <span data-testid="table-loading-more-text">
+              {TABLE.LOADING_MORE || "Se încarcă mai multe..."}
+            </span>
           </div>
         </td>
       </tr>
@@ -219,178 +217,197 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     [],
   );
 
-  // Memoizăm rândul gol pentru reutilizare
+  // Memoizăm rândul pentru tabelul gol
   const emptyRow = useMemo(
     () => (
       <tr data-testid="transaction-table-empty">
         <td
           colSpan={8}
-          className={cn(tableCell({ variant: "default" }))}
-          aria-live="polite"
+          className={cn(
+            "p-8 text-center border-b border-neutral/20 dark:border-neutral-600/30",
+            "text-neutral-500 dark:text-neutral-400"
+          )}
         >
           <div
             className={cn(
-              flexContainer({
-                direction: "col",
-                justify: "center",
-                align: "center",
-                gap: "md",
-              }),
-              "p-4",
+              "flex flex-row justify-center items-center gap-2"
             )}
           >
-            <span className="text-gray-600 text-lg">{emptyMessage}</span>
-            {isFiltered && (
-              <Badge variant="secondary" size="sm">
-                Încercați să ajustați filtrele
-              </Badge>
-            )}
+            <span data-testid="table-empty-text">{emptyMessage}</span>
           </div>
         </td>
       </tr>
     ),
-    [emptyMessage, isFiltered],
+    [emptyMessage],
   );
 
   return (
-    <div className="space-y-4 relative">
-      {/* Container pentru tabelul responsiv cu stiluri rafinate */}
-      <div
-        className="relative overflow-x-auto"
-        role="region"
-        aria-label={TABLE.HEADERS.TYPE + " " + TABLE.HEADERS.AMOUNT}
-      >
-        {/* Overlay de loading peste tabel când se face fetch, dar avem date vechi */}
-        {isFetching && !isLoading && (
+    <div
+      className={cn(
+        card({ variant: "default" }),
+        "w-full overflow-hidden"
+      )}
+      data-testid="transaction-table-container"
+      {...rest}
+    >
+      {/* Table Container cu Overlay pentru isFetching */}
+      <div className="relative">
+        {/* Overlay când isFetching este true */}
+        {isFetching && (
           <div
-            className="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center z-10"
-            data-testid="transaction-table-loading-overlay"
-            aria-live="polite"
-            aria-label={TABLE.LOADING}
-            style={{ pointerEvents: "none" }}
+            className="absolute inset-0 bg-background/80 dark:bg-surface-dark/80 backdrop-blur-sm z-10 flex items-center justify-center"
+            data-testid="table-fetching-overlay"
           >
-            <Spinner size="md" />
+            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-background dark:bg-surface-dark shadow-lg border border-neutral/20 dark:border-neutral-600/30">
+              <Spinner size="sm" />
+              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                Se actualizează...
+              </span>
+            </div>
           </div>
         )}
-        <table
-          className={cn(dataTable({ variant: "striped" }))}
-          data-testid="transaction-table"
-        >
-          <thead>
-            <tr className="bg-gray-50">
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.TYPE}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.AMOUNT}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.CATEGORY}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.SUBCATEGORY}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.DESCRIPTION}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.DATE}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.RECURRING}
-              </th>
-              <th className={cn(tableHeader())} scope="col">
-                {TABLE.HEADERS.FREQUENCY}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {isLoading
-              ? loadingRow
-              : !isFetching && transactions && transactions.length === 0
-                ? emptyRow
-                : transactions.map((t, idx) => (
-                    <tr
-                      key={`${t.id}-${idx}`}
-                      className="hover:bg-gray-50 transition-colors duration-150"
-                      data-testid={`transaction-item-${t.id || idx}`}
-                    >
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        <Badge
-                          variant={
-                            t.type === TransactionType.EXPENSE
-                              ? "error"
-                              : t.type === TransactionType.INCOME
-                                ? "success"
-                                : "secondary"
-                          }
-                          size="sm"
-                        >
-                          {t.type || ""}
-                        </Badge>
-                      </td>
-                      <td
-                        className={cn(tableCell({ variant: "numeric" }))}
-                        style={getAmountStyles(t.amount, t.type)}
+
+        <div className="overflow-x-auto">
+          <table
+            className={cn(
+              "w-full border-collapse"
+            )}
+            data-testid="transaction-table"
+          >
+            <thead>
+              <tr className="border-b border-neutral/20 dark:border-neutral-600/30">
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-date"
+                >
+                  {TABLE.HEADERS.DATE}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-description"
+                >
+                  {TABLE.HEADERS.DESCRIPTION}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-amount"
+                >
+                  {TABLE.HEADERS.AMOUNT}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-category"
+                >
+                  {TABLE.HEADERS.CATEGORY}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-subcategory"
+                >
+                  {TABLE.HEADERS.SUBCATEGORY}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-recurring"
+                >
+                  {TABLE.HEADERS.RECURRING}
+                </th>
+                <th
+                  className={cn(
+                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
+                  )}
+                  data-testid="header-frequency"
+                >
+                  {TABLE.HEADERS.FREQUENCY}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading
+                ? loadingRow
+                : !isFetching && transactions && transactions.length === 0
+                  ? emptyRow
+                  : transactions.map((t, idx) => (
+                      <tr
+                        key={`${t.id}-${idx}`}
+                        className="hover:bg-gray-50 transition-colors duration-150"
+                        data-testid={`transaction-item-${t.id || idx}`}
                       >
-                        <span className="font-medium">
-                          {formatAmount(t.amount)}
-                        </span>
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {t.category || ""}
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {t.subcategory || ""}
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {t.description || ""}
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {formatDate(t.date)}
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {t.recurring === true ? (
-                          <Badge variant="primary" size="sm">
-                            {TABLE.BOOL.YES}
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" size="sm">
-                            {TABLE.BOOL.NO}
-                          </Badge>
-                        )}
-                      </td>
-                      <td className={cn(tableCell({ variant: "default" }))}>
-                        {t.recurring === true && t.frequency ? (
-                          <Badge variant="primary" size="sm">
-                            {t.frequency}
-                          </Badge>
-                        ) : (
-                          ""
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-            {/* Fără date, dar în curs de încărcare - arăta indicator de loading pentru următoarea pagină */}
-            {isFetchingNextPage && loadingMoreRow}
-          </tbody>
-        </table>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {formatDate(t.date)}
+                        </td>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {t.description || ""}
+                        </td>
+                        <td
+                          className="p-4 border-b border-neutral/20 dark:border-neutral-600/30"
+                          style={getAmountStyles(t.amount, t.type)}
+                          data-testid={`amount-${idx}`}
+                        >
+                          <span className="font-medium">
+                            {formatAmount(t.amount)}
+                          </span>
+                        </td>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {t.category || ""}
+                        </td>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {t.subcategory || ""}
+                        </td>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {t.recurring === true ? (
+                            <Badge
+                              variant="primary"
+                            >
+                              Da
+                            </Badge>
+                          ) : (
+                            <Badge
+                              variant="secondary"
+                            >
+                              Nu
+                            </Badge>
+                          )}
+                        </td>
+                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                          {t.frequency && (
+                            <Badge
+                              variant="primary"
+                            >
+                              {t.frequency}
+                            </Badge>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+              {/* Fără date, dar în curs de încărcare - arăta indicator de loading pentru următoarea pagină */}
+              {isFetchingNextPage && loadingMoreRow}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Informații despre numărul total de tranzacții */}
       {!isLoading && transactions && transactions.length > 0 && (
         <div
           className={cn(
-            flexContainer({
-              direction: "row",
-              justify: "between",
-              align: "center",
-            }),
-            "mt-4",
+            "flex flex-row justify-between items-center p-4 border-t border-neutral/20 dark:border-neutral-600/30"
           )}
           aria-live="polite"
         >
-          <span className="text-gray-600 text-sm">
+          <span className="text-neutral-600 dark:text-neutral-400 text-sm">
             {TABLE.SHOWING_INFO.replace(
               "{shown}",
               String(transactions.length),

@@ -42,15 +42,16 @@ const ValidatedSubmitButton: React.FC<ValidatedSubmitButtonProps> = ({
   children,
   ...rest
 }) => {
+  const isLoadingState = Boolean(isLoading);
+  
   return (
     <Button
       type="submit"
       variant={isFormValid ? "primary" : "secondary"}
-      disabled={!isFormValid || Boolean(isLoading) || disabled}
-      isLoading={Boolean(isLoading)}
+      disabled={!isFormValid || isLoadingState || disabled}
       {...rest}
     >
-      {isLoading ? loadingText : submitText || children}
+      {isLoadingState ? loadingText : submitText || children}
     </Button>
   );
 };

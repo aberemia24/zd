@@ -47,6 +47,18 @@ export declare const MESAJE: {
         EROARE_STERGERE: string;
         NU_SE_POT_STERGE_PREDEFINITE: string;
         CONFIRMARE_STERGERE: string;
+        CONFIRMARE_STERGERE_TITLE: string;
+        MAXIM_SUBCATEGORII: string;
+        EROARE_ADAUGARE_SUBCATEGORIE: string;
+        CATEGORIA_NEGASITA: string;
+        NUME_DUPLICAT: string;
+        EROARE_REDENUMIRE: string;
+        DOAR_CUSTOM_STERGERE: string;
+        EROARE_STERGERE_SUBCATEGORIE: string;
+        EROARE_STERGERE_ORFANE: string;
+        SUCCES_ADAUGARE_SUBCATEGORIE: string;
+        SUCCES_REDENUMIRE_SUBCATEGORIE: string;
+        SUCCES_STERGERE_SUBCATEGORIE: string;
     };
     EROARE_EXPORT: string;
     SUCCES_EXPORT: string;

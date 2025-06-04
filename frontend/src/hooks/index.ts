@@ -8,5 +8,6 @@
 export { usePrefetchRoutes } from "./usePrefetchRoutes";
 export { useURLFilters } from "./useURLFilters";
 export { useExport } from "./useExport";
+export { useNavigationState } from './useNavigationState';
 
 // Adăugați aici alte re-exporturi pe măsură ce creați hook-uri

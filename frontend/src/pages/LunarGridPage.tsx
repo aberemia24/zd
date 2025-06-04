@@ -1,16 +1,15 @@
 import React, { useEffect, useState, useMemo, useCallback, useTransition } from "react";
-import { EXCEL_GRID, UI } from "@shared-constants/ui";
+import { EXCEL_GRID, UI, TITLES, CATEGORIES } from "@shared-constants";
 import LunarGridTanStack from "../components/features/LunarGrid/LunarGridTanStack";
-import { TITLES } from "@shared-constants";
-import { CATEGORIES } from "@shared-constants/categories";
 import { useTransactionStore } from "../stores/transactionStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import { useAuthStore } from "../stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
-import { cn } from "../styles/cva/shared/utils";
-import { container, modal, flex } from "../styles/cva/components/layout";
-import { button } from "../styles/cva/components/forms";
+
+// CVA styling imports
+import { cn, dashboard, modal, button } from "../styles/cva/unified-cva";
+
 import { Maximize2, Minimize2 } from "lucide-react";
 import Badge from "../components/primitives/Badge/Badge";
 import Select from "../components/primitives/Select/Select";
@@ -111,7 +110,7 @@ const LunarGridPage: React.FC = () => {
     if (layoutMode === 'fullscreen') {
       return (
         <div 
-          className={modal({ variant: "subtle" })}
+          className={modal({ variant: "default" })}
           onClick={() => setLayoutMode('full-width')}
           data-testid="fullscreen-backdrop"
         />
@@ -298,26 +297,21 @@ const LunarGridPage: React.FC = () => {
           </Badge>
         )}
 
-        {/* 🚨 CONSOLIDATION - Page header folosind flex composition CVA - COMPACT */}
+        {/* 🚨 CONSOLIDATION - Page header folosind flexbox manual - COMPACT */}
         <div className={cn(
-          flex({ 
-            direction: "row", 
-            justify: "between", 
-            align: "center", 
-            gap: "sm"
-          }),
+          "flex flex-row justify-between items-center gap-4",
           "mb-4 min-h-[3rem]",
           layoutMode === 'full-width' ? "px-4" : ""
         )}>
-          {/* 🚨 CONSOLIDATION - Title section folosind flex composition CVA - COMPACT */}
-          <div className={flex({ align: "center", gap: "sm" })}>
+          {/* 🚨 CONSOLIDATION - Title section folosind flexbox manual - COMPACT */}
+          <div className="flex items-center gap-4">
             <h1 className="text-2xl font-semibold text-gray-900 whitespace-nowrap">
               {TITLES.GRID_LUNAR}
             </h1>
             {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
             {isPending && (
               <div 
-                className={flex({ align: "center", gap: "xs" })}
+                className="flex items-center gap-2"
                 data-testid="transition-loading-indicator"
               >
                 <Spinner size="sm" />
@@ -326,17 +320,17 @@ const LunarGridPage: React.FC = () => {
             )}
           </div>
 
-          {/* 🚨 CONSOLIDATION - Controls section folosind flex composition CVA - NOWRAP */}
+          {/* 🚨 CONSOLIDATION - Controls section folosind flexbox manual - NOWRAP */}
           <div className={cn(
-            flex({ align: "center", gap: "sm" }),
+            "flex items-center gap-4",
             "flex-shrink-0"
           )}>
             {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button - COMPACT */}
             <button
               onClick={handleLayoutModeToggle}
               className={cn(
-                button({ variant: "outline", size: "xs" }),
-                flex({ align: "center", gap: "xs" }),
+                button({ variant: "outline", size: "sm" }),
+                "flex items-center gap-2",
                 "whitespace-nowrap flex-shrink-0",
                 layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
               )}
@@ -384,18 +378,16 @@ const LunarGridPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Arată Loading state când încărcăm date - CVA Spinner + flex composition - COMPACT */}
+        {/* Arată Loading state când încărcăm date - CVA Spinner + flexbox manual - COMPACT */}
         {loading ? (
           <div className={cn(
-            flex({ justify: "center", align: "center", gap: "sm" }),
+            "flex justify-center items-center gap-4",
             "py-6",
             layoutMode === 'full-width' ? "px-4" : ""
           )}>
             <Spinner size="md" />
             <p className="text-gray-700 text-sm">
-              {UI.LUNAR_GRID_PAGE.LOADING_MESSAGE_TEMPLATE
-                .replace('{month}', getMonthName(month))
-                .replace('{year}', year.toString())}
+              {`Încărcăm datele pentru ${getMonthName(month)} ${year}...`}
             </p>
           </div>
         ) : (

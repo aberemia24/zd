@@ -1,62 +1,60 @@
 import React from "react";
-import { LOADER } from "@shared-constants";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
-  loader,
-  type LoaderProps as CVALoaderProps,
-} from "../../../styles/cva/components/feedback";
+import { 
+  cn,
+  card
+} from "../../../styles/cva-v2";
+import Spinner from "../Spinner/Spinner";
 
-export interface LoaderProps extends CVALoaderProps {
-  text?: string;
-  showText?: boolean;
+export interface LoaderProps {
+  size?: "sm" | "md" | "lg" | "xl";
+  message?: string;
+  overlay?: boolean;
   className?: string;
-  dataTestId?: string;
 }
 
+/**
+ * Loader component pentru loading states cu overlay opțional
+ * Bazat pe noul sistem CVA v2 modular
+ */
 const Loader: React.FC<LoaderProps> = ({
   size = "md",
-  color = "primary",
-  text = LOADER.TEXT,
-  showText = true,
+  message = "Se încarcă...",
+  overlay = false,
   className,
-  dataTestId,
+  ...props
 }) => {
-  return (
+  const content = (
     <div
       className={cn(
-        "flex flex-col items-center justify-center space-y-2",
-        className,
+        "flex flex-col items-center justify-center gap-3 p-6",
+        overlay && [
+          "fixed inset-0 z-50 bg-carbon-50/80 backdrop-blur-sm",
+          "dark:bg-carbon-900/80"
+        ],
+        !overlay && card({ variant: "default" }),
+        className
       )}
-      data-testid={dataTestId || "loader-container"}
+      role="status"
+      aria-live="polite"
+      {...props}
     >
-      <svg
-        className={cn(loader({ size, color }))}
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        data-testid="loader-svg"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
-        />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-        />
-      </svg>
-      {showText && (
-        <span className="text-sm text-secondary-700" data-testid="loader-text">
-          {text}
-        </span>
+      <Spinner size={size} color="primary" />
+      
+      {message && (
+        <p className="text-sm font-medium text-carbon-700 dark:text-carbon-300 text-center">
+          {message}
+        </p>
       )}
     </div>
   );
+
+  // If overlay, render directly in body portal-style
+  if (overlay) {
+    return content;
+  }
+
+  // Otherwise render as normal component
+  return content;
 };
 
 export default Loader;

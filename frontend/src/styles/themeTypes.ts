@@ -17,13 +17,28 @@ export type ColorScale = {
   900: string;
 };
 
+// Extended ColorScale pentru Carbon (include 950 pentru True Black)
+export type ExtendedColorScale = ColorScale & {
+  950: string;
+};
+
 export type ThemeColors = {
+  // Noile culori Carbon Copper Extended
+  carbon: ExtendedColorScale;  // Primary black/gray scale
+  copper: ColorScale;          // Primary accent color
+  emerald: ColorScale;         // Success color
+  ruby: ColorScale;           // Error color  
+  amber: ColorScale;          // Warning color
+  
+  // Alias pentru compatibilitate cu codul existent
   primary: ColorScale;
   secondary: ColorScale;
+  accent: ColorScale;
   success: ColorScale;
   warning: ColorScale;
   error: ColorScale;
   gray: ColorScale;
+  background: string;
   white: string;
   black: string;
 };
@@ -46,6 +61,8 @@ export type Shadows = {
   md: string;
   lg: string;
   xl: string;
+  glow: string;
+  "glow-lg": string;
 };
 
 export type BorderRadius = {
@@ -54,6 +71,7 @@ export type BorderRadius = {
   md: string;
   lg: string;
   xl: string;
+  "2xl": string;
   full: string;
 };
 

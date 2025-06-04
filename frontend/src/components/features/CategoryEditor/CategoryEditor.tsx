@@ -8,15 +8,19 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from "@shared-constants/ui";
-import { MESAJE } from "@shared-constants/messages";
+import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS, MESAJE } from "@shared-constants";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Badge from "../../primitives/Badge/Badge";
 import Alert from "../../primitives/Alert/Alert";
-import { cn } from "../../../styles/cva/shared/utils";
-import { modal } from "../../../styles/cva/components/layout";
-import { card, flex } from "../../../styles/cva/components/layout";
+
+// CVA styling imports
+import { 
+  cn,
+  modal,
+  card
+} from "../../../styles/cva/unified-cva";
+
 import { useCategoryEditorState } from "./useCategoryEditorState";
 
 interface Props {
@@ -28,7 +32,7 @@ interface Props {
   initialMode?: "edit" | "delete" | "add";
 }
 
-export const CategoryEditor: React.FC<Props> = ({
+const CategoryEditorComponent: React.FC<Props> = ({
   open,
   onClose,
   userId,
@@ -107,8 +111,7 @@ export const CategoryEditor: React.FC<Props> = ({
     return count > 0 ? (
       <Badge
         variant="secondary"
-        size="sm"
-        dataTestId={`subcat-count-${cat}-${subcat}`}
+        data-testid={`subcat-count-${cat}-${subcat}`}
       >
         {count}
       </Badge>
@@ -132,7 +135,7 @@ export const CategoryEditor: React.FC<Props> = ({
     return (
       <div
         className={cn(
-          card({ variant: "elevated", size: "sm" }),
+          card({ variant: "elevated" }),
           "bg-yellow-50 border-yellow-200 border-l-4 border-l-yellow-500",
           "p-4 rounded-lg",
         )}
@@ -148,23 +151,20 @@ export const CategoryEditor: React.FC<Props> = ({
           {UI.CATEGORY_EDITOR.DELETE_CONFIRMATION_TITLE}
         </h3>
         <p className="text-sm text-yellow-700 mb-4">{message}</p>
-        <div
-          className={cn(flex({ direction: "row", gap: "md", justify: "end" }))}
-        >
+        <div className="flex flex-row gap-4 justify-end">
           <Button
-            variant="danger"
+            variant="primary"
             size="sm"
             onClick={onConfirm}
-            dataTestId="confirm-delete-btn"
+            data-testid="confirm-delete-btn"
           >
-            {" "}
-            {BUTTONS.DELETE}{" "}
+            {BUTTONS.DELETE}
           </Button>
           <Button
             variant="secondary"
             size="sm"
             onClick={onCancel}
-            dataTestId="cancel-delete-btn"
+            data-testid="cancel-delete-btn"
           >
             {BUTTONS.CANCEL}
           </Button>
@@ -231,20 +231,16 @@ export const CategoryEditor: React.FC<Props> = ({
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           {error && (
             <Alert
-              type="error"
-              dataTestId="error-message"
-              message={error}
+              variant="error"
+              data-testid="error-message"
               className="mb-4"
-            />
+            >
+              {error}
+            </Alert>
           )}
-          <div
-            className={cn(
-              flex({ direction: "row", gap: "xl", justify: "between" }),
-              "h-full",
-            )}
-          >
+          <div className="flex flex-row gap-8 justify-between h-full">
             <div
-              className={cn(card({ variant: "default", size: "md" }), "flex-1")}
+              className={cn(card({ variant: "default" }), "flex-1")}
               data-testid="categories-section"
             >
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -290,7 +286,7 @@ export const CategoryEditor: React.FC<Props> = ({
               </div>
             </div>
             <div
-              className={cn(card({ variant: "default", size: "md" }), "flex-1")}
+              className={cn(card({ variant: "default" }), "flex-1")}
               data-testid="subcategories-section"
               id="subcategories-section"
             >
@@ -351,11 +347,7 @@ export const CategoryEditor: React.FC<Props> = ({
                             subcatAction.subcat === sc.name ? (
                               <div
                                 className={cn(
-                                  flex({
-                                    direction: "row",
-                                    gap: "sm",
-                                    align: "center",
-                                  }),
+                                  "flex flex-row gap-sm items-center",
                                 )}
                               >
                                 <Input
@@ -383,14 +375,14 @@ export const CategoryEditor: React.FC<Props> = ({
                                   }}
                                   autoFocus
                                   className="flex-grow"
-                                  dataTestId={`rename-input-${sc.name}`}
+                                  data-testid={`rename-input-${sc.name}`}
                                   maxLength={32}
                                 />
                                 <Button
                                   variant="primary"
                                   size="sm"
                                   disabled={!isValidSubcat(renameValue)}
-                                  dataTestId={`confirm-rename-${sc.name}`}
+                                  data-testid={`confirm-rename-${sc.name}`}
                                   type="button"
                                   onClick={() =>
                                     handleRename(
@@ -406,7 +398,7 @@ export const CategoryEditor: React.FC<Props> = ({
                                 <Button
                                   variant="secondary"
                                   size="sm"
-                                  dataTestId={`cancel-rename-${sc.name}`}
+                                  data-testid={`cancel-rename-${sc.name}`}
                                   type="button"
                                   onClick={() => {
                                     setSubcatAction(null);
@@ -420,11 +412,7 @@ export const CategoryEditor: React.FC<Props> = ({
                             ) : (
                               <div
                                 className={cn(
-                                  flex({
-                                    direction: "row",
-                                    justify: "between",
-                                    align: "center",
-                                  }),
+                                  "flex flex-row justify-between items-center",
                                 )}
                               >
                                 <span className="text-sm text-gray-700 font-medium">
@@ -432,19 +420,13 @@ export const CategoryEditor: React.FC<Props> = ({
                                 </span>
                                 <div
                                   className={cn(
-                                    flex({
-                                      direction: "row",
-                                      gap: "sm",
-                                      align: "center",
-                                    }),
-                                    "opacity-0 group-hover:opacity-100 transition-opacity duration-150",
+                                    "flex flex-row gap-sm items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150",
                                   )}
                                 >
                                   {sc.isCustom && (
                                     <Badge
                                       variant="success"
-                                      size="xs"
-                                      dataTestId={`custom-flag-${sc.name}`}
+                                      data-testid={`custom-flag-${sc.name}`}
                                     >
                                       {FLAGS.CUSTOM}
                                     </Badge>
@@ -452,7 +434,7 @@ export const CategoryEditor: React.FC<Props> = ({
                                   {badge(selectedCategory, sc.name)}
                                   <Button
                                     variant="primary"
-                                    size="xs"
+                                    size="sm"
                                     onClick={() => {
                                       setSubcatAction({
                                         type: "edit",
@@ -461,7 +443,7 @@ export const CategoryEditor: React.FC<Props> = ({
                                       });
                                       setRenameValue(sc.name);
                                     }}
-                                    dataTestId={`edit-subcat-btn-${sc.name}`}
+                                    data-testid={`edit-subcat-btn-${sc.name}`}
                                     aria-label={`${UI.CATEGORY_EDITOR.RENAME_BUTTON} ${sc.name}`}
                                   >
                                     {UI.CATEGORY_EDITOR.RENAME_BUTTON}
@@ -469,8 +451,8 @@ export const CategoryEditor: React.FC<Props> = ({
                                   {/* Butonul de ștergere apare DOAR pentru subcategoriile personalizate (custom) */}
                                   {sc.isCustom && (
                                     <Button
-                                      variant="danger"
-                                      size="xs"
+                                      variant="primary"
+                                      size="sm"
                                       onClick={() =>
                                         setSubcatAction({
                                           type: "delete",
@@ -478,7 +460,7 @@ export const CategoryEditor: React.FC<Props> = ({
                                           subcat: sc.name,
                                         })
                                       }
-                                      dataTestId={`delete-subcat-btn-${sc.name}`}
+                                      data-testid={`delete-subcat-btn-${sc.name}`}
                                       aria-label={`${UI.CATEGORY_EDITOR.DELETE_BUTTON} ${sc.name}`}
                                     >
                                       {UI.CATEGORY_EDITOR.DELETE_BUTTON}
@@ -493,15 +475,11 @@ export const CategoryEditor: React.FC<Props> = ({
                   </div>
                   <div
                     className={cn(
-                      card({ variant: "elevated", size: "sm" }),
+                      card({ variant: "elevated" }),
                       "bg-gray-50 border border-gray-200 p-4",
                     )}
                   >
-                    <div
-                      className={cn(
-                        flex({ direction: "row", gap: "sm", align: "center" }),
-                      )}
-                    >
+                    <div className="flex flex-row gap-sm items-center">
                       <Input
                         type="text"
                         value={newSubcat}
@@ -519,14 +497,14 @@ export const CategoryEditor: React.FC<Props> = ({
                         }}
                         placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
                         className="flex-grow"
-                        dataTestId="add-subcat-input"
+                        data-testid="add-subcat-input"
                         maxLength={32}
                       />
                       <Button
                         variant="primary"
                         size="sm"
                         disabled={!isValidSubcat(newSubcat)}
-                        dataTestId="add-subcat-btn"
+                        data-testid="add-subcat-btn"
                         type="button"
                         onClick={() => {
                           const selectedCat = categories.find(
@@ -542,7 +520,7 @@ export const CategoryEditor: React.FC<Props> = ({
                       <Button
                         variant="secondary"
                         size="sm"
-                        dataTestId="cancel-add-subcat-btn"
+                        data-testid="cancel-add-subcat-btn"
                         type="button"
                         onClick={() => setNewSubcat("")}
                         className="min-w-[90px]"
@@ -554,10 +532,11 @@ export const CategoryEditor: React.FC<Props> = ({
                 </>
               ) : (
                 <Alert
-                  type="info"
-                  dataTestId="no-cat-msg"
-                  message={INFO.CATEGORY_EDITOR_EMPTY}
-                />
+                  variant="default"
+                  data-testid="no-cat-msg"
+                >
+                  {INFO.CATEGORY_EDITOR_EMPTY}
+                </Alert>
               )}
             </div>
           </div>
@@ -566,5 +545,18 @@ export const CategoryEditor: React.FC<Props> = ({
     </div>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+export const CategoryEditor = React.memo(CategoryEditorComponent, (prevProps, nextProps) => {
+  // Custom comparison pentru props critice la performance
+  return (
+    prevProps.open === nextProps.open &&
+    prevProps.userId === nextProps.userId &&
+    prevProps.initialCategory === nextProps.initialCategory &&
+    prevProps.initialSubcategory === nextProps.initialSubcategory &&
+    prevProps.initialMode === nextProps.initialMode
+    // onClose este callback și se va schimba în mod normal
+  );
+});
 
 export default CategoryEditor;

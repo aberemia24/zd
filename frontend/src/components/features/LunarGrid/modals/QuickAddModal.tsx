@@ -6,15 +6,13 @@ import Checkbox from "../../../primitives/Checkbox/Checkbox";
 import Select from "../../../primitives/Select/Select";
 import ConfirmationModal from "../../../primitives/ConfirmationModal/ConfirmationModal";
 import { useConfirmationModal } from "../../../primitives/ConfirmationModal/useConfirmationModal";
-import {
-  transactionModalOverlay,
-  transactionModalContent,
-  transactionModalHeader,
-  transactionModalTitle,
-  transactionModalBody,
-  transactionModalFooter,
-  transactionModalCloseButton,
-} from "../../../../styles/cva/components/modal";
+import { 
+  cn,
+  modal,
+  card,
+  button,
+  type ModalProps
+} from "../../../../styles/cva-v2";
 import { useBaseModalLogic, CellContext } from "./hooks/useBaseModalLogic";
 import { 
   FrequencyType, 
@@ -100,6 +98,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
 
   // Focus management references
   const firstFocusableRef = React.useRef<HTMLInputElement>(null);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Initialize form cu prefilled amount și focus management
   useEffect(() => {
@@ -205,31 +204,26 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
     );
   }, [form.data]);
 
-  // Outside click handler cu dirty state detection
-  const handleOutsideClick = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
-    // Verifică că click-ul a fost pe overlay, nu pe modal content
+  // Handle backdrop click pentru UX îmbunătățit
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      if (isDirty) {
-        // Sunt modificări - cere confirmare
-        const confirmed = await showConfirmation({
-          title: "Modificări nesalvate",
-          message: "Aveți modificări nesalvate. Doriți să închideți modalul și să pierdeți aceste modificări?",
-          confirmText: "Da, închide modalul",
-          cancelText: "Nu, continuă editarea",
-          variant: "warning",
-          icon: "⚠️"
-        });
-
-        if (confirmed) {
-          onCancel();
-        }
-        // Dacă nu confirmă, nu face nimic (modalul rămâne deschis)
-      } else {
-        // Nu sunt modificări - închide direct
-        onCancel();
-      }
+      onCancel();
     }
-  }, [isDirty, onCancel, showConfirmation]);
+  }, [onCancel]);
+
+  // Handle content click pentru a preveni închiderea accidentală
+  const handleContentClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  // Handle outside click pentru modal poziționat
+  const handleOutsideClick = useCallback((e: React.MouseEvent) => {
+    if (position && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      onCancel();
+    } else if (!position && e.target === e.currentTarget) {
+      onCancel();
+    }
+  }, [position, onCancel]);
 
   // Enhanced Escape handler cu dirty state detection
   const handleEscape = useCallback(async () => {
@@ -354,81 +348,76 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       <div 
         className={position 
           ? "fixed z-50 pointer-events-none" 
-          : transactionModalOverlay({ blur: false })
+          : modal({ variant: "default" })
         }
         role="dialog"
         aria-modal="true"
         aria-labelledby="quick-add-modal-title"
-        aria-describedby="quick-add-modal-description"
-        onClick={position ? undefined : handleOutsideClick}
-        style={position ? { inset: 0 } : undefined}
+        onClick={handleOutsideClick}
+        ref={containerRef}
+        data-testid="quick-add-modal-overlay"
       >
+        {/* Modal Content */}
         <div 
-          className={position 
-            ? transactionModalContent({ mode: "quick-add-positioned" })
-            : transactionModalContent({ mode: "quick-add" })
-          }
-          style={positionedStyle}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Modal Header - foarte compact pentru pozitionat */}
-          {position ? (
-            // Header minimal pentru modal poziționat
-            <div className="px-3 py-1 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
-              <span 
-                id="quick-add-modal-title"
-                className="text-xs font-medium text-slate-700"
-              >
-                {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
-              </span>
-              <button
-                className="text-slate-400 hover:text-slate-600 text-sm p-1"
-                onClick={onCancel}
-                data-testid="quick-add-modal-close"
-                aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
-              >
-                ✕
-              </button>
-            </div>
-          ) : (
-            // Header normal pentru modal centrat
-            <div className={transactionModalHeader({ variant: "primary" })}>
-              <h2 
-                id="quick-add-modal-title"
-                className={transactionModalTitle({ variant: "primary" })}
-              >
-                {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
-              </h2>
-              <button
-                className={transactionModalCloseButton()}
-                onClick={onCancel}
-                data-testid="quick-add-modal-close"
-                aria-label={EXCEL_GRID.MODAL.CLOSE_MODAL_ARIA}
-              >
-                ✕
-              </button>
-            </div>
+          className={cn(
+            card({ variant: "elevated" }),
+            position 
+              ? "pointer-events-auto fixed max-w-sm w-80 max-h-96 overflow-y-auto shadow-xl border border-neutral/20 dark:border-neutral-600/30" 
+              : "max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto",
+            "animate-theme-fade bg-background dark:bg-surface-dark"
           )}
+          style={positionedStyle}
+          onClick={handleOutsideClick}
+          data-testid="quick-add-modal-content"
+        >
+          {/* Header - doar pentru modal centrat */}
+          {!position ? (
+            // Header pentru modal centrat
+            <div className={cn(
+              "p-4 border-b border-neutral/20 dark:border-neutral-600/30 rounded-t-lg",
+              "bg-background dark:bg-surface-dark"
+            )}>
+              <div className="flex items-center justify-between">
+                <h2 
+                  id="quick-add-modal-title"
+                  className="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
+                >
+                  {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
+                </h2>
+                <button
+                  className={cn(
+                    button({ variant: "ghost", size: "sm" }),
+                    "hover-lift text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  )}
+                  onClick={onCancel}
+                  data-testid="quick-add-modal-close"
+                  aria-label="Închide modal"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           {/* Modal Body */}
-          <div className={position 
-            ? transactionModalBody({ mode: "positioned" })
-            : transactionModalBody()
-          }>
+          <div className={cn(
+            "p-6",
+            position ? "p-4" : "p-6"
+          )}>
             {/* Context Info */}
-            <div 
-              id="quick-add-modal-description"
-              className={position 
-                ? "text-xs text-slate-600 bg-blue-50 p-1.5 rounded"
-                : "text-sm text-slate-600 bg-blue-50 p-3 rounded-md"
-              }
-            >
-              <strong>{cellContext.category}</strong>
-              {cellContext.subcategory && ` → ${cellContext.subcategory}`}
-              <br />
-              <span>
-                {cellContext.day}/{cellContext.month}/{cellContext.year}
-              </span>
+            <div className={cn(
+              "mb-4 p-3 rounded-lg",
+              "bg-neutral/5 dark:bg-neutral-600/10 border border-neutral/20 dark:border-neutral-600/30"
+            )}>
+              <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                <div className="font-medium text-neutral-900 dark:text-neutral-100">
+                  {cellContext.category}
+                  {cellContext.subcategory && ` → ${cellContext.subcategory}`}
+                </div>
+                <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                  {cellContext.day}/{cellContext.month}/{cellContext.year}
+                </div>
+              </div>
             </div>
             {/* Amount Input */}
             <div>
@@ -608,10 +597,11 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
           </div>
 
           {/* Modal Footer */}
-          <div className={position 
-            ? transactionModalFooter({ mode: "positioned" })
-            : transactionModalFooter()
-          }>
+          <div className={cn(
+            "p-4 border-t border-neutral/20 dark:border-neutral-600/30 rounded-b-lg",
+            "bg-background dark:bg-surface-dark",
+            position ? "p-3" : "p-4"
+          )}>
             {/* LGI TASK 5: Buton Delete pentru edit mode */}
             {mode === 'edit' && onDelete && (
               <Button

@@ -1,20 +1,24 @@
 // Componenta principală a aplicației - orchestrator pentru rutare între pagini
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom"; // Importuri react-router-dom
 
-import TransactionsPage from "./pages/TransactionsPage";
-import LunarGridPage from "./pages/LunarGridPage";
-import OptionsPage from "./pages/OptionsPage";
-// ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează bucla infinită de setState
-// import ProfilerDebugPage from "./components/dev/ProfilerDebugPage";
+// Lazy imports pentru pagini mari - optimizare performanță
+import { lazyLoad } from "./utils/lazyLoading";
+
+// Auth components - păstrate normale pentru încărcare rapidă
 import LoginForm from "./components/features/Auth/LoginForm";
 import RegisterForm from "./components/features/Auth/RegisterForm";
 import { Toaster } from "react-hot-toast";
 import Spinner from "./components/primitives/Spinner";
 import NavLink from "./components/primitives/NavLink";
+import { CommandPaletteProvider } from "./components/primitives/CommandPalette";
 import { TITLES } from "@shared-constants";
-import { cn } from "./styles/cva/shared/utils";
-import { container, flex } from "./styles/cva/components/layout";
+
+// Dark mode integration
+import { useDarkMode } from "./hooks/useDarkMode";
+
+// CVA styling imports
+import { cn, dashboard } from "./styles/cva/unified-cva";
 
 // Import store Zustand pentru autentificare
 import { useAuthStore } from "./stores/authStore";
@@ -22,9 +26,26 @@ import { useAuthStore } from "./stores/authStore";
 import { useCategoryStore } from "./stores/categoryStore";
 import { CATEGORIES } from "@shared-constants/categories";
 
+// Lazy loaded pages cu loading states optimizate
+const TransactionsPage = lazyLoad(() => import("./pages/TransactionsPage"), {
+  minDelay: 200, // Prevent loading flashes
+  withErrorBoundary: true,
+});
+
+const LunarGridPage = lazyLoad(() => import("./pages/LunarGridPage"), {
+  minDelay: 200, // Prevent loading flashes  
+  withErrorBoundary: true,
+});
+
+const OptionsPage = lazyLoad(() => import("./pages/OptionsPage"), {
+  minDelay: 200, // Prevent loading flashes
+  withErrorBoundary: true,
+});
+
 /**
  * Componenta principală a aplicației, refactorizată pentru a utiliza custom hooks și servicii
  * Migrated la CVA styling system pentru consistență
+ * ✅ OPTIMIZAT: Lazy loading pentru pagini mari pentru reducerea bundle-ului inițial
  *
  * Structura:
  *
@@ -36,6 +57,7 @@ export const App: React.FC = () => {
   // console.log("🔜 App render using react-router-dom");
 
   const { user, loading, checkUser } = useAuthStore();
+  const { toggleDarkMode } = useDarkMode();
 
   // Inițializarea categoriilor la nivel global
   const loadCategories = useCategoryStore((state) => state.loadUserCategories);
@@ -92,7 +114,7 @@ export const App: React.FC = () => {
     return (
       <div
         className={cn(
-          container({ size: "lg" }),
+          dashboard({ layout: "single" }),
           "min-h-screen flex items-center justify-center",
         )}
       >
@@ -107,13 +129,27 @@ export const App: React.FC = () => {
   // la /login. Pagina de login va fi ruta implicită dacă nu e logat.
 
   return (
-    <>
+    <CommandPaletteProvider
+      onToggleDarkMode={toggleDarkMode}
+      onSidebarToggle={() => {
+        // TODO: Implement sidebar toggle when sidebar is added
+        console.log('Sidebar toggle requested');
+      }}
+      onNewTab={() => {
+        // TODO: Implement new tab functionality when tabs are added
+        console.log('New tab requested');
+      }}
+      onShowHelp={() => {
+        // TODO: Implement help modal when help system is added
+        console.log('Help requested');
+      }}
+    >
       <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className={container({ size: "lg" })}>
+      <div className={dashboard({ layout: "single" })}>
         {user /* Afișează navigarea doar dacă utilizatorul este logat */ && (
           <div
             className={cn(
-              flex({ direction: "row", gap: "lg", justify: "start" }),
+              "flex flex-row gap-8 justify-start",
               "border-b border-gray-200 mb-6 pb-4",
             )}
           >
@@ -177,7 +213,7 @@ export const App: React.FC = () => {
           )}
         </Routes>
       </div>
-    </>
+    </CommandPaletteProvider>
   );
 };
 

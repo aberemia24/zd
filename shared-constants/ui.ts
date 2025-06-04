@@ -136,6 +136,66 @@ export const BUTTONS = {
   RESET_ALL_FILTERS: 'Resetează toate',
 };
 
+// 🍞 TOAST NOTIFICATIONS - Notificări temporare
+export const TOAST = {
+  // Toast actions
+  CLOSE: 'Închide notificarea',
+  
+  // Toast variants and titles
+  INFO: {
+    TITLE: 'Informație',
+    DEFAULT_MESSAGE: 'Informație disponibilă'
+  },
+  SUCCESS: {
+    TITLE: 'Succes',
+    DEFAULT_MESSAGE: 'Operația a fost finalizată cu succes'
+  },
+  WARNING: {
+    TITLE: 'Atenție', 
+    DEFAULT_MESSAGE: 'Verificați informațiile introduse'
+  },
+  ERROR: {
+    TITLE: 'Eroare',
+    DEFAULT_MESSAGE: 'A apărut o eroare neașteptată'
+  },
+  
+  // Common toast messages for Budget App
+  TRANSACTION: {
+    ADDED: 'Tranzacția a fost adăugată cu succes',
+    UPDATED: 'Tranzacția a fost actualizată',
+    DELETED: 'Tranzacția a fost ștearsă',
+    ERROR_ADDING: 'Eroare la adăugarea tranzacției',
+    ERROR_UPDATING: 'Eroare la actualizarea tranzacției',
+    ERROR_DELETING: 'Eroare la ștergerea tranzacției'
+  },
+  CATEGORY: {
+    ADDED: 'Categoria a fost adăugată',
+    UPDATED: 'Categoria a fost actualizată', 
+    DELETED: 'Categoria a fost ștearsă',
+    ERROR_ADDING: 'Eroare la adăugarea categoriei',
+    ERROR_UPDATING: 'Eroare la actualizarea categoriei',
+    ERROR_DELETING: 'Eroare la ștergerea categoriei'
+  },
+  EXPORT: {
+    SUCCESS: 'Exportul a fost finalizat cu succes',
+    ERROR: 'Eroare la exportul datelor'
+  },
+  AUTH: {
+    LOGIN_SUCCESS: 'Autentificare reușită',
+    LOGIN_ERROR: 'Eroare la autentificare',
+    LOGOUT_SUCCESS: 'V-ați deconectat cu succes',
+    REGISTER_SUCCESS: 'Contul a fost creat cu succes'
+  },
+  
+  // Settings for toast behavior
+  DURATION: {
+    SHORT: 3000,    // 3 secunde pentru mesaje simple
+    MEDIUM: 5000,   // 5 secunde pentru mesaje normale
+    LONG: 7000,     // 7 secunde pentru mesaje importante
+    PERSISTENT: 0   // 0 = nu se închide automat
+  }
+};
+
 export const TABLE = {
   HEADERS: {
     TYPE: 'Tip',
@@ -147,6 +207,8 @@ export const TABLE = {
     RECURRING: 'Recurent',
     FREQUENCY: 'Frecvență',
     DESCRIPTION: 'Descriere',
+    RUNNING_BALANCE: 'Sold curent', // Pentru running balance column
+    ACTIONS: 'Acțiuni', // Pentru actions column
   },
   EMPTY: EMPTY_STATE_MESSAGES.EMPTY_TRANSACTION_LIST,
   LOADING: LOADING_MESSAGES.GENERIC,
@@ -159,6 +221,80 @@ export const TABLE = {
   },
   NO_TRANSACTIONS: EMPTY_STATE_MESSAGES.NO_TRANSACTIONS,
   NO_SUBCATEGORIES: EMPTY_STATE_MESSAGES.NO_SUBCATEGORIES,
+  
+  // 🚀 TASK 8.2 - Desktop-First Table Features
+  ADVANCED_FEATURES: {
+    // Pagination enhanced
+    ITEMS_PER_PAGE: 'Elemente pe pagină:',
+    JUMP_TO_PAGE: 'Mergi la pagina:',
+    PAGE_SIZE_OPTIONS: 'Opțiuni mărime pagină',
+    TOTAL_RECORDS: 'Total înregistrări: {count}',
+    SELECTED_RECORDS: '{count} selectate',
+    
+    // Search and filtering
+    SEARCH_PLACEHOLDER: 'Caută în tranzacții...',
+    ADVANCED_SEARCH: 'Căutare avansată',
+    REGEX_SEARCH: 'Căutare cu expresii regulate',
+    CLEAR_FILTERS: 'Șterge filtrele',
+    SAVE_FILTER_PRESET: 'Salvează preset filtru',
+    LOAD_FILTER_PRESET: 'Încarcă preset filtru',
+    
+    // Sorting
+    SORT_BY: 'Sortează după',
+    SECONDARY_SORT: 'Sortare secundară',
+    REMOVE_SORT: 'Elimină sortarea',
+    MULTI_COLUMN_SORT_HINT: 'Ține Shift + Click pentru sortare pe mai multe coloane',
+    
+    // Selection and bulk operations
+    SELECT_ALL: 'Selectează toate',
+    SELECT_PAGE: 'Selectează pagina',
+    DESELECT_ALL: 'Deselectează toate',
+    BULK_ACTIONS: 'Acțiuni în masă',
+    BULK_DELETE: 'Șterge selecțiile',
+    BULK_EXPORT: 'Exportă selecțiile',
+    BULK_EDIT_CATEGORY: 'Modifică categoria',
+    
+    // Export functionality
+    EXPORT_OPTIONS: 'Opțiuni export',
+    EXPORT_CSV: 'Exportă CSV',
+    EXPORT_PDF: 'Exportă PDF',
+    EXPORT_EXCEL: 'Exportă Excel',
+    EXPORT_FILTERED: 'Exportă doar datele filtrate',
+    EXPORT_ALL: 'Exportă toate datele',
+    
+    // Financial calculations
+    RUNNING_BALANCE_SHOW: 'Afișează soldul curent',
+    RUNNING_BALANCE_HIDE: 'Ascunde soldul curent',
+    SUMMARY_FOOTER: 'Sumar financiar',
+    TOTAL_INCOME: 'Total venituri',
+    TOTAL_EXPENSES: 'Total cheltuieli',
+    NET_BALANCE: 'Balanța netă',
+    AVERAGE_TRANSACTION: 'Tranzacția medie',
+    
+    // Keyboard shortcuts
+    KEYBOARD_SHORTCUTS: 'Comenzi rapide tastatură',
+    NAVIGATION_HINT: 'Folosește săgețile pentru navigare',
+    EDIT_HINT: 'Enter pentru editare, Escape pentru anulare',
+    SEARCH_HINT: 'Ctrl+F pentru căutare rapidă',
+    
+    // Context menu
+    CONTEXT_MENU: {
+      EDIT: 'Editează tranzacția',
+      DELETE: 'Șterge tranzacția',
+      DUPLICATE: 'Duplică tranzacția',
+      VIEW_DETAILS: 'Vezi detalii complete',
+      ADD_TO_FAVORITES: 'Adaugă la favorite',
+      COPY_VALUES: 'Copiază valorile',
+    },
+    
+    // Desktop optimizations
+    FULLSCREEN_MODE: 'Mod ecran complet',
+    COMPACT_VIEW: 'Vizualizare compactă',
+    COMFORTABLE_VIEW: 'Vizualizare confortabilă',
+    COLUMN_VISIBILITY: 'Vizibilitate coloane',
+    RESIZE_COLUMNS: 'Redimensionează coloanele',
+    FREEZE_COLUMNS: 'Înghețe coloanele',
+  },
 };
 
 // Texte pentru componenta de încărcare (Loader)
@@ -590,4 +726,208 @@ export const BALANCE_LABELS = {
   AVAILABLE: 'Disponibil',
   SAVINGS: 'Economii',
   INVESTMENTS: 'Investiții',
+};
+
+// Texte pentru componenta Export Modal
+export const EXPORT_UI = {
+  YEAR_LABEL: 'An:',
+  MONTH_LABEL: 'Lună:',
+  CATEGORY_FILTER_LABEL: 'Categorie:',
+  FILENAME_LABEL: 'Numele fișierului:',
+  FILENAME_PLACEHOLDER: 'ex: raport-lunar'
+};
+
+// Supporting UI Components
+export const TOOLTIP = {
+  DEFAULT_DELAY: 200,
+  PLACEMENTS: {
+    TOP: 'Sus',
+    BOTTOM: 'Jos', 
+    LEFT: 'Stânga',
+    RIGHT: 'Dreapta'
+  },
+  VARIANTS: {
+    DEFAULT: 'Implicit',
+    INFO: 'Informație',
+    WARNING: 'Avertisment',
+    ERROR: 'Eroare',
+    SUCCESS: 'Succes'
+  }
+};
+
+export const PROGRESS = {
+  LABELS: {
+    BUDGET_PROGRESS: 'Progres Buget',
+    EXPORT_PROGRESS: 'Progres Export',
+    LOADING_PROGRESS: 'Se încarcă...',
+    FINANCIAL_GOAL: 'Obiectiv Financiar'
+  },
+  VARIANTS: {
+    DEFAULT: 'Implicit',
+    SUCCESS: 'Succes',
+    WARNING: 'Avertisment', 
+    ERROR: 'Eroare',
+    FINANCIAL: 'Financiar'
+  },
+  SIZES: {
+    SMALL: 'Mic',
+    MEDIUM: 'Mediu',
+    LARGE: 'Mare',
+    EXTRA_LARGE: 'Extra Mare'
+  },
+  POSITIONS: {
+    TOP: 'Sus',
+    BOTTOM: 'Jos',
+    INLINE: 'În linie'
+  }
+};
+
+export const BADGE = {
+  VARIANTS: {
+    NEUTRAL: 'Neutru',
+    PRIMARY: 'Principal',
+    SUCCESS: 'Succes',
+    WARNING: 'Avertisment',
+    ERROR: 'Eroare',
+    INFO: 'Informație'
+  },
+  FINANCIAL_STATES: {
+    OVER_BUDGET: 'Peste Buget',
+    UNDER_BUDGET: 'Sub Buget',
+    ON_TARGET: 'Pe Țintă',
+    INCOME: 'Venit',
+    EXPENSE: 'Cheltuială'
+  }
+};
+
+// 🧭 Navigation System Constants
+export const NAVIGATION = {
+  // Main navigation items
+  ITEMS: {
+    DASHBOARD: 'Tablou de bord',
+    TRANSACTIONS: 'Tranzacții',
+    LUNAR_GRID: 'Grid Lunar',
+    ACCOUNTS: 'Conturi',
+    REPORTS: 'Rapoarte',
+    OPTIONS: 'Opțiuni',
+    SETTINGS: 'Setări'
+  },
+  
+  // Sidebar specific
+  SIDEBAR: {
+    TOGGLE: 'Comută sidebar',
+    EXPAND: 'Extinde sidebar',
+    COLLAPSE: 'Restrânge sidebar',
+    PERSISTENT: 'Sidebar persistent',
+    AUTO_HIDE: 'Ascunde automat'
+  },
+  
+  // Breadcrumbs
+  BREADCRUMBS: {
+    HOME: 'Acasă',
+    SEPARATOR: '/',
+    BACK_TO: 'Înapoi la',
+    CURRENT_PAGE: 'Pagina curentă'
+  },
+  
+  // Context menu
+  CONTEXT_MENU: {
+    OPEN: 'Deschide meniu contextual',
+    CLOSE: 'Închide meniu contextual',
+    NEW_TAB: 'Deschide în tab nou',
+    BOOKMARK: 'Adaugă la favorite',
+    SHARE: 'Partajează'
+  },
+  
+  // Tabs system
+  TABS: {
+    NEW_TAB: 'Tab nou',
+    CLOSE_TAB: 'Închide tab',
+    CLOSE_ALL: 'Închide toate',
+    CLOSE_OTHERS: 'Închide celelalte',
+    NEXT_TAB: 'Tab următor',
+    PREV_TAB: 'Tab anterior'
+  },
+  
+  // Keyboard shortcuts
+  SHORTCUTS: {
+    TOGGLE_SIDEBAR: 'Ctrl+\\',
+    NEW_TAB: 'Ctrl+T',
+    CLOSE_TAB: 'Ctrl+W',
+    NEXT_TAB: 'Ctrl+Tab',
+    PREV_TAB: 'Ctrl+Shift+Tab',
+    CONTEXT_MENU: 'Shift+F10',
+    HOME: 'Alt+H',
+    BACK: 'Alt+Săgeată stânga',
+    FORWARD: 'Alt+Săgeată dreapta',
+    COMMAND_PALETTE: 'Ctrl+K',
+    TOGGLE_DARK_MODE: 'Ctrl+D'
+  },
+  
+  // Command Palette system
+  COMMAND_PALETTE: {
+    TITLE: 'Comandă rapidă',
+    PLACEHOLDER: 'Caută acțiuni, pagini, shortcuts...',
+    NO_RESULTS: 'Niciun rezultat găsit',
+    HELP_TEXT: 'Apasă Escape pentru a închide',
+    CATEGORIES: {
+      NAVIGATION: 'Navigare',
+      ACTIONS: 'Acțiuni',
+      SHORTCUTS: 'Comenzi rapide',
+      RECENT: 'Recent'
+    },
+    RESULTS: {
+      GO_TO: 'Mergi la',
+      EXECUTE: 'Execută',
+      OPEN: 'Deschide',
+      TOGGLE: 'Comută'
+    }
+  },
+  
+  // Theme System Constants
+  THEME: {
+    TOGGLE_DARK_MODE: 'Comută tema întunecată',
+    DARK_MODE: 'Tema întunecată',
+    LIGHT_MODE: 'Tema deschisă',
+    SYSTEM_PREFERENCE: 'Preferința sistemului',
+    TOGGLE_DESCRIPTION: 'Comută între tema deschisă și întunecată'
+  },
+  
+  // Mobile navigation
+  MOBILE: {
+    HAMBURGER: 'Deschide meniul principal',
+    CLOSE_MENU: 'Închide meniul',
+    MENU_OVERLAY: 'Overlay meniu mobil'
+  },
+  
+  // Accessibility
+  ARIA: {
+    NAVIGATION: 'Navigare principală',
+    BREADCRUMB: 'Navigare breadcrumb',
+    TAB_LIST: 'Listă taburi',
+    TAB_PANEL: 'Panou tab',
+    CURRENT_PAGE: 'Pagina curentă',
+    EXTERNAL_LINK: 'Deschide în fereastră nouă',
+    CONTEXT_MENU: 'Meniu contextual'
+  },
+  
+  // Persistence storage keys
+  STORAGE: {
+    SIDEBAR_EXPANDED: 'sidebar-expanded',
+    TABS_STATE: 'app-tabs-state',
+    BREADCRUMB_HISTORY: 'navigation-breadcrumb-history',
+    NAVIGATION_STATE: 'navigation-global-state',
+    LAST_VISITED_PAGE: 'navigation-last-page',
+    USER_PREFERENCES: 'navigation-user-preferences'
+  },
+  
+  // State management
+  STATE: {
+    PERSISTENCE_ENABLED: 'Persistența navigării activată',
+    PERSISTENCE_DISABLED: 'Persistența navigării dezactivată',
+    STATE_RESTORED: 'Starea navigării a fost restaurată',
+    STATE_CLEARED: 'Starea navigării a fost ștearsă',
+    SYNC_COMPLETE: 'Sincronizarea componentelor completă',
+    SYNC_FAILED: 'Eșec la sincronizarea componentelor'
+  }
 };

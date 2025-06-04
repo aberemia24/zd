@@ -15,10 +15,10 @@ export declare const TransactionSchema: z.ZodObject<{
     created_at: z.ZodOptional<z.ZodString>;
     updated_at: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
+    date: string;
     id: string;
     amount: number;
     type: TransactionType;
-    date: string;
     status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;
@@ -29,10 +29,10 @@ export declare const TransactionSchema: z.ZodObject<{
     created_at?: string | undefined;
     updated_at?: string | undefined;
 }, {
+    date: string;
     id: string;
     amount: number;
     type: TransactionType;
-    date: string;
     status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;
@@ -58,9 +58,9 @@ export declare const CreateTransactionSchema: z.ZodObject<Omit<{
     created_at: z.ZodOptional<z.ZodString>;
     updated_at: z.ZodOptional<z.ZodString>;
 }, "id" | "created_at" | "updated_at">, "strip", z.ZodTypeAny, {
+    date: string;
     amount: number;
     type: TransactionType;
-    date: string;
     status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;
@@ -69,9 +69,9 @@ export declare const CreateTransactionSchema: z.ZodObject<Omit<{
     frequency?: FrequencyType | undefined;
     actualAmount?: number | undefined;
 }, {
+    date: string;
     amount: number;
     type: TransactionType;
-    date: string;
     status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;

@@ -19,3 +19,16 @@ export declare enum CategoryType {
     EXPENSE = "EXPENSE",
     SAVING = "SAVING"
 }
+export declare enum AccountType {
+    CHECKING = "CHECKING",
+    SAVINGS = "SAVINGS",
+    INVESTMENT = "INVESTMENT",
+    CASH = "CASH",
+    CREDIT = "CREDIT"
+}
+export declare enum BalanceImpactType {
+    AVAILABLE_ONLY = "AVAILABLE_ONLY",
+    SAVINGS_TRANSFER = "SAVINGS_TRANSFER",
+    INVESTMENT_TRANSFER = "INVESTMENT_TRANSFER",
+    NEUTRAL = "NEUTRAL"
+}

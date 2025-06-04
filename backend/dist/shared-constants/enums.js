@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CategoryType = exports.FrequencyType = exports.TransactionStatus = exports.TransactionType = void 0;
+exports.BalanceImpactType = exports.AccountType = exports.CategoryType = exports.FrequencyType = exports.TransactionStatus = exports.TransactionType = void 0;
 var TransactionType;
 (function (TransactionType) {
     TransactionType["INCOME"] = "INCOME";
@@ -26,4 +26,19 @@ var CategoryType;
     CategoryType["EXPENSE"] = "EXPENSE";
     CategoryType["SAVING"] = "SAVING";
 })(CategoryType || (exports.CategoryType = CategoryType = {}));
+var AccountType;
+(function (AccountType) {
+    AccountType["CHECKING"] = "CHECKING";
+    AccountType["SAVINGS"] = "SAVINGS";
+    AccountType["INVESTMENT"] = "INVESTMENT";
+    AccountType["CASH"] = "CASH";
+    AccountType["CREDIT"] = "CREDIT";
+})(AccountType || (exports.AccountType = AccountType = {}));
+var BalanceImpactType;
+(function (BalanceImpactType) {
+    BalanceImpactType["AVAILABLE_ONLY"] = "AVAILABLE_ONLY";
+    BalanceImpactType["SAVINGS_TRANSFER"] = "SAVINGS_TRANSFER";
+    BalanceImpactType["INVESTMENT_TRANSFER"] = "INVESTMENT_TRANSFER";
+    BalanceImpactType["NEUTRAL"] = "NEUTRAL";
+})(BalanceImpactType || (exports.BalanceImpactType = BalanceImpactType = {}));
 //# sourceMappingURL=enums.js.map

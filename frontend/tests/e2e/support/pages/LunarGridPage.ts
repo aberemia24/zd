@@ -1,4 +1,5 @@
 import { Page, expect } from '@playwright/test';
+import { waitForValidationUpdate } from '../../../src/hooks/useValidation';
 import { LUNAR_GRID_TEST_DATA } from '../../config/test-constants';
 import { TestDataGenerator, LunarGridTestData } from '../../config/test-data-generator';
 import { CATEGORIES } from '../../../../../shared-constants';

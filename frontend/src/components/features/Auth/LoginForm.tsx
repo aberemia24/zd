@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../stores/authStore";
 import toast from "react-hot-toast";
 import { MESAJE, LABELS, BUTTONS } from "@shared-constants";
-import { cn } from "../../../styles/cva/shared/utils";
-import { card } from "../../../styles/cva/components/layout";
-import { button } from "../../../styles/cva/components/forms";
+
+// CVA styling imports - UNIFIED MIGRATION
+import { cn, card, button } from "../../../styles/cva-v2";
+
 import Input from "../../primitives/Input/Input";
 import { ValidatedSubmitButton } from "../../primitives/Button";
 import Alert from "../../primitives/Alert/Alert";
@@ -71,7 +72,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
   return (
     <form
       className={cn(
-        card({ variant: "elevated", size: "md" }),
+        card({ variant: "elevated" }),
         "w-full max-w-md mx-auto",
       )}
       onSubmit={handleSubmit}
@@ -82,7 +83,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
       </div>
 
       <div className="p-6 space-y-4">
-        {/* Email Input */}
+        {/* Email Input - FIXED: removed unsupported error variant */}
         <Input
           id="email"
           type="email"
@@ -90,11 +91,11 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          variant={error ? "error" : "default"}
-          dataTestId="login-email"
+          variant="default"
+          data-testid="login-email"
         />
 
-        {/* Password Input */}
+        {/* Password Input - FIXED: removed unsupported error variant */}
         <Input
           id="password"
           type="password"
@@ -102,29 +103,31 @@ const LoginForm: React.FC<LoginFormProps> = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          variant={error ? "error" : "default"}
-          dataTestId="login-password"
+          variant="default"
+          data-testid="login-password"
         />
 
-        {/* Error Message */}
+        {/* Error Message - FIXED: type → variant */}
         {error && (
           <Alert
-            type="error"
-            message={getErrorMessage() || ""}
-            size="md"
-            dataTestId="login-error"
-          />
+            variant="error"
+            data-testid="login-error"
+          >
+            {getErrorMessage() || ""}
+          </Alert>
         )}
 
-        {/* Submit Button */}
+        {/* Submit Button - FIXED: added children */}
         <ValidatedSubmitButton
           isFormValid={isFormValid}
           size="md"
           isLoading={loading}
-          dataTestId="login-submit"
+          data-testid="login-submit"
           className="w-full"
           submitText={BUTTONS.LOGIN}
-        />
+        >
+          {BUTTONS.LOGIN}
+        </ValidatedSubmitButton>
 
         {/* Register Link */}
         <div className="text-center">

@@ -1,83 +1,59 @@
 import React from "react";
-import { cn } from "../../../styles/cva/shared/utils";
-import {
+import { 
+  cn,
   button,
-  type ButtonProps as CVAButtonProps,
-} from "../../../styles/cva/components/forms";
+  type ButtonProps as CVAButtonProps
+} from "../../../styles/cva-v2";
 
-export type ButtonProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  "data-testid"
-> &
-  CVAButtonProps & {
-    /**
-     * Indică dacă butonul este în stare de încărcare
-     * Acceptă orice tip de valoare care poate fi convertită la boolean
-     */
-    isLoading?: boolean | string | number | null | undefined;
-    dataTestId?: string;
-  };
+export interface ButtonProps extends CVAButtonProps {
+  children: React.ReactNode;
+  className?: string;
+  dataTestId?: string;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  form?: string;
+  autoFocus?: boolean;
+}
 
-const Button: React.FC<ButtonProps> = ({
+/**
+ * Button component cu suport pentru multiple variante și dimensiuni
+ * Bazat pe noul sistem CVA v2 modular
+ * OPTIMIZED cu React.memo pentru performance
+ */
+const ButtonComponent: React.FC<ButtonProps> = ({
+  children,
   variant = "primary",
   size = "md",
-  fullWidth,
-  disabled = false,
-  isLoading = false,
   className,
-  children,
   dataTestId,
-  ...rest
+  disabled,
+  type = "button",
+  form,
+  autoFocus,
+  onClick,
+  onMouseDown,
+  ...props
 }) => {
-  // Determinăm starea butonului, convertind isLoading la boolean
-  const isLoadingBoolean = Boolean(isLoading);
-
   return (
     <button
-      className={cn(
-        button({
-          variant,
-          size,
-          fullWidth,
-        }),
-        // Add loading state styling manually since CVA button doesn't have it
-        isLoadingBoolean && "cursor-wait opacity-70",
-        className,
-      )}
-      disabled={disabled || isLoadingBoolean}
-      data-testid={
-        dataTestId ||
-        `button-${variant}-${size}${isLoadingBoolean ? "-loading" : ""}`
-      }
-      {...rest}
+      type={type}
+      form={form}
+      autoFocus={autoFocus}
+      disabled={disabled}
+      onClick={onClick}
+      onMouseDown={onMouseDown}
+      className={cn(button({ variant, size }), className)}
+      data-testid={dataTestId}
+      {...props}
     >
-      {isLoadingBoolean && (
-        <span className="mr-2">
-          <svg
-            className="animate-spin h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-            />
-          </svg>
-        </span>
-      )}
       {children}
     </button>
   );
 };
+
+// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
+const Button = React.memo(ButtonComponent);
 
 export default Button;

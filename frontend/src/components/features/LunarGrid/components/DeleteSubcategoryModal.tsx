@@ -1,73 +1,73 @@
 import React from 'react';
-import Button from "../../../primitives/Button/Button";
-import { modal, modalContent, flex } from "../../../../styles/cva/components/layout";
-import { MESAJE, BUTTONS } from "@shared-constants";
-import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
+import ConfirmationModal from '../../../primitives/ConfirmationModal/ConfirmationModal';
+import { UI, BUTTONS } from "@shared-constants";
+import { 
+  cn,
+  modal,
+  card,
+  badge
+} from "../../../../styles/cva/unified-cva";
 
-interface DeleteSubcategoryModalProps {
-  onConfirm: () => void;
-  onCancel: () => void;
-  subcategoryAction: {
-    type: 'edit' | 'delete';
-    category: string;
-    subcategory: string;
-  } | null;
-  validTransactions: Array<{
-    category?: string;
-    subcategory?: string | null | undefined;
-    [key: string]: any;
-  }>;
+interface SubcategoryAction {
+  type: 'edit' | 'delete';
+  category: string;
+  subcategory: string;
 }
 
-const DeleteSubcategoryModal: React.FC<DeleteSubcategoryModalProps> = ({ 
-  onConfirm, 
-  onCancel, 
-  subcategoryAction, 
-  validTransactions 
+interface DeleteSubcategoryModalProps {
+  subcategoryAction: SubcategoryAction | null;
+  validTransactions: any[];
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+const DeleteSubcategoryModal: React.FC<DeleteSubcategoryModalProps> = ({
+  subcategoryAction,
+  validTransactions,
+  onConfirm,
+  onCancel
 }) => {
-  if (!subcategoryAction || subcategoryAction.type !== 'delete') return null;
+  if (!subcategoryAction || subcategoryAction.type !== 'delete') {
+    return null;
+  }
 
-  // Calculează numărul de tranzacții asociate cu această subcategorie
-  const transactionsCount = validTransactions.filter(t => 
-    t.category === subcategoryAction.category && 
-    t.subcategory === subcategoryAction.subcategory
-  ).length;
+  // Găsește tranzacțiile pentru această subcategorie
+  const relatedTransactions = validTransactions.filter(transaction => 
+    transaction.category === subcategoryAction.category && 
+    transaction.subcategory === subcategoryAction.subcategory
+  );
 
-  const transactionText = transactionsCount === 0 
-    ? LUNAR_GRID_ACTIONS.NO_TRANSACTIONS
-    : transactionsCount === 1 
-      ? "1 tranzacție"
-      : `${transactionsCount} tranzacții`;
+  const hasRelatedTransactions = relatedTransactions.length > 0;
 
-  const message = `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" (${transactionText})? Această acțiune nu poate fi anulată${transactionsCount > 0 ? ' și toate tranzacțiile asociate vor fi șterse definitiv din baza de date' : ''}.`;
+  // Construim mesajul și detaliile
+  const message = hasRelatedTransactions
+    ? `Subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}" nu poate fi ștearsă deoarece conține ${relatedTransactions.length} tranzacții.`
+    : `Sigur doriți să ștergeți subcategoria "${subcategoryAction.subcategory}" din categoria "${subcategoryAction.category}"?`;
+
+  const details = hasRelatedTransactions
+    ? relatedTransactions.map(transaction => 
+        `${transaction.date}: ${transaction.amount} RON${transaction.description ? ` - ${transaction.description}` : ''}`
+      )
+    : undefined;
+
+  const recommendation = hasRelatedTransactions
+    ? "Pentru a șterge această subcategorie, ștergeți mai întâi toate tranzacțiile asociate sau reasignați-le la o altă subcategorie."
+    : undefined;
 
   return (
-    <div className={modal({ variant: "confirmation", animation: "fade" })} data-testid="delete-subcategory-confirmation">
-      <div className={modalContent()}>
-        <h3 className={modalContent({ content: "header" })}>
-          {MESAJE.CATEGORII.CONFIRMARE_STERGERE_TITLE}
-        </h3>
-        <p className={modalContent({ content: "text" })}>{message}</p>
-        <div className={flex({ justify: "end", gap: "md" })}>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onCancel}
-            dataTestId="cancel-delete-subcategory"
-          >
-            {BUTTONS.CANCEL}
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={onConfirm}
-            dataTestId="confirm-delete-subcategory"
-          >
-            {BUTTONS.DELETE}
-          </Button>
-        </div>
-      </div>
-    </div>
+    <ConfirmationModal
+      isOpen={true}
+      title={hasRelatedTransactions ? "Eroare - Nu se poate șterge" : UI.SUBCATEGORY_ACTIONS.DELETE_CUSTOM_TITLE}
+      message={message}
+      confirmText={hasRelatedTransactions ? "Înțeles" : BUTTONS.DELETE}
+      cancelText={hasRelatedTransactions ? undefined : BUTTONS.CANCEL}
+      variant={hasRelatedTransactions ? "warning" : "danger"}
+      icon={hasRelatedTransactions ? "⚠️" : "🗑️"}
+      details={details}
+      recommendation={recommendation}
+      onConfirm={hasRelatedTransactions ? onCancel : onConfirm}
+      onClose={onCancel}
+    />
   );
 };
 

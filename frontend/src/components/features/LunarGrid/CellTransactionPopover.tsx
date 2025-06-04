@@ -5,10 +5,12 @@ import Select from "../../primitives/Select/Select";
 import Button from "../../primitives/Button/Button";
 import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from "@shared-constants";
 import { FrequencyType } from "@shared-constants/enums";
-import { cn } from "../../../styles/cva/shared/utils";
-import { card } from "../../../styles/cva/components/layout";
-import { formGroup } from "../../../styles/cva/components/feedback";
-import { flex as flexContainer } from "../../../styles/cva/components/layout";
+
+// CVA styling imports
+import { 
+  cn,
+  card
+} from "../../../styles/cva/unified-cva";
 
 interface CellTransactionPopoverProps {
   initialAmount: string;
@@ -87,21 +89,13 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
   return (
     <div
       className={cn(
-        card({ variant: "elevated", size: "sm" }),
+        card({ variant: "elevated" }),
         "animate-fadeIn transition-all duration-150",
       )}
       data-testid="cell-transaction-popover"
     >
-      <div className={cn(formGroup({ variant: "default" }), "space-y-4")}>
-        <div
-          className={cn(
-            flexContainer({
-              direction: "row",
-              justify: "between",
-              align: "center",
-            }),
-          )}
-        >
+      <div className="space-y-4">
+        <div className="flex flex-row justify-between items-center">
           <label
             htmlFor="amount-input"
             className="text-sm font-medium text-gray-700"
@@ -126,15 +120,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           size="md"
         />
 
-        <div
-          className={cn(
-            flexContainer({
-              direction: "row",
-              justify: "between",
-              align: "center",
-            }),
-          )}
-        >
+        <div className="flex flex-row justify-between items-center">
           <label
             htmlFor="description-input"
             className="text-sm font-medium text-gray-700"
@@ -178,16 +164,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           />
         )}
 
-        <div
-          className={cn(
-            flexContainer({
-              direction: "row",
-              justify: "between",
-              align: "center",
-              gap: "md",
-            }),
-          )}
-        >
+        <div className="flex flex-row justify-between items-center gap-4">
           <Button
             type="button"
             variant="primary"

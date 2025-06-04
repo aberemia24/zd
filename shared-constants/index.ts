@@ -8,7 +8,13 @@ export {
   ACCOUNT_MANAGEMENT, BALANCE_DISPLAY, BALANCE_MODALS, BALANCE_LABELS,
   // 🚀 Phase 2 Template Systems
   LOADING_MESSAGES, EMPTY_STATE_MESSAGES, DESIGN_TOKENS,
-  LUNAR_GRID_ACTIONS
+  LUNAR_GRID_ACTIONS,
+  // 🎨 Supporting UI Components - Task 8.5
+  TOOLTIP, PROGRESS, BADGE, EXPORT_UI,
+  // 🍞 Toast Notifications - Task 9.1
+  TOAST,
+  // 🧭 Navigation System - Task 10.1
+  NAVIGATION
 } from './ui';
 export * from './transaction.schema';
 export * from './defaults';

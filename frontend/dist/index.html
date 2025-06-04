@@ -4,8 +4,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Budget App</title>
-  <script type="module" crossorigin src="/assets/index-eDBSLB0R.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-hg5tPcRZ.css">
+  <!-- 🚀 OPTIMIZARE PERFORMANȚĂ - Resource Hints pentru încărcare mai rapidă -->
+  <!-- Preconnect pentru Google Fonts (DNS lookup + connection) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+  <!-- Preload pentru fontul Inter (cel mai critic) -->
+  <link 
+    rel="preload" 
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+    as="style" 
+    onload="this.onload=null;this.rel='stylesheet'"
+  />
+  
+  <!-- Fallback pentru browsere care nu suportă preload -->
+  <noscript>
+    <link 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+      rel="stylesheet"
+    />
+  </noscript>
+  
+  <!-- DNS prefetch pentru alte CDN-uri folosite -->
+  <link rel="dns-prefetch" href="https://unpkg.com" />
+  
+  <!-- Meta pentru SEO și social -->
+  <meta name="description" content="Aplicație modernă pentru gestionarea bugetului personal" />
+  <meta name="theme-color" content="#EA580C" />
+  <script type="module" crossorigin src="/assets/index-kp2QAp6Z.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/chunk-DseqvsBm.js">
+  <link rel="modulepreload" crossorigin href="/assets/chunk-CVLw0C4h.js">
+  <link rel="modulepreload" crossorigin href="/assets/chunk-DRGDK1iM.js">
+  <link rel="modulepreload" crossorigin href="/assets/chunk-p47cpVoj.js">
+  <link rel="modulepreload" crossorigin href="/assets/chunk-cooLPSPN.js">
+  <link rel="modulepreload" crossorigin href="/assets/chunk-CfbPSibB.js">
+  <link rel="stylesheet" crossorigin href="/assets/styles/index-BBJ1eEmh.css">
 </head>
 <body>
   <div id="root"></div>

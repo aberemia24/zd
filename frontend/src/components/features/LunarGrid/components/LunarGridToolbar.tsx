@@ -1,7 +1,9 @@
 import React from 'react';
 import { Table } from '@tanstack/react-table';
-import { cn } from "../../../../styles/cva/shared/utils";
-import { flex } from "../../../../styles/cva/components/layout";
+
+// CVA styling imports - UNIFIED MIGRATION
+import { cn, button } from "../../../../styles/cva/unified-cva";
+
 import Button from "../../../primitives/Button/Button";
 import { LUNAR_GRID, UI } from "@shared-constants";
 
@@ -55,12 +57,12 @@ const LunarGridToolbar: React.FC<LunarGridToolbarProps> = ({
   const hasOrphanTransactions = orphanTransactionsCount > 0;
 
   return (
-    <div className={cn(flex({ direction: "row", justify: "start", gap: "md" }), "mb-4")}>
+    <div className="flex flex-row justify-start items-center gap-3 mb-4">
       <Button
         variant="secondary"
         size="sm"
         onClick={handleToggleExpandAll}
-        dataTestId="toggle-expand-all"
+        data-testid="toggle-expand-all"
       >
         {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
       </Button>
@@ -69,7 +71,7 @@ const LunarGridToolbar: React.FC<LunarGridToolbarProps> = ({
         variant="secondary"
         size="sm"
         onClick={handleResetExpanded}
-        dataTestId="reset-expanded"
+        data-testid="reset-expanded"
       >
         {LUNAR_GRID.RESET_EXPANSION}
       </Button>
@@ -80,8 +82,7 @@ const LunarGridToolbar: React.FC<LunarGridToolbarProps> = ({
           variant="danger"
           size="sm"
           onClick={onCleanOrphanTransactions}
-          dataTestId="clean-orphan-transactions"
-          title={UI.SUBCATEGORY_ACTIONS.DELETE_ORPHAN_TITLE}
+          data-testid="clean-orphan-transactions"
         >
           🗑️ Curăță tranzacții orfane ({orphanTransactionsCount})
         </Button>

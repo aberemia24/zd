@@ -42,7 +42,6 @@ describe("Checkbox", () => {
   it("funcționează cu clase personalizate", () => {
     render(
       <Checkbox
-        wrapperClassName="test-wrapper-class"
         className="test-checkbox-class"
       />,
     );
