@@ -27,7 +27,7 @@ export const modalContent = cva(
         sm: "w-full max-w-sm",
         md: "w-full max-w-md", 
         lg: "w-full max-w-lg",
-        xl: "w-full max-w-6xl", // Pentru CategoryEditor
+        xl: "w-full max-w-4xl", // Pentru CategoryEditor - 4xl e mai rezonabil
         "2xl": "w-full max-w-2xl",
         full: "w-full h-full",
       },

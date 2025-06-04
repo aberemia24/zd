@@ -69,7 +69,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
     initialMode,
   });
 
-  // Professional scroll lock implementation from LunarGrid
+  // Professional scroll lock with scrollbar compensation - same as ConfirmationModal
   useEffect(() => {
     if (!open) return;
 
@@ -77,28 +77,44 @@ const CategoryEditorComponent: React.FC<Props> = ({
     const currentPageScrollY = window.scrollY;
     const currentPageScrollX = window.scrollX;
     
-    // Apply scroll lock with professional styling
+    // Get scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Save original styles for restoration
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    
+    // Apply scroll lock with scrollbar compensation
     document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${currentPageScrollY}px`;
-    document.body.style.left = `-${currentPageScrollX}px`;
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
     
     // Cleanup function - restore scroll when modal closes
     return () => {
-      // Restore page scroll
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.left = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
+      // Restore original styles
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
       
       // Restore scroll position precisely
       window.scrollTo(currentPageScrollX, currentPageScrollY);
     };
   }, [open]);
+
+  // Enhanced escape key handler with capture - same as ConfirmationModal
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    };
+
+    // Use capture to ensure it fires first
+    document.addEventListener('keydown', handleKeyDown, true);
+    return () => document.removeEventListener('keydown', handleKeyDown, true);
+  }, [open, onClose]);
 
   // validare subcategorie - memoizată pentru a evita recrearea la fiecare render
   const isValidSubcat = useCallback(
@@ -108,23 +124,6 @@ const CategoryEditorComponent: React.FC<Props> = ({
       /^[a-zA-Z0-9ăâîșțĂÂÎȘȚ \-|]+$/.test(txt.trim()),
     [],
   );
-
-  // Adaugă event listener pentru tasta Escape - enhanced implementation
-  useEffect(() => {
-    if (!open) return;
-
-    const handleKeyDown = (event: Event) => {
-      const keyboardEvent = event as globalThis.KeyboardEvent;
-      if (keyboardEvent.key === "Escape") {
-        keyboardEvent.preventDefault();
-        keyboardEvent.stopPropagation();
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, onClose]);
 
   // Nu renderizăm nimic dacă modalul nu este deschis
   if (!open) return null;
@@ -143,23 +142,13 @@ const CategoryEditorComponent: React.FC<Props> = ({
   };
 
   return createPortal(
-    <div
+    <div 
       className={cn(modal({ variant: "overlay" }))}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="category-editor-title"
-      data-testid="category-editor-modal"
       onClick={onClose}
     >
       <div className={cn(modalContainer())}>
-        <div
-          className={cn(
-            modalContent({ 
-              size: "xl",
-              padding: "none",
-              maxHeight: "default"
-            })
-          )}
+        <div 
+          className={cn(modalContent({ size: "xl", padding: "none" }))}
           onClick={(e) => e.stopPropagation()}
         >
           <div className={cn(
