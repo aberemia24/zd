@@ -43,6 +43,86 @@ export const textProfessional = cva("transition-colors duration-200", {
 });
 
 /**
+ * Heading hierarchy professional pentru aplicații fintech
+ */
+export const headingProfessional = cva([
+  "text-carbon-900 dark:text-carbon-100",
+  "tracking-tight leading-tight font-semibold"
+], {
+  variants: {
+    level: {
+      h1: "text-3xl font-bold",        // Page titles (ex: "Opțiuni", "Transactions")
+      h2: "text-2xl font-semibold",    // Section titles
+      h3: "text-xl font-semibold",     // Subsection titles  
+      h4: "text-lg font-semibold",     // Group titles, card headers
+      h5: "text-base font-semibold",   // List headers, form sections
+      h6: "text-sm font-semibold"      // Minor headings, labels
+    },
+    variant: {
+      default: "text-carbon-900 dark:text-carbon-100",
+      primary: "text-copper-600 dark:text-copper-300",
+      success: "text-green-700 dark:text-green-300",
+      warning: "text-orange-700 dark:text-orange-300", 
+      danger: "text-red-700 dark:text-red-300",
+      muted: "text-carbon-600 dark:text-carbon-400"
+    }
+  },
+  defaultVariants: { level: "h3", variant: "default" }
+});
+
+/**
+ * Label typography pentru form-uri și interface elements
+ */
+export const labelProfessional = cva([
+  "text-carbon-700 dark:text-carbon-300",
+  "font-medium tracking-normal"
+], {
+  variants: {
+    size: {
+      sm: "text-xs",     // Helper text, disclaimers
+      base: "text-sm",   // Standard form labels
+      lg: "text-base"    // Prominent labels
+    },
+    variant: {
+      default: "text-carbon-700 dark:text-carbon-300",
+      primary: "text-copper-600 dark:text-copper-400",
+      success: "text-green-600 dark:text-green-400",
+      warning: "text-orange-600 dark:text-orange-400",
+      danger: "text-red-600 dark:text-red-400",
+      muted: "text-carbon-500 dark:text-carbon-500"
+    },
+    required: {
+      true: "after:content-['*'] after:text-red-500 after:ml-1"
+    }
+  },
+  defaultVariants: { size: "base", variant: "default" }
+});
+
+/**
+ * Caption typography pentru descrieri și metadata
+ */
+export const captionProfessional = cva([
+  "text-carbon-600 dark:text-carbon-400", 
+  "leading-normal"
+], {
+  variants: {
+    size: {
+      xs: "text-xs",   // Timestamps, micro-text
+      sm: "text-sm"    // Standard captions, descriptions
+    },
+    variant: {
+      default: "text-carbon-600 dark:text-carbon-400",
+      muted: "text-carbon-500 dark:text-carbon-500",
+      primary: "text-copper-500 dark:text-copper-400",
+      success: "text-green-600 dark:text-green-400",
+      warning: "text-orange-600 dark:text-orange-400",
+      danger: "text-red-600 dark:text-red-400"
+    }
+  },
+  defaultVariants: { size: "sm", variant: "default" }
+});
+
+/**
  * Font pentru date financiare cu numere tabulare
  */
 export const fontFinancial = cva([
@@ -70,4 +150,7 @@ export const fontFinancial = cva([
  * Type exports pentru TypeScript
  */
 export type TextProfessionalProps = VariantProps<typeof textProfessional>;
+export type HeadingProfessionalProps = VariantProps<typeof headingProfessional>;
+export type LabelProfessionalProps = VariantProps<typeof labelProfessional>;
+export type CaptionProfessionalProps = VariantProps<typeof captionProfessional>;
 export type FontFinancialProps = VariantProps<typeof fontFinancial>; 

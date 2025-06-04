@@ -41,8 +41,20 @@ export type {
 // =============================================================================
 // FOUNDATIONS EXPORTS - Typography, animations, effects
 // =============================================================================
-export { textProfessional, fontFinancial } from './foundations/typography';
-export type { TextProfessionalProps, FontFinancialProps } from './foundations/typography';
+export { 
+  textProfessional, 
+  headingProfessional,
+  labelProfessional,
+  captionProfessional,
+  fontFinancial 
+} from './foundations/typography';
+export type { 
+  TextProfessionalProps, 
+  HeadingProfessionalProps,
+  LabelProfessionalProps,
+  CaptionProfessionalProps,
+  FontFinancialProps 
+} from './foundations/typography';
 
 export { hoverScale, focusRing, animations } from './foundations/animations';
 export type { HoverScaleProps, FocusRingProps, AnimationsProps } from './foundations/animations';
@@ -93,8 +105,13 @@ export type {
   GridTemplateProps 
 } from './compositions/layout';
 
-export { modal, modalContent, modalOverlay } from './compositions/modal';
-export type { ModalProps, ModalContentProps, ModalOverlayProps } from './compositions/modal';
+// Modal primitives (main usage)
+export { modal, modalContent, modalContainer } from './primitives/modal';
+export type { ModalVariants, ModalContentVariants, ModalContainerVariants } from './primitives/modal';
+
+// Modal compositions (enhanced usage)
+export { enhancedModalOverlay, enhancedModalContent, dialogModal, fullScreenModal } from './compositions/modal';
+export type { EnhancedModalOverlayProps, EnhancedModalContentProps, FullScreenModalProps } from './compositions/modal';
 
 export { 
   gridContainer, 
@@ -240,3 +257,4 @@ export type {
  * - Maintenance ușurat (fișiere focalizate)
  * - Scalabilitate îmbunătățită
  */
+

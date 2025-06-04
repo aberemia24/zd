@@ -4,7 +4,7 @@ import {
   cn,
   modal,
   modalContent,
-  modalOverlay
+  modalContainer
 } from '../../../styles/cva-v2';
 import { useFocusTrap, useBodyScrollLock } from './useModal';
 import type { ModalProps, ModalContextValue } from './types';
@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
   ...props
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Hooks pentru accessibility și UX
   useFocusTrap(isOpen, contentRef);
@@ -78,16 +78,9 @@ const Modal: React.FC<ModalProps> = ({
 
   const modalElement = (
     <ModalContext.Provider value={contextValue}>
-      {/* Overlay */}
+      {/* Modal Overlay */}
       <div
-        className={cn(modalOverlay({ visible: true }), overlayClassName)}
-        aria-hidden="true"
-      />
-      
-      {/* Modal Container */}
-      <div
-        ref={modalRef}
-        className={cn(modal({ variant, size }), className)}
+        className={cn(modal({ variant }), overlayClassName)}
         onClick={handleBackdropClick}
         role="dialog"
         aria-modal="true"
@@ -96,13 +89,16 @@ const Modal: React.FC<ModalProps> = ({
         data-testid={dataTestId}
         {...props}
       >
-        {/* Modal Content */}
-        <div
-          ref={contentRef}
-          className={cn(modalContent({ variant: contentVariant }), contentClassName)}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {children}
+        {/* Modal Container */}
+        <div className={cn(modalContainer())}>
+          {/* Modal Content */}
+          <div
+            ref={contentRef}
+            className={cn(modalContent({ size, padding: 'md' }), contentClassName, className)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </ModalContext.Provider>

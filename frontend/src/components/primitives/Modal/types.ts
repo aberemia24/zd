@@ -1,7 +1,7 @@
 import type { 
-  ModalProps as CVAModalProps,
-  ModalContentProps,
-  ModalOverlayProps 
+  ModalVariants,
+  ModalContentVariants,
+  ModalContainerVariants 
 } from "../../../styles/cva-v2";
 
 /**
@@ -9,11 +9,11 @@ import type {
  * Tipuri pentru sistemul de modal-uri generice
  */
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
-export type ModalVariant = 'default' | 'centered' | 'top-centered';
-export type ModalContentVariant = 'default' | 'elevated';
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
+export type ModalVariant = 'default' | 'overlay' | 'centered';
+export type ModalContentVariant = 'default';
 
-export interface ModalProps extends Omit<CVAModalProps, 'size'> {
+export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;

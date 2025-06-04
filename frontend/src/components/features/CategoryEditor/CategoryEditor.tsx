@@ -5,11 +5,10 @@ import React, {
   useEffect,
   ChangeEvent,
   KeyboardEvent,
-  useMemo,
   useCallback,
 } from "react";
 import { createPortal } from 'react-dom';
-import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS, MESAJE } from "@shared-constants";
+import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from "@shared-constants";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Badge from "../../primitives/Badge/Badge";
@@ -20,9 +19,12 @@ import {
   cn,
   modal,
   card,
-  hoverBackground
+  hoverBackground,
+  headingProfessional,
+  labelProfessional,
+  captionProfessional
 } from "../../../styles/cva-v2";
-import { modalContent, modalContainer } from "../../../styles/cva-v2/primitives/modal";
+import { modalContainer, modalContent } from "../../../styles/cva-v2/primitives/modal";
 
 import { useCategoryEditorState } from "./useCategoryEditorState";
 
@@ -59,8 +61,6 @@ const CategoryEditorComponent: React.FC<Props> = ({
     setError,
     handleAdd,
     handleRename,
-    handleDelete,
-    isValidDeleteRequest,
   } = useCategoryEditorState({
     open,
     userId,
@@ -158,7 +158,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
           )}>
             <h2
               id="category-editor-title"
-              className="text-xl font-bold text-carbon-900 dark:text-carbon-100"
+              className={headingProfessional({ level: "h3" })}
             >
               {UI.CATEGORY_EDITOR.TITLE}
             </h2>
@@ -204,7 +204,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                 className={cn(card({ variant: "default" }), "flex-1")}
                 data-testid="categories-section"
               >
-                <h3 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100 mb-4">
+                <h3 className={headingProfessional({ level: "h4" })}>
                   {UI.CATEGORY_EDITOR.CATEGORIES_SECTION_TITLE}
                 </h3>
                 <div
@@ -235,8 +235,9 @@ const CategoryEditorComponent: React.FC<Props> = ({
                           aria-pressed={selectedCategory === cat.name}
                           aria-controls="subcategories-section"
                           data-testid={`cat-select-${cat.name}`}
-                          className={cn(
-                            "w-full text-left text-sm font-medium transition-colors duration-150",
+                                                      className={cn(
+                              "w-full text-left transition-colors duration-150",
+                              labelProfessional({ size: "base" }),
                             selectedCategory === cat.name
                               ? "text-copper-700 dark:text-copper-300"
                               : "text-carbon-700 dark:text-carbon-300 hover:text-carbon-900 dark:hover:text-carbon-100",
@@ -257,7 +258,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
               >
                 {selectedCategory ? (
                   <>
-                    <h3 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100 mb-4">
+                    <h3 className={headingProfessional({ level: "h4" })}>
                       {UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE}{" "}
                       <span className="text-copper-600 dark:text-copper-400 font-normal">
                         {selectedCategory}
@@ -358,7 +359,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                     "flex flex-row justify-between items-center",
                                   )}
                                 >
-                                  <span className="text-sm text-carbon-700 dark:text-carbon-300 font-medium">
+                                  <span className={captionProfessional({ size: "sm", variant: "default" })}>
                                     {sc.name}
                                   </span>
                                   <div

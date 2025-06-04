@@ -10,7 +10,7 @@ import { ConfirmationModal, PromptModal, useConfirmationModal } from "../compone
 import { Container } from "../components/primitives";
 
 // CVA styling imports
-import { cn, dashboard, card } from "../styles/cva-v2";
+import { cn, dashboard, card, headingProfessional, labelProfessional, captionProfessional } from "../styles/cva-v2";
 
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
 import { supabaseService } from "../services/supabaseService";
@@ -405,10 +405,10 @@ const OptionsPage: React.FC = () => {
         className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
         data-testid="options-page"
       >
-        <h1
-          className="text-3xl font-bold text-gray-900 mb-8"
-          data-testid="options-title"
-        >
+                  <h1
+            className={headingProfessional({ level: "h1" })}
+            data-testid="options-title"
+          >
           {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
         </h1>
 
@@ -420,12 +420,12 @@ const OptionsPage: React.FC = () => {
               "rounded-t-lg",
             )}
           >
-            <h2 className="text-lg font-semibold text-gray-900">
-              {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
-            </h2>
+                         <h2 className={headingProfessional({ level: "h4" })}>
+                {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
+              </h2>
           </div>
           <div className="p-6">
-            <p className="text-gray-600 mb-4">
+            <p className={captionProfessional({ size: "sm" })}>
               {UI.CATEGORY_MANAGEMENT_DESCRIPTION ||
                 "Personalizați categoriile și subcategoriile pentru a se potrivi nevoilor dvs. specifice de bugetare."}
             </p>
@@ -448,12 +448,12 @@ const OptionsPage: React.FC = () => {
               "rounded-t-lg",
             )}
           >
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className={headingProfessional({ level: "h4" })}>
               {UI.DISPLAY_OPTIONS || "Opțiuni de afișare"}
             </h2>
           </div>
           <div className="p-6">
-            <p className="text-gray-500 italic">
+            <p className={captionProfessional({ size: "sm" })}>
               {UI.COMING_SOON || "În curând"}
             </p>
           </div>
@@ -466,12 +466,12 @@ const OptionsPage: React.FC = () => {
               "rounded-t-lg",
             )}
           >
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className={headingProfessional({ level: "h4" })}>
               {UI.DATA_EXPORT || "Export date"}
             </h2>
           </div>
           <div className="p-6">
-            <p className="text-gray-500 italic">
+            <p className={captionProfessional({ size: "sm" })}>
               {UI.COMING_SOON || "În curând"}
             </p>
           </div>

@@ -2,7 +2,12 @@ import React, { useState, useMemo, useCallback } from "react";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Select from "../../primitives/Select/Select";
-import { cn } from "../../../styles/cva-v2";
+import { 
+  cn,
+  headingProfessional,
+  labelProfessional,
+  captionProfessional
+} from "../../../styles/cva-v2";
 import type { ExportFormat } from "../../../utils/ExportManager";
 import { BUTTONS, EXPORT_MESSAGES } from "@shared-constants";
 import { EXPORT_UI } from "@shared-constants/ui";
@@ -156,15 +161,15 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-neutral-100">
+          <h3 className={headingProfessional({ level: "h3" })}>
             Export Tranzacții
           </h3>
           <button
             onClick={onClose}
             className={cn(
-              "text-gray-400 hover:text-gray-600 dark:text-neutral-400 dark:hover:text-neutral-200",
+              "text-carbon-400 hover:text-carbon-600 dark:text-carbon-400 dark:hover:text-carbon-200",
               "transition-colors duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1",
+              "focus:outline-none focus:ring-2 focus:ring-copper-500 focus:ring-offset-1",
               "rounded-md p-1",
             )}
             data-testid="export-modal-close"
@@ -188,7 +193,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         {/* Progress Bar - afișat doar în timpul exportului */}
         {exportState.isExporting && (
           <div className="mb-6">
-            <p className="text-sm text-gray-600 dark:text-neutral-300 mb-2">
+            <p className={captionProfessional({ size: "sm" })}>
               {exportState.status ||
                 EXPORT_MESSAGES.IN_PROGRES.replace(
                   "{progress}",
@@ -207,7 +212,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         {/* Error Display */}
         {exportState.error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-800 dark:text-red-300">
+            <p className={captionProfessional({ size: "sm", variant: "danger" })}>
               {exportState.error}
             </p>
           </div>
@@ -215,7 +220,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
         {/* Informații despre export */}
         <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
-          <p className="text-sm text-blue-800 dark:text-blue-300">
+          <p className={captionProfessional({ size: "sm", variant: "primary" })}>
             Se vor exporta {transactionCount} tranzacții.
           </p>
         </div>
@@ -224,7 +229,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         <div className="space-y-4 mb-6">
           {/* Format Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            <label className={labelProfessional({ size: "sm" })}>
               Format export:
             </label>
             <Select
@@ -238,7 +243,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
           {/* Year Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            <label className={labelProfessional({ size: "sm" })}>
               {EXPORT_UI.YEAR_LABEL}
             </label>
             <Select
@@ -252,7 +257,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
           {/* Month Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            <label className={labelProfessional({ size: "sm" })}>
               {EXPORT_UI.MONTH_LABEL}
             </label>
             <Select
@@ -267,7 +272,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
           {/* Category Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            <label className={labelProfessional({ size: "sm" })}>
               {EXPORT_UI.CATEGORY_FILTER_LABEL}
             </label>
             <Select
@@ -282,7 +287,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
           {/* Custom Filename */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+            <label className={labelProfessional({ size: "sm" })}>
               {EXPORT_UI.FILENAME_LABEL}
             </label>
             <Input
@@ -298,7 +303,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
           {/* Date Range */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              <label className={labelProfessional({ size: "sm" })}>
                 De la data:
               </label>
               <Input
@@ -310,7 +315,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-neutral-300 mb-2">
+              <label className={labelProfessional({ size: "sm" })}>
                 Până la data:
               </label>
               <Input

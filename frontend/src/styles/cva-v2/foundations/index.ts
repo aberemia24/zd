@@ -4,8 +4,18 @@
  */
 
 // Typography
-export { textProfessional, fontFinancial } from './typography';
-export type { TextProfessionalProps, FontFinancialProps } from './typography';
+export {
+  textProfessional,
+  headingProfessional,
+  labelProfessional,
+  captionProfessional,
+  fontFinancial,
+  type TextProfessionalProps,
+  type HeadingProfessionalProps,
+  type LabelProfessionalProps,
+  type CaptionProfessionalProps,
+  type FontFinancialProps
+} from './typography';
 
 // Animations & Interactions
 export { hoverScale, focusRing, animations } from './animations';

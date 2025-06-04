@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { TransactionType, FrequencyType } from '@shared-constants';
 import { LUNAR_GRID_ACTIONS } from '@shared-constants/ui';
+import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
 import {
   useCreateTransactionMonthly,
   useUpdateTransactionMonthly,
@@ -103,6 +104,9 @@ export const useTransactionOperations = ({
       }
 
       const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      
+      // Determină tipul de tranzacție pe baza categoriei
+      const transactionType = getTransactionTypeForCategory(category) || TransactionType.EXPENSE;
 
       if (transactionId) {
         // UPDATE: Modifică tranzacția existentă
@@ -113,7 +117,7 @@ export const useTransactionOperations = ({
             date: isoDate,
             category,
             subcategory: subcategory || undefined,
-            type: TransactionType.EXPENSE,
+            type: transactionType,
           }
         });
       } else {
@@ -123,7 +127,7 @@ export const useTransactionOperations = ({
           date: isoDate,
           category,
           subcategory: subcategory || undefined,
-          type: TransactionType.EXPENSE,
+          type: transactionType,
           description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
         });
       }
@@ -190,6 +194,9 @@ export const useTransactionOperations = ({
       }
 
       const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      // Determină tipul de tranzacție pe baza categoriei
+      const transactionType = getTransactionTypeForCategory(category) || TransactionType.EXPENSE;
 
       if (mode === 'edit' && transactionId) {
         // UPDATE: Modifică tranzacția existentă
@@ -200,7 +207,7 @@ export const useTransactionOperations = ({
             date,
             category,
             subcategory: subcategory || undefined,
-            type: TransactionType.EXPENSE,
+            type: transactionType,
             description: data.description,
           }
         });
@@ -211,7 +218,7 @@ export const useTransactionOperations = ({
           date,
           category,
           subcategory: subcategory || undefined,
-          type: TransactionType.EXPENSE,
+          type: transactionType,
           description: data.description || `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
         });
       }

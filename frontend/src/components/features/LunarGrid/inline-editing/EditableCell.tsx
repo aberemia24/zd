@@ -807,7 +807,9 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       aria-live="polite"
     >
       <div className="w-full h-full px-2 py-1 flex items-center">
-        {displayValue}
+        <span className={className?.includes('text-') ? className.split(' ').find(cls => cls.startsWith('text-')) : ''}>
+          {displayValue}
+        </span>
         {(isSelected || isFocused) && !isReadonly && (
           <span
             className="ml-2 text-xs text-gray-500 opacity-75"

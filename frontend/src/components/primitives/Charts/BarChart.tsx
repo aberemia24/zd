@@ -21,7 +21,11 @@ import {
   DEFAULT_CHART_THEME,
 } from '../../../utils/charts';
 import type { BarChartProps } from '../../../types/charts';
-import { cn } from '../../../styles/cva-v2';
+import { 
+  cn,
+  headingProfessional,
+  captionProfessional
+} from '../../../styles/cva-v2';
 
 // =============================================================================
 // STYLES & THEME CONFIGURATION
@@ -29,19 +33,13 @@ import { cn } from '../../../styles/cva-v2';
 
 const chartContainerStyles = cn(
   'w-full h-full',
-  'bg-white rounded-lg border border-gray-200',
+  'bg-white rounded-lg border border-carbon-200',
   'p-4 space-y-4'
 );
 
-const titleStyles = cn(
-  'text-lg font-semibold text-gray-900',
-  'mb-2'
-);
-
-const subtitleStyles = cn(
-  'text-sm text-gray-600',
-  'mb-4'
-);
+// Typography migrated to CVA-v2
+const titleStyles = headingProfessional({ level: "h4" });
+const subtitleStyles = captionProfessional({ size: "sm" });
 
 // =============================================================================
 // COMPONENT IMPLEMENTATION
@@ -111,8 +109,8 @@ export const BarChart: React.FC<BarChartProps> = ({
     if (!active || !payload || !payload.length) return null;
 
     return (
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 min-w-[200px]">
-        <p className="font-medium text-gray-900 mb-2">{label}</p>
+      <div className="bg-white border border-carbon-300 rounded-lg shadow-lg p-3 min-w-[200px]">
+        <p className={cn("font-medium mb-2", headingProfessional({ level: "h6" }))}>{label}</p>
         {payload.map((entry: any, index: number) => (
           <div key={index} className="flex items-center justify-between space-x-3 mb-1">
             <div className="flex items-center space-x-2">
@@ -120,11 +118,11 @@ export const BarChart: React.FC<BarChartProps> = ({
                 className="w-3 h-3 rounded-sm"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm text-gray-700 capitalize">
+              <span className={cn("capitalize", captionProfessional({ size: "sm" }))}>
                 {entry.dataKey.replace(/([A-Z])/g, ' $1').trim()}
               </span>
             </div>
-            <span className="text-sm font-medium text-gray-900">
+            <span className={cn("font-medium", captionProfessional({ size: "sm" }))}>
               {formatChartCurrency(entry.value)}
             </span>
           </div>
@@ -142,10 +140,10 @@ export const BarChart: React.FC<BarChartProps> = ({
       <div className={cn(chartContainerStyles, className)}>
         {title && <h3 className={titleStyles}>{title}</h3>}
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
+        <div className="flex items-center justify-center h-64 bg-carbon-50 rounded">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Se încarcă graficul...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-copper-600 mx-auto mb-4"></div>
+            <p className={captionProfessional({ size: "sm" })}>Se încarcă graficul...</p>
           </div>
         </div>
       </div>
@@ -159,8 +157,8 @@ export const BarChart: React.FC<BarChartProps> = ({
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
         <div className="flex items-center justify-center h-64 bg-red-50 rounded border border-red-200">
           <div className="text-center">
-            <p className="text-sm text-red-600 mb-2">Eroare la încărcarea graficului</p>
-            <p className="text-xs text-red-500">{error}</p>
+            <p className={cn("mb-2", captionProfessional({ size: "sm", variant: "danger" }))}>Eroare la încărcarea graficului</p>
+            <p className={captionProfessional({ size: "xs", variant: "danger" })}>{error}</p>
           </div>
         </div>
       </div>
@@ -172,8 +170,8 @@ export const BarChart: React.FC<BarChartProps> = ({
       <div className={cn(chartContainerStyles, className)}>
         {title && <h3 className={titleStyles}>{title}</h3>}
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
-          <p className="text-sm text-gray-600">Nu există date pentru afișare</p>
+        <div className="flex items-center justify-center h-64 bg-carbon-50 rounded">
+          <p className={captionProfessional({ size: "sm" })}>Nu există date pentru afișare</p>
         </div>
       </div>
     );

@@ -8,7 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 
 // CVA styling imports
-import { cn, dashboard, modal, button } from "../styles/cva-v2";
+import { cn, dashboard, modal, button, headingProfessional, captionProfessional } from "../styles/cva-v2";
 
 import { Maximize2, Minimize2 } from "lucide-react";
 import Badge from "../components/primitives/Badge/Badge";
@@ -307,7 +307,7 @@ const LunarGridPage: React.FC = () => {
           )}>
             {/* 🚨 CONSOLIDATION - Title section folosind flexbox manual - COMPACT */}
             <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-gray-900 whitespace-nowrap">
+              <h1 className={headingProfessional({ level: "h2" })}>
                 {TITLES.GRID_LUNAR}
               </h1>
               {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
@@ -317,7 +317,7 @@ const LunarGridPage: React.FC = () => {
                   data-testid="transition-loading-indicator"
                 >
                   <Spinner size="sm" />
-                  <span className="text-xs text-gray-600 whitespace-nowrap">{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
+                  <span className={captionProfessional({ size: "xs" })}>{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
                 </div>
               )}
             </div>
@@ -388,7 +388,7 @@ const LunarGridPage: React.FC = () => {
               layoutMode === 'full-width' ? "px-4" : ""
             )}>
               <Spinner size="md" />
-              <p className="text-gray-700 text-sm">
+              <p className={captionProfessional({ size: "sm" })}>
                 {`Încărcăm datele pentru ${getMonthName(month)} ${year}...`}
               </p>
             </div>

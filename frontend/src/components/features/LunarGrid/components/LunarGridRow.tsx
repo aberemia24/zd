@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import { Row, flexRender } from "@tanstack/react-table";
 import { ChevronRight } from "lucide-react";
+import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
+import { TransactionType, BALANCE_DISPLAY } from '@shared-constants';
 
 // Constants și shared
 import { UI, LUNAR_GRID, PLACEHOLDERS } from "@shared-constants";
@@ -185,17 +187,26 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
             return 'default';
           };
 
-          // Value classes using CVA-v2 interactive text
+          // Value classes using transaction type colors
           const getValueClasses = () => {
             const cellValue = flexRender(cell.column.columnDef.cell, cell.getContext());
             if (typeof cellValue === 'string' || typeof cellValue === 'number') {
               const numValue = parseFloat(cellValue.toString());
-              if (!isNaN(numValue)) {
-                if (numValue > 0) return interactiveText({ variant: "success" });
-                if (numValue < 0) return interactiveText({ variant: "warning" });
+              if (!isNaN(numValue) && numValue !== 0) {
+                // Determină tipul de tranzacție pe baza categoriei
+                const transactionType = getTransactionTypeForCategory(original.category);
+                
+                if (transactionType === TransactionType.INCOME) {
+                  return 'text-green-600'; // Verde pentru venituri
+                } else if (transactionType === TransactionType.SAVING) {
+                  return 'text-blue-600'; // Albastru pentru economii/investiții
+                } else {
+                  // EXPENSE sau default
+                  return 'text-red-600'; // Roșu pentru cheltuieli
+                }
               }
             }
-            return "";
+            return 'text-gray-600'; // Neutral pentru zero/empty
           };
 
           return (

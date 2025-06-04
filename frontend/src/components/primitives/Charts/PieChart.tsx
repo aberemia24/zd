@@ -20,7 +20,11 @@ import {
   DEFAULT_CHART_THEME,
 } from '../../../utils/charts';
 import type { PieChartProps } from '../../../types/charts';
-import { cn } from '../../../styles/cva-v2';
+import { 
+  cn,
+  headingProfessional,
+  captionProfessional
+} from '../../../styles/cva-v2';
 
 // =============================================================================
 // STYLES & THEME CONFIGURATION
@@ -28,19 +32,13 @@ import { cn } from '../../../styles/cva-v2';
 
 const chartContainerStyles = cn(
   'w-full h-full',
-  'bg-white rounded-lg border border-gray-200',
+  'bg-white rounded-lg border border-carbon-200',
   'p-4 space-y-4'
 );
 
-const titleStyles = cn(
-  'text-lg font-semibold text-gray-900',
-  'mb-2'
-);
-
-const subtitleStyles = cn(
-  'text-sm text-gray-600',
-  'mb-4'
-);
+// Typography migrated to CVA-v2
+const titleStyles = headingProfessional({ level: "h4" });
+const subtitleStyles = captionProfessional({ size: "sm" });
 
 // =============================================================================
 // COMPONENT IMPLEMENTATION
@@ -117,25 +115,25 @@ export const PieChart: React.FC<PieChartProps> = ({
     const percentage = data.percentage || 0;
 
     return (
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 min-w-[180px]">
+      <div className="bg-white border border-carbon-300 rounded-lg shadow-lg p-3 min-w-[180px]">
         <div className="flex items-center space-x-2 mb-2">
           <div 
             className="w-3 h-3 rounded-full"
             style={{ backgroundColor: payload[0].color }}
           />
-          <span className="font-medium text-gray-900">{label}</span>
+          <span className={cn("font-medium", headingProfessional({ level: "h6" }))}>{label}</span>
         </div>
         <div className="space-y-1">
           <div className="flex justify-between">
-            <span className="text-sm text-gray-600">Valoare:</span>
-            <span className="text-sm font-medium text-gray-900">
+            <span className={captionProfessional({ size: "sm" })}>Valoare:</span>
+            <span className={cn("font-medium", captionProfessional({ size: "sm" }))}>
               {formatChartCurrency(value)}
             </span>
           </div>
           {showPercentages && (
             <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Procent:</span>
-              <span className="text-sm font-medium text-gray-900">
+              <span className={captionProfessional({ size: "sm" })}>Procent:</span>
+              <span className={cn("font-medium", captionProfessional({ size: "sm" }))}>
                 {formatChartPercentage(percentage)}
               </span>
             </div>
@@ -223,10 +221,10 @@ export const PieChart: React.FC<PieChartProps> = ({
       <div className={cn(chartContainerStyles, className)}>
         {title && <h3 className={titleStyles}>{title}</h3>}
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
+        <div className="flex items-center justify-center h-64 bg-carbon-50 rounded">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Se încarcă graficul...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-copper-600 mx-auto mb-4"></div>
+            <p className={captionProfessional({ size: "sm" })}>Se încarcă graficul...</p>
           </div>
         </div>
       </div>
@@ -240,8 +238,8 @@ export const PieChart: React.FC<PieChartProps> = ({
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
         <div className="flex items-center justify-center h-64 bg-red-50 rounded border border-red-200">
           <div className="text-center">
-            <p className="text-sm text-red-600 mb-2">Eroare la încărcarea graficului</p>
-            <p className="text-xs text-red-500">{error}</p>
+            <p className={cn("mb-2", captionProfessional({ size: "sm", variant: "danger" }))}>Eroare la încărcarea graficului</p>
+            <p className={captionProfessional({ size: "xs", variant: "danger" })}>{error}</p>
           </div>
         </div>
       </div>
@@ -253,8 +251,8 @@ export const PieChart: React.FC<PieChartProps> = ({
       <div className={cn(chartContainerStyles, className)}>
         {title && <h3 className={titleStyles}>{title}</h3>}
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
-        <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
-          <p className="text-sm text-gray-600">Nu există date pentru afișare</p>
+        <div className="flex items-center justify-center h-64 bg-carbon-50 rounded">
+          <p className={captionProfessional({ size: "sm" })}>Nu există date pentru afișare</p>
         </div>
       </div>
     );
