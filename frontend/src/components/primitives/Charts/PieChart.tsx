@@ -152,13 +152,34 @@ export const PieChart: React.FC<PieChartProps> = ({
     
     const percentage = entry.percentage || 0;
     
-    // Nu afișăm label pentru segmente foarte mici (sub 5%)
-    if (percentage < 5) return null;
+    // Nu afișăm label pentru segmente foarte mici (sub 3%)
+    if (percentage < 3) return null;
     
+    const categoryName = entry[labelKey] || 'N/A';
+    
+    // Scurtăm numele categoriei dacă e prea lung pentru a încăpea în chart
+    const shortName = categoryName.length > 8 
+      ? categoryName.substring(0, 8) + '...' 
+      : categoryName;
+    
+    // Afișăm doar procentajul pentru a economisi spațiu
     if (showPercentages) {
-      return `${formatChartPercentage(percentage)}`;
+      return (
+        <text 
+          x={entry.x} 
+          y={entry.y} 
+          textAnchor="middle" 
+          dominantBaseline="middle"
+          fontSize="9"
+          fill="#374151"
+          fontWeight="500"
+        >
+          <tspan x={entry.x} dy="-2">{formatChartPercentage(percentage)}</tspan>
+          <tspan x={entry.x} dy="12" fontSize="8">{shortName}</tspan>
+        </text>
+      );
     } else {
-      return entry[labelKey];
+      return shortName;
     }
   }, [showLabels, showPercentages, labelKey]);
 

@@ -1,21 +1,22 @@
-import React, { useState, useMemo, useCallback } from "react";
-import Button from "../../primitives/Button/Button";
+import React, { useState, useCallback, useMemo } from "react";
 import Input from "../../primitives/Input/Input";
 import Select from "../../primitives/Select/Select";
+import Button from "../../primitives/Button/Button";
+import Badge from "../../primitives/Badge/Badge";
+import Alert from "../../primitives/Alert/Alert";
+import FormLayout from "../../primitives/FormLayout/FormLayout";
+import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
+import { useCategoryStore } from "../../../stores/categoryStore";
+import { ExportFormat } from "../../../types/financial";
+import { EXPORT_UI, EXPORT_MESSAGES } from "@shared-constants";
 import { 
   cn,
-  headingProfessional,
-  labelProfessional,
-  captionProfessional,
-  spacingMargin,
-  spaceY,
   flexLayout
 } from "../../../styles/cva-v2";
-import type { ExportFormat } from "../../../utils/ExportManager";
-import { BUTTONS, EXPORT_MESSAGES } from "@shared-constants";
-import { EXPORT_UI } from "@shared-constants/ui";
 
-import { useCategoryStore } from "../../../stores/categoryStore";
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 export interface ExportState {
   isExporting: boolean;
@@ -39,34 +40,20 @@ interface ExportModalProps {
   transactionCount: number;
 }
 
-const EXPORT_FORMATS: Array<{
-  value: ExportFormat;
-  label: string;
-  description: string;
-}> = [
-  {
-    value: "csv",
-    label: "CSV",
-    description: "Comma-separated values - compatibil cu Excel",
-  },
-  {
-    value: "pdf",
-    label: "PDF",
-    description: "Document formatat pentru vizualizare și printare",
-  },
-  {
-    value: "excel",
-    label: "Excel",
-    description: "Fișier Excel (.xlsx) cu formatare avansată",
-  },
+// =============================================================================
+// CONSTANTS
+// =============================================================================
+
+const EXPORT_FORMATS = [
+  { value: "csv", label: "CSV (Comma Separated)" },
+  { value: "excel", label: "Excel (XLSX)" },
+  { value: "json", label: "JSON (Pentru dezvoltatori)" },
 ];
 
-/**
- * Modal pentru configurarea opțiunilor de export
- * Permite selecția formatului și configurarea parametrilor  
- * Migrated la CVA styling system pentru consistență
- * OPTIMIZED cu React.memo pentru performance
- */
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
+
 const ExportModalComponent: React.FC<ExportModalProps> = ({
   isOpen,
   onClose,
@@ -74,6 +61,10 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
   exportState,
   transactionCount,
 }) => {
+  // =============================================================================
+  // LOCAL STATE
+  // =============================================================================
+
   const [format, setFormat] = useState<ExportFormat>("csv");
   const [title, setTitle] = useState("");
   const [dateFrom, setDateFrom] = useState("");
@@ -82,6 +73,10 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
   const [month, setMonth] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [customFilename, setCustomFilename] = useState("");
+
+  // =============================================================================
+  // COMPUTED VALUES
+  // =============================================================================
 
   // Generate options in correct format for Select component - MEMOIZED pentru performance
   const yearOptions = useMemo(() => 
@@ -106,15 +101,31 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
     })), [categories]
   );
 
-  // Închide modalul la apăsarea pe overlay - OPTIMIZED cu useCallback
+  // =============================================================================
+  // EVENT HANDLERS
+  // =============================================================================
+
   const handleOverlayClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   }, [onClose]);
 
-  // Gestionează exportul - OPTIMIZED cu useCallback
-  const handleExport = useCallback(() => {
+  const handleYearChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setYear(parseInt(e.target.value));
+  }, []);
+
+  const handleMonthChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setMonth(e.target.value ? parseInt(e.target.value) : null);
+  }, []);
+
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  }, []);
+
+  const handleExport = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     const options: Parameters<typeof onExport>[1] = {};
 
     if (customFilename.trim()) {
@@ -129,258 +140,268 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
       options.dateRange = { from: dateFrom, to: dateTo };
     }
 
-    onExport(format, options);
+    await onExport(format, options);
   }, [format, customFilename, title, dateFrom, dateTo, onExport]);
 
-  const handleYearChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setYear(Number(e.target.value));
-  }, []);
+  // =============================================================================
+  // EARLY RETURNS
+  // =============================================================================
 
-  const handleMonthChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setMonth(Number(e.target.value));
-  }, []);
-
-  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategory(e.target.value);
-  }, []);
-
-  // Returnează null dacă modalul nu este deschis
   if (!isOpen) return null;
+
+  // =============================================================================
+  // FORM CONFIGURATION
+  // =============================================================================
+
+  const formTitle = "Export Tranzacții";
+  
+  const loadingIndicator = exportState.isExporting ? (
+    <Badge variant="warning">
+      Exportând... {exportState.progress}%
+    </Badge>
+  ) : undefined;
+
+  const formActions = (
+    <>
+      <Button
+        type="button"
+        variant="secondary"
+        size="md"
+        onClick={onClose}
+        disabled={exportState.isExporting}
+        className="w-full sm:w-auto"
+      >
+        Anulează
+      </Button>
+
+      <Button
+        type="submit"
+        variant="primary"
+        size="md"
+        disabled={exportState.isExporting}
+        className="w-full sm:w-auto"
+      >
+        {exportState.isExporting ? `Export în progres...` : `Exportă ${transactionCount} tranzacții`}
+      </Button>
+    </>
+  );
+
+  const formMessages = (
+    <>
+      {exportState.error && (
+        <Alert variant="error">
+          {exportState.error}
+        </Alert>
+      )}
+
+      {exportState.isExporting && exportState.status && (
+        <Alert variant="default">
+          {exportState.status}
+        </Alert>
+      )}
+
+      {!exportState.isExporting && !exportState.error && (
+        <Alert variant="default">
+          Se vor exporta {transactionCount} tranzacții.
+        </Alert>
+      )}
+    </>
+  );
+
+  // =============================================================================
+  // RENDER
+  // =============================================================================
 
   return (
     <div
-      className={cn(
-        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50",
-      )}
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleOverlayClick}
       data-testid="export-modal-overlay"
     >
       <div
-        className={cn(
-          "bg-white dark:bg-surface-dark rounded-lg p-6 w-full max-w-md mx-4 relative shadow-lg",
-          "transform transition-all duration-300 ease-out",
-        )}
+        className="bg-white dark:bg-carbon-900 rounded-lg w-full max-w-2xl mx-4 relative shadow-lg transform transition-all duration-300 ease-out"
         data-testid="export-modal"
       >
-        {/* Header */}
-        <div className={cn(
-          flexLayout({ justify: "between", align: "center" }),
-          spacingMargin({ bottom: 6 })
-        )}>
-          <h3 className={headingProfessional({ level: "h3" })}>
-            Export Tranzacții
-          </h3>
-          <button
-            onClick={onClose}
-            className={cn(
-              "text-carbon-400 hover:text-carbon-600 dark:text-carbon-400 dark:hover:text-carbon-200",
-              "transition-colors duration-150",
-              "focus:outline-none focus:ring-2 focus:ring-copper-500 focus:ring-offset-1",
-              "rounded-md p-1",
-            )}
-            data-testid="export-modal-close"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className={cn(
+            "absolute top-4 right-4 z-10",
+            "text-carbon-400 hover:text-carbon-600 dark:text-carbon-400 dark:hover:text-carbon-200",
+            "transition-colors duration-150",
+            "focus:outline-none focus:ring-2 focus:ring-copper-500 focus:ring-offset-1",
+            "rounded-md p-2"
+          )}
+          data-testid="export-modal-close"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
         {/* Progress Bar - afișat doar în timpul exportului */}
         {exportState.isExporting && (
-          <div className={spacingMargin({ bottom: 6 })}>
-            <p className={captionProfessional({ size: "sm" })}>
-              {exportState.status ||
-                EXPORT_MESSAGES.IN_PROGRES.replace(
-                  "{progress}",
-                  exportState.progress.toString(),
-                )}
-            </p>
-            <div className={cn(
-              "w-full bg-gray-200 dark:bg-neutral-600 rounded-full h-2 shadow-sm",
-              spacingMargin({ bottom: 4 })
-            )}>
+          <div className="p-6 pb-0">
+            <div className="w-full bg-gray-200 dark:bg-neutral-600 rounded-full h-3 shadow-sm">
               <div
-                className="bg-primary-500 dark:bg-primary-400 h-2 rounded-full transition-all duration-300"
+                className="bg-copper-500 dark:bg-copper-400 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${exportState.progress}%` }}
               />
             </div>
           </div>
         )}
 
-        {/* Error Display */}
-        {exportState.error && (
-          <div className={cn(
-            "p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md",
-            spacingMargin({ bottom: 6 })
-          )}>
-            <p className={captionProfessional({ size: "sm", variant: "danger" })}>
-              {exportState.error}
-            </p>
-          </div>
-        )}
-
-        {/* Informații despre export */}
-        <div className={cn(
-          "p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md",
-          spacingMargin({ bottom: 6 })
-        )}>
-          <p className={captionProfessional({ size: "sm", variant: "primary" })}>
-            Se vor exporta {transactionCount} tranzacții.
-          </p>
-        </div>
-
-        {/* Form de configurare export */}
-        <div className={cn(
-          spaceY({ spacing: 4 }),
-          spacingMargin({ bottom: 6 })
-        )}>
-          {/* Format Selection */}
-          <div>
-            <label className={labelProfessional({ size: "sm" })}>
-              Format export:
-            </label>
+        <FormLayout
+          title={formTitle}
+          loadingIndicator={loadingIndicator}
+          actions={formActions}
+          messages={formMessages}
+          onSubmit={handleExport}
+          testId="export-form"
+          ariaLabel="Formular export tranzacții"
+          className="border-0 shadow-none bg-transparent"
+        >
+          {/* Export Configuration */}
+          <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
+            {/* Format Selection */}
             <Select
+              name="format"
+              label="Format export*:"
               value={format}
               onChange={(e) => setFormat(e.target.value as ExportFormat)}
               options={EXPORT_FORMATS}
               disabled={exportState.isExporting}
               data-testid="export-format-select"
+              variant="default"
+              size="md"
             />
+
+            {/* Custom Filename */}
+            <Input
+              name="customFilename"
+              type="text"
+              label={EXPORT_UI.FILENAME_LABEL}
+              value={customFilename}
+              onChange={(e) => setCustomFilename(e.target.value)}
+              placeholder={EXPORT_UI.FILENAME_PLACEHOLDER}
+              disabled={exportState.isExporting}
+              data-testid="export-filename-input"
+              variant="default"
+              size="md"
+            />
+          </FieldGrid>
+
+          {/* Time Period Selection */}
+          <div className="space-y-1">
+            <h4 className="text-md font-medium text-carbon-800 dark:text-carbon-200">
+              Perioada de timp
+            </h4>
+            <p className="text-sm text-carbon-600 dark:text-carbon-400">
+              Selectați intervalul temporal pentru export
+            </p>
           </div>
 
-          {/* Year Selection */}
-          <div>
-            <label className={labelProfessional({ size: "sm" })}>
-              {EXPORT_UI.YEAR_LABEL}
-            </label>
+          <FieldGrid cols={{ base: 1, md: 3 }} gap={4}>
+            {/* Year Selection */}
             <Select
+              name="year"
+              label={EXPORT_UI.YEAR_LABEL}
               value={year.toString()}
               onChange={handleYearChange}
               options={yearOptions}
               disabled={exportState.isExporting}
               data-testid="export-year-select"
+              variant="default"
+              size="md"
             />
-          </div>
 
-          {/* Month Selection */}
-          <div>
-            <label className={labelProfessional({ size: "sm" })}>
-              {EXPORT_UI.MONTH_LABEL}
-            </label>
+            {/* Month Selection */}
             <Select
+              name="month"
+              label={EXPORT_UI.MONTH_LABEL}
               value={month?.toString() || ""}
               onChange={handleMonthChange}
               options={monthOptions}
               placeholder="Toate lunile"
               disabled={exportState.isExporting}
               data-testid="export-month-select"
+              variant="default"
+              size="md"
             />
-          </div>
 
-          {/* Category Selection */}
-          <div>
-            <label className={labelProfessional({ size: "sm" })}>
-              {EXPORT_UI.CATEGORY_FILTER_LABEL}
-            </label>
+            {/* Category Selection */}
             <Select
+              name="category"
+              label={EXPORT_UI.CATEGORY_FILTER_LABEL}
               value={selectedCategory}
               onChange={handleCategoryChange}
               options={categoryOptions}
               placeholder="Toate categoriile"
               disabled={exportState.isExporting}
               data-testid="export-category-select"
+              variant="default"
+              size="md"
             />
+          </FieldGrid>
+
+          {/* Custom Date Range */}
+          <div className="space-y-1">
+            <h4 className="text-md font-medium text-carbon-800 dark:text-carbon-200">
+              Interval personalizat
+            </h4>
+            <p className="text-sm text-carbon-600 dark:text-carbon-400">
+              Opțional - specificați un interval exact de date
+            </p>
           </div>
 
-          {/* Custom Filename */}
-          <div>
-            <label className={labelProfessional({ size: "sm" })}>
-              {EXPORT_UI.FILENAME_LABEL}
-            </label>
+          <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
             <Input
-              type="text"
-              value={customFilename}
-              onChange={(e) => setCustomFilename(e.target.value)}
-              placeholder={EXPORT_UI.FILENAME_PLACEHOLDER}
+              name="dateFrom"
+              type="date"
+              label="De la data:"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
               disabled={exportState.isExporting}
-              data-testid="export-filename-input"
+              data-testid="export-date-from"
+              variant="default"
+              size="md"
             />
-          </div>
 
-          {/* Date Range */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelProfessional({ size: "sm" })}>
-                De la data:
-              </label>
-              <Input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                disabled={exportState.isExporting}
-                data-testid="export-date-from"
-              />
-            </div>
-            <div>
-              <label className={labelProfessional({ size: "sm" })}>
-                Până la data:
-              </label>
-              <Input
-                type="date"
-                value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
-                disabled={exportState.isExporting}
-                data-testid="export-date-to"
-              />
-            </div>
-          </div>
-        </div>
+            <Input
+              name="dateTo"
+              type="date"
+              label="Până la data:"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              disabled={exportState.isExporting}
+              data-testid="export-date-to"
+              variant="default"
+              size="md"
+            />
+          </FieldGrid>
 
-        {/* Action Buttons */}
-        <div className={flexLayout({ justify: "end", gap: 2 })}>
-          <Button
-            variant="ghost"
-            onClick={onClose}
-            disabled={exportState.isExporting}
-            data-testid="export-cancel-button"
-          >
-            {BUTTONS.CANCEL}
-          </Button>
-          <Button
-            variant="primary"
-            onClick={handleExport}
-            disabled={exportState.isExporting}
-            data-testid="export-confirm-button"
-          >
-            {exportState.isExporting ? "Se exportă..." : BUTTONS.EXPORT}
-          </Button>
-        </div>
+          {/* Optional Title */}
+          <FieldWrapper fullWidth>
+            <Input
+              name="title"
+              type="text"
+              label="Titlu raport (opțional):"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="ex: Raport cheltuieli Q1 2024"
+              disabled={exportState.isExporting}
+              data-testid="export-title-input"
+              variant="default"
+              size="md"
+            />
+          </FieldWrapper>
+        </FormLayout>
       </div>
     </div>
   );
 };
 
-// React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
-export const ExportModal = React.memo(ExportModalComponent, (prevProps, nextProps) => {
-  // Custom comparison pentru props critice la performance
-  return (
-    prevProps.isOpen === nextProps.isOpen &&
-    prevProps.transactionCount === nextProps.transactionCount &&
-    prevProps.exportState.isExporting === nextProps.exportState.isExporting &&
-    prevProps.exportState.progress === nextProps.exportState.progress &&
-    prevProps.exportState.error === nextProps.exportState.error &&
-    prevProps.exportState.status === nextProps.exportState.status
-    // onClose și onExport sunt callback-uri și se vor schimba în mod normal
-  );
-});
+// Memoized export pentru optimizare
+const ExportModal = React.memo(ExportModalComponent);
+
+export default ExportModal;

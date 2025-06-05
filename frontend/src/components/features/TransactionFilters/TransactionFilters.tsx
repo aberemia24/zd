@@ -3,6 +3,8 @@ import Button from "../../primitives/Button/Button";
 import Select from "../../primitives/Select/Select";
 import Badge from "../../primitives/Badge/Badge";
 import Input from "../../primitives/Input/Input";
+import FormLayout from "../../primitives/FormLayout/FormLayout";
+import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
 import { 
   OPTIONS, LABELS, PLACEHOLDERS, TransactionType, CategoryType,
   BUTTONS, UI, TABLE, LOADER, INFO, MESAJE 
@@ -16,6 +18,10 @@ import {
   card,
   flexLayout
 } from "../../../styles/cva-v2";
+
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
 
 export interface TransactionFiltersProps {
   type?: TransactionType | "" | string;
@@ -34,36 +40,34 @@ export interface TransactionFiltersProps {
   onAmountMinChange?: (amountMin: string) => void;
   onAmountMaxChange?: (amountMax: string) => void;
   onSearchTextChange?: (searchText: string) => void;
+  // New props for export integration
+  exportButton?: React.ReactNode;
+  showAdvancedByDefault?: boolean;
 }
 
-/**
- * Custom hook pentru debounce
- * Permite reducerea numărului de apeluri pentru text input
- */
+// =============================================================================
+// UTILITIES
+// =============================================================================
+
 function useDebounce<T>(value: T, delay: number): T {
-  // State și setter pentru valoarea debounced
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 
-  useEffect(
-    () => {
-      // Actualizăm valoarea debouncedValue după delay
-      const handler = setTimeout(() => {
-        setDebouncedValue(value);
-      }, delay);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
 
-      // Anulăm timeout-ul dacă valoarea se schimbă
-      // Acest lucru garantează că nu se apelează setTimeout dacă valoarea
-      // se schimbă în timpul delay-ului
-      return () => {
-        clearTimeout(handler);
-      };
-    },
-    // Re-run efectul doar când valoarea sau delay-ul se schimbă
-    [value, delay],
-  );
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
 
   return debouncedValue;
 }
+
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 
 const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   type = "",
@@ -82,105 +86,72 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   onAmountMinChange = () => {},
   onAmountMaxChange = () => {},
   onSearchTextChange = () => {},
+  exportButton,
+  showAdvancedByDefault = false,
 }) => {
-  // State pentru expandarea/colapsarea filtrelor avansate
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  // =============================================================================
+  // LOCAL STATE
+  // =============================================================================
 
-  // Opțiuni pentru tipurile de tranzacții din constante
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(showAdvancedByDefault);
+  const [searchInputValue, setSearchInputValue] = useState(searchText);
+
+  // =============================================================================
+  // HOOKS
+  // =============================================================================
+
+  const customCategories = useCategoryStore((state) => state.categories);
+  const { 
+    subcategories: activeSubcategories, 
+    isLoading: isLoadingSubcategories 
+  } = useActiveSubcategories({
+    category,
+    type,
+    enabled: !!category
+  });
+
+  // Debounce search input pentru performance
+  const debouncedSearchText = useDebounce(searchInputValue, 300);
+
+  // =============================================================================
+  // COMPUTED VALUES
+  // =============================================================================
+
   const types = OPTIONS.TYPE;
 
-  // Categoriile personalizate + predefinite din categoryStore
-  const customCategories = useCategoryStore((state) => state.categories);
-
-  // Construim opțiunile pentru categorii din store, nu din constante
-  // Respectăm regulile: memoizare, fără hardcodări, indicator pentru custom
   const categoryOptions = useMemo(() => {
-    // Filtrăm categoriile bazate pe tipul de tranzacție selectat
     let filteredCategories = customCategories;
 
     if (type) {
-      // Păstrăm doar categoriile compatibile cu tipul de tranzacție selectat
       filteredCategories = customCategories.filter((cat) => {
         if (type === "INCOME") return cat.name === "VENITURI";
         if (type === "EXPENSE")
           return cat.name !== "VENITURI" && cat.name !== "ECONOMII";
         if (type === "SAVING") return cat.name === "ECONOMII";
-        return true; // Dacă tipul e gol, afișăm toate
+        return true;
       });
     }
 
     const options = filteredCategories.map((cat) => ({
       value: cat.name,
-      // Formatăm label-ul pentru afișare, incluzând indicator pentru categorii personalizate
       label:
         cat.name.charAt(0) +
         cat.name.slice(1).toLowerCase().replace(/_/g, " ") +
-        (cat.isCustom ? " ➡️" : ""), // Indicator consistent cu cel din TransactionForm
+        (cat.isCustom ? " ➡️" : ""),
     }));
 
     return options;
   }, [customCategories, type]);
 
-  // Obține subcategoriile active folosind noul hook
-  const {
-    subcategories: activeSubcategories,
-    isLoading: isLoadingSubcategories,
-    isEmpty: noActiveSubcategories,
-  } = useActiveSubcategories({
-    category,
-    type,
-    enabled: !!category, // Activăm doar dacă avem o categorie selectată
-  });
-
-  // Combinăm subcategoriile active cu cele din store dacă e necesar
   const subcategoryOptions = useMemo(() => {
-    // Dacă nu avem o categorie selectată, returnăm un array gol
-    if (!category) return [];
-
-    // Dacă se încarcă subcategoriile active, afișăm toate subcategoriile din store ca înainte
-    if (isLoadingSubcategories) {
-      // Găsim categoria selectată în lista de categorii
-      const selectedCategory = customCategories.find(
-        (cat) => cat.name === category,
-      );
-      if (!selectedCategory) return [];
-
-      // Extragem subcategoriile și le transformăm în opțiuni pentru Select
-      return selectedCategory.subcategories.map((subcat) => ({
-        value: subcat.name,
-        label:
-          subcat.name.charAt(0) +
-          subcat.name.slice(1).toLowerCase().replace(/_/g, " ") +
-          (subcat.isCustom ? " ➡️" : ""),
-      }));
-    }
-
-    // Dacă nu avem subcategorii active sau componentele de căutare returnează array gol, afișăm un mesaj în dropdown
-    if (noActiveSubcategories || activeSubcategories.length === 0) {
-      return [
-        {
-          value: "",
-          label: INFO.NO_SUBCATEGORIES || TABLE.NO_SUBCATEGORIES,
-          disabled: true,
-        },
-      ];
-    }
-
-    // Altfel, returnăm subcategoriile active cu numărul de tranzacții pentru fiecare
-    return activeSubcategories.map((subcat) => ({
-      value: subcat.value,
-      label: subcat.label, // Numărul de tranzacții este deja adăugat în hook-ul useActiveSubcategories
-      disabled: false,
+    if (!activeSubcategories || activeSubcategories.length === 0) return [];
+    
+    return activeSubcategories.map((sub: { value: string; label: string; count: number; category: string }) => ({
+      value: sub.value,
+      label: sub.label,
     }));
-  }, [
-    category,
-    customCategories,
-    isLoadingSubcategories,
-    activeSubcategories,
-    noActiveSubcategories,
-  ]);
+  }, [activeSubcategories]);
 
-  // Calculăm numărul total de filtre active
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (type) count++;
@@ -203,31 +174,14 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     searchText,
   ]);
 
-  // Memoizăm filtrele combinate pentru a evita recalculări inutile
-  const activeFilters = useMemo(
-    () => ({
-      type,
-      category,
-      subcategory,
-      dateFrom,
-      dateTo,
-      amountMin,
-      amountMax,
-      searchText,
-    }),
-    [
-      type,
-      category,
-      subcategory,
-      dateFrom,
-      dateTo,
-      amountMin,
-      amountMax,
-      searchText,
-    ],
-  );
+  // =============================================================================
+  // EFFECTS
+  // =============================================================================
 
-  // Reset subcategory when category changes
+  useEffect(() => {
+    onSearchTextChange(debouncedSearchText);
+  }, [debouncedSearchText, onSearchTextChange]);
+
   useEffect(() => {
     if (
       subcategory &&
@@ -238,77 +192,29 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     }
   }, [category, subcategory, subcategoryOptions, onSubcategoryChange]);
 
-  // Handler pentru reset global - memoizat
-  const handleResetAll = useCallback(() => {
-    onTypeChange("");
-    onCategoryChange("");
-    onSubcategoryChange("");
-    onDateFromChange("");
-    onDateToChange("");
-    onAmountMinChange("");
-    onAmountMaxChange("");
-    onSearchTextChange("");
-  }, [
-    onTypeChange,
-    onCategoryChange,
-    onSubcategoryChange,
-    onDateFromChange,
-    onDateToChange,
-    onAmountMinChange,
-    onAmountMaxChange,
-    onSearchTextChange,
-  ]);
+  // =============================================================================
+  // EVENT HANDLERS
+  // =============================================================================
 
-  // Toggle pentru filtre avansate
-  const toggleAdvancedFilters = useCallback(() => {
-    setShowAdvancedFilters((prev) => !prev);
-  }, []);
-
-  // State intern pentru valoarea text input înainte de debounce
-  const [searchInputValue, setSearchInputValue] = useState(searchText);
-
-  // Aplicăm debounce pe valoarea de input
-  const debouncedSearchText = useDebounce(searchInputValue, 400); // 400ms delay
-
-  // Efect care trimite valoarea debounced către parent component
-  useEffect(() => {
-    if (debouncedSearchText !== searchText) {
-      onSearchTextChange(debouncedSearchText);
-    }
-  }, [debouncedSearchText, searchText, onSearchTextChange]);
-
-  // Handler pentru schimbarea valorii de input
-  const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchInputValue(e.target.value);
-    },
-    [],
-  );
-
-  // Memoizăm handlerul pentru schimbarea tipului
   const handleTypeChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value as TransactionType | "";
-      onTypeChange(value);
-      // Reset categorie și subcategorie când se schimbă tipul
-      onCategoryChange("");
-      onSubcategoryChange("");
+      onTypeChange(e.target.value);
+      if (e.target.value !== type) {
+        onCategoryChange("");
+        onSubcategoryChange("");
+      }
     },
-    [onTypeChange, onCategoryChange, onSubcategoryChange],
+    [onTypeChange, onCategoryChange, onSubcategoryChange, type],
   );
 
-  // Memoizăm handlerul pentru schimbarea categoriei
   const handleCategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value as CategoryType | "";
-      onCategoryChange(value);
-      // Reset subcategorie când se schimbă categoria
+      onCategoryChange(e.target.value);
       onSubcategoryChange("");
     },
     [onCategoryChange, onSubcategoryChange],
   );
 
-  // Memoizăm handlerul pentru schimbarea subcategoriei
   const handleSubcategoryChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       onSubcategoryChange(e.target.value);
@@ -316,7 +222,13 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     [onSubcategoryChange],
   );
 
-  // Memoizăm handlerii pentru filtrele de date
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchInputValue(e.target.value);
+    },
+    [],
+  );
+
   const handleDateFromChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       onDateFromChange(e.target.value);
@@ -331,7 +243,6 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     [onDateToChange],
   );
 
-  // Memoizăm handlerii pentru filtrele de sumă
   const handleAmountMinChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       onAmountMinChange(e.target.value);
@@ -346,40 +257,127 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
     [onAmountMaxChange],
   );
 
-  // Utilizăm CVA unified system și clase CSS manuale
-  return (
-    <div
-      className={flexLayout({ 
-        direction: "row", 
-        justify: "between", 
-        align: "center", 
-        gap: 4 
-      })}
-    >
-      {/* Bara de filtre compactă, pe o singură linie */}
-      <div
-        className={flexLayout({ 
-          direction: "row", 
-          justify: "start", 
-          align: "center", 
-          gap: 4 
-        })}
+  const handleResetAll = useCallback(() => {
+    onTypeChange("");
+    onCategoryChange("");
+    onSubcategoryChange("");
+    onDateFromChange("");
+    onDateToChange("");
+    onAmountMinChange("");
+    onAmountMaxChange("");
+    onSearchTextChange("");
+    setSearchInputValue("");
+  }, [
+    onTypeChange,
+    onCategoryChange,
+    onSubcategoryChange,
+    onDateFromChange,
+    onDateToChange,
+    onAmountMinChange,
+    onAmountMaxChange,
+    onSearchTextChange,
+  ]);
+
+  const toggleAdvancedFilters = useCallback(() => {
+    setShowAdvancedFilters((prev) => !prev);
+  }, []);
+
+  const handleFormSubmit = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    // Form submission pentru aplicarea filtrelor - poate fi extins
+  }, []);
+
+  // =============================================================================
+  // FORM CONFIGURATION
+  // =============================================================================
+
+  const formTitle = "Filtre și Căutare";
+  
+  const loadingIndicator = isLoadingSubcategories ? (
+    <Badge variant="warning">
+      Se încarcă subcategoriile...
+    </Badge>
+  ) : undefined;
+
+  const formActions = (
+    <>
+      {activeFilterCount > 0 && (
+        <Button
+          type="button"
+          variant="secondary"
+          size="md"
+          onClick={handleResetAll}
+          data-testid="reset-filters-btn"
+          className="w-full sm:w-auto"
+        >
+          {BUTTONS.RESET_FILTERS}
+        </Button>
+      )}
+
+      <Button
+        type="button"
+        variant={showAdvancedFilters ? "primary" : "ghost"}
+        size="md"
+        onClick={toggleAdvancedFilters}
+        data-testid="toggle-advanced-filters-btn"
+        className="w-full sm:w-auto"
       >
-        {/* Filtru tip tranzacție */}
+        {showAdvancedFilters
+          ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED
+          : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
+        {activeFilterCount > 0 && (
+                   <Badge variant="neutral" className="ml-2">
+           {activeFilterCount}
+         </Badge>
+       )}
+     </Button>
+
+     {/* Export button integration */}
+     {exportButton}
+   </>
+ );
+
+ const formMessages = (
+   <>
+     {activeFilterCount > 0 && (
+       <Badge variant="neutral">
+          {activeFilterCount} {activeFilterCount === 1 ? 'filtru activ' : 'filtre active'}
+        </Badge>
+      )}
+    </>
+  );
+
+  // =============================================================================
+  // RENDER
+  // =============================================================================
+
+  return (
+    <FormLayout
+      title={formTitle}
+      loadingIndicator={loadingIndicator}
+      actions={formActions}
+      messages={formMessages}
+      onSubmit={handleFormSubmit}
+      testId="transaction-filters-form"
+      ariaLabel="Formular filtre și căutare tranzacții"
+    >
+      {/* Quick Filters Row */}
+      <FieldGrid cols={{ base: 1, sm: 2, md: 4 }} gap={4}>
         <Select
           name="type-filter"
-          label=""
+          label="Tip tranzacție"
           value={type || ""}
           data-testid="type-filter"
           onChange={handleTypeChange}
           options={types}
           placeholder={PLACEHOLDERS.SELECT + " tipul"}
           size="sm"
+          variant="default"
         />
-        {/* Filtru categorie */}
+
         <Select
           name="category-filter"
-          label=""
+          label="Categorie"
           value={category || ""}
           data-testid="category-filter"
           onChange={handleCategoryChange}
@@ -387,11 +385,12 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           placeholder={PLACEHOLDERS.SELECT + " categoria"}
           disabled={!type}
           size="sm"
+          variant="default"
         />
-        {/* Filtru subcategorie */}
+
         <Select
           name="subcategory-filter"
-          label=""
+          label="Subcategorie"
           value={subcategory || ""}
           data-testid="subcategory-filter"
           onChange={handleSubcategoryChange}
@@ -403,98 +402,88 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
           }
           disabled={!category || subcategoryOptions.length === 0}
           size="sm"
+          variant="default"
         />
-      </div>
-      {/* Acțiuni și searchbox la finalul barei */}
-      <div
-        className={flexLayout({ 
-          direction: "row", 
-          justify: "end", 
-          align: "center", 
-          gap: 4 
-        })}
-      >
-        {/* Searchbox compact */}
+
         <Input
           name="search-text-filter"
-          label=""
+          label="Căutare în descriere"
           value={searchInputValue}
           data-testid="search-text-filter"
           onChange={handleSearchChange}
           placeholder={PLACEHOLDERS.SEARCH}
           type="text"
-        />
-        {/* Buton reset filtre */}
-        {activeFilterCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleResetAll}
-            data-testid="reset-filters-btn"
-            aria-label={BUTTONS.RESET_FILTERS}
-          >
-            {BUTTONS.RESET_FILTERS}
-          </Button>
-        )}
-        {/* Buton filtre avansate */}
-        <Button
-          variant="secondary"
           size="sm"
-          onClick={toggleAdvancedFilters}
-          data-testid="toggle-advanced-filters-btn"
-          aria-label={
-            showAdvancedFilters
-              ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED
-              : UI.TRANSACTION_FILTERS.SHOW_ADVANCED
-          }
-        >
-          {showAdvancedFilters
-            ? UI.TRANSACTION_FILTERS.HIDE_ADVANCED
-            : UI.TRANSACTION_FILTERS.SHOW_ADVANCED}
-        </Button>
-      </div>
-      {/* Filtre avansate - rămân sub bară, vizibile doar dacă sunt activate */}
+          variant="default"
+        />
+      </FieldGrid>
+
+      {/* Advanced Filters */}
       {showAdvancedFilters && (
-        <div className={cn(card({ variant: "default" }), "mt-4 p-4 space-y-4")}>
-          <Input
-            name="date-from-filter"
-            label={LABELS.DATE_FROM_FILTER}
-            value={dateFrom}
-            data-testid="date-from-filter"
-            onChange={handleDateFromChange}
-            placeholder={PLACEHOLDERS.SELECT + " data de început"}
-            type="date"
-          />
-          <Input
-            name="date-to-filter"
-            label={LABELS.DATE_TO_FILTER}
-            value={dateTo}
-            data-testid="date-to-filter"
-            onChange={handleDateToChange}
-            placeholder={PLACEHOLDERS.SELECT + " data de sfârșit"}
-            type="date"
-          />
-          <Input
-            name="amount-min-filter"
-            label={LABELS.AMOUNT_MIN_FILTER}
-            value={amountMin}
-            data-testid="amount-min-filter"
-            onChange={handleAmountMinChange}
-            placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
-            type="number"
-          />
-          <Input
-            name="amount-max-filter"
-            label={LABELS.AMOUNT_MAX_FILTER}
-            value={amountMax}
-            data-testid="amount-max-filter"
-            onChange={handleAmountMaxChange}
-            placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
-            type="number"
-          />
-        </div>
+        <>
+          <div className="space-y-1">
+            <h4 className="text-md font-medium text-carbon-800 dark:text-carbon-200">
+              Filtre avansate
+            </h4>
+            <p className="text-sm text-carbon-600 dark:text-carbon-400">
+              Specificați criterii suplimentare pentru filtrarea tranzacțiilor
+            </p>
+          </div>
+
+          <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
+            <Input
+              name="date-from-filter"
+              type="date"
+              label={LABELS.DATE_FROM_FILTER}
+              value={dateFrom}
+              data-testid="date-from-filter"
+              onChange={handleDateFromChange}
+              placeholder={PLACEHOLDERS.SELECT + " data de început"}
+              size="sm"
+              variant="default"
+            />
+
+            <Input
+              name="date-to-filter"
+              type="date"
+              label={LABELS.DATE_TO_FILTER}
+              value={dateTo}
+              data-testid="date-to-filter"
+              onChange={handleDateToChange}
+              placeholder={PLACEHOLDERS.SELECT + " data de sfârșit"}
+              size="sm"
+              variant="default"
+            />
+          </FieldGrid>
+
+          <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
+            <Input
+              name="amount-min-filter"
+              type="number"
+              label={LABELS.AMOUNT_MIN_FILTER}
+              value={amountMin}
+              data-testid="amount-min-filter"
+              onChange={handleAmountMinChange}
+              placeholder={PLACEHOLDERS.AMOUNT_MIN_FILTER}
+              size="sm"
+              variant="default"
+            />
+
+            <Input
+              name="amount-max-filter"
+              type="number"
+              label={LABELS.AMOUNT_MAX_FILTER}
+              value={amountMax}
+              data-testid="amount-max-filter"
+              onChange={handleAmountMaxChange}
+              placeholder={PLACEHOLDERS.AMOUNT_MAX_FILTER}
+              size="sm"
+              variant="default"
+            />
+          </FieldGrid>
+        </>
       )}
-    </div>
+    </FormLayout>
   );
 };
 

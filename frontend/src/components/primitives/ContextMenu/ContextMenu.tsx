@@ -1,284 +1,24 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { cn, dropdown, dropdownItem } from '../../../styles/cva-v2';
-import { NAVIGATION } from '@shared-constants';
-import type { ContextMenuOption, ContextMenuState, FinancialTableRow } from '../../../types/financial';
+// src/components/ContextMenu/ContextMenu.stories.tsx
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { cn } from '../../../styles/cva-v2';
+import type { ContextMenuOption, ContextMenuState } from '../../../types/financial';
 
-/**
- * Props pentru componenta ContextMenu
- * Reutilizează tipurile existente din financial.ts
- */
+// =============================================================================
+// TYPES & INTERFACES
+// =============================================================================
+
 export interface ContextMenuProps {
-  /** Lista de opțiuni pentru context menu */
   options: ContextMenuOption[];
-  /** Starea context menu-ului (poziție, vizibilitate) */
   state: ContextMenuState;
-  /** Callback pentru închiderea context menu-ului */
   onClose: () => void;
-  /** CSS classes adiționale */
-  className?: string;
-  /** Data test ID pentru testare */
-  testId?: string;
-  /** Container element pentru portal (default: document.body) */
-  container?: HTMLElement;
-  /** Offset pentru poziționare (default: { x: 0, y: 0 }) */
   offset?: { x: number; y: number };
+  className?: string;
 }
 
-/**
- * Hook pentru poziționarea inteligentă a context menu-ului
- */
-const useContextMenuPosition = (
-  state: ContextMenuState,
-  menuRef: React.RefObject<HTMLDivElement | null>,
-  offset: { x: number; y: number } = { x: 0, y: 0 }
-) => {
-  const [position, setPosition] = useState({ x: state.x, y: state.y });
+// =============================================================================
+// CONTEXT MENU HOOK
+// =============================================================================
 
-  useEffect(() => {
-    if (!state.isVisible || !menuRef.current) return;
-
-    const menu = menuRef.current;
-    const rect = menu.getBoundingClientRect();
-    const viewport = {
-      width: window.innerWidth,
-      height: window.innerHeight
-    };
-
-    let { x, y } = state;
-    x += offset.x;
-    y += offset.y;
-
-    // Ajustează poziția pentru a evita ieșirea din viewport
-    if (x + rect.width > viewport.width) {
-      x = viewport.width - rect.width - 8; // 8px margin
-    }
-    if (y + rect.height > viewport.height) {
-      y = viewport.height - rect.height - 8; // 8px margin
-    }
-
-    // Asigură-te că nu iese din partea stângă/sus
-    x = Math.max(8, x);
-    y = Math.max(8, y);
-
-    setPosition({ x, y });
-  }, [state.isVisible, state.x, state.y, offset.x, offset.y]);
-
-  return position;
-};
-
-/**
- * Hook pentru gestionarea click-urilor în afara context menu-ului
- */
-const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement | null>,
-  onClose: () => void,
-  isVisible: boolean
-) => {
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        onClose();
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [ref, onClose, isVisible]);
-};
-
-/**
- * Componentă pentru o opțiune din context menu
- */
-const ContextMenuItem: React.FC<{
-  option: ContextMenuOption;
-  testId?: string;
-  onClose: () => void;
-}> = ({ option, testId, onClose }) => {
-     const handleClick = useCallback(
-     (e: React.MouseEvent) => {
-       e.preventDefault();
-       e.stopPropagation();
-       
-       if (option.disabled) return;
-       
-       // Execută acțiunea cu data din context menu state
-       // Nota: targetRow va fi injectat în options de către consumator
-       if (option.onClick) {
-         option.onClick({} as any); // Type assertion temporară pentru compatibilitate
-       }
-       
-       onClose();
-     },
-     [option, onClose]
-   );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        handleClick(e as unknown as React.MouseEvent<HTMLButtonElement>);
-      }
-    },
-    [handleClick]
-  );
-
-  // Separator
-  if (option.separator) {
-    return (
-      <div
-        className="border-t border-carbon-200 dark:border-carbon-700 my-1"
-        role="separator"
-        data-testid={testId ? `${testId}-separator` : undefined}
-      />
-    );
-  }
-
-  const variant = option.id.includes('delete') ? 'danger' : 'default';
-
-  return (
-    <button
-      className={cn(
-        dropdownItem({ variant, disabled: option.disabled }),
-        "w-full text-left flex items-center space-x-2"
-      )}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      disabled={option.disabled}
-      role="menuitem"
-      data-testid={testId ? `${testId}-item-${option.id}` : undefined}
-      aria-label={option.label}
-    >
-      {/* Icon */}
-      {option.icon && (
-        <span className="flex-shrink-0 w-4 h-4" aria-hidden="true">
-          <option.icon />
-        </span>
-      )}
-      
-      {/* Label */}
-      <span className="flex-1">{option.label}</span>
-      
-      {/* Shortcut */}
-      {option.shortcut && (
-        <span className="text-xs text-carbon-500 dark:text-carbon-400 font-mono">
-          {option.shortcut}
-        </span>
-      )}
-    </button>
-  );
-};
-
-/**
- * Componenta principală ContextMenu
- */
-export const ContextMenu: React.FC<ContextMenuProps> = ({
-  options,
-  state,
-  onClose,
-  className,
-  testId = 'context-menu',
-  container = document.body,
-  offset = { x: 0, y: 0 }
-}) => {
-  const menuRef = useRef<HTMLDivElement>(null);
-  const position = useContextMenuPosition(state, menuRef, offset);
-  
-  useOutsideClick(menuRef, onClose, state.isVisible);
-
-  // Focus management
-  useEffect(() => {
-    if (state.isVisible && menuRef.current) {
-      const firstItem = menuRef.current.querySelector('[role="menuitem"]:not([disabled])') as HTMLElement;
-      firstItem?.focus();
-    }
-  }, [state.isVisible]);
-
-  // Keyboard navigation
-  useEffect(() => {
-    if (!state.isVisible) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const menuItems = menuRef.current?.querySelectorAll('[role="menuitem"]:not([disabled])') as NodeListOf<HTMLElement>;
-      if (!menuItems || menuItems.length === 0) return;
-
-      const currentIndex = Array.from(menuItems).findIndex(item => item === document.activeElement);
-
-      switch (e.key) {
-        case 'ArrowDown':
-          e.preventDefault();
-          const nextIndex = currentIndex < menuItems.length - 1 ? currentIndex + 1 : 0;
-          menuItems[nextIndex]?.focus();
-          break;
-        case 'ArrowUp':
-          e.preventDefault();
-          const prevIndex = currentIndex > 0 ? currentIndex - 1 : menuItems.length - 1;
-          menuItems[prevIndex]?.focus();
-          break;
-        case 'Home':
-          e.preventDefault();
-          menuItems[0]?.focus();
-          break;
-        case 'End':
-          e.preventDefault();
-          menuItems[menuItems.length - 1]?.focus();
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.isVisible]);
-
-  if (!state.isVisible) return null;
-
-  const menuElement = (
-    <div
-      ref={menuRef}
-      className={cn(
-        dropdown({ size: 'md' }),
-        'fixed z-50',
-        className
-      )}
-      style={{
-        left: position.x,
-        top: position.y,
-      }}
-      role="menu"
-      aria-label={NAVIGATION.ARIA.CONTEXT_MENU || 'Context menu'}
-      aria-orientation="vertical"
-      data-testid={testId}
-    >
-      {options.map((option, index) => (
-        <ContextMenuItem
-          key={option.id || index}
-          option={option}
-          testId={testId}
-          onClose={onClose}
-        />
-      ))}
-    </div>
-  );
-
-  return createPortal(menuElement, container);
-};
-
-/**
- * Hook pentru utilizarea facilă a context menu-ului
- */
 export const useContextMenu = () => {
   const [state, setState] = useState<ContextMenuState>({
     isVisible: false,
@@ -286,7 +26,7 @@ export const useContextMenu = () => {
     y: 0
   });
 
-  const show = useCallback((x: number, y: number, targetRow?: FinancialTableRow) => {
+  const show = useCallback((x: number, y: number, targetRow?: any) => {
     setState({
       isVisible: true,
       x,
@@ -296,20 +36,42 @@ export const useContextMenu = () => {
   }, []);
 
   const hide = useCallback(() => {
-    setState(prev => ({
-      ...prev,
-      isVisible: false
-    }));
+    setState({
+      isVisible: false,
+      x: 0,
+      y: 0
+    });
   }, []);
 
-  const handleContextMenu = useCallback((
-    e: React.MouseEvent,
-    targetRow?: FinancialTableRow
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    show(e.clientX, e.clientY, targetRow);
+  const handleContextMenu = useCallback((event: React.MouseEvent, targetRow?: any) => {
+    event.preventDefault();
+    show(event.clientX, event.clientY, targetRow);
   }, [show]);
+
+  // Close on outside click or escape
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (state.isVisible) {
+        hide();
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && state.isVisible) {
+        hide();
+      }
+    };
+
+    if (state.isVisible) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [state.isVisible, hide]);
 
   return {
     state,
@@ -319,4 +81,171 @@ export const useContextMenu = () => {
   };
 };
 
-export default ContextMenu; 
+// =============================================================================
+// CONTEXT MENU COMPONENT
+// =============================================================================
+
+export const ContextMenu: React.FC<ContextMenuProps> = ({
+  options,
+  state,
+  onClose,
+  offset = { x: 0, y: 0 },
+  className
+}) => {
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [focusedIndex, setFocusedIndex] = useState(0);
+
+  // Position calculation with boundary detection
+  const calculatePosition = useCallback(() => {
+    if (!menuRef.current || !state.isVisible) return { left: 0, top: 0 };
+
+    const menu = menuRef.current;
+    const { x, y } = state;
+    const { x: offsetX, y: offsetY } = offset;
+
+    const menuRect = menu.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    let left = x + offsetX;
+    let top = y + offsetY;
+
+    // Boundary detection - adjust if menu would go off screen
+    if (left + menuRect.width > viewportWidth) {
+      left = Math.max(10, x - menuRect.width - offsetX);
+    }
+
+    if (top + menuRect.height > viewportHeight) {
+      top = Math.max(10, y - menuRect.height - offsetY);
+    }
+
+    return { left, top };
+  }, [state, offset]);
+
+  // Filter out separators for keyboard navigation
+  const navigableOptions = options.filter(option => !option.separator && !option.disabled);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (!state.isVisible) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          setFocusedIndex(prev => 
+            prev < navigableOptions.length - 1 ? prev + 1 : 0
+          );
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          setFocusedIndex(prev => 
+            prev > 0 ? prev - 1 : navigableOptions.length - 1
+          );
+          break;
+                 case 'Enter':
+           event.preventDefault();
+           if (navigableOptions[focusedIndex]) {
+             navigableOptions[focusedIndex].onClick(state.targetRow!);
+             onClose();
+           }
+           break;
+        case 'Escape':
+          event.preventDefault();
+          onClose();
+          break;
+        case 'Home':
+          event.preventDefault();
+          setFocusedIndex(0);
+          break;
+        case 'End':
+          event.preventDefault();
+          setFocusedIndex(navigableOptions.length - 1);
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [state.isVisible, focusedIndex, navigableOptions, onClose, state.targetRow]);
+
+  // Focus management
+  useEffect(() => {
+    if (state.isVisible && menuRef.current) {
+      setFocusedIndex(0);
+      // Focus the menu container for keyboard navigation
+      menuRef.current.focus();
+    }
+  }, [state.isVisible]);
+
+  if (!state.isVisible) {
+    return null;
+  }
+
+  const position = calculatePosition();
+
+  return (
+    <div
+      ref={menuRef}
+      data-testid="test-context-menu"
+      className={cn(
+        "fixed z-50 min-w-[180px] rounded-md border bg-card p-1 shadow-lg",
+        "animate-in fade-in-0 zoom-in-95",
+        className
+      )}
+      style={{
+        left: position.left,
+        top: position.top,
+      }}
+      tabIndex={-1}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {options.map((option, index) => {
+        if (option.separator) {
+          return (
+            <div
+              key={option.id || `separator-${index}`}
+              className="my-1 h-px bg-border"
+            />
+          );
+        }
+
+        const navigableIndex = navigableOptions.findIndex(nav => nav.id === option.id);
+        const isFocused = navigableIndex === focusedIndex;
+
+        return (
+          <button
+            key={option.id}
+            data-testid={`test-context-menu-item-${option.id}`}
+            className={cn(
+              "relative flex w-full cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+              "transition-colors focus:bg-accent focus:text-accent-foreground",
+              option.disabled 
+                ? "pointer-events-none opacity-50" 
+                : "hover:bg-accent hover:text-accent-foreground",
+              isFocused && "bg-accent text-accent-foreground"
+            )}
+                         onClick={() => {
+               if (!option.disabled) {
+                 option.onClick(state.targetRow!);
+                 onClose();
+               }
+             }}
+            disabled={option.disabled}
+          >
+                         {option.icon && React.createElement(option.icon as React.ComponentType<{ className?: string }>, { className: "mr-2 h-4 w-4" })}
+            <span className="flex-1 text-left">{option.label}</span>
+            {option.shortcut && (
+              <span className="ml-auto text-xs tracking-widest opacity-60">
+                {option.shortcut}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+// Default export
+export default ContextMenu;

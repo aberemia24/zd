@@ -522,7 +522,7 @@ const OptionsPage: React.FC = () => {
                   <strong> Această acțiune NU poate fi anulată!</strong>
                 </p>
                 <Button
-                  variant="primary"
+                  variant="danger"
                   size="sm"
                   onClick={handleResetEverything}
                   disabled={isResetting}

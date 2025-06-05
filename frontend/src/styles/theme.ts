@@ -79,11 +79,11 @@ export const theme: Theme = {
     copper: {
       50: "#FFF7ED",   // Lightest copper
       100: "#FED7AA",  // Pale Peach
-      200: "#FED7B0",  // Light Peach
-      300: "#FB923C",  // Soft Peach
+      200: "#D88865",  // TEST: Copper warm tone - mai vibrant
+      300: "#A86A4F",  // TEST: Hover maro-copper foarte închis
       400: "#F97316",  // Light Orange
-      500: "#EA580C",  // Bright Orange - main copper
-      600: "#C2410C",  // Deep Copper
+      500: "#D88865",  // NEW: Noua culoare principală copper!
+      600: "#A86A4F",  // NEW: Noua culoare hover copper!
       700: "#9A3412",  // Darker Copper
       800: "#7C2D12",  // Very Dark Copper
       900: "#431407",  // Darkest Copper

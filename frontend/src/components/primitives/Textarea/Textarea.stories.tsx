@@ -103,29 +103,60 @@ export const AllVariants: Story = {
  */
 export const AllSizes: Story = {
   render: () => (
-    <div className="space-y-6">
-      <Textarea
-        size="sm"
-        label="Small Size"
-        placeholder="Small textarea..."
-        rows={2}
-      />
+    <div className="space-y-8">
+      <div className="text-lg font-semibold mb-4">Textarea Sizes Comparison</div>
       
-      <Textarea
-        size="md"
-        label="Medium Size (Default)"
-        placeholder="Medium textarea..."
-        rows={3}
-      />
-      
-      <Textarea
-        size="lg"
-        label="Large Size"
-        placeholder="Large textarea..."
-        rows={4}
-      />
+      {/* Side by side comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Small (sm)</div>
+          <Textarea 
+            size="sm" 
+            placeholder="Small textarea (min-h-[60px])" 
+            label="Small Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Min Height: 60px</div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Medium (md)</div>
+          <Textarea 
+            size="md" 
+            placeholder="Medium textarea (min-h-[80px])" 
+            label="Medium Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Min Height: 80px</div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Large (lg)</div>
+          <Textarea 
+            size="lg" 
+            placeholder="Large textarea (min-h-[120px])" 
+            label="Large Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Min Height: 120px</div>
+        </div>
+      </div>
+
+      {/* Stacked comparison for mobile */}
+      <div className="md:hidden space-y-4">
+        <Textarea size="sm" placeholder="Small (60px min height)" label="Small" />
+        <Textarea size="md" placeholder="Medium (80px min height)" label="Medium" />
+        <Textarea size="lg" placeholder="Large (120px min height)" label="Large" />
+      </div>
     </div>
-  )
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Comparison of all available Textarea sizes with visible height differences.'
+      }
+    }
+  }
 };
 
 /**

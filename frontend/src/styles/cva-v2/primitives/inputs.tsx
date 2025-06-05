@@ -20,12 +20,12 @@ export const input = cva([
     variant: {
       default: [
         "border-carbon-300 bg-carbon-50",
-        "focus-visible:ring-copper-500 dark:border-carbon-600 dark:bg-carbon-900",
-        "dark:focus-visible:ring-copper-400"
+        "focus-visible:ring-copper-500/30 dark:border-carbon-600 dark:bg-carbon-900",
+        "dark:focus-visible:ring-copper-400/30"
       ],
       filled: [
         "border-transparent bg-carbon-100",
-        "focus-visible:ring-copper-500 dark:bg-carbon-800"
+        "focus-visible:ring-copper-500/30 dark:bg-carbon-800"
       ],
       error: [
         "border-red-500 bg-carbon-50",
@@ -50,12 +50,12 @@ export const select = cva([
     variant: {
       default: [
         "border-carbon-300 bg-carbon-50",
-        "focus-visible:ring-copper-500 dark:border-carbon-600 dark:bg-carbon-900",
-        "dark:focus-visible:ring-copper-400"
+        "focus-visible:ring-copper-500/30 dark:border-carbon-600 dark:bg-carbon-900",
+        "dark:focus-visible:ring-copper-400/30"
       ],
       filled: [
         "border-transparent bg-carbon-100",
-        "focus-visible:ring-copper-500 dark:bg-carbon-800"
+        "focus-visible:ring-copper-500/30 dark:bg-carbon-800"
       ]
     },
     size: {
@@ -81,12 +81,12 @@ export const textarea = cva([
     variant: {
       default: [
         "border-carbon-300 bg-carbon-50",
-        "focus-visible:ring-copper-500 dark:border-carbon-600 dark:bg-carbon-900",
-        "dark:focus-visible:ring-copper-400"
+        "focus-visible:ring-copper-500/30 dark:border-carbon-600 dark:bg-carbon-900",
+        "dark:focus-visible:ring-copper-400/30"
       ],
       filled: [
         "border-transparent bg-carbon-100",
-        "focus-visible:ring-copper-500 dark:bg-carbon-800"
+        "focus-visible:ring-copper-500/30 dark:bg-carbon-800"
       ]
     },
     size: {
@@ -110,12 +110,12 @@ export const checkbox = cva([
     variant: {
       default: [
         "border-carbon-300 bg-carbon-50 text-copper-600",
-        "focus:ring-copper-500 dark:border-carbon-600 dark:bg-carbon-900",
-        "dark:focus:ring-copper-400 dark:text-copper-400"
+        "focus:ring-copper-500/30 dark:border-carbon-600 dark:bg-carbon-900",
+        "dark:focus:ring-copper-400/30 dark:text-copper-400"
       ],
       filled: [
         "border-transparent bg-carbon-100 text-copper-600",
-        "focus:ring-copper-500 dark:bg-carbon-800"
+        "focus:ring-copper-500/30 dark:bg-carbon-800"
       ]
     },
     size: {

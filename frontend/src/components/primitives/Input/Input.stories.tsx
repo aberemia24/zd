@@ -96,26 +96,60 @@ export const AllVariants: Story = {
  */
 export const AllSizes: Story = {
   render: () => (
-    <div className="space-y-4">
-      <Input
-        size="sm"
-        label="Small Input"
-        placeholder="Small size input"
-      />
+    <div className="space-y-8">
+      <div className="text-lg font-semibold mb-4">Input Sizes Comparison</div>
       
-      <Input
-        size="md"
-        label="Medium Input"
-        placeholder="Medium size input (default)"
-      />
-      
-      <Input
-        size="lg"
-        label="Large Input"
-        placeholder="Large size input"
-      />
+      {/* Side by side comparison */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Small (sm)</div>
+          <Input 
+            size="sm" 
+            placeholder="Small input (h-8)" 
+            label="Small Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Height: 32px (h-8)</div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Medium (md)</div>
+          <Input 
+            size="md" 
+            placeholder="Medium input (h-10)" 
+            label="Medium Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Height: 40px (h-10)</div>
+        </div>
+        
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-carbon-600 dark:text-carbon-400">Large (lg)</div>
+          <Input 
+            size="lg" 
+            placeholder="Large input (h-12)" 
+            label="Large Size"
+            className="w-full"
+          />
+          <div className="text-xs text-carbon-500">Height: 48px (h-12)</div>
+        </div>
+      </div>
+
+      {/* Stacked comparison for mobile */}
+      <div className="md:hidden space-y-4">
+        <Input size="sm" placeholder="Small (32px height)" label="Small" />
+        <Input size="md" placeholder="Medium (40px height)" label="Medium" />
+        <Input size="lg" placeholder="Large (48px height)" label="Large" />
+      </div>
     </div>
-  )
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Comparison of all available Input sizes with visible height differences.'
+      }
+    }
+  }
 };
 
 /**

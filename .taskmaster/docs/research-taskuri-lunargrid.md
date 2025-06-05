@@ -1,3 +1,7 @@
+ ideea e ca nu vrrau planning in vid, vreau sa ne asiguram ca avem idee despre toate constantele, functiile, parametrii, clasele etc pe care urmeaza sa le folosim nu sa le presupunem sa sa le inventam. mai mult, sa ne asiguram ca modificarile sunt safe, nu afecteaza negativ resrul aplicatiei sau mai rau sa scoatem functionalitate existenta. daia trebuie luat totul mega atent si incremental
+
+Si sa folosim si cautam induatry best practice cand zic best practices, nu over engineering, nu enterprise level shit. sa fie robust, usor de implementat si util si performantt. suntem o aplicatie edie facut de un om cu ai. nu avem nevoie de enterprize grade sit sau academic.
+
 # 🔬 RESEARCH COMPLET TASKURI LUNARGRID - Format Ultra Detaliat
 
 **Data Research:** 29 Ianuarie 2025  
@@ -115,7 +119,7 @@
 - Toate labels și messages pentru inline editing
 
 #### ✅ CVA Cell Styles
-**Inline editing styles** integrate în grid CVA system.
+**Inline editing styles** integrate în grid CVA2 ystem.
 
 ### 🎯 REQUEST-URI ULTRA DETALIATE
 

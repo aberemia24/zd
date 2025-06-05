@@ -4,6 +4,8 @@ import TransactionTable from "../components/features/TransactionTable/Transactio
 import TransactionFilters from "../components/features/TransactionFilters/TransactionFilters";
 import { ExportButton } from "../components/features/ExportButton/ExportButton";
 import Alert from "../components/primitives/Alert/Alert";
+import { LineChart } from "../components/primitives/Charts";
+import { useTransactionChartData } from "../hooks/useTransactionChartData";
 import { useQueryClient } from "@tanstack/react-query";
 import { TransactionType, CategoryType } from "@shared-constants";
 import { useFilteredTransactions } from "../services/hooks/useFilteredTransactions";
@@ -135,6 +137,32 @@ const TransactionsPage: React.FC = () => {
     });
   }, [rawTransactions, user?.id]);
 
+  // =============================================================================
+  // CHART DATA PROCESSING
+  // =============================================================================
+
+  const chartData = useTransactionChartData(transactions as Transaction[]);
+
+  // Line chart data pentru trend-uri temporale
+  const lineChartData = useMemo(() => {
+    if (chartData.timeSeriesData.length === 0) return [];
+    
+    // Luăm ultimele 30 de zile și grupăm pe săptămâni pentru clarity
+    const sortedData = [...chartData.timeSeriesData].sort((a, b) => a.timestamp - b.timestamp);
+    const recentData = sortedData.slice(-30); // Ultimele 30 de puncte
+    
+    return recentData.map(point => ({
+      ...point,
+      // Formatăm data pentru display
+      displayDate: new Date(point.date).toLocaleDateString('ro-RO', { 
+        month: 'short', 
+        day: 'numeric' 
+      })
+    }));
+  }, [chartData.timeSeriesData]);
+
+
+
   // Handler pentru evenimentul transaction:created
   const handleTransactionCreated = useCallback(() => {
     // Invalidăm cache-ul pentru a reîncărca datele
@@ -200,12 +228,70 @@ const TransactionsPage: React.FC = () => {
           </Alert>
         )}
 
-        {/* Card pentru formular cu styling elegant */}
-        <div className={cn(card({ variant: "default" }), "mb-6")}>
-          <TransactionForm />
+        {/* Layout 50/50: TransactionForm + Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          {/* Stânga: Transaction Form */}
+          <div className={cn(card({ variant: "default" }))}>
+            <TransactionForm />
+          </div>
+
+          {/* Dreapta: Analytics Dashboard cu 2 charts */}
+          <div className={cn(card({ variant: "default" }), "p-6")}>
+            <div className="space-y-6">
+              {/* Header cu statistici generale */}
+              <div className="text-center border-b border-carbon-200 dark:border-carbon-700 pb-4">
+                <h3 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100 mb-2">
+                  📊 Analiza Financiară
+                </h3>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="text-red-600 dark:text-red-400">
+                    <div className="font-medium">Cheltuieli</div>
+                    <div className="text-lg font-bold">{chartData.totalExpenses.toFixed(0)} RON</div>
+                  </div>
+                  <div className="text-green-600 dark:text-green-400">
+                    <div className="font-medium">Venituri</div>
+                    <div className="text-lg font-bold">{chartData.totalIncome.toFixed(0)} RON</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Trend Temporal (Line) */}
+              <div className="space-y-4 pt-2">
+                <h4 className="font-medium text-carbon-800 dark:text-carbon-200 text-center">
+                  📈 Trend Financiar (Ultimele 30 zile)
+                </h4>
+                {lineChartData.length > 0 ? (
+                  <div className="h-48">
+                    <LineChart
+                      data={lineChartData as any}
+                      xAxisKey="date"
+                      yAxisKeys={["expenses", "income"]}
+                      colors={{
+                        expenses: "#ef4444",  // red-500
+                        income: "#10b981"     // green-500
+                      }}
+                      height={190}
+                      showArea={false}
+                      strokeWidth={3}
+                      dotSize={4}
+                      showLegend={true}
+                      showGridLines={true}
+                    />
+                  </div>
+                ) : (
+                  <div className="h-48 flex items-center justify-center text-carbon-500 dark:text-carbon-400">
+                    <div className="text-center">
+                      <div className="text-2xl mb-1">📈</div>
+                      <p className="text-sm">Fără date de trend</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Card pentru filtre cu styling consistent */}
+        {/* Card pentru filtre cu export integrat */}
         <div className={cn(card({ variant: "default" }), "mb-6")}>
           <TransactionFilters
             type={filterType}
@@ -226,14 +312,12 @@ const TransactionsPage: React.FC = () => {
             onAmountMinChange={setAmountMin}
             onAmountMaxChange={setAmountMax}
             onSearchTextChange={setSearchText}
-          />
-        </div>
-
-        {/* Card pentru export cu styling și layout consistent */}
-        <div className={cn(card({ variant: "default" }), "mb-6")}>
-          <ExportButton
-            transactions={(transactions as Transaction[]) || []}
-            disabled={isLoading || !transactions?.length}
+            exportButton={
+              <ExportButton
+                transactions={(transactions as Transaction[]) || []}
+                disabled={isLoading || !transactions?.length}
+              />
+            }
           />
         </div>
 

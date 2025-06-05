@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useExport } from "../../../hooks/useExport";
 import Button from "../../primitives/Button/Button";
-import { ExportModal } from "./ExportModal";
+import ExportModal from "./ExportModal";
 import type { Transaction } from "../../../types/Transaction";
 import type { ExportFormat } from "../../../utils/ExportManager";
 import { BUTTONS } from "@shared-constants/ui";

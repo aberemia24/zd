@@ -5,6 +5,8 @@ import Select from "../../primitives/Select/Select";
 import Checkbox from "../../primitives/Checkbox/Checkbox";
 import Badge from "../../primitives/Badge/Badge";
 import Alert from "../../primitives/Alert/Alert";
+import FormLayout from "../../primitives/FormLayout/FormLayout";
+import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
 import {
   TransactionType,
   getCategoriesForTransactionType,
@@ -15,11 +17,7 @@ import { useTransactionFormStore } from "../../../stores/transactionFormStore";
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { 
   cn,
-  formGroup,
-  flex,
-  flexLayout,
-  spacingMargin,
-  spaceY
+  flexLayout
 } from "../../../styles/cva-v2";
 
 /**
@@ -67,10 +65,6 @@ export type TransactionFormData = {
   description?: string; // Descriere opțională pentru tranzacție (necesar pentru React Query)
   // currency nu este vizibilă în formular, se folosește valoarea implicită RON în store
 };
-
-// Nu mai folosim props pentru form, error, success, onChange, onSubmit, loading. Totul vine din store Zustand.
-
-// Eliminat structura locală categorii/subcategorii. Folosește doar CATEGORIES din @shared-constants.
 
 // Componentă cu props opționale onSave și onCancel
 interface TransactionFormProps {
@@ -191,7 +185,7 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
       <div
         className={cn(
           flexLayout({ justify: "center", align: "center" }),
-          spacingMargin({ y: 4 })
+          "my-4"
         )}
         data-testid="transaction-form-store-loading"
       >
@@ -213,7 +207,7 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
       <div
         className={cn(
           flexLayout({ justify: "center", align: "center" }),
-          spacingMargin({ y: 4 })
+          "my-4"
         )}
         data-testid="transaction-form-data-loading"
       >
@@ -222,213 +216,62 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
     );
   }
 
-  return (
-    <form
-      aria-label={LABELS.FORM}
-      onSubmit={onSubmit}
-              className={cn(
-          formGroup({ variant: "default" }),
-          spaceY({ spacing: 6 })
-        )}
-      data-testid="transaction-form"
-    >
-      {/* Bara de titlu cu efect de gradient */}
-      <div
-        className={cn(
-          "flex flex-row justify-between items-center"
-        )}
+  // Prepare form sections
+  const formTitle = form.type
+    ? `Adaugă ${form.type === TransactionType.INCOME ? "venit" : "cheltuială"}`
+    : EXCEL_GRID.ACTIONS.ADD_TRANSACTION;
+
+  const loadingIndicator = loading ? (
+    <Badge variant="warning">
+      Se procesează...
+    </Badge>
+  ) : undefined;
+
+  const formActions = (
+    <div className="flex gap-2 justify-end">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        data-testid="cancel-btn"
+        onClick={() => {
+          resetForm();
+          onCancel?.();
+        }}
+        className="px-4"
       >
-        <h3 className="text-lg font-medium text-gray-900">
-          {form.type
-            ? `Adaugă ${form.type === TransactionType.INCOME ? "venit" : "cheltuială"}`
-            : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
-        </h3>
-        {/* Indicator status formular */}
-        {loading && (
-          <Badge variant="warning">
-            Se procesează...
-          </Badge>
-        )}
-      </div>
+        {BUTTONS.CANCEL}
+      </Button>
 
-      {/* Secțiunea de selectare tip tranzacție cu stiluri rafinate */}
-              <div className={spaceY({ spacing: 4 })}>
-        <Select
-          name="type"
-          label={LABELS.TYPE + "*:"}
-          value={form.type}
-          onChange={handleChange}
-          aria-label={LABELS.TYPE}
-          options={OPTIONS.TYPE}
-          placeholder={PLACEHOLDERS.SELECT}
-          data-testid="type-select"
-          variant="default"
-          size="md"
-        />
-      </div>
+      {(() => {
+        // Asigurăm validarea strictă a formularului și conversia la boolean
+        const isFormValid: boolean = Boolean(
+          form.type &&
+            form.amount &&
+            form.category &&
+            form.date &&
+            (!form.recurring || (form.recurring && form.frequency)),
+        );
 
-      {/* Rândul principal de câmpuri cu aranjament grid și stiluri rafinate */}
-              <div className={cn(
-          "grid grid-cols-1 md:grid-cols-2",
-          flexLayout({ gap: 4 })
-        )}>
-        <Input
-          name="amount"
-          type="number"
-          label={LABELS.AMOUNT + "*:"}
-          value={form.amount}
-          onChange={handleChange}
-          aria-label={LABELS.AMOUNT}
-          error={
-            typeof error === "object" && error
-              ? (error as Record<string, string>).amount
-              : undefined
-          }
-          data-testid="amount-input"
-          variant="default"
-          size="md"
-        />
+        return (
+          <ValidatedSubmitButton
+            isFormValid={isFormValid}
+            size="sm"
+            isLoading={Boolean(loading)}
+            data-testid="add-transaction-button"
+            aria-label={BUTTONS.ADD}
+            submitText={BUTTONS.ADD}
+            className="px-6"
+          >
+            {BUTTONS.ADD}
+          </ValidatedSubmitButton>
+        );
+      })()}
+    </div>
+  );
 
-        <Select
-          name="category"
-          label={LABELS.CATEGORY + "*:"}
-          value={form.category}
-          onChange={handleChange}
-          aria-label={LABELS.CATEGORY}
-          options={optiuniCategorie}
-          disabled={!form.type || optiuniCategorie.length === 0}
-          placeholder={PLACEHOLDERS.SELECT}
-          data-testid="category-select"
-          variant="default"
-          size="md"
-        />
-
-        <Select
-          name="subcategory"
-          label={LABELS.SUBCATEGORY}
-          value={form.subcategory}
-          onChange={handleChange}
-          aria-label={LABELS.SUBCATEGORY}
-          options={optiuniSubcategorie}
-          disabled={!form.category || optiuniSubcategorie.length === 0}
-          placeholder={PLACEHOLDERS.SELECT}
-          data-testid="subcategory-select"
-          variant="default"
-          size="md"
-        />
-
-        <Input
-          name="date"
-          type="date"
-          label={LABELS.DATE + "*:"}
-          value={form.date}
-          onChange={handleChange}
-          aria-label={LABELS.DATE}
-          error={
-            typeof error === "object" && error
-              ? (error as Record<string, string>).date
-              : undefined
-          }
-          data-testid="date-input"
-          variant="default"
-          size="md"
-        />
-
-        <div className={flexLayout({ align: "center", gap: 3 })}>
-          <Checkbox
-            name="recurring"
-            label={LABELS.RECURRING + "?"}
-            checked={form.recurring}
-            onChange={handleChange}
-            data-testid="recurring-checkbox"
-            variant="default"
-            size="md"
-          />
-
-          {form.recurring && (
-            <Badge variant="primary">
-              Recurent
-            </Badge>
-          )}
-        </div>
-
-        <Select
-          name="frequency"
-          label={LABELS.FREQUENCY}
-          value={form.frequency}
-          onChange={handleChange}
-          aria-label={LABELS.FREQUENCY}
-          options={OPTIONS.FREQUENCY}
-          disabled={!form.recurring}
-          placeholder={PLACEHOLDERS.SELECT}
-          data-testid="frequency-select"
-          variant="default"
-          size="md"
-        />
-
-        {/* Adăugăm câmp pentru descriere */}
-        <div className="col-span-full">
-          <Input
-            name="description"
-            type="text"
-            label={LABELS.DESCRIPTION}
-            value={form.description || ""}
-            onChange={handleChange}
-            aria-label={LABELS.DESCRIPTION}
-            placeholder={PLACEHOLDERS.DESCRIPTION}
-            data-testid="description-input"
-            variant="default"
-            size="md"
-          />
-        </div>
-      </div>
-
-      {/* Butoane de acțiune cu efecte vizuale moderne */}
-      <div
-        className={cn(
-          "flex flex-row justify-between items-center"
-        )}
-      >
-        {/* Verificăm dacă toate câmpurile obligatorii sunt completate */}
-        {(() => {
-          // Asigurăm validarea strictă a formularului și conversia la boolean
-          const isFormValid: boolean = Boolean(
-            form.type &&
-              form.amount &&
-              form.category &&
-              form.date &&
-              (!form.recurring || (form.recurring && form.frequency)),
-          );
-
-          return (
-            <ValidatedSubmitButton
-              isFormValid={isFormValid}
-              size="md"
-              isLoading={Boolean(loading)}
-              data-testid="add-transaction-button"
-              aria-label={BUTTONS.ADD}
-              submitText={BUTTONS.ADD}
-            >
-              {BUTTONS.ADD}
-            </ValidatedSubmitButton>
-          );
-        })()}
-
-        <Button
-          type="button"
-          variant="secondary"
-          size="md"
-          data-testid="cancel-btn"
-          onClick={() => {
-            resetForm();
-            onCancel?.();
-          }}
-        >
-          {BUTTONS.CANCEL}
-        </Button>
-      </div>
-
-      {/* Mesaje de eroare și succes cu stiluri rafinate */}
+  const formMessages = (
+    <>
       {error && typeof error === "string" && (
         <Alert
           variant="error"
@@ -446,7 +289,146 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
           {safeMessage(success)}
         </Alert>
       )}
-    </form>
+    </>
+  );
+
+  return (
+    <FormLayout
+      title={formTitle}
+      loadingIndicator={loadingIndicator}
+      actions={formActions}
+      messages={formMessages}
+      onSubmit={onSubmit}
+      testId="transaction-form"
+      ariaLabel={LABELS.FORM}
+    >
+      {/* Compact Form Layout - 3 columns for better space usage */}
+      <FieldGrid cols={{ base: 1, sm: 2, md: 3 }} gap={3}>
+        {/* Row 1: Type, Amount, Date */}
+        <Select
+          name="type"
+          label={LABELS.TYPE + "*:"}
+          value={form.type}
+          onChange={handleChange}
+          aria-label={LABELS.TYPE}
+          options={OPTIONS.TYPE}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="type-select"
+          variant="default"
+          size="sm"
+        />
+
+        <Input
+          name="amount"
+          type="number"
+          label={LABELS.AMOUNT + "*:"}
+          value={form.amount}
+          onChange={handleChange}
+          aria-label={LABELS.AMOUNT}
+          error={
+            typeof error === "object" && error
+              ? (error as Record<string, string>).amount
+              : undefined
+          }
+          data-testid="amount-input"
+          variant="default"
+          size="sm"
+        />
+
+        <Input
+          name="date"
+          type="date"
+          label={LABELS.DATE + "*:"}
+          value={form.date}
+          onChange={handleChange}
+          aria-label={LABELS.DATE}
+          error={
+            typeof error === "object" && error
+              ? (error as Record<string, string>).date
+              : undefined
+          }
+          data-testid="date-input"
+          variant="default"
+          size="sm"
+        />
+
+        {/* Row 2: Category, Subcategory, Frequency */}
+        <Select
+          name="category"
+          label={LABELS.CATEGORY + "*:"}
+          value={form.category}
+          onChange={handleChange}
+          aria-label={LABELS.CATEGORY}
+          options={optiuniCategorie}
+          disabled={!form.type || optiuniCategorie.length === 0}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="category-select"
+          variant="default"
+          size="sm"
+        />
+
+        <Select
+          name="subcategory"
+          label={LABELS.SUBCATEGORY}
+          value={form.subcategory}
+          onChange={handleChange}
+          aria-label={LABELS.SUBCATEGORY}
+          options={optiuniSubcategorie}
+          disabled={!form.category || optiuniSubcategorie.length === 0}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="subcategory-select"
+          variant="default"
+          size="sm"
+        />
+
+        <Select
+          name="frequency"
+          label={LABELS.FREQUENCY}
+          value={form.frequency}
+          onChange={handleChange}
+          aria-label={LABELS.FREQUENCY}
+          options={OPTIONS.FREQUENCY}
+          disabled={!form.recurring}
+          placeholder={PLACEHOLDERS.SELECT}
+          data-testid="frequency-select"
+          variant="default"
+          size="sm"
+        />
+
+        {/* Row 3: Recurring Checkbox, Description (spans 2 cols) */}
+        <div className={flexLayout({ align: "center", gap: 2 })}>
+          <Checkbox
+            name="recurring"
+            label={LABELS.RECURRING + "?"}
+            checked={form.recurring}
+            onChange={handleChange}
+            data-testid="recurring-checkbox"
+            variant="default"
+            size="sm"
+          />
+          {form.recurring && (
+            <Badge variant="primary">
+              ✓
+            </Badge>
+          )}
+        </div>
+
+        <FieldWrapper fullWidth>
+          <Input
+            name="description"
+            type="text"
+            label={LABELS.DESCRIPTION}
+            value={form.description || ""}
+            onChange={handleChange}
+            aria-label={LABELS.DESCRIPTION}
+            placeholder={PLACEHOLDERS.DESCRIPTION}
+            data-testid="description-input"
+            variant="default"
+            size="sm"
+          />
+        </FieldWrapper>
+      </FieldGrid>
+    </FormLayout>
   );
 };
 

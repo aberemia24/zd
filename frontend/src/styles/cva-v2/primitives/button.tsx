@@ -15,6 +15,7 @@ export const button = cva([
     variant: {
       primary: [
         "bg-copper-500 hover:bg-copper-600 text-carbon-950",
+        "shadow hover:shadow-lg transition-shadow duration-200",
         "focus-visible:ring-copper-500 dark:bg-copper-400 dark:hover:bg-copper-500",
         "dark:text-carbon-950 dark:focus-visible:ring-copper-300"
       ],

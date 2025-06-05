@@ -372,10 +372,10 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
       </tr>
 
       {/* Add Subcategory Row - cu unified CVA styling */}
-      {isCategory && row.getIsExpanded() && addingSubcategory === original.category && (
+      {isCategory && row.getIsExpanded() && (
         <LunarGridAddSubcategoryRow
           category={original.category}
-          isAdding={true}
+          isAdding={addingSubcategory === original.category}
           inputValue={newSubcategoryName}
           totalColumns={table.getFlatHeaders().length}
           onInputChange={onSetNewSubcategoryName}
