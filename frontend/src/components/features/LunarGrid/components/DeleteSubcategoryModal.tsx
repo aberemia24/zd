@@ -1,7 +1,7 @@
 import React from 'react';
 import ConfirmationModal from '../../../primitives/ConfirmationModal/ConfirmationModal';
 import { UI, BUTTONS } from "@shared-constants";
-import { Transaction } from '../../../types/Transaction';
+import { Transaction } from '../../../../types/Transaction';
 import { 
   cn,
   modal,

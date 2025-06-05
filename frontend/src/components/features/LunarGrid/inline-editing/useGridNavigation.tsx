@@ -62,7 +62,7 @@ export const useGridNavigation = ({
   // Helper pentru aplicarea DOM focus
   const applyDOMFocus = useCallback(
     (row: number, col: number) => {
-      if (!gridRef?.current) return;
+      if (!gridRef?.current) {return;}
 
       const targetCell = gridRef.current.querySelector(
         `[data-testid="cell-${row}-${col}"]`,
@@ -77,7 +77,7 @@ export const useGridNavigation = ({
   // Helper pentru verificarea dacă o celulă e disabled
   const isCellDisabled = useCallback(
     (row: number, col: number) => {
-      if (!gridRef?.current) return false;
+      if (!gridRef?.current) {return false;}
 
       const targetCell = gridRef.current.querySelector(
         `[data-testid="cell-${row}-${col}"]`,
@@ -90,7 +90,7 @@ export const useGridNavigation = ({
   // Focus a specific cell (pentru teste)
   const focusCell = useCallback(
     (row: number, col: number) => {
-      if (!isEnabled) return;
+      if (!isEnabled) {return;}
 
       const position = { row, col };
       setFocusedCell(position);
@@ -109,7 +109,7 @@ export const useGridNavigation = ({
   // Move focus în direcția specificată
   const moveFocus = useCallback(
     (direction: "up" | "down" | "left" | "right") => {
-      if (!isEnabled) return;
+      if (!isEnabled) {return;}
 
       setIsNavigating(true);
 
@@ -173,14 +173,14 @@ export const useGridNavigation = ({
 
   // Start edit pentru celula curent focusată
   const startEdit = useCallback(() => {
-    if (!isEnabled) return;
+    if (!isEnabled) {return;}
     onCellEdit(focusedCell.row, focusedCell.col);
   }, [focusedCell, onCellEdit, isEnabled]);
 
   // Handle Tab navigation (move to next cell, wrap to next row)
   const handleTabNavigation = useCallback(
     (shiftKey: boolean) => {
-      if (!isEnabled) return;
+      if (!isEnabled) {return;}
 
       setFocusedCell((prev) => {
         let nextRow = prev.row;
@@ -222,14 +222,14 @@ export const useGridNavigation = ({
   // Keyboard event handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isEnabled) return;
+      if (!isEnabled) {return;}
 
       // Check if gridRef exists and contains target, or if we're in test environment
       if (gridRef && gridRef.current && e.target instanceof Node) {
         const isInGrid = gridRef.current.contains(e.target);
         // În test environment, permitem toate key events
         const isTestEnvironment = process.env.NODE_ENV === "test";
-        if (!isInGrid && !isTestEnvironment) return;
+        if (!isInGrid && !isTestEnvironment) {return;}
       }
 
       // Prevent default pentru navigation keys
@@ -284,7 +284,7 @@ export const useGridNavigation = ({
   // Handle cell click pentru focus
   const handleCellClick = useCallback(
     (row: number, col: number) => {
-      if (!isEnabled) return;
+      if (!isEnabled) {return;}
 
       const position = { row, col };
       setFocusedCell(position);
@@ -299,7 +299,7 @@ export const useGridNavigation = ({
 
   // Attach keyboard event listener
   useEffect(() => {
-    if (!isEnabled) return;
+    if (!isEnabled) {return;}
 
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
       handleKeyDown(e);
