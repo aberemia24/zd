@@ -51,6 +51,10 @@
     "validate:full": "npm run validate:cva-all && npm run validate:code-quality",
     "fix:hardcoded-strings": "node ../scripts/fix-hardcoded-strings.js",
     "fix:cva-standards": "node ../scripts/fix-cva-standards.js",
+    "performance:monitor": "node ../scripts/performance-monitor.js",
+    "performance:lighthouse": "RUN_LIGHTHOUSE=true node ../scripts/performance-monitor.js",
+    "performance:ci": "CI=true node ../scripts/performance-monitor.js",
+    "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
     "prepare": "husky || true"
   },
   "dependencies": {
@@ -92,6 +96,7 @@
     "@babel/preset-env": "^7.27.2",
     "@babel/preset-react": "^7.27.1",
     "@babel/preset-typescript": "^7.27.1",
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.52.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
@@ -114,6 +119,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
+    "lighthouse": "^12.6.1",
     "lint-staged": "^16.0.0",
     "mailslurp-client": "^15.23.1",
     "msw": "^2.8.4",
