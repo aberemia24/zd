@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect, createContext, useContext } from 'react';
-import { tab, type TabProps as CVATabProps } from '../../../styles/cva/components/layout';
-import { cn, hoverBackground } from '../../../styles/cva-v2';
+import { tab, type TabProps as CVATabProps, cn, hoverBackground } from '../../../styles/cva-v2';
 import { NAVIGATION } from '@shared-constants';
 
 /**

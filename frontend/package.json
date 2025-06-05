@@ -55,10 +55,13 @@
     "performance:lighthouse": "RUN_LIGHTHOUSE=true node ../scripts/performance-monitor.js",
     "performance:ci": "CI=true node ../scripts/performance-monitor.js",
     "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
-    "prepare": "husky || true"
+    "prepare": "husky || true",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
+    "@storybook/react-vite": "^9.0.5",
     "@supabase/supabase-js": "^2.49.8",
     "@tailwindcss/typography": "^0.5.16",
     "@tanstack/react-query": "^5.76.1",
@@ -98,6 +101,8 @@
     "@babel/preset-typescript": "^7.27.1",
     "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.52.0",
+    "@storybook/addon-docs": "^9.0.5",
+    "@storybook/addon-onboarding": "^9.0.5",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.3.1",
     "@testing-library/user-event": "^14.6.1",
@@ -117,6 +122,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-storybook": "^9.0.5",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "lighthouse": "^12.6.1",
@@ -126,13 +132,16 @@
     "nodemailer": "^7.0.3",
     "postcss": "^8.5.3",
     "prettier": "^3.2.5",
+    "prop-types": "^15.8.1",
     "react-refresh": "^0.17.0",
     "rollup-plugin-visualizer": "^6.0.1",
+    "storybook": "^9.0.5",
     "tailwindcss": "^3.4.16",
     "typescript": "4.9.5",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.4"
+    "vitest": "^3.1.4",
+    "webpack": "^5.99.9"
   },
   "overrides": {
     "@types/react": "19.1.5",

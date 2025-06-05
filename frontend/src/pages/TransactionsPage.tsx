@@ -240,7 +240,7 @@ const TransactionsPage: React.FC = () => {
         {/* Tabelul cu tranzacții */}
         <div
           className={cn(flexLayout({ direction: "col" }), spaceY({ spacing: 4 }))}
-          data-testid="transaction-table-container"
+          data-testid="transactions-page-table-container"
         >
           <TransactionTable
             transactions={transactions || []}

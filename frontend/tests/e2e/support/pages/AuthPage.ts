@@ -126,6 +126,10 @@ export class AuthPage {
    * Verifică starea curentă a paginii
    */
   async getPageState(): Promise<PageState> {
+    // Navighează la pagina curentă pentru a primi un status actual
+    await this.page.goto(this.page.url());
+    await this.page.waitForLoadState('networkidle');
+    
     const currentUrl = this.page.url();
     
     return {
@@ -209,6 +213,18 @@ export class AuthPage {
    */
   async loginWithPrimaryAccount(): Promise<TestResult> {
     this.testAccount = AccountManager.getPrimaryAccount();
+    
+    // 🔧 FIX: Verifică prima dată dacă utilizatorul este deja logat
+    const currentState = await this.getPageState();
+    if (currentState.isLoggedIn) {
+      console.log('✅ Utilizatorul este deja logat, skip login process');
+      return {
+        success: true,
+        message: 'Already logged in'
+      };
+    }
+    
+    // Dacă nu este logat, efectuează login-ul normal
     await this.goto();
     return await this.login(this.testAccount);
   }

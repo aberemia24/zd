@@ -60,7 +60,7 @@ const ProfilerDebugPage: React.FC = () => {
               value={year}
               onChange={handleYearChange}
               className="border rounded px-3 py-2 w-32"
-              data-testid="year-input"
+              data-testid="profiler-year-input"
             />
           </div>
           

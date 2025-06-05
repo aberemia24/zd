@@ -375,7 +375,7 @@ const LunarGridPage: React.FC = () => {
                 min="1900"
                 max="2100"
                 className="w-20 text-sm"
-                data-testid="year-input"
+                data-testid="lunargrid-year-input"
               />
             </div>
           </div>

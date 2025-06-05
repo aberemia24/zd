@@ -321,9 +321,67 @@ export const toastCloseButton = cva([
 });
 
 /**
+ * 📋 DROPDOWN COMPONENT
+ * Dropdown menu pentru navigație și acțiuni cu Carbon Copper styling
+ */
+export const dropdown = cva([
+  "absolute z-10 mt-1 rounded-md bg-white dark:bg-neutral-800 shadow-lg",
+  "ring-1 ring-black/5 dark:ring-white/10",
+  "focus:outline-none",
+  "transform transition-all duration-150 ease-out",
+  "origin-top-right opacity-100 scale-100",
+  "border border-neutral-200 dark:border-neutral-700"
+], {
+  variants: {
+    size: {
+      sm: "w-48",
+      md: "w-56", 
+      lg: "w-64",
+      xl: "w-72"
+    }
+  },
+  defaultVariants: {
+    size: "md"
+  }
+});
+
+export const dropdownItem = cva([
+  "block px-4 py-2 text-sm",
+  "text-neutral-700 dark:text-neutral-300",
+  "transition-colors duration-150",
+  "hover:bg-neutral-50 dark:hover:bg-neutral-700",
+  "hover:text-neutral-900 dark:hover:text-neutral-100",
+  "focus:bg-neutral-50 dark:focus:bg-neutral-700",
+  "focus:text-neutral-900 dark:focus:text-neutral-100",
+  "focus:outline-none cursor-pointer"
+], {
+  variants: {
+    variant: {
+      default: "",
+      active: "bg-blue-50 dark:bg-blue-950 text-blue-900 dark:text-blue-100",
+      danger: "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 hover:text-red-700 dark:hover:text-red-300"
+    },
+    disabled: {
+      true: "text-neutral-400 dark:text-neutral-600 pointer-events-none cursor-not-allowed",
+      false: ""
+    }
+  },
+  defaultVariants: {
+    variant: "default",
+    disabled: false
+  }
+});
+
+/**
  * Type exports pentru Toast component
  */
 export type ToastContainerProps = VariantProps<typeof toastContainer>;
 export type ToastProps = VariantProps<typeof toast>;
 export type ToastIconProps = VariantProps<typeof toastIcon>;
-export type ToastCloseButtonProps = VariantProps<typeof toastCloseButton>; 
+export type ToastCloseButtonProps = VariantProps<typeof toastCloseButton>;
+
+/**
+ * Type exports pentru Dropdown component
+ */
+export type DropdownProps = VariantProps<typeof dropdown>;
+export type DropdownItemProps = VariantProps<typeof dropdownItem>; 

@@ -65,6 +65,408 @@
   },
   "suites": [
     {
+      "title": "smoke\\category-management.smoke.spec.ts",
+      "file": "smoke/category-management.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "🟢 Category Management Smoke Tests",
+          "file": "smoke/category-management.smoke.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "utilizatorul poate accesa CategoryEditor din Options",
+              "ok": false,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30132,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                            "column": 48,
+                            "line": 53
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:30:30\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ Utilizatorul este deja logat, skip login process\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-05T12:19:57.248Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-73708--CategoryEditor-din-Options-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context-1",
+                          "contentType": "text/markdown",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-73708--CategoryEditor-din-Options-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4651974a5468b65a23df-b3210610b5f7547eb38f",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 28,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate selecta o categorie și vizualiza subcategoriile",
+              "ok": false,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30088,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                            "column": 48,
+                            "line": 53
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:39:30\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ Utilizatorul este deja logat, skip login process\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-05T12:20:37.167Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-167f7-și-vizualiza-subcategoriile-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context-1",
+                          "contentType": "text/markdown",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-167f7-și-vizualiza-subcategoriile-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4651974a5468b65a23df-dc158367fedd0c952edb",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 37,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate adăuga o subcategorie nouă",
+              "ok": false,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30095,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                            "column": 48,
+                            "line": 53
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:55:30\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ Utilizatorul este deja logat, skip login process\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-05T12:21:09.635Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-9ab6c--adăuga-o-subcategorie-nouă-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context-1",
+                          "contentType": "text/markdown",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-9ab6c--adăuga-o-subcategorie-nouă-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4651974a5468b65a23df-f02bbafeef4d90e00c02",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate redenumi o subcategorie",
+              "ok": false,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30069,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                            "column": 48,
+                            "line": 53
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:73:30\u001b[22m"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ Utilizatorul este deja logat, skip login process\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-05T12:21:42.153Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-f878e-ate-redenumi-o-subcategorie-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "_error-context-1",
+                          "contentType": "text/markdown",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-f878e-ate-redenumi-o-subcategorie-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4651974a5468b65a23df-b0556837f783305189ad",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 71,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate șterge o subcategorie custom",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "interrupted",
+                      "duration": 3273,
+                      "error": {
+                        "message": "Error: locator.click: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n",
+                        "stack": "Error: locator.click: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\n    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:91:30",
+                        "location": {
+                          "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                          "column": 48,
+                          "line": 53
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                            "column": 48,
+                            "line": 53
+                          },
+                          "message": "Error: locator.click: Target page, context or browser has been closed\nCall log:\n\u001b[2m  - waiting for getByTestId('options-tab')\u001b[22m\n\n\n\u001b[90m   at \u001b[39msupport\\pages\\CategoryEditorPage.tsx:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[90m// Metode pentru acțiuni\u001b[39m\n \u001b[90m 52 |\u001b[39m   \u001b[36masync\u001b[39m openFromOptionsPage() {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'options-tab'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mwaitForLoadState(\u001b[32m'networkidle'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 55 |\u001b[39m     \u001b[36mawait\u001b[39m \u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mpage\u001b[33m.\u001b[39mgetByTestId(\u001b[32m'open-category-editor-btn'\u001b[39m)\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[36mthis\u001b[39m\u001b[33m.\u001b[39mmodal)\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at CategoryEditorPage.openFromOptionsPage (C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx:53:48)\u001b[22m\n\u001b[2m    at C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\smoke\\category-management.smoke.spec.ts:91:30\u001b[22m"
+                        },
+                        {
+                          "message": "Error: browserContext._wrapApiCall: Target page, context or browser has been closed"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "✅ Utilizatorul este deja logat, skip login process\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-05T12:22:14.794Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "_error-context-0",
+                          "contentType": "text/markdown",
+                          "path": "C:\\windsurf repo\\budget-app\\frontend\\test-results\\artifacts\\smoke-category-management.-a6fdf-terge-o-subcategorie-custom-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\windsurf repo\\budget-app\\frontend\\tests\\e2e\\support\\pages\\CategoryEditorPage.tsx",
+                        "column": 48,
+                        "line": 53
+                      }
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4651974a5468b65a23df-0e395bcf93b512632184",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 89,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate închide CategoryEditor cu Escape",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4651974a5468b65a23df-c0efeea788a260b9b23b",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 106,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate închide CategoryEditor cu butonul Close",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "4651974a5468b65a23df-463142123b613d801483",
+              "file": "smoke/category-management.smoke.spec.ts",
+              "line": 120,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "smoke\\critical-auth.smoke.spec.ts",
       "file": "smoke/critical-auth.smoke.spec.ts",
       "column": 0,
@@ -90,29 +492,8 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 3107,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Login principal\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Login principal - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-06-02T08:38:12.736Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e126e6d08fe12245c665-5ec09a80a7663343ac60",
@@ -133,29 +514,8 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5777,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Basic Navigation\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Basic Navigation - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-06-02T08:38:15.927Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "e126e6d08fe12245c665-f6f2215ebf7ef84e5be5",
@@ -193,29 +553,8 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1619,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: LunarGrid Loading\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: LunarGrid Loading - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-06-02T08:38:21.716Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "ca675092496f716193df-033cd2ceea04cd2186f4",
@@ -236,38 +575,8 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5398,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Expand/Collapse\n"
-                        },
-                        {
-                          "text": "📊 Celule înainte: 0\n"
-                        },
-                        {
-                          "text": "📊 Celule după expandare: 3090\n"
-                        },
-                        {
-                          "text": "📊 Celule după reset: 0\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Expand/Collapse - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-06-02T08:38:23.339Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "ca675092496f716193df-6662e7ad35de96b47d53",
@@ -288,32 +597,8 @@
                   "expectedStatus": "passed",
                   "projectId": "chromium",
                   "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6986,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "🔍 Smoke Test: Cell Interaction\n"
-                        },
-                        {
-                          "text": "📊 Celule după expandare: 3090\n"
-                        },
-                        {
-                          "text": "✅ Smoke Test: Cell Interaction - SUCCESS\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-06-02T08:38:28.740Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "ca675092496f716193df-d7001f026a035a26fb10",
@@ -324,15 +609,164 @@
           ]
         }
       ]
+    },
+    {
+      "title": "smoke\\transaction-management.smoke.spec.ts",
+      "file": "smoke/transaction-management.smoke.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "🟢 Transaction Management Smoke Tests",
+          "file": "smoke/transaction-management.smoke.spec.ts",
+          "line": 17,
+          "column": 6,
+          "specs": [
+            {
+              "title": "utilizatorul poate adăuga o tranzacție nouă în grid",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-2535764b15c6c7c098c3",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 34,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate crea o subcategorie nouă",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-6e3c2152535dd51d96c2",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 48,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate redenumi o subcategorie",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-2613c299ded564aca192",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 59,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate adăuga o tranzacție recurentă",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-3c7bf70730b79580a68e",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 72,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate șterge o tranzacție din celulă",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-d91d683afac098db22b2",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 84,
+              "column": 7
+            },
+            {
+              "title": "utilizatorul poate naviga prin luni diferite",
+              "ok": true,
+              "tags": [
+                "smoke"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "81f03d3944c22d8e6ef2-e23520ee3acc1bceb648",
+              "file": "smoke/transaction-management.smoke.spec.ts",
+              "line": 97,
+              "column": 7
+            }
+          ]
+        }
+      ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-06-02T08:38:09.820Z",
-    "duration": 27370.342,
-    "expected": 5,
-    "skipped": 0,
-    "unexpected": 0,
+    "startTime": "2025-06-05T12:19:54.517Z",
+    "duration": 144407.406,
+    "expected": 0,
+    "skipped": 14,
+    "unexpected": 4,
     "flaky": 0
   }
 }

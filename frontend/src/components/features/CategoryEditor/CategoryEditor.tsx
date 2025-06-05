@@ -196,7 +196,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
             {error && (
               <Alert
                 variant="error"
-                data-testid="error-message"
+                data-testid="category-editor-error-message"
                 className={spacingMargin({ bottom: 4 })}
               >
                 {error}
@@ -459,7 +459,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                           }}
                           placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
                           className="w-64"
-                          data-testid="add-subcat-input"
+                          data-testid="category-editor-add-subcat-input"
                           maxLength={32}
                         />
                         <Button

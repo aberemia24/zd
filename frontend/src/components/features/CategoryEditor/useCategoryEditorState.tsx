@@ -69,7 +69,7 @@ export function useCategoryEditorState(initialData: {
     if (open && initialMode === "add") {
       setTimeout(() => {
         const addInput = document.querySelector(
-          '[data-testid="add-subcat-input"]',
+          '[data-testid="category-editor-add-subcat-input"]',
         );
         if (addInput instanceof HTMLInputElement) addInput.focus();
       }, 100);

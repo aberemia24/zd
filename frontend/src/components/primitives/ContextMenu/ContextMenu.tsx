@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { cn } from '../../../styles/cva-v2';
-import { dropdown, dropdownItem } from '../../../styles/cva/components/feedback';
+import { cn, dropdown, dropdownItem } from '../../../styles/cva-v2';
 import { NAVIGATION } from '@shared-constants';
 import type { ContextMenuOption, ContextMenuState, FinancialTableRow } from '../../../types/financial';
 

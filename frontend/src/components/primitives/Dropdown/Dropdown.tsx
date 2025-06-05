@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { cn } from '../../../styles/cva-v2';
-import { dropdown, dropdownItem } from '../../../styles/cva/components/feedback';
-import { navigationItem } from '../../../styles/cva-v2/compositions/navigation';
+import { cn, dropdown, dropdownItem, navigationItem } from '../../../styles/cva-v2';
 import { NAVIGATION } from '@shared-constants';
 
 /**

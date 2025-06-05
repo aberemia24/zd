@@ -26,7 +26,9 @@ export {
   toastContent,
   toastTitle,
   toastDescription,
-  toastCloseButton
+  toastCloseButton,
+  dropdown,
+  dropdownItem
 } from './feedback';
 export type { 
   BadgeProps, 
@@ -39,7 +41,9 @@ export type {
   ToastContainerProps,
   ToastProps,
   ToastIconProps,
-  ToastCloseButtonProps
+  ToastCloseButtonProps,
+  DropdownProps,
+  DropdownItemProps
 } from './feedback';
 
 // Layout - extins cu list components
@@ -57,4 +61,8 @@ export type {
     spaceY,
     loadingOverlay
   } from './layout';
-  export type { CardProps, CardHeaderProps, ListProps, ListItemProps, FlexProps, FormGroupProps, SimpleTableProps, TableHeaderProps, TableCellProps } from './layout'; 
+  export type { CardProps, CardHeaderProps, ListProps, ListItemProps, FlexProps, FormGroupProps, SimpleTableProps, TableHeaderProps, TableCellProps } from './layout';
+
+// Navigation
+export { tab, tabList, tabPanel } from './navigation';
+export type { TabProps, TabListProps, TabPanelProps } from './navigation'; 

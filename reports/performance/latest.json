@@ -1,0 +1,268 @@
+{
+  "timestamp": "2025-06-05T12:31:09.742Z",
+  "bundleAnalysis": {
+    "totalSize": 4070348,
+    "jsSize": 2435153,
+    "cssSize": 122483,
+    "chunks": [
+      {
+        "name": "chunk-hqm4448Q.js",
+        "size": 938721
+      },
+      {
+        "name": "chunk-FIamP-ry.js",
+        "size": 388929
+      },
+      {
+        "name": "html2canvas.esm.js-BfxBtG_O.js",
+        "size": 202285
+      },
+      {
+        "name": "chunk-DseqvsBm.js",
+        "size": 163733
+      },
+      {
+        "name": "index.es.js-9fzDTMkE.js",
+        "size": 158664
+      },
+      {
+        "name": "chunk-DRGDK1iM.js",
+        "size": 108152
+      },
+      {
+        "name": "LunarGridPage-JrjXtc0l.js",
+        "size": 86749
+      },
+      {
+        "name": "chunk-C24c0_17.js",
+        "size": 85169
+      },
+      {
+        "name": "index-BvpbN4sO.js",
+        "size": 78480
+      },
+      {
+        "name": "chunk-cooLPSPN.js",
+        "size": 52856
+      },
+      {
+        "name": "TransactionsPage-DOqHOpbP.js",
+        "size": 40676
+      },
+      {
+        "name": "chunk-CfbPSibB.js",
+        "size": 25468
+      },
+      {
+        "name": "OptionsPage-BtWzBHHp.js",
+        "size": 24447
+      },
+      {
+        "name": "purify.es.mjs-CQJ0hv7W.js",
+        "size": 21819
+      },
+      {
+        "name": "chunk-p47cpVoj.js",
+        "size": 17703
+      },
+      {
+        "name": "chunk-Bmu-LTtD.js",
+        "size": 15765
+      },
+      {
+        "name": "chunk-DsxEm3OC.js",
+        "size": 12660
+      },
+      {
+        "name": "chunk-B9naR5oO.js",
+        "size": 5993
+      },
+      {
+        "name": "chunk-DzlhMa4f.js",
+        "size": 4623
+      },
+      {
+        "name": "chunk-C2ckpROa.js",
+        "size": 903
+      },
+      {
+        "name": "chunk-BsyLsq_i.js",
+        "size": 497
+      },
+      {
+        "name": "chunk-C3ZR_RDs.js",
+        "size": 497
+      },
+      {
+        "name": "chunk-Dgys0VZc.js",
+        "size": 335
+      },
+      {
+        "name": "chunk-BNDxwSCV.js",
+        "size": 29
+      }
+    ],
+    "largestChunk": 938721,
+    "assets": [
+      {
+        "name": "bundle-analysis.html",
+        "size": 1510803,
+        "type": "html"
+      },
+      {
+        "name": "assets\\chunk-hqm4448Q.js",
+        "size": 938721,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-FIamP-ry.js",
+        "size": 388929,
+        "type": "js"
+      },
+      {
+        "name": "assets\\html2canvas.esm.js-BfxBtG_O.js",
+        "size": 202285,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-DseqvsBm.js",
+        "size": 163733,
+        "type": "js"
+      },
+      {
+        "name": "assets\\index.es.js-9fzDTMkE.js",
+        "size": 158664,
+        "type": "js"
+      },
+      {
+        "name": "assets\\styles\\index-DdV9SPZX.css",
+        "size": 122483,
+        "type": "css"
+      },
+      {
+        "name": "assets\\chunk-DRGDK1iM.js",
+        "size": 108152,
+        "type": "js"
+      },
+      {
+        "name": "assets\\LunarGridPage-JrjXtc0l.js",
+        "size": 86749,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-C24c0_17.js",
+        "size": 85169,
+        "type": "js"
+      },
+      {
+        "name": "assets\\index-BvpbN4sO.js",
+        "size": 78480,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-cooLPSPN.js",
+        "size": 52856,
+        "type": "js"
+      },
+      {
+        "name": "assets\\TransactionsPage-DOqHOpbP.js",
+        "size": 40676,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-CfbPSibB.js",
+        "size": 25468,
+        "type": "js"
+      },
+      {
+        "name": "assets\\OptionsPage-BtWzBHHp.js",
+        "size": 24447,
+        "type": "js"
+      },
+      {
+        "name": "assets\\purify.es.mjs-CQJ0hv7W.js",
+        "size": 21819,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-p47cpVoj.js",
+        "size": 17703,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-Bmu-LTtD.js",
+        "size": 15765,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-DsxEm3OC.js",
+        "size": 12660,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-B9naR5oO.js",
+        "size": 5993,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-DzlhMa4f.js",
+        "size": 4623,
+        "type": "js"
+      },
+      {
+        "name": "index.html",
+        "size": 1909,
+        "type": "html"
+      },
+      {
+        "name": "assets\\chunk-C2ckpROa.js",
+        "size": 903,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-BsyLsq_i.js",
+        "size": 497,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-C3ZR_RDs.js",
+        "size": 497,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-Dgys0VZc.js",
+        "size": 335,
+        "type": "js"
+      },
+      {
+        "name": "assets\\chunk-BNDxwSCV.js",
+        "size": 29,
+        "type": "js"
+      }
+    ]
+  },
+  "lighthouse": null,
+  "regressions": [],
+  "alerts": [
+    {
+      "type": "error",
+      "category": "bundle",
+      "message": "Total bundle size (3.88 MB) exceeds limit (2 MB)"
+    },
+    {
+      "type": "error",
+      "category": "bundle",
+      "message": "JS bundle size (2.32 MB) exceeds limit (1.5 MB)"
+    },
+    {
+      "type": "warning",
+      "category": "bundle",
+      "message": "Largest chunk (916.72 KB) exceeds recommended size (800 KB)"
+    },
+    {
+      "type": "error",
+      "category": "lighthouse",
+      "message": "Lighthouse audit failed: Command failed: npx lhci autorun --config=lighthouserc.js\nChecking assertions against 3 URL(s), 9 total run(s)\n\n8 result(s) for \u001b[1mhttp://localhost:3000/\u001b[0m :\n\n  \u001b[31m×\u001b[0m  \u001b[1mcategories\u001b[0m.performance failure for \u001b[1mminScore\u001b[0m assertion\n        expected: >=\u001b[32m0.85\u001b[0m\n           found: \u001b[31m0.55\u001b[0m\n      \u001b[2mall values: 0.55, 0.54, 0.55\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mfirst-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       First Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/\n\n        expected: <=\u001b[32m2000\u001b[0m\n           found: \u001b[31m13914.677375000003\u001b[0m\n      \u001b[2mall values: 13914.677375000003, 13930.343400000002, 13923.72155\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mlargest-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Largest Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m26767.917850000013\u001b[0m\n      \u001b[2mall values: 26767.917850000013, 26951.159199999995, 26884.2711\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mspeed-index\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Speed Index\n       https://developer.chrome.com/docs/lighthouse/performance/speed-index/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m13914.677375000003\u001b[0m\n      \u001b[2mall values: 13914.677375000003, 13930.343400000002, 13923.72155\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1munminified-javascript\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Minify JavaScript\n       https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1muses-text-compression\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Enable text compression\n       https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-rel-preload\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-rel-preload\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-webp-images\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-webp-images\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n8 result(s) for \u001b[1mhttp://localhost:3000/transactions\u001b[0m :\n\n  \u001b[31m×\u001b[0m  \u001b[1mcategories\u001b[0m.performance failure for \u001b[1mminScore\u001b[0m assertion\n        expected: >=\u001b[32m0.85\u001b[0m\n           found: \u001b[31m0.55\u001b[0m\n      \u001b[2mall values: 0.55, 0.55, 0.55\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mfirst-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       First Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/\n\n        expected: <=\u001b[32m2000\u001b[0m\n           found: \u001b[31m13844.329275000002\u001b[0m\n      \u001b[2mall values: 13844.329275000002, 13942.249800000003, 13915.917600000008\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mlargest-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Largest Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m26784.810899999997\u001b[0m\n      \u001b[2mall values: 26784.810899999997, 26817.488800000003, 26919.805500000006\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mspeed-index\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Speed Index\n       https://developer.chrome.com/docs/lighthouse/performance/speed-index/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m13844.329275000002\u001b[0m\n      \u001b[2mall values: 13844.329275000002, 13942.249800000003, 13915.917600000008\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1munminified-javascript\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Minify JavaScript\n       https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1muses-text-compression\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Enable text compression\n       https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-rel-preload\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-rel-preload\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-webp-images\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-webp-images\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n8 result(s) for \u001b[1mhttp://localhost:3000/options\u001b[0m :\n\n  \u001b[31m×\u001b[0m  \u001b[1mcategories\u001b[0m.performance failure for \u001b[1mminScore\u001b[0m assertion\n        expected: >=\u001b[32m0.85\u001b[0m\n           found: \u001b[31m0.55\u001b[0m\n      \u001b[2mall values: 0.55, 0.55, 0.55\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mfirst-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       First Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/first-contentful-paint/\n\n        expected: <=\u001b[32m2000\u001b[0m\n           found: \u001b[31m13844.475999999999\u001b[0m\n      \u001b[2mall values: 13844.475999999999, 13917.770250000001, 13919.693\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mlargest-contentful-paint\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Largest Contentful Paint\n       https://developer.chrome.com/docs/lighthouse/performance/lighthouse-largest-contentful-paint/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m26777.390499999998\u001b[0m\n      \u001b[2mall values: 26951, 26927.442, 26777.390499999998\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1mspeed-index\u001b[0m failure for \u001b[1mmaxNumericValue\u001b[0m assertion\n       Speed Index\n       https://developer.chrome.com/docs/lighthouse/performance/speed-index/\n\n        expected: <=\u001b[32m3000\u001b[0m\n           found: \u001b[31m13844.475999999999\u001b[0m\n      \u001b[2mall values: 13844.475999999999, 13917.770250000001, 13919.693\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1munminified-javascript\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Minify JavaScript\n       https://developer.chrome.com/docs/lighthouse/performance/unminified-javascript/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  \u001b[31m×\u001b[0m  \u001b[1muses-text-compression\u001b[0m failure for \u001b[1mminScore\u001b[0m assertion\n       Enable text compression\n       https://developer.chrome.com/docs/lighthouse/performance/uses-text-compression/\n\n        expected: >=\u001b[32m0.9\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-rel-preload\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-rel-preload\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\n\n  ⚠️  \u001b[1muses-webp-images\u001b[0m warning for \u001b[1mauditRan\u001b[0m assertion\n       \"uses-webp-images\" is not a known audit.\n\n        expected: >=\u001b[32m1\u001b[0m\n           found: \u001b[31m0\u001b[0m\n      \u001b[2mall values: 0, 0, 0\u001b[0m\n\nAssertion failed. Exiting with status code 1.\nassert command failed. Exiting with status code 1.\n"
+    }
+  ]
+}

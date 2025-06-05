@@ -75,8 +75,8 @@ export type { ButtonProps } from './primitives/button';
 export { input, select, textarea, checkbox } from './primitives/inputs';
 export type { InputProps, SelectProps, TextareaProps, CheckboxProps } from './primitives/inputs';
 
-export { badge, label, inputWrapper, tooltip, progressContainer, progressBar, progressLabel, toastContainer, toast, toastIcon, toastContent, toastTitle, toastDescription, toastCloseButton } from './primitives/feedback';
-export type { BadgeProps, LabelProps, InputWrapperProps, TooltipProps, ProgressContainerProps, ProgressBarProps, ProgressLabelProps, ToastContainerProps, ToastProps, ToastIconProps, ToastCloseButtonProps } from './primitives/feedback';
+export { badge, label, inputWrapper, tooltip, progressContainer, progressBar, progressLabel, toastContainer, toast, toastIcon, toastContent, toastTitle, toastDescription, toastCloseButton, dropdown, dropdownItem } from './primitives/feedback';
+export type { BadgeProps, LabelProps, InputWrapperProps, TooltipProps, ProgressContainerProps, ProgressBarProps, ProgressLabelProps, ToastContainerProps, ToastProps, ToastIconProps, ToastCloseButtonProps, DropdownProps, DropdownItemProps } from './primitives/feedback';
 
   export { 
     card, 
@@ -91,6 +91,10 @@ export type { BadgeProps, LabelProps, InputWrapperProps, TooltipProps, ProgressC
     loadingOverlay
   } from './primitives/layout';
   export type { CardProps, CardHeaderProps, FlexProps, FormGroupProps, SimpleTableProps, TableHeaderProps, TableCellProps } from './primitives/layout';
+
+// Navigation primitives  
+export { tab, tabList, tabPanel } from './primitives/navigation';
+export type { TabProps, TabListProps, TabPanelProps } from './primitives/navigation';
 
 // =============================================================================
 // COMPOSITIONS EXPORTS - Componente complexe

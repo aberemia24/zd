@@ -1,1 +1,4 @@
 /src/shared-constants/
+
+*storybook.log
+storybook-static

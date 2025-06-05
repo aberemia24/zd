@@ -193,9 +193,9 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
           flexLayout({ justify: "center", align: "center" }),
           spacingMargin({ y: 4 })
         )}
-        data-testid="transaction-form-loading"
+        data-testid="transaction-form-store-loading"
       >
-        <div data-testid="transaction-form-store-loading">Loading store...</div>
+        <div data-testid="transaction-form-store-loading-text">Loading store...</div>
       </div>
     );
   }
@@ -215,9 +215,9 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
           flexLayout({ justify: "center", align: "center" }),
           spacingMargin({ y: 4 })
         )}
-        data-testid="transaction-form-loading"
+        data-testid="transaction-form-data-loading"
       >
-        <div data-testid="transaction-form-data-loading">Loading form...</div>
+        <div data-testid="transaction-form-data-loading-text">Loading form...</div>
       </div>
     );
   }
@@ -432,7 +432,7 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
       {error && typeof error === "string" && (
         <Alert
           variant="error"
-          data-testid="error-message"
+          data-testid="transaction-form-error-message"
         >
           {safeMessage(error)}
         </Alert>

@@ -95,7 +95,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                 options={OPTIONS.TYPE}
                 placeholder="Selectează tipul"
                 {...getSelectProps('type')}
-                data-testid="type-select"
+                data-testid="example-form-type-select"
               />
             )}
           />
@@ -115,7 +115,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                 step="0.01"
                 min="0.01"
                 {...getInputProps('amount')}
-                data-testid="amount-input"
+                data-testid="example-form-amount-input"
               />
             )}
           />
@@ -139,7 +139,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                 ]}
                 placeholder="Selectează categoria"
                 {...getSelectProps('category')}
-                data-testid="category-select"
+                data-testid="example-form-category-select"
               />
             )}
           />
@@ -173,7 +173,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                 type="date"
                 label="Data*"
                 {...getInputProps('date')}
-                data-testid="date-input"
+                data-testid="example-form-date-input"
               />
             )}
           />
@@ -211,7 +211,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                 onChange={onChange}
                 label="Tranzacție recurentă"
                 {...getCheckboxProps('recurring')}
-                data-testid="recurring-checkbox"
+                data-testid="example-form-recurring-checkbox"
               />
             )}
           />
@@ -235,7 +235,7 @@ const ExampleForm: React.FC<ExampleFormProps> = ({
                   ]}
                   placeholder="Selectează frecvența"
                   {...getSelectProps('frequency')}
-                  data-testid="frequency-select"
+                  data-testid="example-form-frequency-select"
                 />
               )}
             />

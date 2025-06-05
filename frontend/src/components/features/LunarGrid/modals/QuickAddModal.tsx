@@ -504,7 +504,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
                     validation.validateField('description', newValue, 'description');
                   }}
                   error={validation.errors.description}
-                  data-testid="quick-add-description-input"
+                  data-testid="quick-add-description-textarea"
                   placeholder={PLACEHOLDERS.DESCRIPTION}
                   rows={2}
                   size="md"
