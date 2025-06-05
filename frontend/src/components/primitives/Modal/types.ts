@@ -1,8 +1,5 @@
-import type { 
-  ModalVariants,
-  ModalContentVariants,
-  ModalContainerVariants 
-} from "../../../styles/cva-v2";
+// Modal type definitions
+// Note: CVA variants imported in components as needed
 
 /**
  * 🎭 MODAL SYSTEM TYPES

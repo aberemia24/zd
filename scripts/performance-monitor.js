@@ -202,7 +202,7 @@ class PerformanceMonitor {
       process.chdir(FRONTEND_DIR);
       
       // Rulează Lighthouse CI
-      const output = execSync('npx lhci autorun --config=lighthouserc.js', {
+      execSync('npx lhci autorun --config=lighthouserc.js', {
         encoding: 'utf8',
         stdio: 'pipe'
       });
@@ -210,7 +210,7 @@ class PerformanceMonitor {
       console.log('✅ Lighthouse audit completed');
 
       // Parse rezultatele (simplificat - în practică ar fi mai complex)
-      const lighthouseData = this.parseLighthouseOutput(output);
+      const lighthouseData = this.parseLighthouseOutput();
       this.reportData.lighthouse = lighthouseData;
 
       return lighthouseData;
@@ -225,7 +225,7 @@ class PerformanceMonitor {
     }
   }
 
-  parseLighthouseOutput(output) {
+  parseLighthouseOutput() {
     // Simplified parsing - în realitate ar extrage metrici din JSON reports
     return {
       performance: 0.85, // Mock data

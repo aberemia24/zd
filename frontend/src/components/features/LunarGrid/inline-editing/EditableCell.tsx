@@ -3,7 +3,6 @@ import { cn } from "../../../../styles/cva-v2";
 import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@shared-constants";
-import { TransactionType } from '@shared-constants';
 
 /**
  * Componenta EditableCell pentru LunarGrid
@@ -141,17 +140,17 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   // OPTIMIZARE: useMemo pentru cell state calculation - Pattern din QuickAddModal
   const cellState = useMemo(() => {
-    if (isReadonly) return "readonly";
-    if (isSaving) return TransactionType.SAVING;
-    if (error) return "error";
-    if (isEditing) return "editing";
-    if (isSelected || isFocused) return "selected";
+    if (isReadonly) {return "readonly";}
+    if (isSaving) {return "saving";}
+    if (error) {return "error";}
+    if (isEditing) {return "editing";}
+    if (isSelected || isFocused) {return "selected";}
     return "normal";
   }, [isReadonly, isSaving, error, isEditing, isSelected, isFocused]);
 
   // OPTIMIZARE: useMemo pentru formatted display value - Pattern din QuickAddModal
   const displayValue = useMemo(() => {
-    if (value === "" || value === null || value === undefined) return "";
+    if (value === "" || value === null || value === undefined) {return "";}
 
     switch (validationType) {
       case "amount":
@@ -234,9 +233,9 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   // Enhanced aria-describedby pentru status changes cu loading feedback
   const enhancedAriaDescribedBy = useMemo(() => {
     const parts = [`cell-${cellId}-description`];
-    if (error) parts.push(`error-${cellId}`);
-    if (isSaving) parts.push(`saving-${cellId}`);
-    if (ariaAnnouncement) parts.push(`announcement-${cellId}`);
+    if (error) {parts.push(`error-${cellId}`);}
+    if (isSaving) {parts.push(`saving-${cellId}`);}
+    if (ariaAnnouncement) {parts.push(`announcement-${cellId}`);}
     return parts.join(" ");
   }, [cellId, error, isSaving, ariaAnnouncement]);
 
@@ -274,7 +273,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   
   // Focus trap logic pentru edit mode
   const handleFocusTrap = useCallback((e: React.KeyboardEvent) => {
-    if (!isEditing || !focusTrapRef.current) return;
+    if (!isEditing || !focusTrapRef.current) {return;}
     
     // Focus trap pentru Tab cycling în edit mode
     if (e.key === "Tab") {
@@ -403,7 +402,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!inputRef.current) return;
+    if (!inputRef.current) {return;}
     
     const inputValue = inputRef.current.value.trim();
     
@@ -694,11 +693,13 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       
       // Performance metrics pentru development
       const renderTime = performance.now();
-      console.debug(`[EditableCell] ${cellId} rendered in ${renderTime.toFixed(2)}ms`, {
-        props: Object.keys({ cellId, value, validationType, isEditing, error, isSaving }).length,
-        controlled: isControlled ? "controlled" : "uncontrolled",
-        state: cellState
-      });
+      if (process.env.NODE_ENV === 'development') {
+        console.debug(`[EditableCell] ${cellId} rendered in ${renderTime.toFixed(2)}ms`, {
+          props: Object.keys({ cellId, value, validationType, isEditing, error, isSaving }).length,
+          controlled: isControlled ? "controlled" : "uncontrolled",
+          state: cellState
+        });
+      }
       
       if (validationErrors.length > 0) {
         console.error("[EditableCell] Validation errors:", validationErrors);

@@ -126,7 +126,7 @@ export function useSentryPerformance() {
    * Măsoară performanța unei cereri API
    */
   const measureApiCall = useCallback(
-    async <T>(endpoint: string, request: () => Promise<T>): Promise<T> => {
+    async <T,>(endpoint: string, request: () => Promise<T>): Promise<T> => {
       return measureTransaction(
         `api.${endpoint}`,
         'http.client',
