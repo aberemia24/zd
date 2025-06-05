@@ -13,7 +13,8 @@ import classNames from "classnames";
 import { useActiveSubcategories } from "../../../services/hooks/useActiveSubcategories";
 import { 
   cn,
-  card
+  card,
+  flexLayout
 } from "../../../styles/cva-v2";
 
 export interface TransactionFiltersProps {
@@ -348,15 +349,21 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
   // Utilizăm CVA unified system și clase CSS manuale
   return (
     <div
-      className={cn(
-        "flex flex-row justify-between items-center gap-4"
-      )}
+      className={flexLayout({ 
+        direction: "row", 
+        justify: "between", 
+        align: "center", 
+        gap: 4 
+      })}
     >
       {/* Bara de filtre compactă, pe o singură linie */}
       <div
-        className={cn(
-          "flex flex-row justify-start items-center gap-4"
-        )}
+        className={flexLayout({ 
+          direction: "row", 
+          justify: "start", 
+          align: "center", 
+          gap: 4 
+        })}
       >
         {/* Filtru tip tranzacție */}
         <Select
@@ -400,9 +407,12 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
       </div>
       {/* Acțiuni și searchbox la finalul barei */}
       <div
-        className={cn(
-          "flex flex-row justify-end items-center gap-4"
-        )}
+        className={flexLayout({ 
+          direction: "row", 
+          justify: "end", 
+          align: "center", 
+          gap: 4 
+        })}
       >
         {/* Searchbox compact */}
         <Input

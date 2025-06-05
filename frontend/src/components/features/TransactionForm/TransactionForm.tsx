@@ -16,7 +16,10 @@ import { useCategoryStore } from "../../../stores/categoryStore";
 import { 
   cn,
   formGroup,
-  flex
+  flex,
+  flexLayout,
+  spacingMargin,
+  spaceY
 } from "../../../styles/cva-v2";
 
 /**
@@ -186,7 +189,10 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
   if (!storeData) {
     return (
       <div
-        className="flex justify-center items-center p-4"
+        className={cn(
+          flexLayout({ justify: "center", align: "center" }),
+          spacingMargin({ y: 4 })
+        )}
         data-testid="transaction-form-loading"
       >
         <div data-testid="transaction-form-store-loading">Loading store...</div>
@@ -205,7 +211,10 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
   ) {
     return (
       <div
-        className="flex justify-center items-center p-4"
+        className={cn(
+          flexLayout({ justify: "center", align: "center" }),
+          spacingMargin({ y: 4 })
+        )}
         data-testid="transaction-form-loading"
       >
         <div data-testid="transaction-form-data-loading">Loading form...</div>
@@ -217,7 +226,10 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
     <form
       aria-label={LABELS.FORM}
       onSubmit={onSubmit}
-      className={cn(formGroup({ variant: "default" }), "space-y-6")}
+              className={cn(
+          formGroup({ variant: "default" }),
+          spaceY({ spacing: 6 })
+        )}
       data-testid="transaction-form"
     >
       {/* Bara de titlu cu efect de gradient */}
@@ -240,7 +252,7 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
       </div>
 
       {/* Secțiunea de selectare tip tranzacție cu stiluri rafinate */}
-      <div className="space-y-4">
+              <div className={spaceY({ spacing: 4 })}>
         <Select
           name="type"
           label={LABELS.TYPE + "*:"}
@@ -256,7 +268,10 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
       </div>
 
       {/* Rândul principal de câmpuri cu aranjament grid și stiluri rafinate */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={cn(
+          "grid grid-cols-1 md:grid-cols-2",
+          flexLayout({ gap: 4 })
+        )}>
         <Input
           name="amount"
           type="number"
@@ -319,7 +334,7 @@ const TransactionFormComponent: React.FC<TransactionFormProps> = ({
           size="md"
         />
 
-        <div className="flex items-center gap-3">
+        <div className={flexLayout({ align: "center", gap: 3 })}>
           <Checkbox
             name="recurring"
             label={LABELS.RECURRING + "?"}

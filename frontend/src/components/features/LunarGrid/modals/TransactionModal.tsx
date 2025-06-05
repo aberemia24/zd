@@ -11,7 +11,9 @@ import {
   textarea,
   checkbox,
   label,
-  inputWrapper
+  inputWrapper,
+  spaceY,
+  flexLayout
 } from "../../../../styles/cva-v2";
 
 /**
@@ -219,12 +221,12 @@ const TransactionModalComponent: React.FC<TransactionModalProps> = ({
       >
         {/* Loading overlay cu CVA styling */}
         {isLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-surface-dark/80 flex items-center justify-center z-10 rounded-lg">
+          <div className={cn("absolute inset-0 bg-white/80 dark:bg-surface-dark/80 z-10 rounded-lg", flexLayout({ direction: "col", justify: "center", align: "center" }))}>
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary dark:border-primary-400"></div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className={cn("p-6", spaceY({ spacing: 6 }))}>
           {/* Modal Header */}
           <div className="border-b border-neutral/20 dark:border-neutral-600/30 pb-4">
             <h2
@@ -239,7 +241,7 @@ const TransactionModalComponent: React.FC<TransactionModalProps> = ({
           </div>
 
           {/* Form Fields cu CVA styling */}
-          <div className="space-y-4">
+          <div className={spaceY({ spacing: 4 })}>
             {/* Amount Input */}
             <div className={cn(inputWrapper())}>
               <label
@@ -318,7 +320,7 @@ const TransactionModalComponent: React.FC<TransactionModalProps> = ({
             </div>
 
             {/* Recurring Checkbox */}
-            <div className="flex items-start space-x-3">
+            <div className={flexLayout({ direction: "row", align: "start", gap: 3 })}>
               <input
                 id="recurring-checkbox"
                 type="checkbox"

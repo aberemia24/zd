@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { syncGlobalTransactionCache, invalidateGlobalTransactionCache } from '../cacheSync';
 import { TransactionValidated, TransactionType } from '@shared-constants';
+import { TransactionType } from '@shared-constants';
 
 describe('Cache Sync Functionality', () => {
   let queryClient: QueryClient;
@@ -139,7 +140,7 @@ describe('Cache Sync Functionality', () => {
 
       // Setup multiple cache keys
       const cacheKey1 = ['transactions', 'infinite', mockUserId, { category: 'Food' }];
-      const cacheKey2 = ['transactions', 'infinite', mockUserId, { type: 'expense' }];
+      const cacheKey2 = ['transactions', 'infinite', mockUserId, { type: TransactionType.EXPENSE }];
       
       queryClient.setQueryData(cacheKey1, existingData);
       queryClient.setQueryData(cacheKey2, existingData);

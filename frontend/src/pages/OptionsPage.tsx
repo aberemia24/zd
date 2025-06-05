@@ -10,7 +10,17 @@ import { ConfirmationModal, PromptModal, useConfirmationModal } from "../compone
 import { Container } from "../components/primitives";
 
 // CVA styling imports
-import { cn, dashboard, card, headingProfessional, labelProfessional, captionProfessional } from "../styles/cva-v2";
+import {
+  cn,
+  card,
+  cardHeader,
+  button,
+  headingProfessional,
+  captionProfessional,
+  dashboard,
+  spacingMargin,
+  spaceY
+} from "../styles/cva-v2";
 
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
 import { supabaseService } from "../services/supabaseService";
@@ -373,7 +383,7 @@ const OptionsPage: React.FC = () => {
           className={cn(dashboard({ layout: "default" }), "min-h-screen pt-8")}
           data-testid="options-page-not-logged"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+          <h1 className={cn(headingProfessional({ level: "h1" }), spacingMargin({ bottom: 6 }))}>
             {UI.OPTIONS_PAGE_TITLE || "Opțiuni"}
           </h1>
           <Alert
@@ -413,16 +423,11 @@ const OptionsPage: React.FC = () => {
         </h1>
 
         {/* Secțiunea de gestionare categorii */}
-        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-          <div
-            className={cn(
-              "p-4 border-b border-gray-200 bg-gray-50",
-              "rounded-t-lg",
-            )}
-          >
-                         <h2 className={headingProfessional({ level: "h4" })}>
-                {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
-              </h2>
+        <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+          <div className={cardHeader({ variant: "default" })}>
+            <h2 className={headingProfessional({ level: "h4" })}>
+              {UI.CATEGORY_MANAGEMENT || "Gestionare categorii"}
+            </h2>
           </div>
           <div className="p-6">
             <p className={captionProfessional({ size: "sm" })}>
@@ -441,13 +446,8 @@ const OptionsPage: React.FC = () => {
         </div>
 
         {/* Alte secțiuni de opțiuni */}
-        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-          <div
-            className={cn(
-              "p-4 border-b border-gray-200 bg-gray-50",
-              "rounded-t-lg",
-            )}
-          >
+        <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+          <div className={cardHeader({ variant: "default" })}>
             <h2 className={headingProfessional({ level: "h4" })}>
               {UI.DISPLAY_OPTIONS || "Opțiuni de afișare"}
             </h2>
@@ -459,13 +459,8 @@ const OptionsPage: React.FC = () => {
           </div>
         </div>
 
-        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-          <div
-            className={cn(
-              "p-4 border-b border-gray-200 bg-gray-50",
-              "rounded-t-lg",
-            )}
-          >
+        <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+          <div className={cardHeader({ variant: "default" })}>
             <h2 className={headingProfessional({ level: "h4" })}>
               {UI.DATA_EXPORT || "Export date"}
             </h2>
@@ -478,34 +473,29 @@ const OptionsPage: React.FC = () => {
         </div>
 
         {/* Secțiunea Reset to Defaults */}
-        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-          <div
-            className={cn(
-              "p-4 border-b border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20",
-              "rounded-t-lg",
-            )}
-          >
-            <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
+        <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+          <div className={cardHeader({ variant: "danger" })}>
+            <h2 className={headingProfessional({ level: "h4", variant: "danger" })}>
               ⚠️ Reset la Setările Inițiale
             </h2>
           </div>
           <div className="p-6">
-            <p className="text-carbon-600 dark:text-carbon-400 mb-4">
+            <p className={cn("text-carbon-600 dark:text-carbon-400", spacingMargin({ bottom: 4 }))}>
               Resetați aplicația la configurația inițială. Alegeți ce doriți să resetați:
             </p>
             
-            <div className="flex flex-col gap-4">
+            <div className={cn("flex flex-col", spaceY({ spacing: 4 }))}>
               {/* Reset doar subcategorii */}
               <div className="border border-carbon-200 dark:border-carbon-700 rounded-lg p-4 bg-carbon-50 dark:bg-carbon-900">
-                <h3 className="font-semibold text-carbon-900 dark:text-carbon-100 mb-2">
+                <h3 className={cn("font-semibold text-carbon-900 dark:text-carbon-100", spacingMargin({ bottom: 2 }))}>
                   🔄 Reset Subcategorii
                 </h3>
-                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                <p className={cn("text-sm text-carbon-600 dark:text-carbon-400", spacingMargin({ bottom: 3 }))}>
                   Șterge subcategoriile custom și redenumește toate subcategoriile la numele inițiale. 
                   <strong className="text-red-700 dark:text-red-400"> ATENȚIE:</strong> Tranzacțiile de pe subcategorii custom vor fi 
                   <strong> șterse definitiv</strong>. Veți fi informați exact câte tranzacții vor fi afectate.
                 </p>
-                <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 p-2 mb-3">
+                <div className={cn("bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 dark:border-blue-500 p-2", spacingMargin({ bottom: 3 }))}>
                   <p className="text-xs text-blue-700 dark:text-blue-300">
                     💡 <strong>Recomandare:</strong> Înainte de reset, mutați manual tranzacțiile importante 
                     din LunarGrid pe subcategorii pe care doriți să le păstrați.
@@ -524,10 +514,10 @@ const OptionsPage: React.FC = () => {
 
               {/* Reset complet */}
               <div className="border border-red-200 dark:border-red-700 rounded-lg p-4 bg-red-50 dark:bg-red-900/20">
-                <h3 className="font-semibold text-red-900 dark:text-red-100 mb-2">
+                <h3 className={cn("font-semibold text-red-900 dark:text-red-100", spacingMargin({ bottom: 2 }))}>
                   💥 Reset Complet (PERICULOS)
                 </h3>
-                <p className="text-sm text-red-700 dark:text-red-300 mb-3">
+                <p className={cn("text-sm text-red-700 dark:text-red-300", spacingMargin({ bottom: 3 }))}>
                   Resetează subcategoriile ȘI șterge <strong>TOATE tranzacțiile</strong> definitiv din baza de date. 
                   <strong> Această acțiune NU poate fi anulată!</strong>
                 </p>
@@ -544,7 +534,7 @@ const OptionsPage: React.FC = () => {
             </div>
 
             {isResetting && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className={cn("p-3 bg-blue-50 border border-blue-200 rounded-lg", spacingMargin({ top: 4 }))}>
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
                   <span className="text-blue-800 text-sm">
@@ -557,36 +547,31 @@ const OptionsPage: React.FC = () => {
         </div>
 
         {/* Secțiunea Cont Utilizator */}
-        <div className={cn(card({ variant: "elevated" }), "mb-6")}>
-          <div
-            className={cn(
-              "p-4 border-b border-carbon-200 dark:border-carbon-700 bg-carbon-50 dark:bg-carbon-900",
-              "rounded-t-lg",
-            )}
-          >
-            <h2 className="text-lg font-semibold text-carbon-900 dark:text-carbon-100">
+        <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+          <div className={cardHeader({ variant: "default" })}>
+            <h2 className={headingProfessional({ level: "h4" })}>
               {UI.ACCOUNT_SETTINGS || "Setări Cont"}
             </h2>
           </div>
           <div className="p-6">
-            <div className="space-y-4">
+            <div className={spaceY({ spacing: 4 })}>
               <div className="border border-carbon-200 dark:border-carbon-700 rounded-lg p-4 bg-carbon-50 dark:bg-carbon-900">
-                <h3 className="font-semibold text-carbon-900 dark:text-carbon-100 mb-2">
+                <h3 className={cn("font-semibold text-carbon-900 dark:text-carbon-100", spacingMargin({ bottom: 2 }))}>
                   👤 Informații cont
                 </h3>
-                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                <p className={cn("text-sm text-carbon-600 dark:text-carbon-400", spacingMargin({ bottom: 3 }))}>
                   <strong>Email:</strong> {user.email || "Nu este disponibil"}
                 </p>
-                <p className="text-sm text-carbon-600 dark:text-carbon-400 mb-3">
+                <p className={cn("text-sm text-carbon-600 dark:text-carbon-400", spacingMargin({ bottom: 3 }))}>
                   <strong>ID Utilizator:</strong> {user.id || "Nu este disponibil"}
                 </p>
               </div>
 
               <div className="border border-orange-200 dark:border-orange-700 rounded-lg p-4 bg-orange-50 dark:bg-orange-900/20">
-                <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-2">
+                <h3 className={cn("font-semibold text-orange-900 dark:text-orange-100", spacingMargin({ bottom: 2 }))}>
                   🚪 Delogare
                 </h3>
-                <p className="text-sm text-orange-700 dark:text-orange-300 mb-3">
+                <p className={cn("text-sm text-orange-700 dark:text-orange-300", spacingMargin({ bottom: 3 }))}>
                   Delogați-vă din aplicație și reveniți la pagina de autentificare.
                 </p>
                 <Button

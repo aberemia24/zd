@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { cn } from '../../../styles/cva-v2';
 import { dropdown, dropdownItem } from '../../../styles/cva/components/feedback';
 import { NAVIGATION } from '@shared-constants';
-import type { ContextMenuOption, ContextMenuState } from '../../../types/financial';
+import type { ContextMenuOption, ContextMenuState, FinancialTableRow } from '../../../types/financial';
 
 /**
  * Props pentru componenta ContextMenu
@@ -131,7 +131,7 @@ const ContextMenuItem: React.FC<{
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        handleClick(e as any);
+        handleClick(e as unknown as React.MouseEvent<HTMLButtonElement>);
       }
     },
     [handleClick]
@@ -287,7 +287,7 @@ export const useContextMenu = () => {
     y: 0
   });
 
-  const show = useCallback((x: number, y: number, targetRow?: any) => {
+  const show = useCallback((x: number, y: number, targetRow?: FinancialTableRow) => {
     setState({
       isVisible: true,
       x,
@@ -305,7 +305,7 @@ export const useContextMenu = () => {
 
   const handleContextMenu = useCallback((
     e: React.MouseEvent,
-    targetRow?: any
+    targetRow?: FinancialTableRow
   ) => {
     e.preventDefault();
     e.stopPropagation();

@@ -3,6 +3,7 @@ import {
   cn,
   card
 } from "../../../styles/cva-v2";
+import { LOADING_MESSAGES } from '@shared-constants';
 import Spinner from "../Spinner/Spinner";
 
 export interface LoaderProps {
@@ -18,7 +19,7 @@ export interface LoaderProps {
  */
 const Loader: React.FC<LoaderProps> = ({
   size = "md",
-  message = "Se încarcă...",
+  message = LOADING_MESSAGES.GENERIC,
   overlay = false,
   className,
   ...props

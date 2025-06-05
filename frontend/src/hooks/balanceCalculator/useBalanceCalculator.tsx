@@ -81,7 +81,7 @@ export const useBalanceCalculator = (
   // State local pentru cache și erori
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-  const [cache, setCache] = useState<Map<string, { data: any; timestamp: number }>>(new Map());
+  const [cache, setCache] = useState<Map<string, { data: number | DailyBalance; timestamp: number }>>(new Map());
 
   // Determină contul activ
   const activeAccountId = defaultAccountId || storeDefaultAccountId || accounts[0]?.accountId;
@@ -211,7 +211,7 @@ export const useBalanceCalculator = (
       const cacheKey = `month-end-${prevYear}-${prevMonth}-${accountId}`;
       const cached = cache.get(cacheKey);
       if (cached && Date.now() - cached.timestamp < cacheTimeout * 2) { // Cache mai lung pentru luni anterioare
-        return cached.data;
+        return typeof cached.data === 'number' ? cached.data : 0;
       }
 
       const endBalance = calculateMonthEndBalance(prevYear, prevMonth, accountId, prevMonthTransactions);
@@ -346,7 +346,7 @@ export const useBalanceCalculator = (
         const cacheKey = `daily-${isoDate}-${targetAccountId}`;
         const cached = cache.get(cacheKey);
         if (cached && Date.now() - cached.timestamp < cacheTimeout) {
-          return cached.data;
+          return cached.data && typeof cached.data === 'object' ? cached.data : null;
         }
 
         // Verificare disponibilitate date

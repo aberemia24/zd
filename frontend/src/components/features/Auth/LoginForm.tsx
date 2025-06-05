@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { MESAJE, LABELS, BUTTONS } from "@shared-constants";
 
 // CVA styling imports - UNIFIED MIGRATION
-import { cn, card, button } from "../../../styles/cva-v2";
+import { cn, card, button, spaceY } from "../../../styles/cva-v2";
 
 import Input from "../../primitives/Input/Input";
 import { ValidatedSubmitButton } from "../../primitives/Button";
@@ -82,7 +82,7 @@ const LoginForm: React.FC<LoginFormProps> = () => {
         <h2 className="text-xl font-semibold text-gray-900">Autentificare</h2>
       </div>
 
-      <div className="p-6 space-y-4">
+      <div className={cn("p-6", spaceY({ spacing: 4 }))}>
         {/* Email Input - FIXED: removed unsupported error variant */}
         <Input
           id="email"

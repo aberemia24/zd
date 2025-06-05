@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn, hoverBackground } from '../../../styles/cva-v2';
+import { cn, hoverBackground, interactiveText, interactiveBorder, headingProfessional } from '../../../styles/cva-v2';
 import { useModalContext } from './Modal';
 import type { ModalHeaderProps } from './types';
 
@@ -22,7 +22,9 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700",
+        "flex items-center justify-between p-6",
+        interactiveBorder({ variant: "default" }),
+        "border-b",
         className
       )}
       {...props}
@@ -30,7 +32,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
       {/* Title/Content */}
       <div 
         id="modal-title"
-        className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+        className={headingProfessional({ level: "h3" })}
       >
         {children}
       </div>
@@ -42,7 +44,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
           onClick={handleClose}
           className={cn(
             "ml-4 p-2 rounded-lg",
-            "text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300",
+            interactiveText({ variant: "muted" }),
             hoverBackground({ variant: "light" }),
             "transition-colors duration-200",
             "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"

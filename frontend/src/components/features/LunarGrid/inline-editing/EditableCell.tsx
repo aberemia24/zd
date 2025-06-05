@@ -3,6 +3,7 @@ import { cn } from "../../../../styles/cva-v2";
 import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@shared-constants";
+import { TransactionType } from '@shared-constants';
 
 /**
  * Componenta EditableCell pentru LunarGrid
@@ -37,15 +38,15 @@ const cellVariants = cva(
   {
     variants: {
       state: {
-        normal: "bg-white hover:bg-gray-50 cursor-pointer text-gray-900",
+        normal: "bg-white cursor-pointer text-carbon-900 dark:text-carbon-100 hover:bg-carbon-50 dark:hover:bg-carbon-800/50",
         selected: "bg-blue-50 border-2 border-blue-400 cursor-text",
         editing: "bg-white ring-2 ring-blue-500 ring-inset cursor-text",
         error: "bg-red-50 border-2 border-red-400 cursor-text",
-        saving: "bg-gray-100 opacity-70 cursor-wait",
-        readonly: "bg-gray-50 cursor-default opacity-60",
+        saving: "bg-carbon-100 dark:bg-carbon-800 opacity-70 cursor-wait",
+        readonly: "bg-carbon-50 dark:bg-carbon-900 cursor-default opacity-60",
       },
       editable: {
-        true: "hover:bg-gray-50",
+        true: "hover:bg-carbon-50 dark:hover:bg-carbon-800/50",
         false: "cursor-default",
       },
     },
@@ -141,7 +142,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   // OPTIMIZARE: useMemo pentru cell state calculation - Pattern din QuickAddModal
   const cellState = useMemo(() => {
     if (isReadonly) return "readonly";
-    if (isSaving) return "saving";
+    if (isSaving) return TransactionType.SAVING;
     if (error) return "error";
     if (isEditing) return "editing";
     if (isSelected || isFocused) return "selected";
@@ -603,7 +604,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       "absolute inset-0 flex items-center justify-center transition-all duration-300 ease-in-out",
       {
         "bg-white bg-opacity-75 backdrop-blur-sm": isEditing,
-        "bg-gray-100 bg-opacity-50": !isEditing,
+        "bg-carbon-100 dark:bg-carbon-800 bg-opacity-50": !isEditing,
         "opacity-100 pointer-events-auto": isSaving,
         "opacity-0 pointer-events-none": !isSaving
       }
@@ -812,7 +813,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         </span>
         {(isSelected || isFocused) && !isReadonly && (
           <span
-            className="ml-2 text-xs text-gray-500 opacity-75"
+            className="ml-2 text-xs text-carbon-500 dark:text-carbon-400 opacity-75"
             data-testid={`editable-cell-hint-${cellId}`}
             aria-hidden="true"
           >

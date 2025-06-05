@@ -1,6 +1,7 @@
 import type { Transaction } from "../types/Transaction";
 import { TransactionType, OPTIONS } from "@shared-constants";
 import { LazyExportManager, type ExportProgressCallback } from "./lazyExportUtils";
+import { LABELS } from '@shared-constants';
 
 export type ExportFormat = "csv" | "pdf" | "excel";
 
@@ -89,9 +90,9 @@ export class ExportManager {
   private static getTransactionTypeLabel(type: TransactionType): string {
     switch (type) {
       case TransactionType.INCOME:
-        return "Venit";
+        return LABELS.INCOME_TYPE;
       case TransactionType.EXPENSE:
-        return "Cheltuială";
+        return LABELS.EXPENSE_TYPE;
       default:
         return "Necunoscut";
     }

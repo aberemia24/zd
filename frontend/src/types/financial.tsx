@@ -60,8 +60,8 @@ export interface TableColumn<T> {
   id: string;
   header: string;
   accessorKey?: keyof T;
-  accessorFn?: (row: T) => any;
-  cell?: (value: any, row: T) => React.ReactNode;
+  accessorFn?: (row: T) => unknown;
+  cell?: (value: unknown, row: T) => React.ReactNode;
   sortable?: boolean;
   filterable?: boolean;
   resizable?: boolean;
@@ -147,7 +147,7 @@ export type BulkOperation =
 export interface BulkOperationPayload {
   operation: BulkOperation;
   selectedIds: string[];
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
 }
 
 // =============================================================================

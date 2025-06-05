@@ -6,7 +6,10 @@ import {
   cn,
   headingProfessional,
   labelProfessional,
-  captionProfessional
+  captionProfessional,
+  spacingMargin,
+  spaceY,
+  flexLayout
 } from "../../../styles/cva-v2";
 import type { ExportFormat } from "../../../utils/ExportManager";
 import { BUTTONS, EXPORT_MESSAGES } from "@shared-constants";
@@ -160,7 +163,10 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         data-testid="export-modal"
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className={cn(
+          flexLayout({ justify: "between", align: "center" }),
+          spacingMargin({ bottom: 6 })
+        )}>
           <h3 className={headingProfessional({ level: "h3" })}>
             Export Tranzacții
           </h3>
@@ -192,7 +198,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
         {/* Progress Bar - afișat doar în timpul exportului */}
         {exportState.isExporting && (
-          <div className="mb-6">
+          <div className={spacingMargin({ bottom: 6 })}>
             <p className={captionProfessional({ size: "sm" })}>
               {exportState.status ||
                 EXPORT_MESSAGES.IN_PROGRES.replace(
@@ -200,7 +206,10 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
                   exportState.progress.toString(),
                 )}
             </p>
-            <div className="w-full bg-gray-200 dark:bg-neutral-600 rounded-full h-2 mb-4 shadow-sm">
+            <div className={cn(
+              "w-full bg-gray-200 dark:bg-neutral-600 rounded-full h-2 shadow-sm",
+              spacingMargin({ bottom: 4 })
+            )}>
               <div
                 className="bg-primary-500 dark:bg-primary-400 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${exportState.progress}%` }}
@@ -211,7 +220,10 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
 
         {/* Error Display */}
         {exportState.error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+          <div className={cn(
+            "p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md",
+            spacingMargin({ bottom: 6 })
+          )}>
             <p className={captionProfessional({ size: "sm", variant: "danger" })}>
               {exportState.error}
             </p>
@@ -219,14 +231,20 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         )}
 
         {/* Informații despre export */}
-        <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+        <div className={cn(
+          "p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md",
+          spacingMargin({ bottom: 6 })
+        )}>
           <p className={captionProfessional({ size: "sm", variant: "primary" })}>
             Se vor exporta {transactionCount} tranzacții.
           </p>
         </div>
 
         {/* Form de configurare export */}
-        <div className="space-y-4 mb-6">
+        <div className={cn(
+          spaceY({ spacing: 4 }),
+          spacingMargin({ bottom: 6 })
+        )}>
           {/* Format Selection */}
           <div>
             <label className={labelProfessional({ size: "sm" })}>
@@ -330,7 +348,7 @@ const ExportModalComponent: React.FC<ExportModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end space-x-3">
+        <div className={flexLayout({ justify: "end", gap: 2 })}>
           <Button
             variant="ghost"
             onClick={onClose}

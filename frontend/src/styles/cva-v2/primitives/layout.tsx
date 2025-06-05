@@ -34,6 +34,28 @@ export const card = cva([
 });
 
 /**
+ * Card Header pentru headerele de secțiune din carduri
+ */
+export const cardHeader = cva([
+  "p-4 border-b rounded-t-lg",
+  "bg-carbon-50 border-carbon-200",
+  "dark:bg-carbon-900 dark:border-carbon-700"
+], {
+  variants: {
+    variant: {
+      default: "bg-carbon-50 border-carbon-200 dark:bg-carbon-900 dark:border-carbon-700",
+      danger: "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700",
+      warning: "bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-700",
+      success: "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700",
+      primary: "bg-copper-50 border-copper-200 dark:bg-copper-950 dark:border-copper-700",
+    }
+  },
+  defaultVariants: {
+    variant: "default"
+  }
+});
+
+/**
  * List pentru afișarea elementelor în listă - optimizat pentru date financiare
  */
 export const list = cva([
@@ -163,10 +185,173 @@ export const formGroup = cva("flex flex-col transition-all duration-150", {
 });
 
 /**
+ * Simple Table pentru HTML tables (non-TanStack)
+ */
+export const simpleTable = cva([
+  "w-full border-collapse"
+], {
+  variants: {
+    variant: {
+      default: "",
+      bordered: "border border-carbon-200 dark:border-carbon-700",
+      striped: "",
+    }
+  },
+  defaultVariants: {
+    variant: "default"
+  }
+});
+
+/**
+ * Table Header pentru <th> elements
+ */
+export const tableHeader = cva([
+  "text-left p-4 font-medium",
+  "text-carbon-700 dark:text-carbon-300",
+  "bg-carbon-50 dark:bg-carbon-800",
+  "border-b border-carbon-200 dark:border-carbon-700"
+], {
+  variants: {
+    align: {
+      left: "text-left",
+      center: "text-center", 
+      right: "text-right"
+    },
+    size: {
+      sm: "p-2 text-sm",
+      md: "p-4",
+      lg: "p-6 text-lg"
+    }
+  },
+  defaultVariants: {
+    align: "left",
+    size: "md"
+  }
+});
+
+/**
+ * Table Cell pentru <td> elements
+ */
+export const tableCell = cva([
+  "p-4 border-b border-carbon-200 dark:border-carbon-700"
+], {
+  variants: {
+    align: {
+      left: "text-left",
+      center: "text-center",
+      right: "text-right"
+    },
+    size: {
+      sm: "p-2 text-sm",
+      md: "p-4", 
+      lg: "p-6"
+    },
+    variant: {
+      default: "",
+      loading: "text-center",
+      empty: "text-center text-carbon-500 dark:text-carbon-400"
+    }
+  },
+  defaultVariants: {
+    align: "left",
+    size: "md",
+    variant: "default"
+  }
+});
+
+/**
+ * Spacing utilities pentru standardizarea spacing patterns comuni
+ */
+export const spacingMargin = cva("", {
+  variants: {
+    bottom: {
+      0: "mb-0",
+      1: "mb-1", 
+      2: "mb-2",
+      3: "mb-3",
+      4: "mb-4",
+      6: "mb-6",
+      8: "mb-8",
+      12: "mb-12"
+    },
+    top: {
+      0: "mt-0",
+      1: "mt-1",
+      2: "mt-2", 
+      3: "mt-3",
+      4: "mt-4",
+      6: "mt-6",
+      8: "mt-8",
+      12: "mt-12"
+    },
+    y: {
+      0: "my-0",
+      1: "my-1",
+      2: "my-2",
+      3: "my-3", 
+      4: "my-4",
+      6: "my-6",
+      8: "my-8"
+    }
+  },
+  defaultVariants: {}
+});
+
+/**
+ * Space-y patterns pentru vertical spacing în containers
+ */
+export const spaceY = cva("", {
+  variants: {
+    spacing: {
+      0: "space-y-0",
+      1: "space-y-1",
+      2: "space-y-2",
+      3: "space-y-3",
+      4: "space-y-4",
+      6: "space-y-6",
+      8: "space-y-8",
+      12: "space-y-12"
+    }
+  },
+  defaultVariants: {
+    spacing: 4
+  }
+});
+
+/**
+ * Loading overlay pentru states de încărcare
+ */
+export const loadingOverlay = cva([
+  "absolute inset-0 flex items-center justify-center transition-all duration-300"
+], {
+  variants: {
+    variant: {
+      default: "bg-background/80 dark:bg-surface-dark/80 backdrop-blur-sm z-10",
+      glass: "bg-white/50 dark:bg-black/50 backdrop-blur-md z-10",
+      subtle: "bg-carbon-50/60 dark:bg-carbon-900/60 backdrop-blur-sm z-5",
+      modal: "bg-black/50 backdrop-blur-sm z-50"
+    },
+    content: {
+      spinner: "",
+      text: "flex-col gap-2",
+      minimal: "opacity-75"
+    }
+  },
+  defaultVariants: {
+    variant: "default",
+    content: "spinner"
+  }
+});
+
+/**
  * Type exports pentru TypeScript
  */
 export type CardProps = VariantProps<typeof card>;
+export type CardHeaderProps = VariantProps<typeof cardHeader>;
 export type ListProps = VariantProps<typeof list>;
 export type ListItemProps = VariantProps<typeof listItem>;
 export type FlexProps = VariantProps<typeof flex>;
-export type FormGroupProps = VariantProps<typeof formGroup>; 
+export type FormGroupProps = VariantProps<typeof formGroup>;
+export type SimpleTableProps = VariantProps<typeof simpleTable>;
+export type TableHeaderProps = VariantProps<typeof tableHeader>;
+export type TableCellProps = VariantProps<typeof tableCell>; 

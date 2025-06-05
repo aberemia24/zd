@@ -1,3 +1,4 @@
+import { LABELS } from '@shared-constants';
 /**
  * 💰 FINANCIAL UTILITIES - Task 8.2
  * Utilitare pentru formatarea și calcularea datelor financiare pentru piața românească
@@ -131,7 +132,7 @@ export function transformToTableRow(
   transaction: FinancialTransaction,
   runningBalance?: number
 ): FinancialTableRow {
-  const typeDisplay = transaction.type === TransactionType.INCOME ? 'Venit' : 'Cheltuială';
+  const typeDisplay = transaction.type === TransactionType.INCOME ? LABELS.INCOME_TYPE : LABELS.EXPENSE_TYPE;
   const categoryPath = transaction.subcategory 
     ? `${transaction.category} > ${transaction.subcategory}`
     : transaction.category;

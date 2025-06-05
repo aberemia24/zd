@@ -87,6 +87,10 @@ export const LABELS = {
   DATE_TO_FILTER: 'Până la data:',
   AMOUNT_MIN_FILTER: 'Suma minimă:',
   AMOUNT_MAX_FILTER: 'Suma maximă:',
+  
+  // Transaction type labels
+  INCOME_TYPE: 'Venit',
+  EXPENSE_TYPE: 'Cheltuială',
 };
 
 export const TITLES = {

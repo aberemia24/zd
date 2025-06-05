@@ -6,6 +6,7 @@ import { cn } from '../../../styles/cva-v2';
 import { modal } from '../../../styles/cva-v2';
 import { navigationItem } from '../../../styles/cva-v2/compositions/navigation';
 import { NAVIGATION, UI } from '@shared-constants';
+import { TransactionType } from '@shared-constants';
 
 /**
  * 🎨 COMMAND PALETTE COMPONENT - CVA v2
@@ -103,7 +104,7 @@ const getDefaultActions = (navigate: (path: string) => void): CommandAction[] =>
     category: 'navigation',
     icon: ArrowRight,
     shortcut: 'Alt+T',
-    keywords: ['transactions', 'tranzacții', 'plăți', 'income', 'expense'],
+    keywords: ['transactions', 'tranzacții', 'plăți', TransactionType.INCOME, TransactionType.EXPENSE],
     href: '/transactions',
     action: () => navigate('/transactions'),
     priority: 10

@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Progress from './Progress';
+import { LOADING_MESSAGES } from '@shared-constants';
 
 describe('Progress Component', () => {
   describe('Basic Rendering', () => {
@@ -79,10 +80,10 @@ describe('Progress Component', () => {
 
   describe('Label', () => {
     it('should render label when provided', () => {
-      render(<Progress value={60} label="Loading..." />);
+      render(<Progress value={60} label={LOADING_MESSAGES.GENERIC} />);
 
-      expect(screen.getByText('Loading...')).toBeInTheDocument();
-      expect(screen.getByText('Loading...')).toHaveClass('font-semibold');
+      expect(screen.getByText(LOADING_MESSAGES.GENERIC)).toBeInTheDocument();
+      expect(screen.getByText(LOADING_MESSAGES.GENERIC)).toHaveClass('font-semibold');
     });
 
     it('should show label with percentage display', () => {

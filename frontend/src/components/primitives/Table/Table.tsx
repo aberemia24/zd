@@ -45,11 +45,11 @@ import {
 export interface TableColumn<TData> {
   // Proprietăți din ColumnDef
   id?: string;
-  header?: string | ((context: any) => React.ReactNode);
+  header?: string | ((context: unknown) => React.ReactNode);
   accessorKey?: string;
-  accessorFn?: (row: TData) => any;
-  cell?: (context: any) => React.ReactNode;
-  footer?: string | ((context: any) => React.ReactNode);
+  accessorFn?: (row: TData) => unknown;
+  cell?: (context: unknown) => React.ReactNode;
+  footer?: string | ((context: unknown) => React.ReactNode);
   
   // Proprietăți Carbon Design System specifice
   enableSorting?: boolean;

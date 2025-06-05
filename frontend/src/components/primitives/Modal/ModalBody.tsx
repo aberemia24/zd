@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../../styles/cva-v2';
+import { cn, interactiveText } from '../../../styles/cva-v2';
 import type { ModalBodyProps } from './types';
 
 /**
@@ -16,7 +16,8 @@ const ModalBody: React.FC<ModalBodyProps> = ({
     <div
       id="modal-description"
       className={cn(
-        "p-6 text-gray-700 dark:text-gray-300",
+        "p-6",
+        interactiveText({ variant: "default" }),
         "max-h-96 overflow-y-auto", // Scroll pentru conținut lung
         className
       )}

@@ -1,9 +1,10 @@
+import { LABELS } from '@shared-constants';
 /**
  * 🔍 TABLE TOOLBAR - Task 8.2
  * Toolbar pentru search avansat și filtering pentru tabele financiare
  */
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Search, Filter, X, Calendar, Tag, DollarSign } from 'lucide-react';
 
 import { TransactionType } from '@shared-constants';
@@ -11,7 +12,7 @@ import {
   cn,
   button,
   input,
-  select,
+  spaceY,
 } from '../../../styles/cva-v2';
 import type { 
   FilterState, 
@@ -61,7 +62,8 @@ const QUICK_FILTERS: QuickFilterPeriod[] = [
 // COMPONENT IMPLEMENTATION
 // =============================================================================
 
-export const TableToolbar: React.FC<TableToolbarProps> = ({
+// Memoized component pentru performance optimization
+export const TableToolbar: React.FC<TableToolbarProps> = memo(({
   searchState,
   filterState,
   onSearchChange,
@@ -69,7 +71,7 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   onQuickFilter,
   onClearAll,
   categories = [],
-  subcategories = [],
+  subcategories: _subcategories = [],
   showQuickFilters = true,
   showCategoryFilter = true,
   showTypeFilter = true,
@@ -101,12 +103,12 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (filterState.categories.length > 0) count++;
-    if (filterState.subcategories.length > 0) count++;
-    if (filterState.types.length > 0) count++;
-    if (filterState.amountRange.min !== null || filterState.amountRange.max !== null) count++;
-    if (filterState.dateRange.start !== null || filterState.dateRange.end !== null) count++;
-    if (searchState.query.trim().length > 0) count++;
+    if (filterState.categories.length > 0) { count++; }
+    if (filterState.subcategories.length > 0) { count++; }
+    if (filterState.types.length > 0) { count++; }
+    if (filterState.amountRange.min !== null || filterState.amountRange.max !== null) { count++; }
+    if (filterState.dateRange.start !== null || filterState.dateRange.end !== null) { count++; }
+    if (searchState.query.trim().length > 0) { count++; }
     return count;
   }, [searchState, filterState]);
 
@@ -160,7 +162,7 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   // =============================================================================
 
   const renderQuickFilters = () => {
-    if (!showQuickFilters) return null;
+    if (!showQuickFilters) { return null; }
 
     return (
       <div className="flex flex-wrap gap-2">
@@ -185,10 +187,10 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
   };
 
   const renderAdvancedFilters = () => {
-    if (!isAdvancedOpen) return null;
+    if (!isAdvancedOpen) { return null; }
 
     return (
-      <div className="border-t border-gray-200 pt-4 space-y-4">
+      <div className={cn("border-t border-gray-200 pt-4", spaceY({ spacing: 4 }))}>
         {/* Category Filter */}
         {showCategoryFilter && categories.length > 0 && (
           <div>
@@ -237,7 +239,7 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
                     type === TransactionType.EXPENSE && 'text-red-700 border-red-300'
                   )}
                 >
-                  {type === TransactionType.INCOME ? 'Venit' : 'Cheltuială'}
+                  {type === TransactionType.INCOME ? LABELS.INCOME_TYPE : LABELS.EXPENSE_TYPE}
                 </button>
               ))}
             </div>
@@ -332,7 +334,10 @@ export const TableToolbar: React.FC<TableToolbarProps> = ({
       {renderAdvancedFilters()}
     </div>
   );
-};
+});
+
+// Add display name for debugging
+TableToolbar.displayName = 'TableToolbar';
 
 // =============================================================================
 // EXPORT

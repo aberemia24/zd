@@ -1,4 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
+import { TransactionType } from '@shared-constants';
 
 /**
  * 🎨 FINANCIAL DOMAIN - Carbon Copper Design System
@@ -90,7 +91,7 @@ export const categoryBadge = cva([
       lg: "px-3 py-1 text-sm"
     }
   },
-  defaultVariants: { type: "expense", size: "md" }
+  defaultVariants: { type: TransactionType.EXPENSE, size: "md" }
 });
 
 /**

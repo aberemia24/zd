@@ -20,7 +20,7 @@ import {
   formatChartPercentage,
   DEFAULT_CHART_THEME,
 } from '../../../utils/charts';
-import type { BarChartProps } from '../../../types/charts';
+import type { BarChartProps, CategoryDataPoint, MonthlyComparisonDataPoint } from '../../../types/charts';
 import { 
   cn,
   headingProfessional,
@@ -105,13 +105,23 @@ export const BarChart: React.FC<BarChartProps> = ({
   // CUSTOM TOOLTIP
   // =============================================================================
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      color: string;
+      dataKey: string;
+      value: number;
+    }>;
+    label?: string;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (!active || !payload || !payload.length) return null;
 
     return (
       <div className="bg-white border border-carbon-300 rounded-lg shadow-lg p-3 min-w-[200px]">
         <p className={cn("font-medium mb-2", headingProfessional({ level: "h6" }))}>{label}</p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index: number) => (
           <div key={index} className="flex items-center justify-between space-x-3 mb-1">
             <div className="flex items-center space-x-2">
               <div 

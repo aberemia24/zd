@@ -42,6 +42,7 @@
     "validate:console-cleanup": "node scripts/validate-console-cleanup.js",
     "validate:jsx-extensions": "node scripts/validate-jsx-extensions.js",
     "validate:typescript-quality": "node scripts/validate-typescript-quality.js",
+    "validate:transaction-types": "node scripts/validate-transaction-types.js",
     "validate:all": "node scripts/validate-all-automation.js",
     "validate:quick": "npm run validate:constants && npm run validate:shared-constants && npm run validate:console-cleanup"
   },

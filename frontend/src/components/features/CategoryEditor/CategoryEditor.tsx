@@ -22,7 +22,9 @@ import {
   hoverBackground,
   headingProfessional,
   labelProfessional,
-  captionProfessional
+  captionProfessional,
+  flexLayout,
+  spacingMargin
 } from "../../../styles/cva-v2";
 import { modalContainer, modalContent } from "../../../styles/cva-v2/primitives/modal";
 
@@ -146,11 +148,12 @@ const CategoryEditorComponent: React.FC<Props> = ({
       className={cn(modal({ variant: "overlay" }))}
       onClick={onClose}
     >
-      <div className={cn(modalContainer())}>
-        <div 
-          className={cn(modalContent({ size: "xl", padding: "none" }))}
-          onClick={(e) => e.stopPropagation()}
-        >
+              <div className={cn(modalContainer(), "mx-2")}>
+          <div 
+            className={cn(modalContent({ size: "xl", padding: "none" }))}
+            style={{ maxWidth: '1100px', width: '90vw' }} // Lățime mai rezonabilă
+            onClick={(e) => e.stopPropagation()}
+          >
           <div className={cn(
             "flex justify-between items-center p-6",
             "border-b border-carbon-200 dark:border-carbon-700",
@@ -194,14 +197,17 @@ const CategoryEditorComponent: React.FC<Props> = ({
               <Alert
                 variant="error"
                 data-testid="error-message"
-                className="mb-4"
+                className={spacingMargin({ bottom: 4 })}
               >
                 {error}
               </Alert>
             )}
-            <div className="flex flex-row gap-12 justify-between h-full">
+            <div className={cn(
+              flexLayout({ direction: "row", gap: 8 }),
+              "h-full"
+            )}>
               <div
-                className={cn(card({ variant: "default" }), "flex-1")}
+                className={cn(card({ variant: "default" }), "w-80 flex-shrink-0")}
                 data-testid="categories-section"
               >
                 <h3 className={headingProfessional({ level: "h4" })}>
@@ -252,7 +258,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
               </div>
 
               <div
-                className={cn(card({ variant: "default" }), "flex-1")}
+                className={cn(card({ variant: "default" }), "flex-1 min-w-0")}
                 data-testid="subcategories-section"
                 id="subcategories-section"
               >
@@ -267,7 +273,8 @@ const CategoryEditorComponent: React.FC<Props> = ({
                     <div
                       style={{ maxHeight: 400 }}
                       className={cn(
-                        "overflow-y-auto border border-carbon-200 dark:border-carbon-700 rounded-lg mb-4",
+                        "overflow-y-auto border border-carbon-200 dark:border-carbon-700 rounded-lg",
+                        spacingMargin({ bottom: 4 }),
                         "bg-carbon-50 dark:bg-carbon-900"
                       )}
                       data-testid="subcategories-scroll-wrapper"
@@ -290,9 +297,11 @@ const CategoryEditorComponent: React.FC<Props> = ({
                               subcatAction.cat === selectedCategory &&
                               subcatAction.subcat === sc.name ? (
                                 <div
-                                  className={cn(
-                                    "flex flex-row gap-sm items-center",
-                                  )}
+                                  className={flexLayout({
+                                    direction: "row",
+                                    align: "center",
+                                    gap: 2
+                                  })}
                                 >
                                   <Input
                                     type="text"
@@ -355,18 +364,25 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                 </div>
                               ) : (
                                 <div
-                                  className={cn(
-                                    "flex flex-row justify-between items-center",
-                                  )}
+                                  className={flexLayout({
+                                    direction: "row",
+                                    justify: "between",
+                                    align: "center"
+                                  })}
                                 >
                                   <span className={captionProfessional({ size: "sm", variant: "default" })}>
                                     {sc.name}
                                   </span>
-                                  <div
-                                    className={cn(
-                                      "flex flex-row gap-sm items-center opacity-0 group-hover:opacity-100 transition-opacity duration-150",
-                                    )}
-                                  >
+                                                                      <div
+                                      className={cn(
+                                        flexLayout({
+                                          direction: "row",
+                                          align: "center",
+                                          gap: 2
+                                        }),
+                                        "opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                                      )}
+                                    >
                                     {sc.isCustom && (
                                       <Badge
                                         variant="success"
@@ -417,10 +433,15 @@ const CategoryEditorComponent: React.FC<Props> = ({
                     <div
                       className={cn(
                         card({ variant: "elevated" }),
-                        "bg-carbon-100 dark:bg-carbon-800 border border-carbon-200 dark:border-carbon-700 p-4",
+                        "bg-carbon-100 dark:bg-carbon-800 border border-carbon-200 dark:border-carbon-700",
+                        spacingMargin({ y: 4 }),
                       )}
                     >
-                      <div className="flex flex-row gap-sm items-center">
+                      <div className={flexLayout({
+                        direction: "row",
+                        align: "center",
+                        gap: 2
+                      })}>
                         <Input
                           type="text"
                           value={newSubcat}
@@ -437,7 +458,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                             if (e.key === "Escape") setNewSubcat("");
                           }}
                           placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
-                          className="flex-grow"
+                          className="w-64"
                           data-testid="add-subcat-input"
                           maxLength={32}
                         />

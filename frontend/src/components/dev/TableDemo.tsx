@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import Table, { type TableColumn } from '../primitives/Table/Table';
+import { TransactionType } from '@shared-constants';
+import { LABELS } from '@shared-constants';
 
 // Tipuri pentru demo
 interface DemoTransaction {
@@ -8,7 +10,7 @@ interface DemoTransaction {
   description: string;
   amount: number;
   category: string;
-  type: 'income' | 'expense';
+  type: TransactionType.INCOME | TransactionType.EXPENSE;
 }
 
 // Date demo
@@ -19,7 +21,7 @@ const demoData: DemoTransaction[] = [
     description: 'Salar',
     amount: 5000,
     category: 'Venituri',
-    type: 'income'
+    type: TransactionType.INCOME
   },
   {
     id: '2',
@@ -27,7 +29,7 @@ const demoData: DemoTransaction[] = [
     description: 'Cumpărături alimentare',
     amount: -350,
     category: 'Alimente',
-    type: 'expense'
+    type: TransactionType.EXPENSE
   },
   {
     id: '3',
@@ -35,7 +37,7 @@ const demoData: DemoTransaction[] = [
     description: 'Abonament internet',
     amount: -89.99,
     category: 'Utilități',
-    type: 'expense'
+    type: TransactionType.EXPENSE
   },
   {
     id: '4',
@@ -43,7 +45,7 @@ const demoData: DemoTransaction[] = [
     description: 'Freelancing',
     amount: 1200,
     category: 'Venituri suplimentare',
-    type: 'income'
+    type: TransactionType.INCOME
   },
 ];
 
@@ -97,11 +99,11 @@ const columns: TableColumn<DemoTransaction>[] = [
       const type = getValue() as string;
       return (
         <span className={`px-2 py-1 rounded text-xs font-medium ${
-          type === 'income' 
+          type === TransactionType.INCOME 
             ? 'bg-success-100 text-success-800' 
             : 'bg-danger-100 text-danger-800'
         }`}>
-          {type === 'income' ? 'Venit' : 'Cheltuială'}
+          {type === TransactionType.INCOME ? LABELS.INCOME_TYPE : LABELS.EXPENSE_TYPE}
         </span>
       );
     },

@@ -78,8 +78,19 @@ export type { InputProps, SelectProps, TextareaProps, CheckboxProps } from './pr
 export { badge, label, inputWrapper, tooltip, progressContainer, progressBar, progressLabel, toastContainer, toast, toastIcon, toastContent, toastTitle, toastDescription, toastCloseButton } from './primitives/feedback';
 export type { BadgeProps, LabelProps, InputWrapperProps, TooltipProps, ProgressContainerProps, ProgressBarProps, ProgressLabelProps, ToastContainerProps, ToastProps, ToastIconProps, ToastCloseButtonProps } from './primitives/feedback';
 
-export { card, flex, formGroup } from './primitives/layout';
-export type { CardProps, FlexProps, FormGroupProps } from './primitives/layout';
+  export { 
+    card, 
+    cardHeader, 
+    flex, 
+    formGroup, 
+    simpleTable, 
+    tableHeader, 
+    tableCell,
+    spacingMargin,
+    spaceY,
+    loadingOverlay
+  } from './primitives/layout';
+  export type { CardProps, CardHeaderProps, FlexProps, FormGroupProps, SimpleTableProps, TableHeaderProps, TableCellProps } from './primitives/layout';
 
 // =============================================================================
 // COMPOSITIONS EXPORTS - Componente complexe

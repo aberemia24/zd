@@ -1,6 +1,7 @@
 import React from 'react';
 import ConfirmationModal from '../../../primitives/ConfirmationModal/ConfirmationModal';
 import { UI, BUTTONS } from "@shared-constants";
+import { Transaction } from '../../../types/Transaction';
 import { 
   cn,
   modal,
@@ -16,7 +17,7 @@ interface SubcategoryAction {
 
 interface DeleteSubcategoryModalProps {
   subcategoryAction: SubcategoryAction | null;
-  validTransactions: any[];
+  validTransactions: Transaction[];
   onConfirm: () => void;
   onCancel: () => void;
 }

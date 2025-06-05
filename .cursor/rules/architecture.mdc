@@ -45,3 +45,19 @@ api.ts: Configurare API
 - Folosește pattern-ul robust: păstrează datele vechi la fetch/filtrare (useRef/useMemo) pentru UX fluid, fără blink sau re-mount.
 - Testează cu loguri temporare, dar elimină-le după validare.
 </logging_and_ux>
+
+<automation_and_enforcement>
+**Shared Constants Automation:**
+- Script: `npm run sync-shared-constants` - sincronizare automată frontend/src/shared-constants/
+- Script: `npm run validate:shared-constants` - verifică consistența importurilor
+- Script: `npm run validate:constants` - verifică integritatea constantelor
+- Pre-build hooks execută sincronizarea automată
+- Pre-commit hooks validează respectarea guidelines
+
+**Quality Assurance:**
+- ESLint Rules: detectează string-uri hardcodate și importuri incorecte
+- TypeScript Validation: verifică tipizarea corectă a constantelor
+- CI/CD Pipeline: execută toate validările pentru pull requests
+- Automated Testing: verifică că testele folosesc constante în loc de string-uri
+- Pattern Detection: identifică violări ale principiului "single source of truth"
+</automation_and_enforcement>

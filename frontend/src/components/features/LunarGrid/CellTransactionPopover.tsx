@@ -10,7 +10,9 @@ import { FrequencyType } from "@shared-constants/enums";
 import { 
   cn,
   card,
-  textProfessional
+  textProfessional,
+  flexLayout,
+  spaceY
 } from "../../../styles/cva-v2";
 
 interface CellTransactionPopoverProps {
@@ -95,8 +97,8 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
       )}
       data-testid="cell-transaction-popover"
     >
-      <div className="space-y-4">
-        <div className="flex flex-row justify-between items-center">
+      <div className={spaceY({ spacing: 4 })}>
+        <div className={flexLayout({ direction: "row", justify: "between", align: "center" })}>
           <label
             htmlFor="amount-input"
             className={textProfessional({ variant: "body", contrast: "enhanced" })}
@@ -121,7 +123,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           size="md"
         />
 
-        <div className="flex flex-row justify-between items-center">
+        <div className={flexLayout({ direction: "row", justify: "between", align: "center" })}>
           <label
             htmlFor="description-input"
             className={textProfessional({ variant: "body", contrast: "enhanced" })}
@@ -165,7 +167,7 @@ const CellTransactionPopover: React.FC<CellTransactionPopoverProps> = ({
           />
         )}
 
-        <div className="flex flex-row justify-between items-center gap-4">
+        <div className={flexLayout({ direction: "row", justify: "between", align: "center", gap: 4 })}>
           <Button
             type="button"
             variant="primary"

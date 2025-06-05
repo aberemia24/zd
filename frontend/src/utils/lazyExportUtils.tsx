@@ -1,3 +1,5 @@
+import { TransactionType } from '@shared-constants';
+import { BUTTONS } from '@shared-constants';
 /**
  * Lazy Export Utilities
  * 
@@ -68,7 +70,7 @@ export const loadCSVExport = async () => {
 // =============================================================================
 
 export interface ExportProgress {
-  stage: 'loading' | 'processing' | 'generating' | 'saving' | 'complete' | 'error';
+  stage: 'loading' | 'processing' | 'generating' | TransactionType.SAVING | 'complete' | 'error';
   progress: number; // 0-100
   message: string;
 }
@@ -131,7 +133,7 @@ export class LazyExportManager {
         column.width = 15;
       });
       
-      this.reportProgress('saving', 80, 'Salvare fișier...');
+      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
       
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { 
@@ -152,7 +154,7 @@ export class LazyExportManager {
   /**
    * Export PDF lazy-loaded
    */
-  async exportToPDF(data: any[], filename: string, title: string = 'Export') {
+  async exportToPDF(data: any[], filename: string, title: string = BUTTONS.EXPORT) {
     try {
       this.reportProgress('loading', 10, 'Încărcare librării PDF...');
       
@@ -182,7 +184,7 @@ export class LazyExportManager {
         });
       }
       
-      this.reportProgress('saving', 80, 'Salvare fișier...');
+      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
       
       doc.save(`${filename}.pdf`);
       
@@ -212,7 +214,7 @@ export class LazyExportManager {
         ...options
       });
       
-      this.reportProgress('saving', 80, 'Salvare imagine...');
+      this.reportProgress(TransactionType.SAVING, 80, 'Salvare imagine...');
       
       canvas.toBlob((blob) => {
         if (blob) {
@@ -260,7 +262,7 @@ export class LazyExportManager {
         )
       ].join('\n');
       
-      this.reportProgress('saving', 80, 'Salvare fișier...');
+      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       saveAs(blob, `${filename}.csv`);

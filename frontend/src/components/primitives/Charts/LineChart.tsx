@@ -1,3 +1,4 @@
+import { TransactionType } from '@shared-constants';
 /**
  * 📈 LINE CHART COMPONENT - Task 8.3
  * Componentă pentru chart-uri în linie cu Recharts și Carbon Design System styling
@@ -23,7 +24,7 @@ import {
   formatChartDate,
   DEFAULT_CHART_THEME,
 } from '../../../utils/charts';
-import type { LineChartProps } from '../../../types/charts';
+import type { LineChartProps, TimeSeriesDataPoint } from '../../../types/charts';
 import { cn } from '../../../styles/cva-v2';
 
 // =============================================================================
@@ -32,17 +33,17 @@ import { cn } from '../../../styles/cva-v2';
 
 const chartContainerStyles = cn(
   'w-full h-full',
-  'bg-white rounded-lg border border-gray-200',
+  'bg-white rounded-lg border border-carbon-200 dark:border-carbon-700',
   'p-4 space-y-4'
 );
 
 const titleStyles = cn(
-  'text-lg font-semibold text-gray-900',
+  'text-lg font-semibold text-carbon-900 dark:text-carbon-100',
   'mb-2'
 );
 
 const subtitleStyles = cn(
-  'text-sm text-gray-600',
+  'text-sm text-carbon-600 dark:text-carbon-400',
   'mb-4'
 );
 
@@ -87,7 +88,7 @@ export const LineChart: React.FC<LineChartProps> = ({
     yAxisKeys.forEach((key, index) => {
       const keyStr = String(key);
       // Pentru date financiare, folosim culori specifice
-      if (keyStr === 'income') {
+      if (keyStr === TransactionType.INCOME) {
         defaultColors[keyStr] = theme.colors.income;
       } else if (keyStr === 'expenses') {
         defaultColors[keyStr] = theme.colors.expense;
@@ -123,23 +124,33 @@ export const LineChart: React.FC<LineChartProps> = ({
   // CUSTOM TOOLTIP
   // =============================================================================
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array<{
+      color: string;
+      dataKey: string;
+      value: number;
+    }>;
+    label?: string | number;
+  }
+
+  const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
     if (!active || !payload || !payload.length) return null;
 
     return (
-      <div className="bg-white border border-gray-300 rounded-lg shadow-lg p-3 min-w-[200px]">
-        <p className="font-medium text-gray-900 mb-2">
-          {formatChartDate(label, 'medium')}
+      <div className="bg-white border border-carbon-300 dark:border-carbon-600 rounded-lg shadow-lg p-3 min-w-[200px]">
+        <p className="font-medium text-carbon-900 dark:text-carbon-100 mb-2">
+          {label ? formatChartDate(label, 'medium') : 'N/A'}
         </p>
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index: number) => (
           <div key={index} className="flex items-center justify-between space-x-3 mb-1">
             <div className="flex items-center space-x-2">
               <div 
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm text-gray-700 capitalize">
-                {entry.dataKey === 'income' ? 'Venituri' :
+              <span className="text-sm text-carbon-700 dark:text-carbon-300 capitalize">
+                {entry.dataKey === TransactionType.INCOME ? 'Venituri' :
                  entry.dataKey === 'expenses' ? 'Cheltuieli' :
                  entry.dataKey === 'balance' ? 'Balanță' :
                  entry.dataKey === 'net' ? 'Net' :
@@ -147,7 +158,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                  entry.dataKey.replace(/([A-Z])/g, ' $1').trim()}
               </span>
             </div>
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-carbon-900 dark:text-carbon-100">
               {formatChartCurrency(entry.value)}
             </span>
           </div>
@@ -173,7 +184,7 @@ export const LineChart: React.FC<LineChartProps> = ({
 
   const hasNegativeValues = useMemo(() => {
     return processedData.some(item => 
-      yAxisKeys.some(key => (item as any)[key] < 0)
+      yAxisKeys.some(key => (item as any)[key] < 0) // Dynamic key access for chart data
     );
   }, [processedData, yAxisKeys]);
 
@@ -189,7 +200,7 @@ export const LineChart: React.FC<LineChartProps> = ({
         <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Se încarcă graficul...</p>
+            <p className="text-sm text-carbon-600 dark:text-carbon-400">Se încarcă graficul...</p>
           </div>
         </div>
       </div>
@@ -203,8 +214,8 @@ export const LineChart: React.FC<LineChartProps> = ({
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
         <div className="flex items-center justify-center h-64 bg-red-50 rounded border border-red-200">
           <div className="text-center">
-            <p className="text-sm text-red-600 mb-2">Eroare la încărcarea graficului</p>
-            <p className="text-xs text-red-500">{error}</p>
+            <p className="text-sm text-danger dark:text-danger-400 mb-2">Eroare la încărcarea graficului</p>
+            <p className="text-xs text-danger dark:text-danger-500">{error}</p>
           </div>
         </div>
       </div>
@@ -217,7 +228,7 @@ export const LineChart: React.FC<LineChartProps> = ({
         {title && <h3 className={titleStyles}>{title}</h3>}
         {subtitle && <p className={subtitleStyles}>{subtitle}</p>}
         <div className="flex items-center justify-center h-64 bg-gray-50 rounded">
-          <p className="text-sm text-gray-600">Nu există date pentru afișare</p>
+          <p className="text-sm text-carbon-600 dark:text-carbon-400">Nu există date pentru afișare</p>
         </div>
       </div>
     );
@@ -329,7 +340,7 @@ export const LineChart: React.FC<LineChartProps> = ({
                   stroke: '#fff',
                   strokeWidth: 2,
                 }}
-                name={String(key) === 'income' ? 'Venituri' :
+                name={String(key) === TransactionType.INCOME ? 'Venituri' :
                      String(key) === 'expenses' ? 'Cheltuieli' :
                      String(key) === 'balance' ? 'Balanță' :
                      String(key) === 'net' ? 'Net' :

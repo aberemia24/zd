@@ -1,5 +1,6 @@
 import React from 'react';
 import { Table } from '@tanstack/react-table';
+import { TransformedTableDataRow } from '../hooks/useLunarGridTable';
 
 // CVA styling imports - MIGRATED TO CVA-V2
 import { cn, button } from "../../../../styles/cva-v2";
@@ -8,13 +9,13 @@ import Button from "../../../primitives/Button/Button";
 import { LUNAR_GRID, UI } from "@shared-constants";
 
 interface LunarGridToolbarProps {
-  table: Table<any>;
+  table: Table<TransformedTableDataRow>;
   expandedRows: Record<string, boolean>;
   setExpandedRows: (rows: Record<string, boolean>) => void;
   validTransactions: Array<{
     category?: string;
     subcategory?: string | null | undefined;
-    [key: string]: any;
+    [key: string]: unknown; // More specific than any
   }>;
   onCleanOrphanTransactions: () => void;
 }

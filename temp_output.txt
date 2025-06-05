@@ -1,0 +1,121 @@
+­ƒöì Validating TypeScript code quality...
+
+­ƒöì TYPESCRIPT QUALITY VALIDATION
+==================================================
+Scanning TypeScript code for type safety and quality issues...
+
+­ƒôè TYPESCRIPT QUALITY STATISTICS
+==================================================
+­ƒôü Files Scanned: 269
+­ƒöì TypeScript/React Files: 269
+ÔÜá´©Å  Files with Issues: 101
+­ƒÄ» Clean Files: 168
+­ƒôê Total Issues: 309
+
+­ƒôü FILE DISTRIBUTION
+------------------------------
+  frontend\src\hooks: 12 files
+  frontend\src\services\hooks: 11 files
+  frontend\src\shared-constants: 11 files
+  frontend\src\services: 9 files
+  frontend\src\utils: 9 files
+  frontend\src\components\features\LunarGrid\hooks: 8 files
+  frontend\src\components\features\LunarGrid\components: 7 files
+  frontend\src\components\features\LunarGrid\inline-editing: 7 files
+  frontend\src\components\primitives\Modal: 7 files
+  frontend\src\stores: 7 files
+
+­ƒÜ¿ SEVERITY BREAKDOWN
+------------------------------
+­ƒöÑ HIGH:    27 issues
+ÔÜá´©Å  MEDIUM:  282 issues
+­ƒÆí LOW:     0 issues
+
+­ƒôï ISSUE CATEGORIES
+------------------------------
+  Type Assertions: 255 issues ÔÜá´©Å255
+  Type Safety: 27 issues ­ƒöÑ27
+  Type Specificity: 27 issues ÔÜá´©Å27
+
+­ƒöì TOP TYPESCRIPT QUALITY ISSUES
+==================================================
+­ƒöÑ HIGH PRIORITY ISSUES (27)
+----------------------------------------
+­ƒôì frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx:38
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx:38
+   Code: as any
+   Issue: Type assertion to any
+   ­ƒÆí Fix: Avoid type assertions to any, use proper typing
+
+­ƒôì frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx:270
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\primitives\Charts\BarChart.tsx:92
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\primitives\Charts\BarChart.tsx:98
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\primitives\Charts\LineChart.tsx:111
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\primitives\Charts\LineChart.tsx:117
+   Code: : any
+   Issue: Explicit any type usage
+   ­ƒÆí Fix: Use specific types instead of any
+
+­ƒôì frontend\src\components\primitives\Charts\LineChart.tsx:187
+   Code: as any
+   Issue: Type assertion to any
+   ­ƒÆí Fix: Avoid type assertions to any, use proper typing
+
+   ­ƒôØ ... and 19 more high priority issues
+
+ÔÜá´©Å  MEDIUM PRIORITY ISSUES (282)
+----------------------------------------
+­ƒôì frontend\src\components\dev\TableDemo.tsx:80 - as numbe
+   ­ƒÆí Consider proper typing instead of type assertions
+­ƒôì frontend\src\components\dev\TableDemo.tsx:99 - as strin
+   ­ƒÆí Consider proper typing instead of type assertions
+­ƒôì frontend\src\components\dev\useProfilingWrapper.tsx:39 - as ProfilerPhase
+   ­ƒÆí Consider proper typing instead of type assertions
+­ƒôì frontend\src\components\features\CategoryEditor\useCategoryEditorState.tsx:55 - as SubcatActionType
+   ­ƒÆí Consider proper typing instead of type assertions
+­ƒôì frontend\src\components\features\ExportButton\ExportModal.tsx:255 - as ExportFormat
+   ­ƒÆí Consider proper typing instead of type assertions
+   ­ƒôØ ... and 277 more medium priority issues
+
+­ƒÆí TYPESCRIPT QUALITY RECOMMENDATIONS
+==================================================
+­ƒöÑ CRITICAL: Fix high-priority type safety issues immediately
+   ÔÇó Replace any types with specific interfaces
+   ÔÇó Remove @ts-ignore comments and fix underlying issues
+   ÔÇó Avoid type assertions to any
+­ƒÄ» ASSERTIONS: Minimize type assertions
+   ÔÇó Use proper typing instead of type casting
+   ÔÇó Add runtime validation where necessary
+
+­ƒôÜ BEST PRACTICES:
+   1. Define explicit interfaces for all props and complex objects
+   2. Use type guards for runtime type checking
+   3. Prefer unknown over any for better type safety
+   4. Use utility types (Pick, Omit, Partial) for type composition
+   5. Enable strict TypeScript compiler options
+
+­ƒôï TYPESCRIPT QUALITY SUMMARY
+==================================================
+ÔØî TypeScript quality validation: FAILED
+­ƒÜ¿ 27 critical type safety issues need immediate attention
+­ƒôè Total issues: 309 across 101 files

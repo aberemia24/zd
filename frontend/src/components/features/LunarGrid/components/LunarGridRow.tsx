@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { Row, flexRender } from "@tanstack/react-table";
+import { Row, flexRender, Table } from "@tanstack/react-table";
 import { ChevronRight } from "lucide-react";
 import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
-import { TransactionType, BALANCE_DISPLAY } from '@shared-constants';
+import { TransactionType } from '@shared-constants';
 
 // Constants și shared
-import { UI, LUNAR_GRID, PLACEHOLDERS } from "@shared-constants";
+import { UI, LUNAR_GRID } from "@shared-constants";
 
 // Components
 import LunarGridSubcategoryRowCell from "./LunarGridSubcategoryRowCell";
@@ -26,28 +26,42 @@ import {
   textProfessional,
   hoverScale,
   focusRing,
-  interactiveText,
   type GridRowProps,
-  type GridCellProps,
-  type GridExpandIconProps
+  type GridCellProps
 } from "../../../../styles/cva-v2";
+
+// Tip pentru celula evidențiată (simplified version of CellPosition)
+interface HighlightedCell {
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+}
+
+// Interface pentru categoria cu subcategoriile sale
+interface CategoryWithSubcategories {
+  name: string;
+  subcategories?: Array<{
+    name: string;
+    isCustom?: boolean;
+  }>;
+}
 
 interface LunarGridRowProps {
   row: Row<TransformedTableDataRow>;
   level?: number;
-  categories: any[];
-  expandedRows: Record<string, boolean>;
-  subcategoryAction: any;
+  categories: CategoryWithSubcategories[];
+  _expandedRows: Record<string, boolean>;
+  subcategoryAction: { type: 'edit' | 'delete'; category: string; subcategory: string } | null;
   editingSubcategoryName: string;
-  highlightedCell: any;
+  _highlightedCell: HighlightedCell | null;
   addingSubcategory: string | null;
   newSubcategoryName: string;
-  table: any;
+  table: Table<TransformedTableDataRow>;
   transactionMap: Map<string, string>;
   // Event handlers
   onExpandToggle: (rowId: string, isExpanded: boolean) => void;
   onSubcategoryEdit: (category: string, subcategory: string, newName: string) => void;
-  onSubcategoryDelete: (category: string, subcategory: string) => void;
+  _onSubcategoryDelete: (category: string, subcategory: string) => void;
   onEditingValueChange: (value: string) => void;
   onClearSubcategoryAction: () => void;
   onStartEditingSubcategory: (category: string, subcategory: string) => void;
@@ -80,17 +94,17 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   row,
   level = 0,
   categories,
-  expandedRows,
+  _expandedRows,
   subcategoryAction,
   editingSubcategoryName,
-  highlightedCell,
+  _highlightedCell,
   addingSubcategory,
   newSubcategoryName,
   table,
   transactionMap,
   onExpandToggle,
   onSubcategoryEdit,
-  onSubcategoryDelete,
+  _onSubcategoryDelete,
   onEditingValueChange,
   onClearSubcategoryAction,
   onStartEditingSubcategory,
@@ -120,14 +134,14 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
 
   // Determine row type for unified CVA styling - MEMOIZED
   const rowType = useMemo((): GridRowProps['type'] => {
-    if (isTotalRow) return 'total';
-    if (isCategory) return 'category';
+    if (isTotalRow) {return 'total';}
+    if (isCategory) {return 'category';}
     return 'subcategory';
   }, [isTotalRow, isCategory]);
 
   // Determine row state for unified CVA styling - MEMOIZED
   const rowState = useMemo((): GridRowProps['state'] => {
-    if (isCategory && row.getIsExpanded()) return 'expanded';
+    if (isCategory && row.getIsExpanded()) {return 'expanded';}
     return undefined;
   }, [isCategory, row]);
 
@@ -148,10 +162,10 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
           // Get cell type for unified CVA styling
           const getCellType = (): GridCellProps['type'] => {
             if (isFirstCell) {
-              if (isCategory) return 'category';
-              if (isSubcategory) return 'subcategory';
+              if (isCategory) {return 'category';}
+              if (isSubcategory) {return 'subcategory';}
             }
-            if (isTotalCell) return 'balance';
+            if (isTotalCell) {return 'balance';}
             return 'value';
           };
 
@@ -163,15 +177,15 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 category: original.category,
                 subcategory: original.subcategory,
                 day,
-                rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row: any) => 
+                rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
                   row.original.category === original.category && 
                   row.original.subcategory === original.subcategory
                 )),
                 colIndex: day - 1,
               };
               
-              if (isPositionFocused(cellPosition)) return 'active';
-              if (isPositionSelected(cellPosition)) return 'selected';
+              if (isPositionFocused(cellPosition)) {return 'active';}
+              if (isPositionSelected(cellPosition)) {return 'selected';}
             }
 
             // Value state based on content
@@ -179,8 +193,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
             if (typeof cellValue === 'string' || typeof cellValue === 'number') {
               const numValue = parseFloat(cellValue.toString());
               if (!isNaN(numValue)) {
-                if (numValue > 0) return 'positive';
-                if (numValue < 0) return 'negative';
+                if (numValue > 0) {return 'positive';}
+                if (numValue < 0) {return 'negative';}
               }
             }
 
@@ -267,7 +281,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   subcategory={original.subcategory || ''}
                   isCustom={(() => {
                     const categoryData = categories.find(cat => cat.name === original.category);
-                    const subcategoryData = categoryData?.subcategories?.find((sub: any) => sub.name === original.subcategory);
+                    const subcategoryData = categoryData?.subcategories?.find(sub => sub.name === original.subcategory);
                     return subcategoryData?.isCustom || false;
                   })()}
                   isEditing={
@@ -292,7 +306,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       category: original.category,
                       subcategory: original.subcategory,
                       day,
-                      rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row: any) => 
+                      rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
                         row.original.category === original.category && 
                         row.original.subcategory === original.subcategory
                       )),
@@ -311,7 +325,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     cellId={`${original.category}-${original.subcategory || ''}-${cell.column.id.split("-")[1]}`}
                     value={(() => {
                       const cellValue = cell.getValue();
-                      if (cellValue === null || cellValue === undefined || cellValue === '') return '';
+                      if (cellValue === null || cellValue === undefined || cellValue === '') {return '';}
                       return String(cellValue);
                     })()}
                     onSave={async (value: string | number) => {
@@ -383,9 +397,9 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
     prevProps.editingSubcategoryName === nextProps.editingSubcategoryName &&
     prevProps.addingSubcategory === nextProps.addingSubcategory &&
     prevProps.newSubcategoryName === nextProps.newSubcategoryName &&
-    JSON.stringify(prevProps.expandedRows) === JSON.stringify(nextProps.expandedRows) &&
+    JSON.stringify(prevProps._expandedRows) === JSON.stringify(nextProps._expandedRows) &&
     JSON.stringify(prevProps.subcategoryAction) === JSON.stringify(nextProps.subcategoryAction) &&
-    JSON.stringify(prevProps.highlightedCell) === JSON.stringify(nextProps.highlightedCell) &&
+    JSON.stringify(prevProps._highlightedCell) === JSON.stringify(nextProps._highlightedCell) &&
     prevProps.row.getIsExpanded() === nextProps.row.getIsExpanded()
     // Event handlers se vor schimba în mod normal și nu trebuie comparate
   );

@@ -11,7 +11,7 @@ import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 import { useAuthStore } from "../stores/authStore";
 
 // CVA styling imports
-import { cn, card, dashboard, headingProfessional } from "../styles/cva-v2";
+import { cn, card, dashboard, headingProfessional, flexLayout, spaceY } from "../styles/cva-v2";
 import { Container } from "../components/primitives";
 
 import { PAGINATION } from "@shared-constants";
@@ -239,7 +239,7 @@ const TransactionsPage: React.FC = () => {
 
         {/* Tabelul cu tranzacții */}
         <div
-          className="flex flex-col space-y-4"
+          className={cn(flexLayout({ direction: "col" }), spaceY({ spacing: 4 }))}
           data-testid="transaction-table-container"
         >
           <TransactionTable

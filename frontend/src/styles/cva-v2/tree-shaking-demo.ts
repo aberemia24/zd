@@ -4,11 +4,10 @@
  */
 
 // =============================================================================
-// ❌ IMPORT MONOLITIC (VECHIUL SISTEM)
+// ❌ IMPORT MONOLITIC (VECHIUL SISTEM) - DEPRECATED
 // =============================================================================
-// import { button, input, textProfessional, ambientGlow } from '../cva/unified-cva';
-// 
-// PROBLEMĂ: Importă TOATE componentele (956 linii) chiar dacă folosești doar 4
+// PROBLEMĂ: Importurile monolitice încarcă TOATE componentele (956 linii) 
+// chiar dacă folosești doar câteva componente
 // Bundle size impact: ~33KB pentru orice import
 // Tree-shaking: INEFICIENT
 

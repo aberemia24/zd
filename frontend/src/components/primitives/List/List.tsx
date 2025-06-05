@@ -342,7 +342,7 @@ export interface ListComponentProps extends ListProps {
   loading?: boolean;
   error?: string | null;
   empty?: string | ReactNode;
-  onItemClick?: (item: any) => void;
+  onItemClick?: (item: FinancialListItem | CategoryListItem) => void;
   showActions?: boolean;
   showSubcategories?: boolean;
   compact?: boolean;

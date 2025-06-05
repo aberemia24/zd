@@ -15,7 +15,15 @@ import {
   card,
   badge,
   button,
-  hoverBackground
+  hoverBackground,
+  simpleTable,
+  tableHeader,
+  tableCell,
+  flexLayout,
+  captionProfessional,
+  fontFinancial,
+  loadingOverlay,
+  spacingMargin
 } from "../../../styles/cva-v2";
 import type { TransactionValidated } from "@shared-constants/transaction.schema";
 import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
@@ -172,15 +180,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <tr data-testid="transaction-table-loading">
         <td
           colSpan={8}
-          className={cn(
-            "p-4 text-center border-b border-neutral/20 dark:border-neutral-600/30"
-          )}
+          className={tableCell({ align: "center", size: "md", variant: "default" })}
           aria-live="polite"
         >
           <div
-            className={cn(
-              "flex flex-row justify-center items-center gap-2"
-            )}
+            className={flexLayout({ direction: "row", justify: "center", align: "center", gap: 2 })}
           >
             <Spinner size="sm" />
             <span data-testid="table-loading-text">{TABLE.LOADING}</span>
@@ -197,15 +201,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <tr data-testid="transaction-table-loading-more">
         <td
           colSpan={8}
-          className={cn(
-            "p-4 text-center border-b border-neutral/20 dark:border-neutral-600/30"
-          )}
+          className={tableCell({ align: "center", size: "md", variant: "default" })}
           aria-live="polite"
         >
           <div
-            className={cn(
-              "flex flex-row justify-center items-center gap-2"
-            )}
+            className={flexLayout({ direction: "row", justify: "center", align: "center", gap: 2 })}
           >
             <Spinner size="sm" />
             <span data-testid="table-loading-more-text">
@@ -224,15 +224,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       <tr data-testid="transaction-table-empty">
         <td
           colSpan={8}
-          className={cn(
-            "p-8 text-center border-b border-neutral/20 dark:border-neutral-600/30",
-            "text-neutral-500 dark:text-neutral-400"
-          )}
+          className={tableCell({ align: "center", size: "lg", variant: "empty" })}
         >
           <div
-            className={cn(
-              "flex flex-row justify-center items-center gap-2"
-            )}
+            className={flexLayout({ direction: "row", justify: "center", align: "center", gap: 2 })}
           >
             <span data-testid="table-empty-text">{emptyMessage}</span>
           </div>
@@ -256,12 +251,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         {/* Overlay când isFetching este true */}
         {isFetching && (
           <div
-            className="absolute inset-0 bg-background/80 dark:bg-surface-dark/80 backdrop-blur-sm z-10 flex items-center justify-center"
+            className={loadingOverlay()}
             data-testid="table-fetching-overlay"
           >
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-background dark:bg-surface-dark shadow-lg border border-neutral/20 dark:border-neutral-600/30">
+            <div className={cn(
+              "px-4 py-2 rounded-lg bg-background dark:bg-surface-dark shadow-lg border border-neutral/20 dark:border-neutral-600/30",
+              flexLayout({ align: "center", gap: 2 })
+            )}>
               <Spinner size="sm" />
-              <span className="text-sm text-neutral-700 dark:text-neutral-300">
+              <span className={captionProfessional({ size: "sm", variant: "default" })}>
                 Se actualizează...
               </span>
             </div>
@@ -270,65 +268,49 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
         <div className="overflow-x-auto">
           <table
-            className={cn(
-              "w-full border-collapse"
-            )}
+            className={simpleTable()}
             data-testid="transaction-table"
           >
             <thead>
               <tr className="border-b border-neutral/20 dark:border-neutral-600/30">
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-date"
                 >
                   {TABLE.HEADERS.DATE}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-description"
                 >
                   {TABLE.HEADERS.DESCRIPTION}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-amount"
                 >
                   {TABLE.HEADERS.AMOUNT}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-category"
                 >
                   {TABLE.HEADERS.CATEGORY}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-subcategory"
                 >
                   {TABLE.HEADERS.SUBCATEGORY}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-recurring"
                 >
                   {TABLE.HEADERS.RECURRING}
                 </th>
                 <th
-                  className={cn(
-                    "text-left p-4 font-medium text-neutral-700 dark:text-neutral-300 bg-neutral/5 dark:bg-neutral-600/10"
-                  )}
+                  className={tableHeader({ align: "left", size: "md" })}
                   data-testid="header-frequency"
                 >
                   {TABLE.HEADERS.FREQUENCY}
@@ -346,28 +328,28 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         className={hoverBackground({ variant: "subtle" })}
                         data-testid={`transaction-item-${t.id || idx}`}
                       >
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {formatDate(t.date)}
                         </td>
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {t.description || ""}
                         </td>
                         <td
-                          className="p-4 border-b border-neutral/20 dark:border-neutral-600/30"
+                          className={tableCell({ align: "left", size: "md", variant: "default" })}
                           style={getAmountStyles(t.amount, t.type)}
                           data-testid={`amount-${idx}`}
                         >
-                          <span className="font-medium">
+                          <span className={fontFinancial({ weight: "medium", size: "base" })}>
                             {formatAmount(t.amount)}
                           </span>
                         </td>
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {t.category || ""}
                         </td>
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {t.subcategory || ""}
                         </td>
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {t.recurring === true ? (
                             <Badge
                               variant="primary"
@@ -382,7 +364,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                             </Badge>
                           )}
                         </td>
-                        <td className="p-4 border-b border-neutral/20 dark:border-neutral-600/30">
+                        <td className={tableCell({ align: "left", size: "md", variant: "default" })}>
                           {t.frequency && (
                             <Badge
                               variant="primary"
@@ -404,11 +386,13 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       {!isLoading && transactions && transactions.length > 0 && (
         <div
           className={cn(
-            "flex flex-row justify-between items-center p-4 border-t border-neutral/20 dark:border-neutral-600/30"
+            "border-t border-neutral/20 dark:border-neutral-600/30",
+            spacingMargin({ y: 4 }),
+            flexLayout({ direction: "row", justify: "between", align: "center" })
           )}
           aria-live="polite"
         >
-          <span className="text-neutral-600 dark:text-neutral-400 text-sm">
+          <span className={captionProfessional({ size: "sm", variant: "muted" })}>
             {TABLE.SHOWING_INFO.replace(
               "{shown}",
               String(transactions.length),
@@ -434,7 +418,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       {/* Element invizibil pentru intersection observer */}
       <div
         ref={bottomRef}
-        style={{ height: "20px", margin: "10px 0" }}
+        className={cn("h-5", spacingMargin({ y: 3 }))}
         aria-hidden="true"
       />
     </div>

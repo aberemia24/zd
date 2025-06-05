@@ -72,6 +72,8 @@ export declare const LABELS: {
     DATE_TO_FILTER: string;
     AMOUNT_MIN_FILTER: string;
     AMOUNT_MAX_FILTER: string;
+    INCOME_TYPE: string;
+    EXPENSE_TYPE: string;
 };
 export declare const TITLES: {
     TRANZACTII: string;

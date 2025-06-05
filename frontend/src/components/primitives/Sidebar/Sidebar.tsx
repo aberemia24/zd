@@ -4,6 +4,7 @@ import {
   cn,
   navigation,
   navigationItem,
+  loadingOverlay,
   type NavigationProps,
   type NavigationItemProps
 } from '../../../styles/cva-v2';
@@ -165,7 +166,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {/* Overlay */}
         {showOverlay && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className={cn(loadingOverlay({ variant: "modal" }), "lg:hidden")}
             onClick={onOverlayClick}
             data-testid={`${testId}-overlay`}
             aria-label={NAVIGATION.MOBILE.MENU_OVERLAY}

@@ -11,7 +11,7 @@ import {
   modal,
   card,
   button,
-  type ModalProps
+  flexLayout
 } from "../../../../styles/cva-v2";
 import { useBaseModalLogic, CellContext } from "./hooks/useBaseModalLogic";
 import { 
@@ -460,7 +460,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
                   data-testid="quick-add-description-input"
                 />
                 {/* Character counter pentru modal poziționat */}
-                <div className="flex justify-between items-center text-xs mt-1">
+                <div className={cn("text-xs mt-1", flexLayout({ direction: "row", justify: "between", align: "center" }))}>
                   {validation.errors.description ? (
                     <div className="text-red-600 flex-1">{validation.errors.description}</div>
                   ) : validation.warnings.description ? (
@@ -570,7 +570,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
                 ? "bg-slate-50 p-1.5 rounded text-xs"
                 : "bg-slate-50 p-3 rounded-md text-sm"
               }>
-                <div className="flex justify-between items-center">
+                <div className={flexLayout({ direction: "row", justify: "between", align: "center" })}>
                   <span>{position ? EXCEL_GRID.MODAL.FINANCIAL_IMPACT_SHORT : EXCEL_GRID.MODAL.FINANCIAL_IMPACT_FULL}</span>
                   <span
                     className={`font-semibold ${

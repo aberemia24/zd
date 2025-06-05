@@ -14,7 +14,8 @@ import {
   hoverScale,
   focusRing,
   animations,
-  interactiveText
+  interactiveText,
+  flexLayout
 } from "../../../../styles/cva-v2";
 
 import { 
@@ -57,10 +58,10 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
   };
 
   return (
-    <div className="flex justify-between items-center gap-2 w-full">
-      <div className="flex items-center gap-3">
+    <div className={cn("w-full", flexLayout({ direction: "row", justify: "between", align: "center", gap: 2 }))}>
+              <div className={flexLayout({ direction: "row", align: "center", gap: 3 })}>
         {isEditing ? (
-          <div className="flex items-center gap-2">
+                      <div className={flexLayout({ direction: "row", align: "center", gap: 2 })}>
             <input
               type="text"
               value={editingValue}
@@ -96,7 +97,7 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
             </Button>
           </div>
         ) : (
-          <div className="flex justify-between items-center gap-2 w-full">
+          <div className={cn("w-full", flexLayout({ direction: "row", justify: "between", align: "center", gap: 2 }))}>
             <span className={cn(
               textProfessional({ variant: "body", contrast: "high" })
             )}>
@@ -117,7 +118,8 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
       
       {!isEditing && (
         <div className={cn(
-          "flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+          "opacity-0 group-hover:opacity-100 transition-opacity duration-200",
+          flexLayout({ direction: "row", align: "center", gap: 1 }),
           "animate-fade-in-up"
         )}>
           <button

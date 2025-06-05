@@ -40,6 +40,15 @@ jobs:
       - name: Validate shared constants usage
         run: npm run validate:shared-constants
         
+      - name: Validate JSX extensions
+        run: npm run validate:jsx-extensions
+        
+      - name: Validate TypeScript quality
+        run: npm run validate:typescript-quality
+        
+      - name: Validate console cleanup
+        run: npm run validate:console-cleanup
+        
       - name: Run unit tests with coverage
         run: cd frontend && npm run test:coverage -- --run || true
         continue-on-error: true

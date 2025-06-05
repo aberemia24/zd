@@ -52,10 +52,7 @@ import {
   textProfessional,
   fontFinancial,
   focusRing,
-  flex,
-  type GridContainerProps,
-  type GridCellProps,
-  type GridHeaderProps
+  flex
 } from "../../../styles/cva-v2";
 
 // Interfețe TypeScript
@@ -172,7 +169,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         e.stopPropagation();
 
         // Doar deschide modal-ul dacă se ține Shift (pentru advanced editing)
-        if (!e.shiftKey) return;
+        if (!e.shiftKey) {return;}
 
         // Verifică dacă currentTarget este valid
         const anchorEl = e.currentTarget as HTMLElement;
@@ -374,7 +371,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       rows: navigationRows,
       isActive: !modalState?.isOpen && !popover?.isOpen, // Dezactivează navigation când modal/popover e deschis
       onDeleteRequest: async (positions: CellPosition[]) => {
-        if (!user?.id || positions.length === 0) return;
+        if (!user?.id || positions.length === 0) {return;}
 
         try {
           // Găsește tranzacțiile care există pentru pozițiile selectate
@@ -444,7 +441,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Blocare scroll când modalul este deschis - UX Enhancement (doar scroll, nu operațiuni)
     useEffect(() => {
       const scrollableContainer = scrollableContainerRef.current;
-      if (!scrollableContainer) return;
+      if (!scrollableContainer) {return;}
 
       if (modalState?.isOpen) {
         // Salvează poziția actuală de scroll pentru tabel
@@ -503,10 +500,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             row={row}
             level={level}
             categories={categories}
-            expandedRows={expandedRows}
+            _expandedRows={expandedRows}
             subcategoryAction={subcategoryAction}
             editingSubcategoryName={editingSubcategoryName}
-            highlightedCell={highlightedCell}
+            _highlightedCell={highlightedCell}
             addingSubcategory={addingSubcategory}
             newSubcategoryName={newSubcategoryName}
             table={table}
@@ -518,7 +515,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               }));
             }}
             onSubcategoryEdit={handleRenameSubcategory}
-            onSubcategoryDelete={(category, subcategory) => {
+            _onSubcategoryDelete={(category, subcategory) => {
               // Setează modalul pentru confirmare delete
               startDeletingSubcategory(category, subcategory);
             }}
@@ -551,7 +548,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           validTransactions={validTransactions}
           onCleanOrphanTransactions={() => {
             // TODO: Implementează curățarea tranzacțiilor orfane
-            console.log("Clean orphan transactions");
+            // Clean orphan transactions (console.log removed for production)
           }}
         />
 
@@ -810,5 +807,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     );
   },
 );
+
+// Add display name for debugging
+LunarGridTanStack.displayName = 'LunarGridTanStack';
 
 export default LunarGridTanStack;

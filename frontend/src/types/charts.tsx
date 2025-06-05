@@ -67,8 +67,8 @@ export interface BaseChartProps {
   className?: string;
   loading?: boolean;
   error?: string | null;
-  onDataPointClick?: (dataPoint: any, index: number) => void;
-  onDataPointHover?: (dataPoint: any, index: number) => void;
+  onDataPointClick?: (dataPoint: ChartDataPoint, index: number) => void;
+  onDataPointHover?: (dataPoint: ChartDataPoint, index: number) => void;
   showTooltip?: boolean;
   showLegend?: boolean;
   showGridLines?: boolean;

@@ -19,7 +19,7 @@ export interface PersistenceConfig<T> {
   /** Deserializer custom (default: JSON.parse) */
   deserialize?: (value: string) => T;
   /** Validare valoare la încărcare */
-  validate?: (value: any) => value is T;
+  validate?: (value: unknown) => value is T;
   /** Debounce pentru salvări (ms, default: 0) */
   debounceMs?: number;
   /** Activează logging pentru debug */
@@ -62,7 +62,7 @@ export const useLocalStoragePersistence = <T,>(
   const [error, setError] = useState<string | null>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const log = useCallback((message: string, data?: any) => {
+  const log = useCallback((message: string, data?: unknown) => {
     if (debug) {
       console.debug(`[useLocalStoragePersistence:${key}] ${message}`, data);
     }
@@ -204,7 +204,7 @@ export const useURLPersistence = <T extends Record<string, any>>(
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const log = useCallback((message: string, data?: any) => {
+  const log = useCallback((message: string, data?: unknown) => {
     if (debug) {
       console.debug(`[useURLPersistence:${key}] ${message}`, data);
     }

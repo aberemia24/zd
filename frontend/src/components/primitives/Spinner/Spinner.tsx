@@ -1,5 +1,6 @@
 import React from "react";
 import { cn } from "../../../styles/cva-v2";
+import { LOADING_MESSAGES } from '@shared-constants';
 
 export interface SpinnerProps {
   size?: "sm" | "md" | "lg" | "xl";
@@ -42,7 +43,7 @@ const Spinner: React.FC<SpinnerProps> = ({
         className
       )}
       role="status"
-      aria-label="Se încarcă..."
+      aria-label={LOADING_MESSAGES.GENERIC}
       {...props}
     >
       <svg
@@ -65,7 +66,7 @@ const Spinner: React.FC<SpinnerProps> = ({
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         />
       </svg>
-      <span className="sr-only">Se încarcă...</span>
+      <span className="sr-only">{LOADING_MESSAGES.GENERIC}</span>
     </div>
   );
 };

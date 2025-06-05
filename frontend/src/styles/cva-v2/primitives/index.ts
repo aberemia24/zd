@@ -43,5 +43,18 @@ export type {
 } from './feedback';
 
 // Layout - extins cu list components
-export { card, list, listItem, flex, formGroup } from './layout';
-export type { CardProps, ListProps, ListItemProps, FlexProps, FormGroupProps } from './layout'; 
+  export { 
+    card, 
+    cardHeader, 
+    list, 
+    listItem, 
+    flex, 
+    formGroup, 
+    simpleTable, 
+    tableHeader, 
+    tableCell,
+    spacingMargin,
+    spaceY,
+    loadingOverlay
+  } from './layout';
+  export type { CardProps, CardHeaderProps, ListProps, ListItemProps, FlexProps, FormGroupProps, SimpleTableProps, TableHeaderProps, TableCellProps } from './layout'; 

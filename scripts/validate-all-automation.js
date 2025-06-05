@@ -53,6 +53,26 @@ const VALIDATION_SCRIPTS = [
     name: 'TypeScript Quality',
     npmScript: 'validate:typescript-quality',
     description: 'Validează calitatea TypeScript: any/unknown usage, type assertions'
+  },
+  {
+    name: 'Transaction Types',
+    npmScript: 'validate:transaction-types',
+    description: 'Verifică că transaction types folosesc enum-uri în loc de string-uri hardcodate'
+  },
+  {
+    name: 'CVA Standards',
+    npmScript: 'validate:cva-standards', 
+    description: 'Validează pattern-uri CVA complexe și standardizarea componentelor'
+  },
+  {
+    name: 'CVA Imports',
+    npmScript: 'validate:cva-imports',
+    description: 'Verifică import-uri CVA și anti-patterns în modularitate'
+  },
+  {
+    name: 'Component Consistency',
+    npmScript: 'validate:component-consistency',
+    description: 'Validează consistența pattern-urilor cross-component'
   }
 ];
 

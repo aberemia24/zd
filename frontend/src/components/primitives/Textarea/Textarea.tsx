@@ -4,6 +4,7 @@ import {
   textarea,
   inputWrapper,
   label,
+  flexLayout,
   type TextareaProps as CVATextareaProps,
   type LabelProps as CVALabelProps,
   type InputWrapperProps as CVAInputWrapperProps
@@ -90,7 +91,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
 
         {/* Character counter */}
         {showCharacterCount && (
-          <div className="flex justify-between items-center text-xs">
+          <div className={cn("text-xs", flexLayout({ direction: "row", justify: "between", align: "center" }))}>
             {error ? (
               <div className="text-red-600 dark:text-red-400 flex-1">{error}</div>
             ) : success ? (
