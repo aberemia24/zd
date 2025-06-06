@@ -8,12 +8,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 
 // CVA styling imports
-import { cn, dashboard, modal, button, headingProfessional, captionProfessional } from "../styles/cva-v2";
+import { cn, dashboard, modal, headingProfessional, captionProfessional } from "../styles/cva-v2";
 
 import { Maximize2, Minimize2 } from "lucide-react";
 import Badge from "../components/primitives/Badge/Badge";
-import Select from "../components/primitives/Select/Select";
-import Input from "../components/primitives/Input/Input";
 import Spinner from "../components/primitives/Spinner/Spinner";
 import { Container } from "../components/primitives";
 
@@ -215,61 +213,14 @@ const LunarGridPage: React.FC = () => {
     return monthNames[month - 1];
   };
 
-  // Handler pentru a actualiza luna și anul - optimizat cu debounce și transitions
-  // pentru a evita cereri API multiple când utilizatorul schimbă rapid luna/anul
-  const handleMonthChange = useCallback(
-    (e: React.ChangeEvent<HTMLSelectElement>) => {
-      startTransition(() => {
-        const newMonth = parseInt(e.target.value, 10);
-        setMonth(newMonth);
-
-        // Invalidate cache pentru a forța o nouă cerere cu noile valori
-        if (debounceTimerRef.current) {
-          window.clearTimeout(debounceTimerRef.current);
-        }
-
-        debounceTimerRef.current = window.setTimeout(() => {
-          queryClient.invalidateQueries({
-            queryKey: ["transactions", "monthly"],
-          });
-        }, 100);
-      });
-    },
-    [queryClient],
-  );
-
-  // Optimizare similară pentru schimbarea anului cu transitions
-  const handleYearChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      startTransition(() => {
-        const newYear = parseInt(e.target.value, 10);
-        if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
-          setYear(newYear);
-
-          if (debounceTimerRef.current) {
-            window.clearTimeout(debounceTimerRef.current);
-          }
-
-          debounceTimerRef.current = window.setTimeout(() => {
-            queryClient.invalidateQueries({
-              queryKey: ["transactions", "monthly"],
-            });
-          }, 100);
-        }
-      });
-    },
-    [queryClient],
-  );
-
   // Generăm opțiuni pentru dropdown cu luni
   const monthOptions = useMemo(() => {
     const options = [];
     for (let i = 1; i <= 12; i++) {
-      options.push(
-        <option key={i} value={i}>
-          {getMonthName(i)}
-        </option>,
-      );
+      options.push({
+        value: i.toString(),
+        label: getMonthName(i)
+      });
     }
     return options;
   }, []);
@@ -291,99 +242,7 @@ const LunarGridPage: React.FC = () => {
             </Badge>
           )}
 
-          {/* 🚨 CONSOLIDATION - Page header folosind flexbox manual - COMPACT */}
-          <div className={cn(
-            "flex flex-row justify-between items-center gap-4",
-            "mb-4 min-h-[3rem]",
-            layoutMode === 'full-width' ? "px-4" : ""
-          )}>
-            {/* 🚨 CONSOLIDATION - Title section folosind flexbox manual - COMPACT */}
-            <div className="flex items-center gap-4">
-              <h1 className={headingProfessional({ level: "h2" })}>
-                {TITLES.GRID_LUNAR}
-              </h1>
-              {/* Indicator pentru React 18 Transitions - CVA Spinner primitive - COMPACT */}
-              {isPending && (
-                <div 
-                  className="flex items-center gap-2"
-                  data-testid="transition-loading-indicator"
-                >
-                  <Spinner size="sm" />
-                  <span className={captionProfessional({ size: "xs" })}>{UI.LUNAR_GRID_PAGE.NAVIGATION_LOADING}</span>
-                </div>
-              )}
-            </div>
-
-            {/* 🚨 CONSOLIDATION - Controls section folosind flexbox manual - NOWRAP */}
-            <div className={cn(
-              "flex items-center gap-4",
-              "flex-shrink-0"
-            )}>
-              {/* 🎯 FULLSCREEN: Native icon - specialized and prominent */}
-              <div
-                onClick={handleLayoutModeToggle}
-                className={cn(
-                  "cursor-pointer select-none",
-                  "p-2 rounded-lg", // Minimal padding for click area
-                  "hover:bg-primary-50 active:bg-primary-100",
-                  "transition-all duration-150",
-                  "flex items-center justify-center",
-                  layoutMode === 'fullscreen' ? "bg-primary-100 text-primary-700" : "text-primary-600 hover:text-primary-800"
-                )}
-                title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
-                  '{nextMode}', 
-                  layoutMode === 'full-width' ? UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN : UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH
-                )}
-                data-testid="layout-mode-toggle"
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleLayoutModeToggle();
-                  }
-                }}
-              >
-                {layoutMode === 'fullscreen' ? (
-                  <Minimize2 size={28} strokeWidth={2} className="drop-shadow-sm" />
-                ) : (
-                  <Maximize2 size={28} strokeWidth={2} className="drop-shadow-sm" />
-                )}
-              </div>
-
-              {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}
-              <Select
-                value={month.toString()}
-                onChange={handleMonthChange}
-                options={[
-                  { value: "1", label: getMonthName(1) },
-                  { value: "2", label: getMonthName(2) },
-                  { value: "3", label: getMonthName(3) },
-                  { value: "4", label: getMonthName(4) },
-                  { value: "5", label: getMonthName(5) },
-                  { value: "6", label: getMonthName(6) },
-                  { value: "7", label: getMonthName(7) },
-                  { value: "8", label: getMonthName(8) },
-                  { value: "9", label: getMonthName(9) },
-                  { value: "10", label: getMonthName(10) },
-                  { value: "11", label: getMonthName(11) },
-                  { value: "12", label: getMonthName(12) },
-                ]}
-                data-testid="month-selector"
-              />
-
-              {/* 🚨 CONSOLIDATION - Input primitive CVA - COMPACT */}
-              <Input
-                type="number"
-                value={year.toString()}
-                onChange={handleYearChange}
-                min="1900"
-                max="2100"
-                className="w-20 text-sm"
-                data-testid="lunargrid-year-input"
-              />
-            </div>
-          </div>
+          {/* 🚨 REMOVED: Page header - controalele sunt mutate în header-ul tabelului */}
 
           {/* Arată Loading state când încărcăm date - CVA Spinner + flexbox manual - COMPACT */}
           {loading ? (
@@ -399,7 +258,23 @@ const LunarGridPage: React.FC = () => {
             </div>
           ) : (
             <div className={layoutMode === 'full-width' ? "px-4" : ""}>
-              <LunarGridTanStack year={year} month={month} />
+              <LunarGridTanStack 
+                year={year} 
+                month={month}
+                onYearChange={(newYear) => {
+                  startTransition(() => {
+                    setDateWithDebounce(month, newYear);
+                  });
+                }}
+                onMonthChange={(newMonth) => {
+                  startTransition(() => {
+                    setDateWithDebounce(newMonth, year);
+                  });
+                }}
+                isFullscreen={layoutMode === 'fullscreen'}
+                onToggleFullscreen={handleLayoutModeToggle}
+                monthOptions={monthOptions}
+              />
             </div>
           )}
         </div>

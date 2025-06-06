@@ -15,9 +15,9 @@ import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
 
 // Componente UI și features
 import LunarGridRow from "./components/LunarGridRow";
-import LunarGridToolbar from "./components/LunarGridToolbar";
 import LunarGridModals from "./components/LunarGridModals";
 import DeleteSubcategoryModal from "./components/DeleteSubcategoryModal";
+import Button from "../../primitives/Button/Button";
 
 // Hooks specializate
 import {
@@ -66,11 +66,17 @@ interface CategoryStoreItem {
 export interface LunarGridTanStackProps {
   year: number;
   month: number;
+  // New props pentru controale mutate în header
+  onYearChange?: (year: number) => void;
+  onMonthChange?: (month: number) => void;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
+  monthOptions?: Array<{ value: string; label: string }>;
 }
 
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
-  ({ year, month }) => {
+  ({ year, month, onYearChange, onMonthChange, isFullscreen, onToggleFullscreen, monthOptions }) => {
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
 
@@ -128,7 +134,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, user?.id);
 
     // Hook pentru redimensionare tabel și mod fullscreen
-    const { isFullscreen, toggleFullscreen } = useTableResize();
+    const { isFullscreen: tableIsFullscreen, toggleFullscreen } = useTableResize();
 
     // Ref pentru container-ul interior care face scrollul efectiv (nu tableContainerRef care e exterior)
     const scrollableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -516,32 +522,16 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Renderizare (layout principal)
     return (
       <>
-        <LunarGridToolbar
-          table={table}
-          expandedRows={expandedRows}
-          setExpandedRows={setExpandedRows}
-          validTransactions={validTransactions}
-          onCleanOrphanTransactions={() => {
-            // TODO: Implementează curățarea tranzacțiilor orfane
-            // Clean orphan transactions (console.log removed for production)
-          }}
-        />
+        {/* REMOVED: LunarGridToolbar - controalele sunt mutate în header-ul tabelului */}
 
-        {/* Header principal global: Luna și anul în română - fix deasupra tabelului */}
-        {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-          <div className="w-full py-4 mb-4 text-center border-b-2 border-gray-200 bg-white select-none cursor-default">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight select-none cursor-default">
-              {formatMonthYear(month, year)}
-            </h2>
-          </div>
-        )}
+        {/* REMOVED: Header principal global - mutat în header-ul tabelului */}
 
         <div 
           ref={tableContainerRef}
           className={cn(
             gridContainer({ 
               variant: "professional",
-              size: isFullscreen ? "fullscreen" : "default"
+              size: isFullscreen || tableIsFullscreen ? "fullscreen" : "default"
             }),
             "transition-all duration-200 hover-lift",
             focusRing({ variant: "default" })
@@ -566,15 +556,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
           }}
         >
-          {/* REMOVED: Table-only resize button - unified with main fullscreen functionality in header */}
-
           {/* Container interior - FĂRĂ overflow duplicat (scroll e gestionat de outer container) */}
           <div 
             ref={scrollableContainerRef}
             className={cn(
               "relative", // REMOVED overflow-auto - scroll is handled by outer gridContainer
               // Height constraints rămân pentru space management
-              isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
+              isFullscreen || tableIsFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
             )}
             data-testid="lunar-grid-container"
           >
@@ -616,12 +604,155 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               </div>
             )}
             
-            {/* 🎨 Professional Grid Table - FĂRĂ header luna/anul în interior */}
+            {/* 🎨 Professional Grid Table cu header integrat */}
             {!isLoading && !error && table.getRowModel().rows.length > 0 && (
               <table 
                 className="w-full border-collapse table-auto"
                 data-testid="lunar-grid-table"
               >
+                {/* 🎨 Header integrat cu controale - ÎNAINTEA thead-ului normal */}
+                <thead>
+                  <tr>
+                    <th 
+                      colSpan={table.getFlatHeaders().length}
+                      className={cn(
+                        "bg-white border-b-2 border-gray-200 p-4",
+                        "sticky top-0 z-50"
+                      )}
+                    >
+                      <div className="grid grid-cols-3 items-center gap-4">
+                        {/* Partea stânga: Butoane control grid */}
+                        <div className="flex items-center gap-3 justify-start">
+                          <h2 className={cn(
+                            textProfessional({ variant: "heading", contrast: "high" }),
+                            "text-lg font-bold"
+                          )}>
+                            Grid Lunar
+                          </h2>
+                          
+                          {/* Butoane extinde/resetează din toolbar */}
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              const isCurrentlyExpanded = table.getIsAllRowsExpanded();
+                              const newExpandedState: Record<string, boolean> = {};
+                              
+                              if (!isCurrentlyExpanded) {
+                                // Expandează toate
+                                table.getRowModel().rows.forEach(row => {
+                                  if (row.getCanExpand()) {
+                                    newExpandedState[row.id] = true;
+                                  }
+                                });
+                              }
+                              
+                              setExpandedRows(newExpandedState);
+                              table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+                            }}
+                            data-testid="toggle-expand-all"
+                          >
+                            {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
+                          </Button>
+                          
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => {
+                              setExpandedRows({});
+                              table.resetExpanded();
+                            }}
+                            data-testid="reset-expanded"
+                          >
+                            {LUNAR_GRID.RESET_EXPANSION}
+                          </Button>
+                        </div>
+
+                        {/* Partea centrală: Luna și anul cu mărimea originală */}
+                        <div className="flex justify-center">
+                          <h2 className="text-3xl font-bold text-gray-900 tracking-tight select-none cursor-default">
+                            {formatMonthYear(month, year)}
+                          </h2>
+                        </div>
+
+                        {/* Partea dreaptă: Controale navigare + Fullscreen */}
+                        <div className="flex items-center gap-3 justify-end">
+                          {/* Select pentru lună */}
+                          {monthOptions && onMonthChange && (
+                            <select
+                              value={month.toString()}
+                              onChange={(e) => onMonthChange(parseInt(e.target.value, 10))}
+                              className={cn(
+                                "px-3 py-2 border border-gray-300 rounded-md",
+                                "bg-white text-sm font-medium",
+                                "focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              )}
+                              data-testid="month-selector"
+                            >
+                              {monthOptions.map(option => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                          
+                          {/* Input pentru an */}
+                          {onYearChange && (
+                            <input
+                              type="number"
+                              value={year.toString()}
+                              onChange={(e) => {
+                                const newYear = parseInt(e.target.value, 10);
+                                if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
+                                  onYearChange(newYear);
+                                }
+                              }}
+                              min="1900"
+                              max="2100"
+                              className={cn(
+                                "w-20 px-2 py-2 border border-gray-300 rounded-md",
+                                "bg-white text-sm font-medium text-center",
+                                "focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              )}
+                              data-testid="lunargrid-year-input"
+                            />
+                          )}
+                          
+                          {/* Buton fullscreen */}
+                          <div
+                            onClick={onToggleFullscreen || toggleFullscreen}
+                            className={cn(
+                              "cursor-pointer select-none",
+                              "p-2 rounded-lg",
+                              "hover:bg-primary-50 active:bg-primary-100",
+                              "transition-all duration-150",
+                              "flex items-center justify-center",
+                              (isFullscreen || tableIsFullscreen) ? "bg-primary-100 text-primary-700" : "text-primary-600 hover:text-primary-800"
+                            )}
+                            title="Toggle fullscreen"
+                            data-testid="layout-mode-toggle"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                (onToggleFullscreen || toggleFullscreen)();
+                              }
+                            }}
+                          >
+                            {(isFullscreen || tableIsFullscreen) ? (
+                              <Minimize2 size={24} strokeWidth={2} />
+                            ) : (
+                              <Maximize2 size={24} strokeWidth={2} />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+
                 {/* 🎨 Professional Header cu enhanced styling */}
                 <thead className={cn(gridHeader({ sortable: false, sticky: true }))}>
                   <tr>
