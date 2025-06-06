@@ -18,7 +18,7 @@ import {
   gridSubcategoryState,
   gridInteractive
 } from "../../../../styles/cva-v2";
-import { BUTTONS, PLACEHOLDERS, LUNAR_GRID_ACTIONS } from "@shared-constants";
+import { BUTTONS, PLACEHOLDERS, LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants";
 
 interface AddSubcategoryRowProps {
   category: string;

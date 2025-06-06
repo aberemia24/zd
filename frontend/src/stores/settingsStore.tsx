@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { AccountBalance } from "../hooks/balanceCalculator/useBalanceCalculator.types";
-import { MESAJE, ACCOUNT_MANAGEMENT } from "@shared-constants";
+import { MESAJE, ACCOUNT_MANAGEMENT } from "@budget-app/shared-constants";
 
 /**
  * Configurație generală pentru aplicație

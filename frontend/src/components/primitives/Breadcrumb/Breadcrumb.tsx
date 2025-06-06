@@ -7,7 +7,7 @@ import {
   type BreadcrumbSeparatorProps as CVABreadcrumbSeparatorProps
 } from '../../../styles/cva-v2';
 import { cn } from '../../../styles/cva-v2';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 
 /**
  * Tipuri pentru Breadcrumb Component

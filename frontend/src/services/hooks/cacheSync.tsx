@@ -1,5 +1,5 @@
 import { QueryClient, InfiniteData } from '@tanstack/react-query';
-import { TransactionValidated } from '@shared-constants';
+import { TransactionValidated } from '@budget-app/shared-constants';
 
 // Global flag pentru preventing infinite loops în logging
 declare global {

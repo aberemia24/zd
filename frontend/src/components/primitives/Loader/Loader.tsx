@@ -3,7 +3,7 @@ import {
   cn,
   card
 } from "../../../styles/cva-v2";
-import { LOADING_MESSAGES } from '@shared-constants';
+import { LOADING_MESSAGES } from '@budget-app/shared-constants';
 import Spinner from "../Spinner/Spinner";
 
 export interface LoaderProps {

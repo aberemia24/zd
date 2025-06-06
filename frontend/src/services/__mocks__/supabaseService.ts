@@ -5,9 +5,9 @@
  */
 
 // Importăm tipurile necesare
-import { TransactionType } from "@shared-constants";
-import { PAGINATION } from "@shared-constants";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { TransactionType } from "@budget-app/shared-constants";
+import { PAGINATION } from "@budget-app/shared-constants";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 
 // Mock pentru răspunsul implicit cu tranzacții goale
 const defaultTransactions: TransactionValidated[] = [];

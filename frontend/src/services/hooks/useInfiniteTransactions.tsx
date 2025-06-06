@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabaseService } from "../supabaseService";
 import type { TransactionPage, Pagination } from "../supabaseService";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
-import { TransactionType } from "@shared-constants/enums";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
+import { TransactionType } from "@budget-app/shared-constants/enums";
 import { useAuthStore } from "../../stores/authStore";
 import { useMemo } from "react";
 

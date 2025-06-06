@@ -1,5 +1,5 @@
-import { TransactionValidated } from "@shared-constants/transaction.schema";
-import { EXCEL_GRID } from "@shared-constants";
+import { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
+import { EXCEL_GRID } from "@budget-app/shared-constants";
 import { LunarGridRowData } from "../../components/features/LunarGrid/types";
 import {
   calculateAmountsForCategory,

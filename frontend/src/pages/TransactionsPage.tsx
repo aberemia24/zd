@@ -7,7 +7,7 @@ import Alert from "../components/primitives/Alert/Alert";
 import { LineChart } from "../components/primitives/Charts";
 import { useTransactionChartData } from "../hooks/useTransactionChartData";
 import { useQueryClient } from "@tanstack/react-query";
-import { TransactionType, CategoryType } from "@shared-constants";
+import { TransactionType, CategoryType } from "@budget-app/shared-constants";
 import { useFilteredTransactions } from "../services/hooks/useFilteredTransactions";
 import { useTransactionFiltersStore } from "../stores/transactionFiltersStore";
 import { useAuthStore } from "../stores/authStore";
@@ -16,8 +16,8 @@ import { useAuthStore } from "../stores/authStore";
 import { cn, card, dashboard, headingProfessional, flexLayout, spaceY } from "../styles/cva-v2";
 import { Container } from "../components/primitives";
 
-import { PAGINATION } from "@shared-constants";
-import { TITLES } from "@shared-constants";
+import { PAGINATION } from "@budget-app/shared-constants";
+import { TITLES } from "@budget-app/shared-constants";
 import type { Transaction } from "../types/Transaction";
 
 // Interfață pentru tranzacții cu proprietăți opționale pentru transformare

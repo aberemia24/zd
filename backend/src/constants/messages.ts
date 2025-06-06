@@ -1,1 +1,1 @@
-import { MESAJE } from '@shared-constants/messages';
+import { MESAJE } from '@budget-app/shared-constants/messages';

@@ -1,4 +1,4 @@
-import { TransactionType } from "@shared-constants/enums";
+import { TransactionType } from "@budget-app/shared-constants/enums";
 import { Transaction } from "../../../types/Transaction";
 import {
   calculateDailyBalances,

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from "react";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 // CVA styling imports
 import { 

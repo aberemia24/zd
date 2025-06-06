@@ -9,7 +9,7 @@ import { cn, hoverBackground } from '../../../styles/cva-v2';
 import { list, listItem, badge, type ListProps, type ListItemProps } from '../../../styles/cva-v2/primitives';
 import { formatCurrencyRON, formatDateRON } from '../../../utils/financial';
 import type { FinancialListItem, CategoryListItem } from '../../../types/financial';
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 
 // =============================================================================
 // LIST ITEM ACTIONS COMPONENT

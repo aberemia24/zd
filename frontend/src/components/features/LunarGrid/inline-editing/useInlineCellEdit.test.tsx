@@ -12,7 +12,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useInlineCellEdit } from "./useInlineCellEdit";
-import { EXCEL_GRID } from "@shared-constants";
+import { EXCEL_GRID } from "@budget-app/shared-constants";
 
 // Live data setup - no mocks
 const createTestQueryClient = () =>

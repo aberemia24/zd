@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 
 /**
  * 🎨 FINANCIAL DOMAIN - Carbon Copper Design System

@@ -6,7 +6,7 @@ import { TransformedTableDataRow } from '../hooks/useLunarGridTable';
 import { cn, button } from "../../../../styles/cva-v2";
 
 import Button from "../../../primitives/Button/Button";
-import { LUNAR_GRID, UI } from "@shared-constants";
+import { LUNAR_GRID, UI } from "@budget-app/shared-constants";
 
 interface LunarGridToolbarProps {
   table: Table<TransformedTableDataRow>;

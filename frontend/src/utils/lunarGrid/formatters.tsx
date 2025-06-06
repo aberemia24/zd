@@ -1,4 +1,4 @@
-import { TransactionType, CategoryType } from "@shared-constants/enums";
+import { TransactionType, CategoryType } from "@budget-app/shared-constants/enums";
 
 // Constante locale pentru formatare
 const LOCALE = "ro-RO";

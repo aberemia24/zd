@@ -5,7 +5,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
-import { TEST_CONSTANTS } from "@shared-constants";
+import { TEST_CONSTANTS } from "@budget-app/shared-constants";
 import Checkbox from "./Checkbox";
 
 describe("Checkbox", () => {

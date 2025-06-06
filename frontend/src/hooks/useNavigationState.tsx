@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useStatePersistence } from './useStatePersistence';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 
 /**
  * 🧭 Navigation State Management & Persistence

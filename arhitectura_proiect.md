@@ -5,10 +5,33 @@
 ├── 📁 frontend/                # Aplicația React + React Query + Zustand + TailwindCSS
 ├── 📁 backend/                 # API NestJS + Supabase
 ├── 📁 shared-constants/        # Sursa unică pentru constants, enums, tipuri partajate
-├── 📄 package.json             # Configurație npm pentru monorepo (workspaces)
+├── 📄 package.json             # Scripturi pentru întreg proiectul
+├── 📄 pnpm-workspace.yaml      # Fișierul de configurare care definește monorepo-ul pentru pnpm
 ├── 📄 README.md                # Documentație generală a proiectului
 └── 📄 BEST_PRACTICES.md        # Convenții și bune practici de dezvoltare
+
+---
+
+## 📦 Single Source of Truth cu pnpm Workspaces
+
+Componenta centrală a arhitecturii este pachetul **`@budget-app/shared-constants`**, gestionat acum printr-un sistem modern de **pnpm workspaces**. Acesta elimină complet nevoia de scripturi manuale de sincronizare.
+
+**Cum funcționează:**
+1.  **Definiție în `pnpm-workspace.yaml`**: Acest fișier declară `frontend`, `backend` și `shared-constants` ca pachete interconectate.
+2.  **Pachet intern**: `shared-constants` are propriul său `package.json`, transformându-l într-un pachet real (`@budget-app/shared-constants`).
+3.  **Dependență de Workspace**: `frontend` și `backend` declară `@budget-app/shared-constants` ca o dependență folosind protocolul `workspace:*`.
+4.  **Link-uri Simbolice**: Când rulezi `pnpm install`, `pnpm` creează link-uri simbolice în `node_modules` pentru fiecare pachet. Orice modificare în `shared-constants` este **reflectată instantaneu** în `frontend` și `backend`.
+
+**Avantaje:**
+-   **Zero Sincronizare Manuală**: Modificările sunt vizibile imediat, fără pași intermediari.
+-   **Robustețe**: Elimină o sursă majoră de erori umane și de build.
+-   **Workflow Curat**: Simplifică dezvoltarea și managementul dependențelor.
+-   **Type Safety**: TypeScript recunoaște pachetul și oferă autocomplete și validare a tipurilor între pachete.
+
+---
+
 📁 shared-constants/
+(Pachet: `@budget-app/shared-constants`)
 
 Rol: Sursa unică de adevăr pentru toate constantele, enum-urile și tipurile partajate între frontend și backend.
 
@@ -27,7 +50,7 @@ Rol: Sursa unică de adevăr pentru toate constantele, enum-urile și tipurile p
 
 # Dependențe cheie:
 index.ts - Exportă toate constantele, folosit pentru importuri în frontend/backend
-Toate fișierele frontend/backend care folosesc constante trebuie să le importe prin @shared-constants
+Toate fișierele frontend/backend care folosesc constante trebuie să le importe prin `@budget-app/shared-constants`
 Excel_grid.ts - Constante pentru vizualizarea tip grid a datelor financiare
 QUERY_KEYS.ts - Chei pentru React Query
 
@@ -107,7 +130,7 @@ Rol: Componente reutilizabile de bază (UI Kit)
 └── 📄 Spinner.tsx              # Component simplu de loading
 Dependențe cheie:
 
-Toate folosesc @shared-constants pentru texte, token-uri de design
+Toate folosesc `@budget-app/shared-constants` pentru texte, token-uri de design
 Folosesc classNames pentru condiționare clase CSS
 Utilizează constante din styles/theme.ts și utilitare din styles/themeUtils.ts
 Componentele LunarGrid sunt optimizate cu React.memo și virtualizare TanStack
@@ -144,7 +167,7 @@ TransactionForm.tsx → useTransactionFormStore, useTransactionMutations (React 
 TransactionTable.tsx → useInfiniteTransactions (React Query)
 LunarGrid.tsx → useMonthlyTransactions (React Query), useCategoryStore
 CategoryEditor.tsx → useCategoryStore
-Toate utilizează componente primitive și constante din @shared-constants
+Toate utilizează componente primitive și constante din `@budget-app/shared-constants`
 
 📁 frontend/src/pages/
 Rol: Pagini principale pentru rutare
@@ -475,7 +498,7 @@ export function useInfiniteTransactions(queryParams: TransactionQueryParams) {
   - `fetchTransactions()`: Obține tranzacții cu filtre și paginare
   - `createTransaction()`, `updateTransaction()`, `deleteTransaction()`
   - `fetchMonthlyTransactions()`: Date pentru grid lunar
-- **Validare**: Folosește schema Zod din `@shared-constants/transaction.schema.ts`
+- **Validare**: Folosește schema Zod din `@budget-app/shared-constants/transaction.schema.ts`
 - **Optimizări**: Transformare între snake_case (DB) și camelCase (UI)
 
 **2. categoryService.ts:**
@@ -642,12 +665,12 @@ Rol: Tipuri TypeScript pentru aplicație
 **Transaction.ts:**
 - `Transaction`: Tipul principal pentru tranzacție
 - `TransactionQueryParams`: Parametri pentru filtrare
-- Dependențe: @shared-constants/enums.ts
+- Dependențe: `@budget-app/shared-constants/enums.ts`
 
 **Category.ts:**
 - `CustomCategory`, `CustomSubcategory`: Tipuri pentru categorii personalizate
 - `CustomCategoriesPayload`: Structura pentru salvare în DB
-- Dependențe: @shared-constants/categories.ts [ACTUALIZAT 2025-05-22]
+- Dependențe: `@budget-app/shared-constants/categories.ts` [ACTUALIZAT 2025-05-22]
 
 **ComponentProps.ts [NOU 2025-05-22]:**
 - `BaseComponentProps`: Props comune pentru toate componentele (className, testId, etc.)
@@ -667,7 +690,7 @@ Rol: API pentru backend și integrare cu Supabase
 ├── 📁 src/
 │   ├── 📄 main.ts               # Punct de intrare NestJS
 │   ├── 📄 app.module.ts         # Modul principal aplicație
-│   ├── 📁 constants/            # Constante backend (importă din shared-constants)
+│   ├── 📁 constants/            # Constante backend (importă din `@budget-app/shared-constants`)
 │   ├── 📁 controllers/          # Controllere API pentru rute HTTP
 │   ├── 📁 services/             # Servicii business logic
 │   └── 📁 modules/              # Module NestJS specifice
@@ -751,8 +774,8 @@ graph TD
 ### Regula de aur pentru constante partajate:
 ```typescript
 // CORECT
-import { TransactionType, MESAJE } from '@shared-constants';
-import { QUERY_PARAMS } from '@shared-constants/queryParams';
+import { TransactionType, MESAJE } from '@budget-app/shared-constants';
+import { QUERY_PARAMS } from '@budget-app/shared-constants/queryParams';
 
 // INCORECT (niciodată direct din fișiere locale)
 import { TransactionType } from '../constants/enums'; // GREȘIT!
@@ -796,20 +819,20 @@ O parte esențială a arhitecturii Budget App este menținerea sincronizării î
 
 #### Proces de verificare sincronizare:
 
-1. **Validare automată**: Script `npm run validate:constants` verifică că toate importurile folosesc path mapping-ul corect `@shared-constants`
+1. **Validare automată**: Script `npm run validate:constants` verifică că toate importurile folosesc path mapping-ul corect `@budget-app/shared-constants`
 
 2. **Sursa unică pentru toate enum-urile și constantele**:
-   - TransactionType, FrequencyType - definite doar în `shared-constants/enums.ts`
-   - Mesaje UI și feedback - definite doar în `shared-constants/messages.ts` și `shared-constants/ui.ts`
-   - Configurare API - definită doar în `shared-constants/api.ts`
+   - TransactionType, FrequencyType - definite doar în `@budget-app/shared-constants/enums.ts`
+   - Mesaje UI și feedback - definite doar în `@budget-app/shared-constants/messages.ts` și `@budget-app/shared-constants/ui.ts`
+   - Configurare API - definită doar în `@budget-app/shared-constants/api.ts`
 
 3. **Re-export corect**:
-   - Toate shared-constants sunt exportate prin barrel (`shared-constants/index.ts`)
+   - Toate shared-constants sunt exportate prin barrel (`@budget-app/shared-constants/index.ts`)
    - Frontend are copie automată în `frontend/src/shared-constants/` generată prin script
 
 4. **Flow de actualizare**:
-   - Modificare în `shared-constants/`
-   - Actualizare `shared-constants/index.ts`
+   - Modificare în `@budget-app/shared-constants/`
+   - Actualizare `@budget-app/shared-constants/index.ts`
    - Rulare `npm run sync:constants` (copiere în frontend)
    - Validare cu `npm run validate:constants`
    - Commit cu toate modificările împreună
@@ -818,7 +841,7 @@ O parte esențială a arhitecturii Budget App este menținerea sincronizării î
 
 ```typescript
 // Pattern corect pentru utilizarea constantelor:
-import { MESAJE, UI, TRANSACTION_TYPES } from '@shared-constants';
+import { MESAJE, UI, TRANSACTION_TYPES } from '@budget-app/shared-constants';
 
 // Validare tipuri:
 const type = data.type as TransactionType;

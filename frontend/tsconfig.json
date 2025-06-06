@@ -1,27 +1,27 @@
 {
   "compilerOptions": {
+    "composite": true,
     "target": "ES2022",
     "useDefineForClassFields": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-        "skipLibCheck": true,    "esModuleInterop": true,    "allowSyntheticDefaultImports": true,    "strict": true,    "noImplicitReturns": false,    "noUnusedLocals": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "noImplicitReturns": false,
+    "noUnusedLocals": false,
     "forceConsistentCasingInFileNames": true,
     "module": "ES2022",
-        "moduleResolution": "node",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": "src",
     "types": ["vite/client", "vitest/globals", "node", "@testing-library/jest-dom"],
-    "paths": {
-      "@shared-constants": ["shared-constants/index.ts"],
-      "@shared-constants/*": ["shared-constants/*"],
-      "@shared-constants/queryParams": ["shared-constants/queryParams.ts"],
-      "@shared-constants/validation": ["shared-constants/validation.ts"],
-      "@shared-constants/api": ["shared-constants/api.ts"]
-    }
+    "paths": {}
   },
-  "include": ["src", "../shared-constants"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src"],
+  "references": [{ "path": "./tsconfig.node.json" }, { "path": "../shared-constants" }]
 }

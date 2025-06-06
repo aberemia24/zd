@@ -4,7 +4,7 @@ import { cn } from '../../../styles/cva-v2';
 import { button } from '../../../styles/cva-v2';
 import { dataTablePagination } from '../../../styles/cva-v2/compositions/data-table';
 import Select from '../Select/Select';
-import { TABLE } from '@shared-constants';
+import { TABLE } from '@budget-app/shared-constants';
 
 /**
  * 🎨 PAGINATION COMPONENT - CVA v2

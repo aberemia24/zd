@@ -4,11 +4,11 @@ import {
   TransactionType,
   FrequencyType,
   TransactionStatus,
-} from "@shared-constants/enums";
+} from "@budget-app/shared-constants/enums";
 import {
   TransactionValidated,
   CreateTransaction,
-} from "@shared-constants/transaction.schema";
+} from "@budget-app/shared-constants/transaction.schema";
 
 /**
  * Definițiile de tipuri pentru tranzacții

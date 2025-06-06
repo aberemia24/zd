@@ -12,7 +12,7 @@ import {
   RecurringFrequency,
   GenerationConfig,
 } from "../../../types/lunarGrid/RecurringTransactions";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 describe("Recurring Transaction Generator", () => {
   // =============================================================================

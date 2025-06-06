@@ -47,3 +47,4 @@ export declare const CATEGORIES: {
         readonly Proiecte: readonly ["Investiție/Afacere 1", "Investiție/Afacere 2", "Investiție/Afacere 3", "Investiție/Afacere 4", "Investiție/Afacere 5"];
     };
 };
+//# sourceMappingURL=categories.d.ts.map

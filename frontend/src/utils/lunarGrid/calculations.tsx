@@ -1,6 +1,6 @@
-import { TransactionValidated } from "@shared-constants/transaction.schema";
-import { CategoryType } from "@shared-constants/enums";
-import { EXCEL_GRID } from "@shared-constants";
+import { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
+import { CategoryType } from "@budget-app/shared-constants/enums";
+import { EXCEL_GRID } from "@budget-app/shared-constants";
 
 // Structuri pentru caching
 const categoryAmountsCache = new Map<string, Record<number, number>>();

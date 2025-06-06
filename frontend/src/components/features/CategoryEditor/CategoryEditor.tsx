@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import { createPortal } from 'react-dom';
-import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from "@shared-constants";
+import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from "@budget-app/shared-constants";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Badge from "../../primitives/Badge/Badge";

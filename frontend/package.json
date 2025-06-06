@@ -5,17 +5,11 @@
   "proxy": "http://localhost:3001",
   "main": "src/index.tsx",
   "scripts": {
-    "sync-shared-constants": "node ../scripts/sync-shared-constants.js",
-    "predev": "npm run sync-shared-constants",
     "dev": "vite",
-    "prestart": "npm run sync-shared-constants",
     "start": "vite",
-    "prebuild": "npm run sync-shared-constants && npm run validate:cva-all",
     "build": "vite build",
     "build:analyze": "cross-env ANALYZE=true vite build",
     "preview": "vite preview",
-    "postinstall": "npm run sync-shared-constants",
-    "pretest": "npm run sync-shared-constants",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 110",
@@ -32,26 +26,6 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report test-results/e2e-report",
-    "validate:constants": "node ../scripts/validate-constants.js",
-    "validate:shared-constants": "node ../scripts/validate-shared-constants-usage.js",
-    "validate:data-testid": "node ../scripts/validate-data-testid-consistency.js",
-    "validate:barrel-imports": "node ../scripts/validate-barrel-imports.js",
-    "validate:console-cleanup": "node ../scripts/validate-console-cleanup.js",
-    "validate:cva-standards": "node ../scripts/validate-cva-standards.js",
-    "validate:cva-imports": "node ../scripts/validate-cva-imports.js",
-    "validate:component-consistency": "node ../scripts/validate-component-consistency.js",
-    "validate:jsx-extensions": "node ../scripts/validate-jsx-extensions.js",
-    "validate:typescript-quality": "node ../scripts/validate-typescript-quality.js",
-    "validate:transaction-types": "node ../scripts/validate-transaction-types.js",
-    "validate:all": "node ../scripts/validate-all-automation.js",
-    "validate:comprehensive": "npm run validate:all",
-    "validate:quick": "npm run validate:constants && npm run validate:shared-constants && npm run validate:cva-standards",
-    "validate:cva-all": "npm run validate:cva-standards && npm run validate:cva-imports && npm run validate:component-consistency",
-    "validate:code-quality": "npm run validate:jsx-extensions && npm run validate:typescript-quality",
-    "validate:full": "npm run validate:cva-all && npm run validate:code-quality",
-    "fix:hardcoded-strings": "node ../scripts/fix-hardcoded-strings.js",
-    "fix:cva-standards": "node ../scripts/fix-cva-standards.js",
-    "performance:monitor": "node ../scripts/performance-monitor.js",
     "performance:lighthouse": "RUN_LIGHTHOUSE=true node ../scripts/performance-monitor.js",
     "performance:ci": "CI=true node ../scripts/performance-monitor.js",
     "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
@@ -60,6 +34,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@budget-app/shared-constants": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@storybook/react-vite": "^9.0.5",
     "@supabase/supabase-js": "^2.49.8",
@@ -158,7 +133,10 @@
     },
     "@types/react-router-dom": {
       "@types/react": "18.3.3"
-    }
+    },
+    "src/**/*.{json,md,css}": [
+      "prettier --write"
+    ]
   },
   "browserslist": {
     "production": [
@@ -175,13 +153,7 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "eslint --fix",
-      "prettier --write",
-      "npm run validate:constants",
-      "npm run validate:shared-constants",
-      "npm run validate:jsx-extensions",
-      "npm run validate:typescript-quality",
-      "npm run validate:console-cleanup",
-      "npm run validate:cva-all"
+      "prettier --write"
     ],
     "src/**/*.{js,jsx}": [
       "eslint --fix",

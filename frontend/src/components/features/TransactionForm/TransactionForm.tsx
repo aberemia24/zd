@@ -10,9 +10,9 @@ import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
 import {
   TransactionType,
   getCategoriesForTransactionType,
-} from "@shared-constants";
-import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS, EXCEL_GRID } from "@shared-constants";
-import { MESAJE } from "@shared-constants";
+} from "@budget-app/shared-constants";
+import { LABELS, PLACEHOLDERS, BUTTONS, OPTIONS, EXCEL_GRID } from "@budget-app/shared-constants";
+import { MESAJE } from "@budget-app/shared-constants";
 import { useTransactionFormStore } from "../../../stores/transactionFormStore";
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { 

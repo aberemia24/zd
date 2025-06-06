@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../../stores/authStore";
 import toast from "react-hot-toast";
-import { MESAJE, LABELS, BUTTONS } from "@shared-constants";
+import { MESAJE, LABELS, BUTTONS } from "@budget-app/shared-constants";
 
 // CVA styling imports - UNIFIED MIGRATION
 import { cn, card, button, spaceY } from "../../../styles/cva-v2";

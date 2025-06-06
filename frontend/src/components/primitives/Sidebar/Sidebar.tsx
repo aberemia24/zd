@@ -8,7 +8,7 @@ import {
   type NavigationProps,
   type NavigationItemProps
 } from '../../../styles/cva-v2';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 import { useNavigationState } from '../../../hooks/useNavigationState';
 
 /**

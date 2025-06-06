@@ -1,5 +1,5 @@
 import React, { Profiler } from 'react';
-import { API } from '@shared-constants/api';
+import { API } from '@budget-app/shared-constants/api';
 import useProfilingWrapper from './useProfilingWrapper';
 
 interface ProfilerContainerProps {

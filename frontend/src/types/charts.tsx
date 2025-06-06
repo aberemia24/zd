@@ -3,7 +3,7 @@
  * Tipuri TypeScript pentru componentele de chart-uri financiare cu Recharts
  */
 
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 
 // =============================================================================
 // CORE CHART DATA TYPES

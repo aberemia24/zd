@@ -34,7 +34,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 // 2. Constante și shared
-import { MESSAGES, TRANSACTION_TYPES } from '@shared-constants';
+import { MESSAGES, TRANSACTION_TYPES } from '@budget-app/shared-constants';
 
 // 3. Componente și hooks
 import { Button } from 'components/primitives';
@@ -49,12 +49,15 @@ import { formatCurrency, groupByCategory } from 'utils';
 import type { Transaction, TransactionFilters } from 'types';
 ```
 
-### Imports pentru constants partajate
+### Imports pentru constants partajate (Modernizat cu pnpm Workspaces)
 
-- Sursă unică de adevăr: `shared-constants/`
-- Import **doar** prin path mapping `@shared-constants`
-- **Interzis**: importuri din barrel-uri locale sau direct din frontend/src/constants
-- Validare automată periodică cu `npm run validate:constants`
+- **Sursă unică de adevăr**: Pachetul `@budget-app/shared-constants` din folderul `shared-constants/`.
+- **Import direct**: Se importă direct din `@budget-app/shared-constants`, la fel ca orice alt pachet din `node_modules`.
+  ```typescript
+  import { UI, MESAJE } from '@budget-app/shared-constants';
+  ```
+- **Fără Path Mapping Manual**: Nu mai este necesară nicio configurare de `alias` sau `paths` în `tsconfig.json`, `vite.config.ts`, sau `jest.config.js`. `pnpm` și TypeScript gestionează acest lucru automat.
+- **Validare implicită**: Structura de workspace și verificarea tipurilor de către TypeScript asigură că importurile sunt corecte. Nu mai sunt necesare scripturi separate de validare.
 
 ### [2025-04-25] Importuri pentru constants locale: barrel & portabilitate
 
@@ -208,7 +211,7 @@ frontend/tests/
 
 #### Testare robustă cu constants și data-testid [ACTUALIZAT 2025-05-22]
 
-**Pattern validat în cod pentru testare modernă:**- **Obligatoriu**: Toate mesajele UI și sistemului provin din `@shared-constants` (messages.ts, ui.ts)- **Obligatoriu**: Toate elementele interactive au `data-testid` unic și predictibil- **Pattern standard**: `{component}-{element}-{id?}` pentru data-testid (ex: `transaction-row-123`, `add-btn`, `error-msg`)- **Selecție în teste**: Doar prin `data-testid`, nu prin text, clase sau structură DOM**Exemplu pattern implementat:**```tsx// În componente<Button   data-testid="save-transaction-btn"  onClick={handleSave}>  {UI.BUTTONS.SAVE}</Button><div data-testid="transaction-form-error">  {MESSAGES.ERRORS.INVALID_AMOUNT}</div>// În testeimport { UI, MESSAGES } from '@shared-constants';test('salvarea tranzacției funcționează corect', async () => {  render(<TransactionForm />);    // Selecție prin data-testid  const saveBtn = screen.getByTestId('save-transaction-btn');  const errorDiv = screen.queryByTestId('transaction-form-error');    // Verificare text prin constants  expect(saveBtn).toHaveTextContent(UI.BUTTONS.SAVE);  expect(errorDiv).not.toBeInTheDocument();    // Interacțiuni  await userEvent.click(saveBtn);    // Așteptare rezultat asincron  await waitFor(() => {    expect(screen.getByTestId('transaction-form-error'))      .toHaveTextContent(MESSAGES.ERRORS.INVALID_AMOUNT);  });});```**Pattern pentru formulare complexe validat:**```tsx// Verificare valori inițiale cu waitFor pentru stabilitatetest('formularul se inițializează cu valorile corecte', async () => {  render(<TransactionForm initialData={mockTransaction} />);    // Verificare individuală cu waitFor pentru câmpuri complexe  await waitFor(() => {    expect(screen.getByTestId('amount-input')).toHaveValue('100.50');  });    await waitFor(() => {    expect(screen.getByTestId('category-select')).toHaveValue('Food');  });    await waitFor(() => {    expect(screen.getByTestId('date-input')).toHaveValue('2025-05-22');  });});#### Pattern memoizare și optimizare performanță [NOU 2025-05-22]**Pattern implementat în componente pentru performanță optimă:****1. Memoizarea componentelor cu React.memo:**```tsx// Pattern validat în TransactionTable, LunarGrid, CategoryEditorconst TransactionTable = React.memo(({   transactions,   onTransactionClick,   filters }: TransactionTableProps) => {  // Implementare componentă});// Export cu displayName pentru debuggingTransactionTable.displayName = 'TransactionTable';export default TransactionTable;```**2. Memoizarea funcțiilor cu useCallback:**```tsx// Pattern pentru funcții event handlers și callbacksconst handleSaveTransaction = useCallback(async (data: TransactionInput) => {  try {    await transactionService.createTransaction(data);    queryClient.invalidateQueries({ queryKey: ['transactions'] });  } catch (error) {    console.error('Eroare salvare tranzacție:', error);  }}, [queryClient]);// Pattern pentru funcții de procesare dateconst handleFilterTransactions = useCallback((filters: TransactionFilters) => {  // Logică filtrare}, []);```**3. Memoizarea calculelor costisitoare cu useMemo:**```tsx// Pattern pentru procesare date complexeconst processedTransactions = useMemo(() => {  return transactions    .filter(tx => tx.userId === userId)    .map(tx => ({      ...tx,      formattedAmount: formatCurrency(tx.amount),      categoryLabel: getCategoryLabel(tx.category)    }))    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());}, [transactions, userId]);// Pattern pentru chei de grupconst groupedByCategory = useMemo(() => {  return processedTransactions.reduce((acc, transaction) => {    const key = `${transaction.category}|${transaction.subcategory}`;    if (!acc[key]) acc[key] = [];    acc[key].push(transaction);    return acc;  }, {} as Record<string, Transaction[]>);}, [processedTransactions]);```**Reguli de aplicare:**- **React.memo**: Pentru orice componentă care primește props complexe sau se re-renderează frecvent- **useCallback**: Pentru funcții event handlers care se trimit ca props către componente memoizate- **useMemo**: Pentru calcule costisitoare, procesări de arrays mari sau transformări complexe- **Chei unice**: Pentru liste React, combină ID-ul cu index sau alte date pentru unicitate garantată
+**Pattern validat în cod pentru testare modernă:**- **Obligatoriu**: Toate mesajele UI și sistemului provin din `@budget-app/shared-constants` (messages.ts, ui.ts)- **Obligatoriu**: Toate elementele interactive au `data-testid` unic și predictibil- **Pattern standard**: `{component}-{element}-{id?}` pentru data-testid (ex: `transaction-row-123`, `add-btn`, `error-msg`)- **Selecție în teste**: Doar prin `data-testid`, nu prin text, clase sau structură DOM**Exemplu pattern implementat:**```tsx// În componente<Button   data-testid="save-transaction-btn"  onClick={handleSave}>  {UI.BUTTONS.SAVE}</Button><div data-testid="transaction-form-error">  {MESSAGES.ERRORS.INVALID_AMOUNT}</div>// În testeimport { UI, MESSAGES } from '@budget-app/shared-constants';test('salvarea tranzacției funcționează corect', async () => {  render(<TransactionForm />);    // Selecție prin data-testid  const saveBtn = screen.getByTestId('save-transaction-btn');  const errorDiv = screen.queryByTestId('transaction-form-error');    // Verificare text prin constants  expect(saveBtn).toHaveTextContent(UI.BUTTONS.SAVE);  expect(errorDiv).not.toBeInTheDocument();    // Interacțiuni  await userEvent.click(saveBtn);    // Așteptare rezultat asincron  await waitFor(() => {    expect(screen.getByTestId('transaction-form-error'))      .toHaveTextContent(MESSAGES.ERRORS.INVALID_AMOUNT);  });});```**Pattern pentru formulare complexe validat:**```tsx// Verificare valori inițiale cu waitFor pentru stabilitatetest('formularul se inițializează cu valorile corecte', async () => {  render(<TransactionForm initialData={mockTransaction} />);    // Verificare individuală cu waitFor pentru câmpuri complexe  await waitFor(() => {    expect(screen.getByTestId('amount-input')).toHaveValue('100.50');  });    await waitFor(() => {    expect(screen.getByTestId('category-select')).toHaveValue('Food');  });    await waitFor(() => {    expect(screen.getByTestId('date-input')).toHaveValue('2025-05-22');  });});#### Pattern memoizare și optimizare performanță [NOU 2025-05-22]**Pattern implementat în componente pentru performanță optimă:****1. Memoizarea componentelor cu React.memo:**```tsx// Pattern validat în TransactionTable, LunarGrid, CategoryEditorconst TransactionTable = React.memo(({   transactions,   onTransactionClick,   filters }: TransactionTableProps) => {  // Implementare componentă});// Export cu displayName pentru debuggingTransactionTable.displayName = 'TransactionTable';export default TransactionTable;```**2. Memoizarea funcțiilor cu useCallback:**```tsx// Pattern pentru funcții event handlers și callbacksconst handleSaveTransaction = useCallback(async (data: TransactionInput) => {  try {    await transactionService.createTransaction(data);    queryClient.invalidateQueries({ queryKey: ['transactions'] });  } catch (error) {    console.error('Eroare salvare tranzacție:', error);  }}, [queryClient]);// Pattern pentru funcții de procesare dateconst handleFilterTransactions = useCallback((filters: TransactionFilters) => {  // Logică filtrare}, []);```**3. Memoizarea calculelor costisitoare cu useMemo:**```tsx// Pattern pentru procesare date complexeconst processedTransactions = useMemo(() => {  return transactions    .filter(tx => tx.userId === userId)    .map(tx => ({      ...tx,      formattedAmount: formatCurrency(tx.amount),      categoryLabel: getCategoryLabel(tx.category)    }))    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());}, [transactions, userId]);// Pattern pentru chei de grupconst groupedByCategory = useMemo(() => {  return processedTransactions.reduce((acc, transaction) => {    const key = `${transaction.category}|${transaction.subcategory}`;    if (!acc[key]) acc[key] = [];    acc[key].push(transaction);    return acc;  }, {} as Record<string, Transaction[]>);}, [processedTransactions]);```**Reguli de aplicare:**- **React.memo**: Pentru orice componentă care primește props complexe sau se re-renderează frecvent- **useCallback**: Pentru funcții event handlers care se trimit ca props către componente memoizate- **useMemo**: Pentru calcule costisitoare, procesări de arrays mari sau transformări complexe- **Chei unice**: Pentru liste React, combină ID-ul cu index sau alte date pentru unicitate garantată
 
 #### Politica de mocking [ACTUALIZAT]
 
@@ -357,7 +360,7 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
   - **Keyboard shortcuts**: Enter pentru salvare, Escape pentru anulare
 - Best practices obligatorii pentru acest pattern:
   - Forțează refresh cu `transactionStore.refresh()` după operare pentru actualizare instantă
-  - Toate textele din `@shared-constants/ui.ts` (zero hardcoded strings)
+  - Toate textele din `@budget-app/shared-constants/ui.ts` (zero hardcoded strings)
   - Toate date-testid-urile predictibile pentru celule/popover/butoane
   - Validare strictă pentru tipuri: `as TransactionType`, `as FrequencyType`
   - Try/catch pentru operații asincrone cu handling de erori și logging adecvat
@@ -409,13 +412,13 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 
 #### Centralizare chei query params tranzacții
 
-- Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts`.
-- Importurile se fac EXPLICIT din `@shared-constants/queryParams` (nu din barrel și nu local).
+- Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `@budget-app/shared-constants/queryParams.ts`.
+- Importurile se fac EXPLICIT din `@budget-app/shared-constants/queryParams` (nu din barrel și nu local).
 - Motiv: sincronizare automată între frontend și backend, fără duplicare sau risc de desincronizare la refactor.
 - Exemplu corect:
 
   ```typescript
-  import { QUERY_PARAMS } from '@shared-constants/queryParams';
+  import { QUERY_PARAMS } from '@budget-app/shared-constants/queryParams';
   ```
 
 - Orice modificare la aceste chei se anunță și se documentează în `DEV_LOG.md`.
@@ -433,101 +436,50 @@ Aceste practici sunt conforme cu regula critică din memoria d7b6eb4b-0702-4b0a-
 
 ### Organizare și Importuri Partajate
 
-- Sursa unică de adevăr pentru enums/constants partajate este `shared-constants/` la rădăcina proiectului.
-- Importurile pentru enums/constants partajate se fac DOAR prin path mapping `@shared-constants`, nu direct din fișiere sau barrel local.
-- Orice import legacy (ex: din `constants/enums.ts`, `shared/`, barrel local) este interzis și va fi blocat automat de scriptul `node tools/validate-constants.js`.
-- Barrel-ul `shared-constants/index.ts` trebuie actualizat imediat după orice modificare.
-- Orice modificare la enums/constants partajate trebuie anunțată și documentată în `DEV_LOG.md`.
-- Exemplu corect de import:
+- Sursa unică de adevăr pentru enums/constants partajate este pachetul `@budget-app/shared-constants`.
+- Importurile pentru enums/constants partajate se fac DOAR din pachetul `@budget-app/shared-constants`.
+- **Eliminat**: Nu se mai actualizează manual barrel-ul. Modificările sunt detectate automat.
 
-  ```typescript
-  import { TransactionType, CategoryType } from '@shared-constants';
-  ```
+```typescript
+// Pattern corect de import
+import { TransactionType, CategoryType } from '@budget-app/shared-constants';
 
-- Auditarea automată a importurilor se face cu `node tools/validate-constants.js` și este obligatorie înainte de orice commit major.
-
-## Best practices: React Query (2025)
-
-### Pattern recomandat
-
-- Folosește hooks dedicate pentru fetch/mutații (ex: `useTransactions`, `useCategories`)
-- Separă UI state (filtre, formulare) de server state (date fetch-uite)
-- Toate fetch/mutații folosesc rutele centralizate din `@shared-constants/api`
-- Serviciile (ex: TransactionService) nu conțin string-uri hardcodate
-
-### Exemplu usage
-
-```tsx
-const { data, isLoading } = useTransactions({ year, month });
-const { mutate: addTransaction } = useTransactions().create;
-addTransaction({ ... });
+// INCORECT (path-uri relative)
+import { TransactionType } from '../../shared-constants/enums';
 ```
 
-### Anti-patternuri
+- Toate fetch/mutații folosesc rutele centralizate din `@budget-app/shared-constants/api`
 
-- ❌ Fetch în useEffect + Zustand store (vezi secțiunea anti-pattern)
-- ❌ String-uri hardcodate pentru endpoint-uri sau mesaje
-- ❌ Mutarea logicii de fetch în store-uri UI
-
-### Riscuri
-
-- Navigare rapidă → folosește debounce în hooks/componente grid
-- Orice schimbare la contractul API trebuie reflectată în tipuri/hooks
-
----
-
-### Checklist future-proof pentru constants shared
+### Audit și Refactorizare - Checklist [NOU 2025-05-22]
 
 - [ ] Toate constantele/enumurile/mesajele partajate se definesc DOAR în `shared-constants/`.
-- [ ] Importurile pentru constants shared se fac DOAR prin path mapping `@shared-constants`.
-- [ ] Barrel-ul `shared-constants/index.ts` se actualizează la fiecare modificare.
-- [ ] Nu există duplicări locale în FE sau BE pentru constants partajate.
-- [ ] Orice modificare se documentează clar în code review și în `DEV_LOG.md`.
-- [ ] Se rulează periodic scriptul de audit pentru importuri (`node tools/validate-constants.js`).
-- [ ] Orice abatere se aprobă și se justifică explicit.
-
-#### Configurare Path Mapping pentru Shared Constants
+- [ ] Importurile pentru constants shared se fac DOAR din pachetul `@budget-app/shared-constants`.
+- [ ] **Eliminat**: Nu se mai actualizează manual barrel-ul.
+- [ ] Toate rutele API sunt definite în `api.ts`.
+- [ ] Toate textele UI (labels, butoane, etc.) sunt în `ui.ts` și importate ca atare.
+- [ ] Testele folosesc constante din `shared-constants`, nu string-uri hardcodate.
 
 ---
+### Configurare Mediu de Dezvoltare
 
-### Best practices pentru testare automată UI (`data-testid`)
+- **Eliminat**: Nu mai este necesară configurarea de alias-uri în `tsconfig.json`, `jest.config.js`, sau `vite.config.ts` pentru `@shared-constants`. `pnpm workspaces` și referințele de proiect (`project references`) din TypeScript se ocupă de rezolvarea căilor automat.
 
-- Folosește `data-testid` pe orice element funcțional relevant pentru testare (butoane, inputuri, itemi de listă, mesaje de feedback etc.).
-- Alege valori unice și stabile (ex: `save-btn`, `amount-input`, `transaction-item-<id>`).
-- Pentru componente custom, propagă prop-ul `data-testid` către elementul nativ.
-- Nu depinde de text, clasă sau structură pentru selecție în teste!
-- Evită `data-testid` pe elemente strict decorative.
-- Documentează excepțiile în code review.
+### Sistemul CVA v2 (Class Variance Authority) [NOU 2025-05-22]
 
-**Exemple:**
+- **Confirmările destructive** (ex: ștergere subcategorie) se fac direct din grid, cu mesaj centralizat în `@budget-app/shared-constants/messages.ts`.
 
-```tsx
-<button data-testid="save-btn">Salvează</button>
-<input data-testid="amount-input" />
-<li data-testid={`transaction-item-${id}`}>...</li>
-```
+### Tranzacții Recurente [VALIDAT 2025-05-22]
 
-- Pentru a asigura funcționarea corectă a importurilor `@shared-constants` în toate mediile (TypeScript, Jest, Vite):
-  - În `tsconfig.json` adaugă la `compilerOptions.paths`:
+- Alternativ, definește tipurile într-un loc central (`@budget-app/shared-constants/schema.ts`)
+- Păstrează codul simplu și eficient
 
-    ```json
-    "@shared-constants": ["../shared-constants/index.ts"],
-    "@shared-constants/*": ["../shared-constants/*"]
-    ```
+### Optimizare SEO și Performanță [NOU 2025-05-22]
 
-  - În `jest.config.js`:
+- Toate textele și datele din UI folosesc exclusiv sursa unică de adevăr (`@budget-app/shared-constants`).
 
-    ```js
-    moduleNameMapper: {
-      '^@shared-constants$': '<rootDir>/../shared-constants/index.ts',
-      '^@shared-constants/(.*)$': '<rootDir>/../shared-constants/$1',
-    }
-    ```
+### Arhitectură hooks [VALIDAT 2025-05-22]
 
-  - În `vite.config.ts`:      ```typescript      resolve: {        alias: {          '@shared-constants': path.resolve(__dirname, '../shared-constants')        }      }      ```
-
-- Verifică periodic ca toate aceste configurații să fie sincronizate și testele să ruleze fără erori de path mapping.
-- Orice discrepanță între configurări trebuie remediată imediat și documentată în `DEV_LOG.md`.
+- **Sursă unică de adevăr**: Toate hooks-urile sunt în `src/hooks` și exportate prin `index.ts`
 
 ## Management Memorii Critice și Deprecated
 
@@ -1228,7 +1180,7 @@ export function useActiveSubcategories({ category, type, enabled = true }) {
 - Fallback automat pentru subcategorii lipsă sau corupte, cu warning doar în dev dacă apar duplicate.
 - Eliminare completă duplicate keys: nu mai există avertismente React sau bug-uri la expand/collapse all.
 - Pipeline-ul de date pentru subRows este 100% robust, combină subcategorii din definiție și fallback din tranzacții corupte.
-- Toate textele și datele din UI folosesc exclusiv sursa unică de adevăr (`@shared-constants`).
+- Toate textele și datele din UI folosesc exclusiv sursa unică de adevăr (`@budget-app/shared-constants`).
 - Testarea se face doar cu data-testid predictibil, fără stringuri hardcodate.
 - Eliminarea tuturor logurilor de debug înainte de production.
 - Patternul de pipeline și chei unice trebuie urmat la orice refactor viitor pentru griduri ierarhice.

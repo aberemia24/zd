@@ -7,23 +7,23 @@ alwaysApply: true
 - Budget App folosește arhitectură monorepo: frontend/, backend/, shared-constants/
 - Frontend: React + Zustand + TailwindCSS
 - Backend: NestJS + Supabase
-- Shared-constants: Sursa unică pentru constante, enums și mesaje
+- Shared-constants: Pachetul `@budget-app/shared-constants` este sursa unică pentru constante, enums și mesaje, gestionat prin pnpm workspaces.
 </structure>
 <source_of_truth>
-- Toate constantele, enum-urile și mesajele sunt DOAR în `shared-constants/`
-- Copiile din `frontend/src/shared-constants/` sunt generate automat
-- Importuri DOAR prin alias `@shared-constants`
-- Actualizați `shared-constants/index.ts` după orice modificare
-- Validați cu `npm run validate:constants` înainte de commit
+- **Pachet unic**: Toate constantele, enum-urile și mesajele sunt DOAR în pachetul `@budget-app/shared-constants`.
+- **Fără sincronizare manuală**: Datorită `pnpm workspaces`, nu mai există copii automate sau scripturi de sincronizare. Modificările sunt reflectate instantaneu.
+- **Import direct**: Importurile se fac direct din pachet: `import { ... } from '@budget-app/shared-constants';`.
+- **Fără alias-uri**: Nu se mai folosesc alias-uri custom (`@shared-constants`).
+- **Fără validare manuală**: Structura de workspace și TypeScript asigură consistența, eliminând nevoia de scripturi ca `validate:constants`.
 </source_of_truth>
 <text_and_messages>
 INTERZIS string-uri hardcodate în cod
-Toate textele UI în shared-constants/ui.ts
-Toate mesajele de sistem în shared-constants/messages.ts
+Toate textele UI în `@budget-app/shared-constants/ui.ts`
+Toate mesajele de sistem în `@budget-app/shared-constants/messages.ts`
 Testele verifică mesajele folosind constantele, nu string-uri
 </text_and_messages>
 <api_routes>
-Toate rutele definite în shared-constants/api.ts
+Toate rutele definite în `@budget-app/shared-constants/api.ts`
 API_URL este deprecated și interzis
 Folosiți API.ROUTES.* în schimb
 </api_routes>
@@ -33,7 +33,7 @@ components/features/: Componente specifice businessului
 stores/: State management Zustand
 services/: Comunicare cu API
 pages/: Componente pentru rutare
-shared-constants/:
+shared-constants/ (Pachet: `@budget-app/shared-constants`):
 defaults.ts: Valori implicite
 enums.ts: Tipuri de date
 messages.ts: Mesaje sistem

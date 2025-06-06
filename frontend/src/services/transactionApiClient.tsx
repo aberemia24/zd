@@ -1,6 +1,6 @@
-import { API } from "@shared-constants/api";
+import { API } from "@budget-app/shared-constants/api";
 import { Transaction, TransactionQueryParams } from "../types/Transaction";
-import { MESAJE } from "@shared-constants";
+import { MESAJE } from "@budget-app/shared-constants";
 
 /**
  * Răspuns paginat de la API

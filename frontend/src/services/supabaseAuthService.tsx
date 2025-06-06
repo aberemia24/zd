@@ -3,7 +3,7 @@
 // Orice modificare trebuie documentată în DEV_LOG.md
 
 import { supabase } from "./supabase";
-import { MESAJE } from "@shared-constants/messages";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 // Tip user autenticat

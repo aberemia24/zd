@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useFormValidation, transactionSchema, authSchema } from '../useFormValidation';
 
 // Mock pentru shared-constants
-jest.mock('@shared-constants', () => ({
+jest.mock('@budget-app/shared-constants', () => ({
   VALIDATION_MESSAGES: {
     EMPTY_VALUE: 'Câmpul este obligatoriu',
     AMOUNT_REQUIRED: 'Suma este obligatorie',

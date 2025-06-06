@@ -8,7 +8,7 @@ import {
   ConflictSummary,
   TemplateValidationResult,
 } from "../../types/lunarGrid/RecurringTransactions";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 /**
  * recurringTransactionGenerator.ts - Core Algorithms pentru LunarGrid Phase 3

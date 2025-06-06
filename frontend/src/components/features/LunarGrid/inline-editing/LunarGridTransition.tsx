@@ -6,7 +6,7 @@ import {
   usePerformanceOptimization,
   LunarGridCellData,
 } from "./index";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 /**
  * Component de tranziție pentru înlocuirea modalurilor cu inline editing

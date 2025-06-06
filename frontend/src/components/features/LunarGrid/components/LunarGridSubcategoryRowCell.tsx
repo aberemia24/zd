@@ -22,7 +22,7 @@ import {
   UI, 
   LUNAR_GRID_ACTIONS,
   FLAGS
-} from "@shared-constants";
+} from "@budget-app/shared-constants";
 
 interface SubcategoryRowCellProps {
   category: string;

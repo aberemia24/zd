@@ -2,8 +2,8 @@
 // Owner: echipa FE
 import { supabase } from "./supabase";
 import { CustomCategoriesPayload } from "../types/Category";
-import { API } from "@shared-constants/api";
-import { MESAJE } from "@shared-constants/messages";
+import { API } from "@budget-app/shared-constants/api";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 
 // Helper pentru logging consistent
 const logError = (context: string, error: unknown) => {

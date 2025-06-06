@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { TransactionType, FrequencyType } from '@shared-constants';
-import { LUNAR_GRID_ACTIONS } from '@shared-constants/ui';
-import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
+import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
+import { LUNAR_GRID_ACTIONS } from '@budget-app/shared-constants/ui';
+import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
 import {
   useCreateTransactionMonthly,
   useUpdateTransactionMonthly,

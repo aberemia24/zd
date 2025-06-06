@@ -23,7 +23,7 @@ import {
 } from "./useTransactionQueries";
 // import { useActiveSubcategories } from "./useActiveSubcategories"; // Unused for now
 import { TransactionFilters } from "../../types/Transaction";
-import { TransactionType, TransactionStatus } from "@shared-constants";
+import { TransactionType, TransactionStatus } from "@budget-app/shared-constants";
 import React, { ReactNode } from "react";
 
 // Mock doar serviciul Supabase pentru a preveni conexiunile reale

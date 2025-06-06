@@ -3,7 +3,7 @@
  * Tipuri TypeScript pentru datele financiare optimizate pentru desktop-first Budget App
  */
 
-import { TransactionType, FrequencyType } from '@shared-constants';
+import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
 
 // =============================================================================
 // CORE FINANCIAL TYPES

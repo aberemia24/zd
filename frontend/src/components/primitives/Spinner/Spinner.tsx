@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "../../../styles/cva-v2";
-import { LOADING_MESSAGES } from '@shared-constants';
+import { LOADING_MESSAGES } from '@budget-app/shared-constants';
 
 export interface SpinnerProps {
   size?: "sm" | "md" | "lg" | "xl";

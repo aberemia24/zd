@@ -3,8 +3,8 @@ import Input from "../../primitives/Input/Input";
 import Checkbox from "../../primitives/Checkbox/Checkbox";
 import Select from "../../primitives/Select/Select";
 import Button from "../../primitives/Button/Button";
-import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from "@shared-constants";
-import { FrequencyType } from "@shared-constants/enums";
+import { OPTIONS, LABELS, BUTTONS, PLACEHOLDERS } from "@budget-app/shared-constants";
+import { FrequencyType } from "@budget-app/shared-constants/enums";
 
 // CVA styling imports - MIGRATED TO CVA-V2
 import { 

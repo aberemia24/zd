@@ -2,8 +2,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { useMonthlyTransactions } from "../../services/hooks/useMonthlyTransactions";
 import { Transaction } from "../../types/Transaction";
-import { TransactionType } from "@shared-constants";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { TransactionType } from "@budget-app/shared-constants";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 import {
   DailyBalance,
   AccountDailyBalance,

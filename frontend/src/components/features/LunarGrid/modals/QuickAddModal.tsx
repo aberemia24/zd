@@ -21,7 +21,7 @@ import {
   PLACEHOLDERS,
   EXCEL_GRID,
   OPTIONS 
-} from "@shared-constants";
+} from "@budget-app/shared-constants";
 import { LAYOUT_CONSTANTS } from '../../../../styles/cva-v2/foundations';
 import { useToast } from '../../../primitives/Toast/useToast';
 

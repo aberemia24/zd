@@ -4,7 +4,7 @@ import Button from "../../primitives/Button/Button";
 import ExportModal from "./ExportModal";
 import type { Transaction } from "../../../types/Transaction";
 import type { ExportFormat } from "../../../utils/ExportManager";
-import { BUTTONS } from "@shared-constants/ui";
+import { BUTTONS } from "@budget-app/shared-constants/ui";
 
 interface ExportButtonProps {
   transactions: Transaction[];

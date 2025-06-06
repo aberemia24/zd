@@ -1,5 +1,5 @@
-import { TransactionType } from "@shared-constants/enums";
-import { TransactionValidated } from "@shared-constants/transaction.schema";
+import { TransactionType } from "@budget-app/shared-constants/enums";
+import { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 import { ColumnDef, Row, Table, Column } from "@tanstack/react-table";
 import { Virtualizer, VirtualizerOptions } from "@tanstack/react-virtual";
 import { ReactNode } from "react";

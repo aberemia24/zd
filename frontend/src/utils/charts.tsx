@@ -3,7 +3,7 @@
  * Utilitare pentru procesarea datelor și configurarea chart-urilor financiare
  */
 
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 import { formatCurrencyRON, formatDateRON } from './financial';
 import type {
   ChartDataPoint,

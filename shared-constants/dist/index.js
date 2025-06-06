@@ -1,23 +1,23 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./defaults"), exports);
-__exportStar(require("./enums"), exports);
-__exportStar(require("./messages"), exports);
-__exportStar(require("./ui"), exports);
-__exportStar(require("./transaction.schema"), exports);
-__exportStar(require("./categories"), exports);
-__exportStar(require("./queryParams"), exports);
+// index barrel pentru shared-constants
+export { TransactionType, CategoryType, FrequencyType, AccountType, BalanceImpactType } from './enums';
+export * from './messages';
+export { MESAJE, LUNAR_GRID_MESSAGES, EXPORT_MESSAGES, URL_PERSISTENCE } from './messages';
+export { LABELS, TITLES, PLACEHOLDERS, BUTTONS, TABLE, LOADER, EXCEL_GRID, OPTIONS, UI, FLAGS, INFO, LUNAR_GRID, TEST_CONSTANTS, 
+// 🆕 Balance System Constants 
+ACCOUNT_MANAGEMENT, BALANCE_DISPLAY, BALANCE_MODALS, BALANCE_LABELS, 
+// 🚀 Phase 2 Template Systems
+LOADING_MESSAGES, EMPTY_STATE_MESSAGES, DESIGN_TOKENS, LUNAR_GRID_ACTIONS, 
+// 🎨 Supporting UI Components - Task 8.5
+TOOLTIP, PROGRESS, BADGE, EXPORT_UI, 
+// 🍞 Toast Notifications - Task 9.1
+TOAST, 
+// 🧭 Navigation System - Task 10.1
+NAVIGATION } from './ui';
+export * from './transaction.schema';
+export * from './defaults';
+export * from './enums';
+export * from './categories';
+export { getCategoriesForTransactionType } from './category-mapping';
+export * from './queryParams';
+export * from './validation';
+export * from './api';

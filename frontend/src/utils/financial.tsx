@@ -1,10 +1,10 @@
-import { LABELS } from '@shared-constants';
+import { LABELS } from '@budget-app/shared-constants';
 /**
  * 💰 FINANCIAL UTILITIES - Task 8.2
  * Utilitare pentru formatarea și calcularea datelor financiare pentru piața românească
  */
 
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 import type { 
   FinancialTransaction, 
   FinancialTableRow, 

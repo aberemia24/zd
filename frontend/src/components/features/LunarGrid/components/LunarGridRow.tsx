@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { Row, flexRender, Table } from "@tanstack/react-table";
 import { ChevronRight, Lock } from "lucide-react";
-import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
-import { TransactionType, VALIDATION } from '@shared-constants';
+import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
+import { TransactionType, VALIDATION } from '@budget-app/shared-constants';
 
 // Constants și shared
-import { UI, LUNAR_GRID } from "@shared-constants";
+import { UI, LUNAR_GRID } from "@budget-app/shared-constants";
 
 // Components
 import LunarGridSubcategoryRowCell from "./LunarGridSubcategoryRowCell";

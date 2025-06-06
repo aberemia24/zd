@@ -4,7 +4,7 @@ import { useBreadcrumbNavigation } from '../Breadcrumb/useBreadcrumbNavigation';
 import Button from '../Button/Button';
 import { Breadcrumb } from '../Breadcrumb/Breadcrumb';
 import { cn } from '../../../styles/cva-v2';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 
 /**
  * 🧭 Navigation State Demo Component

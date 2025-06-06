@@ -1,9 +1,6 @@
-"use strict";
 // Sursă unică de adevăr pentru categorii și subcategorii tranzacții (doar în română)
 // Orice modificare trebuie anunțată în DEV_LOG.md și barrel-ul index.ts trebuie actualizat!
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CATEGORIES = void 0;
-exports.CATEGORIES = {
+export const CATEGORIES = {
     VENITURI: {
         "Surse de venit": [
             "Salarii",

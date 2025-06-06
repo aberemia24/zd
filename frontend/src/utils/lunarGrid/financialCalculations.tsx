@@ -1,5 +1,5 @@
 import { Transaction } from "../../types/Transaction";
-import { TransactionType } from "@shared-constants/enums";
+import { TransactionType } from "@budget-app/shared-constants/enums";
 import {
   BalanceCalculation,
   FinancialSummary,

@@ -1,6 +1,6 @@
 import { ExportManager } from "./ExportManager";
 import type { Transaction } from "../types/Transaction";
-import { TransactionType, TransactionStatus } from "@shared-constants";
+import { TransactionType, TransactionStatus } from "@budget-app/shared-constants";
 
 // Mock data pentru testare
 const mockTransactions: Transaction[] = [

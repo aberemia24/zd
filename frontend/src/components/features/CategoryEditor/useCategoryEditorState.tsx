@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { CustomCategory, CustomSubcategory } from "../../../types/Category";
-import { MESAJE } from "@shared-constants/messages";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 
 /**
  * Tipul acțiunii pentru subcategorii (edit/delete)

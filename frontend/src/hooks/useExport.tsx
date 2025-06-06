@@ -6,7 +6,7 @@ import {
   ExportOptions,
 } from "../utils/ExportManager";
 import type { Transaction } from "../types/Transaction";
-import { MESAJE } from "@shared-constants/messages";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 
 interface ExportState {
   isExporting: boolean;

@@ -4,7 +4,7 @@ import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import Breadcrumb, { useBreadcrumb, type BreadcrumbItem } from './Breadcrumb';
 
 // Mock pentru NAVIGATION constants
-jest.mock('@shared-constants', () => ({
+jest.mock('@budget-app/shared-constants', () => ({
   NAVIGATION: {
     BREADCRUMBS: {
       HOME: 'Acasă',

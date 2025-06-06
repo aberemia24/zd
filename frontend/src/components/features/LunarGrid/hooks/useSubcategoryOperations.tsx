@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
-import { TransactionType, MESAJE } from '@shared-constants';
+import { TransactionType, MESAJE } from '@budget-app/shared-constants';
 import { useCategoryStore } from '../../../../stores/categoryStore';
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import { useValidation } from '../../../../hooks/useValidation';

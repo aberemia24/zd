@@ -1,5 +1,5 @@
-import { TransactionType } from '@shared-constants';
-import { BUTTONS } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
+import { BUTTONS } from '@budget-app/shared-constants';
 /**
  * Lazy Export Utilities
  * 

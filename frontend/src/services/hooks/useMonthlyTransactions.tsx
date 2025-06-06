@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabaseService } from "../supabaseService";
-import { PAGINATION } from "@shared-constants";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { PAGINATION } from "@budget-app/shared-constants";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 import { useAuthStore } from "../../stores/authStore";
 import { queryKeys, optimizeQueryOptions } from "./reactQueryUtils";
 import { useEffect, useCallback } from "react";

@@ -15,6 +15,7 @@
     "format": "prettier --write src"
   },
   "dependencies": {
+    "@budget-app/shared-constants": "workspace:*",
     "@nestjs/common": "11.0.20",
     "@nestjs/config": "4.0.0",
     "@nestjs/core": "11.0.20",

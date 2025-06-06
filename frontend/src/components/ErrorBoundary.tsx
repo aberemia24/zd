@@ -1,5 +1,5 @@
 import React from "react";
-import { MESAJE } from "@shared-constants";
+import { MESAJE } from "@budget-app/shared-constants";
 
 // CVA styling imports - UNIFIED MIGRATION
 import { cn, button } from "../styles/cva-v2";

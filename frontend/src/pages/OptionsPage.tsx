@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import CategoryEditor from "../components/features/CategoryEditor/CategoryEditor";
-import { UI, CATEGORIES, TransactionType } from "@shared-constants";
+import { UI, CATEGORIES, TransactionType } from "@budget-app/shared-constants";
 import { Button } from "../components/primitives/Button";
 import Alert from "../components/primitives/Alert";
 import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";

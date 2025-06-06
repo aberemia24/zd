@@ -15,7 +15,7 @@ import {
   detectConflicts,
   resolveConflicts,
 } from "../../utils/lunarGrid/recurringTransactionGenerator";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 /**
  * useRecurringTransactions.tsx - Hook pentru LunarGrid Phase 3

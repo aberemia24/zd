@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { TOAST } from '@shared-constants';
+import { TOAST } from '@budget-app/shared-constants';
 import type { 
   ToastData, 
   ToastContextValue, 

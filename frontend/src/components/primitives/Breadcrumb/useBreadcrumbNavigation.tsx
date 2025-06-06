@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useNavigationState, BreadcrumbItem } from '../../../hooks/useNavigationState';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 
 /**
  * 🧭 Breadcrumb Navigation Integration

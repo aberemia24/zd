@@ -9,7 +9,7 @@ import {
   toastDescription,
   toastCloseButton
 } from '../../../styles/cva-v2';
-import { TOAST } from '@shared-constants';
+import { TOAST } from '@budget-app/shared-constants';
 import type { ToastProps } from './types';
 
 /**

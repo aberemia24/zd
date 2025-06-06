@@ -1,24 +1,85 @@
 import { z } from 'zod';
+import { TransactionType, FrequencyType, TransactionStatus } from './enums';
 export declare const TransactionSchema: z.ZodObject<{
     id: z.ZodString;
     amount: z.ZodNumber;
-    type: z.ZodString;
+    type: z.ZodNativeEnum<typeof TransactionType>;
     date: z.ZodString;
     description: z.ZodOptional<z.ZodString>;
     category: z.ZodOptional<z.ZodString>;
+    subcategory: z.ZodOptional<z.ZodString>;
+    recurring: z.ZodOptional<z.ZodBoolean>;
+    frequency: z.ZodOptional<z.ZodNativeEnum<typeof FrequencyType>>;
+    actualAmount: z.ZodOptional<z.ZodNumber>;
+    status: z.ZodOptional<z.ZodNativeEnum<typeof TransactionStatus>>;
+    created_at: z.ZodOptional<z.ZodString>;
+    updated_at: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     date: string;
     id: string;
     amount: number;
-    type: string;
+    type: TransactionType;
+    status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;
+    subcategory?: string | undefined;
+    recurring?: boolean | undefined;
+    frequency?: FrequencyType | undefined;
+    actualAmount?: number | undefined;
+    created_at?: string | undefined;
+    updated_at?: string | undefined;
 }, {
     date: string;
     id: string;
     amount: number;
-    type: string;
+    type: TransactionType;
+    status?: TransactionStatus | undefined;
     description?: string | undefined;
     category?: string | undefined;
+    subcategory?: string | undefined;
+    recurring?: boolean | undefined;
+    frequency?: FrequencyType | undefined;
+    actualAmount?: number | undefined;
+    created_at?: string | undefined;
+    updated_at?: string | undefined;
+}>;
+export declare const CreateTransactionSchema: z.ZodObject<Omit<{
+    id: z.ZodString;
+    amount: z.ZodNumber;
+    type: z.ZodNativeEnum<typeof TransactionType>;
+    date: z.ZodString;
+    description: z.ZodOptional<z.ZodString>;
+    category: z.ZodOptional<z.ZodString>;
+    subcategory: z.ZodOptional<z.ZodString>;
+    recurring: z.ZodOptional<z.ZodBoolean>;
+    frequency: z.ZodOptional<z.ZodNativeEnum<typeof FrequencyType>>;
+    actualAmount: z.ZodOptional<z.ZodNumber>;
+    status: z.ZodOptional<z.ZodNativeEnum<typeof TransactionStatus>>;
+    created_at: z.ZodOptional<z.ZodString>;
+    updated_at: z.ZodOptional<z.ZodString>;
+}, "id" | "created_at" | "updated_at">, "strip", z.ZodTypeAny, {
+    date: string;
+    amount: number;
+    type: TransactionType;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    subcategory?: string | undefined;
+    recurring?: boolean | undefined;
+    frequency?: FrequencyType | undefined;
+    actualAmount?: number | undefined;
+}, {
+    date: string;
+    amount: number;
+    type: TransactionType;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
+    category?: string | undefined;
+    subcategory?: string | undefined;
+    recurring?: boolean | undefined;
+    frequency?: FrequencyType | undefined;
+    actualAmount?: number | undefined;
 }>;
 export type TransactionValidated = z.infer<typeof TransactionSchema>;
+export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
+//# sourceMappingURL=transaction.schema.d.ts.map

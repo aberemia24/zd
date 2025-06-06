@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { TransactionType, CategoryType, PAGINATION } from "@shared-constants";
+import { TransactionType, CategoryType, PAGINATION } from "@budget-app/shared-constants";
 import {
   BaseStoreState,
   storeLogger,

@@ -1,4 +1,4 @@
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 /**
  * 📈 LINE CHART COMPONENT - Task 8.3
  * Componentă pentru chart-uri în linie cu Recharts și Carbon Design System styling

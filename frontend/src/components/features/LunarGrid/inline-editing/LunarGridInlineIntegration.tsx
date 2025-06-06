@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { EditableCell } from "./EditableCell";
 import { useGridNavigation } from "./useGridNavigation";
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 /**
  * Component pentru integrarea inline editing cu LunarGrid existent

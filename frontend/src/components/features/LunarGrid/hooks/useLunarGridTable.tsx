@@ -14,7 +14,7 @@ import { useAuthStore } from "../../../../stores/authStore";
 import { useMonthlyTransactions } from "../../../../services/hooks/useMonthlyTransactions";
 
 // Import-uri pentru tipurile de tranzacții
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 
 // Import-uri utilitare din @utils/lunarGrid (via barrel file) - doar cele folosite
 import {
@@ -25,7 +25,7 @@ import {
   formatCurrencyForGrid,
   formatMonthYear,
 } from "../../../../utils/lunarGrid";
-import { MESAJE, LUNAR_GRID_MESSAGES } from "@shared-constants";
+import { MESAJE, LUNAR_GRID_MESSAGES } from "@budget-app/shared-constants";
 
 // CVA styling imports
 import { cn, hoverBackground } from "../../../../styles/cva-v2";

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback, useTransition } from "react";
-import { EXCEL_GRID, UI, TITLES, CATEGORIES } from "@shared-constants";
+import { EXCEL_GRID, UI, TITLES, CATEGORIES } from "@budget-app/shared-constants";
 import LunarGridTanStack from "../components/features/LunarGrid/LunarGridTanStack";
 import { useTransactionStore } from "../stores/transactionStore";
 import { useCategoryStore } from "../stores/categoryStore";

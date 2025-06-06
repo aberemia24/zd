@@ -8,9 +8,9 @@ import type { TransactionPage } from "../supabaseService";
 import {
   TransactionValidated,
   CreateTransaction,
-} from "@shared-constants/transaction.schema";
-import { TransactionStatus } from "@shared-constants";
-import { MESAJE } from "@shared-constants/messages";
+} from "@budget-app/shared-constants/transaction.schema";
+import { TransactionStatus } from "@budget-app/shared-constants";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 import { syncGlobalTransactionCache } from './cacheSync';
 import { useMutationErrorHandler } from '../../hooks/useErrorHandler';
 

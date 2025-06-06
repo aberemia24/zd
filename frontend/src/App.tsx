@@ -12,7 +12,7 @@ import Spinner from "./components/primitives/Spinner";
 import NavLink from "./components/primitives/NavLink";
 import { CommandPaletteProvider } from "./components/primitives/CommandPalette";
 import { ToastProvider, ToastContainer } from "./components/primitives/Toast";
-import { TITLES } from "@shared-constants";
+import { TITLES } from "@budget-app/shared-constants";
 
 // Dark mode integration
 import { useDarkMode } from "./hooks/useDarkMode";
@@ -24,7 +24,7 @@ import { cn, dashboard } from "./styles/cva-v2";
 import { useAuthStore } from "./stores/authStore";
 // Import pentru inițializarea categoriilor
 import { useCategoryStore } from "./stores/categoryStore";
-import { CATEGORIES } from "@shared-constants/categories";
+import { CATEGORIES } from "@budget-app/shared-constants/categories";
 
 // Lazy loaded pages cu loading states optimizate
 const TransactionsPage = lazyLoad(() => import("./pages/TransactionsPage"), {

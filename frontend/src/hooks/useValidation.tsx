@@ -1,5 +1,5 @@
 import { useCallback, useState, useMemo } from 'react';
-import { VALIDATION, VALIDATION_MESSAGES, VALIDATION_HELPERS } from '@shared-constants/validation';
+import { VALIDATION, VALIDATION_MESSAGES, VALIDATION_HELPERS } from '@budget-app/shared-constants/validation';
 import { useErrorHandler } from './useErrorHandler';
 
 /**

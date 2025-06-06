@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LunarGridTanStack from '../features/LunarGrid/LunarGridTanStack';
 import ProfilerContainer from './ProfilerContainer';
-import { API } from '@shared-constants/api';
+import { API } from '@budget-app/shared-constants/api';
 
 /**
  * Pagină de debug pentru analiza performanței folosind React Profiler.

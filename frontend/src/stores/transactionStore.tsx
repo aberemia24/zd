@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { TransactionQueryParamsWithRecurring } from "../types/Transaction";
-import { PAGINATION } from "@shared-constants";
+import { PAGINATION } from "@budget-app/shared-constants";
 import {
   BaseStoreState,
   storeLogger,

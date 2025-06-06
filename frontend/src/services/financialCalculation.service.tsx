@@ -6,8 +6,8 @@
  */
 
 import { createCachedQueryFn } from "./reactQueryUtils";
-import { TransactionType } from "@shared-constants";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import { TransactionType } from "@budget-app/shared-constants";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 
 // Interfețe pentru serviciul de calculare financiară
 export interface DailyBalanceParams {

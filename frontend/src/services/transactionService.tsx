@@ -5,7 +5,7 @@
  * interogările, mutațiile și managementul cache-ului pentru tranzacții.
  */
 
-import { API } from "@shared-constants/api";
+import { API } from "@budget-app/shared-constants/api";
 import { Transaction, TransactionFilters } from "../types/Transaction";
 import { createCachedQueryFn } from "./reactQueryUtils";
 import { memoizeRequest } from "../utils/performanceUtils";

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 import type { Transaction } from '../types/Transaction';
 import type { CategoryDataPoint, TimeSeriesDataPoint } from '../types/charts';
 

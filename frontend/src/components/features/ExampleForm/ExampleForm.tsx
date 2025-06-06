@@ -12,7 +12,7 @@ import {
   cn,
   formGroup
 } from '../../../styles/cva-v2';
-import { TransactionType, OPTIONS } from '@shared-constants';
+import { TransactionType, OPTIONS } from '@budget-app/shared-constants';
 
 interface ExampleFormProps {
   onSubmit?: (data: TransactionFormData) => Promise<void>;

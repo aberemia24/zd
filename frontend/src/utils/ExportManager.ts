@@ -1,7 +1,7 @@
 import type { Transaction } from "../types/Transaction";
-import { TransactionType, OPTIONS } from "@shared-constants";
+import { TransactionType, OPTIONS } from "@budget-app/shared-constants";
 import { LazyExportManager, type ExportProgressCallback } from "./lazyExportUtils";
-import { LABELS } from '@shared-constants';
+import { LABELS } from '@budget-app/shared-constants';
 
 export type ExportFormat = "csv" | "pdf" | "excel";
 

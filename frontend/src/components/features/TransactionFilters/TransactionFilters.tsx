@@ -8,7 +8,7 @@ import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
 import { 
   OPTIONS, LABELS, PLACEHOLDERS, TransactionType, CategoryType,
   BUTTONS, UI, TABLE, LOADER, INFO, MESAJE 
-} from "@shared-constants";
+} from "@budget-app/shared-constants";
 import { useCategoryStore } from "../../../stores/categoryStore";
 
 import classNames from "classnames";

@@ -1,6 +1,6 @@
 import React from "react";
 import Button, { ButtonProps } from "./Button";
-import { BUTTONS } from "@shared-constants";
+import { BUTTONS } from "@budget-app/shared-constants";
 
 export interface ValidatedSubmitButtonProps
   extends Omit<ButtonProps, "variant"> {

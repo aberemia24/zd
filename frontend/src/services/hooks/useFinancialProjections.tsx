@@ -8,7 +8,7 @@ import type {
   MonthlyProjection,
   BalanceProjection
 } from '../financialCalculation.service';
-import type { TransactionValidated } from '@shared-constants/transaction.schema';
+import type { TransactionValidated } from '@budget-app/shared-constants/transaction.schema';
 
 // Creez query keys pentru financial projections
 const financialProjectionKeys = createQueryKeyFactory('financial-projections');

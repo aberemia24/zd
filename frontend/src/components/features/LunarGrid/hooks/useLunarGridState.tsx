@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { usePersistentExpandedRows } from '../../../../utils/lunarGrid/lunarGridHelpers';
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 // Interfațe pentru state management
 interface PopoverState {

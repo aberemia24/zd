@@ -2,7 +2,7 @@ import { useForm, UseFormProps, FieldValues, Path, UseFormReturn } from 'react-h
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCallback, useMemo } from 'react';
-import { VALIDATION_MESSAGES, VALIDATION } from '@shared-constants';
+import { VALIDATION_MESSAGES, VALIDATION } from '@budget-app/shared-constants';
 
 /**
  * Proprietăți pentru hookul de validare formular

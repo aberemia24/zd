@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NAVIGATION } from '@shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 
 /**
  * Global keyboard shortcuts pentru Budget App

@@ -1,9 +1,9 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import { INITIAL_FORM_STATE, MESAJE, VALIDATION, TransactionType, FrequencyType, TransactionStatus, CATEGORIES } from "@shared-constants";
-import { API } from "@shared-constants/api";
+import { INITIAL_FORM_STATE, MESAJE, VALIDATION, TransactionType, FrequencyType, TransactionStatus, CATEGORIES } from "@budget-app/shared-constants";
+import { API } from "@budget-app/shared-constants/api";
 import type { TransactionFormData } from "../components/features/TransactionForm/TransactionForm";
-import { CreateTransaction } from "@shared-constants/transaction.schema";
+import { CreateTransaction } from "@budget-app/shared-constants/transaction.schema";
 import { useAuthStore } from "./authStore";
 import {
   BaseStoreState,

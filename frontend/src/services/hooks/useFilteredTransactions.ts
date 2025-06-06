@@ -3,7 +3,7 @@ import {
   type TransactionQueryParams,
 } from "./useInfiniteTransactions";
 import { useMemo, useRef } from "react";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 
 /**
  * Tipul de returnare pentru hook-ul useFilteredTransactions

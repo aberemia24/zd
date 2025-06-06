@@ -7,8 +7,8 @@ import {
   CategoryType,
   FrequencyType,
   TransactionStatus,
-} from "@shared-constants";
-import { TABLE, BUTTONS, INFO } from "@shared-constants";
+} from "@budget-app/shared-constants";
+import { TABLE, BUTTONS, INFO } from "@budget-app/shared-constants";
 import type { Transaction } from "../../../types/Transaction";
 import { 
   cn,
@@ -25,7 +25,7 @@ import {
   loadingOverlay,
   spacingMargin
 } from "../../../styles/cva-v2";
-import type { TransactionValidated } from "@shared-constants/transaction.schema";
+import type { TransactionValidated } from "@budget-app/shared-constants/transaction.schema";
 import { formatCurrencyForGrid } from "../../../utils/lunarGrid";
 
 export type { Transaction };

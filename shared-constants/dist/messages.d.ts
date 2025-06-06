@@ -1,4 +1,18 @@
 export declare const MESAJE: {
+    LOGIN_SUCCES: string;
+    LOGIN_ERROR: string;
+    LOGOUT_SUCCES: string;
+    REGISTER_SUCCES: string;
+    REGISTER_ERROR: string;
+    PAROLE_NECORESPUNZATOARE: string;
+    INVALID_TYPE: string;
+    INVALID_CATEGORY: string;
+    MISSING_REQUIRED_FIELD: string;
+    NOT_FOUND: string;
+    SERVER_ERROR: string;
+    TRANSACTION_CREATED: string;
+    TRANSACTION_UPDATED: string;
+    TRANSACTION_DELETED: string;
     CAMPURI_OBLIGATORII: string;
     FRECV_RECURENTA: string;
     AVERTISMENT_DATE: string;
@@ -17,4 +31,65 @@ export declare const MESAJE: {
     LOG_EROARE_INCARCARE: string;
     LOG_EROARE_SALVARE: string;
     LOG_EROARE_STERGERE: string;
+    EROARE_AUTENTIFICARE: string;
+    EROARE_RLS: string;
+    EROARE_RETEA: string;
+    PAROLA_PREA_SLABA: string;
+    EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA: string;
+    VALIDARE: {
+        SUMA_INVALIDA: string;
+        FORMAT_DATE: string;
+        CAMP_LIPSA: string;
+    };
+    CATEGORII: {
+        NUME_GOL: string;
+        SUBCATEGORIE_EXISTENTA: string;
+        EROARE_STERGERE: string;
+        NU_SE_POT_STERGE_PREDEFINITE: string;
+        CONFIRMARE_STERGERE: string;
+        CONFIRMARE_STERGERE_TITLE: string;
+        MAXIM_SUBCATEGORII: string;
+        EROARE_ADAUGARE_SUBCATEGORIE: string;
+        CATEGORIA_NEGASITA: string;
+        NUME_DUPLICAT: string;
+        EROARE_REDENUMIRE: string;
+        DOAR_CUSTOM_STERGERE: string;
+        EROARE_STERGERE_SUBCATEGORIE: string;
+        EROARE_STERGERE_ORFANE: string;
+        SUCCES_ADAUGARE_SUBCATEGORIE: string;
+        SUCCES_REDENUMIRE_SUBCATEGORIE: string;
+        SUCCES_STERGERE_SUBCATEGORIE: string;
+    };
+    EROARE_EXPORT: string;
+    SUCCES_EXPORT: string;
+    EXPORT_IN_PROGRES: string;
+    EXPORT_FINALIZAT: string;
 };
+export declare const LUNAR_GRID_MESSAGES: {
+    EROARE_INCARCARE: string;
+    EROARE_CREARE_TRANZACTIE: string;
+    EROARE_ACTUALIZARE_TRANZACTIE: string;
+    EROARE_STERGERE_TRANZACTIE: string;
+};
+export declare const EXPORT_MESSAGES: {
+    EROARE_GENERALA: string;
+    EROARE_FORMAT: string;
+    EROARE_DATE_INVALIDE: string;
+    EROARE_TIMEOUT: string;
+    SUCCES: string;
+    IN_PROGRES: string;
+    ANULAT: string;
+    CONFIRMARE_MULTE_RANDURI: string;
+    SUGESTIE_FILTRARE: string;
+    SALVARE: string;
+    DESCHIDERE: string;
+};
+export declare const URL_PERSISTENCE: {
+    LINK_COPIAT: string;
+    LINK_NEGASIT: string;
+    FILTRE_RESETATE: string;
+    FILTRE_INVALIDE: string;
+    FILTRE_INCARCATE: string;
+    FILTRE_SALVATE: string;
+};
+//# sourceMappingURL=messages.d.ts.map

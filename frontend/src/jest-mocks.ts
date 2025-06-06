@@ -6,8 +6,8 @@
  * Se poate include la începutul fiecărui fișier de test care necesită mock-uri comune.
  */
 
-import { MESAJE } from "@shared-constants/messages";
-import { FrequencyType, CategoryType } from "@shared-constants/enums";
+import { MESAJE } from "@budget-app/shared-constants/messages";
+import { FrequencyType, CategoryType } from "@budget-app/shared-constants/enums";
 
 // Mock pentru user autentificat
 export const mockAuthUser = {

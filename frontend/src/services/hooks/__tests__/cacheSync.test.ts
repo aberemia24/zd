@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { syncGlobalTransactionCache, invalidateGlobalTransactionCache } from '../cacheSync';
-import { TransactionValidated, TransactionType } from '@shared-constants';
-import { TransactionType } from '@shared-constants';
+import { TransactionValidated, TransactionType } from '@budget-app/shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 
 describe('Cache Sync Functionality', () => {
   let queryClient: QueryClient;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Progress from './Progress';
-import { LOADING_MESSAGES } from '@shared-constants';
+import { LOADING_MESSAGES } from '@budget-app/shared-constants';
 
 describe('Progress Component', () => {
   describe('Basic Rendering', () => {

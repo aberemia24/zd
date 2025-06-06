@@ -1,4 +1,4 @@
-import { LABELS } from '@shared-constants';
+import { LABELS } from '@budget-app/shared-constants';
 /**
  * 🔍 TABLE TOOLBAR - Task 8.2
  * Toolbar pentru search avansat și filtering pentru tabele financiare
@@ -7,7 +7,7 @@ import { LABELS } from '@shared-constants';
 import React, { useState, useCallback, useMemo, memo } from 'react';
 import { Search, Filter, X, Calendar, Tag, DollarSign } from 'lucide-react';
 
-import { TransactionType } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
 import { 
   cn,
   button,

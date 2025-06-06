@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { MESAJE } from '@shared-constants/messages';
+import { MESAJE } from '@budget-app/shared-constants/messages';
 
 /**
  * Tipuri de erori pentru clasificare și handling specializat

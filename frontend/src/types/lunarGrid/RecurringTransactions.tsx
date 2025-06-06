@@ -1,4 +1,4 @@
-import { TransactionType } from "@shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 /**
  * RecurringTransactions.ts - Type Definitions pentru LunarGrid Phase 3

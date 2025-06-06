@@ -13,7 +13,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { EditableCell } from "./EditableCell";
-import { EXCEL_GRID } from "@shared-constants";
+import { EXCEL_GRID } from "@budget-app/shared-constants";
 
 // Live data setup - no mocks
 const createTestQueryClient = () =>

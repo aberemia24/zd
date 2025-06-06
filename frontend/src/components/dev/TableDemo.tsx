@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Table, { type TableColumn } from '../primitives/Table/Table';
-import { TransactionType } from '@shared-constants';
-import { LABELS } from '@shared-constants';
+import { TransactionType } from '@budget-app/shared-constants';
+import { LABELS } from '@budget-app/shared-constants';
 
 // Tipuri pentru demo
 interface DemoTransaction {

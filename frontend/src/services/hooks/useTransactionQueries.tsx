@@ -16,7 +16,7 @@ import {
 import type { Transaction, TransactionFilters } from "../../types/Transaction";
 import { transactionService } from "../transactionService";
 import { useMemo } from "react";
-import { EXCEL_GRID } from "@shared-constants";
+import { EXCEL_GRID } from "@budget-app/shared-constants";
 
 // Adaptăm interfața TransactionFilters pentru a fi compatibilă cu Record<string, unknown>
 type TransactionFiltersRecord = TransactionFilters & Record<string, unknown>;

@@ -3,15 +3,15 @@ import { flexRender, Row } from "@tanstack/react-table";
 import toast from 'react-hot-toast';
 import { Maximize2, Minimize2 } from 'lucide-react';
 
-// Constants și shared (@shared-constants)
+// Constants și shared (@budget-app/shared-constants)
 import { 
   TransactionType, 
   FrequencyType, 
   LUNAR_GRID_MESSAGES, 
   UI, 
   LUNAR_GRID 
-} from "@shared-constants";
-import { LUNAR_GRID_ACTIONS } from "@shared-constants/ui";
+} from "@budget-app/shared-constants";
+import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 
 // Componente UI și features
 import LunarGridRow from "./components/LunarGridRow";

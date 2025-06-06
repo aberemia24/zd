@@ -6,9 +6,9 @@ import { supabase } from "./supabase";
 import {
   TransactionValidated,
   CreateTransaction,
-} from "@shared-constants/transaction.schema";
-import { CATEGORIES } from "@shared-constants/categories";
-import { MESAJE } from "@shared-constants/messages";
+} from "@budget-app/shared-constants/transaction.schema";
+import { CATEGORIES } from "@budget-app/shared-constants/categories";
+import { MESAJE } from "@budget-app/shared-constants/messages";
 
 export interface Pagination {
   limit?: number;

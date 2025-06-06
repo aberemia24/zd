@@ -7,11 +7,11 @@
 import "@testing-library/jest-dom";
 import { supabaseService } from "./supabaseService";
 
-// Import-uri corecte folosind alias-ul @shared-constants conform regulilor globale
-import { TransactionType, FrequencyType } from "@shared-constants/enums";
-import { API } from "@shared-constants/api";
-import { MESAJE } from "@shared-constants/messages";
-import type { CreateTransaction } from "@shared-constants/transaction.schema";
+// Import-uri corecte folosind alias-ul @budget-app/shared-constants conform regulilor globale
+import { TransactionType, FrequencyType } from "@budget-app/shared-constants/enums";
+import { API } from "@budget-app/shared-constants/api";
+import { MESAJE } from "@budget-app/shared-constants/messages";
+import type { CreateTransaction } from "@budget-app/shared-constants/transaction.schema";
 
 // Mock direct pentru Supabase (serviciu extern care necesită mockuri)
 // Pentru servicii externe în testare, mock-urile sunt permise conform regulilor
