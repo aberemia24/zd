@@ -390,7 +390,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       {/* Overlay pentru positioned modal - separat pentru a permite click outside */}
       {position && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-25"
+          className="fixed inset-0 z-40 bg-black bg-opacity-15"
           onClick={handleOutsideClick}
         />
       )}
