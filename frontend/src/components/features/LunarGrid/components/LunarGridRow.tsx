@@ -420,7 +420,14 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                         }
                       }
                       
-                      onSingleClickModal(original.category, original.subcategory, day, safeValue, transactionId, e.currentTarget as HTMLElement);
+                      // SOLUȚIE 1: Ensure we have a valid HTMLElement
+                      const targetElement = e.currentTarget as HTMLElement;
+                      if (!targetElement) {
+                        console.warn('🎯 [MODAL-POSITION] No valid target element for modal positioning');
+                        return;
+                      }
+                      
+                      onSingleClickModal(original.category, original.subcategory, day, safeValue, transactionId, targetElement);
                     }}
                     className={cn(
                       gridInput({ variant: "default", type: "number" }),

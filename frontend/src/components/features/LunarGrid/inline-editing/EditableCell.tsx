@@ -450,6 +450,23 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   // Enhanced auto-save la blur cu error handling - MOVED AFTER ALL DEPENDENCIES
   const handleEnhancedBlur = useCallback(async (e: React.FocusEvent) => {
+    // SOLUȚIE 3: Verifică dacă blur-ul este cauzat de click pe altă celulă
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    const isClickOnAnotherCell = relatedTarget?.closest('[data-testid^="editable-cell-"]');
+    
+    if (isClickOnAnotherCell) {
+      // Salvează automat valoarea curentă dacă s-a modificat
+      if (inputRef.current && inputRef.current.value.trim() !== String(value).trim()) {
+        await handleSaveWithErrorHandling(inputRef.current.value);
+              } else {
+          // Anulează editarea dacă nu s-a schimbat nimic
+          if (onCancel) {
+            onCancel();
+          }
+        }
+      return;
+    }
+    
     // Verifică dacă focus-ul rămâne în componenta curentă
     if (focusTrapRef.current?.contains(e.relatedTarget as Node)) {
       return; // Nu salvează dacă focus-ul rămâne în edit mode
@@ -462,27 +479,29 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     }
     
     setAriaAnnouncement(`Auto-saved ${validationType} value on blur.`);
-  }, [isControlled, handleControlledBlur, handleBlur, validationType]);
+  }, [isControlled, handleControlledBlur, handleBlur, validationType, value, handleSaveWithErrorHandling, onCancel]);
 
   // Handle keyboard events cu enhanced shortcuts și focus trap
   const handleCombinedKeyDown = useCallback((e: React.KeyboardEvent) => {
-    // Previne form submission în toate cazurile
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    
-    // Enhanced keyboard shortcuts pentru toate stările
-    if (e.key === "Escape" && isEditing) {
-      e.preventDefault();
-      e.stopPropagation();
-      handleEnhancedEscape(e);
-    }
-    
-    if (e.key === "Enter" && isEditing && !e.shiftKey) {
-      e.preventDefault();
-      e.stopPropagation();
-      handleEnhancedEnter(e);
+    // FIX: Simplified Enter și Escape handling
+    if (isEditing) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleEnhancedEnter(e);
+        return;
+      }
+
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        if (onCancel) {
+          onCancel();
+        } else {
+          handleEnhancedEscape(e);
+        }
+        return;
+      }
     }
     
     // Focus management și activare editing
@@ -517,7 +536,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
     // Pass to parent handler
     onKeyDown?.(e);
-  }, [isEditing, isReadonly, isSelected, isFocused, onStartEdit, startEdit, handleEnhancedEscape, isControlled, inlineKeyDown, onKeyDown, handleFocusTrap, handleEnhancedEnter, announceEditActivation]);
+  }, [isEditing, isReadonly, isSelected, isFocused, onStartEdit, startEdit, handleEnhancedEscape, isControlled, inlineKeyDown, onKeyDown, handleFocusTrap, handleEnhancedEnter, announceEditActivation, onCancel]);
 
   // TASK 11: Timer cleanup la unmount
   useEffect(() => {
@@ -528,7 +547,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     };
   }, [clickTimer]);
 
-  // TASK 11: Unified click handler cu timer-based detection (250ms delay)
+  // SIMPLIFIED: Direct click handler fără timer pentru a fixa modalul
   const handleUnifiedClick = useCallback((e: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
@@ -540,35 +559,14 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       return;
     }
 
-    // Dacă există un timer activ, înseamnă că este al doilea click (double-click)
-    if (clickTimer) {
-      clearTimeout(clickTimer);
-      setClickTimer(null);
-      
-      // Handle double-click - activează inline editing
-      console.debug('[EditableCell] Double-click detected - activating inline editing');
-      announceEditActivation('double-click');
-      if (onStartEdit) {
-        onStartEdit();
-      } else {
-        handleDoubleClick();
-      }
+    // FIX: Direct single click pentru modal - fără timer complications
+    console.debug('[EditableCell] Click detected - opening modal');
+    if (onSingleClick && e) {
+      onSingleClick(e);
     } else {
-      // Prima apăsare - setează timer pentru single-click
-      const timer = setTimeout(() => {
-        // După CLICK_DETECTION_DELAY ms fără al doilea click - handle single-click
-        console.debug('[EditableCell] Single-click confirmed - opening modal');
-        if (onSingleClick && e) {
-          onSingleClick(e);
-        } else {
-          onFocus?.();
-        }
-        setClickTimer(null);
-      }, EXCEL_GRID.INLINE_EDITING.CLICK_DETECTION_DELAY);
-      
-      setClickTimer(timer);
+      onFocus?.();
     }
-  }, [isEditing, isReadonly, clickTimer, onStartEdit, handleDoubleClick, announceEditActivation, onSingleClick, onFocus]);
+  }, [isEditing, isReadonly, onSingleClick, onFocus]);
 
   // TASK 11: Handle cell click pentru backward compatibility (deprecated - se folosește handleUnifiedClick)
   const handleCellClick = useCallback((e?: React.MouseEvent) => {
@@ -799,11 +797,8 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
             setValue(e.target.value);
           }}
           onKeyDown={(e) => {
-            // Previne form submission
-            if (e.key === "Enter") {
-              e.preventDefault();
-              e.stopPropagation();
-            }
+            // SOLUȚIE 2: Direct handling for input keydown in editing mode
+            e.stopPropagation(); // Prevent event bubbling to avoid double handling
             handleCombinedKeyDown(e);
           }}
           onBlur={handleEnhancedBlur}
@@ -865,6 +860,18 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       ref={focusTrapRef}
       className={cellClasses}
       onClick={(e) => handleUnifiedClick(e)}
+      onDoubleClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!isReadonly && !isEditing) {
+          console.debug('[EditableCell] Double-click detected - activating inline editing');
+          if (onStartEdit) {
+            onStartEdit();
+          } else {
+            handleDoubleClick();
+          }
+        }
+      }}
       onKeyDown={handleCharacterTyping}
       tabIndex={isReadonly ? -1 : 0}
       data-testid={testId || `editable-cell-${cellId}`}

@@ -159,6 +159,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         transactionId: string | null,
       ): Promise<void> => {
         await transactionOps.handleEditableCellSave(category, subcategory, day, value, transactionId);
+        
+        // NU resetez highlight aici - se face doar la închiderea modalului
+        // Highlight-ul trebuie să rămână pentru a arăta celula activă
       },
       [transactionOps],
     );
@@ -229,11 +232,23 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         // Determină modul: edit dacă există tranzacție, add altfel
         const mode: 'add' | 'edit' = transactionId ? 'edit' : 'add';
 
-        // Calculez poziția pentru modalul poziționat DOAR dacă avem anchorElement
-        const position = anchorElement ? {
+        // SOLUȚIE 1: Improved position calculation cu validation
+        const position = anchorElement && anchorElement.isConnected ? {
           top: anchorElement.getBoundingClientRect().top + window.scrollY,
           left: anchorElement.getBoundingClientRect().left + window.scrollX,
         } : undefined; // Lasă undefined pentru modal centrat cu overlay CVA
+
+        // Log pentru debugging poziționarea
+        if (process.env.NODE_ENV === 'development') {
+          console.log('🎯 [MODAL-POSITION] Modal positioning data:', {
+            hasAnchor: !!anchorElement,
+            isConnected: anchorElement?.isConnected,
+            position,
+            mode,
+            category,
+            day
+          });
+        }
 
         // Setez contextul celulei pentru modal  
         const cellContext = {
