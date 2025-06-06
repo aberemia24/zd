@@ -317,6 +317,7 @@ export declare const EXCEL_GRID: {
     INLINE_EDITING: {
         EDIT_HINT: string;
         SAVING: string;
+        CLICK_DETECTION_DELAY: number;
         VALIDATION_ERRORS: {
             EMPTY_VALUE: string;
             INVALID_NUMBER: string;

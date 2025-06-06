@@ -8,6 +8,8 @@ import { EXCEL_GRID } from "@shared-constants";
  * Componenta EditableCell pentru LunarGrid
  * Implementează inline editing cu visual feedback conform Creative Phase decisions
  * OPTIMIZAT cu pattern-urile validate din QuickAddModal (Task #5)
+ * 
+ * TASK 11: Implementat timer-based click detection pentru single vs double click
  */
 
 export interface EditableCellProps {
@@ -110,6 +112,9 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     }
   }
 
+  // TASK 11: Timer-based click detection state
+  const [clickTimer, setClickTimer] = useState<NodeJS.Timeout | null>(null);
+  
   const {
     isEditing: internalEditing,
     value: editValue,
@@ -514,8 +519,64 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     onKeyDown?.(e);
   }, [isEditing, isReadonly, isSelected, isFocused, onStartEdit, startEdit, handleEnhancedEscape, isControlled, inlineKeyDown, onKeyDown, handleFocusTrap, handleEnhancedEnter, announceEditActivation]);
 
-  // Handle cell click pentru focus și start edit (single click activation)
+  // TASK 11: Timer cleanup la unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimer) {
+        clearTimeout(clickTimer);
+      }
+    };
+  }, [clickTimer]);
+
+  // TASK 11: Unified click handler cu timer-based detection (250ms delay)
+  const handleUnifiedClick = useCallback((e: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    // Dacă suntem în editing mode, nu procesăm click events
+    if (isEditing || isReadonly) {
+      return;
+    }
+
+    // Dacă există un timer activ, înseamnă că este al doilea click (double-click)
+    if (clickTimer) {
+      clearTimeout(clickTimer);
+      setClickTimer(null);
+      
+      // Handle double-click - activează inline editing
+      console.debug('[EditableCell] Double-click detected - activating inline editing');
+      announceEditActivation('double-click');
+      if (onStartEdit) {
+        onStartEdit();
+      } else {
+        handleDoubleClick();
+      }
+    } else {
+      // Prima apăsare - setează timer pentru single-click
+      const timer = setTimeout(() => {
+        // După CLICK_DETECTION_DELAY ms fără al doilea click - handle single-click
+        console.debug('[EditableCell] Single-click confirmed - opening modal');
+        if (onSingleClick && e) {
+          onSingleClick(e);
+        } else {
+          onFocus?.();
+        }
+        setClickTimer(null);
+      }, EXCEL_GRID.INLINE_EDITING.CLICK_DETECTION_DELAY);
+      
+      setClickTimer(timer);
+    }
+  }, [isEditing, isReadonly, clickTimer, onStartEdit, handleDoubleClick, announceEditActivation, onSingleClick, onFocus]);
+
+  // TASK 11: Handle cell click pentru backward compatibility (deprecated - se folosește handleUnifiedClick)
   const handleCellClick = useCallback((e?: React.MouseEvent) => {
+    // Deprecated: această funcție va fi înlocuită treptat cu handleUnifiedClick
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[EditableCell] handleCellClick is deprecated. Use handleUnifiedClick for timer-based detection.');
+    }
+    
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -567,8 +628,13 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     handleCombinedKeyDown(e);
   }, [isEditing, isReadonly, onStartEdit, startEdit, inputRef, handleCombinedKeyDown, announceEditActivation]);
 
-  // Handle double click pentru start edit - FIXED dependencies
+  // TASK 11: Handle double click pentru backward compatibility (deprecated - se folosește handleUnifiedClick)
   const handleCellDoubleClick = useCallback((e?: React.MouseEvent) => {
+    // Deprecated: această funcție nu mai este necesară cu timer-based detection
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[EditableCell] handleCellDoubleClick is deprecated. Timer-based detection handles both single and double clicks automatically.');
+    }
+    
     if (e) {
       e.preventDefault();
       e.stopPropagation();
@@ -798,8 +864,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     <div
       ref={focusTrapRef}
       className={cellClasses}
-      onClick={(e) => handleCellClick(e)}
-      onDoubleClick={(e) => handleCellDoubleClick(e)}
+      onClick={(e) => handleUnifiedClick(e)}
       onKeyDown={handleCharacterTyping}
       tabIndex={isReadonly ? -1 : 0}
       data-testid={testId || `editable-cell-${cellId}`}

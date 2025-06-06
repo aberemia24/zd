@@ -320,6 +320,7 @@ exports.EXCEL_GRID = {
     INLINE_EDITING: {
         EDIT_HINT: 'Apasă F2 pentru editare',
         SAVING: exports.LOADING_MESSAGES.SAVING,
+        CLICK_DETECTION_DELAY: 250,
         VALIDATION_ERRORS: {
             EMPTY_VALUE: 'Valoarea nu poate fi goală',
             INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',

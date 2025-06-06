@@ -386,6 +386,8 @@ export const EXCEL_GRID = {
   INLINE_EDITING: {
     EDIT_HINT: 'Apasă F2 pentru editare',
     SAVING: LOADING_MESSAGES.SAVING,
+    // TASK 11: Timer delay pentru click detection (în ms)
+    CLICK_DETECTION_DELAY: 250,
     VALIDATION_ERRORS: {
       EMPTY_VALUE: 'Valoarea nu poate fi goală',
       INVALID_NUMBER: 'Valoarea trebuie să fie un număr valid',
