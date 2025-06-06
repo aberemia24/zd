@@ -133,7 +133,7 @@ export const gridRow = cva([
       ],
       total: [
         "font-bold border-t-2 border-carbon-400 dark:border-carbon-500",
-        "bg-carbon-200 dark:bg-carbon-700 sticky top-0 z-20"
+        "bg-carbon-200 dark:bg-carbon-700"
       ]
     },
     state: {

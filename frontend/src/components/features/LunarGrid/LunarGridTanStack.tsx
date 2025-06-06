@@ -610,15 +610,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 className="w-full border-collapse table-auto"
                 data-testid="lunar-grid-table"
               >
-                {/* 🎨 Header integrat cu controale - ÎNAINTEA thead-ului normal */}
-                <thead>
+                {/* 🎨 Unified Sticky Header cu controale și zilele */}
+                <thead className={cn(gridHeader({ sortable: false, sticky: true }), "border-spacing-0")}>
+                  {/* Prima secțiune: Controale */}
                   <tr>
                     <th 
                       colSpan={table.getFlatHeaders().length}
-                      className={cn(
-                        "bg-white border-b-2 border-gray-200 p-4",
-                        "sticky top-0 z-50"
-                      )}
+                      className="bg-white border-b-0 p-4"
                     >
                       <div className="grid grid-cols-3 items-center gap-4">
                         {/* Partea stânga: Butoane control grid */}
@@ -751,11 +749,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       </div>
                     </th>
                   </tr>
-                </thead>
-
-                {/* 🎨 Professional Header cu enhanced styling */}
-                <thead className={cn(gridHeader({ sortable: false, sticky: true }))}>
-                  <tr>
+                  
+                  {/* A doua secțiune: Headers cu zilele - în același thead */}
+                  <tr className="bg-white border-t-0">
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
                       const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
@@ -792,7 +788,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                   </tr>
                   
                   {/* 🎨 Professional Balance Row cu enhanced styling */}
-                  <tr className={cn(gridRow({ type: "total" }))}>
+                  <tr className={cn(gridRow({ type: "total" }), "bg-white border-t-0")}>
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
                       const isPinned = header.column.getIsPinned();
