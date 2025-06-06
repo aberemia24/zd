@@ -27,6 +27,7 @@ import {
   textProfessional,
   hoverScale,
   focusRing,
+  balanceDisplay,
   type GridRowProps,
   type GridCellProps
 } from "../../../../styles/cva-v2";
@@ -234,26 +235,31 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
             return 'default';
           };
 
-          // Value classes using transaction type colors
+          // 🎨 Value classes using transaction type colors - aplicat pe LunarGridCell
           const getValueClasses = () => {
-            const cellValue = flexRender(cell.column.columnDef.cell, cell.getContext());
-            if (typeof cellValue === 'string' || typeof cellValue === 'number') {
+            // Obține valoarea celulei din TanStack Table
+            const cellValue = cell.getValue();
+            
+            // Aplică color coding doar pentru valori numerice non-zero și doar pentru celulele de zi
+            if (isDayCell && (typeof cellValue === 'string' || typeof cellValue === 'number')) {
               const numValue = parseFloat(cellValue.toString());
               if (!isNaN(numValue) && numValue !== 0) {
                 // Determină tipul de tranzacție pe baza categoriei
                 const transactionType = getTransactionTypeForCategory(original.category);
                 
                 if (transactionType === TransactionType.INCOME) {
-                  return 'text-green-600'; // Verde pentru venituri
+                  return balanceDisplay({ variant: "positive", size: "sm" }); // Verde pentru venituri
                 } else if (transactionType === TransactionType.SAVING) {
-                  return 'text-blue-600'; // Albastru pentru economii/investiții
+                  return balanceDisplay({ variant: "primary", size: "sm" }); // Copper pentru economii/investiții
                 } else {
                   // EXPENSE sau default
-                  return 'text-red-600'; // Roșu pentru cheltuieli
+                  return balanceDisplay({ variant: "negative", size: "sm" }); // Roșu pentru cheltuieli
                 }
               }
             }
-            return 'text-gray-600'; // Neutral pentru zero/empty
+            
+            // Pentru celulele fără valoare sau non-day cells, returnează string gol
+            return '';
           };
 
           return (
@@ -271,8 +277,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   focusRing({ variant: "default" }),
                   "transition-all duration-150"
                 ),
-                isTotalCell && "font-semibold tabular-nums",
-                getValueClasses()
+                isTotalCell && "font-semibold tabular-nums"
               )}
               title={
                 isCategory && isDayCell
@@ -411,7 +416,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     }}
                     className={cn(
                       gridInput({ variant: "default", type: "number" }),
-                      "text-center min-h-[40px] flex items-center justify-center"
+                      "text-center min-h-[40px] flex items-center justify-center",
+                      getValueClasses()
                     )}
                     placeholder="0"
                   />
