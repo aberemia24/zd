@@ -223,14 +223,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         // Determină modul: edit dacă există tranzacție, add altfel
         const mode: 'add' | 'edit' = transactionId ? 'edit' : 'add';
 
-        // Calculez poziția pentru modalul poziționat
+        // Calculez poziția pentru modalul poziționat DOAR dacă avem anchorElement
         const position = anchorElement ? {
           top: anchorElement.getBoundingClientRect().top + window.scrollY,
           left: anchorElement.getBoundingClientRect().left + window.scrollX,
-        } : {
-          top: 100,
-          left: 100,
-        };
+        } : undefined; // Lasă undefined pentru modal centrat cu overlay CVA
 
         // Setez contextul celulei pentru modal  
         const cellContext = {
@@ -250,7 +247,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           year,
           month,
           existingValue: currentValue,
-          position,
+          position, // Va fi undefined pentru modal centrat = overlay CVA cu opacity
           transactionId,
         });
 
@@ -591,15 +588,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             )}
           </button>
 
-          {/* Container interior cu overflow-auto pentru scroll */}
+          {/* Container interior - FĂRĂ overflow duplicat (scroll e gestionat de outer container) */}
           <div 
             ref={scrollableContainerRef}
             className={cn(
-              gridContainer({ 
-                variant: "professional", 
-                size: "fullscreen"
-              }),
-              "relative overflow-auto scroll-smooth",
+              "relative", // Removed: gridContainer, overflow-auto, scroll-smooth
+              // Height constraints rămân pentru space management
               isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
             )}
             data-testid="lunar-grid-container"

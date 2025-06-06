@@ -22,6 +22,8 @@ import {
   EXCEL_GRID,
   OPTIONS 
 } from "@shared-constants";
+import { LAYOUT_CONSTANTS } from '../../../../styles/cva-v2/foundations';
+import { useToast } from '../../../primitives/Toast/useToast';
 
 /**
  * Props pentru QuickAddModal component
@@ -52,41 +54,16 @@ export interface QuickAddModalProps {
 }
 
 // Quick Add Modal Component cu React.memo pentru performance
-export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
-  cellContext,
-  prefillAmount = "",
+export const QuickAddModal: React.FC<QuickAddModalProps> = ({ 
+  cellContext, 
+  prefillAmount = "", 
   autoFocus = true,
   mode = 'add',
   position,
-  onSave,
+  onSave, 
   onCancel,
-  onDelete,
+  onDelete 
 }) => {
-
-  // Development validation pentru props (doar în development mode)
-  if (process.env.NODE_ENV === 'development') {
-    // Validation pentru cellContext
-    if (!cellContext.category) {
-      console.warn('QuickAddModal: cellContext.category is required');
-    }
-    if (!cellContext.day || !cellContext.month || !cellContext.year) {
-      console.warn('QuickAddModal: cellContext date fields are required');
-    }
-    
-    // Validation pentru mode și onDelete consistency
-    if (mode === 'edit' && !onDelete) {
-      console.warn('QuickAddModal: onDelete should be provided for edit mode');
-    }
-    if (mode === 'add' && onDelete) {
-      console.warn('QuickAddModal: onDelete should not be provided for add mode');
-    }
-
-    // Position validation
-    if (position && (typeof position.top !== 'number' || typeof position.left !== 'number')) {
-      console.warn('QuickAddModal: position should have numeric top and left properties');
-    }
-  }
-
   // Base modal logic integration
   const { form, validation, loading, calculations } =
     useBaseModalLogic(cellContext);
@@ -302,9 +279,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
     // Smart positioning: calculez cea mai bună poziție bazat pe viewport
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const modalWidth = 320; // Estimez lățimea modalului
-    const modalHeight = 400; // Estimez înălțimea modalului
-    const offset = 12; // Spațiu între celulă și modal
+    const modalWidth = LAYOUT_CONSTANTS.MODAL.POSITIONING.ESTIMATED_WIDTH;
+    const modalHeight = LAYOUT_CONSTANTS.MODAL.POSITIONING.ESTIMATED_HEIGHT;
+    const offset = LAYOUT_CONSTANTS.MODAL.POSITIONING.OFFSET;
     
     let finalTop = position.top;
     let finalLeft = position.left;
@@ -349,7 +326,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       position: 'fixed' as const,
       top: `${finalTop}px`,
       left: `${finalLeft}px`,
-      zIndex: 50,
+      zIndex: parseInt(LAYOUT_CONSTANTS.MODAL.Z_INDEX.MODAL.replace('z-', '')),
       maxWidth: `${Math.min(modalWidth, viewportWidth - 2 * offset)}px`, // Responsive width
       maxHeight: `${Math.min(modalHeight, viewportHeight - 2 * offset)}px`, // Responsive height
     };
@@ -390,14 +367,14 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       {/* Overlay pentru positioned modal - separat pentru a permite click outside */}
       {position && (
         <div 
-          className="fixed inset-0 z-40 bg-black bg-opacity-15"
+          className="fixed inset-0 bg-black bg-opacity-30 z-40"
           onClick={handleOutsideClick}
         />
       )}
       
       <div 
         className={position 
-          ? "fixed z-50 pointer-events-none" 
+          ? cn("fixed pointer-events-none", LAYOUT_CONSTANTS.MODAL.Z_INDEX.MODAL)
           : modal({ variant: "default" })
         }
         role="dialog"
@@ -711,21 +688,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
       <ConfirmationModal {...modalProps} />
     </>
   );
-}, (prevProps, nextProps) => {
-  // Custom comparison pentru optimizarea re-renders
-  return (
-    prevProps.mode === nextProps.mode &&
-    prevProps.prefillAmount === nextProps.prefillAmount &&
-    prevProps.autoFocus === nextProps.autoFocus &&
-    prevProps.cellContext.category === nextProps.cellContext.category &&
-    prevProps.cellContext.subcategory === nextProps.cellContext.subcategory &&
-    prevProps.cellContext.day === nextProps.cellContext.day &&
-    prevProps.cellContext.month === nextProps.cellContext.month &&
-    prevProps.cellContext.year === nextProps.cellContext.year &&
-    JSON.stringify(prevProps.position) === JSON.stringify(nextProps.position)
-    // onSave, onCancel, onDelete sunt callbacks și se vor schimba mereu
-  );
-});
+};
 
 // Display name pentru debugging
 QuickAddModal.displayName = 'QuickAddModal';

@@ -1,8 +1,8 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const modal = cva(
-  // Base modal classes - overlay foarte subtil pentru UX seamless
-  "fixed inset-0 bg-black bg-opacity-15 flex items-center justify-center z-50",
+  // Base modal classes - overlay vizibil pentru UX clear
+  "fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50",
   {
     variants: {
       variant: {
