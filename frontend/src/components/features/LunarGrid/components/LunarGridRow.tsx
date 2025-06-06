@@ -357,8 +357,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   onStartEdit={() => onStartEditingSubcategory(original.category, original.subcategory || '')}
                   onStartDelete={() => onStartDeletingSubcategory(original.category, original.subcategory || '')}
                 />
-              ) : isDayCell && (isCategory || isSubcategory) ? (
-                // Day Cell cu unified CVA input styling
+              ) : isDayCell && isSubcategory ? (
+                // Day Cell cu unified CVA input styling - DOAR pentru subcategorii
                 <div
                   onClick={(e) => {
                     e.preventDefault();
@@ -421,6 +421,22 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     )}
                     placeholder="0"
                   />
+                </div>
+              ) : isDayCell && isCategory ? (
+                // Day Cell pentru categorii - DOAR afișare, fără interactivitate
+                <div className="w-full h-full min-h-[40px] flex items-center justify-center">
+                  <span className={cn(
+                    "text-center font-medium",
+                    getValueClasses()
+                  )}>
+                    {(() => {
+                      const cellValue = cell.getValue();
+                      if (cellValue === null || cellValue === undefined || cellValue === '') {
+                        return '';
+                      }
+                      return String(cellValue);
+                    })()}
+                  </span>
                 </div>
               ) : (
                 // Regular cell content
