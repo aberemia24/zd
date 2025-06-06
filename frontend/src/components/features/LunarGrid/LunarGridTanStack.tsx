@@ -220,59 +220,28 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         transactionId: string | null,
         anchorElement?: HTMLElement,
       ) => {
-        console.log('🎯 [MODAL-DEBUG] handleSingleClickModal called with:', {
-          category,
-          subcategory,
-          day,
-          currentValue,
-          transactionId,
-          anchorElement: anchorElement ? 'Element provided' : 'No element'
-        });
-
         // Determină modul: edit dacă există tranzacție, add altfel
         const mode: 'add' | 'edit' = transactionId ? 'edit' : 'add';
-        
-        console.log('🎯 [MODAL-DEBUG] Determined mode:', mode);
-        
-        // Calculează poziția pentru modal dacă avem elementul anchor
-        let position: { top: number; left: number } | undefined;
-        if (anchorElement) {
-          const rect = anchorElement.getBoundingClientRect();
-          const scrollY = window.scrollY || document.documentElement.scrollTop;
-          const scrollX = window.scrollX || document.documentElement.scrollLeft;
-          
-          // Dimensiuni estimate ale modal-ului
-          const modalWidth = 320; // 80 * 4 = 320px (w-80)
-          const modalHeight = 384; // max-h-96 = ~384px
-          
-          // Verifică dacă modal-ul ar ieși din viewport
-          const viewportWidth = window.innerWidth;
-          const viewportHeight = window.innerHeight;
-          
-          let top = rect.bottom + scrollY + 8; // 8px offset sub element
-          let left = rect.left + scrollX;
-          
-          // Ajustează horizontal dacă ar ieși din viewport
-          if (left + modalWidth > viewportWidth) {
-            left = Math.max(16, viewportWidth - modalWidth - 16); // 16px margin
-          }
-          
-          // Ajustează vertical dacă ar ieși din viewport
-          if (top + modalHeight > viewportHeight + scrollY) {
-            // Plasează modal-ul deasupra elementului
-            top = rect.top + scrollY - modalHeight - 8;
-            
-            // Dacă tot nu încape, plasează-l în centrul viewport-ului
-            if (top < scrollY + 16) {
-              top = scrollY + (viewportHeight - modalHeight) / 2;
-            }
-          }
-          
-          position = { top, left };
-          console.log('🎯 [MODAL-DEBUG] Calculated position:', position);
-        }
-        
-        const newModalState = {
+
+        // Calculez poziția pentru modalul poziționat
+        const position = anchorElement ? {
+          top: anchorElement.getBoundingClientRect().top + window.scrollY,
+          left: anchorElement.getBoundingClientRect().left + window.scrollX,
+        } : {
+          top: 100,
+          left: 100,
+        };
+
+        // Setez contextul celulei pentru modal  
+        const cellContext = {
+          category,
+          subcategory: subcategory || '',
+          day,
+          currentValue: currentValue?.toString() || '',
+        };
+
+        // Setez starea modalului
+        setModalState({
           isOpen: true,
           mode,
           category,
@@ -281,25 +250,18 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           year,
           month,
           existingValue: currentValue,
-          transactionId,
-          anchorEl: anchorElement,
           position,
-        };
+          transactionId,
+        });
 
-        console.log('🎯 [MODAL-DEBUG] Setting modal state:', newModalState);
-        
-        setModalState(newModalState);
-
-        // LGI TASK 5: Setează highlight-ul pentru celula în editare
+        // Setez celula evidențiată
         setHighlightedCell({
           category,
           subcategory,
           day,
         });
-
-        console.log('🎯 [MODAL-DEBUG] Modal state and highlighted cell set successfully');
       },
-      [year, month, setModalState, setHighlightedCell],
+      [setModalState, setHighlightedCell],
     );
 
     // Wrapper handlers - combină logica business din hook-uri cu UI management

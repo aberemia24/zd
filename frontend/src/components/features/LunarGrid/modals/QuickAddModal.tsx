@@ -62,16 +62,6 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   onCancel,
   onDelete,
 }) => {
-  console.log('🎨 [QUICKADDMODAL-DEBUG] QuickAddModal render with:', {
-    cellContext,
-    prefillAmount,
-    autoFocus,
-    mode,
-    position,
-    hasOnSave: !!onSave,
-    hasOnCancel: !!onCancel,
-    hasOnDelete: !!onDelete
-  });
 
   // Development validation pentru props (doar în development mode)
   if (process.env.NODE_ENV === 'development') {
@@ -308,17 +298,60 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   // Memoize styled objects pentru position mode pentru a preveni re-creation
   const positionedStyle = useMemo(() => {
     if (!position) return undefined;
-    console.log('🎨 [MODAL-POSITION] Applying positioned style:', {
-      position: 'fixed',
-      top: `${position.top}px`,
-      left: `${position.left}px`,
-      zIndex: 50,
+    
+    // Smart positioning: calculez cea mai bună poziție bazat pe viewport
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const modalWidth = 320; // Estimez lățimea modalului
+    const modalHeight = 400; // Estimez înălțimea modalului
+    const offset = 12; // Spațiu între celulă și modal
+    
+    let finalTop = position.top;
+    let finalLeft = position.left;
+    let placement = 'bottom'; // Default placement
+    
+    // Smart vertical positioning
+    if (position.top + modalHeight + offset > viewportHeight) {
+      // Nu încape jos, încerc sus
+      if (position.top - modalHeight - offset > 0) {
+        finalTop = position.top - modalHeight - offset;
+        placement = 'top';
+      } else {
+        // Nu încape nici sus, centrez vertical cu limită
+        finalTop = Math.max(offset, Math.min(position.top - modalHeight / 2, viewportHeight - modalHeight - offset));
+        placement = 'center';
+      }
+    } else {
+      // Încape jos, poziționez sub celulă
+      finalTop = position.top + offset;
+      placement = 'bottom';
+    }
+    
+    // Smart horizontal positioning
+    if (position.left + modalWidth > viewportWidth) {
+      // Nu încape la dreapta, poziționez la stânga
+      finalLeft = Math.max(offset, position.left - modalWidth);
+    } else if (position.left < 0) {
+      // Este prea la stânga, poziționez la offset minim
+      finalLeft = offset;
+    }
+    // Altfel, păstrez poziția originală
+    
+    console.log('🎨 [MODAL-POSITION] Smart positioning calculated:', {
+      original: { top: position.top, left: position.left },
+      final: { top: finalTop, left: finalLeft },
+      placement,
+      viewport: { width: viewportWidth, height: viewportHeight },
+      modalSize: { width: modalWidth, height: modalHeight }
     });
+    
     return {
       position: 'fixed' as const,
-      top: `${position.top}px`,
-      left: `${position.left}px`,
+      top: `${finalTop}px`,
+      left: `${finalLeft}px`,
       zIndex: 50,
+      maxWidth: `${Math.min(modalWidth, viewportWidth - 2 * offset)}px`, // Responsive width
+      maxHeight: `${Math.min(modalHeight, viewportHeight - 2 * offset)}px`, // Responsive height
     };
   }, [position]);
 
