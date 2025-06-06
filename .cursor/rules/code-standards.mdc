@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
-
 # Standarde de Cod
 <naming_conventions>
 - Constants/enums: SCREAMING_SNAKE_CASE (ex: MAX_ITEMS)
@@ -17,7 +16,7 @@ alwaysApply: true
 <imports_organization>
 Grupați importurile în blocuri separate:
 React și librării externe
-Constants/shared (@shared-constants)
+Pachetul `@budget-app/shared-constants`
 Componente și hooks
 Utilitare și tipuri
 Importurile absolute înaintea celor relative

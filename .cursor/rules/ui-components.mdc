@@ -28,7 +28,7 @@ Format recomandat: [component-name]-[variant]-[action]
 Pentru liste: folosiți id-uri unice în format clar
 <text_content>
 INTERZIS textele hardcodate în componente
-Folosiți constants din @shared-constants/ui.ts
+Folosiți constants din `@budget-app/shared-constants`
 Prevedeți traduceri prin constante
 Asigurați că toate textele sunt centralizate și reutilizabile
 <interaction_patterns>
