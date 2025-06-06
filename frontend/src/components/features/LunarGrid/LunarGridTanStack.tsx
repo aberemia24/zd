@@ -220,8 +220,19 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         transactionId: string | null,
         anchorElement?: HTMLElement,
       ) => {
+        console.log('🎯 [MODAL-DEBUG] handleSingleClickModal called with:', {
+          category,
+          subcategory,
+          day,
+          currentValue,
+          transactionId,
+          anchorElement: anchorElement ? 'Element provided' : 'No element'
+        });
+
         // Determină modul: edit dacă există tranzacție, add altfel
-        const mode = transactionId ? 'edit' : 'add';
+        const mode: 'add' | 'edit' = transactionId ? 'edit' : 'add';
+        
+        console.log('🎯 [MODAL-DEBUG] Determined mode:', mode);
         
         // Calculează poziția pentru modal dacă avem elementul anchor
         let position: { top: number; left: number } | undefined;
@@ -258,9 +269,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           }
           
           position = { top, left };
+          console.log('🎯 [MODAL-DEBUG] Calculated position:', position);
         }
         
-        setModalState({
+        const newModalState = {
           isOpen: true,
           mode,
           category,
@@ -272,7 +284,11 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           transactionId,
           anchorEl: anchorElement,
           position,
-        });
+        };
+
+        console.log('🎯 [MODAL-DEBUG] Setting modal state:', newModalState);
+        
+        setModalState(newModalState);
 
         // LGI TASK 5: Setează highlight-ul pentru celula în editare
         setHighlightedCell({
@@ -280,6 +296,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           subcategory,
           day,
         });
+
+        console.log('🎯 [MODAL-DEBUG] Modal state and highlighted cell set successfully');
       },
       [year, month, setModalState, setHighlightedCell],
     );

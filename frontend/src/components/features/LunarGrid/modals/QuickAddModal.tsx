@@ -62,6 +62,17 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   onCancel,
   onDelete,
 }) => {
+  console.log('🎨 [QUICKADDMODAL-DEBUG] QuickAddModal render with:', {
+    cellContext,
+    prefillAmount,
+    autoFocus,
+    mode,
+    position,
+    hasOnSave: !!onSave,
+    hasOnCancel: !!onCancel,
+    hasOnDelete: !!onDelete
+  });
+
   // Development validation pentru props (doar în development mode)
   if (process.env.NODE_ENV === 'development') {
     // Validation pentru cellContext
@@ -297,8 +308,14 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = memo(({
   // Memoize styled objects pentru position mode pentru a preveni re-creation
   const positionedStyle = useMemo(() => {
     if (!position) return undefined;
+    console.log('🎨 [MODAL-POSITION] Applying positioned style:', {
+      position: 'fixed',
+      top: `${position.top}px`,
+      left: `${position.left}px`,
+      zIndex: 50,
+    });
     return {
-      position: 'absolute' as const,
+      position: 'fixed' as const,
       top: `${position.top}px`,
       left: `${position.left}px`,
       zIndex: 50,

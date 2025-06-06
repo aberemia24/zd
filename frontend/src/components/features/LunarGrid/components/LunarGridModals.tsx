@@ -56,6 +56,19 @@ interface LunarGridModalsProps {
 }
 
 const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
+  console.log('🎭 [MODALS-DEBUG] LunarGridModals render with:', {
+    hasPopover: !!props.popover,
+    hasModalState: !!props.modalState,
+    modalState: props.modalState ? {
+      isOpen: props.modalState.isOpen,
+      mode: props.modalState.mode,
+      category: props.modalState.category,
+      subcategory: props.modalState.subcategory,
+      day: props.modalState.day,
+      position: props.modalState.position
+    } : null
+  });
+
   return (
     <>
       {/* Popover pentru editare tranzacție */}
@@ -84,21 +97,24 @@ const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
 
       {/* LGI TASK 5: QuickAddModal pentru single click */}
       {props.modalState && (
-        <QuickAddModal
-          cellContext={{
-            category: props.modalState.category,
-            subcategory: props.modalState.subcategory,
-            day: props.modalState.day,
-            month: props.month,
-            year: props.year,
-          }}
-          prefillAmount={props.modalState.existingValue ? String(props.modalState.existingValue) : ""}
-          mode={props.modalState.mode}
-          position={props.modalState.position}
-          onSave={props.onSaveModal}
-          onCancel={props.onCancelModal}
-          onDelete={props.modalState.mode === 'edit' ? props.onDeleteFromModal : undefined}
-        />
+        <>
+          {console.log('🎭 [MODALS-DEBUG] Rendering QuickAddModal with modalState:', props.modalState)}
+          <QuickAddModal
+            cellContext={{
+              category: props.modalState.category,
+              subcategory: props.modalState.subcategory,
+              day: props.modalState.day,
+              month: props.month,
+              year: props.year,
+            }}
+            prefillAmount={props.modalState.existingValue ? String(props.modalState.existingValue) : ""}
+            mode={props.modalState.mode}
+            position={props.modalState.position}
+            onSave={props.onSaveModal}
+            onCancel={props.onCancelModal}
+            onDelete={props.modalState.mode === 'edit' ? props.onDeleteFromModal : undefined}
+          />
+        </>
       )}
     </>
   );
