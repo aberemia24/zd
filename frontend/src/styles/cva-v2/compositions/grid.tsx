@@ -119,7 +119,7 @@ export const gridRow = cva([
       subcategory: "pl-4",
       total: [
         "font-bold border-t-2 border-carbon-400 dark:border-carbon-500",
-        "bg-carbon-200 dark:bg-carbon-700 sticky top-0 z-10"
+        "bg-carbon-200 dark:bg-carbon-700 sticky top-0 z-20"
       ]
     },
     state: {
@@ -149,9 +149,13 @@ export const gridHeader = cva([
       asc: "text-copper-600 dark:text-copper-400",
       desc: "text-copper-600 dark:text-copper-400",
       none: ""
+    },
+    sticky: {
+      true: "sticky top-0 z-10",
+      false: ""
     }
   },
-  defaultVariants: { sortable: false, sorted: "none" }
+  defaultVariants: { sortable: false, sorted: "none", sticky: false }
 });
 
 /**

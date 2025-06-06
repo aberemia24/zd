@@ -643,7 +643,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 data-testid="lunar-grid-table"
               >
                 {/* 🎨 Professional Header cu enhanced styling */}
-                <thead className={cn(gridHeader({ sortable: false }))}>
+                <thead className={cn(gridHeader({ sortable: false, sticky: true }))}>
                   <tr>
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
