@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Check } from "lucide-react";
 import Button from "../../../primitives/Button/Button";
 import { Edit, Trash2 } from "lucide-react";
 
@@ -37,7 +37,8 @@ interface SubcategoryRowCellProps {
   onStartDelete: () => void;
 }
 
-const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
+// 🔧 PERFORMANCE: React.memo pentru a preveni re-renders inutile
+const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = React.memo(({
   category,
   subcategory,
   isCustom,
@@ -50,11 +51,25 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
   onStartDelete
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // 🔧 FIX: Prevent default pentru keyboard events
+    if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY || e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     if (e.key === LUNAR_GRID_ACTIONS.ENTER_KEY && editingValue.trim()) {
       onSaveEdit();
     } else if (e.key === LUNAR_GRID_ACTIONS.ESCAPE_KEY) {
       onCancelEdit();
     }
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const relatedTarget = e.relatedTarget as HTMLElement;
+    if (relatedTarget && relatedTarget.closest('[data-testid*="save-edit-subcategory"], [data-testid*="cancel-edit-subcategory"]')) {
+      return;
+    }
+    onCancelEdit();
   };
 
   return (
@@ -67,7 +82,7 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
               value={editingValue}
               onChange={(e) => onEditingValueChange(e.target.value)}
               onKeyDown={handleKeyDown}
-              onBlur={onCancelEdit}
+              onBlur={handleBlur}
               className={cn(
                 "flex-1",
                 animations({ type: "scale-in" }),
@@ -79,7 +94,9 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
             <Button
               size="xs"
               variant="primary"
-              onClick={onSaveEdit}
+              onClick={() => {
+                onSaveEdit();
+              }}
               disabled={!editingValue.trim()}
               data-testid={`save-edit-subcategory-${subcategory}`}
               className="hover-scale"
@@ -148,6 +165,6 @@ const LunarGridSubcategoryRowCell: React.FC<SubcategoryRowCellProps> = ({
       )}
     </div>
   );
-};
+});
 
 export default LunarGridSubcategoryRowCell; 

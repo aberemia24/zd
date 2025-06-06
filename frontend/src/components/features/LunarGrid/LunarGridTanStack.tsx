@@ -340,14 +340,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [subcategoryOps],
     );
 
-    // Handler pentru rename subcategorie custom
-    const handleRenameSubcategory = useCallback(
-      async (categoryName: string, oldSubcategoryName: string, newSubcategoryName: string) => {
-        await subcategoryOps.handleRenameSubcategory(categoryName, oldSubcategoryName, newSubcategoryName);
-      },
-      [subcategoryOps],
-    );
-
     // Interogare tabel optimizată (fără handleri de click/double-click)
     const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows, handleCellClick);
@@ -513,8 +505,14 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                 ...prev,
                 [rowId]: isExpanded
               }));
+              
+              // 🔧 FIX: Reset addingSubcategory state când categoria se collapses
+              if (!isExpanded && addingSubcategory === rowId) {
+                setAddingSubcategory(null);
+                setNewSubcategoryName("");
+              }
             }}
-            onSubcategoryEdit={handleRenameSubcategory}
+            onSubcategoryEdit={subcategoryOps.handleRenameSubcategory}
             _onSubcategoryDelete={(category, subcategory) => {
               // Setează modalul pentru confirmare delete
               startDeletingSubcategory(category, subcategory);
@@ -535,7 +533,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           />
         );
       },
-      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, handleRenameSubcategory, setEditingSubcategoryName, clearSubcategoryAction, startEditingSubcategory, startDeletingSubcategory, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected],
+      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected],
     );
 
     // Renderizare (layout principal)

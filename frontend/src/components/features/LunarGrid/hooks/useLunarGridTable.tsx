@@ -439,19 +439,9 @@ export function useLunarGridTable(
             const displayValue = getValue<string>();
             const original = row.original as TransformedTableDataRow;
             return (
-              <div className="flex items-center">
-                {row.getCanExpand && row.getCanExpand() ? (
-                  <span
-                    className="mr-1"
-                    data-testid={`expand-btn-${original.category}`}
-                  >
-                    {row.getIsExpanded() ? "▼" : "▶"}
-                  </span>
-                ) : null}
-                <span className={original.isCategory ? "font-semibold" : ""}>
-                  {displayValue}
-                </span>
-              </div>
+              <span className={original.isCategory ? "font-semibold" : ""}>
+                {displayValue}
+              </span>
             );
           },
           size: 200,

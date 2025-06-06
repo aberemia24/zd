@@ -132,6 +132,30 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
 
   const { isCategory, isSubcategory, isTotalRow } = rowMetadata;
 
+  // 🔧 LOGIC: Determine if this subcategory row is the last one for its category
+  const tableRows = table.getRowModel().rows;
+  
+  const isLastSubcategoryInCategory = useMemo(() => {
+    if (!isSubcategory) return false;
+    
+    const currentCategory = original.category;
+    
+    // Get all subcategory rows for the current category
+    const categorySubcategories = tableRows.filter(r => {
+      const rowData = r.original as TransformedTableDataRow;
+      return !rowData.isCategory && rowData.category === currentCategory;
+    });
+    
+    // If no subcategories, this logic shouldn't apply
+    if (categorySubcategories.length === 0) return false;
+    
+    // Get the last subcategory row for this category
+    const lastSubcategoryRow = categorySubcategories[categorySubcategories.length - 1];
+    
+    // Check if current row is the last subcategory
+    return row.id === lastSubcategoryRow.id;
+  }, [isSubcategory, original.category, row.id, tableRows]);
+
   // Determine row type for unified CVA styling - MEMOIZED
   const rowType = useMemo((): GridRowProps['type'] => {
     if (isTotalRow) {return 'total';}
@@ -372,18 +396,28 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
       </tr>
 
       {/* Add Subcategory Row - cu unified CVA styling */}
-      {isCategory && row.getIsExpanded() && (
-        <LunarGridAddSubcategoryRow
-          category={original.category}
-          isAdding={addingSubcategory === original.category}
-          inputValue={newSubcategoryName}
-          totalColumns={table.getFlatHeaders().length}
-          onInputChange={onSetNewSubcategoryName}
-          onSave={() => onAddSubcategory(original.category)}
-          onCancel={onCancelAddingSubcategory}
-          onStartAdd={() => onSetAddingSubcategory(original.category)}
-        />
-      )}
+      {(() => {
+        // 🔧 UPDATED LOGIC: Render Add Subcategory button after the LAST subcategory, not after category
+        const categoryIsExpanded = _expandedRows[original.category];
+        const shouldRenderAfterLastSubcategory = isLastSubcategoryInCategory && categoryIsExpanded;
+        
+        // 🔧 SAFETY CHECK: Prevent duplicate buttons by checking if this specific row should render
+        const uniqueKey = `add-subcategory-${original.category}-${row.id}`;
+        
+        return shouldRenderAfterLastSubcategory ? (
+          <LunarGridAddSubcategoryRow
+            key={uniqueKey}
+            category={original.category}
+            isAdding={addingSubcategory === original.category}
+            inputValue={newSubcategoryName}
+            totalColumns={table.getFlatHeaders().length}
+            onInputChange={onSetNewSubcategoryName}
+            onSave={() => onAddSubcategory(original.category)}
+            onCancel={onCancelAddingSubcategory}
+            onStartAdd={() => onSetAddingSubcategory(original.category)}
+          />
+        ) : null;
+      })()}
     </>
   );
 };

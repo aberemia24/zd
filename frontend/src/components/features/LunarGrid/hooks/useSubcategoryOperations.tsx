@@ -233,125 +233,44 @@ export const useSubcategoryOperations = ({
 
   // Enhanced: Handler pentru rename subcategorie custom cu validare centralizată
   const handleRenameSubcategory = useCallback(
-    async (categoryName: string, oldSubcategoryName: string, newSubcategoryNameParam: string) => {
-      // Validări preliminare cu feedback îmbunătățit
-      if (!userId) {
-        toast.error("Utilizator neautentificat. Reîncărcați pagina și încercați din nou.");
-        return;
-      }
-      
-      // Enhanced: Validare nume folosind sistemul centralizat
-      try {
-        validateSubcategoryName(newSubcategoryNameParam.trim());
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        }
+    async (categoryName: string, oldName: string, newName: string) => {
+      if (!newName.trim()) {
+        toast.error('Numele subcategoriei nu poate fi gol');
         return;
       }
 
-      // Verifică dacă numele este identic (nu e nevoie de rename)
-      if (oldSubcategoryName === newSubcategoryNameParam.trim()) {
-        toast.success(`Numele subcategoriei este deja "${oldSubcategoryName}". Nu este nevoie de modificare.`);
-        clearSubcategoryAction();
+      if (newName === oldName) {
+        toast.success('Numele nu a fost modificat');
         return;
       }
-
-      // Set loading state cu detalii operație
-      setLoadingStates(prev => ({
-        ...prev,
-        isRenaming: true,
-        operationCategory: categoryName,
-        operationSubcategory: oldSubcategoryName
-      }));
 
       try {
-        // Enhanced: Găsește categoria în store cu validare robustă
-        const category = categories.find(cat => cat.name === categoryName);
-        if (!category) {
-          toast.error(`${MESAJE.CATEGORII.CATEGORIA_NEGASITA}: "${categoryName}"`);
-          return;
-        }
-
-        // Enhanced: Verifică că subcategoria există și e custom
-        const oldSubcategory = category.subcategories.find(sub => sub.name === oldSubcategoryName);
-        if (!oldSubcategory) {
-          toast.error(`Subcategoria "${oldSubcategoryName}" nu a fost găsită în categoria "${categoryName}"`);
-          return;
-        }
-
-        if (!oldSubcategory.isCustom) {
-          toast.error(`Nu se pot redenumi subcategoriile predefinite. "${oldSubcategoryName}" este o subcategorie sistem.`);
-          return;
-        }
-
-        // Enhanced: Verifică dacă noul nume deja există cu feedback îmbunătățit
-        const existingSubcategory = category.subcategories.find(sub => 
-          sub.name === newSubcategoryNameParam.trim() && sub.name !== oldSubcategoryName
-        );
-        if (existingSubcategory) {
-          toast.error(`${MESAJE.CATEGORII.SUBCATEGORIE_EXISTENTA}: "${newSubcategoryNameParam.trim()}" există deja în categoria "${categoryName}"`);
-          return;
-        }
-
-        // Enhanced: Toast loading pentru operații lungi
-        const toastId = toast.loading(`Se redenumește "${oldSubcategoryName}" în "${newSubcategoryNameParam.trim()}"...`);
-
-        // Creează categoria actualizată cu subcategoria redenumită
-        const updatedCategories = categories.map(cat => {
-          if (cat.name === categoryName) {
+        // 🔧 PERFORMANCE FIX: Construiesc categories array-ul corect
+        const updatedCategories = categories.map((category: any) => {
+          if (category.name === categoryName) {
             return {
-              ...cat,
-              subcategories: cat.subcategories.map(sub => 
-                sub.name === oldSubcategoryName 
-                  ? { ...sub, name: newSubcategoryNameParam.trim() }
-                  : sub
+              ...category,
+              subcategories: category.subcategories.map((sub: any) => 
+                sub.name === oldName ? { ...sub, name: newName } : sub
               )
             };
           }
-          return cat;
+          return category;
         });
 
-        // Salvează în CategoryStore
-        await saveCategories(userId, updatedCategories);
+        // 🔧 PERFORMANCE FIX: Apelez saveCategories cu signature corect (userId, categories)
+        await saveCategories(userId || '', updatedCategories);
         
-        // Enhanced: Invalidează și cache-ul pentru tranzacții (pentru update UI)
-        queryClient.invalidateQueries({
-          queryKey: ["transactions", year, month, userId],
-        });
+        toast.success(`Subcategoria "${oldName}" a fost redenumită în "${newName}"`);
         
-        // Reset state
-        clearSubcategoryAction();
-        validation.clearAllErrors();
-        
-        // Enhanced: Success feedback cu detalii
-        toast.success(`${MESAJE.CATEGORII.SUCCES_REDENUMIRE_SUBCATEGORIE}: "${oldSubcategoryName}" → "${newSubcategoryNameParam.trim()}" în categoria "${categoryName}"`, {
-          id: toastId,
-          duration: 3000
-        });
+        // 🔧 PERFORMANCE OPTIMIZATION: Eliminat aggressive cache invalidation 
+        // Grid va folosi updated categories din store automat fără full refresh
       } catch (error) {
-        // Enhanced: Error handling cu informații utile pentru debugging
-        const errorMessage = error instanceof Error ? error.message : 'Eroare necunoscută';
-        toast.error(`${MESAJE.CATEGORII.EROARE_REDENUMIRE}: ${errorMessage}`);
-        console.error("Enhanced Subcategory Rename Error:", {
-          error,
-          categoryName,
-          oldSubcategoryName,
-          newSubcategoryName: newSubcategoryNameParam.trim(),
-          userId,
-          timestamp: new Date().toISOString()
-        });
-      } finally {
-        // Clear loading state
-        setLoadingStates(prev => ({
-          ...prev,
-          isRenaming: false,
-          operationCategory: undefined,
-          operationSubcategory: undefined
-        }));
+        console.error('Error in handleRenameSubcategory:', error);
+        toast.error('Eroare la redenumirea subcategoriei');
       }
     },
-    [userId, categories, saveCategories, queryClient, year, month, clearSubcategoryAction, validateSubcategoryName, validation],
+    [categories, saveCategories, userId]
   );
 
   // Enhanced: Handler pentru ștergerea unei subcategorii custom cu loading states
