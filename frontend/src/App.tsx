@@ -8,10 +8,10 @@ import { lazyLoad } from "./utils/lazyLoading";
 // Auth components - păstrate normale pentru încărcare rapidă
 import LoginForm from "./components/features/Auth/LoginForm";
 import RegisterForm from "./components/features/Auth/RegisterForm";
-import { Toaster } from "react-hot-toast";
 import Spinner from "./components/primitives/Spinner";
 import NavLink from "./components/primitives/NavLink";
 import { CommandPaletteProvider } from "./components/primitives/CommandPalette";
+import { ToastProvider, ToastContainer } from "./components/primitives/Toast";
 import { TITLES } from "@shared-constants";
 
 // Dark mode integration
@@ -144,75 +144,77 @@ export const App: React.FC = () => {
         console.log('Help requested');
       }}
     >
-      <Toaster position="top-right" toastOptions={{ duration: 3500 }} />
-      <div className={dashboard({ layout: "compact" })}>
-        {user /* Afișează navigarea doar dacă utilizatorul este logat */ && (
-          <div
-            className={cn(
-              "flex flex-row gap-8 justify-start",
-              "border-b border-gray-200 mb-6 pb-4",
-            )}
-          >
-            <NavLink to="/transactions" testId="transactions-tab">
-              {TITLES.TRANZACTII}
-            </NavLink>
-            <NavLink to="/lunar-grid" testId="lunar-grid-tab">
-              {" "}
-              {TITLES.GRID_LUNAR}{" "}
-            </NavLink>{" "}
-            <NavLink to="/enhanced-lunar-grid" testId="enhanced-lunar-grid-tab">
-              {" "}
-              Enhanced LunarGrid (Phase 4){" "}
-            </NavLink>{" "}
-            <NavLink to="/lunar-grid-enhanced" testId="lunar-grid-enhanced-tab">
-              {" "}
-              🚀 LunarGrid Enhanced (Modal Architecture){" "}
-            </NavLink>{" "}
-            <NavLink to="/options" testId="options-tab">
-              {" "}
-              {TITLES.OPTIUNI || "Opțiuni"}{" "}
-            </NavLink>
-            {/* ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează crash
-            <NavLink to="/profiler-debug" testId="profiler-debug-tab">
-              {" "}
-              🔍 Profiler Debug{" "}
-            </NavLink>
-            */}
-          </div>
-        )}
-
-        <Routes>
-          {user ? (
-            <>
-              <Route
-                path="/"
-                element={<Navigate to="/transactions" replace />}
-              />
-              <Route path="/transactions" element={<TransactionsPage />} />
-              <Route path="/lunar-grid" element={<LunarGridPage />} />
-              <Route path="/options" element={<OptionsPage />} />
+      <ToastProvider>
+        <ToastContainer children={null} />
+        <div className={dashboard({ layout: "compact" })}>
+          {user /* Afișează navigarea doar dacă utilizatorul este logat */ && (
+            <div
+              className={cn(
+                "flex flex-row gap-8 justify-start",
+                "border-b border-gray-200 mb-6 pb-4",
+              )}
+            >
+              <NavLink to="/transactions" testId="transactions-tab">
+                {TITLES.TRANZACTII}
+              </NavLink>
+              <NavLink to="/lunar-grid" testId="lunar-grid-tab">
+                {" "}
+                {TITLES.GRID_LUNAR}{" "}
+              </NavLink>{" "}
+              <NavLink to="/enhanced-lunar-grid" testId="enhanced-lunar-grid-tab">
+                {" "}
+                Enhanced LunarGrid (Phase 4){" "}
+              </NavLink>{" "}
+              <NavLink to="/lunar-grid-enhanced" testId="lunar-grid-enhanced-tab">
+                {" "}
+                🚀 LunarGrid Enhanced (Modal Architecture){" "}
+              </NavLink>{" "}
+              <NavLink to="/options" testId="options-tab">
+                {" "}
+                {TITLES.OPTIUNI || "Opțiuni"}{" "}
+              </NavLink>
               {/* ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează crash
-              <Route path="/profiler-debug" element={<ProfilerDebugPage />} />
+              <NavLink to="/profiler-debug" testId="profiler-debug-tab">
+                {" "}
+                🔍 Profiler Debug{" "}
+              </NavLink>
               */}
-              {/* Orice altă rută pentru utilizator logat, redirecționează la tranzacții */}
-              <Route
-                path="*"
-                element={<Navigate to="/transactions" replace />}
-              />
-            </>
-          ) : (
-            <>
-              {/* Rute publice pentru login și register */}
-              <Route path="/login" element={<LoginForm />} />{" "}
-              {/* Simplificat: LoginForm va avea link către /register */}
-              <Route path="/register" element={<RegisterForm />} />{" "}
-              {/* Simplificat: RegisterForm va avea link către /login */}
-              {/* Orice altă rută, inclusiv rădăcina, redirecționează la login dacă nu e logat */}
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
+            </div>
           )}
-        </Routes>
-      </div>
+
+          <Routes>
+            {user ? (
+              <>
+                <Route
+                  path="/"
+                  element={<Navigate to="/transactions" replace />}
+                />
+                <Route path="/transactions" element={<TransactionsPage />} />
+                <Route path="/lunar-grid" element={<LunarGridPage />} />
+                <Route path="/options" element={<OptionsPage />} />
+                {/* ❌ ELIMINAT TEMPORAR: ProfilerDebugPage cauzează crash
+                <Route path="/profiler-debug" element={<ProfilerDebugPage />} />
+                */}
+                {/* Orice altă rută pentru utilizator logat, redirecționează la tranzacții */}
+                <Route
+                  path="*"
+                  element={<Navigate to="/transactions" replace />}
+                />
+              </>
+            ) : (
+              <>
+                {/* Rute publice pentru login și register */}
+                <Route path="/login" element={<LoginForm />} />{" "}
+                {/* Simplificat: LoginForm va avea link către /register */}
+                <Route path="/register" element={<RegisterForm />} />{" "}
+                {/* Simplificat: RegisterForm va avea link către /login */}
+                {/* Orice altă rută, inclusiv rădăcina, redirecționează la login dacă nu e logat */}
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </>
+            )}
+          </Routes>
+        </div>
+      </ToastProvider>
     </CommandPaletteProvider>
   );
 };

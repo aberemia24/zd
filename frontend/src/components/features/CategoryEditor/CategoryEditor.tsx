@@ -24,7 +24,8 @@ import {
   labelProfessional,
   captionProfessional,
   flexLayout,
-  spacingMargin
+  spacingMargin,
+  textProfessional
 } from "../../../styles/cva-v2";
 import { modalContainer, modalContent } from "../../../styles/cva-v2/primitives/modal";
 
@@ -437,59 +438,89 @@ const CategoryEditorComponent: React.FC<Props> = ({
                         spacingMargin({ y: 4 }),
                       )}
                     >
-                      <div className={flexLayout({
-                        direction: "row",
-                        align: "center",
-                        gap: 2
-                      })}>
-                        <Input
-                          type="text"
-                          value={newSubcat}
-                          onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setNewSubcat(e.target.value)
-                          }
-                          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-                            if (e.key === "Enter" && isValidSubcat(newSubcat)) {
-                              const selectedCat = categories.find(
-                                (cat) => cat.name === selectedCategory,
-                              );
-                              if (selectedCat) handleAdd(selectedCat);
-                            }
-                            if (e.key === "Escape") setNewSubcat("");
-                          }}
-                          placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
-                          className="w-64"
-                          data-testid="category-editor-add-subcat-input"
-                          maxLength={32}
-                        />
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          disabled={!isValidSubcat(newSubcat)}
-                          data-testid="add-subcat-btn"
-                          type="button"
-                          onClick={() => {
-                            const selectedCat = categories.find(
-                              (cat) => cat.name === selectedCategory,
-                            );
-                            if (selectedCat && isValidSubcat(newSubcat))
-                              handleAdd(selectedCat);
-                          }}
-                          className="min-w-[90px]"
-                        >
-                          {BUTTONS.ADD}
-                        </Button>
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          data-testid="cancel-add-subcat-btn"
-                          type="button"
-                          onClick={() => setNewSubcat("")}
-                          className="min-w-[90px]"
-                        >
-                          {BUTTONS.CANCEL}
-                        </Button>
-                      </div>
+                      {(() => {
+                        // 🔧 VALIDATION: Check custom subcategories limit (max 5 per category)
+                        const selectedCat = categories.find(cat => cat.name === selectedCategory);
+                        const customSubcategoriesCount = selectedCat?.subcategories?.filter(sub => sub.isCustom).length || 0;
+                        const hasReachedLimit = customSubcategoriesCount >= 5;
+                        
+                        if (hasReachedLimit) {
+                          return (
+                            <div className={cn(
+                              "p-4 text-center",
+                              textProfessional({ variant: "caption", contrast: "high" })
+                            )}>
+                              <span>ℹ️ Maxim 5 subcategorii custom per categorie ({customSubcategoriesCount}/5)</span>
+                              <br />
+                              <span className="text-carbon-500 dark:text-carbon-400">
+                                Nu mai poți adăuga subcategorii custom în această categorie.
+                              </span>
+                            </div>
+                          );
+                        }
+                        
+                        return (
+                          <div className={flexLayout({
+                            direction: "row",
+                            align: "center",
+                            gap: 2
+                          })}>
+                            <Input
+                              type="text"
+                              value={newSubcat}
+                              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                                setNewSubcat(e.target.value)
+                              }
+                              onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+                                if (e.key === "Enter" && isValidSubcat(newSubcat)) {
+                                  const selectedCat = categories.find(
+                                    (cat) => cat.name === selectedCategory,
+                                  );
+                                  if (selectedCat) handleAdd(selectedCat);
+                                }
+                                if (e.key === "Escape") setNewSubcat("");
+                              }}
+                              placeholder={PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY}
+                              className="w-64"
+                              data-testid="category-editor-add-subcat-input"
+                              maxLength={32}
+                            />
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              disabled={!isValidSubcat(newSubcat)}
+                              data-testid="add-subcat-btn"
+                              type="button"
+                              onClick={() => {
+                                const selectedCat = categories.find(
+                                  (cat) => cat.name === selectedCategory,
+                                );
+                                if (selectedCat && isValidSubcat(newSubcat))
+                                  handleAdd(selectedCat);
+                              }}
+                              className="min-w-[90px]"
+                            >
+                              {BUTTONS.ADD}
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              data-testid="cancel-add-subcat-btn"
+                              type="button"
+                              onClick={() => setNewSubcat("")}
+                              className="min-w-[90px]"
+                            >
+                              {BUTTONS.CANCEL}
+                            </Button>
+                            <span className={cn(
+                              textProfessional({ variant: "caption", contrast: "high" }),
+                              "text-carbon-500 dark:text-carbon-400 ml-2"
+                            )}>
+                              ({customSubcategoriesCount}/5)
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </>
                 ) : (

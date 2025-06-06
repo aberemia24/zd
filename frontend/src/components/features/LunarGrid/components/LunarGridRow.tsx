@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { Row, flexRender, Table } from "@tanstack/react-table";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Lock } from "lucide-react";
 import { getTransactionTypeForCategory } from '@shared-constants/category-mapping';
-import { TransactionType } from '@shared-constants';
+import { TransactionType, VALIDATION } from '@shared-constants';
 
 // Constants și shared
 import { UI, LUNAR_GRID } from "@shared-constants";
@@ -11,6 +11,7 @@ import { UI, LUNAR_GRID } from "@shared-constants";
 import LunarGridSubcategoryRowCell from "./LunarGridSubcategoryRowCell";
 import LunarGridAddSubcategoryRow from "./LunarGridAddSubcategoryRow";
 import LunarGridCell from "./LunarGridCell";
+import Tooltip from "../../../primitives/Tooltip/Tooltip";
 
 // Types
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
@@ -119,42 +120,50 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   isPositionFocused,
   isPositionSelected,
 }) => {
-  const original = row.original;
+  const { original } = row;
+  const isCategory = original.isCategory;
+  const isSubcategory = !isCategory;
   
   // Memoized computations pentru performance - evită recalcularea la fiecare render
   const rowMetadata = useMemo(() => {
-    const isCategory = !original.subcategory;
-    const isSubcategory = !!original.subcategory;
     const isTotalRow = original.category === 'TOTAL';
     
-    return { isCategory, isSubcategory, isTotalRow };
-  }, [original.subcategory, original.category]);
+    return { isTotalRow };
+  }, [original.category]);
 
-  const { isCategory, isSubcategory, isTotalRow } = rowMetadata;
+  const { isTotalRow } = rowMetadata;
 
-  // 🔧 LOGIC: Determine if this subcategory row is the last one for its category
-  const tableRows = table.getRowModel().rows;
-  
+  // 🔧 UPDATED LOGIC: Calculează dacă acest row este ultima subcategorie din categoria sa
   const isLastSubcategoryInCategory = useMemo(() => {
-    if (!isSubcategory) return false;
+    if (isCategory || !original.category) return false;
     
-    const currentCategory = original.category;
+    const tableRows = table.getRowModel().rows;
+    const subcategoryRows = tableRows.filter(r => 
+      !r.original.isCategory && r.original.category === original.category
+    );
     
-    // Get all subcategory rows for the current category
-    const categorySubcategories = tableRows.filter(r => {
-      const rowData = r.original as TransformedTableDataRow;
-      return !rowData.isCategory && rowData.category === currentCategory;
-    });
+    return subcategoryRows.length > 0 && subcategoryRows[subcategoryRows.length - 1].id === row.id;
+  }, [isCategory, original.category, table, row.id]);
+
+  // 🔒 LOCK ICON LOGIC: Verifică dacă categoria a atins limita de 5 subcategorii custom
+  const shouldShowLockIcon = useMemo(() => {
+    if (!isCategory) return false;
     
-    // If no subcategories, this logic shouldn't apply
-    if (categorySubcategories.length === 0) return false;
+    const categoryData = categories.find(cat => cat.name === original.category);
+    const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom).length || 0;
     
-    // Get the last subcategory row for this category
-    const lastSubcategoryRow = categorySubcategories[categorySubcategories.length - 1];
+    return customSubcategoriesCount >= VALIDATION.MAX_CUSTOM_SUBCATEGORIES;
+  }, [isCategory, categories, original.category]);
+
+  // 💡 TOOLTIP LOGIC: Verifică dacă să afișeze tooltip pe ultima subcategorie
+  const shouldShowTooltipOnLastSubcategory = useMemo(() => {
+    if (isCategory || !isLastSubcategoryInCategory) return false;
     
-    // Check if current row is the last subcategory
-    return row.id === lastSubcategoryRow.id;
-  }, [isSubcategory, original.category, row.id, tableRows]);
+    const categoryData = categories.find(cat => cat.name === original.category);
+    const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom).length || 0;
+    
+    return customSubcategoriesCount >= VALIDATION.MAX_CUSTOM_SUBCATEGORIES;
+  }, [isCategory, isLastSubcategoryInCategory, categories, original.category]);
 
   // Determine row type for unified CVA styling - MEMOIZED
   const rowType = useMemo((): GridRowProps['type'] => {
@@ -277,8 +286,11 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   className="flex items-center gap-2 cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
+                    const isCurrentlyExpanded = row.getIsExpanded();
+                    const willBeExpanded = !isCurrentlyExpanded;
+                    
                     row.toggleExpanded();
-                    onExpandToggle(row.id, !row.getIsExpanded());
+                    onExpandToggle(row.id, willBeExpanded);
                   }}
                   title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
                   data-testid={`toggle-category-${original.category}`}
@@ -295,7 +307,30 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     "font-semibold",
                     textProfessional({ variant: "default" })
                   )}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <span className={textProfessional({ variant: "heading", contrast: "high" })}>
+                      {original.category}
+                    </span>
+                    
+                    {/* 🔒 LOCK ICON: Afișat când categoria a atins limita de 5 subcategorii custom */}
+                    {shouldShowLockIcon && (
+                      <Tooltip
+                        content={`Categoria "${original.category}" a atins limita maximă de ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom. Nu se mai poate adăuga butonul "Add Subcategory".`}
+                        variant="warning"
+                        placement="right"
+                        delay={300}
+                      >
+                        <span 
+                          className="inline-flex"
+                          onMouseEnter={(e) => e.stopPropagation()}
+                          onMouseLeave={(e) => e.stopPropagation()}
+                        >
+                          <Lock 
+                            className="h-4 w-4 text-amber-600 dark:text-amber-400 ml-2 cursor-help" 
+                            aria-label={`Limitare atinsă: ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom maxim`}
+                          />
+                        </span>
+                      </Tooltip>
+                    )}
                   </span>
                 </div>
               ) : isFirstCell && isSubcategory ? (
@@ -401,10 +436,18 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
         const categoryIsExpanded = _expandedRows[original.category];
         const shouldRenderAfterLastSubcategory = isLastSubcategoryInCategory && categoryIsExpanded;
         
+        // 🔧 LIMIT CHECK: Verify custom subcategories limit (max 5 per category)
+        const categoryData = categories.find(cat => cat.name === original.category);
+        const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom).length || 0;
+        const hasReachedLimit = customSubcategoriesCount >= 5; // VALIDATION.MAX_CUSTOM_SUBCATEGORIES
+        
         // 🔧 SAFETY CHECK: Prevent duplicate buttons by checking if this specific row should render
         const uniqueKey = `add-subcategory-${original.category}-${row.id}`;
         
-        return shouldRenderAfterLastSubcategory ? (
+        // Only render if category is expanded, this is last subcategory, AND limit not reached
+        const shouldRender = shouldRenderAfterLastSubcategory && !hasReachedLimit;
+        
+        return shouldRender ? (
           <LunarGridAddSubcategoryRow
             key={uniqueKey}
             category={original.category}

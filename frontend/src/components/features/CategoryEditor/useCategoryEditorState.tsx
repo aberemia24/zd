@@ -82,6 +82,13 @@ export function useCategoryEditorState(initialData: {
       setError(null);
 
       if (!newSubcat.trim()) return setError(MESAJE.CATEGORII.NUME_GOL);
+      
+      // 🔧 VALIDATION: Check custom subcategories limit (max 5 per category)
+      const customSubcategoriesCount = cat.subcategories.filter(sub => sub.isCustom).length;
+      if (customSubcategoriesCount >= 5) {
+        return setError(`Maxim 5 subcategorii custom permise per categorie. Categoria "${cat.name}" are deja ${customSubcategoriesCount} subcategorii custom.`);
+      }
+      
       if (
         cat.subcategories.some(
           (sc: CustomSubcategory) =>
