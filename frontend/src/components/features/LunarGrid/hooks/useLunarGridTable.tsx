@@ -550,6 +550,12 @@ export function useLunarGridTable(
     getSubRows: (row) => row.subRows || [],
     autoResetExpanded: false,
     getRowId: (row) => row.id,
+    enableColumnPinning: true,
+    initialState: {
+      columnPinning: {
+        left: ['category'],
+      },
+    },
   });
 
   // Funcție pentru a genera un ID unic pentru celule (folosit pentru identificarea celulei în editare)

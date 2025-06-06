@@ -529,8 +529,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
         {/* Header principal global: Luna și anul în română - fix deasupra tabelului */}
         {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-          <div className="w-full py-4 mb-4 text-center border-b-2 border-gray-200 bg-white">
-            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+          <div className="w-full py-4 mb-4 text-center border-b-2 border-gray-200 bg-white select-none cursor-default">
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight select-none cursor-default">
               {formatMonthYear(month, year)}
             </h2>
           </div>
@@ -628,6 +628,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
                       const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
+                      const isPinned = header.column.getIsPinned();
                       
                       return (
                         <th
@@ -637,13 +638,21 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             gridCell({ 
                               type: "header",
                               size: "md",
-                              frozen: isFirstColumn ? "column" : false
+                              frozen: isPinned ? "column" : false
                             }),
                             textProfessional({ variant: "heading", contrast: "enhanced" }),
                             isFirstColumn && "min-w-[200px]",
-                            isNumericColumn && "w-20"
+                            isNumericColumn && "w-20",
+                            "select-none cursor-default"
                           )}
-                          style={{ width: header.getSize() }}
+                          style={{ 
+                            width: header.getSize(),
+                            ...(isPinned && {
+                              position: 'sticky',
+                              left: 0,
+                              zIndex: 10
+                            })
+                          }}
                         >
                           {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
                         </th>
@@ -655,6 +664,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                   <tr className={cn(gridRow({ type: "total" }))}>
                     {table.getFlatHeaders().map((header, index) => {
                       const isFirstColumn = index === 0;
+                      const isPinned = header.column.getIsPinned();
                       
                       if (isFirstColumn) {
                         return (
@@ -663,10 +673,17 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             className={cn(
                               gridCell({ 
                                 type: "balance",
-                                frozen: "column"
+                                frozen: "both"
                               }),
-                              textProfessional({ variant: "heading", contrast: "enhanced" })
+                              textProfessional({ variant: "heading", contrast: "enhanced" }),
+                              "select-none cursor-default"
                             )}
+                            style={{
+                              position: 'sticky',
+                              left: 0,
+                              top: 0,
+                              zIndex: 30
+                            }}
                           >
                             {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
                           </th>
@@ -686,9 +703,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                 alignment: "center", // Center alignment pentru daily balance
                                 state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "default" 
                               }),
-                              fontFinancial({ size: "xs", weight: "medium" }),
                               "contrast-high",
-                              dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral"
+                              dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral",
+                              "select-none cursor-default"
                             )}
                           >
                             {dailyBalance !== 0 ? formatCurrencyForGrid(dailyBalance) : "—"}
@@ -707,9 +724,9 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                                 alignment: "center", // Center alignment pentru month total 
                                 state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "default" 
                               }),
-                              fontFinancial({ size: "xs", weight: "medium" }),
                               "contrast-high",
-                              monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral"
+                              monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral",
+                              "select-none cursor-default"
                             )}
                           >
                             {monthTotal !== 0 ? formatCurrencyForGrid(monthTotal) : "—"}

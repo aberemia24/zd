@@ -6,10 +6,11 @@ import { cva, type VariantProps } from "class-variance-authority";
  */
 
 /**
- * Grid container principal
+ * Grid container principal - Global select-none pentru tot grid-ul
  */
 export const gridContainer = cva([
-  "overflow-auto rounded-lg transition-all duration-200 ease-in-out"
+  "overflow-auto rounded-lg transition-all duration-200 ease-in-out",
+  "select-none cursor-default"
 ], {
   variants: {
     variant: {
@@ -87,7 +88,7 @@ export const gridCell = cva([
     state: {
       default: "",
       selected: "bg-copper-50 dark:bg-copper-900/20",
-      editing: "bg-copper-100 dark:bg-copper-800/30",
+      editing: "bg-copper-100 dark:bg-copper-800/30 select-text cursor-text",
       readonly: "bg-carbon-50/30 dark:bg-carbon-800/30",
       active: "bg-copper-100 ring-2 ring-copper-400 dark:bg-copper-800/50 dark:ring-copper-500",
       positive: "text-green-600 dark:text-green-400",
@@ -198,7 +199,8 @@ export const gridExpandIcon = cva([
 export const gridInput = cva([
   "w-full bg-transparent border-0 p-0 text-sm",
   "focus:outline-none focus:bg-copper-50 dark:focus:bg-copper-900/20",
-  "transition-colors duration-200"
+  "transition-colors duration-200",
+  "select-text cursor-text"
 ], {
   variants: {
     variant: {

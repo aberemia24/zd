@@ -38,7 +38,7 @@ const cellVariants = cva(
     variants: {
       state: {
         normal: "bg-white cursor-pointer text-carbon-900 dark:text-carbon-100 hover:bg-carbon-50 dark:hover:bg-carbon-800/50",
-        selected: "bg-blue-50 border-2 border-blue-400 cursor-text",
+        selected: "bg-blue-50 border-2 border-blue-400 cursor-pointer",
         editing: "bg-white ring-2 ring-blue-500 ring-inset cursor-text",
         error: "bg-red-50 border-2 border-red-400 cursor-text",
         saving: "bg-carbon-100 dark:bg-carbon-800 opacity-70 cursor-wait",

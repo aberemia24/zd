@@ -269,7 +269,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 gridCell({
                   type: getCellType(),
                   state: getCellState(),
-                  frozen: isFirstCell ? "column" : false
+                  frozen: cell.column.getIsPinned() ? "column" : false
                 }),
                 textProfessional({ variant: "default" }),
                 isFirstCell && level > 0 && "pl-8",
@@ -280,6 +280,13 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 ),
                 isTotalCell && "font-semibold tabular-nums"
               )}
+              style={{
+                ...(cell.column.getIsPinned() && {
+                  position: 'sticky',
+                  left: 0,
+                  zIndex: 5
+                })
+              }}
               title={
                 isCategory && isDayCell
                   ? UI.LUNAR_GRID_TOOLTIPS.CALCULATED_SUM

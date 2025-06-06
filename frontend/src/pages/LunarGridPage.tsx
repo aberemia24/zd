@@ -96,15 +96,7 @@ const LunarGridPage: React.FC = () => {
     }
   };
 
-  // 🎯 FULLSCREEN: Layout mode icon - larger and more visible
-  const getLayoutModeIcon = (mode: LayoutMode) => {
-    switch (mode) {
-      case 'fullscreen':
-        return <Minimize2 size={20} />;
-      default:
-        return <Maximize2 size={20} />;
-    }
-  };
+
 
   // 🎯 LGI-TASK-07: Fullscreen backdrop cu CVA professional styling
   const renderFullscreenBackdrop = () => {
@@ -327,24 +319,37 @@ const LunarGridPage: React.FC = () => {
               "flex items-center gap-4",
               "flex-shrink-0"
             )}>
-              {/* 🎯 FULLSCREEN: Icon-only button - more prominent and visible */}
-              <button
+              {/* 🎯 FULLSCREEN: Native icon - specialized and prominent */}
+              <div
                 onClick={handleLayoutModeToggle}
                 className={cn(
-                  button({ variant: "outline", size: "md" }),
+                  "cursor-pointer select-none",
+                  "p-2 rounded-lg", // Minimal padding for click area
+                  "hover:bg-primary-50 active:bg-primary-100",
+                  "transition-all duration-150",
                   "flex items-center justify-center",
-                  "w-10 h-10", // Square button for icon-only
-                  "flex-shrink-0",
-                  layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
+                  layoutMode === 'fullscreen' ? "bg-primary-100 text-primary-700" : "text-primary-600 hover:text-primary-800"
                 )}
                 title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
                   '{nextMode}', 
                   layoutMode === 'full-width' ? UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULLSCREEN : UI.LUNAR_GRID_PAGE.LAYOUT_MODES.FULL_WIDTH
                 )}
                 data-testid="layout-mode-toggle"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleLayoutModeToggle();
+                  }
+                }}
               >
-                {getLayoutModeIcon(layoutMode)}
-              </button>
+                {layoutMode === 'fullscreen' ? (
+                  <Minimize2 size={28} strokeWidth={2} className="drop-shadow-sm" />
+                ) : (
+                  <Maximize2 size={28} strokeWidth={2} className="drop-shadow-sm" />
+                )}
+              </div>
 
               {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}
               <Select
