@@ -282,56 +282,53 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
             >
               {isFirstCell && isCategory ? (
                 // Category Cell cu unified CVA expand icon
-                <div 
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const isCurrentlyExpanded = row.getIsExpanded();
-                    const willBeExpanded = !isCurrentlyExpanded;
-                    
-                    row.toggleExpanded();
-                    onExpandToggle(row.id, willBeExpanded);
-                  }}
-                  title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
-                  data-testid={`toggle-category-${original.category}`}
-                >
-                  <ChevronRight 
-                    className={cn(
-                      gridExpandIcon({ 
-                        variant: "professional",
-                        expanded: row.getIsExpanded()
-                      })
-                    )}
-                  />
-                  <span className={cn(
-                    "font-semibold",
-                    textProfessional({ variant: "default" })
-                  )}>
-                    <span className={textProfessional({ variant: "heading", contrast: "high" })}>
+                <div className="flex items-center gap-2">
+                  {/* 🔧 EXPAND SECTION: Div separat pentru expand cu tooltip propriu */}
+                  <div 
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const isCurrentlyExpanded = row.getIsExpanded();
+                      const willBeExpanded = !isCurrentlyExpanded;
+                      
+                      row.toggleExpanded();
+                      onExpandToggle(row.id, willBeExpanded);
+                    }}
+                    title={row.getIsExpanded() ? LUNAR_GRID.COLLAPSE_CATEGORY_TITLE : LUNAR_GRID.EXPAND_CATEGORY_TITLE}
+                    data-testid={`toggle-category-${original.category}`}
+                  >
+                    <ChevronRight 
+                      className={cn(
+                        gridExpandIcon({ 
+                          variant: "professional",
+                          expanded: row.getIsExpanded()
+                        })
+                      )}
+                    />
+                    <span className={cn(
+                      "font-semibold",
+                      textProfessional({ variant: "heading", contrast: "high" })
+                    )}>
                       {original.category}
                     </span>
-                    
-                    {/* 🔒 LOCK ICON: Afișat când categoria a atins limita de 5 subcategorii custom */}
-                    {shouldShowLockIcon && (
-                      <Tooltip
-                        content={`Categoria "${original.category}" a atins limita maximă de ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom. Nu se mai poate adăuga butonul "Add Subcategory".`}
-                        variant="warning"
-                        placement="right"
-                        delay={300}
-                      >
-                        <span 
-                          className="inline-flex"
-                          onMouseEnter={(e) => e.stopPropagation()}
-                          onMouseLeave={(e) => e.stopPropagation()}
-                        >
-                          <Lock 
-                            className="h-4 w-4 text-amber-600 dark:text-amber-400 ml-2 cursor-help" 
-                            aria-label={`Limitare atinsă: ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom maxim`}
-                          />
-                        </span>
-                      </Tooltip>
-                    )}
-                  </span>
+                  </div>
+
+                  {/* 🔒 LOCK ICON SECTION: Div separat pentru lacăt cu tooltip propriu */}
+                  {shouldShowLockIcon && (
+                    <Tooltip
+                      content={`Categoria "${original.category}" a atins limita maximă de ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom. Nu se mai poate adăuga butonul "Add Subcategory".`}
+                      variant="warning"
+                      placement="right"
+                      delay={300}
+                    >
+                      <span className="inline-flex">
+                        <Lock 
+                          className="h-4 w-4 text-amber-600 dark:text-amber-400 cursor-help" 
+                          aria-label={`Limitare atinsă: ${VALIDATION.MAX_CUSTOM_SUBCATEGORIES} subcategorii custom maxim`}
+                        />
+                      </span>
+                    </Tooltip>
+                  )}
                 </div>
               ) : isFirstCell && isSubcategory ? (
                 // Subcategory Cell
