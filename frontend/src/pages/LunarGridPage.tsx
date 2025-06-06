@@ -96,13 +96,13 @@ const LunarGridPage: React.FC = () => {
     }
   };
 
-  // 🎯 LGI-TASK-07: Layout mode icon (doar 2 moduri)
+  // 🎯 FULLSCREEN: Layout mode icon - larger and more visible
   const getLayoutModeIcon = (mode: LayoutMode) => {
     switch (mode) {
       case 'fullscreen':
-        return <Minimize2 size={16} />;
+        return <Minimize2 size={20} />;
       default:
-        return <Maximize2 size={16} />;
+        return <Maximize2 size={20} />;
     }
   };
 
@@ -327,13 +327,14 @@ const LunarGridPage: React.FC = () => {
               "flex items-center gap-4",
               "flex-shrink-0"
             )}>
-              {/* 🎯 LGI-TASK-07: Progressive Enhancement Button cu CVA button - COMPACT */}
+              {/* 🎯 FULLSCREEN: Icon-only button - more prominent and visible */}
               <button
                 onClick={handleLayoutModeToggle}
                 className={cn(
-                  button({ variant: "outline", size: "sm" }),
-                  "flex items-center gap-2",
-                  "whitespace-nowrap flex-shrink-0",
+                  button({ variant: "outline", size: "md" }),
+                  "flex items-center justify-center",
+                  "w-10 h-10", // Square button for icon-only
+                  "flex-shrink-0",
                   layoutMode === 'fullscreen' ? "ring-2 ring-blue-300 bg-blue-50" : ""
                 )}
                 title={UI.LUNAR_GRID_PAGE.LAYOUT_TOGGLE_TOOLTIP.replace(
@@ -343,7 +344,6 @@ const LunarGridPage: React.FC = () => {
                 data-testid="layout-mode-toggle"
               >
                 {getLayoutModeIcon(layoutMode)}
-                <span className="hidden sm:inline text-xs">{getLayoutModeLabel(layoutMode)}</span>
               </button>
 
               {/* 🚨 CONSOLIDATION - Select primitive CVA cu options - COMPACT */}

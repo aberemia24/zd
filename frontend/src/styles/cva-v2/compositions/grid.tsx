@@ -92,9 +92,14 @@ export const gridCell = cva([
       active: "bg-copper-100 ring-2 ring-copper-400 dark:bg-copper-800/50 dark:ring-copper-500",
       positive: "text-green-600 dark:text-green-400",
       negative: "text-red-600 dark:text-red-400"
+    },
+    frozen: {
+      false: "",
+      column: "sticky left-0 z-10 bg-carbon-50 dark:bg-carbon-900 shadow-lg",
+      both: "sticky top-0 left-0 z-30 bg-carbon-50 dark:bg-carbon-900 shadow-lg"
     }
   },
-  defaultVariants: { type: "data", alignment: "left", size: "md", state: "default" }
+  defaultVariants: { type: "data", alignment: "left", size: "md", state: "default", frozen: false }
 });
 
 /**
@@ -114,9 +119,17 @@ export const gridRow = cva([
       default: "",
       category: [
         "font-semibold bg-carbon-100 dark:bg-carbon-800",
-        "border-b-2 border-carbon-300 dark:border-carbon-600"
+        "border-b-2 border-carbon-300 dark:border-carbon-600",
+        "hover:bg-carbon-150 dark:hover:bg-carbon-750",
+        "transition-colors duration-200"
       ],
-      subcategory: "pl-4",
+      subcategory: [
+        "pl-4 bg-carbon-50/30 dark:bg-carbon-850/30",
+        "hover:bg-carbon-100/60 dark:hover:bg-carbon-800/60",
+        "border-l-2 border-l-transparent",
+        "hover:border-l-carbon-300 dark:hover:border-l-carbon-500",
+        "transition-all duration-200"
+      ],
       total: [
         "font-bold border-t-2 border-carbon-400 dark:border-carbon-500",
         "bg-carbon-200 dark:bg-carbon-700 sticky top-0 z-20"
@@ -217,9 +230,10 @@ export const gridSubcategoryRow = cva([
     variant: {
       default: "hover:bg-carbon-50/60 dark:hover:bg-carbon-800/60",
       professional: [
-        "hover:bg-carbon-50/80 hover:shadow-sm dark:hover:bg-carbon-800/80",
+        "hover:bg-carbon-100/70 hover:shadow-sm dark:hover:bg-carbon-800/70",
         "border-l-2 border-l-transparent",
-        "hover:border-l-carbon-300 dark:hover:border-l-carbon-500"
+        "hover:border-l-carbon-400 dark:hover:border-l-carbon-400",
+        "hover:pl-2 transition-all duration-200"
       ],
       active: "bg-carbon-50/80 border-l-2 border-l-carbon-400 dark:bg-carbon-800/80 dark:border-l-carbon-400",
       custom: [

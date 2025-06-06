@@ -566,33 +566,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
           }}
         >
-          {/* Buton resize fullscreen */}
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className={cn(
-              button({ 
-                variant: "outline",
-                size: "md"
-              }),
-              "absolute top-2 right-2 z-10"
-            )}
-            title={isFullscreen ? LUNAR_GRID.RESIZE.EXIT_FULLSCREEN : LUNAR_GRID.RESIZE.TOGGLE_FULLSCREEN}
-            data-testid="grid-resize-button"
-            aria-label={LUNAR_GRID.RESIZE.RESIZE_BUTTON_TITLE}
-          >
-            {isFullscreen ? (
-              <Minimize2 className="w-5 h-5" />
-            ) : (
-              <Maximize2 className="w-5 h-5" />
-            )}
-          </button>
+          {/* REMOVED: Table-only resize button - unified with main fullscreen functionality in header */}
 
           {/* Container interior - FĂRĂ overflow duplicat (scroll e gestionat de outer container) */}
           <div 
             ref={scrollableContainerRef}
             className={cn(
-              "relative", // Removed: gridContainer, overflow-auto, scroll-smooth
+              "relative", // REMOVED overflow-auto - scroll is handled by outer gridContainer
               // Height constraints rămân pentru space management
               isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
             )}
@@ -656,7 +636,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                           className={cn(
                             gridCell({ 
                               type: "header",
-                              size: "md"
+                              size: "md",
+                              frozen: isFirstColumn ? "column" : false
                             }),
                             textProfessional({ variant: "heading", contrast: "enhanced" }),
                             isFirstColumn && "min-w-[200px]",
@@ -680,7 +661,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                           <th
                             key={`balance-${header.id}`}
                             className={cn(
-                              gridCell({ type: "balance" }),
+                              gridCell({ 
+                                type: "balance",
+                                frozen: "column"
+                              }),
                               textProfessional({ variant: "heading", contrast: "enhanced" })
                             )}
                           >
@@ -698,7 +682,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             key={`balance-${header.id}`}
                             className={cn(
                               gridCell({ 
-                                type: "balance", 
+                                type: "balance",
+                                alignment: "center", // Center alignment pentru daily balance
                                 state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "default" 
                               }),
                               fontFinancial({ size: "xs", weight: "medium" }),
@@ -718,7 +703,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             key={`balance-${header.id}`}
                             className={cn(
                               gridCell({ 
-                                type: "balance", 
+                                type: "balance",
+                                alignment: "center", // Center alignment pentru month total 
                                 state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "default" 
                               }),
                               fontFinancial({ size: "xs", weight: "medium" }),
@@ -734,7 +720,10 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       return (
                         <th
                           key={`balance-${header.id}`}
-                          className={cn(gridCell({ type: "balance" }))}
+                          className={cn(gridCell({ 
+                            type: "balance",
+                            alignment: "center" // Center alignment pentru empty balance cells
+                          }))}
                         >
                           —
                         </th>

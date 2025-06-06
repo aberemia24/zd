@@ -268,7 +268,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
               className={cn(
                 gridCell({
                   type: getCellType(),
-                  state: getCellState()
+                  state: getCellState(),
+                  frozen: isFirstCell ? "column" : false
                 }),
                 textProfessional({ variant: "default" }),
                 isFirstCell && level > 0 && "pl-8",

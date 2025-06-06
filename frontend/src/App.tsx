@@ -161,14 +161,6 @@ export const App: React.FC = () => {
                 {" "}
                 {TITLES.GRID_LUNAR}{" "}
               </NavLink>{" "}
-              <NavLink to="/enhanced-lunar-grid" testId="enhanced-lunar-grid-tab">
-                {" "}
-                Enhanced LunarGrid (Phase 4){" "}
-              </NavLink>{" "}
-              <NavLink to="/lunar-grid-enhanced" testId="lunar-grid-enhanced-tab">
-                {" "}
-                🚀 LunarGrid Enhanced (Modal Architecture){" "}
-              </NavLink>{" "}
               <NavLink to="/options" testId="options-tab">
                 {" "}
                 {TITLES.OPTIUNI || "Opțiuni"}{" "}
