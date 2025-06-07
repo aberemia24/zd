@@ -17,15 +17,6 @@ export type {
   UseGridNavigationReturn,
 } from "./useGridNavigation";
 
-export {
-  usePerformanceOptimization,
-  withPerformanceOptimization,
-} from "./usePerformanceOptimization";
-export type {
-  UsePerformanceOptimizationProps,
-  UsePerformanceOptimizationReturn,
-} from "./usePerformanceOptimization";
-
 // Components
 export { EditableCell } from "./EditableCell";
 export type { EditableCellProps } from "./EditableCell";
@@ -38,10 +29,3 @@ export type {
   LunarGridCellData,
   LunarGridInlineIntegrationProps,
 } from "./LunarGridInlineIntegration";
-
-// Transition components
-export {
-  LunarGridTransition,
-  useLunarGridTransition,
-} from "./LunarGridTransition";
-export type { LunarGridTransitionProps } from "./LunarGridTransition";
