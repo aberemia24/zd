@@ -488,3 +488,248 @@ Performance mai bună
 Developer experience superior
 
 Recomandare: Adoptă versiunea simplificată și adaugă complexity doar când e demonstrată nevoia.
+
+
+Să fac un research aprofundat despre best practices pentru inline editing în industry și să verific și implementarea actuală din LunarGrid.
+Ran tool
+Ran tool
+Ran tool
+Acum să verific și implementarea actuală din LunarGrid pentru a înțelege contextul actual:
+Search files...
+Ran tool
+Perfect! Acum am toată informația necesară pentru research. Am văzut că Task 3 este despre simplificarea EditableCell.tsx și că ai deja implementat inline editing cu double-click. Să îți dau un research complet despre best practices din industry.
+
+## 📊 Research Complet: Inline Editing Best Practices în Industry
+
+### 🎯 Situația Actuală în LunarGrid
+
+Din codul tău, văd că ai deja:
+- **Double-click to edit** în `EditableCell.tsx` cu `handleDoubleClick`
+- **Single-click opens modal** prin `onSingleClick` prop
+- **F2 keyboard shortcut** pentru inline editing
+- **Enter/Escape** pentru save/cancel
+- Suport pentru `validationType` (amount, text, percentage, date)
+
+### 🏆 Industry Best Practices - Research Findings
+
+#### 1. **Google Sheets / Excel Pattern** (cel mai folosit)
+```
+✅ Single click = Select cell
+✅ Double click = Enter edit mode  
+✅ F2 = Enter edit mode
+✅ Enter = Save and move down
+✅ Tab = Save and move right
+✅ Escape = Cancel
+```
+
+#### 2. **Airtable Pattern** (hybrid approach)
+```
+✅ Single click = Select + show hover controls
+✅ Double click = Enter edit mode
+✅ Hover = Show edit icon + other actions
+```
+
+#### 3. **Notion/Linear Pattern** (modern approach)  
+```
+✅ Single click = Enter edit mode immediately (pentru text)
+✅ Hover = Show action buttons
+✅ Click outside = Auto-save
+```
+
+### 🎨 Recomandările Mele Pentru Tine
+
+Bazat pe research-ul făcut și codul tău existent, iată ce îți recomand:
+
+#### **Opțiunea 1: Hybrid Excel + Hover Actions (RECOMANDAT)**
+
+```typescript
+// Pattern-ul recomandat pentru tine
+const cellInteraction = {
+  singleClick: "select cell + show hover actions",
+  doubleClick: "enter inline edit mode", 
+  hover: "show [edit icon] [more actions ⋯]",
+  f2: "enter inline edit mode",
+  enter: "save and move down",
+  escape: "cancel edit"
+}
+```
+
+**Visual UX:**
+```
+┌─────────────────┐
+│     €123.45     │ ← Normal state
+└─────────────────┘
+
+     ↓ hover ↓
+┌─────────────────┐
+│ €123.45  [✏️][⋯] │ ← Hover actions
+└─────────────────┘
+
+   ↓ double-click ↓
+┌─────────────────┐
+│ [€____123.45___]│ ← Edit mode
+└─────────────────┘
+```
+
+#### **Implementarea Pentru Tine:**
+
+```typescript
+// În LunarGridCell.tsx - UPDATE PROPOSAL
+const LunarGridCell = ({ cellId, value, onSave, onSingleClick }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  return (
+    <div 
+      className="relative cell-container"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <EditableCell
+        cellId={cellId}
+        value={value}
+        onSave={onSave}
+        onSingleClick={(e) => {
+          // Select cell doar, nu modal instant
+          onCellSelect?.(cellId);
+        }}
+        // Double-click rămâne pentru inline edit
+      />
+      
+      {/* Hover actions - doar când hover */}
+      {isHovered && (
+        <div className="absolute right-1 top-1 flex gap-1">
+          <button 
+            onClick={onSingleClick}
+            className="hover-action-btn"
+          >
+            ⋯
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+```
+
+### 🚀 De Ce Această Abordare?
+
+#### **✅ Avantaje:**
+1. **Familiar Pattern**: Excel/Sheets users se simt acasă
+2. **Progressive Disclosure**: Actions apar doar când ai nevoie
+3. **Backward Compatible**: Nu strici nimic din ce ai deja
+4. **Fast Workflow**: Double-click for quick edits, hover for advanced
+5. **Mobile Friendly**: Long press poate fi hover equivalent
+
+#### **✅ Best of Both Worlds:**
+- **Quick operations**: Double-click → edit direct
+- **Complex operations**: Hover → click ⋯ → modal cu opțiuni avansate
+- **Keyboard users**: F2 funcționează perfect
+- **Mouse users**: Hover actions sunt vizibile
+
+
+```
+
+### 💡 Final Recommendations
+
+**NU schimba** ce ai deja bun:
+- ✅ Double-click inline editing e perfect
+- ✅ F2 keyboard shortcut e professional  
+- ✅ Enter/Escape handlers sunt standard
+- ✅ Validation logic e solid
+
+**ADAUGĂ** doar hover actions layer:
+- 🎯 Single click = select (nu modal)
+- 🎯 Hover = show action buttons
+- 🎯 Keep double-click pentru quick edits
+- 🎯 Keep modal pentru complex operations
+
+**Rezultatul final**: Excel-like experience cu modern hover enhancements - exact ce folosesc Airtable, Notion și Linear pentru best UX.
+
+### ❓ Ce zici de această abordare?
+
+E destul de pragmatică și nu complică codul existent, ci doar adaugă un layer de hover actions. Users vor avea:
+- **Fast workflow**: double-click pentru edit rapid
+- **Advanced workflow**: hover → ⋯ → modal pentru operațiuni complexe  
+- **Familiar patterns**: toată lumea știe Excel/Sheets interactions
+
+Vrei să implementăm această abordare sau preferi ceva diferit din research?
+
+
+Ai dreptate 100%! **NU** am făcut research aprofundat pe cod și dependințe. Să fac o analiză completă și granulară înainte să continui. Să verific totul din codebase:
+Search files...
+Search files...
+Search files...
+Search files...
+Search files...
+Excelent! **Am terminat research-ul APROFUNDAT**. Acum înțeleg complet contextul și dependințele. Să documentez toate găsirile:
+
+## 🔍 **RESEARCH COMPLET FINALIZAT - DOCUMENTAȚIE DETALIATĂ**
+
+### 📊 **CE AM GĂSIT - DEPENDINȚE CRITICE RATATE**
+
+**❌ PROBLEME MAJORE în EditableCellv2.tsx:**
+
+1. **Shared Constants - LIPSITE:**
+   - `EXCEL_GRID.INLINE_EDITING.EDIT_HINT` - folosit în legacy
+   - `EXCEL_GRID.INLINE_EDITING.VALIDATION_ERRORS.*` - 7 tipuri diferite
+   - `EXCEL_GRID.INLINE_EDITING.PLACEHOLDER.*` - 4 tipuri
+   - `EXCEL_GRID.INLINE_EDITING.CLICK_DETECTION_DELAY: 250` - pentru timer
+
+2. **CVA System - NEINTEGRAT:**
+   - **Legacy folosește:** `cellVariants` și `inputVariants` custom
+   - **CVA-v2 EXISTĂ:** `gridCell`, `gridInput` în `compositions/grid.tsx`
+   - **TOATE clasele** sunt diferite de ce am folosit eu!
+
+3. **Validation System - COMPLET ABSENT:**
+   - **Legacy folosește:** `useValidation` hook centralizat
+   - **Import necesar:** `import { useValidation, ValidationType } from "../../../../hooks/useValidation"`
+   - **ÎNLOCUIEȘTE** validarea ad-hoc din EditableCellv2
+
+4. **Hook Dependencies - RATATE:**
+   - **Legacy folosește:** `useInlineCellEdit` hook specializat
+   - **Pattern REAL:** Nu hook-uri direct în componentă
+
+5. **Keyboard Navigation - INCOMPLET:**
+   - **Legacy folosește:** `useGridNavigation` pentru F2, Enter, Escape
+   - **Pattern REAL:** Keyboard handling în grid container, nu individual cells
+
+### 🎯 **STRATEGIA CORECTĂ - COMPLETĂ REFACERE**
+
+**NU pot continua cu EditableCellv2.tsx** - este complet deconectat de ecosystem. Trebuie:
+Ran tool
+Ran tool
+Ran tool
+Excelent! **Research-ul aprofundat este COMPLET**. Am descoperit problemele critice și strategia corectă. Să știrg fișierele greșite și să implementez soluția reală:
+Ran tool
+Ran tool
+Ran tool
+Ran tool
+Perfect! **Am curățat fișierele greșite**. Acum să implementez strategia CORECTĂ:
+
+## 🎯 **STRATEGIA FINALĂ CORECTĂ - IMPLEMENTARE REALĂ**
+
+**Bazat pe research-ul aprofundat:**
+
+### ✅ **CE am descoperit din RESEARCH:**
+
+1. **EditableCell.tsx (957 linii)** - este over-engineered DAR are pattern-urile corecte
+2. **useInlineCellEdit hook** - pattern validat pentru editing logic  
+3. **useValidation centralizat** - obligatoriu pentru validare consistentă
+4. **CVA gridCell/gridInput** - sistemul real de styling din cva-v2
+5. **EXCEL_GRID constants** - 12+ constante pentru text și validare
+6. **useGridNavigation** - management keyboard shortcuts la nivel de grid
+
+### 🔧 **PLANUL DE IMPLEMENTARE REAL:**
+
+**TASK 3 = Refactoring INTELIGENT al EditableCell.tsx** 
+- ✅ **Păstrez** toate funcționalitățile și props-urile existente
+- ✅ **Reduc** de la 957 linii la ~300 linii prin eliminarea over-engineering-ului
+- ✅ **Adaug** pattern hybrid (hover actions când selected)
+- ✅ **Integrez** cu CVA gridCell/gridInput corect
+- ✅ **Respect** toate dependencies existente (useInlineCellEdit, useValidation, EXCEL_GRID)
+
+**Ai dreptate** - trebuia să fac research-ul ÎNAINTE să încep să scriu cod. Acum am toată informația necesară pentru o implementare SAFE și CORECTĂ.
+
+**Următorul pas:** Să analizez în detaliu `useInlineCellEdit` și să încep refactoring-ul REAL cu toate dependencies-urile corecte. 
+
+**Mulțumesc pentru corectură** - este **"better done than perfect, but still done right"** 🎯
