@@ -8,7 +8,7 @@ import React, {
   useCallback,
 } from "react";
 import { createPortal } from 'react-dom';
-import { BUTTONS, PLACEHOLDERS, UI, INFO, FLAGS } from "@budget-app/shared-constants";
+import { BUTTONS, PLACEHOLDERS, UI, MESAJE } from "@budget-app/shared-constants";
 import Button from "../../primitives/Button/Button";
 import Input from "../../primitives/Input/Input";
 import Badge from "../../primitives/Badge/Badge";
@@ -174,7 +174,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                 "p-2 rounded-md hover:bg-carbon-100 dark:hover:bg-carbon-800",
                 "focus:outline-none focus:ring-2 focus:ring-copper-500 focus:ring-offset-1",
               )}
-              aria-label="Închide"
+              aria-label={MESAJE.CATEGORII.HINT_ARIA_INCHIDE}
               data-testid="close-category-editor"
             >
               <svg
@@ -222,7 +222,10 @@ const CategoryEditorComponent: React.FC<Props> = ({
                   )}
                   data-testid="categories-scroll-wrapper"
                 >
-                  <ul className="divide-y divide-carbon-200 dark:divide-carbon-700">
+                  <ul 
+                    className="divide-y divide-carbon-200 dark:divide-carbon-700"
+                    aria-label={MESAJE.CATEGORII.HINT_ARIA_LISTA_CATEGORII}
+                  >
                     {categories.map((cat) => (
                       <li
                         key={cat.name}
@@ -241,6 +244,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                           }}
                           aria-pressed={selectedCategory === cat.name}
                           aria-controls="subcategories-section"
+                          aria-label={MESAJE.CATEGORII.HINT_ARIA_SELECTEAZA_CATEGORIA}
                           data-testid={`cat-select-${cat.name}`}
                                                       className={cn(
                               "w-full text-left transition-colors duration-150",
@@ -282,9 +286,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                     >
                       <ul
                         className="divide-y divide-carbon-200 dark:divide-carbon-700"
-                        aria-label={
-                          UI.CATEGORY_EDITOR.SUBCATEGORIES_SECTION_TITLE
-                        }
+                        aria-label={MESAJE.CATEGORII.HINT_ARIA_LISTA_SUBCATEGORII}
                       >
                         {categories
                           .find((cat) => cat.name === selectedCategory)
@@ -329,6 +331,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                     }}
                                     autoFocus
                                     className="flex-grow"
+                                    aria-label={MESAJE.CATEGORII.HINT_ARIA_REDENUMIRE_INPUT}
                                     data-testid={`rename-input-${sc.name}`}
                                     maxLength={32}
                                   />
@@ -389,7 +392,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                         variant="success"
                                         data-testid={`custom-flag-${sc.name}`}
                                       >
-                                        {FLAGS.CUSTOM}
+                                        custom
                                       </Badge>
                                     )}
                                     {badge(selectedCategory, sc.name)}
@@ -450,10 +453,10 @@ const CategoryEditorComponent: React.FC<Props> = ({
                               "p-4 text-center",
                               textProfessional({ variant: "caption", contrast: "high" })
                             )}>
-                              <span>ℹ️ Maxim 5 subcategorii custom per categorie ({customSubcategoriesCount}/5)</span>
+                              <span>{MESAJE.CATEGORII.INFO_SYMBOL} {MESAJE.CATEGORII.INFO_LIMIT_COUNT(customSubcategoriesCount)}</span>
                               <br />
                               <span className="text-carbon-500 dark:text-carbon-400">
-                                Nu mai poți adăuga subcategorii custom în această categorie.
+                                {MESAJE.CATEGORII.LIMITE_ATINSA}
                               </span>
                             </div>
                           );
@@ -516,7 +519,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                               textProfessional({ variant: "caption", contrast: "high" }),
                               "text-carbon-500 dark:text-carbon-400 ml-2"
                             )}>
-                              ({customSubcategoriesCount}/5)
+                              {MESAJE.CATEGORII.INFO_LIMIT_COUNT(customSubcategoriesCount)}
                             </span>
                           </div>
                         );
@@ -528,7 +531,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                     variant="default"
                     data-testid="no-cat-msg"
                   >
-                    {INFO.CATEGORY_EDITOR_EMPTY}
+                    {UI.CATEGORY_EDITOR.NO_SELECTION}
                   </Alert>
                 )}
               </div>

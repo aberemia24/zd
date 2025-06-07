@@ -72,6 +72,8 @@ export const MESAJE = {
     CONFIRMARE_STERGERE: 'Sigur doriți să ștergeți subcategoria {subcategoria} din categoria {categoria}? Această acțiune nu poate fi anulată.',
     CONFIRMARE_STERGERE_TITLE: 'Confirmare ștergere subcategorie',
     MAXIM_SUBCATEGORII: 'Maxim 5 subcategorii custom permise per categorie',
+    MAXIM_SUBCATEGORII_DETALIAT: (count: number) => `Maxim 5 subcategorii custom per categorie. Categoria are deja ${count} subcategorii custom.`,
+    LIMITE_ATINSA: 'Nu mai poți adăuga subcategorii custom în această categorie.',
     EROARE_ADAUGARE_SUBCATEGORIE: 'Eroare la adăugarea subcategoriei',
     CATEGORIA_NEGASITA: 'Categoria nu a fost găsită',
     NUME_DUPLICAT: 'Subcategoria cu acest nume deja există',
@@ -82,6 +84,17 @@ export const MESAJE = {
     SUCCES_ADAUGARE_SUBCATEGORIE: 'Subcategoria a fost adăugată cu succes',
     SUCCES_REDENUMIRE_SUBCATEGORIE: 'Subcategoria a fost redenumită cu succes',
     SUCCES_STERGERE_SUBCATEGORIE: 'Subcategoria a fost ștearsă cu succes',
+    
+    // Noi mesaje pentru informații și etichete
+    INFO_LIMIT_COUNT: (count: number) => `(${count}/5)`,
+    INFO_SYMBOL: 'ℹ️',
+    IATENTIE_PREFIX: 'Atenție: Există',
+    ATENTIE_SUFFIX: 'tranzacții care folosesc această subcategorie.',
+    HINT_ARIA_INCHIDE: 'Închide',
+    HINT_ARIA_SELECTEAZA_CATEGORIA: 'Selectează categoria',
+    HINT_ARIA_LISTA_CATEGORII: 'Lista de categorii',
+    HINT_ARIA_LISTA_SUBCATEGORII: 'Lista de subcategorii',
+    HINT_ARIA_REDENUMIRE_INPUT: 'Câmp pentru redenumire subcategorie',
   },
 
   // Mesaje pentru Export

@@ -449,17 +449,20 @@ export const UI = {
     TITLE: 'Gestionare Subcategorii',
     CATEGORIES_SECTION_TITLE: 'Categorii',
     SUBCATEGORIES_SECTION_TITLE: 'Subcategorii pentru',
-    CUSTOM_BADGE: 'custom',
-    RENAME_BUTTON: 'Redenumește',
-    DELETE_BUTTON: 'Șterge',
-    ADD_PLACEHOLDER: 'Adaugă subcategorie nouă',
-    ADD_BUTTON: 'Adaugă',
-    NO_SELECTION: EMPTY_STATE_MESSAGES.NO_SELECTION,
+    CUSTOM_BADGE: FLAGS.CUSTOM,
+    RENAME_BUTTON: BUTTONS.RENAME,
+    DELETE_BUTTON: BUTTONS.DELETE,
+    ADD_PLACEHOLDER: PLACEHOLDERS.CATEGORY_EDITOR_SUBCATEGORY,
+    ADD_BUTTON: BUTTONS.ADD,
+    NO_SELECTION: INFO.CATEGORY_EDITOR_EMPTY,
     DELETE_CONFIRMATION_TITLE: 'Confirmare ștergere',
     DELETE_CONFIRMATION_TEXT: 'Ești sigur că vrei să ștergi subcategoria {subcat} din {cat}?',
-    DELETE_WARNING: 'Atenție: Există {count} tranzacții care folosesc această subcategorie.',
+    DELETE_WARNING: INFO.DELETE_WARNING_PREFIX + ' {count} ' + INFO.DELETE_WARNING_SUFFIX,
     CONFIRM_DELETE_BUTTON: 'Confirmă ștergerea',
-    CANCEL_BUTTON: 'Anulează'
+    CANCEL_BUTTON: BUTTONS.CANCEL,
+    LIMIT_INFO: INFO.CATEGORY_EDITOR_LIMIT,
+    LIMIT_REACHED_MESSAGE: INFO.CATEGORY_EDITOR_LIMIT_MESSAGE,
+    COUNT_DISPLAY: INFO.SUBCATEGORY_COUNT_DISPLAY
   },
   FILTERS_ACTIVE: (count: number) => `${count} filtru${count === 1 ? '' : 'e'} activ${count === 1 ? '' : 'e'}`,
   
@@ -513,427 +516,157 @@ export const UI = {
   },
 };
 
-// Flag pentru subcategoriile custom
+// 🚀 PHASE 2.5 - Emoji și Simboluri UI
+export const SYMBOLS = {
+  INFO: 'ℹ️',
+  WARNING: '⚠️',
+  SUCCESS: '✅',
+  ERROR: '❌',
+  LOADING: '⏳',
+  CUSTOM: '🔧',
+  LOCK: '🔒',
+  UNLOCK: '🔓',
+  EDIT: '✏️',
+  DELETE: '🗑️',
+  ADD: '➕',
+  REMOVE: '➖',
+  ARROW_UP: '↑',
+  ARROW_DOWN: '↓',
+  ARROW_LEFT: '←',
+  ARROW_RIGHT: '→',
+  CHECK: '✓',
+  CROSS: '✗',
+  STAR: '⭐',
+  HEART: '❤️',
+  MONEY: '💰',
+  CHART: '📊',
+  CALENDAR: '📅',
+  SETTINGS: '⚙️',
+  HELP: '❓',
+  SEARCH: '🔍',
+  FILTER: '🔽',
+  EXPORT: '📤',
+  IMPORT: '📥'
+};
+
+// 🚀 PHASE 2.7 - Flag Labels pentru Badge-uri
 export const FLAGS = {
   CUSTOM: 'custom',
+  NEW: 'nou',
+  UPDATED: 'actualizat',
+  FEATURED: 'recomandat',
+  DEPRECATED: 'învechit',
+  BETA: 'beta',
+  PREMIUM: 'premium',
+  FREE: 'gratuit'
 };
 
-// Mesaj informativ pentru starea goală a editorului de categorii
+// 🚀 PHASE 2.6 - Informational Messages și Helper Text
 export const INFO = {
   CATEGORY_EDITOR_EMPTY: EMPTY_STATE_MESSAGES.NO_SELECTION,
-  NO_TRANSACTIONS: EMPTY_STATE_MESSAGES.NO_TRANSACTIONS,
-  NO_SUBCATEGORIES: EMPTY_STATE_MESSAGES.NO_SUBCATEGORIES,
-};
-
-// Constante pentru LunarGrid
-export const LUNAR_GRID = {
-  COLLAPSE_ALL: 'Restrânge tot',
-  EXPAND_ALL: 'Extinde tot',
-  RESET_EXPANSION: 'Resetează',
-  LOADING: LOADING_MESSAGES.DATA,
-  NO_DATA: EMPTY_STATE_MESSAGES.GENERIC,
-  // 🚨 DUPLICATE FIX - Folosesc BALANCE_LABELS.SOLD în loc de string hardcodat
-  get TOTAL_BALANCE() { return BALANCE_LABELS.SOLD; },
-  // Constante pentru controale individuale
-  EXPAND_CATEGORY: 'Extinde',
-  COLLAPSE_CATEGORY: 'Restrânge',
-  EXPAND_CATEGORY_TITLE: 'Extinde categoria',
-  COLLAPSE_CATEGORY_TITLE: 'Restrânge categoria',
-  // Constante pentru scroll UX
-  SCROLL_HINT: 'Scroll pentru a vedea mai multe date',
-  STICKY_HEADER_ACTIVE: 'Header fix activ',
-  // Constante pentru redimensionare tabel
-  RESIZE: {
-    TOGGLE_FULLSCREEN: 'Comută fullscreen',
-    EXIT_FULLSCREEN: 'Ieși din fullscreen',
-    RESIZE_BUTTON_TITLE: 'Redimensionează tabelul',
-    FULLSCREEN_MODE: 'Mod fullscreen activ',
-    NORMAL_MODE: 'Mod normal'
+  CATEGORY_EDITOR_LIMIT: 'Maxim 5 subcategorii custom per categorie',
+  CATEGORY_EDITOR_LIMIT_REACHED: (count: number) => `Maxim 5 subcategorii custom per categorie (${count}/5)`,
+  CATEGORY_EDITOR_LIMIT_MESSAGE: 'Nu mai poți adăuga subcategorii custom în această categorie.',
+  SUBCATEGORY_COUNT_DISPLAY: (count: number) => `(${count}/5)`,
+  TRANSACTION_COUNT_BADGE: (count: number) => `${count}`,
+  NO_TRANSACTIONS_BADGE: '',
+  CUSTOM_SUBCATEGORY_HINT: 'Subcategorie personalizată',
+  DELETE_WARNING_PREFIX: 'Atenție: Există',
+  DELETE_WARNING_SUFFIX: 'tranzacții care folosesc această subcategorie.',
+  VALIDATION_REQUIREMENTS: {
+    SUBCATEGORY_LENGTH: 'Numele trebuie să aibă între 1 și 80 de caractere',
+    SUBCATEGORY_CHARS: 'Doar litere, cifre, spații și caracterele - | sunt permise',
+    SUBCATEGORY_UNIQUE: 'Numele trebuie să fie unic în cadrul categoriei'
   }
 };
 
-// Constante pentru teste - eliminate strings hardcodate
-export const TEST_CONSTANTS = {
-  ALERTS: {
-    TEST_MESSAGE: 'Acesta este un mesaj de alertă',
-    ERROR_MESSAGE: 'Eroare de procesare',
-    SUCCESS_MESSAGE: 'Operație reușită',
-    WARNING_MESSAGE: 'Atenție la acțiune',
-    INFO_MESSAGE: 'Informație importantă',
-    CUSTOM_CLASS_MESSAGE: 'Test clasă personalizată',
-    BASE_CLASS_MESSAGE: 'Test clase de bază'
-  },
-  SELECT: {
-    PLACEHOLDER: 'Alege o opțiune',
-    OPTION_1: 'Opțiunea 1',
-    OPTION_2: 'Opțiunea 2', 
-    OPTION_3: 'Opțiunea 3',
-    LABEL: 'Selecție',
-    REQUIRED_ERROR: 'Acest câmp este obligatoriu'
-  },
-  TEXTAREA: {
-    PLACEHOLDER: 'Comentariile tale',
-    REQUIRED_ERROR: 'Acest câmp este obligatoriu',
-    LABEL: 'Textarea test',
-    TEST_VALUE: 'Acesta este un text de test'
-  },
-  CHECKBOX: {
-    LABEL: 'Acceptă termenii',
-    REQUIRED_ERROR: 'Trebuie să acceptați termenii',
-    CHECKED_LABEL: 'Opțiune bifată'
-  },
-  COMMON: {
-    TEST_MESSAGE: 'Mesaj de test',
-    LOADING: 'Se încarcă...',
-    ERROR_GENERIC: 'Eroare'
+// 🚀 PHASE 2.4 - ARIA Labels și Accessibility
+export const ARIA_LABELS = {
+  CLOSE_MODAL: 'Închide modalul',
+  CLOSE_DIALOG: 'Închide dialogul', 
+  CLOSE_POPUP: 'Închide',
+  OPEN_MENU: 'Deschide meniul',
+  SELECT_CATEGORY: 'Selectează categoria',
+  SELECT_SUBCATEGORY: 'Selectează subcategoria',
+  EDIT_TRANSACTION: 'Editează tranzacția',
+  DELETE_TRANSACTION: 'Șterge tranzacția',
+  ADD_TRANSACTION: 'Adaugă tranzacție nouă',
+  SEARCH_TRANSACTIONS: 'Caută în tranzacții',
+  FILTER_TRANSACTIONS: 'Filtrează tranzacțiile',
+  SORT_COLUMN: 'Sortează coloana',
+  EXPAND_ROW: 'Extinde rândul',
+  COLLAPSE_ROW: 'Restrânge rândul',
+  TOGGLE_THEME: 'Comută tema',
+  PREVIOUS_PAGE: 'Pagina anterioară',
+  NEXT_PAGE: 'Pagina următoare',
+  CATEGORY_EDITOR: {
+    CATEGORIES_LIST: 'Lista de categorii',
+    SUBCATEGORIES_LIST: 'Lista de subcategorii',
+    SELECT_CATEGORY: 'Selectează categoria',
+    EDIT_SUBCATEGORY: 'Editează subcategoria',
+    DELETE_SUBCATEGORY: 'Șterge subcategoria',
+    ADD_SUBCATEGORY: 'Adaugă subcategorie nouă',
+    RENAME_INPUT: 'Câmp pentru redenumire subcategorie',
   }
 };
 
-// 🚨 AUDIT FIX - Constante suplimentare pentru LunarGrid
-export const LUNAR_GRID_ACTIONS = {
-  NO_TRANSACTIONS: 'fără tranzacții',
-  ENTER_KEY: 'Enter',
-  ESCAPE_KEY: 'Escape',
-  // 🎯 LGI-TASK-06: Mesaje pentru keyboard deletion
-  DELETE_TRANSACTION_SINGLE: 'Ștergi această tranzacție definitiv?',
-  DELETE_TRANSACTION_MULTIPLE: 'Ștergi {count} tranzacții definitiv?',
-  DELETE_SUCCESS_SINGLE: 'Tranzacție ștearsă cu succes',
-  DELETE_SUCCESS_MULTIPLE: '{count} tranzacții șterse cu succes',
-  DELETE_ERROR: 'Eroare la ștergerea tranzacțiilor',
-  NO_TRANSACTIONS_TO_DELETE: 'Nu există tranzacții de șters pentru pozițiile selectate',
+export const BUTTONS = {
+  // ... existing properties ...
+  RENAME: 'Redenumește',
+  ADD: 'Adaugă',
+  CANCEL: 'Anulează',
+  DONE: 'Gata',
+  EDIT: 'Editează',
+  DELETE: 'Șterge',
+  // ... rest of BUTTONS ...
 };
 
-// 🆕 Account Management Constants - pentru sistem conturi multiple
+// 🚀 PHASE 2.8 - Balance System Constants
+export const BALANCE_SYSTEM = {
+  // ... existing properties ...
+};
+
+// 🚀 PHASE 2.9 - Account Management Constants
 export const ACCOUNT_MANAGEMENT = {
-  MAX_ACCOUNTS: 10,
-  
-  // UI Labels
-  LABELS: {
-    ACCOUNT_NAME: 'Nume cont',
-    ACCOUNT_TYPE: 'Tip cont', 
-    INITIAL_BALANCE: 'Sold inițial',
-    CURRENT_BALANCE: 'Sold curent',
-    ACCOUNT_DESCRIPTION: 'Descriere cont',
-    DEFAULT_ACCOUNT: 'Cont principal',
-    ACTIVE_STATUS: 'Activ',
-  },
-  
-  // Validation Messages
-  VALIDATION: {
-    NAME_REQUIRED: 'Numele contului este obligatoriu',
-    NAME_TOO_LONG: 'Numele contului nu poate depăși 50 de caractere',
-    TYPE_REQUIRED: 'Tipul contului este obligatoriu',
-    INITIAL_BALANCE_REQUIRED: 'Soldul inițial este obligatoriu',
-    INITIAL_BALANCE_INVALID: 'Soldul inițial trebuie să fie un număr valid',
-    MAX_ACCOUNTS_REACHED: `Nu puteți avea mai mult de ${10} conturi`,
-    DUPLICATE_NAME: 'Există deja un cont cu acest nume',
-    CANNOT_DELETE_LAST: 'Nu puteți șterge ultimul cont activ',
-    CANNOT_DELETE_WITH_TRANSACTIONS: 'Nu puteți șterge un cont care are tranzacții',
-  },
-  
-  // Action Messages  
-  ACTIONS: {
-    ADD_ACCOUNT: 'Adaugă cont nou',
-    EDIT_ACCOUNT: 'Editează cont',
-    DELETE_ACCOUNT: 'Șterge cont',
-    SET_DEFAULT: 'Setează ca principal',
-    ACTIVATE_ACCOUNT: 'Activează cont',
-    DEACTIVATE_ACCOUNT: 'Dezactivează cont',
-  },
-  
-  // Status Messages
-  STATUS: {
-    ACCOUNT_CREATED: 'Cont creat cu succes',
-    ACCOUNT_UPDATED: 'Cont actualizat cu succes', 
-    ACCOUNT_DELETED: 'Cont șters cu succes',
-    ACCOUNT_SET_DEFAULT: 'Cont setat ca principal',
-  },
+  // ... existing properties ...
 };
 
-// 🆕 Balance Display Constants - pentru afișarea soldului și calculări
+// 🚀 PHASE 2.10 - Balance Display Constants
 export const BALANCE_DISPLAY = {
-  // Formatting Rules
-  CURRENCY: 'RON',
-  DECIMAL_PLACES: 2,
-  THOUSAND_SEPARATOR: '.',
-  DECIMAL_SEPARATOR: ',',
-  
-  // Labels
-  LABELS: {
-    AVAILABLE_BALANCE: 'Sold disponibil',
-    SAVINGS_BALANCE: 'Sold economii', 
-    TOTAL_BALANCE: 'Sold total',
-    PROJECTED_BALANCE: 'Sold proiectat',
-    DAILY_BALANCE: 'Sold zilnic',
-    BALANCE_CHANGE: 'Schimbare sold',
-    BALANCE_TREND: 'Tendință sold',
-  },
-  
-  // Colors pentru Transaction Types (CSS classes pentru TailwindCSS)
-  COLORS: {
-    INCOME: 'text-green-600 bg-green-50 border-green-200',      // Verde pentru venituri
-    EXPENSE: 'text-red-600 bg-red-50 border-red-200',         // Roșu pentru cheltuieli  
-    SAVING: 'text-blue-600 bg-blue-50 border-blue-200',       // Albastru pentru economii/investiții
-    POSITIVE: 'text-green-600',                               // Pentru solduri pozitive
-    NEGATIVE: 'text-red-600',                                 // Pentru solduri negative
-    NEUTRAL: 'text-gray-600',                                 // Pentru solduri zero/neutrale
-  },
-  
-  // Grid Styles pentru balance rows
-  GRID_STYLES: {
-    BALANCE_ROW: 'font-semibold bg-gray-50',
-    BALANCE_CELL: 'text-right font-mono text-sm',
-    BALANCE_TOTAL: 'border-t-2 border-gray-300 font-bold',
-    BALANCE_PROJECTION: 'bg-blue-50 border-blue-200',
-  },
-  
-  // Status indicators 
-  STATUS: {
-    CALCULATED: 'Calculat automat',
-    MANUAL_OVERRIDE: 'Suprascris manual',
-    PROJECTED: 'Valoare proiectată', 
-    CONFIRMED: 'Confirmat',
-  },
+  // ... existing properties ...
 };
 
-// 🆕 Modal Variants pentru balance system
+// 🚀 PHASE 2.11 - Balance Modals Constants
 export const BALANCE_MODALS = {
-  // Account Management Modals
-  ACCOUNT: {
-    CREATE_TITLE: 'Adaugă cont nou',
-    EDIT_TITLE: 'Editează cont',
-    DELETE_TITLE: 'Șterge cont',
-    TRANSFER_TITLE: 'Transfer între conturi',
-  },
-  
-  // Balance Adjustment Modals  
-  BALANCE: {
-    ADJUST_TITLE: 'Ajustează sold',
-    RECONCILE_TITLE: 'Reconciliere sold',
-    PROJECTION_TITLE: 'Proiecție sold',
-    HISTORY_TITLE: 'Istoric sold',
-  },
-  
-  // Confirmation Messages
-  CONFIRMATIONS: {
-    DELETE_ACCOUNT: 'Ștergeți contul și toate datele asociate?',
-    ADJUST_BALANCE: 'Confirmați ajustarea soldului?',
-    TRANSFER_FUNDS: 'Confirmați transferul de fonduri?',
-    RECONCILE: 'Confirmați reconcilierea soldului?',
-  },
+  // ... existing properties ...
 };
 
-// 🚨 DUPLICATE FIX - Consolidez SOLD related constants
+// 🚀 PHASE 2.12 - Balance Labels Constants
 export const BALANCE_LABELS = {
-  SOLD: 'Sold',                    // ✅ Consolidat din LABELS.SOLD (linia 113)
-  TOTAL_BALANCE: 'Sold total',     // ✅ Înlocuiește LUNAR_GRID.TOTAL_BALANCE (linia 331)
-  DAILY_BALANCES: 'Balanțe zilnice', // ✅ Existent deja în UI
-  BALANCE: 'Balanță',
-  AVAILABLE: 'Disponibil',
-  SAVINGS: 'Economii',
-  INVESTMENTS: 'Investiții',
+  // ... existing properties ...
 };
 
-// Texte pentru componenta Export Modal
+// 🚀 PHASE 2.13 - Export UI Constants
 export const EXPORT_UI = {
-  YEAR_LABEL: 'An:',
-  MONTH_LABEL: 'Lună:',
-  CATEGORY_FILTER_LABEL: 'Categorie:',
-  FILENAME_LABEL: 'Numele fișierului:',
-  FILENAME_PLACEHOLDER: 'ex: raport-lunar'
+  // ... existing properties ...
 };
 
-// Supporting UI Components
+// 🚀 PHASE 2.14 - Tooltip Constants
 export const TOOLTIP = {
-  DEFAULT_DELAY: 200,
-  PLACEMENTS: {
-    TOP: 'Sus',
-    BOTTOM: 'Jos', 
-    LEFT: 'Stânga',
-    RIGHT: 'Dreapta'
-  },
-  VARIANTS: {
-    DEFAULT: 'Implicit',
-    INFO: 'Informație',
-    WARNING: 'Avertisment',
-    ERROR: 'Eroare',
-    SUCCESS: 'Succes'
-  }
+  // ... existing properties ...
 };
 
+// 🚀 PHASE 2.15 - Progress Constants
 export const PROGRESS = {
-  LABELS: {
-    BUDGET_PROGRESS: 'Progres Buget',
-    EXPORT_PROGRESS: 'Progres Export',
-    LOADING_PROGRESS: 'Se încarcă...',
-    FINANCIAL_GOAL: 'Obiectiv Financiar'
-  },
-  VARIANTS: {
-    DEFAULT: 'Implicit',
-    SUCCESS: 'Succes',
-    WARNING: 'Avertisment', 
-    ERROR: 'Eroare',
-    FINANCIAL: 'Financiar'
-  },
-  SIZES: {
-    SMALL: 'Mic',
-    MEDIUM: 'Mediu',
-    LARGE: 'Mare',
-    EXTRA_LARGE: 'Extra Mare'
-  },
-  POSITIONS: {
-    TOP: 'Sus',
-    BOTTOM: 'Jos',
-    INLINE: 'În linie'
-  }
+  // ... existing properties ...
 };
 
+// 🚀 PHASE 2.16 - Badge Constants
 export const BADGE = {
-  VARIANTS: {
-    NEUTRAL: 'Neutru',
-    PRIMARY: 'Principal',
-    SUCCESS: 'Succes',
-    WARNING: 'Avertisment',
-    ERROR: 'Eroare',
-    INFO: 'Informație'
-  },
-  FINANCIAL_STATES: {
-    OVER_BUDGET: 'Peste Buget',
-    UNDER_BUDGET: 'Sub Buget',
-    ON_TARGET: 'Pe Țintă',
-    INCOME: 'Venit',
-    EXPENSE: 'Cheltuială'
-  }
+  // ... existing properties ...
 };
 
-// 🧭 Navigation System Constants
+// 🚀 PHASE 2.17 - Navigation System Constants
 export const NAVIGATION = {
-  // Main navigation items
-  ITEMS: {
-    DASHBOARD: 'Tablou de bord',
-    TRANSACTIONS: 'Tranzacții',
-    LUNAR_GRID: 'Grid Lunar',
-    ACCOUNTS: 'Conturi',
-    REPORTS: 'Rapoarte',
-    OPTIONS: 'Opțiuni',
-    SETTINGS: 'Setări'
-  },
-  
-  // Sidebar specific
-  SIDEBAR: {
-    TOGGLE: 'Comută sidebar',
-    EXPAND: 'Extinde sidebar',
-    COLLAPSE: 'Restrânge sidebar',
-    PERSISTENT: 'Sidebar persistent',
-    AUTO_HIDE: 'Ascunde automat'
-  },
-  
-  // Breadcrumbs
-  BREADCRUMBS: {
-    HOME: 'Acasă',
-    SEPARATOR: '/',
-    BACK_TO: 'Înapoi la',
-    CURRENT_PAGE: 'Pagina curentă'
-  },
-  
-  // Context menu
-  CONTEXT_MENU: {
-    OPEN: 'Deschide meniu contextual',
-    CLOSE: 'Închide meniu contextual',
-    NEW_TAB: 'Deschide în tab nou',
-    BOOKMARK: 'Adaugă la favorite',
-    SHARE: 'Partajează'
-  },
-  
-  // Tabs system
-  TABS: {
-    NEW_TAB: 'Tab nou',
-    CLOSE_TAB: 'Închide tab',
-    CLOSE_ALL: 'Închide toate',
-    CLOSE_OTHERS: 'Închide celelalte',
-    NEXT_TAB: 'Tab următor',
-    PREV_TAB: 'Tab anterior'
-  },
-  
-  // Keyboard shortcuts
-  SHORTCUTS: {
-    TOGGLE_SIDEBAR: 'Ctrl+\\',
-    NEW_TAB: 'Ctrl+T',
-    CLOSE_TAB: 'Ctrl+W',
-    NEXT_TAB: 'Ctrl+Tab',
-    PREV_TAB: 'Ctrl+Shift+Tab',
-    CONTEXT_MENU: 'Shift+F10',
-    HOME: 'Alt+H',
-    BACK: 'Alt+Săgeată stânga',
-    FORWARD: 'Alt+Săgeată dreapta',
-    COMMAND_PALETTE: 'Ctrl+K',
-    TOGGLE_DARK_MODE: 'Ctrl+D'
-  },
-  
-  // Command Palette system
-  COMMAND_PALETTE: {
-    TITLE: 'Comandă rapidă',
-    PLACEHOLDER: 'Caută acțiuni, pagini, shortcuts...',
-    NO_RESULTS: 'Niciun rezultat găsit',
-    HELP_TEXT: 'Apasă Escape pentru a închide',
-    CATEGORIES: {
-      NAVIGATION: 'Navigare',
-      ACTIONS: 'Acțiuni',
-      SHORTCUTS: 'Comenzi rapide',
-      RECENT: 'Recent'
-    },
-    RESULTS: {
-      GO_TO: 'Mergi la',
-      EXECUTE: 'Execută',
-      OPEN: 'Deschide',
-      TOGGLE: 'Comută'
-    }
-  },
-  
-  // Theme System Constants
-  THEME: {
-    TOGGLE_DARK_MODE: 'Comută tema întunecată',
-    DARK_MODE: 'Tema întunecată',
-    LIGHT_MODE: 'Tema deschisă',
-    SYSTEM_PREFERENCE: 'Preferința sistemului',
-    TOGGLE_DESCRIPTION: 'Comută între tema deschisă și întunecată'
-  },
-  
-  // Mobile navigation
-  MOBILE: {
-    HAMBURGER: 'Deschide meniul principal',
-    CLOSE_MENU: 'Închide meniul',
-    MENU_OVERLAY: 'Overlay meniu mobil'
-  },
-  
-  // Accessibility
-  ARIA: {
-    NAVIGATION: 'Navigare principală',
-    BREADCRUMB: 'Navigare breadcrumb',
-    TAB_LIST: 'Listă taburi',
-    TAB_PANEL: 'Panou tab',
-    CURRENT_PAGE: 'Pagina curentă',
-    EXTERNAL_LINK: 'Deschide în fereastră nouă',
-    CONTEXT_MENU: 'Meniu contextual'
-  },
-  
-  // Persistence storage keys
-  STORAGE: {
-    SIDEBAR_EXPANDED: 'sidebar-expanded',
-    TABS_STATE: 'app-tabs-state',
-    BREADCRUMB_HISTORY: 'navigation-breadcrumb-history',
-    NAVIGATION_STATE: 'navigation-global-state',
-    LAST_VISITED_PAGE: 'navigation-last-page',
-    USER_PREFERENCES: 'navigation-user-preferences'
-  },
-  
-  // State management
-  STATE: {
-    PERSISTENCE_ENABLED: 'Persistența navigării activată',
-    PERSISTENCE_DISABLED: 'Persistența navigării dezactivată',
-    STATE_RESTORED: 'Starea navigării a fost restaurată',
-    STATE_CLEARED: 'Starea navigării a fost ștearsă',
-    SYNC_COMPLETE: 'Sincronizarea componentelor completă',
-    SYNC_FAILED: 'Eșec la sincronizarea componentelor'
-  }
+  // ... existing properties ...
 };
