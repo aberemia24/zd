@@ -42,54 +42,54 @@ tests/e2e/
 
 ```bash
 # 🟢 Smoke tests - Rapide și critice (< 10s)
-npx playwright test --grep "@smoke"
+pnpm exec playwright test --grep "@smoke"
 
 # 📋 Feature tests - Funcționalități individuale  
-npx playwright test --grep "@features"
+pnpm exec playwright test --grep "@features"
 
 # 🔄 Integration tests - Workflow-uri complete
-npx playwright test --grep "@integration"
+pnpm exec playwright test --grep "@integration"
 
 # ✅ Validation tests - Infrastructure testing
-npx playwright test --grep "@validation"
+pnpm exec playwright test --grep "@validation"
 
 # 🔧 Debug tests - Temporare (pentru dezvoltare)
-npx playwright test --grep "@debug"
+pnpm exec playwright test --grep "@debug"
 ```
 
 ### Rulare pe foldere:
 
 ```bash
 # Toate smoke tests
-npx playwright test smoke/
+pnpm exec playwright test smoke/
 
 # Toate suite-urile principale
-npx playwright test suites/
+pnpm exec playwright test suites/
 
 # Doar features
-npx playwright test suites/features/
+pnpm exec playwright test suites/features/
 
 # Doar integration
-npx playwright test suites/integration/
+pnpm exec playwright test suites/integration/
 
 # Debug temporar
-npx playwright test debug/
+pnpm exec playwright test debug/
 ```
 
 ### Combinații utile:
 
 ```bash
 # Quick check - doar smoke
-npx playwright test --grep "@smoke" --reporter=line
+pnpm exec playwright test --grep "@smoke" --reporter=line
 
 # Full features testing
-npx playwright test --grep "@features|@integration"
+pnpm exec playwright test --grep "@features|@integration"
 
 # Tot except debug
-npx playwright test --grep "^(?!.*@debug).*$"
+pnpm exec playwright test --grep "^(?!.*@debug).*$"
 
 # Rulare paralelă pentru CI
-npx playwright test --workers=4 --grep "@smoke|@features"
+pnpm exec playwright test --workers=4 --grep "@smoke|@features"
 ```
 
 ## 📊 **TIPURI DE TESTE EXPLICITE**
@@ -117,16 +117,16 @@ npx playwright test --workers=4 --grep "@smoke|@features"
 
 ```bash
 # Quick smoke check înainte de commit
-npm run test:smoke
+pnpm test:e2e:smoke
 
 # Test doar CategoryEditor
-npx playwright test category-editor
+pnpm exec playwright test category-editor
 
 # Test cu debugging vizual
-npx playwright test --headed --grep "@smoke"
+pnpm exec playwright test --headed --grep "@smoke"
 
 # Generează raport HTML
-npx playwright test --reporter=html
+pnpm exec playwright test --reporter=html
 ```
 
 ## 🛠️ **CONFIGURARE TAGURI**

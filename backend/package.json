@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:prod": "npm run build && node -r tsconfig-paths/register dist/main.js",
+    "start:prod": "pnpm run build && node -r tsconfig-paths/register dist/main.js",
     "start:dev": "nest start --watch",
     "dev": "nest start --watch",
     "build": "tsc",

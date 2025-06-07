@@ -71,7 +71,7 @@ class PerformanceMonitor {
     try {
       // Build cu bundle analyzer
       process.chdir(FRONTEND_DIR);
-      execSync('npm run build:analyze', { stdio: 'inherit' });
+      execSync('pnpm run build:analyze', { stdio: 'inherit' });
 
       // Analizează fișierele din dist
       const bundleStats = this.getBundleStats();

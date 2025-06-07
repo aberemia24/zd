@@ -58,34 +58,41 @@ Detalii complete: vezi [BEST_PRACTICES.md](./BEST_PRACTICES.md).
 
 ```bash
 # Instalare dependințe
-npm install
+pnpm install
 
-# Sincronizare shared constants (opțional înainte de build/start)
-npm run sync-shared-constants
+# Build toate pachetele (shared-constants sync automatic)
+pnpm run build
 ```
 
 ### Start Frontend
 
-**PowerShell (Windows):**
-```powershell
-cd frontend; npm start
-```
-
-**Bash/Zsh (Linux/macOS):**
 ```bash
-cd frontend && npm start
+pnpm --filter frontend dev
 ```
 
 ### Start Backend
 
-**PowerShell (Windows):**
-```powershell
-cd backend; npm run start:dev
+```bash
+pnpm --filter backend dev
 ```
 
-**Bash/Zsh (Linux/macOS):**
+### Commands Cross-Package
+
 ```bash
-cd backend && npm run start:dev
+# Test toate pachetele
+pnpm run test
+
+# Build toate pachetele
+pnpm run build
+
+# Lint toate pachetele
+pnpm run lint
+
+# Run command specific în frontend
+pnpm --filter frontend build
+
+# Run command specific în backend
+pnpm --filter backend start:prod
 ```
 
 > **💡 Notă**: PowerShell folosește `;` ca separator de comenzi, în timp ce Bash/Zsh folosesc `&&`.
@@ -189,8 +196,8 @@ Toate importurile pentru enums/constants partajate trebuie să folosească doar 
 
 Verifică automat corectitudinea cu:
 
-```sh
-node tools/validate-constants.js
+```bash
+pnpm run validate:constants
 ```
 
 Dacă există importuri greșite, scriptul va afișa eroarea și va opri execuția. Exemplu:
