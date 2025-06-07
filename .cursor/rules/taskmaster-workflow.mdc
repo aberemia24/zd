@@ -63,7 +63,7 @@ alwaysApply: true
 
 ### Shared Constants Sync:
 - Pentru a rezolva problemele de import cu shared constants, MEREU rulează un build pentru a declanșa scriptul de sincronizare
-- Comanda: `npm run build` în frontend/
+- Comanda: `pnpm run build` în frontend/
 
 ### Memory Bank Files:
 - Toate fișierele core Memory Bank se află în `memory-bank/` directory

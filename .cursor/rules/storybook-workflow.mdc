@@ -76,7 +76,7 @@ if (component_created_by_AI) {
 ### **Addon Interactions - Perfect pentru AI**
 ```bash
 # Instalare (când e necesar)
-npm install --save-dev @storybook/addon-interactions
+pnpm install --save-dev @storybook/addon-interactions
 ```
 
 ### **Simple Interactions în Stories**
@@ -301,19 +301,19 @@ export const LargeDataset: Story = {
 ### **Development Commands**
 ```bash
 # Start Storybook
-cd frontend && npm run storybook
+pnpm --filter frontend storybook
 
 # Build Storybook static
-cd frontend && npm run build-storybook
+pnpm --filter frontend build-storybook
 
 # Storybook cu specific port
-cd frontend && npx storybook dev -p 6006
+pnpm --filter frontend storybook dev -p 6006
 ```
 
 ### **Integration în Workflow**
 ```bash
 # Înainte de commit nou component
-1. npm run storybook
+1. pnpm --filter frontend storybook
 2. Verifică toate stories funcționează
 3. Testează responsive behavior
 4. Verifică accessibility (în viitor)
@@ -345,10 +345,10 @@ cd frontend && npx storybook dev -p 6006
 ### **Development Commands**
 ```bash
 # Storybook development
-cd frontend && npm run storybook
+pnpm --filter frontend storybook
 
 # Storybook cu addon interactions (viitor)
-cd frontend && npm run storybook:interactions
+pnpm --filter frontend storybook:interactions
 ```
 
 ### **Productivity Shortcuts**

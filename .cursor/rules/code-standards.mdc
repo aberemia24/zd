@@ -86,9 +86,9 @@ export function formatCurrency(amount: number, currency = 'RON'): string {
 - `eqeqeq: ["error", "always"]` - Forțează compararea strictă (`===` în loc de `==`)
 
 **Automated Validation:**
-- Script: `npm run validate:typescript-quality` - verifică calitatea TypeScript
-- Script: `npm run validate:jsx-extensions` - verifică extensiile de fișiere
-- Script: `npm run validate:console-cleanup` - detectează console statements rămase
+- Script: `pnpm run validate:typescript-quality` - verifică calitatea TypeScript
+- Script: `pnpm run validate:jsx-extensions` - verifică extensiile de fișiere
+- Script: `pnpm run validate:console-cleanup` - detectează console statements rămase
 - Pre-commit hooks execută validările automat înainte de commit
 - CI/CD pipeline include toate validările pentru pull requests
 </linting_rules>

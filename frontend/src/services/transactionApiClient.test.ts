@@ -4,8 +4,8 @@ import {
 } from "./transactionApiClient";
 import { Transaction } from "../types/Transaction";
 import { API } from "@budget-app/shared-constants/api";
-import { MESAJE } from "shared-constants";
-import { TransactionType, CategoryType } from "shared-constants";
+import { MESAJE } from "@budget-app/shared-constants";
+import { TransactionType, CategoryType } from "@budget-app/shared-constants";
 
 // Mock pentru fetch global
 global.fetch = jest.fn(() =>

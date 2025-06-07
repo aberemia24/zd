@@ -2,10 +2,11 @@
 import { Transaction } from "../types/Transaction";
 import { MOCK_USER_ID } from "./mockData";
 
-import { render, fireEvent, within } from "@testing-library/react";
+import { render, fireEvent, within, RenderResult, RenderOptions } from "@testing-library/react";
+import { ReactElement } from "react";
 
 // Creează rapid o tranzacție mock cu override-uri
-import { TransactionType } from "shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 export function createMockTransaction(
   overrides: Partial<Transaction> = {},
@@ -55,12 +56,15 @@ export function getAllSubcategories(
 }
 
 // Pattern: render cu provider/context (ex: redux, theme, etc.)
+interface ProviderOptions extends Omit<RenderOptions, 'wrapper'> {
+  providerProps?: Record<string, any>;
+}
 
 // Exemplu generic, adaptează la contextul tău
 export function renderWithProviders(
-  ui: React.ReactElement,
-  { providerProps = {}, ...renderOptions } = {},
-) {
+  ui: ReactElement,
+  { providerProps = {}, ...renderOptions }: ProviderOptions = {},
+): RenderResult {
   // return render(<Provider {...providerProps}>{ui}</Provider>, renderOptions);
   return render(ui, renderOptions);
 }
