@@ -1,19 +1,13 @@
 /**
- * LunarGrid Modals - Simplified Modal Architecture
+ * LunarGrid Modals - Simplified Modal Architecture (V3 Refactor)
  *
  * POST-REFACTOR: Minimal Modal System
- * Doar QuickAddModal păstrat conform PRD LunarGrid Plan Shift
+ * Simplified QuickAddModal conform LunarGrid Refactor V3
  */
 
 // Simplified Modal Architecture - Keep Only Essential
-export { QuickAddModal } from "./QuickAddModal";
-export type { QuickAddModalProps } from "./QuickAddModal";
-
-// Base Modal Logic Hooks (for QuickAddModal support)
-export { useBaseModalLogic } from "./hooks/useBaseModalLogic";
-export type { CellContext } from "./hooks/useBaseModalLogic";
-
-// Demo Modal (pentru development reference) - REMOVED: file not found
+export { QuickAddModalSimplified as QuickAddModal } from "./QuickAddModalSimplified";
+export type { QuickAddModalProps, CellContext } from "./QuickAddModalSimplified";
 
 // Transaction Modal (legacy - poate fi eliminat în viitor)
 export { TransactionModal } from "./TransactionModal";

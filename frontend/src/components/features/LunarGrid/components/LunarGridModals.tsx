@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import CellTransactionPopover from "../CellTransactionPopover";
-import { QuickAddModal } from "../modals/QuickAddModal";
+import { QuickAddModalSimplified as QuickAddModal } from "../modals/QuickAddModalSimplified";
 import { FrequencyType, TransactionType } from "@budget-app/shared-constants";
 import { cn } from "../../../../styles/cva-v2";
 
@@ -95,7 +95,6 @@ const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
           }}
           prefillAmount={props.modalState.existingValue ? String(props.modalState.existingValue) : ""}
           mode={props.modalState.mode}
-          position={props.modalState.position}
           onSave={props.onSaveModal}
           onCancel={props.onCancelModal}
           onDelete={props.modalState.mode === 'edit' ? props.onDeleteFromModal : undefined}
