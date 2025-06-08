@@ -17,6 +17,8 @@ import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 import LunarGridRow from "./components/LunarGridRow";
 import LunarGridTable from "./components/LunarGridTable";
 import LunarGridModalManager from "./components/LunarGridModalManager";
+import LunarGridStateManager from "./components/LunarGridStateManager";
+import LunarGridEventHandler from "./components/LunarGridEventHandler";
 import Button from "../../primitives/Button/Button";
 
 // Hooks specializate
@@ -102,10 +104,13 @@ export interface LunarGridTanStackProps {
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
   ({ year, month, onYearChange, onMonthChange, isFullscreen, onToggleFullscreen, monthOptions }) => {
+    // HYBRID APPROACH: Test StateManager integration alongside existing hooks
+    const [useStateManager] = React.useState(false); // Feature flag for hybrid testing
+    
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
 
-    // State pentru subcategorii și modal
+    // State pentru subcategorii și modal - HYBRID: will come from StateManager when enabled
     const { categories } = useCategoryStore();
 
     // Hook consolidat pentru toate LunarGrid state-urile
