@@ -133,11 +133,8 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (!isActive || !focusedPosition) {
-        console.log('🔍 [KEYBOARD-NAV] Event ignored:', { isActive, focusedPosition: !!focusedPosition, key: e.key });
         return;
       }
-
-      console.log('🔍 [KEYBOARD-NAV] Processing key:', e.key, { focusedPosition, selectedCount: selectedPositions.length });
 
       switch (e.key) {
         case "ArrowUp":
@@ -180,18 +177,15 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
         case "Enter":
         case "F2":
           e.preventDefault();
-          console.log('🔍 [KEYBOARD-NAV] Edit mode requested for:', focusedPosition);
           onEditMode?.(focusedPosition);
           break;
 
         case "Delete":
         case "Backspace":
           e.preventDefault();
-          console.log('🔍 [KEYBOARD-NAV] Delete requested for positions:', selectedPositions);
           if (selectedPositions.length > 0) {
             onDeleteRequest?.(selectedPositions);
           } else if (focusedPosition) {
-            console.log('🔍 [KEYBOARD-NAV] No selection, using focused position for delete');
             onDeleteRequest?.([focusedPosition]);
           }
           break;
@@ -262,14 +256,13 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
       position: CellPosition,
       event?: { ctrlKey?: boolean; shiftKey?: boolean; metaKey?: boolean },
     ) => {
-      console.log('🔍 [KEYBOARD-NAV] Cell clicked:', position, { event });
+
       
       setFocusedPosition(position);
       onFocusChange?.(position);
 
       if (event?.ctrlKey || event?.metaKey) {
         // Ctrl+Click: toggle selection
-        console.log('🔍 [KEYBOARD-NAV] Ctrl+Click detected');
         setSelectedPositions((prev) => {
           const isSelected = prev.some(
             (pos) =>
@@ -292,14 +285,13 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
             newSelection = [...prev, position];
           }
 
-          console.log('🔍 [KEYBOARD-NAV] Updated selection:', newSelection);
+
           lastSelectedPosition.current = position;
           onSelection?.(newSelection, newSelection.length > 1);
           return newSelection;
         });
       } else if (event?.shiftKey && lastSelectedPosition.current) {
         // Shift+Click: select range
-        console.log('🔍 [KEYBOARD-NAV] Shift+Click detected');
         const startPos = lastSelectedPosition.current;
         const endPos = position;
 
@@ -326,12 +318,11 @@ export const useKeyboardNavigation = (options: KeyboardNavigationOptions) => {
           rangeSelection.push(startPos, endPos);
         }
 
-        console.log('🔍 [KEYBOARD-NAV] Range selection:', rangeSelection);
+
         setSelectedPositions(rangeSelection);
         onSelection?.(rangeSelection, rangeSelection.length > 1);
       } else {
         // Normal click: single selection
-        console.log('🔍 [KEYBOARD-NAV] Normal click - single selection');
         setSelectedPositions([position]);
         lastSelectedPosition.current = position;
         onSelection?.([position], false);

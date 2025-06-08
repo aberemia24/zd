@@ -154,7 +154,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       // Permite doar cifre, punct, virgulă, minus
       if (!allowedChars.test(char)) {
         e.preventDefault();
-        console.log('🔒 [INPUT-FILTER] Blocked invalid character:', char);
+
       }
     }
   }, [validationType]);
@@ -168,7 +168,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       if (cleanText !== pastedText) {
         e.preventDefault();
         setValue(cleanText);
-        console.log('🔒 [PASTE-FILTER] Cleaned pasted text:', pastedText, '→', cleanText);
+  
       }
     }
   }, [validationType, setValue]);

@@ -159,7 +159,7 @@ export const useLunarGridInlineIntegration = () => {
           return {
             triggerEdit: (cellData: LunarGridCellData) => {
               // Trigger inline edit direct pe celulă
-              console.log("Triggering inline edit for:", cellData);
+      
             },
           };
 
@@ -168,7 +168,7 @@ export const useLunarGridInlineIntegration = () => {
           return {
             setupRecurring: (cellData: LunarGridCellData) => {
               // Inline recurring setup
-              console.log("Setting up recurring for:", cellData);
+      
             },
           };
 

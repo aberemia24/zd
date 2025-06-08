@@ -158,28 +158,9 @@ export function useLunarGridTable(
   const categories = useCategoryStore((state) => state.categories);
   const user = useAuthStore((state) => state.user);
 
-  // 🔍 DEBUG: Tracking categories changes
-  console.log('🔍 [STORE-BASIC-DEBUG] Basic store values:', {
-    categoriesExists: !!categories,
-    categoriesLength: categories?.length || 0,
-    userExists: !!user,
-    userId: user?.id
-  });
 
-  useEffect(() => {
-    console.log('🔍 [CATEGORIES-DEBUG] Categories updated from store:', {
-      count: categories?.length || 0,
-      timestamp: new Date().toISOString(),
-      categories: categories?.map(cat => ({
-        name: cat.name,
-        subcategoriesCount: cat.subcategories?.length || 0,
-        subcategories: cat.subcategories?.map(sub => ({
-          name: sub.name,
-          isCustom: sub.isCustom
-        })) || []
-      }))
-    });
-  }, [categories]);
+
+
 
   // Folosim direct noul hook specializat pentru încărcarea lunară
   const {
@@ -190,20 +171,7 @@ export function useLunarGridTable(
     includeAdjacentDays: true,
   });
 
-  // 🐞 DEBUG: Verificăm dacă datele se actualizează după cache sync
-  useEffect(() => {
-    console.log('🔍 [COMPONENT-DEBUG] validTransactions updated:', {
-      count: validTransactions?.length || 0,
-      timestamp: new Date().toISOString(),
-      sampleTransactions: validTransactions?.slice(0, 3)?.map(t => ({
-        id: t.id,
-        amount: t.amount,
-        date: t.date,
-        category: t.category,
-        subcategory: t.subcategory
-      }))
-    });
-  }, [validTransactions]);
+
 
   // Gestionare erori de la React Query
   useEffect(() => {
@@ -218,11 +186,7 @@ export function useLunarGridTable(
 
   // Transformăm în formatul necesar pentru tabel cu subrows native
   const rawTableData = useMemo(() => {
-    console.log('🔍 [RAWTABLE-DEBUG] Starting data transformation with:', {
-      categoriesCount: categories?.length || 0,
-      transactionsCount: validTransactions?.length || 0,
-      categories: categories?.map(cat => cat.name) || []
-    });
+
 
     // 1. Grupăm tranzacțiile pe categorii și subcategorii
     const categoriesMap: Record<string, TransformedTableDataRow> = {};
@@ -265,22 +229,13 @@ export function useLunarGridTable(
       const subcategories = categoryDef ? categoryDef.subcategories : [];
       const fallbackRows = fallbackRowsMap[cat] || [];
       
-      console.log(`🔍 [SUBROWS-DEBUG] Building subRows for category "${cat}":`, {
-        subcategoriesFromDef: subcategories?.map(sub => ({
-          name: sub.name,
-          isCustom: sub.isCustom
-        })) || [],
-        fallbackRows: fallbackRows?.map(fb => fb.subcategory) || [],
-        categoryDef: categoryDef ? 'Found' : 'Not found'
-      });
+
       
       // Construim subRows UNICE
       const subRows = buildUniqueSubRows(cat, subcategories, fallbackRows);
       categoriesMap[cat].subRows = subRows;
       
-      console.log(`🔍 [SUBROWS-DEBUG] Built ${subRows.length} subRows for "${cat}":`, 
-        subRows.map(sr => sr.subcategory)
-      );
+
     });
 
     // 4. Aplicăm aceeași strategie de selecție ca în transactionMap pentru consistență
@@ -542,23 +497,7 @@ export function useLunarGridTable(
     });
   }, [year, month, stableClickHandlers]);
 
-  // 🔍 DEBUG: Monitor data changes in TanStack Table
-  useEffect(() => {
-    console.log('🔍 [TABLE-DEBUG] rawTableData updated for TanStack Table:', {
-      categoriesCount: rawTableData.length,
-      timestamp: new Date().toISOString(),
-      sampleData: rawTableData.slice(0, 2).map(row => ({
-        id: row.id,
-        category: row.category,
-        isCategory: row.isCategory,
-        total: row.total,
-        subRowsCount: row.subRows?.length || 0,
-        'day-1': row['day-1'] || 0,
-        'day-2': row['day-2'] || 0,
-        'day-3': row['day-3'] || 0,
-      }))
-    });
-  }, [rawTableData]);
+
 
   const table = useReactTable({
     data: rawTableData,
@@ -593,14 +532,10 @@ export function useLunarGridTable(
     const map = new Map<string, string>();
     
     if (!validTransactions?.length) {
-      console.log('🔍 [TRANSACTIONMAP-DEBUG] No validTransactions available');
       return map;
     }
     
-    console.log('🔍 [TRANSACTIONMAP-DEBUG] Building transactionMap:', {
-      transactionCount: validTransactions.length,
-      timestamp: new Date().toISOString()
-    });
+
     
     // 🔥 FIX: Grupează tranzacțiile per cheie pentru a agrega duplicate keys
     const transactionGroups = new Map<string, TransactionValidated[]>();
@@ -619,13 +554,7 @@ export function useLunarGridTable(
     
     // Pentru fiecare cheie, folosește tranzacția cu cea mai mare sumă (principală)
     for (const [key, transactions] of transactionGroups) {
-      if (transactions.length > 1) {
-        console.log(`🔍 [TRANSACTIONMAP-DEBUG] Multiple transactions for key ${key}:`, {
-          count: transactions.length,
-          amounts: transactions.map(t => t.amount),
-          ids: transactions.map(t => t.id.substring(0, 8))
-        });
-      }
+
       
       // 🔥 NEW STRATEGY: Selectează tranzacția cea mai recentă (ultima modificată/creată)
       const primaryTransaction = transactions.reduce((latest, current) => {
@@ -642,24 +571,10 @@ export function useLunarGridTable(
       
       map.set(key, primaryTransaction.id);
       
-      // Debug pentru zilele 1-10
-      if (extractedDay <= 10) {
-        console.log('🔍 [TRANSACTIONMAP-DEBUG] Selected primary transaction for early days:', {
-          key,
-          selectedId: primaryTransaction.id.substring(0, 8),
-          selectedAmount: primaryTransaction.amount,
-          totalTransactionsForKey: transactions.length,
-          originalDate: primaryTransaction.date,
-          updated_at: primaryTransaction.updated_at,
-          extractedDay
-        });
-      }
+
     }
     
-    console.log('🔍 [TRANSACTIONMAP-DEBUG] TransactionMap built:', {
-      size: map.size,
-      keysample: Array.from(map.keys()).slice(0, 5)
-    });
+
     
     return map;
   }, [validTransactions, year, month]);

@@ -239,17 +239,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           left: anchorElement.getBoundingClientRect().left + window.scrollX,
         } : undefined; // Lasă undefined pentru modal centrat cu overlay CVA
 
-        // Log pentru debugging poziționarea
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🎯 [MODAL-POSITION] Modal positioning data:', {
-            hasAnchor: !!anchorElement,
-            isConnected: anchorElement?.isConnected,
-            position,
-            mode,
-            category,
-            day
-          });
-        }
+
 
         // Setez contextul celulei pentru modal  
         const cellContext = {

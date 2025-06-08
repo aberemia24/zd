@@ -152,7 +152,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
     
     // 🐛 DEBUG: Log pentru debugging doar pentru subcategorii custom
     if (process.env.NODE_ENV === 'development' && original.subcategory.includes('custom')) {
-      console.log(`[FIX-DUPLICATE] ${original.subcategory}: isLast=${isLast}, lastInCategory=${lastSubcategoryInCategory}, allSubs=[${allSubcategoriesInCategory.join(', ')}]`);
+
     }
     
     return isLast;
@@ -382,7 +382,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 <div
                   onClick={(e: React.MouseEvent) => {
                     // 🔍 DEBUG: Click pe wrapper div
-                    console.log('🔍 [ROW-DEBUG] Wrapper div click detected');
+            
                     
                     const day = parseInt(cell.column.id.split("-")[1]);
                     const cellPosition: CellPosition = {
@@ -458,12 +458,12 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                         )),
                         colIndex: day - 1,
                       };
-                      console.log('🔍 [ROW-DEBUG] onFocus called for position:', cellPosition);
+              
                       onCellClick(cellPosition, { ctrlKey: false, shiftKey: false, metaKey: false });
                     }}
                     onSingleClick={(e: React.MouseEvent) => {
                       // 🔍 DEBUG: Click pe LunarGridCell
-                      console.log('🔍 [ROW-DEBUG] LunarGridCell single click detected');
+              
                       
                       const day = parseInt(cell.column.id.split("-")[1]);
                       const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
@@ -482,7 +482,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                         colIndex: day - 1,
                       };
 
-                      console.log('🔍 [ROW-DEBUG] About to call onCellClick with position:', cellPosition);
+              
                       onCellClick(cellPosition, {
                         ctrlKey: e.ctrlKey,
                         shiftKey: e.shiftKey,
@@ -616,7 +616,7 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
     const nextValue = nextCells[i].getValue();
     
     if (prevValue !== nextValue) {
-      console.log(`🔄 [ROW-MEMO] Cell value changed for ${prevCells[i].column.id}: ${prevValue} → ${nextValue}`);
+
       return false; // Re-render needed
     }
   }
@@ -624,7 +624,7 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
   // 🔄 TRANSACTION MAP CHECK: Verifică dacă transaction map s-a schimbat
   // Important pentru editabile cells care depind de transactionId
   if (prevProps.transactionMap.size !== nextProps.transactionMap.size) {
-    console.log(`🔄 [ROW-MEMO] Transaction map size changed: ${prevProps.transactionMap.size} → ${nextProps.transactionMap.size}`);
+
     return false;
   }
 

@@ -184,17 +184,7 @@ const LunarGridEventHandler: React.FC<LunarGridEventHandlerProps> = ({
         left: anchorElement.getBoundingClientRect().left + window.scrollX,
       } : undefined; // Undefined for centered modal with overlay
 
-      // Log positioning data for debugging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🎯 [MODAL-POSITION] Modal positioning data:', {
-          hasAnchor: !!anchorElement,
-          isConnected: anchorElement?.isConnected,
-          position,
-          mode,
-          category,
-          day
-        });
-      }
+
 
       // Set modal state
       setModalState({

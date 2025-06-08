@@ -237,7 +237,7 @@ const LunarGridStateManager: React.FC<LunarGridStateManagerProps> = ({
     isActive: !modalState?.isOpen && !popover?.isOpen,
     onEditMode: (position: CellPosition) => {
       // TODO: Implement edit mode trigger for focused positions
-      console.log('Edit mode requested for position:', position);
+      
     },
   });
 
