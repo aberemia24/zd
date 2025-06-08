@@ -7,12 +7,13 @@ import { useCallback, useEffect, useState } from "react";
  * ✅ Arrow Keys Navigation: ↑↓←→ for cell movement
  * ✅ Enter/F2: Edit mode activation
  * ✅ Single Focus: Track one focused cell
- * ✅ Basic Click: Simple cell selection
+ * ✅ Single Click: Simple cell selection
+ * ✅ Double Click: Inline editing (Excel-like)
+ * ✅ Delete/Backspace: Single cell deletion
  * 
  * REMOVED FEATURES (for simplicity):
  * ❌ Multi-selection (Ctrl+Click, Shift+Click)
  * ❌ Range selection algorithm
- * ❌ Delete/Backspace handling
  * ❌ Space bar selection toggle
  * ❌ Debug logging overhead
  * 
@@ -25,12 +26,27 @@ export interface CellPosition {
   day: number;
 }
 
+// Legacy interface compatibility (for backward compatibility with Row/Table components)
+export interface CellPositionComplex {
+  category: string;
+  subcategory?: string;
+  day: number;
+  rowIndex: number;
+  colIndex: number;
+}
+
 // Simplified options - removed complex callbacks
 export interface KeyboardNavigationOptions {
   totalDays: number;
   totalRows: number;
+  rows?: Array<{
+    category: string;
+    subcategory?: string;
+    isExpanded?: boolean;
+  }>;
   onFocusChange?: (position: CellPosition | null) => void;
   onEditMode?: (position: CellPosition) => void;
+  onDeleteRequest?: (positions: CellPosition[]) => void;
   isActive?: boolean;
 }
 
@@ -38,8 +54,10 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
   const {
     totalDays,
     totalRows,
+    rows,
     onFocusChange,
     onEditMode,
+    onDeleteRequest,
     isActive = true,
   } = options;
 
@@ -110,6 +128,25 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
           setFocusedPosition(null);
           onFocusChange?.(null);
           break;
+
+        case "Delete":
+        case "Backspace":
+          e.preventDefault();
+          if (focusedPosition && onDeleteRequest && rows) {
+            // Convert categoryIndex to full position for delete
+            const row = rows[focusedPosition.categoryIndex];
+            if (row) {
+              const fullPosition = {
+                ...focusedPosition,
+                category: row.category,
+                subcategory: row.subcategory,
+                rowIndex: focusedPosition.categoryIndex,
+                colIndex: focusedPosition.day - 1,
+              };
+              onDeleteRequest([fullPosition]);
+            }
+          }
+          break;
       }
 
       // Update focus if new position is valid
@@ -136,6 +173,16 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
       onFocusChange?.(position);
     },
     [onFocusChange],
+  );
+
+  // Double-click handler for inline editing (Excel-like)
+  const handleCellDoubleClick = useCallback(
+    (position: CellPosition) => {
+      setFocusedPosition(position);
+      onFocusChange?.(position);
+      onEditMode?.(position);
+    },
+    [onFocusChange, onEditMode],
   );
 
   // Direct focus setter
@@ -172,6 +219,7 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
     
     // Essential handlers
     handleCellClick,
+    handleCellDoubleClick,
     handleKeyDown,
     
     // Utilities

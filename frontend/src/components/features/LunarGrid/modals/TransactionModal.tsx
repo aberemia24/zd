@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from "react";
 import { TransactionType } from "@budget-app/shared-constants";
+import type { CellPositionComplex as CellPosition } from "../hooks/useKeyboardNavigationSimplified";
 
 // CVA styling imports
 import { 
@@ -29,13 +30,7 @@ import {
  * ✅ Keyboard shortcuts (Esc, Ctrl+Enter)
  */
 
-export interface CellPosition {
-  category: string;
-  subcategory?: string;
-  day: number;
-  rowIndex: number;
-  colIndex: number;
-}
+// CellPosition imported from unified types
 
 export interface TransactionData {
   id?: string;

@@ -15,7 +15,7 @@ import Tooltip from "../../../primitives/Tooltip/Tooltip";
 
 // Types
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
-import { CellPosition } from "../hooks/useKeyboardNavigation";
+import { CellPositionComplex as CellPosition } from "../hooks/useKeyboardNavigationSimplified";
 
 // Utilities - MIGRATED TO CVA-V2
 import { 

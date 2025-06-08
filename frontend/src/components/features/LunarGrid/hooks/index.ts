@@ -1,6 +1,7 @@
 export { useLunarGridTable } from "./useLunarGridTable";
-export { default as useKeyboardNavigation } from "./useKeyboardNavigation";
+export { useKeyboardNavigationSimplified as useKeyboardNavigation } from "./useKeyboardNavigationSimplified";
 export type {
   CellPosition,
+  CellPositionComplex,
   KeyboardNavigationOptions,
-} from "./useKeyboardNavigation";
+} from "./useKeyboardNavigationSimplified";

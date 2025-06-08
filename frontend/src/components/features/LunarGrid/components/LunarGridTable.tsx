@@ -19,7 +19,7 @@ import LunarGridHeader from "./LunarGridHeader";
 
 // Types - importăm tipurile din hook-ul useLunarGridTable
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
-import { CellPosition } from "../hooks/useKeyboardNavigation";
+import { CellPositionComplex as CellPosition } from "../hooks/useKeyboardNavigationSimplified";
 
 export interface LunarGridTableProps {
   // Table data și config
