@@ -142,6 +142,37 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   // ===== EVENT HANDLERS SIMPLU =====
   
+  // 🔒 SIMPLE FIX: Permite doar cifre, punct, virgulă pentru amount/percentage
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (validationType === 'amount' || validationType === 'percentage') {
+      const allowedChars = /[0-9.,\-]/;
+      const char = e.key;
+      
+      // Permite control keys (backspace, delete, arrow keys, etc.)
+      if (char.length > 1) return;
+      
+      // Permite doar cifre, punct, virgulă, minus
+      if (!allowedChars.test(char)) {
+        e.preventDefault();
+        console.log('🔒 [INPUT-FILTER] Blocked invalid character:', char);
+      }
+    }
+  }, [validationType]);
+
+  // 🔒 SIMPLE FIX: Filtrează paste content
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
+    if (validationType === 'amount' || validationType === 'percentage') {
+      const pastedText = e.clipboardData.getData('text');
+      const cleanText = pastedText.replace(/[^0-9.,\-]/g, '');
+      
+      if (cleanText !== pastedText) {
+        e.preventDefault();
+        setValue(cleanText);
+        console.log('🔒 [PASTE-FILTER] Cleaned pasted text:', pastedText, '→', cleanText);
+      }
+    }
+  }, [validationType, setValue]);
+
   // HIBRID: Single click = select only (nu deschide modal)
   const handleSingleClick = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -262,6 +293,8 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
           autoFocus
           autoComplete="off"
           spellCheck={false}
+          onKeyPress={handleKeyPress}
+          onPaste={handlePaste}
         />
         
         {/* Loading indicator simplu */}
