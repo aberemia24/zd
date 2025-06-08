@@ -119,6 +119,26 @@ export const useTransactionOperations = ({
         throw new Error("Valoare invalidă");
       }
 
+      // 🔧 FIX: Tratează 0 ca ștergere de tranzacție
+      if (numValue === 0) {
+        if (transactionId) {
+          console.log('🔄 [TRANSACTION-OPS] Value is 0 - DELETING transaction...');
+          try {
+            await deleteTransactionMutation.mutateAsync(transactionId);
+            console.log('✅ [TRANSACTION-OPS] DELETE completed for transaction:', transactionId.substring(0, 8) + '...');
+            toast.success('Tranzacție ștearsă cu succes');
+          } catch (error) {
+            console.error('❌ [TRANSACTION-OPS] DELETE failed:', error);
+            toast.error('Eroare la ștergerea tranzacției. Încercați din nou.');
+            throw error;
+          }
+        } else {
+          console.log('🔄 [TRANSACTION-OPS] Value is 0 but no transaction exists - nothing to delete');
+          // Nu e nevoie să facem nimic dacă nu există tranzacție și valoarea e 0
+        }
+        return;
+      }
+
       const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
       
       // Determină tipul de tranzacție pe baza categoriei

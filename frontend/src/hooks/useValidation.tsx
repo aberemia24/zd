@@ -33,6 +33,7 @@ export interface ValidationOptions {
   customMaxLength?: number;
   customMin?: number;
   customMax?: number;
+  allowZero?: boolean;
   context?: string; // Pentru logging enhanced
 }
 
@@ -143,39 +144,44 @@ export function useValidation(componentName?: string): UseValidationReturn {
   });
 
   /**
-   * Validator pentru sume monetare
+   * Validator pentru sume monetare (amounts)
    */
   const validateAmount = useCallback((
     value: string | number, 
     options: ValidationOptions = {}
   ): ValidationResult => {
-    const { allowEmpty = false, customMin, customMax } = options;
+    const { 
+      allowEmpty = false, 
+      customMin, 
+      customMax,
+      allowZero = false
+    } = options;
     
-    // Convert to string for consistent processing
     const stringValue = String(value).trim();
     
     if (!stringValue) {
       return {
         isValid: allowEmpty,
-        error: allowEmpty ? undefined : VALIDATION_MESSAGES.AMOUNT_REQUIRED
+        error: allowEmpty ? undefined : VALIDATION_MESSAGES.EMPTY_VALUE
       };
     }
     
-    // Check if it's a valid number
     if (!VALIDATION_HELPERS.isValidNumber(stringValue)) {
       return {
         isValid: false,
-        error: VALIDATION_MESSAGES.AMOUNT_MUST_BE_NUMBER
+        error: VALIDATION_MESSAGES.INVALID_AMOUNT
       };
     }
     
     const numValue = parseFloat(stringValue);
     
-    // Check if positive
-    if (numValue <= 0) {
+    const minAllowed = allowZero ? 0 : 0.01;
+    if (numValue < minAllowed) {
       return {
         isValid: false,
-        error: VALIDATION_MESSAGES.AMOUNT_MUST_BE_POSITIVE
+        error: allowZero 
+          ? 'Suma nu poate fi negativă' 
+          : VALIDATION_MESSAGES.AMOUNT_MUST_BE_POSITIVE
       };
     }
     

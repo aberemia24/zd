@@ -73,12 +73,18 @@ export const useInlineCellEdit = ({
         return 'Tip de validare necunoscut';
       }
 
+      // 🔧 FIX: Pentru amount, permitem 0 (pentru ștergere tranzacții)
+      const validationOptions = {
+        allowEmpty: false,
+        ...(validationType === 'amount' && { allowZero: true })
+      };
+
       // Validare folosind sistemul centralizat
       const result = validation.validateField(
         cellId, 
         val, 
         mappedType, 
-        { allowEmpty: false }
+        validationOptions
       );
 
       return result.error || null;

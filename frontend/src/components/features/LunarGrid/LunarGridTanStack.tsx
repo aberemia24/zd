@@ -523,12 +523,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             onCellSave={handleEditableCellSave}
             onSingleClickModal={handleSingleClickModal}
             onCellClick={navHandleCellClick}
+            isPositionFocused={(position) => Boolean(isPositionFocused(position))}
+            isPositionSelected={(position) => Boolean(isPositionSelected(position))}
             onAddSubcategory={handleAddSubcategory}
             onCancelAddingSubcategory={cancelAddingSubcategory}
             onSetAddingSubcategory={setAddingSubcategory}
             onSetNewSubcategoryName={setNewSubcategoryName}
-            isPositionFocused={(position) => Boolean(isPositionFocused(position))}
-            isPositionSelected={(position) => Boolean(isPositionSelected(position))}
           />
         );
       },

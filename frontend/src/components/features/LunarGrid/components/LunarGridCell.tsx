@@ -8,6 +8,10 @@ interface LunarGridCellProps {
   onSingleClick: (e: React.MouseEvent) => void;
   className?: string;
   placeholder?: string;
+  isSelected?: boolean;
+  isFocused?: boolean;
+  onFocus?: () => void;
+  onCellSelect?: (cellId: string) => void;
 }
 
 const LunarGridCell: React.FC<LunarGridCellProps> = (props) => {
@@ -20,6 +24,9 @@ const LunarGridCell: React.FC<LunarGridCellProps> = (props) => {
       validationType="amount"
       className={props.className}
       placeholder={props.placeholder}
+      isSelected={props.isSelected}
+      isFocused={props.isFocused}
+      onFocus={props.onFocus || (() => props.onCellSelect?.(props.cellId))}
     />
   );
 };

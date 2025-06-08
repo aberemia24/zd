@@ -380,8 +380,10 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
               ) : isDayCell && isSubcategory ? (
                 // Day Cell cu unified CVA input styling - DOAR pentru subcategorii
                 <div
-                  onClick={(e) => {
-                    e.preventDefault();
+                  onClick={(e: React.MouseEvent) => {
+                    // 🔍 DEBUG: Click pe wrapper div
+                    console.log('🔍 [ROW-DEBUG] Wrapper div click detected');
+                    
                     const day = parseInt(cell.column.id.split("-")[1]);
                     const cellPosition: CellPosition = {
                       category: original.category,
@@ -415,11 +417,77 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       const transactionId = transactionMap.get(transactionKey) || null;
                       await onCellSave(original.category, original.subcategory, day, value, transactionId);
                     }}
+                    // NEW: Props pentru hybrid pattern hover actions
+                    isSelected={(() => {
+                      const day = parseInt(cell.column.id.split("-")[1]);
+                      const cellPosition: CellPosition = {
+                        category: original.category,
+                        subcategory: original.subcategory,
+                        day,
+                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
+                          row.original.category === original.category && 
+                          row.original.subcategory === original.subcategory
+                        )),
+                        colIndex: day - 1,
+                      };
+                      return isPositionSelected(cellPosition);
+                    })()}
+                    isFocused={(() => {
+                      const day = parseInt(cell.column.id.split("-")[1]);
+                      const cellPosition: CellPosition = {
+                        category: original.category,
+                        subcategory: original.subcategory,
+                        day,
+                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
+                          row.original.category === original.category && 
+                          row.original.subcategory === original.subcategory
+                        )),
+                        colIndex: day - 1,
+                      };
+                      return isPositionFocused(cellPosition);
+                    })()}
+                    onFocus={() => {
+                      const day = parseInt(cell.column.id.split("-")[1]);
+                      const cellPosition: CellPosition = {
+                        category: original.category,
+                        subcategory: original.subcategory,
+                        day,
+                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
+                          row.original.category === original.category && 
+                          row.original.subcategory === original.subcategory
+                        )),
+                        colIndex: day - 1,
+                      };
+                      console.log('🔍 [ROW-DEBUG] onFocus called for position:', cellPosition);
+                      onCellClick(cellPosition, { ctrlKey: false, shiftKey: false, metaKey: false });
+                    }}
                     onSingleClick={(e: React.MouseEvent) => {
+                      // 🔍 DEBUG: Click pe LunarGridCell
+                      console.log('🔍 [ROW-DEBUG] LunarGridCell single click detected');
+                      
                       const day = parseInt(cell.column.id.split("-")[1]);
                       const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
                       const transactionId = transactionMap.get(transactionKey) || null;
                       const cellValue = cell.getValue();
+                      
+                      // 🔄 CRITICAL FIX: Apelează onCellClick pentru keyboard navigation
+                      const cellPosition: CellPosition = {
+                        category: original.category,
+                        subcategory: original.subcategory,
+                        day,
+                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
+                          row.original.category === original.category && 
+                          row.original.subcategory === original.subcategory
+                        )),
+                        colIndex: day - 1,
+                      };
+
+                      console.log('🔍 [ROW-DEBUG] About to call onCellClick with position:', cellPosition);
+                      onCellClick(cellPosition, {
+                        ctrlKey: e.ctrlKey,
+                        shiftKey: e.shiftKey,
+                        metaKey: e.metaKey,
+                      });
                       
                       let safeValue: string | number = 0;
                       if (cellValue !== null && cellValue !== undefined && cellValue !== '') {
