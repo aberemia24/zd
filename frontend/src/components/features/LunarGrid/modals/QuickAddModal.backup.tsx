@@ -9,7 +9,9 @@ import { useConfirmationModal } from "../../../primitives/ConfirmationModal/useC
 import { 
   cn,
   modal,
-  card
+  card,
+  button,
+  flexLayout
 } from "../../../../styles/cva-v2";
 import { useBaseModalLogic, CellContext } from "./hooks/useBaseModalLogic";
 import { 
@@ -20,6 +22,8 @@ import {
   EXCEL_GRID,
   OPTIONS 
 } from "@budget-app/shared-constants";
+import { LAYOUT_CONSTANTS } from '../../../../styles/cva-v2/foundations';
+import { useToast } from '../../../primitives/Toast/useToast';
 
 /**
  * Props pentru QuickAddModal component
@@ -91,27 +95,6 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prefillAmount, autoFocus]);
 
-  // Basic security helpers
-  const sanitizeInput = useCallback((value: string): string => {
-    return value
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#x27;');
-  }, []);
-
-  const isDangerousInput = useCallback((value: string): boolean => {
-    // Only block truly dangerous patterns, not simple < or >
-    const dangerousPatterns = [
-      /<script[^>]*>/i,     // <script> tags with any attributes
-      /javascript\s*:/i,    // javascript: protocol
-      /on\w+\s*=\s*['"]/i, // event handlers like onclick="
-      /<iframe[^>]*>/i,     // iframe tags
-      /<object[^>]*>/i      // object tags
-    ];
-    return dangerousPatterns.some(pattern => pattern.test(value));
-  }, []);
-
   // Handle save action cu enhanced error handling
   const handleSave = useCallback(async () => {
     // Edge case: verifică dacă modalul este încă montat
@@ -135,12 +118,9 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     loading.setIsLoading(true);
 
     try {
-      // Final sanitization și trim before save
-      const cleanDescription = sanitizeInput(form.data.description.trim());
-      
       await onSave({
         amount: form.data.amount,
-        description: cleanDescription,
+        description: form.data.description,
         recurring: form.data.recurring,
         frequency: form.data.frequency as FrequencyType,
       });
@@ -158,7 +138,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     } finally {
       loading.setIsLoading(false);
     }
-  }, [form, loading, validation, onSave, sanitizeInput]);
+  }, [form, loading, validation, onSave]);
 
   // LGI TASK 5: Handler pentru delete action cu ConfirmationModal
   const handleDelete = useCallback(async () => {
@@ -192,25 +172,68 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     }
   }, [onDelete, showConfirmation, loading, validation]);
 
-  // Simplified outside click handler
-  const handleOutsideClick = useCallback((e: React.MouseEvent) => {
+  // Detectez dacă sunt modificări în formular (dirty state)
+  const isDirty = useMemo(() => {
+    return (
+      form.data.amount.trim() !== "" ||
+      form.data.description.trim() !== "" ||
+      form.data.recurring ||
+      form.data.frequency !== undefined
+    );
+  }, [form.data]);
+
+  // Handle backdrop click pentru UX îmbunătățit
+  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onCancel();
     }
   }, [onCancel]);
 
-  // Simplified Escape handler - direct close, no confirmation
-  const handleEscape = useCallback(() => {
-    onCancel();
-  }, [onCancel]);
+  // Handle content click pentru a preveni închiderea accidentală
+  const handleContentClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
-  // Simplified keyboard shortcuts - Enter/Escape only
+  // Handle outside click pentru modal poziționat
+  const handleOutsideClick = useCallback((e: React.MouseEvent) => {
+    if (position && containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      onCancel();
+    } else if (!position && e.target === e.currentTarget) {
+      onCancel();
+    }
+  }, [position, onCancel]);
+
+  // Enhanced Escape handler cu dirty state detection
+  const handleEscape = useCallback(async () => {
+    if (isDirty) {
+      // Sunt modificări - cere confirmare
+      const confirmed = await showConfirmation({
+        title: "Modificări nesalvate",
+        message: "Aveți modificări nesalvate. Doriți să închideți modalul și să pierdeți aceste modificări?",
+        confirmText: "Da, închide modalul",
+        cancelText: "Nu, continuă editarea",
+        variant: "warning",
+        icon: "⚠️"
+      });
+
+      if (confirmed) {
+        onCancel();
+      }
+      // Dacă nu confirmă, nu face nimic (modalul rămâne deschis)
+    } else {
+      // Nu sunt modificări - închide direct
+      onCancel();
+    }
+  }, [isDirty, onCancel, showConfirmation]);
+
+  // Handle keyboard shortcuts cu optimized dependencies și focus trap
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+        // Previne Enter doar dacă este într-un textarea (pentru new lines)
         const target = e.target as HTMLElement;
         if (target?.tagName?.toLowerCase() === 'textarea') {
-          return; // Allow Enter in textarea for new lines
+          return; // Permite Enter în textarea pentru new lines
         }
         e.preventDefault();
         handleSave();
@@ -219,37 +242,103 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
         e.preventDefault();
         handleEscape();
       }
+      
+      // Focus trap logic pentru Tab navigation
+      if (e.key === "Tab") {
+        const focusableElements = document.querySelectorAll(
+          'input, button, textarea, select, [tabindex]:not([tabindex="-1"])'
+        );
+        const focusableArray = Array.from(focusableElements) as HTMLElement[];
+        const firstElement = focusableArray[0];
+        const lastElement = focusableArray[focusableArray.length - 1];
+
+        if (e.shiftKey) {
+          // Shift + Tab - navighează înapoi
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab - navighează înainte
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleSave, handleEscape]);
 
-  // Simple viewport-aware positioning - keeps modal visible
-  const positionedStyle = position ? (() => {
-    const modalWidth = 320; // Estimated modal width
-    const modalHeight = 400; // Estimated modal height
-    const offset = 10;
+  // Memoize styled objects pentru position mode pentru a preveni re-creation
+  const positionedStyle = useMemo(() => {
+    if (!position) return undefined;
     
-    let top = position.top + offset;
-    let left = position.left;
+    // Smart positioning: calculez cea mai bună poziție bazat pe viewport
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const modalWidth = LAYOUT_CONSTANTS.MODAL.POSITIONING.ESTIMATED_WIDTH;
+    const modalHeight = LAYOUT_CONSTANTS.MODAL.POSITIONING.ESTIMATED_HEIGHT;
+    const offset = LAYOUT_CONSTANTS.MODAL.POSITIONING.OFFSET;
     
-    // Simple viewport boundary checks
-    if (top + modalHeight > window.innerHeight) {
-      top = position.top - modalHeight - offset; // Show above if no room below
+    let finalTop = position.top;
+    let finalLeft = position.left;
+    let placement = 'bottom'; // Default placement
+    
+    // Smart vertical positioning
+    if (position.top + modalHeight + offset > viewportHeight) {
+      // Nu încape jos, încerc sus
+      if (position.top - modalHeight - offset > 0) {
+        finalTop = position.top - modalHeight - offset;
+        placement = 'top';
+      } else {
+        // Nu încape nici sus, centrez vertical cu limită
+        finalTop = Math.max(offset, Math.min(position.top - modalHeight / 2, viewportHeight - modalHeight - offset));
+        placement = 'center';
+      }
+    } else {
+      // Încape jos, poziționez sub celulă
+      finalTop = position.top + offset;
+      placement = 'bottom';
     }
-    if (left + modalWidth > window.innerWidth) {
-      left = window.innerWidth - modalWidth - offset; // Shift left if no room right
+    
+    // Smart horizontal positioning
+    if (position.left + modalWidth > viewportWidth) {
+      // Nu încape la dreapta, poziționez la stânga
+      finalLeft = Math.max(offset, position.left - modalWidth);
+    } else if (position.left < 0) {
+      // Este prea la stânga, poziționez la offset minim
+      finalLeft = offset;
     }
+    // Altfel, păstrez poziția originală
+    
+    console.log('🎨 [MODAL-POSITION] Smart positioning calculated:', {
+      original: { top: position.top, left: position.left },
+      final: { top: finalTop, left: finalLeft },
+      placement,
+      viewport: { width: viewportWidth, height: viewportHeight },
+      modalSize: { width: modalWidth, height: modalHeight }
+    });
     
     return {
       position: 'fixed' as const,
-      top: `${Math.max(offset, top)}px`,
-      left: `${Math.max(offset, left)}px`,
+      top: `${finalTop}px`,
+      left: `${finalLeft}px`,
+      zIndex: parseInt(LAYOUT_CONSTANTS.MODAL.Z_INDEX.MODAL.replace('z-', '')),
+      maxWidth: `${Math.min(modalWidth, viewportWidth - 2 * offset)}px`, // Responsive width
+      maxHeight: `${Math.min(modalHeight, viewportHeight - 2 * offset)}px`, // Responsive height
     };
-  })() : undefined;
+  }, [position]);
 
-
+  // Memoize financial impact calculation pentru performance - cu validare pentru NaN
+  const financialImpact = useMemo(() => {
+    const numericValue = parseFloat(form.data.amount.replace(',', '.'));
+    return form.data.amount && !isNaN(numericValue) && numericValue > 0
+      ? calculations.calculateFinancialImpact(numericValue)
+      : null;
+  }, [form.data.amount, calculations]);
 
   // Handler pentru input numeric - permite doar cifre, punct și virgulă
   const handleAmountChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -263,37 +352,15 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
     // Dacă nu respectă pattern-ul, nu actualizează valoarea (input-ul nu se schimbă)
   }, [form]);
 
-  // Handler pentru description input cu basic security
-  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value;
-    
-    // Basic security check - block dangerous patterns
-    if (isDangerousInput(rawValue)) {
-      validation.setErrors('description', 'Text conține caractere nepermise');
-      return;
-    }
-    
-    // Allow typing but validate - sanitization happens on save
-    form.updateData({ description: rawValue });
-    validation.validateField('description', rawValue, 'description');
-  }, [form, validation, isDangerousInput]);
-
-  // Handler pentru description textarea cu basic security
-  const handleDescriptionTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const rawValue = e.target.value;
-    
-    // Basic security check - block dangerous patterns
-    if (isDangerousInput(rawValue)) {
-      validation.setErrors('description', 'Text conține caractere nepermise');
-      return;
-    }
-    
-    // Allow typing but validate - sanitization happens on save
-    form.updateData({ description: rawValue });
-    validation.validateField('description', rawValue, 'description');
-  }, [form, validation, isDangerousInput]);
-
-
+  // Cleanup și validation la unmount
+  useEffect(() => {
+    return () => {
+      // Cleanup pentru a preveni memory leaks
+      if (loading.isLoading) {
+        console.warn('QuickAddModal: Component unmounted while loading');
+      }
+    };
+  }, [loading.isLoading]);
 
   return (
     <>
@@ -307,7 +374,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
       
       <div 
         className={position 
-          ? "fixed pointer-events-none z-50"
+          ? cn("fixed pointer-events-none", LAYOUT_CONSTANTS.MODAL.Z_INDEX.MODAL)
           : modal({ variant: "default" })
         }
         role="dialog"
@@ -345,7 +412,10 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                   {mode === 'edit' ? EXCEL_GRID.ACTIONS.EDIT_TRANSACTION : EXCEL_GRID.ACTIONS.ADD_TRANSACTION}
                 </h2>
                 <button
-                  className="p-2 text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200 rounded"
+                  className={cn(
+                    button({ variant: "ghost", size: "sm" }),
+                    "hover-lift text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                  )}
                   onClick={onCancel}
                   data-testid="quick-add-modal-close"
                   aria-label="Închide modal"
@@ -398,42 +468,84 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                 </div>
               )}
             </div>
-            {/* Description Input */}
-            <div>
-              {position ? (
-                // Compact input pentru modal poziționat
-                <Input
-                  label={LABELS.DESCRIPTION}
+            {/* Description Input - foarte compact pentru pozitionat */}
+            {position ? (
+              // Input simplu pentru modal poziționat să economisesc spațiu
+              <div>
+                <input
                   type="text"
                   value={form.data.description}
-                  onChange={handleDescriptionChange}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    const newValue = e.target.value;
+                    form.updateData({ description: newValue });
+                    // Validează în timp real pentru feedback instant
+                    validation.validateField('description', newValue, 'description');
+                  }}
                   placeholder={PLACEHOLDERS.DESCRIPTION}
                   maxLength={100}
-                  size="sm"
-                  error={validation.errors.description}
+                  className="w-full px-2 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   data-testid="quick-add-description-input"
                 />
-              ) : (
-                // Textarea normal pentru modal centrat
+                {/* Character counter pentru modal poziționat */}
+                <div className={cn("text-xs mt-1", flexLayout({ direction: "row", justify: "between", align: "center" }))}>
+                  {validation.errors.description ? (
+                    <div className="text-red-600 flex-1">{validation.errors.description}</div>
+                  ) : validation.warnings.description ? (
+                    <div className="text-amber-600 flex-1">{validation.warnings.description[0]}</div>
+                  ) : (
+                    <div className={`flex-1 ${
+                      form.data.description.length >= 100 
+                        ? 'text-red-600 font-medium' 
+                        : form.data.description.length >= 85 
+                        ? 'text-amber-600' 
+                        : 'text-gray-500'
+                    }`}>
+                      {form.data.description.length >= 100 
+                        ? '🚫 Limită atinsă' 
+                        : form.data.description.length >= 85 
+                        ? '⚠️ Aproape de limită' 
+                        : ''}
+                    </div>
+                  )}
+                  <div className={`text-right font-mono ${
+                    form.data.description.length >= 100 
+                      ? 'text-red-600 font-bold' 
+                      : form.data.description.length >= 85 
+                      ? 'text-amber-600 font-medium' 
+                      : 'text-gray-500'
+                  }`}>
+                    {form.data.description.length}/100
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Textarea normal pentru modal centrat cu character counter îmbunătățit
+              <div>
                 <Textarea
                   label={LABELS.DESCRIPTION}
                   value={form.data.description}
-                  onChange={handleDescriptionTextareaChange}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                    const newValue = e.target.value;
+                    form.updateData({ description: newValue });
+                    // Validează în timp real pentru feedback instant
+                    validation.validateField('description', newValue, 'description');
+                  }}
                   error={validation.errors.description}
                   data-testid="quick-add-description-textarea"
                   placeholder={PLACEHOLDERS.DESCRIPTION}
                   rows={2}
                   size="md"
                   maxLength={100}
+                  withCharacterCount={true}
                 />
-              )}
-              {/* Simple character count protection */}
-              {form.data.description.length > 90 && (
-                <div className="text-xs text-amber-600 mt-1">
-                  {form.data.description.length}/100 caractere
-                </div>
-              )}
-            </div>
+                {/* Hint pentru caractere permise - afișat doar când există eroare */}
+                {validation.errors.description && (
+                  <div className="text-xs text-blue-600 mt-1 bg-blue-50 p-2 rounded">
+                    💡 Tip: Folosiți doar litere, cifre, spații și punctuația de bază (. , ! ? - ( ) & % + : ;)
+                  </div>
+                )}
+              </div>
+            )}
             {/* Recurring Checkbox */}
             <div>
               <Checkbox
@@ -479,7 +591,27 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                 )}
               </div>
             )}
-
+            {/* Financial Impact Preview */}
+            {financialImpact && (
+              <div className={position 
+                ? "bg-slate-50 p-1.5 rounded text-xs"
+                : "bg-slate-50 p-3 rounded-md text-sm"
+              }>
+                <div className={flexLayout({ direction: "row", justify: "between", align: "center" })}>
+                  <span>{position ? EXCEL_GRID.MODAL.FINANCIAL_IMPACT_SHORT : EXCEL_GRID.MODAL.FINANCIAL_IMPACT_FULL}</span>
+                  <span
+                    className={`font-semibold ${
+                      financialImpact.isPositive
+                        ? "text-emerald-600"
+                        : "text-red-600"
+                    }`}
+                  >
+                    {financialImpact.isPositive ? "+" : ""}
+                    {financialImpact.amount} RON
+                  </span>
+                </div>
+              </div>
+            )}
             {/* General Error */}
             {validation.errors.general && (
               <div className={position 
@@ -528,7 +660,7 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
                 variant="primary"
                 size="xs"
                 onClick={handleSave}
-                disabled={loading.isLoading || !form.data.amount || validation.hasErrors}
+                disabled={loading.isLoading || !form.data.amount}
                 data-testid="quick-add-save-button"
                 aria-describedby={loading.isLoading ? "save-loading-status" : undefined}
               >
@@ -561,4 +693,37 @@ export const QuickAddModal: React.FC<QuickAddModalProps> = ({
 // Display name pentru debugging
 QuickAddModal.displayName = 'QuickAddModal';
 
-// Simplified QuickAddModal with essential functionality preserved
+/**
+ * INTEGRATION VALIDATION CHECKLIST - Task 5.3
+ * 
+ * ✅ Props Flow Validation:
+ * - cellContext: category, subcategory, day, month, year ✓
+ * - prefillAmount: string (existingValue) ✓  
+ * - mode: 'add' | 'edit' ✓
+ * - position: { top, left } pentru positioned modal ✓
+ * - onSave: async function returning Promise<void> ✓
+ * - onCancel: function ✓
+ * - onDelete: optional pentru edit mode ✓
+ * 
+ * ✅ LunarGridModals Integration:
+ * - modalState conditional rendering ✓
+ * - props mapping corect ✓
+ * - delete conditional (mode === 'edit') ✓
+ * 
+ * ✅ Performance Optimizations:
+ * - React.memo cu custom comparison ✓
+ * - useMemo pentru styled objects ✓
+ * - useCallback pentru handlers ✓
+ * 
+ * ✅ Accessibility Features:
+ * - ARIA labels și roles ✓
+ * - Focus management ✓
+ * - Keyboard navigation ✓
+ * - Screen reader support ✓
+ * 
+ * ✅ UX Enhancements:
+ * - Loading states cu visual feedback ✓
+ * - Smooth animations ✓
+ * - ConfirmationModal pentru delete ✓
+ * - Focus trap functionality ✓
+ */
