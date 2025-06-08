@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
 import { LUNAR_GRID_ACTIONS } from '@budget-app/shared-constants/ui';
@@ -83,6 +84,9 @@ export const useTransactionOperations = ({
   userId
 }: UseTransactionOperationsProps): UseTransactionOperationsReturn => {
 
+  // Query client pentru debugging și cache invalidation
+  const queryClient = useQueryClient();
+
   // Hooks pentru mutații de tranzacții
   const createTransactionMutation = useCreateTransactionMonthly(year, month, userId);
   const updateTransactionMutation = useUpdateTransactionMonthly(year, month, userId);
@@ -97,9 +101,21 @@ export const useTransactionOperations = ({
       value: string | number,
       transactionId: string | null,
     ): Promise<void> => {
+      console.log('🔄 [TRANSACTION-OPS] Starting handleEditableCellSave:', {
+        category,
+        subcategory,
+        day,
+        value,
+        transactionId: transactionId ? transactionId.substring(0, 8) + '...' : null,
+        year,
+        month,
+        userId: userId ? userId.substring(0, 8) + '...' : null
+      });
+
       const numValue = typeof value === "string" ? parseFloat(value) : value;
 
       if (isNaN(numValue)) {
+        console.error('❌ [TRANSACTION-OPS] Invalid value:', value);
         throw new Error("Valoare invalidă");
       }
 
@@ -108,31 +124,79 @@ export const useTransactionOperations = ({
       // Determină tipul de tranzacție pe baza categoriei
       const transactionType = getTransactionTypeForCategory(category) || TransactionType.EXPENSE;
 
-      if (transactionId) {
-        // UPDATE: Modifică tranzacția existentă
-        await updateTransactionMutation.mutateAsync({
-          id: transactionId,
-          transactionData: {
+      try {
+        if (transactionId) {
+          // UPDATE: Modifică tranzacția existentă
+          console.log('🔄 [TRANSACTION-OPS] Running UPDATE mutation...');
+          const result = await updateTransactionMutation.mutateAsync({
+            id: transactionId,
+            transactionData: {
+              amount: numValue,
+              date: isoDate,
+              category,
+              subcategory: subcategory || undefined,
+              type: transactionType,
+            }
+          });
+          console.log('✅ [TRANSACTION-OPS] UPDATE completed:', {
+            id: result.id.substring(0, 8) + '...',
+            amount: result.amount,
+            category: result.category,
+            subcategory: result.subcategory
+          });
+        } else {
+          // CREATE: Creează o tranzacție nouă
+          console.log('🔄 [TRANSACTION-OPS] Running CREATE mutation...');
+          const result = await createTransactionMutation.mutateAsync({
             amount: numValue,
             date: isoDate,
             category,
             subcategory: subcategory || undefined,
             type: transactionType,
-          }
+            description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
+          });
+          console.log('✅ [TRANSACTION-OPS] CREATE completed:', {
+            id: result.id.substring(0, 8) + '...',
+            amount: result.amount,
+            category: result.category,
+            subcategory: result.subcategory
+          });
+        }
+
+        // Debug cache state după mutation
+        const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+        const cacheData = queryClient.getQueryData(monthlyQueryKey);
+        console.log('🔍 [TRANSACTION-OPS] Cache data after mutation:', {
+          queryKey: monthlyQueryKey,
+          cacheExists: !!cacheData,
+          cacheSize: cacheData ? (cacheData as any)?.data?.length || 0 : 0,
+          timestamp: new Date().toISOString()
         });
-      } else {
-        // CREATE: Creează o tranzacție nouă
-        await createTransactionMutation.mutateAsync({
-          amount: numValue,
-          date: isoDate,
-          category,
-          subcategory: subcategory || undefined,
-          type: transactionType,
-          description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
-        });
+
+        // 🔍 DEBUG: Să vedem ce conține cache-ul
+        if (cacheData) {
+          const data = (cacheData as any)?.data || [];
+          console.log('🔍 [TRANSACTION-OPS] Sample cache transactions:', 
+            data.slice(0, 3).map((tx: any) => ({
+              id: tx.id?.substring(0, 8) + '...',
+              amount: tx.amount,
+              category: tx.category,
+              subcategory: tx.subcategory,
+              date: tx.date
+            }))
+          );
+        }
+
+        // Success message
+        toast.success('Tranzacție salvată cu succes');
+
+      } catch (error) {
+        console.error('❌ [TRANSACTION-OPS] Mutation failed:', error);
+        toast.error('Eroare la salvarea tranzacției. Încercați din nou.');
+        throw error;
       }
     },
-    [year, month, updateTransactionMutation, createTransactionMutation],
+    [year, month, userId, updateTransactionMutation, createTransactionMutation, queryClient],
   );
 
   // Handler pentru salvarea tranzacției din popover (Shift+Click)

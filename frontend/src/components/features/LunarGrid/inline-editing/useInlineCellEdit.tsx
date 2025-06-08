@@ -182,7 +182,7 @@ export const useInlineCellEdit = ({
   // Handle keyboard events cu Escape fix și validare îmbunătățită
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      e.stopPropagation(); // Previne propagarea care poate cauza page refresh
+      // Doar preventDefault pentru tastele pe care le gestionăm, nu stopPropagation
 
       switch (e.key) {
         case "Enter":
@@ -196,26 +196,9 @@ export const useInlineCellEdit = ({
           break;
 
         case "Tab":
-          // Lasă Tab să se propage pentru navigare, dar salvează data
-          e.preventDefault(); // Prevent default tab behavior
-          saveValue().then(() => {
-            // După salvare, găsește următoarea celulă editabilă
-            const form = (e.target as HTMLElement).closest("table");
-            if (form) {
-              const cells = form.querySelectorAll(
-                '[data-testid^="editable-cell-"]:not([data-testid*="editing"])',
-              );
-              const currentIndex = Array.from(cells).findIndex((cell) =>
-                cell.contains(e.target as HTMLElement),
-              );
-              const nextCell = cells[currentIndex + 1] as HTMLElement;
-              if (nextCell) {
-                nextCell.focus();
-                // Trigger double click to start editing
-                nextCell.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
-              }
-            }
-          });
+          // Salvează și permite Tab navigation normal
+          e.preventDefault();
+          saveValue();
           break;
       }
     },

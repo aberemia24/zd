@@ -542,6 +542,24 @@ export function useLunarGridTable(
     });
   }, [year, month, stableClickHandlers]);
 
+  // 🔍 DEBUG: Monitor data changes in TanStack Table
+  useEffect(() => {
+    console.log('🔍 [TABLE-DEBUG] rawTableData updated for TanStack Table:', {
+      categoriesCount: rawTableData.length,
+      timestamp: new Date().toISOString(),
+      sampleData: rawTableData.slice(0, 2).map(row => ({
+        id: row.id,
+        category: row.category,
+        isCategory: row.isCategory,
+        total: row.total,
+        subRowsCount: row.subRows?.length || 0,
+        'day-1': row['day-1'] || 0,
+        'day-2': row['day-2'] || 0,
+        'day-3': row['day-3'] || 0,
+      }))
+    });
+  }, [rawTableData]);
+
   const table = useReactTable({
     data: rawTableData,
     columns,

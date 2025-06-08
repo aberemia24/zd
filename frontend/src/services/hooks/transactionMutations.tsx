@@ -310,11 +310,23 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
       return response;
     },
     onMutate: async (newTransaction) => {
+      console.log('🔄 [CREATE-MUTATE] Starting optimistic update for:', {
+        amount: newTransaction.amount,
+        category: newTransaction.category,
+        subcategory: newTransaction.subcategory,
+        date: newTransaction.date,
+        queryKey: monthlyQueryKey
+      });
+
       // Cancel outgoing refetches pentru a nu rescrie cache-ul optimistic
       await queryClient.cancelQueries({ queryKey: monthlyQueryKey });
 
       // Snapshot current data
       const previousData = queryClient.getQueryData(monthlyQueryKey);
+      console.log('🔍 [CREATE-MUTATE] Previous cache data:', {
+        exists: !!previousData,
+        size: previousData ? (previousData as any)?.data?.length || 0 : 0
+      });
 
       // Optimistic update cu temporary ID
       const tempTransaction = {
@@ -325,20 +337,45 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
       };
 
       queryClient.setQueryData(monthlyQueryKey, (old: MonthlyTransactionsResult | undefined) => {
-        if (!old) return { data: [tempTransaction], count: 1 };
-        return {
+        if (!old) {
+          console.log('🔍 [CREATE-MUTATE] No existing cache, creating new with temp transaction');
+          return { data: [tempTransaction], count: 1 };
+        }
+        
+        const newData = {
           data: [...old.data, tempTransaction],
           count: old.count + 1,
         };
+        
+        console.log('🔍 [CREATE-MUTATE] Updated cache optimistically:', {
+          oldSize: old.data.length,
+          newSize: newData.data.length,
+          tempId: tempTransaction.id
+        });
+        
+        return newData;
       });
 
       return { previousData };
     },
     onSuccess: (savedTransaction) => {
+      console.log('✅ [CREATE-SUCCESS] Transaction saved to server:', {
+        id: savedTransaction.id?.substring(0, 8) + '...',
+        amount: savedTransaction.amount,
+        category: savedTransaction.category,
+        subcategory: savedTransaction.subcategory,
+        timestamp: new Date().toISOString()
+      });
+
       // Manual cache update cu datele reale din server (elimină temp ID)
       const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
       
       if (currentData) {
+        console.log('🔍 [CREATE-SUCCESS] Current cache before update:', {
+          size: currentData.data.length,
+          tempTransactions: currentData.data.filter(tx => tx.id.startsWith('temp-')).length
+        });
+
         const updatedResult: MonthlyTransactionsResult = {
           data: currentData.data.map(tx => 
             tx.id.startsWith('temp-') ? savedTransaction : tx
@@ -346,7 +383,14 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
           count: currentData.count,
         };
         
+        console.log('🔍 [CREATE-SUCCESS] Updated cache with real transaction:', {
+          newSize: updatedResult.data.length,
+          realTransactionId: savedTransaction.id?.substring(0, 8) + '...'
+        });
+        
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
+      } else {
+        console.warn('⚠️ [CREATE-SUCCESS] No current cache data found!');
       }
       
       // 🔄 NEW: Sync cu global cache pentru consistență între module

@@ -111,11 +111,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     } = useLunarGridState(year, month);
 
     // Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
-    // Dezactivez refetchOnWindowFocus pentru a evita refresh automat la focus
+    // Optimizat pentru optimistic updates - cache redus pentru a detecta schimbările
     const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
       includeAdjacentDays: true,
       refetchOnMount: false, // Nu refetch automat la mount dacă datele sunt fresh
-      staleTime: 5 * 60 * 1000, // 5 minute cache pentru a evita refresh-uri inutile
+      staleTime: 0, // 🔥 FIX: Cache zero pentru a permite detecția optimistic updates
+      refetchOnWindowFocus: false, // Evită refresh la focus
     });
 
     // Hooks pentru operații specializate

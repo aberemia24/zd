@@ -517,7 +517,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
 // React.memo wrapper pentru optimizarea re-renderurilor - Pattern validat din proiect
 const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) => {
   // Custom comparison pentru props critice la performance
-  return (
+  const basicPropsEqual = (
     prevProps.row.id === nextProps.row.id &&
     prevProps.level === nextProps.level &&
     prevProps.editingSubcategoryName === nextProps.editingSubcategoryName &&
@@ -527,8 +527,41 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
     JSON.stringify(prevProps.subcategoryAction) === JSON.stringify(nextProps.subcategoryAction) &&
     JSON.stringify(prevProps._highlightedCell) === JSON.stringify(nextProps._highlightedCell) &&
     prevProps.row.getIsExpanded() === nextProps.row.getIsExpanded()
-    // Event handlers se vor schimba în mod normal și nu trebuie comparate
   );
+
+  if (!basicPropsEqual) {
+    return false;
+  }
+
+  // 🔄 CRITICAL FIX: Verifică dacă cell values s-au schimbat
+  // Aceasta permite re-render când cache-ul se actualizează cu noi tranzacții
+  const prevCells = prevProps.row.getVisibleCells();
+  const nextCells = nextProps.row.getVisibleCells();
+  
+  if (prevCells.length !== nextCells.length) {
+    return false;
+  }
+
+  // Compară values din fiecare celulă - critic pentru EditableCell re-rendering
+  for (let i = 0; i < prevCells.length; i++) {
+    const prevValue = prevCells[i].getValue();
+    const nextValue = nextCells[i].getValue();
+    
+    if (prevValue !== nextValue) {
+      console.log(`🔄 [ROW-MEMO] Cell value changed for ${prevCells[i].column.id}: ${prevValue} → ${nextValue}`);
+      return false; // Re-render needed
+    }
+  }
+
+  // 🔄 TRANSACTION MAP CHECK: Verifică dacă transaction map s-a schimbat
+  // Important pentru editabile cells care depind de transactionId
+  if (prevProps.transactionMap.size !== nextProps.transactionMap.size) {
+    console.log(`🔄 [ROW-MEMO] Transaction map size changed: ${prevProps.transactionMap.size} → ${nextProps.transactionMap.size}`);
+    return false;
+  }
+
+  return true; // Props sunt identice, skip re-render
+  // Event handlers se vor schimba în mod normal și nu trebuie comparate
 });
 
 export default LunarGridRow; 
