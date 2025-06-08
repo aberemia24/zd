@@ -5,10 +5,11 @@ import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
 import { LUNAR_GRID_ACTIONS } from '@budget-app/shared-constants/ui';
 import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
 import {
-  useCreateTransactionMonthly,
-  useUpdateTransactionMonthly,
+  useCreateTransaction,
+  useUpdateTransaction,
   useDeleteTransactionMonthly
 } from '../../../../services/hooks/transactionMutations';
+import { TransactionData } from '../modals'; // Asigură-te că TransactionData este exportat din modals
 
 interface PopoverState {
   isOpen: boolean;
@@ -38,41 +39,15 @@ interface ModalState {
 interface UseTransactionOperationsProps {
   year: number;
   month: number;
-  userId: string | undefined;
+  userId?: string;
 }
 
-interface UseTransactionOperationsReturn {
-  handleEditableCellSave: (
-    category: string,
-    subcategory: string | undefined,
-    day: number,
-    value: string | number,
-    transactionId: string | null,
-  ) => Promise<void>;
-  
-  handleSavePopover: (
-    popover: PopoverState | null,
-    formData: {
-      amount: string;
-      recurring: boolean;
-      frequency?: FrequencyType;
-    }
-  ) => Promise<void>;
-  
-  handleSaveModal: (
-    modalState: ModalState | null,
-    data: {
-      amount: string;
-      description: string;
-      recurring: boolean;
-      frequency?: FrequencyType;
-    }
-  ) => Promise<void>;
-  
-  handleDeleteFromModal: (
-    modalState: ModalState | null
-  ) => Promise<void>;
+export interface UseTransactionOperationsReturn {
+  handleSaveTransaction: (transaction: Omit<TransactionData, "id">, existingId?: string) => Promise<void>;
+  handleEditableCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
+  isSaving: boolean;
 }
+export type TransformedDataForPopover = TransactionData;
 
 /**
  * Hook pentru gestionarea operațiilor CRUD pe tranzacții în LunarGrid
@@ -88,88 +63,51 @@ export const useTransactionOperations = ({
   const queryClient = useQueryClient();
 
   // Hooks pentru mutații de tranzacții
-  const createTransactionMutation = useCreateTransactionMonthly(year, month, userId);
-  const updateTransactionMutation = useUpdateTransactionMonthly(year, month, userId);
+  const createTransactionMutation = useCreateTransaction();
+  const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, userId);
 
+  const isSaving = createTransactionMutation.isPending || updateTransactionMutation.isPending;
+
+  const handleSaveTransaction = async (transaction: Omit<TransactionData, "id">, existingId?: string) => {
+    // Obiectul complet pentru mutație
+    const mutationData = {
+      amount: transaction.amount,
+      type: transaction.type,
+      date: transaction.date,
+      description: transaction.description,
+      category: transaction.category,
+      subcategory: transaction.subcategory,
+      recurring: transaction.isRecurring,
+      // ... (alte câmpuri dacă sunt necesare, ex: frequency)
+    };
+
+    if (existingId) {
+      await updateTransactionMutation.mutateAsync({ id: existingId, transactionData: mutationData });
+    } else {
+      await createTransactionMutation.mutateAsync(mutationData);
+    }
+    queryClient.invalidateQueries({ queryKey: ['transactions', year, month] });
+  };
+
   // Handler pentru salvarea din EditableCell (inline editing)
-  const handleEditableCellSave = useCallback(
-    async (
-      category: string,
-      subcategory: string | undefined,
-      day: number,
-      value: string | number,
-      transactionId: string | null,
-    ): Promise<void> => {
+  const handleEditableCellSave = async (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => {
+    const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const amount = typeof value === 'string' ? parseFloat(value) : value;
+    const type = getTransactionTypeForCategory(category);
+    
+    const transactionData: Omit<TransactionData, "id"> = {
+      amount,
+      type,
+      date,
+      category,
+      subcategory,
+      description: '', // EditableCell nu are descriere
+      isRecurring: false,
+    };
 
-
-      const numValue = typeof value === "string" ? parseFloat(value) : value;
-
-      if (isNaN(numValue)) {
-        console.error('❌ [TRANSACTION-OPS] Invalid value:', value);
-        throw new Error("Valoare invalidă");
-      }
-
-      // 🔧 FIX: Tratează 0 ca ștergere de tranzacție
-      if (numValue === 0) {
-        if (transactionId) {
-          try {
-            await deleteTransactionMutation.mutateAsync(transactionId);
-            toast.success('Tranzacție ștearsă cu succes');
-          } catch (error) {
-            console.error('❌ [TRANSACTION-OPS] DELETE failed:', error);
-            toast.error('Eroare la ștergerea tranzacției. Încercați din nou.');
-            throw error;
-          }
-        } else {
-          // Nu e nevoie să facem nimic dacă nu există tranzacție și valoarea e 0
-        }
-        return;
-      }
-
-      const isoDate = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      
-      // Determină tipul de tranzacție pe baza categoriei
-      const transactionType = getTransactionTypeForCategory(category) || TransactionType.EXPENSE;
-
-      try {
-        if (transactionId) {
-          // UPDATE: Modifică tranzacția existentă
-          await updateTransactionMutation.mutateAsync({
-            id: transactionId,
-            transactionData: {
-              amount: numValue,
-              date: isoDate,
-              category,
-              subcategory: subcategory || undefined,
-              type: transactionType,
-            }
-          });
-        } else {
-          // CREATE: Creează o tranzacție nouă
-          await createTransactionMutation.mutateAsync({
-            amount: numValue,
-            date: isoDate,
-            category,
-            subcategory: subcategory || undefined,
-            type: transactionType,
-            description: `${category}${subcategory ? ` - ${subcategory}` : ""} (${day}/${month}/${year})`,
-          });
-        }
-
-
-
-        // Success message
-        toast.success('Tranzacție salvată cu succes');
-
-      } catch (error) {
-        console.error('❌ [TRANSACTION-OPS] Mutation failed:', error);
-        toast.error('Eroare la salvarea tranzacției. Încercați din nou.');
-        throw error;
-      }
-    },
-    [year, month, userId, updateTransactionMutation, createTransactionMutation, queryClient],
-  );
+    await handleSaveTransaction(transactionData, transactionId || undefined);
+  };
 
   // Handler pentru salvarea tranzacției din popover (Shift+Click)
   const handleSavePopover = useCallback(
@@ -279,9 +217,8 @@ export const useTransactionOperations = ({
   );
 
   return {
+    handleSaveTransaction,
     handleEditableCellSave,
-    handleSavePopover,
-    handleSaveModal,
-    handleDeleteFromModal,
+    isSaving,
   };
 }; 

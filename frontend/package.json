@@ -36,6 +36,7 @@
   "dependencies": {
     "@budget-app/shared-constants": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
+    "@radix-ui/react-popover": "^1.1.14",
     "@storybook/react-vite": "^9.0.5",
     "@supabase/supabase-js": "^2.49.8",
     "@tailwindcss/typography": "^0.5.16",

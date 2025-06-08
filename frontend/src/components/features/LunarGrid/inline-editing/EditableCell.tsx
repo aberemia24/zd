@@ -1,21 +1,23 @@
 // EditableCell.tsx - HIBRID PATTERN SIMPLU
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Edit2, MoreHorizontal } from "lucide-react";
+import * as Popover from '@radix-ui/react-popover';
 import { cn } from "../../../../styles/cva-v2";
 import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@budget-app/shared-constants";
+import { TransactionData } from "../modals/types";
 
 // CVA variants SIMPLU - fără over-engineering
 const cellVariants = cva(
-  "relative w-full h-full text-sm transition-all duration-150 border-0 outline-none group",
+  "relative w-full h-full text-sm transition-all duration-150 border-0 outline-none group flex items-center justify-center px-2 py-1",
   {
     variants: {
       state: {
         normal: "bg-white cursor-pointer text-gray-900 hover:bg-gray-50",
-        selected: "bg-blue-50 border-2 border-blue-400 cursor-pointer",
-        editing: "bg-white ring-2 ring-blue-500 ring-inset cursor-text",
-        error: "bg-red-50 border-2 border-red-400 cursor-text",
+        selected: "bg-copper-100 border-2 border-copper-500 cursor-pointer text-copper-900 dark:bg-copper-900/20 dark:border-copper-500 dark:text-copper-100",
+        editing: "bg-white ring-2 ring-copper-700 ring-inset cursor-default text-copper-800 dark:bg-copper-50 dark:ring-copper-400 dark:text-copper-900",
+        error: "bg-red-50 border-2 border-red-400 cursor-default",
         saving: "bg-gray-100 opacity-70 cursor-wait",
         readonly: "bg-gray-50 cursor-default opacity-60",
       },
@@ -27,7 +29,7 @@ const cellVariants = cva(
 );
 
 const inputVariants = cva(
-  "w-full h-full px-2 py-1 text-sm font-normal border-0 outline-none bg-transparent",
+  "w-full h-full px-2 py-1 text-sm font-normal border-0 outline-none bg-transparent cursor-text",
   {
     variants: {
       validationType: {
@@ -63,12 +65,21 @@ export interface EditableCellProps {
   onStartEdit?: () => void;
   onCancel?: () => void;
   onSingleClick?: (e: React.MouseEvent) => void;
+  onCellClick?: (e: React.MouseEvent) => void;
+  onClick?: (e: React.MouseEvent) => void;
   "data-testid"?: string;
   
   // NEW: Hibrid pattern props
   isHovered?: boolean;
   onHoverChange?: (hovered: boolean) => void;
   showHoverActions?: boolean;
+  
+  // Props noi pentru popover-ul integrat
+  date: string;
+  existingTransaction?: TransactionData;
+  onSaveTransaction: (transaction: Omit<TransactionData, "id">) => Promise<void>;
+  isSavingTransaction?: boolean;
+  onTogglePopover: () => void;
 }
 
 const EditableCellComponent: React.FC<EditableCellProps> = ({
@@ -89,10 +100,17 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   onStartEdit,
   onCancel,
   onSingleClick,
+  onCellClick,
+  onClick,
   "data-testid": testId,
   isHovered = false,
   onHoverChange,
   showHoverActions = false,
+  date,
+  existingTransaction,
+  onSaveTransaction,
+  isSavingTransaction,
+  onTogglePopover,
 }) => {
   // ===== HIBRID PATTERN STATE =====
   const [internalHovered, setInternalHovered] = useState(false);
@@ -127,15 +145,15 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   const isSaving = propIsSaving !== undefined ? propIsSaving : internalIsSaving;
 
   // ===== HIBRID PATTERN LOGIC =====
-  // Show hover actions when: hovered AND (selected OR focused) AND not editing
-  const shouldShowHoverActions = isActuallyHovered && (isSelected || isFocused) && !isEditing && !isReadonly;
+  // Show hover actions when: selected OR focused OR hovered AND not editing and not readonly
+  const shouldDisplayActions = (isSelected || isFocused || isActuallyHovered) && !isEditing && !isReadonly;
 
   // ===== COMPUTED VALUES =====
   const cellState = isReadonly ? "readonly" 
     : isSaving ? "saving"
     : error ? "error"
     : isEditing ? "editing"
-    : (isSelected || isFocused) ? "selected"
+    : (isSelected || isFocused) ? "selected" 
     : "normal";
 
   const displayValue = value === "" || value === null || value === undefined ? "" : String(value);
@@ -173,17 +191,6 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     }
   }, [validationType, setValue]);
 
-  // HIBRID: Single click = select only (nu deschide modal)
-  const handleSingleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (isEditing || isReadonly) return;
-    
-    // Doar selectează celula - hover actions vor apărea automat
-    onFocus?.();
-  }, [isEditing, isReadonly, onFocus]);
-
   // Double click = start editing (neschimbat)
   const handleDoubleClickWrapper = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -196,7 +203,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         handleDoubleClick();
       }
     }
-  }, [isReadonly, isEditing, onStartEdit, handleDoubleClick]);
+  }, [isReadonly, isEditing, onStartEdit, handleDoubleClick, cellId]);
 
   // Keyboard navigation EXACT conform PRD
   const handleKeyDownWrapper = useCallback((e: React.KeyboardEvent) => {
@@ -222,7 +229,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         } else {
           startEdit();
         }
-      } else if (e.key === "Enter" && !isReadonly && shouldShowHoverActions) {
+      } else if (e.key === "Enter" && !isReadonly && shouldDisplayActions) {
         // Enter: Start edit DOAR când hover actions sunt afișate
         e.preventDefault();
         if (onStartEdit) {
@@ -230,17 +237,18 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         } else {
           startEdit();
         }
-      } else if (e.key === "Escape" && shouldShowHoverActions) {
+      } else if (e.key === "Escape" && shouldDisplayActions) {
         // Escape: Deselect când hover actions sunt afișate
         e.preventDefault();
         // Trigger deselection prin onHoverChange
         setInternalHovered(false);
         onHoverChange?.(false);
+      } else {
       }
     }
     
     onKeyDown?.(e);
-  }, [isEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, onKeyDown, isReadonly, shouldShowHoverActions, setInternalHovered, onHoverChange]);
+  }, [isEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, onKeyDown, isReadonly, shouldDisplayActions, setInternalHovered, onHoverChange, cellId]);
 
   // ===== MOBILE SUPPORT SIMPLU =====
   const handleTouchStart = useCallback(() => {
@@ -250,25 +258,25 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       onHoverChange?.(true);
     }, 600);
     setLongPressTimer(timer);
-  }, [onHoverChange]);
+  }, [onHoverChange, cellId]);
 
   const handleTouchEnd = useCallback(() => {
     if (longPressTimer) {
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
     }
-  }, [longPressTimer]);
+  }, [longPressTimer, cellId]);
 
   // Desktop hover management
   const handleMouseEnter = useCallback(() => {
     setInternalHovered(true);
     onHoverChange?.(true);
-  }, [onHoverChange]);
+  }, [onHoverChange, cellId]);
 
   const handleMouseLeave = useCallback(() => {
     setInternalHovered(false);
     onHoverChange?.(false);
-  }, [onHoverChange]);
+  }, [onHoverChange, cellId]);
 
   // ===== HOVER ACTIONS HANDLERS =====
   const handleEditButtonClick = useCallback((e: React.MouseEvent) => {
@@ -278,12 +286,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     } else {
       startEdit();
     }
-  }, [onStartEdit, startEdit]);
-
-  const handleMoreButtonClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    onSingleClick?.(e); // Deschide modal pentru advanced editing
-  }, [onSingleClick]);
+  }, [onStartEdit, startEdit, cellId]);
 
   // ===== RENDER =====
   if (isEditing) {
@@ -331,8 +334,16 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   return (
     <div
-      className={cn(cellVariants({ state: cellState }), "group relative", className)}
-      onClick={handleSingleClick}
+      className={cn(cellVariants({ state: cellState }), className, "w-full h-full")}
+      onClick={(e) => {
+        // Dacă click-ul a venit de pe un element copil (ex: butoanele de acțiune),
+        // nu facem nimic. Doar click-urile directe pe div-ul principal vor declanșa selecția.
+        if (e.target !== e.currentTarget) {
+          e.stopPropagation();
+          return;
+        }
+        onClick?.(e);
+      }}
       onDoubleClick={handleDoubleClickWrapper}
       onKeyDown={handleKeyDownWrapper}
       onMouseEnter={handleMouseEnter}
@@ -344,46 +355,46 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       role="gridcell"
       aria-label={`${validationType} cell with value ${displayValue}`}
     >
-      {/* Cell content */}
-      <div className="w-full h-full px-2 py-1 flex items-center justify-center">
-        <span>{displayValue}</span>
-        
-        {/* Hint text pentru selected/focused cells */}
-        {(isSelected || isFocused) && !isReadonly && !shouldShowHoverActions && (
-          <span className="ml-2 text-xs text-gray-500 opacity-75">
-            F2 to edit
-          </span>
-        )}
-      </div>
-
-      {/* ===== HIBRID PATTERN: HOVER ACTIONS ===== */}
-      {shouldShowHoverActions && (
-        <div className="absolute right-1 top-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-          {/* Edit button */}
-          <button
-            onClick={handleEditButtonClick}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            title="Edit inline (F2)"
-            aria-label="Edit cell inline"
-            tabIndex={0}
-            data-testid={`edit-button-${cellId}`}
-          >
-            <Edit2 size={14} />
-          </button>
-          
-          {/* More options button */}
-          <button
-            onClick={handleMoreButtonClick}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-            title="More options"
-            aria-label="Open advanced options modal"
-            tabIndex={0}
-            data-testid={`more-button-${cellId}`}
-          >
-            <MoreHorizontal size={14} />
-          </button>
-        </div>
+      {/* Cell content simplified */}
+      <span>{displayValue}</span>
+      
+      {/* Hint text pentru selected/focused cells */}
+      {(isSelected || isFocused) && !isReadonly && !shouldDisplayActions && (
+        <span className="ml-2 text-xs text-gray-500 opacity-75">
+          F2 to edit
+        </span>
       )}
+
+      {/* CONTAINERUL PENTRU ACȚIUNI */}
+      <div className={cn(
+        "absolute right-1 top-1 flex gap-1 transition-opacity duration-200 z-10",
+        {
+          "opacity-100": shouldDisplayActions, // Make visible if selected/focused or hovered
+          "opacity-0": !shouldDisplayActions // Hide otherwise
+        }
+      )}>
+        <button
+          onClick={handleEditButtonClick}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          title="Edit inline (F2)"
+          aria-label="Edit cell inline"
+          tabIndex={0}
+          data-testid={`edit-button-${cellId}`}
+        >
+          <Edit2 size={14} />
+        </button>
+        
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onTogglePopover();
+          }}
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+          title="More options"
+        >
+          <MoreHorizontal size={14} />
+        </button>
+      </div>
       
       {/* Loading overlay pentru non-editing state */}
       {isSaving && (

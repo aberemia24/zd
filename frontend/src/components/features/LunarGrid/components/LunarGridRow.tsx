@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Row, flexRender, Table } from "@tanstack/react-table";
 import { ChevronRight, Lock } from "lucide-react";
 import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
@@ -12,10 +12,14 @@ import LunarGridSubcategoryRowCell from "./LunarGridSubcategoryRowCell";
 import LunarGridAddSubcategoryRow from "./LunarGridAddSubcategoryRow";
 import LunarGridCell from "./LunarGridCell";
 import Tooltip from "../../../primitives/Tooltip/Tooltip";
+import { TransactionPopover } from '../modals';
+import type { UseTransactionOperationsReturn } from '../hooks/useTransactionOperations';
+import { TransformedDataForPopover } from '../hooks/useTransactionOperations'; // Presupunând că exportați acest tip
+import { EditableCell } from "../inline-editing/EditableCell"; // Asigură-te că AdvancedEditPopover este exportat din acest fișier
 
 // Types
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
-import { CellPositionComplex as CellPosition } from "../hooks/useKeyboardNavigationSimplified";
+import { CellPosition } from "../hooks/useKeyboardNavigationSimplified";
 
 // Utilities - MIGRATED TO CVA-V2
 import { 
@@ -33,11 +37,7 @@ import {
 } from "../../../../styles/cva-v2";
 
 // Tip pentru celula evidențiată (simplified version of CellPosition)
-interface HighlightedCell {
-  category: string;
-  subcategory: string | undefined;
-  day: number;
-}
+interface HighlightedCell extends CellPosition {}
 
 // Interface pentru categoria cu subcategoriile sale
 interface CategoryWithSubcategories {
@@ -60,6 +60,10 @@ interface LunarGridRowProps {
   newSubcategoryName: string;
   table: Table<TransformedTableDataRow>;
   transactionMap: Map<string, string>;
+  year: number;
+  month: number;
+  validTransactions: TransformedDataForPopover[];
+  transactionOps: UseTransactionOperationsReturn;
   // Event handlers
   onExpandToggle: (rowId: string, isExpanded: boolean) => void;
   onSubcategoryEdit: (category: string, subcategory: string, newName: string) => void;
@@ -70,7 +74,7 @@ interface LunarGridRowProps {
   onStartDeletingSubcategory: (category: string, subcategory: string) => void;
   onCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
   onSingleClickModal: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null, element: HTMLElement) => void;
-  onCellClick: (position: CellPosition, modifiers: { ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }) => void;
+  onCellClick?: (position: CellPosition, modifiers: { ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }) => void;
   onAddSubcategory: (category: string) => void;
   onCancelAddingSubcategory: () => void;
   onSetAddingSubcategory: (category: string | null) => void;
@@ -104,6 +108,10 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   newSubcategoryName,
   table,
   transactionMap,
+  year,
+  month,
+  validTransactions,
+  transactionOps,
   onExpandToggle,
   onSubcategoryEdit,
   _onSubcategoryDelete,
@@ -124,6 +132,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   const { original } = row;
   const isCategory = original.isCategory;
   const isSubcategory = !isCategory;
+  
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   
   // Memoized computations pentru performance - evită recalcularea la fiecare render
   const rowMetadata = useMemo(() => {
@@ -219,19 +229,20 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
           const getCellState = (): GridCellProps['state'] => {
             if (isDayCell) {
               const day = parseInt(cell.column.id.split("-")[1]);
+              const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) => 
+                row.original.category === original.category && 
+                row.original.subcategory === original.subcategory
+              ));
               const cellPosition: CellPosition = {
                 category: original.category,
                 subcategory: original.subcategory,
                 day,
-                rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                  row.original.category === original.category && 
-                  row.original.subcategory === original.subcategory
-                )),
+                rowIndex,
                 colIndex: day - 1,
+                categoryIndex: rowIndex,
               };
               
               if (isPositionFocused(cellPosition)) {return 'active';}
-              if (isPositionSelected(cellPosition)) {return 'selected';}
             }
 
             // Value state based on content
@@ -285,12 +296,9 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 }),
                 textProfessional({ variant: "default" }),
                 isFirstCell && level > 0 && "pl-8",
-                isDayCell && cn(
-                  hoverScale({ intensity: "subtle" }),
-                  focusRing({ variant: "default" }),
-                  "transition-all duration-150"
-                ),
-                isTotalCell && "font-semibold tabular-nums"
+                isDayCell && isSubcategory && "!p-0",
+                isTotalCell && "font-semibold tabular-nums",
+                { 'z-20': isPopoverOpen }
               )}
               style={{
                 ...(cell.column.getIsPinned() && {
@@ -306,9 +314,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
               }
             >
               {isFirstCell && isCategory ? (
-                // Category Cell cu unified CVA expand icon
-                <div className="flex items-center gap-2">
-                  {/* 🔧 EXPAND SECTION: Div separat pentru expand cu tooltip propriu */}
+                // Category Cell
+                <div className="flex items-center gap-2 px-4">
                   <div 
                     className="flex items-center gap-2 cursor-pointer"
                     onClick={(e) => {
@@ -378,145 +385,44 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   onStartDelete={() => onStartDeletingSubcategory(original.category, original.subcategory || '')}
                 />
               ) : isDayCell && isSubcategory ? (
-                // Day Cell cu unified CVA input styling - DOAR pentru subcategorii
-                <div
-                  onClick={(e: React.MouseEvent) => {
-                    // 🔍 DEBUG: Click pe wrapper div
-            
-                    
-                    const day = parseInt(cell.column.id.split("-")[1]);
-                    const cellPosition: CellPosition = {
-                      category: original.category,
-                      subcategory: original.subcategory,
-                      day,
-                      rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                        row.original.category === original.category && 
-                        row.original.subcategory === original.subcategory
-                      )),
-                      colIndex: day - 1,
-                    };
-
-                    onCellClick(cellPosition, {
-                      ctrlKey: e.ctrlKey,
-                      shiftKey: e.shiftKey,
-                      metaKey: e.metaKey,
-                    });
-                  }}
-                  className="w-full h-full min-h-[40px] flex items-center justify-center cursor-pointer"
+                <TransactionPopover
+                  isOpen={isPopoverOpen}
+                  onOpenChange={setIsPopoverOpen}
                 >
                   <LunarGridCell
                     cellId={`${original.category}-${original.subcategory || ''}-${cell.column.id.split("-")[1]}`}
-                    value={(() => {
-                      const cellValue = cell.getValue();
-                      if (cellValue === null || cellValue === undefined || cellValue === '') {return '';}
-                      return String(cellValue);
-                    })()}
-                    onSave={async (value: string | number) => {
-                      const day = parseInt(cell.column.id.split("-")[1]);
-                      const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                      const transactionId = transactionMap.get(transactionKey) || null;
-                      await onCellSave(original.category, original.subcategory, day, value, transactionId);
-                    }}
-                    // NEW: Props pentru hybrid pattern hover actions
+                    value={String(cell.getValue() || '')}
                     isSelected={(() => {
                       const day = parseInt(cell.column.id.split("-")[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) => row.original.category === original.category && row.original.subcategory === original.subcategory));
                       const cellPosition: CellPosition = {
-                        category: original.category,
-                        subcategory: original.subcategory,
-                        day,
-                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                          row.original.category === original.category && 
-                          row.original.subcategory === original.subcategory
-                        )),
-                        colIndex: day - 1,
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
                       };
                       return isPositionSelected(cellPosition);
                     })()}
                     isFocused={(() => {
                       const day = parseInt(cell.column.id.split("-")[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) => row.original.category === original.category && row.original.subcategory === original.subcategory));
                       const cellPosition: CellPosition = {
-                        category: original.category,
-                        subcategory: original.subcategory,
-                        day,
-                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                          row.original.category === original.category && 
-                          row.original.subcategory === original.subcategory
-                        )),
-                        colIndex: day - 1,
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
                       };
                       return isPositionFocused(cellPosition);
                     })()}
-                    onFocus={() => {
-                      const day = parseInt(cell.column.id.split("-")[1]);
-                      const cellPosition: CellPosition = {
-                        category: original.category,
-                        subcategory: original.subcategory,
-                        day,
-                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                          row.original.category === original.category && 
-                          row.original.subcategory === original.subcategory
-                        )),
-                        colIndex: day - 1,
-                      };
-              
-                      onCellClick(cellPosition, { ctrlKey: false, shiftKey: false, metaKey: false });
-                    }}
-                    onSingleClick={(e: React.MouseEvent) => {
-                      // 🔍 DEBUG: Click pe LunarGridCell
-              
-                      
-                      const day = parseInt(cell.column.id.split("-")[1]);
-                      const transactionKey = `${original.category}-${original.subcategory || ''}-${day}`;
-                      const transactionId = transactionMap.get(transactionKey) || null;
-                      const cellValue = cell.getValue();
-                      
-                      // 🔄 CRITICAL FIX: Apelează onCellClick pentru keyboard navigation
-                      const cellPosition: CellPosition = {
-                        category: original.category,
-                        subcategory: original.subcategory,
-                        day,
-                        rowIndex: Math.max(0, table.getRowModel().rows.findIndex((row) => 
-                          row.original.category === original.category && 
-                          row.original.subcategory === original.subcategory
-                        )),
-                        colIndex: day - 1,
-                      };
-
-              
-                      onCellClick(cellPosition, {
-                        ctrlKey: e.ctrlKey,
-                        shiftKey: e.shiftKey,
-                        metaKey: e.metaKey,
-                      });
-                      
-                      let safeValue: string | number = 0;
-                      if (cellValue !== null && cellValue !== undefined && cellValue !== '') {
-                        if (typeof cellValue === 'number') {
-                          safeValue = cellValue;
-                        } else {
-                          const stringValue = String(cellValue);
-                          const numericValue = parseFloat(stringValue.replace(/[^\d,.-]/g, '').replace(',', '.'));
-                          safeValue = isNaN(numericValue) ? stringValue : numericValue;
-                        }
-                      }
-                      
-                      // SOLUȚIE 1: Ensure we have a valid HTMLElement
-                      const targetElement = e.currentTarget as HTMLElement;
-                      if (!targetElement) {
-                        console.warn('🎯 [MODAL-POSITION] No valid target element for modal positioning');
-                        return;
-                      }
-                      
-                      onSingleClickModal(original.category, original.subcategory, day, safeValue, transactionId, targetElement);
-                    }}
-                    className={cn(
-                      gridInput({ variant: "default", type: "number" }),
-                      "text-center min-h-[40px] flex items-center justify-center",
-                      getValueClasses()
-                    )}
+                    className={getValueClasses()}
                     placeholder="0"
+                    date={`${year}-${String(month + 1).padStart(2, '0')}-${String(parseInt(cell.column.id.split("-")[1])).padStart(2, '0')}`}
+                    existingTransaction={validTransactions.find(t => 
+                      t.category === original.category && 
+                      t.subcategory === original.subcategory && 
+                      new Date(t.date).getUTCDate() === parseInt(cell.column.id.split("-")[1])
+                    )}
+                    onSaveTransaction={transactionOps.handleSaveTransaction}
+                    isSavingTransaction={transactionOps.isSaving}
+                    onTogglePopover={() => setIsPopoverOpen(prev => !prev)}
                   />
-                </div>
+                </TransactionPopover>
               ) : isDayCell && isCategory ? (
                 // Day Cell pentru categorii - DOAR afișare, fără interactivitate
                 <div className="w-full h-full min-h-[40px] flex items-center justify-center">
@@ -593,11 +499,13 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
     prevProps.newSubcategoryName === nextProps.newSubcategoryName &&
     JSON.stringify(prevProps._expandedRows) === JSON.stringify(nextProps._expandedRows) &&
     JSON.stringify(prevProps.subcategoryAction) === JSON.stringify(nextProps.subcategoryAction) &&
+    // 🔧 FIX: Include _highlightedCell in memo comparison for visual feedback
     JSON.stringify(prevProps._highlightedCell) === JSON.stringify(nextProps._highlightedCell) &&
     prevProps.row.getIsExpanded() === nextProps.row.getIsExpanded()
   );
 
   if (!basicPropsEqual) {
+    // console.log("TRG: Basic props not equal, re-rendering", prevProps, nextProps);
     return false;
   }
 
@@ -607,6 +515,7 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
   const nextCells = nextProps.row.getVisibleCells();
   
   if (prevCells.length !== nextCells.length) {
+    // console.log("TRG: Cell count changed, re-rendering");
     return false;
   }
 
@@ -616,7 +525,7 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
     const nextValue = nextCells[i].getValue();
     
     if (prevValue !== nextValue) {
-
+      // console.log(`TRG: Cell value changed for ${prevCells[i].id}, re-rendering:`, prevValue, nextValue);
       return false; // Re-render needed
     }
   }
@@ -624,7 +533,15 @@ const LunarGridRow = React.memo(LunarGridRowComponent, (prevProps, nextProps) =>
   // 🔄 TRANSACTION MAP CHECK: Verifică dacă transaction map s-a schimbat
   // Important pentru editabile cells care depind de transactionId
   if (prevProps.transactionMap.size !== nextProps.transactionMap.size) {
+    // console.log("TRG: Transaction map size changed, re-rendering");
+    return false;
+  }
 
+  // 🔧 FIX: Comparați direct funcțiile isPositionFocused și isPositionSelected
+  // Acest lucru este necesar pentru a asigura re-render-ul corect când se schimbă focalizarea
+  if (prevProps.isPositionFocused !== nextProps.isPositionFocused ||
+      prevProps.isPositionSelected !== nextProps.isPositionSelected) {
+    // console.log("TRG: Position focus/selection functions changed, re-rendering");
     return false;
   }
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import React from "react";
 
 /**
  * Simplified Keyboard Navigation Hook for LunarGrid - V3 Refactor
@@ -24,16 +25,14 @@ import { useCallback, useEffect, useState } from "react";
 export interface CellPosition {
   categoryIndex: number;
   day: number;
-}
-
-// Legacy interface compatibility (for backward compatibility with Row/Table components)
-export interface CellPositionComplex {
   category: string;
   subcategory?: string;
-  day: number;
   rowIndex: number;
   colIndex: number;
 }
+
+// Legacy interface compatibility (for backward compatibility with Row/Table components)
+// REMOVED: CellPositionComplex is no longer needed after unifying CellPosition types.
 
 // Simplified options - removed complex callbacks
 export interface KeyboardNavigationOptions {
@@ -61,66 +60,99 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
     isActive = true,
   } = options;
 
-  // Single focus state - no complex multi-selection
+  console.log('⚙️ [KeyboardNav] isActive:', isActive); // Log isActive at start
+
+  // Stări separate pentru focus și selecție
   const [focusedPosition, setFocusedPosition] = useState<CellPosition | null>(null);
+  const [selectedPositions, setSelectedPositions] = useState<CellPosition[]>([]);
+  const focusedPositionRef = React.useRef(focusedPosition); // Ref to hold latest focusedPosition
+
+  // Update ref whenever focusedPosition changes
+  useEffect(() => {
+    focusedPositionRef.current = focusedPosition;
+    console.log('🔄 [KeyboardNav] focusedPosition updated:', focusedPosition);
+  }, [focusedPosition]);
 
   // Simplified navigation calculation
   const getNextPosition = useCallback(
     (current: CellPosition, direction: "up" | "down" | "left" | "right"): CellPosition | null => {
       const { categoryIndex, day } = current;
 
+      let nextCategoryIndex = categoryIndex;
+      let nextDay = day;
+
       switch (direction) {
         case "up":
-          return categoryIndex > 0 ? { categoryIndex: categoryIndex - 1, day } : null;
+          nextCategoryIndex = categoryIndex > 0 ? categoryIndex - 1 : 0; // Ensure not less than 0
+          break;
         
         case "down":
-          return categoryIndex < totalRows - 1 ? { categoryIndex: categoryIndex + 1, day } : null;
+          nextCategoryIndex = categoryIndex < totalRows - 1 ? categoryIndex + 1 : totalRows - 1; // Ensure not greater than totalRows - 1
+          break;
         
         case "left":
-          return day > 1 ? { categoryIndex, day: day - 1 } : null;
+          nextDay = day > 1 ? day - 1 : 1; // Ensure not less than 1
+          break;
         
         case "right":
-          return day < totalDays ? { categoryIndex, day: day + 1 } : null;
+          nextDay = day < totalDays ? day + 1 : totalDays; // Ensure not greater than totalDays
+          break;
       }
       
+      // Retrieve category and subcategory from rows array for the new position
+      if (rows && nextCategoryIndex >= 0 && nextCategoryIndex < totalRows &&
+          nextDay >= 1 && nextDay <= totalDays) {
+        const rowData = rows[nextCategoryIndex];
+        if (rowData) {
+          const newPosition = {
+            categoryIndex: nextCategoryIndex,
+            day: nextDay,
+            category: rowData.category,
+            subcategory: rowData.subcategory,
+            rowIndex: nextCategoryIndex,
+            colIndex: nextDay - 1,
+          };
+          return newPosition;
+        }
+      }
       return null;
     },
-    [totalRows, totalDays],
+    [totalRows, totalDays, rows],
   );
 
   // Simplified keyboard handler - essential keys only
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isActive || !focusedPosition) return;
+      if (!isActive || !focusedPositionRef.current) return;
 
       let newPosition: CellPosition | null = null;
 
       switch (e.key) {
         case "ArrowUp":
           e.preventDefault();
-          newPosition = getNextPosition(focusedPosition, "up");
+          newPosition = getNextPosition(focusedPositionRef.current, "up");
           break;
 
         case "ArrowDown":
           e.preventDefault();
-          newPosition = getNextPosition(focusedPosition, "down");
+          newPosition = getNextPosition(focusedPositionRef.current, "down");
           break;
 
         case "ArrowLeft":
           e.preventDefault();
-          newPosition = getNextPosition(focusedPosition, "left");
+          newPosition = getNextPosition(focusedPositionRef.current, "left");
           break;
 
         case "ArrowRight":
         case "Tab":
           e.preventDefault();
-          newPosition = getNextPosition(focusedPosition, "right");
+          newPosition = getNextPosition(focusedPositionRef.current, "right");
           break;
 
         case "Enter":
         case "F2":
           e.preventDefault();
-          onEditMode?.(focusedPosition);
+          onEditMode?.(focusedPositionRef.current);
           break;
 
         case "Escape":
@@ -132,19 +164,8 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
         case "Delete":
         case "Backspace":
           e.preventDefault();
-          if (focusedPosition && onDeleteRequest && rows) {
-            // Convert categoryIndex to full position for delete
-            const row = rows[focusedPosition.categoryIndex];
-            if (row) {
-              const fullPosition = {
-                ...focusedPosition,
-                category: row.category,
-                subcategory: row.subcategory,
-                rowIndex: focusedPosition.categoryIndex,
-                colIndex: focusedPosition.day - 1,
-              };
-              onDeleteRequest([fullPosition]);
-            }
+          if (focusedPositionRef.current && onDeleteRequest) {
+            onDeleteRequest([focusedPositionRef.current]);
           }
           break;
       }
@@ -155,21 +176,24 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
         onFocusChange?.(newPosition);
       }
     },
-    [isActive, focusedPosition, getNextPosition, onFocusChange, onEditMode],
+    [isActive, getNextPosition, onFocusChange, onEditMode, onDeleteRequest],
   );
 
   // Event listener registration
   useEffect(() => {
     if (isActive) {
       document.addEventListener("keydown", handleKeyDown);
-      return () => document.removeEventListener("keydown", handleKeyDown);
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
     }
   }, [isActive, handleKeyDown]);
 
-  // Simplified cell click - no complex modifiers
+  // Click pe celulă: setează focusul ȘI selecția
   const handleCellClick = useCallback(
     (position: CellPosition, modifiers?: { ctrlKey?: boolean; shiftKey?: boolean; metaKey?: boolean }) => {
       setFocusedPosition(position);
+      setSelectedPositions([position]); // La un click simplu, resetăm selecția la celula curentă
       onFocusChange?.(position);
     },
     [onFocusChange],
@@ -197,19 +221,26 @@ export const useKeyboardNavigationSimplified = (options: KeyboardNavigationOptio
   // Simple position check helpers
   const isPositionFocused = useCallback(
     (position: CellPosition) => {
-      return focusedPosition !== null &&
+      const isFocused = focusedPosition !== null &&
         focusedPosition.categoryIndex === position.categoryIndex &&
-        focusedPosition.day === position.day;
+        focusedPosition.day === position.day &&
+        focusedPosition.category === position.category &&
+        focusedPosition.subcategory === position.subcategory;
+      return isFocused;
     },
     [focusedPosition],
   );
 
   const isPositionSelected = useCallback(
     (position: CellPosition) => {
-      // For simplicity, selected = focused
-      return isPositionFocused(position);
+      return selectedPositions.some(p => 
+        p.categoryIndex === position.categoryIndex &&
+        p.day === position.day &&
+        p.category === position.category &&
+        p.subcategory === position.subcategory
+      );
     },
-    [isPositionFocused],
+    [selectedPositions],
   );
 
   // Simplified return interface

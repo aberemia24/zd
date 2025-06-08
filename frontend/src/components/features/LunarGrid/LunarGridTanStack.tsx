@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, memo, useEffect } from 'react';
+import React, { useCallback, useMemo, memo, useEffect, useRef } from 'react';
 import { flexRender, Row } from "@tanstack/react-table";
 import toast from 'react-hot-toast';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import * as Popover from '@radix-ui/react-popover';
 
 // Constants și shared (@budget-app/shared-constants)
 import { 
@@ -16,42 +17,16 @@ import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 // Componente UI și features
 import LunarGridRow from "./components/LunarGridRow";
 import LunarGridTable from "./components/LunarGridTable";
-import LunarGridModalManager from "./components/LunarGridModalManager";
-import LunarGridStateManager from "./components/LunarGridStateManager";
-import LunarGridEventHandler from "./components/LunarGridEventHandler";
 import Button from "../../primitives/Button/Button";
+import { TransactionPopover } from './modals';
 
 // Hooks specializate
 import {
   useLunarGridTable,
   TransformedTableDataRow,
 } from "./hooks/useLunarGridTable";
-import { useKeyboardNavigationSimplified, type CellPosition as SimpleCellPosition } from "./hooks/useKeyboardNavigationSimplified";
+import { useKeyboardNavigationSimplified, type CellPosition } from "./hooks/useKeyboardNavigationSimplified";
 
-// Type conversion utilities for CellPosition compatibility
-type LegacyCellPosition = {
-  category: string;
-  subcategory?: string;
-  day: number;
-  rowIndex: number;
-  colIndex: number;
-};
-
-const convertToSimple = (legacy: LegacyCellPosition): SimpleCellPosition => ({
-  categoryIndex: legacy.rowIndex,
-  day: legacy.day,
-});
-
-const convertToLegacy = (simple: SimpleCellPosition, rows: Array<{category: string; subcategory?: string}>): LegacyCellPosition => {
-  const row = rows[simple.categoryIndex];
-  return {
-    category: row.category,
-    subcategory: row.subcategory,
-    day: simple.day,
-    rowIndex: simple.categoryIndex,
-    colIndex: simple.day - 1,
-  };
-};
 import { useLunarGridState } from "./hooks/useLunarGridState";
 import { useTransactionOperations } from "./hooks/useTransactionOperations";
 import { useSubcategoryOperations } from "./hooks/useSubcategoryOperations";
@@ -101,11 +76,43 @@ export interface LunarGridTanStackProps {
   monthOptions?: Array<{ value: string; label: string }>;
 }
 
+interface LunarGridRowProps {
+  row: Row<TransformedTableDataRow>;
+  categories: CategoryStoreItem[];
+  _expandedRows: Record<string, boolean>;
+  subcategoryAction: (category: string, subcategory: string) => void;
+  editingSubcategoryName: string | null;
+  _highlightedCell: CellPosition | null;
+  addingSubcategory: string | null;
+  newSubcategoryName: string;
+  table: any;
+  transactionMap: any;
+  onExpandToggle: (rowId: string, isExpanded: boolean) => void;
+  onSubcategoryEdit: (category: string, newName: string) => void;
+  _onSubcategoryDelete: (category: string, subcategory: string) => void;
+  onEditingValueChange: (newName: string | null) => void;
+  onClearSubcategoryAction: () => void;
+  onStartEditingSubcategory: (category: string) => void;
+  onStartDeletingSubcategory: (category: string, subcategory: string) => void;
+  onCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
+  onSingleClickModal: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null, element: HTMLElement) => void;
+  onCellClick: (position: CellPosition) => void;
+  isPositionFocused: (position: CellPosition) => boolean;
+  isPositionSelected: (position: CellPosition) => boolean;
+  onAddSubcategory: (category: string) => void;
+  onCancelAddingSubcategory: () => void;
+  onSetAddingSubcategory: (category: string | null) => void;
+  onSetNewSubcategoryName: (name: string) => void;
+  year: number;
+  month: number;
+  validTransactions: any[];
+  transactionOps: any;
+}
+
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
   ({ year, month, onYearChange, onMonthChange, isFullscreen, onToggleFullscreen, monthOptions }) => {
-    // HYBRID APPROACH: Test StateManager integration alongside existing hooks
-    const [useStateManager] = React.useState(false); // Feature flag for hybrid testing
+    // REMOVED: useStateManager feature flag and associated logic as it's not currently used.
     
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
@@ -116,10 +123,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     // Hook consolidat pentru toate LunarGrid state-urile
     const {
       // Editing states
-      popover,
-      setPopover,
-      modalState,
-      setModalState,
       highlightedCell,
       setHighlightedCell,
       // Subcategory states (din useLunarGridSubcategoryState)
@@ -197,22 +200,29 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [transactionOps],
     );
 
-    // Note: Real handlers should come from LunarGridEventHandler component
-    // Current implementation uses placeholders until full EventHandler integration
+    // Reintroduce handleSingleClickModal with actual modal logic
     const handleSingleClickModal = useCallback(
       (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null, element: HTMLElement) => {
-        // PLACEHOLDER: Real implementation in LunarGridEventHandler
-        console.log('Single click modal (placeholder):', { category, subcategory, day, value, transactionId });
+        setHighlightedCell({
+          category,
+          subcategory,
+          day,
+          year,
+          month,
+          existingValue: value,
+          transactionId,
+        });
       },
-      []
+      [setHighlightedCell, year, month],
     );
 
+    // Reintroduce handleAddSubcategory with actual logic
     const handleAddSubcategory = useCallback(
       (category: string) => {
-        // PLACEHOLDER: Real implementation in LunarGridEventHandler  
-        console.log('Add subcategory (placeholder):', category);
+        setAddingSubcategory(category);
+        setNewSubcategoryName("");
       },
-      []
+      [setAddingSubcategory, setNewSubcategoryName],
     );
 
     // Interogare tabel optimizată (fără handleri de click/double-click)
@@ -228,23 +238,27 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       }));
     }, [table]);
 
+    // Handle focus change from keyboard navigation and update highlightedCell
+    const handleKeyboardFocusChange = useCallback((position: CellPosition | null) => {
+      setHighlightedCell(position);
+      console.log(`📍[LunarGridTanStack] Keyboard focus changed to:`, position);
+    }, [setHighlightedCell]);
+
     // Keyboard navigation hook cu delete support (simplified)
     const keyboardNav = useKeyboardNavigationSimplified({
       totalDays: days.length,
       totalRows: navigationRows.length,
       rows: navigationRows,
-      isActive: !modalState?.isOpen && !popover?.isOpen, // Dezactivează navigation când modal/popover e deschis
-      onDeleteRequest: async (positions: SimpleCellPosition[]) => {
+      isActive: true, // Acum este mereu activ, popover-ul se ocupă de focus trapping
+      onFocusChange: handleKeyboardFocusChange, // Pass the new focus handler
+      onDeleteRequest: async (positions: CellPosition[]) => {
         if (!user?.id || positions.length === 0) {return;}
 
         try {
-          // Convert simple positions to legacy format for existing logic
-          const legacyPositions = positions.map(pos => convertToLegacy(pos, navigationRows));
-          
           // Găsește tranzacțiile care există pentru pozițiile selectate
           const transactionsToDelete: string[] = [];
           
-          for (const pos of legacyPositions) {
+          for (const pos of positions) {
             // Găsește tranzacția pentru această poziție
             // Convertește day la data completă
             const targetDate = `${year}-${month.toString().padStart(2, '0')}-${pos.day.toString().padStart(2, '0')}`;
@@ -292,72 +306,51 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           toast.error(LUNAR_GRID_ACTIONS.DELETE_ERROR);
         }
       },
-      onEditMode: (position: SimpleCellPosition) => {
-        // Convert simple position to legacy for existing logic
-        const legacyPosition = convertToLegacy(position, navigationRows);
-        
+      onEditMode: (position: CellPosition) => {
+        // TODO: Implementează edit mode direct pentru pozițiile focalizate
         // Trigger inline edit mode pentru poziția selectată
-        // Găsește celula și trigger edit mode similar cu double click
-        const categoryRow = table.getRowModel().rows.find(row => 
-          row.original.category === legacyPosition.category && 
-          (!legacyPosition.subcategory || row.original.subcategory === legacyPosition.subcategory)
-        );
-        if (categoryRow) {
-          // TODO: Implementează edit mode direct pentru pozițiile focalizate
+        const cellId = `${position.category}-${position.subcategory || ''}-${position.day}`;
+        const cellElement = document.getElementById(cellId);
+        if (cellElement) {
+          const editableCellComponent = cellElement.querySelector('[data-editable-cell-input]') as HTMLElement;
+          if (editableCellComponent) {
+            editableCellComponent.focus();
+          }
         }
       },
     });
 
     // Create wrapper functions with legacy interface for backward compatibility
-    const navHandleCellClick = useCallback(
-      (position: LegacyCellPosition, modifiers?: { ctrlKey?: boolean; shiftKey?: boolean; metaKey?: boolean }) => {
-        const simplePosition = convertToSimple(position);
-        keyboardNav.handleCellClick(simplePosition, modifiers);
-      },
-      [keyboardNav.handleCellClick]
-    );
+    // REMOVED: Wrapper functions are no longer needed after unifying CellPosition types.
+    const navHandleCellClick = keyboardNav.handleCellClick;
+    const isPositionFocused = useCallback((position: CellPosition) => {
+      const result = highlightedCell !== null &&
+        highlightedCell.category === position.category &&
+        highlightedCell.subcategory === position.subcategory &&
+        highlightedCell.day === position.day;
+      return result;
+    }, [highlightedCell]);
 
-    const isPositionFocused = useCallback(
-      (position: LegacyCellPosition) => {
-        const simplePosition = convertToSimple(position);
-        return keyboardNav.isPositionFocused(simplePosition);
-      },
-      [keyboardNav.isPositionFocused]
-    );
-
-    const isPositionSelected = useCallback(
-      (position: LegacyCellPosition) => {
-        const simplePosition = convertToSimple(position);
-        return keyboardNav.isPositionSelected(simplePosition);
-      },
-      [keyboardNav.isPositionSelected]
-    );
+    const isPositionSelected = useCallback((position: CellPosition) => {
+      // For simplicity, selected = focused
+      const result = isPositionFocused(position);
+      console.log(`✨[LunarGridTanStack] isPositionSelected (Prop): comparing highlighted:`, highlightedCell, `with position:`, position, `-> Result:`, result);
+      return result;
+    }, [isPositionFocused, highlightedCell]);
 
     // Blocare scroll când modalul este deschis - UX Enhancement (doar scroll, nu operațiuni)
     useEffect(() => {
       const scrollableContainer = scrollableContainerRef.current;
       if (!scrollableContainer) {return;}
 
-      if (modalState?.isOpen) {
+      if (highlightedCell) {
         // Salvează poziția actuală de scroll pentru tabel
         const currentScrollTop = scrollableContainer.scrollTop;
         const currentScrollLeft = scrollableContainer.scrollLeft;
         
-        // Salvează poziția actuală de scroll pentru pagină
-        const currentPageScrollY = window.scrollY;
-        const currentPageScrollX = window.scrollX;
-        
         // Blochează scrollul tabelului
         scrollableContainer.style.overflow = 'hidden';
         scrollableContainer.style.position = 'relative';
-        
-        // Blochează scrollul paginii cu stil profesional
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${currentPageScrollY}px`;
-        document.body.style.left = `-${currentPageScrollX}px`;
-        document.body.style.width = '100%';
-        document.body.style.height = '100%';
         
         // Cleanup - restabilește scrollul când modalul se închide
         return () => {
@@ -368,32 +361,20 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollableContainer.scrollTop = currentScrollTop;
             scrollableContainer.scrollLeft = currentScrollLeft;
           }
-          
-          // Restabilește scrollul paginii
-          document.body.style.overflow = '';
-          document.body.style.position = '';
-          document.body.style.top = '';
-          document.body.style.left = '';
-          document.body.style.width = '';
-          document.body.style.height = '';
-          
-          // Restabilește poziția de scroll a paginii
-          window.scrollTo(currentPageScrollX, currentPageScrollY);
         };
       }
-    }, [modalState?.isOpen]);
+    }, [highlightedCell]);
 
     // Gestionarea poziției popover-ului
-    const popoverStyle = calculatePopoverStyle(popover);
+    const popoverStyle = calculatePopoverStyle(highlightedCell);
 
     // Simplified render pentru row folosind LunarGridRow component  
     const renderRow = useCallback(
-      (row: Row<TransformedTableDataRow>, level: number = 0): React.ReactNode => {
+      (row: Row<TransformedTableDataRow>) => {
         return (
           <LunarGridRow
             key={row.id}
             row={row}
-            level={level}
             categories={categories}
             _expandedRows={expandedRows}
             subcategoryAction={subcategoryAction}
@@ -426,17 +407,20 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             onStartDeletingSubcategory={startDeletingSubcategory}
             onCellSave={handleEditableCellSave}
             onSingleClickModal={handleSingleClickModal}
-            onCellClick={navHandleCellClick}
-            isPositionFocused={(position) => Boolean(isPositionFocused(position))}
-            isPositionSelected={(position) => Boolean(isPositionSelected(position))}
+            isPositionFocused={isPositionFocused}
+            isPositionSelected={isPositionSelected}
             onAddSubcategory={handleAddSubcategory}
             onCancelAddingSubcategory={cancelAddingSubcategory}
             onSetAddingSubcategory={setAddingSubcategory}
             onSetNewSubcategoryName={setNewSubcategoryName}
+            year={year}
+            month={month}
+            validTransactions={validTransactions}
+            transactionOps={transactionOps}
           />
         );
       },
-      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected],
+      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected, year, month, validTransactions, transactionOps],
     );
 
     // Renderizare (layout principal)
@@ -458,22 +442,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           )}
           data-testid="lunar-grid-resize-container"
           onSubmit={(e) => {
-            // Previne form submission care cauzează page refresh
             e.preventDefault();
             e.stopPropagation();
           }}
-          onClick={(e) => {
-            // Previne click-uri nedorite care pot cauza navigație
-            e.stopPropagation();
-          }}
           onWheel={(e) => {
-            // Capturează mouse wheel pentru scroll natural în tabel
             e.stopPropagation();
-            // Permite scroll-ul natural al browser-ului în container
           }}
-          tabIndex={0} // Face container-ul focusable pentru keyboard navigation
+          tabIndex={0}
           style={{
-            scrollBehavior: 'smooth' // Smooth scrolling pentru o experiență mai plăcută
+            scrollBehavior: 'smooth'
           }}
         >
           {/* Container interior - FĂRĂ overflow duplicat (scroll e gestionat de outer container) */}
@@ -572,26 +549,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
         </div>
         
         {/* Modal Manager - toate modal-urile și popover-urile consolidate */}
-        <LunarGridModalManager
-          popover={popover}
-          popoverStyle={popoverStyle || {}}
-          onSavePopover={(formData) => transactionOps.handleSavePopover(popover, formData)}
-          onCancelPopover={() => setPopover(null)}
-          modalState={modalState}
-          onSaveModal={(data) => transactionOps.handleSaveModal(modalState, data)}
-          onCancelModal={() => setModalState(null)}
-          onDeleteFromModal={() => transactionOps.handleDeleteFromModal(modalState)}
-          subcategoryAction={subcategoryAction}
-          validTransactions={validTransactions}
-          onConfirmSubcategoryAction={() => {
-            if (subcategoryAction && subcategoryAction.type === 'delete') {
-              subcategoryOps.handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
-            }
-          }}
-          onCancelSubcategoryAction={clearSubcategoryAction}
-          year={year}
-          month={month}
-        />
+        {/* (Removed LunarGridModalManager JSX) */}
       </>
     );
   },

@@ -19,7 +19,7 @@ import LunarGridHeader from "./LunarGridHeader";
 
 // Types - importăm tipurile din hook-ul useLunarGridTable
 import { TransformedTableDataRow } from "../hooks/useLunarGridTable";
-import { CellPositionComplex as CellPosition } from "../hooks/useKeyboardNavigationSimplified";
+import { CellPosition } from "../hooks/useKeyboardNavigationSimplified";
 
 export interface LunarGridTableProps {
   // Table data și config
@@ -32,11 +32,7 @@ export interface LunarGridTableProps {
   renderRow: (row: Row<TransformedTableDataRow>) => React.ReactNode;
   
   // Highlighted cell pentru visual feedback
-  highlightedCell: {
-    category: string;
-    subcategory?: string;
-    day: number;
-  } | null;
+  highlightedCell: CellPosition | null;
   
   // Keyboard navigation - folosim tipul CellPosition complet
   isPositionSelected?: (position: CellPosition) => boolean;
