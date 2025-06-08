@@ -198,7 +198,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     }
   }, [isReadonly, isEditing, onStartEdit, handleDoubleClick]);
 
-  // Keyboard navigation SIMPLU
+  // Keyboard navigation EXACT conform PRD
   const handleKeyDownWrapper = useCallback((e: React.KeyboardEvent) => {
     if (isEditing) {
       // În edit mode: Enter = save, Escape = cancel
@@ -213,27 +213,42 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       }
       inlineKeyDown(e);
     } else {
-      // Nu în edit mode: F2/Enter = start edit
-      if ((e.key === "F2" || e.key === "Enter") && !isReadonly) {
+      // Nu în edit mode - logica EXACTĂ din PRD:
+      if (e.key === "F2" && !isReadonly) {
+        // F2: Start edit când not editing și not readonly
         e.preventDefault();
         if (onStartEdit) {
           onStartEdit();
         } else {
           startEdit();
         }
+      } else if (e.key === "Enter" && !isReadonly && shouldShowHoverActions) {
+        // Enter: Start edit DOAR când hover actions sunt afișate
+        e.preventDefault();
+        if (onStartEdit) {
+          onStartEdit();
+        } else {
+          startEdit();
+        }
+      } else if (e.key === "Escape" && shouldShowHoverActions) {
+        // Escape: Deselect când hover actions sunt afișate
+        e.preventDefault();
+        // Trigger deselection prin onHoverChange
+        setInternalHovered(false);
+        onHoverChange?.(false);
       }
     }
     
     onKeyDown?.(e);
-  }, [isEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, onKeyDown, isReadonly]);
+  }, [isEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, onKeyDown, isReadonly, shouldShowHoverActions, setInternalHovered, onHoverChange]);
 
   // ===== MOBILE SUPPORT SIMPLU =====
   const handleTouchStart = useCallback(() => {
-    // Mobile: Long press (500ms) = show hover actions
+    // Mobile: Long press (600ms) = show hover actions
     const timer = setTimeout(() => {
       setInternalHovered(true);
       onHoverChange?.(true);
-    }, 500);
+    }, 600);
     setLongPressTimer(timer);
   }, [onHoverChange]);
 
@@ -316,7 +331,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   return (
     <div
-      className={cn(cellVariants({ state: cellState }), className)}
+      className={cn(cellVariants({ state: cellState }), "group relative", className)}
       onClick={handleSingleClick}
       onDoubleClick={handleDoubleClickWrapper}
       onKeyDown={handleKeyDownWrapper}
