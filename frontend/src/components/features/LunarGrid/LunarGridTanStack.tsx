@@ -15,8 +15,8 @@ import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 
 // Componente UI și features
 import LunarGridRow from "./components/LunarGridRow";
-import LunarGridModals from "./components/LunarGridModals";
-import DeleteSubcategoryModal from "./components/DeleteSubcategoryModal";
+import LunarGridTable from "./components/LunarGridTable";
+import LunarGridModalManager from "./components/LunarGridModalManager";
 import Button from "../../primitives/Button/Button";
 
 // Hooks specializate
@@ -621,307 +621,71 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             
             {/* 🎨 Professional Grid Table cu header integrat */}
             {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-              <table 
-                className="w-full border-collapse table-auto"
-                data-testid="lunar-grid-table"
-              >
-                {/* 🎨 Unified Sticky Header cu controale și zilele */}
-                <thead className={cn(gridHeader({ sortable: false, sticky: true }), "border-spacing-0")}>
-                  {/* Prima secțiune: Controale */}
-                  <tr>
-                    <th 
-                      colSpan={table.getFlatHeaders().length}
-                      className="bg-white border-b-0 p-4"
-                    >
-                      <div className="grid grid-cols-3 items-center gap-4">
-                        {/* Partea stânga: Butoane control grid */}
-                        <div className="flex items-center gap-3 justify-start">
-                          <h2 className={cn(
-                            textProfessional({ variant: "heading", contrast: "high" }),
-                            "text-lg font-bold"
-                          )}>
-                            Grid Lunar
-                          </h2>
-                          
-                          {/* Butoane extinde/resetează din toolbar */}
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => {
-                              const isCurrentlyExpanded = table.getIsAllRowsExpanded();
-                              const newExpandedState: Record<string, boolean> = {};
-                              
-                              if (!isCurrentlyExpanded) {
-                                // Expandează toate
-                                table.getRowModel().rows.forEach(row => {
-                                  if (row.getCanExpand()) {
-                                    newExpandedState[row.id] = true;
-                                  }
-                                });
-                              }
-                              
-                              setExpandedRows(newExpandedState);
-                              table.toggleAllRowsExpanded(!isCurrentlyExpanded);
-                            }}
-                            data-testid="toggle-expand-all"
-                          >
-                            {table.getIsAllRowsExpanded() ? LUNAR_GRID.COLLAPSE_ALL : LUNAR_GRID.EXPAND_ALL}
-                          </Button>
-                          
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => {
-                              setExpandedRows({});
-                              table.resetExpanded();
-                            }}
-                            data-testid="reset-expanded"
-                          >
-                            {LUNAR_GRID.RESET_EXPANSION}
-                          </Button>
-                        </div>
-
-                        {/* Partea centrală: Luna și anul cu mărimea originală */}
-                        <div className="flex justify-center">
-                          <h2 className="text-3xl font-bold text-gray-900 tracking-tight select-none cursor-default">
-                            {formatMonthYear(month, year)}
-                          </h2>
-                        </div>
-
-                        {/* Partea dreaptă: Controale navigare + Fullscreen */}
-                        <div className="flex items-center gap-3 justify-end">
-                          {/* Select pentru lună */}
-                          {monthOptions && onMonthChange && (
-                            <select
-                              value={month.toString()}
-                              onChange={(e) => onMonthChange(parseInt(e.target.value, 10))}
-                              className={cn(
-                                "px-3 py-2 border border-gray-300 rounded-md",
-                                "bg-white text-sm font-medium",
-                                "focus:outline-none focus:ring-2 focus:ring-primary-500"
-                              )}
-                              data-testid="month-selector"
-                            >
-                              {monthOptions.map(option => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          )}
-                          
-                          {/* Input pentru an */}
-                          {onYearChange && (
-                            <input
-                              type="number"
-                              value={year.toString()}
-                              onChange={(e) => {
-                                const newYear = parseInt(e.target.value, 10);
-                                if (!isNaN(newYear) && newYear > 1900 && newYear < 2100) {
-                                  onYearChange(newYear);
-                                }
-                              }}
-                              min="1900"
-                              max="2100"
-                              className={cn(
-                                "w-20 px-2 py-2 border border-gray-300 rounded-md",
-                                "bg-white text-sm font-medium text-center",
-                                "focus:outline-none focus:ring-2 focus:ring-primary-500"
-                              )}
-                              data-testid="lunargrid-year-input"
-                            />
-                          )}
-                          
-                          {/* Buton fullscreen */}
-                          <div
-                            onClick={onToggleFullscreen || toggleFullscreen}
-                            className={cn(
-                              "cursor-pointer select-none",
-                              "p-2 rounded-lg",
-                              "hover:bg-primary-50 active:bg-primary-100",
-                              "transition-all duration-150",
-                              "flex items-center justify-center",
-                              (isFullscreen || tableIsFullscreen) ? "bg-primary-100 text-primary-700" : "text-primary-600 hover:text-primary-800"
-                            )}
-                            title="Toggle fullscreen"
-                            data-testid="layout-mode-toggle"
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                (onToggleFullscreen || toggleFullscreen)();
-                              }
-                            }}
-                          >
-                            {(isFullscreen || tableIsFullscreen) ? (
-                              <Minimize2 size={24} strokeWidth={2} />
-                            ) : (
-                              <Maximize2 size={24} strokeWidth={2} />
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </th>
-                  </tr>
-                  
-                  {/* A doua secțiune: Headers cu zilele - în același thead */}
-                  <tr className="bg-white border-t-0">
-                    {table.getFlatHeaders().map((header, index) => {
-                      const isFirstColumn = index === 0;
-                      const isNumericColumn = header.id.startsWith("day-") || header.id === "total";
-                      const isPinned = header.column.getIsPinned();
-                      
-                      return (
-                        <th
-                          key={header.id}
-                          colSpan={header.colSpan}
-                          className={cn(
-                            gridCell({ 
-                              type: "header",
-                              size: "md",
-                              frozen: isPinned ? "column" : false
-                            }),
-                            textProfessional({ variant: "heading", contrast: "enhanced" }),
-                            isFirstColumn && "min-w-[200px]",
-                            isNumericColumn && "w-20",
-                            "select-none cursor-default"
-                          )}
-                          style={{ 
-                            width: header.getSize(),
-                            ...(isPinned && {
-                              position: 'sticky',
-                              left: 0,
-                              zIndex: 10
-                            })
-                          }}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext()) as React.ReactNode}
-                        </th>
-                      );
-                    })}
-                  </tr>
-                  
-                  {/* 🎨 Professional Balance Row cu enhanced styling */}
-                  <tr className={cn(gridRow({ type: "total" }), "bg-white border-t-0")}>
-                    {table.getFlatHeaders().map((header, index) => {
-                      const isFirstColumn = index === 0;
-                      const isPinned = header.column.getIsPinned();
-                      
-                      if (isFirstColumn) {
-                        return (
-                          <th
-                            key={`balance-${header.id}`}
-                            className={cn(
-                              gridCell({ 
-                                type: "balance",
-                                frozen: "both"
-                              }),
-                              textProfessional({ variant: "heading", contrast: "enhanced" }),
-                              "select-none cursor-default"
-                            )}
-                            style={{
-                              position: 'sticky',
-                              left: 0,
-                              top: 0,
-                              zIndex: 30
-                            }}
-                          >
-                            {UI.LUNAR_GRID_TOOLTIPS.DAILY_BALANCES}
-                          </th>
-                        );
-                      }
-                      
-                      if (header.id.startsWith("day-")) {
-                        const dayNumber = parseInt(header.id.split("-")[1], 10);
-                        const dailyBalance = dailyBalances[dayNumber] || 0;
-                        
-                        return (
-                          <th
-                            key={`balance-${header.id}`}
-                            className={cn(
-                              gridCell({ 
-                                type: "balance",
-                                alignment: "center", // Center alignment pentru daily balance
-                                state: dailyBalance > 0 ? "positive" : dailyBalance < 0 ? "negative" : "default" 
-                              }),
-                              "contrast-high",
-                              dailyBalance > 0 ? "value-positive" : dailyBalance < 0 ? "value-negative" : "value-neutral",
-                              "select-none cursor-default"
-                            )}
-                          >
-                            {dailyBalance !== 0 ? formatCurrencyForGrid(dailyBalance) : "—"}
-                          </th>
-                        );
-                      }
-                      
-                      if (header.id === "total") {
-                        const monthTotal = Object.values(dailyBalances).reduce((sum, val) => sum + val, 0);
-                        return (
-                          <th
-                            key={`balance-${header.id}`}
-                            className={cn(
-                              gridCell({ 
-                                type: "balance",
-                                alignment: "center", // Center alignment pentru month total 
-                                state: monthTotal > 0 ? "positive" : monthTotal < 0 ? "negative" : "default" 
-                              }),
-                              "contrast-high",
-                              monthTotal > 0 ? "value-positive" : monthTotal < 0 ? "value-negative" : "value-neutral",
-                              "select-none cursor-default"
-                            )}
-                          >
-                            {monthTotal !== 0 ? formatCurrencyForGrid(monthTotal) : "—"}
-                          </th>
-                        );
-                      }
-                      
-                      return (
-                        <th
-                          key={`balance-${header.id}`}
-                          className={cn(gridCell({ 
-                            type: "balance",
-                            alignment: "center" // Center alignment pentru empty balance cells
-                          }))}
-                        >
-                          —
-                        </th>
-                      );
-                    })}
-                  </tr>
-                </thead>
-                <tbody>
-                  {table.getRowModel().rows.map((row) => renderRow(row))}
-                </tbody>
-              </table>
+              <>
+                {/* Tabelul cu header integrat - NU mai avem header separat */}
+                <LunarGridTable
+                  table={table}
+                  dailyBalances={dailyBalances}
+                  renderRow={renderRow}
+                  highlightedCell={highlightedCell}
+                  isPositionSelected={(position) => Boolean(isPositionSelected(position))}
+                  isPositionFocused={(position) => Boolean(isPositionFocused(position))}
+                  onCellClick={navHandleCellClick}
+                  // Header props - transmise către LunarGridTable pentru integrare
+                  year={year}
+                  month={month}
+                  onYearChange={onYearChange}
+                  onMonthChange={onMonthChange}
+                  monthOptions={monthOptions}
+                  isAllRowsExpanded={table.getIsAllRowsExpanded()}
+                  onToggleExpandAll={() => {
+                    const isCurrentlyExpanded = table.getIsAllRowsExpanded();
+                    const newExpandedState: Record<string, boolean> = {};
+                    
+                    if (!isCurrentlyExpanded) {
+                      // Expandează toate
+                      table.getRowModel().rows.forEach(row => {
+                        if (row.getCanExpand()) {
+                          newExpandedState[row.id] = true;
+                        }
+                      });
+                    }
+                    
+                    setExpandedRows(newExpandedState);
+                    table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+                  }}
+                  onResetExpanded={() => {
+                    setExpandedRows({});
+                    table.resetExpanded();
+                  }}
+                  isFullscreen={isFullscreen || tableIsFullscreen}
+                  onToggleFullscreen={onToggleFullscreen || toggleFullscreen}
+                />
+              </>
             )}
           </div>
         </div>
         
-        {/* Toate modal-urile și popover-urile consolidate */}
-        <LunarGridModals
+        {/* Modal Manager - toate modal-urile și popover-urile consolidate */}
+        <LunarGridModalManager
           popover={popover}
-          popoverStyle={popoverStyle}
-          year={year}
-          month={month}
+          popoverStyle={popoverStyle || {}}
           onSavePopover={handleSavePopover}
           onCancelPopover={() => setPopover(null)}
           modalState={modalState}
           onSaveModal={handleSaveModal}
           onCancelModal={handleCloseModal}
           onDeleteFromModal={handleDeleteFromModal}
-        />
-
-        {/* DeleteSubcategoryModal pentru delete subcategory */}
-        <DeleteSubcategoryModal
           subcategoryAction={subcategoryAction}
           validTransactions={validTransactions}
-          onConfirm={() => {
+          onConfirmSubcategoryAction={() => {
             if (subcategoryAction && subcategoryAction.type === 'delete') {
               handleDeleteSubcategory(subcategoryAction.category, subcategoryAction.subcategory);
             }
           }}
-          onCancel={clearSubcategoryAction}
+          onCancelSubcategoryAction={clearSubcategoryAction}
+          year={year}
+          month={month}
         />
       </>
     );

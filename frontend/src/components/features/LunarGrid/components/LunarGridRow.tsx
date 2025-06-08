@@ -134,17 +134,29 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
 
   const { isTotalRow } = rowMetadata;
 
-  // 🔧 UPDATED LOGIC: Calculează dacă acest row este ultima subcategorie din categoria sa
+  // 🔧 DEFINITIVE FIX: Calculează dacă acest row este ultima subcategorie din categoria sa
+  // Folosim o abordare robustă bazată pe datele categoriei din props, nu pe poziția din tabel
   const isLastSubcategoryInCategory = useMemo(() => {
-    if (isCategory || !original.category) return false;
+    if (isCategory || !original.category || !original.subcategory) return false;
     
-    const tableRows = table.getRowModel().rows;
-    const subcategoryRows = tableRows.filter(r => 
-      !r.original.isCategory && r.original.category === original.category
-    );
+    // Găsim categoria din props-urile transmise (acestea conțin datele definitive)
+    const categoryData = categories.find(cat => cat.name === original.category);
+    if (!categoryData || !categoryData.subcategories) return false;
     
-    return subcategoryRows.length > 0 && subcategoryRows[subcategoryRows.length - 1].id === row.id;
-  }, [isCategory, original.category, table, row.id]);
+    // Obținem lista completă de subcategorii din categoria
+    const allSubcategoriesInCategory = categoryData.subcategories.map(sub => sub.name);
+    
+    // Verificăm dacă subcategoria curentă este ultima din listă
+    const lastSubcategoryInCategory = allSubcategoriesInCategory[allSubcategoriesInCategory.length - 1];
+    const isLast = original.subcategory === lastSubcategoryInCategory;
+    
+    // 🐛 DEBUG: Log pentru debugging doar pentru subcategorii custom
+    if (process.env.NODE_ENV === 'development' && original.subcategory.includes('custom')) {
+      console.log(`[FIX-DUPLICATE] ${original.subcategory}: isLast=${isLast}, lastInCategory=${lastSubcategoryInCategory}, allSubs=[${allSubcategoriesInCategory.join(', ')}]`);
+    }
+    
+    return isLast;
+  }, [categories, original.category, original.subcategory, isCategory]);
 
   // 🔒 LOCK ICON LOGIC: Verifică dacă categoria a atins limita de 5 subcategorii custom
   const shouldShowLockIcon = useMemo(() => {
@@ -475,11 +487,14 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
         const customSubcategoriesCount = categoryData?.subcategories?.filter(sub => sub.isCustom).length || 0;
         const hasReachedLimit = customSubcategoriesCount >= 5; // VALIDATION.MAX_CUSTOM_SUBCATEGORIES
         
-        // 🔧 SAFETY CHECK: Prevent duplicate buttons by checking if this specific row should render
-        const uniqueKey = `add-subcategory-${original.category}-${row.id}`;
+        // 🔧 DEFINITIVE UNIQUENESS: Creăm o cheie stabilă bazată DOAR pe categoria finală
+        // Aceasta previne complet dublările prin asigurarea că doar ULTIMA subcategorie din categorie
+        // poate avea butonul, indiferent de re-renderuri sau modificări de date
+        const isReallyLastSubcategory = isLastSubcategoryInCategory && shouldRenderAfterLastSubcategory;
+        const uniqueKey = `add-subcategory-${original.category}-FINAL`;
         
-        // Only render if category is expanded, this is last subcategory, AND limit not reached
-        const shouldRender = shouldRenderAfterLastSubcategory && !hasReachedLimit;
+        // 🚫 DUPLICATE PREVENTION: Renderăm DOAR dacă toate condițiile sunt îndeplinite
+        const shouldRender = isReallyLastSubcategory && !hasReachedLimit;
         
         return shouldRender ? (
           <LunarGridAddSubcategoryRow
