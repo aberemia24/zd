@@ -141,7 +141,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       // Expanded rows state
       expandedRows,
       setExpandedRows,
-    } = useLunarGridState(year, month);
+    } = useLunarGridState();
 
     // Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
     // Optimizat pentru optimistic updates - cache redus pentru a detecta schimbările
@@ -207,13 +207,12 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           category,
           subcategory,
           day,
-          year,
-          month,
-          existingValue: value,
-          transactionId,
+          categoryIndex: 0, // Temporary value, will be calculated properly later
+          rowIndex: 0, // Temporary value, will be calculated properly later  
+          colIndex: day - 1,
         });
       },
-      [setHighlightedCell, year, month],
+      [setHighlightedCell],
     );
 
     // Reintroduce handleAddSubcategory with actual logic
@@ -366,7 +365,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     }, [highlightedCell]);
 
     // Gestionarea poziției popover-ului
-    const popoverStyle = calculatePopoverStyle(highlightedCell);
+    // const popoverStyle = calculatePopoverStyle(highlightedCell); // Temporarily disabled
 
     // Simplified render pentru row folosind LunarGridRow component  
     const renderRow = useCallback(
@@ -407,6 +406,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             onStartDeletingSubcategory={startDeletingSubcategory}
             onCellSave={handleEditableCellSave}
             onSingleClickModal={handleSingleClickModal}
+            onCellClick={navHandleCellClick}
             isPositionFocused={isPositionFocused}
             isPositionSelected={isPositionSelected}
             onAddSubcategory={handleAddSubcategory}
@@ -420,7 +420,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
           />
         );
       },
-      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected, year, month, validTransactions, transactionOps],
+      [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected, year, month, validTransactions, transactionOps],
     );
 
     // Renderizare (layout principal)

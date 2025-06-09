@@ -12,7 +12,7 @@ import LunarGridSubcategoryRowCell from "./LunarGridSubcategoryRowCell";
 import LunarGridAddSubcategoryRow from "./LunarGridAddSubcategoryRow";
 import LunarGridCell from "./LunarGridCell";
 import Tooltip from "../../../primitives/Tooltip/Tooltip";
-import { TransactionPopover } from '../modals';
+
 import type { UseTransactionOperationsReturn } from '../hooks/useTransactionOperations';
 import { TransformedDataForPopover } from '../hooks/useTransactionOperations'; // Presupunând că exportați acest tip
 import { EditableCell } from "../inline-editing/EditableCell"; // Asigură-te că AdvancedEditPopover este exportat din acest fișier
@@ -133,7 +133,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   const isCategory = original.isCategory;
   const isSubcategory = !isCategory;
   
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
   
   // Memoized computations pentru performance - evită recalcularea la fiecare render
   const rowMetadata = useMemo(() => {
@@ -296,9 +296,9 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                 }),
                 textProfessional({ variant: "default" }),
                 isFirstCell && level > 0 && "pl-8",
-                isDayCell && isSubcategory && "!p-0",
+                isDayCell && isSubcategory && "!p-0 !overflow-visible",
                 isTotalCell && "font-semibold tabular-nums",
-                { 'z-20': isPopoverOpen }
+
               )}
               style={{
                 ...(cell.column.getIsPinned() && {
@@ -385,13 +385,15 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   onStartDelete={() => onStartDeletingSubcategory(original.category, original.subcategory || '')}
                 />
               ) : isDayCell && isSubcategory ? (
-                <TransactionPopover
-                  isOpen={isPopoverOpen}
-                  onOpenChange={setIsPopoverOpen}
-                >
                   <LunarGridCell
                     cellId={`${original.category}-${original.subcategory || ''}-${cell.column.id.split("-")[1]}`}
                     value={String(cell.getValue() || '')}
+                    onSave={async (value: string | number) => {
+                      // FIX CRITIC: Conectează salvarea inline cu backend-ul
+                      const day = parseInt(cell.column.id.split("-")[1]);
+                      const transactionId = transactionMap.get(`${original.category}-${original.subcategory}-${day}`) || null;
+                      await onCellSave(original.category, original.subcategory, day, value, transactionId);
+                    }}
                     isSelected={(() => {
                       const day = parseInt(cell.column.id.split("-")[1]);
                       const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) => row.original.category === original.category && row.original.subcategory === original.subcategory));
@@ -412,6 +414,20 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     })()}
                     className={getValueClasses()}
                     placeholder="0"
+                    onClick={(e) => {
+                      // CONEXIUNE CRITICĂ: Conectează selecția de celule
+                      const day = parseInt(cell.column.id.split("-")[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) => row.original.category === original.category && row.original.subcategory === original.subcategory));
+                      const cellPosition: CellPosition = {
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
+                      };
+                      onCellClick?.(cellPosition, {
+                        ctrlKey: e.ctrlKey,
+                        shiftKey: e.shiftKey,
+                        metaKey: e.metaKey
+                      });
+                    }}
                     date={`${year}-${String(month + 1).padStart(2, '0')}-${String(parseInt(cell.column.id.split("-")[1])).padStart(2, '0')}`}
                     existingTransaction={validTransactions.find(t => 
                       t.category === original.category && 
@@ -420,9 +436,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                     )}
                     onSaveTransaction={transactionOps.handleSaveTransaction}
                     isSavingTransaction={transactionOps.isSaving}
-                    onTogglePopover={() => setIsPopoverOpen(prev => !prev)}
+                    onTogglePopover={() => {}} // Nu mai e necesar, păstrat doar pentru compatibilitate
                   />
-                </TransactionPopover>
               ) : isDayCell && isCategory ? (
                 // Day Cell pentru categorii - DOAR afișare, fără interactivitate
                 <div className="w-full h-full min-h-[40px] flex items-center justify-center">

@@ -193,17 +193,20 @@ export const useInlineCellEdit = ({
       switch (e.key) {
         case "Enter":
           e.preventDefault();
+          e.stopPropagation(); // PREVINE PROPAGAREA care cauzează refresh
           saveValue();
           break;
 
         case "Escape":
           e.preventDefault();
+          e.stopPropagation(); // PREVINE PROPAGAREA 
           cancelEdit(); // Anulare directă, nu prin blur
           break;
 
         case "Tab":
           // Salvează și permite Tab navigation normal
           e.preventDefault();
+          e.stopPropagation(); // PREVINE PROPAGAREA 
           saveValue();
           break;
       }

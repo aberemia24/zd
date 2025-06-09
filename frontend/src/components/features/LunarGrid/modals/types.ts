@@ -1,4 +1,4 @@
-import { TransactionType } from "@budget-app/shared-constants";
+import { TransactionType, FrequencyType } from "@budget-app/shared-constants";
 
 export interface TransactionData {
   id?: string;
@@ -6,6 +6,7 @@ export interface TransactionData {
   type: TransactionType;
   description: string;
   isRecurring: boolean;
+  frequency?: FrequencyType;
   category: string;
   subcategory?: string;
   date: string;

@@ -50,6 +50,8 @@ export class CategoryEditorPage {
 
   // Metode pentru acțiuni
   async openFromOptionsPage() {
+    await this.page.waitForSelector('[data-testid="transactions-tab"]');
+
     await this.page.getByTestId('options-tab').click();
     await this.page.waitForLoadState('networkidle');
     await this.page.getByTestId('open-category-editor-btn').click();

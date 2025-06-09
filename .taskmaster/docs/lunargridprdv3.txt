@@ -1,0 +1,124 @@
+# LUNAR GRID - AUDIT COMPLET ȘI SIMPLIFICARE
+## Product Requirements Document v3
+
+### CONTEXTUL PROIECTULUI
+- Proiect de web app dezvoltat cu AI în Cursor
+- Focus pe soluții practice, NU enterprise/academice/overengineering
+- Responsive design NU este prioritate
+- Necesitate de instrucțiuni foarte clare și granulare pentru AI
+
+### OBIECTIVUL PRINCIPAL
+Audit complet și plan de simplificare pentru LunarGrid - de la arhitectură monolitică complexă la orchestrator simplu și stabil.
+
+---
+
+## 1. SCOPUL AUDITULUI
+
+### 1.1 Analiza Completă LunarGrid
+- **Componente**: Toate componentele, hooks, features, funcții, operațiuni, metode
+- **Dependințe**: Cum totul este conectat, importuri, relații între module
+- **Minutiozitate**: Analiză foarte detaliată a întregii arhitecturi
+
+### 1.2 Identificarea Problemelor
+- **Cod nefolosit**: Dead code care poate fi eliminat
+- **Cod dublat**: Funcționalitate duplicată și locațiile acesteia
+- **Probleme de logică**: Erori sau inconsistențe în implementare
+- **Lipsuri evidente**: Funcționalități incomplete sau missing
+- **Best practices**: Comparație cu standardele industriei (practice, nu enterprise)
+
+---
+
+## 2. PROBLEME CRITICE IDENTIFICATE
+
+### 2.1 LunarGridTanStack - Complexitate Excesivă
+- **Status actual**: Monolit devenit prea complex pentru dezvoltare ulterioară
+- **Progres**: Început de simplificare către orchestrator, dar blocat
+- **Risc**: Orice modificare strică funcționalități existente
+- **Necesitate**: Plan extrem de granular pentru refactoring pas cu pas
+
+### 2.2 EditableCell - Overengineering
+- **Problema**: Arhitectură prea complexă pentru funcționalitatea oferită
+- **Impact**: AI-ul nu poate naviga eficient prin complexitate
+- **Necesitate**: Simplificare și stabilizare
+
+### 2.3 Probleme Funcționale Specifice
+
+#### 2.3.1 Selecția Celulelor
+- **Problema**: Click selectează celula doar pe o porțiune din suprafață, nu pe toată
+- **Impact**: UX slab, utilizatorii nu pot selecta intuitiv
+
+#### 2.3.2 Refresh Pagină (REGRESIE)
+- **Problema**: Modificarea sau adăugarea tranzacție în grid cauzează refresh de pagină
+- **Status**: Regresie - a fost rezolvată în trecut, a reapărut
+- **Prioritate**: CRITICĂ - afectează serious UX-ul
+
+#### 2.3.3 Delete Functionality
+- **Problema 1**: Prompt browser nativ la delete (arată urât)
+- **Problema 2**: Delete nu funcționează pe unele celule (observat la începutul lunii)
+- **Lipsă**: Nu există opțiune delete în hover options
+
+#### 2.3.4 Popover More Options
+- **Status**: Implementat conform viziunii, dar incert dacă este corect
+- **Necesitate**: Validare implementare și optimizare
+
+#### 2.3.5 Hover Options UX
+- **Problema**: Opțiunile de hover acoperă cifra și arată ciudat
+- **Necesitate**: Soluție mai elegantă de afișare
+- **Lipsă**: Trebuie adăugat delete direct în hover options
+
+---
+
+## 3. PLANUL DE IMPLEMENTARE
+
+### 3.1 Faza 1: Audit Complet
+- **Mapare completă** a arhitecturii LunarGrid
+- **Inventar** toate componentele, hooks, utils, types
+- **Analiza dependințelor** și a flow-ului de date
+- **Identificarea** codului mort și duplicat
+
+### 3.2 Faza 2: Plan Granular de Refactoring
+- **Instrucțiuni pas cu pas** pentru AI
+- **Nivel de detaliu**: "ia liniile X-Y și înlocuiește cu Z"
+- **Ordine de execuție** pentru a evita breaking changes
+- **Puncte de verificare** pentru fiecare pas
+
+### 3.3 Faza 3: Fix-uri Critice
+- **Prioritate 1**: Rezolvare regresie refresh pagină
+- **Prioritate 2**: Fix delete functionality pe toate celulele
+- **Prioritate 3**: Îmbunătățire selecție celule (full surface)
+- **Prioritate 4**: Optimizare hover options UX
+
+### 3.4 Faza 4: Simplificare Arhitectură
+- **LunarGridTanStack**: De la monolit la orchestrator
+- **EditableCell**: Reducere complexitate
+- **Dead code removal**: Eliminare cod nefolosit
+- **Consolidare**: Merge funcționalități duplicate
+
+---
+
+## 4. CRITERIILE DE SUCCES
+
+### 4.1 Funcționalitate
+- ✅ Delete funcționează pe toate celulele
+- ✅ Nu mai există refresh de pagină la edit/add
+- ✅ Selecția celulelor funcționează pe toată suprafața
+- ✅ Hover options elegant și funcțional cu delete
+
+### 4.2 Arhitectură
+- ✅ LunarGrid simplu de navigat pentru AI
+- ✅ Zero cod mort
+- ✅ Zero funcționalități duplicate
+- ✅ Documentație clară pentru fiecare componentă
+
+### 4.3 Dezvoltare Viitoare
+- ✅ AI poate adăuga features fără să strice existentele
+- ✅ Cod ușor de înțeles și modificat
+- ✅ Arhitectură stabilă pentru dezvoltare rapidă
+
+---
+
+## 5. NOTĂ PENTRU TASKMASTER
+
+Acest audit trebuie să producă un plan foarte granular pentru AI, cu instrucțiuni specifice la nivel de linie de cod. Scopul este să transformăm LunarGrid dintr-un labirint complex într-o arhitectură clară, simplă și funcțională.
+
+**IMPORTANT**: Toate soluțiile trebuie să fie practice și simple, fără enterprise patterns sau overengineering.

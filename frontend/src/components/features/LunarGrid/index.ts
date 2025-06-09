@@ -1,3 +1,6 @@
+// This file is intentionally left blank for now.
+// It is being restored to fix a build/routing issue caused by its deletion.
+
 // Barrel export pentru componente LunarGrid
 
 // Main components
