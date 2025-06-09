@@ -867,3 +867,14 @@ export const NAVIGATION = {
         SYNC_FAILED: 'Eșec la sincronizarea componentelor'
     }
 };
+// Breadcrumb Text
+export const BREADCRUMB_HOME = "Acasă";
+export const BREADCRUMB_SEPARATOR = "/";
+// LunarGrid Preferences
+export const LUNAR_GRID_PREFERENCES_TITLE = "🗓️ Preferințe LunarGrid";
+export const LUNAR_GRID_DELETE_CONFIRM_TITLE = "⌨️ Confirmare ștergere cu Delete key";
+export const LUNAR_GRID_DELETE_CONFIRM_DESCRIPTION = "Controlează dacă aplicația va cere confirmare când ștergi tranzacții folosind tasta Delete în grid.";
+export const LUNAR_GRID_DELETE_CONFIRM_LABEL = "Afișează confirmare pentru ștergere cu Delete key";
+export const LUNAR_GRID_DELETE_CONFIRM_RECOMMENDATION = "💡 Recomandat activat pentru a preveni ștergerea accidentală a tranzacțiilor importante. Când e dezactivat, Delete key va șterge imediat fără confirmare (stil Excel cu Undo).";
+export const LUNAR_GRID_DELETE_CONFIRM_ENABLED_SUCCESS = "Confirmarea pentru ștergere a fost activată";
+export const LUNAR_GRID_DELETE_CONFIRM_DISABLED_SUCCESS = "Confirmarea pentru ștergere a fost dezactivată";

@@ -11,6 +11,7 @@ import {
 } from '../../../../services/hooks/transactionMutations';
 import { TransactionData } from '../modals'; // Asigură-te că TransactionData este exportat din modals
 import { useConfirmationModal } from '../../../primitives/ConfirmationModal';
+import { useLunarGridPreferences } from '../../../../hooks/useLunarGridPreferences';
 
 interface PopoverState {
   isOpen: boolean;
@@ -106,37 +107,65 @@ export const useTransactionOperations = ({
     if (isEmptyValue) {
       // Dacă există tranzacție, verifică dacă trebuie să afișeze confirmarea
       if (transactionId) {
-        // Check localStorage pentru "don't show again" preference
-        const dontShowDeleteConfirm = localStorage.getItem('budget-app-delete-confirm-disabled') === 'true';
+        // Check preferences cu noul hook reutilizabil
+        const { preferences } = useLunarGridPreferences();
+        const dontShowDeleteConfirm = !preferences.deleteConfirmationEnabled;
         
         if (!dontShowDeleteConfirm) {
-          // Afișează confirmarea cu opțiunea "don't show again"
-          const confirmed = await showConfirmation({
-            title: "Șterge tranzacția?",
-            message: "Această acțiune va șterge complet tranzacția din baza de date.",
-            confirmText: "Șterge",
-            cancelText: "Anulează", 
-            variant: "danger",
-            icon: "🗑️",
-            details: [
-              `Categorie: ${category}${subcategory ? ` - ${subcategory}` : ""}`,
-              `Data: ${day}/${month + 1}/${year}`,
-              `Sumă: ${typeof value === 'string' ? parseFloat(value) || 0 : value}`,
-            ],
-            recommendation: "Această acțiune nu poate fi anulată. Asigură-te că vrei să ștergi această tranzacție.",
-            // Add "don't show again" functionality
-            showDontShowAgain: true,
-            localStorageKey: 'budget-app-delete-confirm-disabled'
+          // TOAST SUBTIL cu UNDO în loc de modal mare
+          const deleteToast = toast((t) => (
+            <div className="flex items-center gap-3 min-w-[300px]">
+              <span className="text-amber-800">🗑️ Ștergi tranzacția?</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    // DELETE CONFIRMED
+                    try {
+                      console.log(`[TransactionOps] Deleting transaction ${transactionId} via toast confirm`);
+                      await deleteTransactionMutation.mutateAsync(transactionId);
+                      toast.dismiss(t.id);
+                      toast.success('Tranzacție ștearsă', { duration: 2000 });
+                    } catch (error) {
+                      toast.error('Eroare la ștergere');
+                      console.error('Delete error:', error);
+                    }
+                  }}
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
+                >
+                  Șterge
+                </button>
+                <button
+                  onClick={() => {
+                    // CANCEL - doar dismiss toast-ul
+                    toast.dismiss(t.id);
+                    console.log(`[TransactionOps] Delete cancelled via toast for transaction ${transactionId}`);
+                  }}
+                  className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
+                >
+                  Anulează
+                </button>
+              </div>
+            </div>
+          ), {
+            duration: 4000, // 4 secunde pentru undo - Excel/Sheets standard
+            position: 'top-right',
+            style: {
+              background: '#fef3c7', // Yellow amber background
+              border: '1px solid #f59e0b',
+              color: '#92400e',
+              minWidth: '350px',
+              padding: '12px',
+            },
           });
-          
-          if (!confirmed) {
-            console.log(`[TransactionOps] Delete cancelled by user for transaction ${transactionId}`);
-            return;
-          }
+        } else {
+          // Direct delete fără confirmare (dacă user-ul a ales "don't show again")
+          console.log(`[TransactionOps] Direct deleting transaction ${transactionId} (confirmation disabled)`);
+          await deleteTransactionMutation.mutateAsync(transactionId);
+          toast.success('Tranzacție ștearsă', {
+            duration: 2000,
+            position: 'top-right',
+          });
         }
-        
-        console.log(`[TransactionOps] Deleting transaction ${transactionId} because of empty value:`, { value, category, subcategory, day });
-        await deleteTransactionMutation.mutateAsync(transactionId);
         return;
       } else {
         // Dacă nu există tranzacție și valoarea e goală, nu face nimic

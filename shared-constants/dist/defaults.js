@@ -27,3 +27,23 @@ export const LUNAR_GRID_FEATURE_FLAGS = {
     USE_PERFORMANCE_OPTIMIZATIONS: true,
     USE_DEBUG_MODE: false,
 };
+// LocalStorage Keys
+export const STORAGE_KEYS = {
+    // Theme and UI preferences
+    DARK_MODE: 'darkMode',
+    SIDEBAR_EXPANDED: 'sidebar-expanded',
+    // LunarGrid preferences  
+    LUNAR_GRID_DELETE_CONFIRM: 'lunar-grid-delete-confirm',
+    LUNAR_GRID_LAST_CATEGORY_UPDATE: 'budget-app-last-category-update',
+    // Component state persistence
+    TABS_ACTIVE: 'tabs-active',
+    EXPANDED_ROWS: 'expanded-rows'
+};
+// Default values for preferences
+export const PREFERENCE_DEFAULTS = {
+    // LunarGrid preferences
+    DELETE_CONFIRMATION_ENABLED: true,
+    // UI preferences
+    SIDEBAR_EXPANDED: true,
+    DARK_MODE: false
+};

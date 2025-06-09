@@ -4,10 +4,13 @@ import { useAuthStore } from "../stores/authStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import CategoryEditor from "../components/features/CategoryEditor/CategoryEditor";
 import { UI, CATEGORIES, TransactionType } from "@budget-app/shared-constants";
+import * as UITexts from "@budget-app/shared-constants/ui";
 import { Button } from "../components/primitives/Button";
 import Alert from "../components/primitives/Alert";
 import { ConfirmationModal, PromptModal, useConfirmationModal } from "../components/primitives/ConfirmationModal";
 import { Container } from "../components/primitives";
+import { PreferenceToggle } from "../components/primitives/PreferenceToggle";
+import { useLunarGridPreferences } from "../hooks/useLunarGridPreferences";
 
 // CVA styling imports
 import {
@@ -25,6 +28,40 @@ import {
 import { useDeleteTransaction } from "../services/hooks/useTransactionMutations";
 import { supabaseService } from "../services/supabaseService";
 import { toast } from "react-hot-toast";
+
+/**
+ * Componentă separată pentru preferințele LunarGrid
+ * Folosește hook-ul specialized și componenta reutilizabilă
+ */
+const LunarGridPreferencesSection: React.FC = () => {
+  const { preferences, toggleDeleteConfirmation, isLoaded } = useLunarGridPreferences();
+
+  return (
+    <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>
+      <div className={cardHeader({ variant: "default" })}>
+        <h2 className={headingProfessional({ level: "h4" })}>
+          {UITexts.LUNAR_GRID_PREFERENCES_TITLE}
+        </h2>
+      </div>
+      <div className="p-6">
+        <div className={spaceY({ spacing: 4 })}>
+          <PreferenceToggle
+            id="delete-confirmation"
+            title={UITexts.LUNAR_GRID_DELETE_CONFIRM_TITLE}
+            description={UITexts.LUNAR_GRID_DELETE_CONFIRM_DESCRIPTION}
+            label={UITexts.LUNAR_GRID_DELETE_CONFIRM_LABEL}
+            recommendation={UITexts.LUNAR_GRID_DELETE_CONFIRM_RECOMMENDATION}
+            checked={preferences.deleteConfirmationEnabled}
+            onChange={toggleDeleteConfirmation}
+            testId="lunar-grid-delete-confirm-toggle"
+            isLoading={!isLoaded}
+            variant="blue"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 /**
  * Pagina de opțiuni a aplicației
@@ -471,6 +508,9 @@ const OptionsPage: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* Preferințe LunarGrid */}
+        <LunarGridPreferencesSection />
 
         {/* Secțiunea Reset to Defaults */}
         <div className={cn(card({ variant: "elevated" }), spacingMargin({ bottom: 6 }))}>

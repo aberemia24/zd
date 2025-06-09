@@ -5,6 +5,7 @@
 ## 📋 Cuprins
 - [Prezentare Generală](#prezentare-generală)
 - [Arhitectura Componentei](#arhitectura-componentei)
+- [Bug Fixes și Îmbunătățiri](#bug-fixes-și-îmbunătățiri)
 - [Hook-uri Specializate](#hook-uri-specializate)
 - [Structura Fișierelor](#structura-fișierelor)
 - [Fluxul de Date](#fluxul-de-date)
@@ -21,6 +22,7 @@ LunarGrid este o componentă complexă pentru gestionarea bugetului lunar în fo
 - **11.94s build time** (îmbunătățire de 36%)
 - **7 componente modulare** + **2 hook-uri specializate**
 - **100% funcționalitate păstrată** + bug fixes
+- **✅ FIXED: Empty Cell Display** - Celulele goale afișează string gol conform standardelor Excel/Airtable/Notion
 
 ---
 
@@ -61,6 +63,28 @@ LunarGrid este o componentă complexă pentru gestionarea bugetului lunar în fo
 - Keyboard navigation setup
 
 **NU conține**: Business logic (mutat în hook-uri specializate)
+
+---
+
+## 🐛 Bug Fixes și Îmbunătățiri
+
+### ✅ Empty Cell Display Fix (COMPLET)
+
+**Problema**: Celulele goale afișau "0" în loc de string gol, violând standardele Excel/Airtable/Notion.
+
+**Soluția aplicată**:
+1. **LunarGridRow.tsx**: Fixed value conversion logic la sursă (liniile 387, 459)
+2. **LunarGridRow.tsx**: Placeholder schimbat de la "0" la "" (linia 409)  
+3. **EditableCell.tsx**: Eliminat fallback "Empty" pentru placeholder gol (linia 504)
+
+**Rezultat**: Celulele goale afișează acum string gol, conform best practices industriale.
+
+### 🎯 În Progres - Critical Bug Fixes
+
+**1. Delete Key Functionality** - Delete key nu clear-uiește valorile celulelor
+**2. F2 State Corruption** - F2 nu mai funcționează după Escape
+**3. Incomplete Popover Functionality** - Popover doar decorativ, lipsesc features
+**4. Grid Interaction Robustness** - Optimizări pentru event propagation
 
 ---
 

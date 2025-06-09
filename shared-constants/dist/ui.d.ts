@@ -774,4 +774,13 @@ export declare const NAVIGATION: {
         SYNC_FAILED: string;
     };
 };
+export declare const BREADCRUMB_HOME = "Acas\u0103";
+export declare const BREADCRUMB_SEPARATOR = "/";
+export declare const LUNAR_GRID_PREFERENCES_TITLE = "\uD83D\uDDD3\uFE0F Preferin\u021Be LunarGrid";
+export declare const LUNAR_GRID_DELETE_CONFIRM_TITLE = "\u2328\uFE0F Confirmare \u0219tergere cu Delete key";
+export declare const LUNAR_GRID_DELETE_CONFIRM_DESCRIPTION = "Controleaz\u0103 dac\u0103 aplica\u021Bia va cere confirmare c\u00E2nd \u0219tergi tranzac\u021Bii folosind tasta Delete \u00EEn grid.";
+export declare const LUNAR_GRID_DELETE_CONFIRM_LABEL = "Afi\u0219eaz\u0103 confirmare pentru \u0219tergere cu Delete key";
+export declare const LUNAR_GRID_DELETE_CONFIRM_RECOMMENDATION = "\uD83D\uDCA1 Recomandat activat pentru a preveni \u0219tergerea accidental\u0103 a tranzac\u021Biilor importante. C\u00E2nd e dezactivat, Delete key va \u0219terge imediat f\u0103r\u0103 confirmare (stil Excel cu Undo).";
+export declare const LUNAR_GRID_DELETE_CONFIRM_ENABLED_SUCCESS = "Confirmarea pentru \u0219tergere a fost activat\u0103";
+export declare const LUNAR_GRID_DELETE_CONFIRM_DISABLED_SUCCESS = "Confirmarea pentru \u0219tergere a fost dezactivat\u0103";
 //# sourceMappingURL=ui.d.ts.map

@@ -23,4 +23,17 @@ export declare const LUNAR_GRID_FEATURE_FLAGS: {
     USE_PERFORMANCE_OPTIMIZATIONS: boolean;
     USE_DEBUG_MODE: boolean;
 };
+export declare const STORAGE_KEYS: {
+    readonly DARK_MODE: "darkMode";
+    readonly SIDEBAR_EXPANDED: "sidebar-expanded";
+    readonly LUNAR_GRID_DELETE_CONFIRM: "lunar-grid-delete-confirm";
+    readonly LUNAR_GRID_LAST_CATEGORY_UPDATE: "budget-app-last-category-update";
+    readonly TABS_ACTIVE: "tabs-active";
+    readonly EXPANDED_ROWS: "expanded-rows";
+};
+export declare const PREFERENCE_DEFAULTS: {
+    readonly DELETE_CONFIRMATION_ENABLED: true;
+    readonly SIDEBAR_EXPANDED: true;
+    readonly DARK_MODE: false;
+};
 //# sourceMappingURL=defaults.d.ts.map
