@@ -378,7 +378,18 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   }, [internalEditing, onCancel]);
 
   // ===== COMPUTED VALUES =====
-  const displayValue = value === "" || value === null || value === undefined ? "" : String(value);
+  const displayValue = (() => {
+    if (value === "" || value === null || value === undefined) {
+      return "";
+    }
+    
+    if (validationType === "amount" && (value === 0 || value === "0")) {
+      return "";
+    }
+    
+    return String(value);
+  })();
+  
   const hasValue = displayValue.length > 0;
   const isError = !!(propError || internalError);
   const isWarning = !!(warning && smartValidation);
@@ -503,7 +514,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
           validationType === 'amount' && "font-mono tabular-nums text-right",
           validationType === 'percentage' && "font-mono tabular-nums text-right",
         )}>
-          {hasValue ? displayValue : (placeholder || "Empty")}
+          {hasValue ? displayValue : (placeholder || "")}
         </span>
         
         {/* Value type indicator */}

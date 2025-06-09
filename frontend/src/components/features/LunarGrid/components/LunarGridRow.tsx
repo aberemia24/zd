@@ -387,7 +387,14 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
               ) : isDayCell && isSubcategory ? (
                   <LunarGridCell
                     cellId={`${original.category}-${original.subcategory || ''}-${cell.column.id.split("-")[1]}`}
-                    value={String(cell.getValue() || '')}
+                    value={(() => {
+                      const cellValue = cell.getValue();
+                      // Tratează valorile empty conform standardelor Excel/Airtable/Notion 
+                      if (cellValue === null || cellValue === undefined || cellValue === 0 || cellValue === "0") {
+                        return "";
+                      }
+                      return String(cellValue);
+                    })()}
                     onSave={async (value: string | number) => {
                       // FIX CRITIC: Conectează salvarea inline cu backend-ul
                       const day = parseInt(cell.column.id.split("-")[1]);
@@ -413,7 +420,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       return isPositionFocused(cellPosition);
                     })()}
                     className={getValueClasses()}
-                    placeholder="0"
+                    placeholder=""
                     onClick={(e) => {
                       // CONEXIUNE CRITICĂ: Conectează selecția de celule
                       const day = parseInt(cell.column.id.split("-")[1]);
@@ -447,7 +454,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                   )}>
                     {(() => {
                       const cellValue = cell.getValue();
-                      if (cellValue === null || cellValue === undefined || cellValue === '') {
+                      // Tratează valorile empty conform standardelor Excel/Airtable/Notion 
+                      if (cellValue === null || cellValue === undefined || cellValue === '' || cellValue === 0 || cellValue === "0") {
                         return '';
                       }
                       return String(cellValue);
