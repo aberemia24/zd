@@ -282,8 +282,20 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         } else {
           startEdit();
         }
-      } else if (e.key === "Delete" && !isReadonly && computedState.shouldShowActions) {
+      } else if (e.key === "Delete" && !isReadonly && (isSelected || isFocused)) {
+        // FIXED: Delete key should work when cell is selected/focused, not just when actions are shown
+        console.log("🗑️ DELETE KEY PRESSED - clearing cell value", { 
+          cellId, 
+          value, 
+          isReadonly,
+          isSelected,
+          isFocused,
+          shouldShowActions: computedState.shouldShowActions,
+          cellState: computedState.cellState,
+          interactionState: computedState.interactionState
+        });
         e.preventDefault();
+        e.stopPropagation();
         // Quick delete value
         onSave("");
       } else if (e.key === "Escape" && computedState.shouldShowActions) {
@@ -307,7 +319,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   }, [
     internalEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, 
     onKeyDown, isReadonly, computedState.shouldShowActions, onSave, 
-    setValue, setInternalHovered, onHoverChange
+    setValue, setInternalHovered, onHoverChange, isSelected, isFocused, cellId, value
   ]);
 
   // ===== ENHANCED MOBILE & ACCESSIBILITY SUPPORT =====

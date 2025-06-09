@@ -10,6 +10,8 @@ interface ConfirmationOptions {
   icon?: string;
   details?: string[];
   recommendation?: string;
+  showDontShowAgain?: boolean;
+  localStorageKey?: string;
 }
 
 interface UseConfirmationModalReturn {
@@ -23,20 +25,32 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
     isOpen: boolean;
     options: ConfirmationOptions;
     resolver?: (value: boolean) => void;
+    dontShowAgain?: boolean;
   }>({
     isOpen: false,
     options: {
       title: "",
       message: "",
     },
+    dontShowAgain: false,
   });
 
   const showConfirmation = useCallback((options: ConfirmationOptions): Promise<boolean> => {
+    // Check localStorage first if this is a preference-based confirmation
+    if (options.localStorageKey && options.showDontShowAgain) {
+      const dontShow = localStorage.getItem(options.localStorageKey) === 'true';
+      if (dontShow) {
+        // Skip confirmation and return true (as if user confirmed)
+        return Promise.resolve(true);
+      }
+    }
+
     return new Promise((resolve) => {
       setModalState({
         isOpen: true,
         options,
         resolver: resolve,
+        dontShowAgain: false,
       });
     });
   }, []);
@@ -51,10 +65,16 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
         title: "",
         message: "",
       },
+      dontShowAgain: false,
     });
   }, [modalState]);
 
   const handleConfirm = useCallback(() => {
+    // If "don't show again" was checked, save to localStorage
+    if (modalState.dontShowAgain && modalState.options.localStorageKey) {
+      localStorage.setItem(modalState.options.localStorageKey, 'true');
+    }
+    
     if (modalState.resolver) {
       modalState.resolver(true);
     }
@@ -64,10 +84,19 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
         title: "",
         message: "",
       },
+      dontShowAgain: false,
     });
   }, [modalState]);
 
-  const modalProps: Omit<ConfirmationModalProps, "onConfirm" | "onCancel"> = {
+  // Handle "don't show again" checkbox change
+  const handleDontShowAgainChange = useCallback((checked: boolean) => {
+    setModalState(prev => ({
+      ...prev,
+      dontShowAgain: checked,
+    }));
+  }, []);
+
+  const modalProps: ConfirmationModalProps = {
     isOpen: modalState.isOpen,
     title: modalState.options.title,
     message: modalState.options.message,
@@ -77,14 +106,14 @@ export const useConfirmationModal = (): UseConfirmationModalReturn => {
     icon: modalState.options.icon,
     details: modalState.options.details,
     recommendation: modalState.options.recommendation,
+    showDontShowAgain: modalState.options.showDontShowAgain,
+    onDontShowAgainChange: handleDontShowAgainChange,
+    onConfirm: handleConfirm,
+    onCancel: hideModal,
   };
 
   return {
-    modalProps: {
-      ...modalProps,
-      onConfirm: handleConfirm,
-      onCancel: hideModal,
-    },
+    modalProps,
     showConfirmation,
     hideModal,
   };

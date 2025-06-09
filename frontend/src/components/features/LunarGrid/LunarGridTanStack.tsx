@@ -20,6 +20,7 @@ import LunarGridRow from "./components/LunarGridRow";
 import LunarGridTable from "./components/LunarGridTable";
 import Button from "../../primitives/Button/Button";
 import { TransactionPopover } from './modals';
+import { ConfirmationModal } from '../../primitives/ConfirmationModal';
 
 // Orchestrator components (pentru feature flag)
 import LunarGridStateManager from "./components/LunarGridStateManager";
@@ -456,7 +457,13 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                     focusRing({ variant: "default" })
                   )}
                   data-testid="lunar-grid-orchestrator-container"
+                  onSubmit={handlers.onContainerSubmit}
+                  onClick={handlers.onContainerClick}
+                  onWheel={handlers.onContainerWheel}
                   tabIndex={0}
+                  style={{
+                    scrollBehavior: 'smooth'
+                  }}
                 >
                   <div 
                     ref={stateResult.scrollableContainerRef}
@@ -538,6 +545,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                       />
                     )}
                   </div>
+                  {/* Add ConfirmationModal for Delete confirmation */}
+                  <ConfirmationModal {...stateResult.transactionOps.confirmationModalProps} />
                 </div>
               )}
             </LunarGridEventHandler>
@@ -652,6 +661,8 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             )}
           </div>
         </div>
+        {/* Add ConfirmationModal for Delete confirmation */}
+        <ConfirmationModal {...transactionOps.confirmationModalProps} />
       </>
     );
   },

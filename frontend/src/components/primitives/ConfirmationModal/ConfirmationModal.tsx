@@ -21,6 +21,8 @@ export interface ConfirmationModalProps {
   details?: string[];
   recommendation?: string;
   confirmButtonClass?: string;
+  showDontShowAgain?: boolean;
+  onDontShowAgainChange?: (checked: boolean) => void;
 }
 
 /**
@@ -40,8 +42,26 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   details,
   recommendation,
   confirmButtonClass = '',
+  showDontShowAgain,
+  onDontShowAgainChange,
 }) => {
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const [dontShowAgain, setDontShowAgain] = React.useState(false);
+
+  // Handle checkbox change
+  const handleDontShowAgainChange = (checked: boolean) => {
+    setDontShowAgain(checked);
+    if (onDontShowAgainChange) {
+      onDontShowAgainChange(checked);
+    }
+  };
+
+  // Reset checkbox when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setDontShowAgain(false);
+    }
+  }, [isOpen]);
 
   // Professional scroll lock with scrollbar compensation
   useEffect(() => {
@@ -144,6 +164,27 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Recommendation:</strong> {recommendation}
                   </p>
+                </div>
+              )}
+
+              {/* Don't show again checkbox */}
+              {showDontShowAgain && (
+                <div className="mt-4 pt-3 border-t border-carbon-200 dark:border-copper-700">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={dontShowAgain}
+                      onChange={(e) => handleDontShowAgainChange(e.target.checked)}
+                      className={cn(
+                        "h-4 w-4 rounded border-carbon-300 dark:border-copper-600",
+                        "text-blue-600 focus:ring-blue-500 dark:focus:ring-blue-400",
+                        "dark:bg-copper-800 dark:checked:bg-blue-600"
+                      )}
+                    />
+                    <span className="text-sm text-carbon-600 dark:text-copper-400">
+                      Nu mai afișa această confirmare în viitor
+                    </span>
+                  </label>
                 </div>
               )}
             </div>

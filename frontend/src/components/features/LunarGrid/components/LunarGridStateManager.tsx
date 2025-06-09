@@ -44,7 +44,10 @@ interface ModalState {
   position?: { top: number; left: number };
 }
 
-interface HighlightedCell {
+// HighlightedCell trebuie să fie consistent cu CellPosition pentru a evita erorile TypeScript
+interface HighlightedCell extends CellPosition {
+  // Extinde CellPosition care are categoryIndex, rowIndex, colIndex
+  // Și adaugă proprietățile specifice:
   category: string;
   subcategory: string | undefined;
   day: number;
@@ -65,8 +68,8 @@ export interface LunarGridStateResult {
   setPopover: React.Dispatch<React.SetStateAction<PopoverState | null>>;
   modalState: ModalState | null;
   setModalState: React.Dispatch<React.SetStateAction<ModalState | null>>;
-  highlightedCell: HighlightedCell | null;
-  setHighlightedCell: React.Dispatch<React.SetStateAction<HighlightedCell | null>>;
+  highlightedCell: CellPosition | null;
+  setHighlightedCell: React.Dispatch<React.SetStateAction<CellPosition | null>>;
   
   // Subcategory management states
   addingSubcategory: string | null;
@@ -154,13 +157,13 @@ const LunarGridStateManager: React.FC<LunarGridStateManagerProps> = ({
   const { categories } = useCategoryStore();
   const { user } = useAuthStore();
 
+  // Direct state management pentru popover și modal (nu sunt în useLunarGridState)
+  const [popover, setPopover] = React.useState<PopoverState | null>(null);
+  const [modalState, setModalState] = React.useState<ModalState | null>(null);
+
   // Consolidated LunarGrid state (editing, subcategory, expanded rows)
   const {
     // Core editing states
-    popover,
-    setPopover,
-    modalState,
-    setModalState,
     highlightedCell,
     setHighlightedCell,
     // Subcategory states
@@ -178,7 +181,7 @@ const LunarGridStateManager: React.FC<LunarGridStateManagerProps> = ({
     // Expanded rows state
     expandedRows,
     setExpandedRows,
-  } = useLunarGridState(year, month);
+  } = useLunarGridState();
 
   // Monthly transactions hook
   const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {

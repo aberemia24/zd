@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
@@ -10,6 +10,7 @@ import {
   useDeleteTransactionMonthly
 } from '../../../../services/hooks/transactionMutations';
 import { TransactionData } from '../modals'; // Asigură-te că TransactionData este exportat din modals
+import { useConfirmationModal } from '../../../primitives/ConfirmationModal';
 
 interface PopoverState {
   isOpen: boolean;
@@ -46,6 +47,7 @@ export interface UseTransactionOperationsReturn {
   handleSaveTransaction: (transaction: Omit<TransactionData, "id">, existingId?: string) => Promise<void>;
   handleEditableCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
   isSaving: boolean;
+  confirmationModalProps: any; // Import ConfirmationModalProps if needed for proper typing
 }
 export type TransformedDataForPopover = TransactionData;
 
@@ -67,7 +69,10 @@ export const useTransactionOperations = ({
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, userId);
 
-  const isSaving = createTransactionMutation.isPending || updateTransactionMutation.isPending;
+  const [isSaving, setIsSaving] = useState(createTransactionMutation.isPending || updateTransactionMutation.isPending);
+
+  // Add confirmation modal for Delete key
+  const { modalProps, showConfirmation } = useConfirmationModal();
 
   const handleSaveTransaction = async (transaction: Omit<TransactionData, "id">, existingId?: string) => {
     // Obiectul complet pentru mutație
@@ -93,7 +98,60 @@ export const useTransactionOperations = ({
   // Handler pentru salvarea din EditableCell (inline editing)
   const handleEditableCellSave = async (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => {
     const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    // FIX CRITIC: Când Delete key se apasă și value este empty/0, șterge tranzacția în loc să salvezi amount NULL
+    const isEmptyValue = value === "" || value === 0 || value === "0" || 
+                        (typeof value === 'string' && (value.trim() === "" || parseFloat(value.trim()) === 0));
+    
+    if (isEmptyValue) {
+      // Dacă există tranzacție, verifică dacă trebuie să afișeze confirmarea
+      if (transactionId) {
+        // Check localStorage pentru "don't show again" preference
+        const dontShowDeleteConfirm = localStorage.getItem('budget-app-delete-confirm-disabled') === 'true';
+        
+        if (!dontShowDeleteConfirm) {
+          // Afișează confirmarea cu opțiunea "don't show again"
+          const confirmed = await showConfirmation({
+            title: "Șterge tranzacția?",
+            message: "Această acțiune va șterge complet tranzacția din baza de date.",
+            confirmText: "Șterge",
+            cancelText: "Anulează", 
+            variant: "danger",
+            icon: "🗑️",
+            details: [
+              `Categorie: ${category}${subcategory ? ` - ${subcategory}` : ""}`,
+              `Data: ${day}/${month + 1}/${year}`,
+              `Sumă: ${typeof value === 'string' ? parseFloat(value) || 0 : value}`,
+            ],
+            recommendation: "Această acțiune nu poate fi anulată. Asigură-te că vrei să ștergi această tranzacție.",
+            // Add "don't show again" functionality
+            showDontShowAgain: true,
+            localStorageKey: 'budget-app-delete-confirm-disabled'
+          });
+          
+          if (!confirmed) {
+            console.log(`[TransactionOps] Delete cancelled by user for transaction ${transactionId}`);
+            return;
+          }
+        }
+        
+        console.log(`[TransactionOps] Deleting transaction ${transactionId} because of empty value:`, { value, category, subcategory, day });
+        await deleteTransactionMutation.mutateAsync(transactionId);
+        return;
+      } else {
+        // Dacă nu există tranzacție și valoarea e goală, nu face nimic
+        console.log(`[TransactionOps] Ignoring empty value for non-existing transaction:`, { value, category, subcategory, day });
+        return;
+      }
+    }
+    
+    // Pentru valori non-empty, salvează/update tranzacția normal
     const amount = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(amount)) {
+      throw new Error("Valoarea introdusă nu este un număr valid");
+    }
+    
     const type = getTransactionTypeForCategory(category);
     
     const transactionData: Omit<TransactionData, "id"> = {
@@ -220,5 +278,6 @@ export const useTransactionOperations = ({
     handleSaveTransaction,
     handleEditableCellSave,
     isSaving,
+    confirmationModalProps: modalProps,
   };
 }; 
