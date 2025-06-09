@@ -135,9 +135,22 @@ export declare const TOAST: {
         ADDED: string;
         UPDATED: string;
         DELETED: string;
+        DELETED_PERMANENT: string;
+        RESTORED: string;
+        RESTORED_CTRL_Z: string;
         ERROR_ADDING: string;
         ERROR_UPDATING: string;
         ERROR_DELETING: string;
+        ERROR_RESTORING: string;
+        UNDO: {
+            TITLE: string;
+            BUTTON_TEXT: string;
+            NO_OPERATION: string;
+            EXPIRED: string;
+            SUCCESS_TOAST: string;
+            SUCCESS_CTRL_Z: string;
+            ERROR: string;
+        };
     };
     CATEGORY: {
         ADDED: string;

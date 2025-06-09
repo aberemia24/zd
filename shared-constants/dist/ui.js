@@ -154,9 +154,23 @@ export const TOAST = {
         ADDED: 'Tranzacția a fost adăugată cu succes',
         UPDATED: 'Tranzacția a fost actualizată',
         DELETED: 'Tranzacția a fost ștearsă',
+        DELETED_PERMANENT: 'Tranzacție ștearsă definitiv',
+        RESTORED: 'Tranzacție restaurată',
+        RESTORED_CTRL_Z: '✅ Tranzacție restaurată (Ctrl+Z)',
         ERROR_ADDING: 'Eroare la adăugarea tranzacției',
         ERROR_UPDATING: 'Eroare la actualizarea tranzacției',
-        ERROR_DELETING: 'Eroare la ștergerea tranzacției'
+        ERROR_DELETING: 'Eroare la ștergerea tranzacției',
+        ERROR_RESTORING: 'Eroare la restaurare',
+        // Undo functionality
+        UNDO: {
+            TITLE: 'Tranzacție ștearsă',
+            BUTTON_TEXT: 'UNDO',
+            NO_OPERATION: 'Nu există operațiune de anulat',
+            EXPIRED: 'Undo expirat (30s limit)',
+            SUCCESS_TOAST: 'Tranzacție restaurată',
+            SUCCESS_CTRL_Z: '✅ Tranzacție restaurată (Ctrl+Z)',
+            ERROR: 'Eroare la restaurare'
+        }
     },
     CATEGORY: {
         ADDED: 'Categoria a fost adăugată',
@@ -878,3 +892,9 @@ export const LUNAR_GRID_DELETE_CONFIRM_LABEL = "Afișează confirmare pentru șt
 export const LUNAR_GRID_DELETE_CONFIRM_RECOMMENDATION = "💡 Recomandat activat pentru a preveni ștergerea accidentală a tranzacțiilor importante. Când e dezactivat, Delete key va șterge imediat fără confirmare (stil Excel cu Undo).";
 export const LUNAR_GRID_DELETE_CONFIRM_ENABLED_SUCCESS = "Confirmarea pentru ștergere a fost activată";
 export const LUNAR_GRID_DELETE_CONFIRM_DISABLED_SUCCESS = "Confirmarea pentru ștergere a fost dezactivată";
+// FUTURE UI CONSTANTS - exemplu pentru extensibilitate:
+// LUNAR_GRID_AUTO_SAVE_TITLE: "�� Auto-save delay",
+// LUNAR_GRID_AUTO_SAVE_DESCRIPTION: "Controlează întârzierea pentru salvarea automată.",
+// LUNAR_GRID_GRID_LINES_TITLE: "📏 Afișare linii grid",
+// LUNAR_GRID_COMPACT_MODE_TITLE: "📦 Mod compact",
+// LUNAR_GRID_SHORTCUTS_TITLE: "⌨️ Keyboard shortcuts",

@@ -1,17 +1,19 @@
-import { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
-import { LUNAR_GRID_ACTIONS } from '@budget-app/shared-constants/ui';
+import { LUNAR_GRID_ACTIONS, TOAST } from '@budget-app/shared-constants/ui';
 import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
 import {
   useCreateTransaction,
   useUpdateTransaction,
   useDeleteTransactionMonthly
 } from '../../../../services/hooks/transactionMutations';
-import { TransactionData } from '../modals'; // Asigură-te că TransactionData este exportat din modals
+import { Transaction } from '../../../../types/Transaction';
+import { TransactionData } from '../modals';
 import { useConfirmationModal } from '../../../primitives/ConfirmationModal';
 import { useLunarGridPreferences } from '../../../../hooks/useLunarGridPreferences';
+import { toast as toastStyles, toastIcon, toastContent, toastTitle } from '../../../../styles/cva-v2/primitives/feedback';
 
 interface PopoverState {
   isOpen: boolean;
@@ -62,18 +64,80 @@ export const useTransactionOperations = ({
   userId
 }: UseTransactionOperationsProps): UseTransactionOperationsReturn => {
 
-  // Query client pentru debugging și cache invalidation
+  // ✅ HOOK CALLS LA ÎNCEPUT - Rules of Hooks compliance
   const queryClient = useQueryClient();
-
+  
   // Hooks pentru mutații de tranzacții
   const createTransactionMutation = useCreateTransaction();
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, userId);
+  
+  // ✅ FIX CRITICAL: Hook pentru preferences apelat la început, nu în handler
+  const { preferences } = useLunarGridPreferences();
 
   const [isSaving, setIsSaving] = useState(createTransactionMutation.isPending || updateTransactionMutation.isPending);
 
   // Add confirmation modal for Delete key
   const { modalProps, showConfirmation } = useConfirmationModal();
+
+  // ✅ CTRL+Z UNDO STATE - track ultima operațiune de delete pentru Ctrl+Z
+  const [lastDeletedTransaction, setLastDeletedTransaction] = useState<{
+    data: any;
+    timestamp: number;
+  } | null>(null);
+
+  // ✅ CTRL+Z KEYBOARD LISTENER
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+Z (sau Cmd+Z pe Mac) pentru undo
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        
+        if (lastDeletedTransaction) {
+          // Verifică dacă undo-ul e încă valid (maxim 30 secunde)
+          const timeSinceDelete = Date.now() - lastDeletedTransaction.timestamp;
+          if (timeSinceDelete <= 30000) { // 30 secunde window
+            handleCtrlZUndo();
+          } else {
+            toast.error(TOAST.TRANSACTION.UNDO.EXPIRED, { duration: 2000 });
+            setLastDeletedTransaction(null);
+          }
+        } else {
+          toast.error(TOAST.TRANSACTION.UNDO.NO_OPERATION, { duration: 1500 });
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [lastDeletedTransaction]);
+
+  // ✅ CTRL+Z UNDO HANDLER
+  const handleCtrlZUndo = async () => {
+    if (!lastDeletedTransaction) return;
+
+    try {
+      const transactionData = lastDeletedTransaction.data;
+      
+      await createTransactionMutation.mutateAsync({
+        amount: typeof transactionData.amount === 'string' ? parseFloat(transactionData.amount) : transactionData.amount,
+        type: transactionData.type,
+        date: typeof transactionData.date === 'string' ? transactionData.date : transactionData.date.toISOString(),
+        category: transactionData.category,
+        subcategory: transactionData.subcategory,
+        description: transactionData.description || '',
+        recurring: transactionData.recurring || false,
+        frequency: transactionData.frequency
+      });
+      
+      toast.success(TOAST.TRANSACTION.UNDO.SUCCESS_CTRL_Z, { duration: 2000 });
+      setLastDeletedTransaction(null); // Clear undo state după restore
+      console.log(`[TransactionOps] Ctrl+Z undo successful`);
+    } catch (error) {
+      console.error('[TransactionOps] Ctrl+Z undo failed:', error);
+      toast.error(TOAST.TRANSACTION.UNDO.ERROR);
+    }
+  };
 
   const handleSaveTransaction = async (transaction: Omit<TransactionData, "id">, existingId?: string) => {
     // Obiectul complet pentru mutație
@@ -107,61 +171,102 @@ export const useTransactionOperations = ({
     if (isEmptyValue) {
       // Dacă există tranzacție, verifică dacă trebuie să afișeze confirmarea
       if (transactionId) {
-        // Check preferences cu noul hook reutilizabil
-        const { preferences } = useLunarGridPreferences();
         const dontShowDeleteConfirm = !preferences.deleteConfirmationEnabled;
         
         if (!dontShowDeleteConfirm) {
-          // TOAST SUBTIL cu UNDO în loc de modal mare
-          const deleteToast = toast((t) => (
-            <div className="flex items-center gap-3 min-w-[300px]">
-              <span className="text-amber-800">🗑️ Ștergi tranzacția?</span>
-              <div className="flex gap-2">
-                <button
-                  onClick={async () => {
-                    // DELETE CONFIRMED
-                    try {
-                      console.log(`[TransactionOps] Deleting transaction ${transactionId} via toast confirm`);
-                      await deleteTransactionMutation.mutateAsync(transactionId);
-                      toast.dismiss(t.id);
-                      toast.success('Tranzacție ștearsă', { duration: 2000 });
-                    } catch (error) {
-                      toast.error('Eroare la ștergere');
-                      console.error('Delete error:', error);
-                    }
-                  }}
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 transition-colors"
-                >
-                  Șterge
-                </button>
-                <button
-                  onClick={() => {
-                    // CANCEL - doar dismiss toast-ul
-                    toast.dismiss(t.id);
-                    console.log(`[TransactionOps] Delete cancelled via toast for transaction ${transactionId}`);
-                  }}
-                  className="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600 transition-colors"
-                >
-                  Anulează
-                </button>
+          // ✅ STEP 1: Găsește și salvează transaction data pentru undo
+          const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
+          const monthlyData = queryClient.getQueryData<{data: Transaction[], count: number}>(monthlyQueryKey);
+          const transactionToDelete = monthlyData?.data.find(tx => tx.id === transactionId);
+          
+          if (!transactionToDelete) {
+            console.warn(`[TransactionOps] Transaction ${transactionId} not found in cache for undo`);
+            // Fallback: direct delete fără undo
+            await deleteTransactionMutation.mutateAsync(transactionId);
+            toast.success(TOAST.TRANSACTION.DELETED);
+            return;
+          }
+          
+          // ✅ STEP 2: SALVEAZĂ PENTRU CTRL+Z UNDO
+          setLastDeletedTransaction({
+            data: transactionToDelete,
+            timestamp: Date.now()
+          });
+          
+          // ✅ STEP 3: OPTIMISTIC DELETE cu undo capability
+          let undoPerformed = false;
+          
+          // Execute delete immediately (optimistic)
+          console.log(`[TransactionOps] Optimistic delete - removing transaction ${transactionId} from UI`);
+          await deleteTransactionMutation.mutateAsync(transactionId);
+          
+          // ✅ STEP 4: CVA STYLED UNDO TOAST
+          const undoToast = toast((t) => (
+            <div className={toastStyles({ variant: 'warning' })}>
+              <div className={toastIcon({ variant: 'warning' })}>🗑️</div>
+              <div className={toastContent()}>
+                <div className={toastTitle()}>{TOAST.TRANSACTION.UNDO.TITLE}</div>
               </div>
+              <button
+                onClick={async () => {
+                  // ✅ UNDO ACTION - restore transaction
+                  undoPerformed = true;
+                  toast.dismiss(t.id);
+                  setLastDeletedTransaction(null); // Clear Ctrl+Z state când se face undo din toast
+                  
+                  try {
+                                         // Recreate transaction cu datele salvate
+                     await createTransactionMutation.mutateAsync({
+                       amount: typeof transactionToDelete.amount === 'string' ? parseFloat(transactionToDelete.amount) : transactionToDelete.amount,
+                       type: transactionToDelete.type,
+                       date: typeof transactionToDelete.date === 'string' ? transactionToDelete.date : transactionToDelete.date.toISOString(),
+                       category: transactionToDelete.category,
+                       subcategory: transactionToDelete.subcategory,
+                       description: transactionToDelete.description || '',
+                       recurring: transactionToDelete.recurring || false,
+                       frequency: transactionToDelete.frequency
+                     });
+                    
+                    toast.success(TOAST.TRANSACTION.UNDO.SUCCESS_TOAST, { duration: 2000 });
+                    console.log(`[TransactionOps] Undo successful - transaction restored`);
+                  } catch (error) {
+                    console.error('[TransactionOps] Undo failed:', error);
+                    toast.error(TOAST.TRANSACTION.UNDO.ERROR);
+                  }
+                }}
+                className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1 rounded text-sm font-medium transition-colors"
+              >
+                {TOAST.TRANSACTION.UNDO.BUTTON_TEXT}
+              </button>
             </div>
           ), {
-            duration: 4000, // 4 secunde pentru undo - Excel/Sheets standard
+            duration: 4000,
             position: 'top-right',
+            // ✅ FIX: Override react-hot-toast default styling să elimine containerul alb
             style: {
-              background: '#fef3c7', // Yellow amber background
-              border: '1px solid #f59e0b',
-              color: '#92400e',
-              minWidth: '350px',
-              padding: '12px',
+              background: 'transparent', // Elimină background-ul alb default
+              border: 'none',            // Elimină border-ul default  
+              padding: '0',              // Elimină padding-ul default
+              boxShadow: 'none',         // Elimină shadow-ul default
+              margin: '0',               // Elimină margin-ul default
             },
           });
+          
+          // ✅ STEP 5: Auto-confirm after timeout
+          setTimeout(() => {
+            if (!undoPerformed) {
+              console.log(`[TransactionOps] Auto-confirming delete after 4s timeout for transaction ${transactionId}`);
+              toast.success(TOAST.TRANSACTION.DELETED_PERMANENT, { 
+                duration: 2000,
+                position: 'top-right'
+              });
+            }
+          }, 4000);
         } else {
           // Direct delete fără confirmare (dacă user-ul a ales "don't show again")
           console.log(`[TransactionOps] Direct deleting transaction ${transactionId} (confirmation disabled)`);
           await deleteTransactionMutation.mutateAsync(transactionId);
-          toast.success('Tranzacție ștearsă', {
+          toast.success(TOAST.TRANSACTION.DELETED, {
             duration: 2000,
             position: 'top-right',
           });
@@ -169,7 +274,6 @@ export const useTransactionOperations = ({
         return;
       } else {
         // Dacă nu există tranzacție și valoarea e goală, nu face nimic
-        console.log(`[TransactionOps] Ignoring empty value for non-existing transaction:`, { value, category, subcategory, day });
         return;
       }
     }

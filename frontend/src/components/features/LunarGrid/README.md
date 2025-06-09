@@ -79,12 +79,49 @@ LunarGrid este o componentă complexă pentru gestionarea bugetului lunar în fo
 
 **Rezultat**: Celulele goale afișează acum string gol, conform best practices industriale.
 
-### 🎯 În Progres - Critical Bug Fixes
+### ✅ Delete & Undo Functionality (COMPLET)
 
-**1. Delete Key Functionality** - Delete key nu clear-uiește valorile celulelor
-**2. F2 State Corruption** - F2 nu mai funcționează după Escape
-**3. Incomplete Popover Functionality** - Popover doar decorativ, lipsesc features
-**4. Grid Interaction Robustness** - Optimizări pentru event propagation
+**Funcționalitate implementată**: Professional delete experience cu dual undo system
+
+**Caracteristici**:
+1. **Optimistic Delete Pattern** - Ștergere imediată cu undo window
+2. **Dual Undo System**:
+   - **Toast UNDO button** (4 secunde) - pattern Gmail/Slack
+   - **Ctrl+Z keyboard shortcut** (30 secunde) - pattern Excel/Sheets
+3. **Smart State Management** - Track última operațiune de delete
+4. **CVA Design System Integration** - Toast-uri styled cu Carbon Copper theme
+5. **Localized Constants** - Toate textele în română din `@budget-app/shared-constants`
+
+**UX Flow**:
+```
+Delete key → Optimistic delete → Toast cu UNDO (4s) + Ctrl+Z available (30s)
+            ↓ (timeout)         ↓ (undo)              ↓ (undo)
+    Auto-confirm definitiv ←   Restore transaction ←  Restore transaction
+```
+
+**Implementation Details**:
+- **State tracking** cu timestamp pentru expiry logic
+- **Cleanup prevention** - Clear Ctrl+Z state când se face undo din toast
+- **Error handling** robust cu feedback messages
+- **Professional messaging** cu constante din shared-constants
+
+### ⌨️ Keyboard Shortcuts
+
+**Excel-like functionality implementată**:
+
+| Shortcut | Acțiune | Scope | Status |
+|----------|---------|-------|--------|
+| `Delete` | Șterge tranzacție cu undo | Celulă selectată | ✅ COMPLET |
+| `Ctrl+Z` / `Cmd+Z` | Undo last delete | Global în LunarGrid | ✅ COMPLET |
+| `F2` | Edit mode | Celulă selectată | ✅ Existent |
+| `Enter` | Salvează editing | În edit mode | ✅ Existent |
+| `Escape` | Anulează editing | În edit mode | ✅ Existent |
+
+**Note tehnice**:
+- **Global keyboard listener** - addEventListener pe document
+- **Prevention logic** - preventDefault pentru a nu interfera cu browser defaults
+- **Smart state management** - Tracking cu expiry windows
+- **Cross-platform** - Support Ctrl (Windows) și Cmd (Mac)
 
 ---
 

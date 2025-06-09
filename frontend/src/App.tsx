@@ -1,6 +1,7 @@
 // Componenta principală a aplicației - orchestrator pentru rutare între pagini
 import React, { useEffect, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom"; // Importuri react-router-dom
+import { Toaster } from "react-hot-toast"; // FIX: Adăugat pentru delete confirmation toasts
 
 // Lazy imports pentru pagini mari - optimizare performanță
 import { lazyLoad } from "./utils/lazyLoading";
@@ -146,6 +147,7 @@ export const App: React.FC = () => {
     >
       <ToastProvider>
         <ToastContainer children={null} />
+        <Toaster />
         <div className={dashboard({ layout: "compact" })}>
           {user /* Afișează navigarea doar dacă utilizatorul este logat */ && (
             <div

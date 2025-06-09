@@ -168,9 +168,24 @@ export const TOAST = {
     ADDED: 'Tranzacția a fost adăugată cu succes',
     UPDATED: 'Tranzacția a fost actualizată',
     DELETED: 'Tranzacția a fost ștearsă',
+    DELETED_PERMANENT: 'Tranzacție ștearsă definitiv',
+    RESTORED: 'Tranzacție restaurată',
+    RESTORED_CTRL_Z: '✅ Tranzacție restaurată (Ctrl+Z)',
     ERROR_ADDING: 'Eroare la adăugarea tranzacției',
     ERROR_UPDATING: 'Eroare la actualizarea tranzacției',
-    ERROR_DELETING: 'Eroare la ștergerea tranzacției'
+    ERROR_DELETING: 'Eroare la ștergerea tranzacției',
+    ERROR_RESTORING: 'Eroare la restaurare',
+    
+    // Undo functionality
+    UNDO: {
+      TITLE: 'Tranzacție ștearsă',
+      BUTTON_TEXT: 'UNDO',
+      NO_OPERATION: 'Nu există operațiune de anulat',
+      EXPIRED: 'Undo expirat (30s limit)',
+      SUCCESS_TOAST: 'Tranzacție restaurată',
+      SUCCESS_CTRL_Z: '✅ Tranzacție restaurată (Ctrl+Z)',
+      ERROR: 'Eroare la restaurare'
+    }
   },
   CATEGORY: {
     ADDED: 'Categoria a fost adăugată',

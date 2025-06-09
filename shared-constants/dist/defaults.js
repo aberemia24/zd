@@ -35,6 +35,11 @@ export const STORAGE_KEYS = {
     // LunarGrid preferences  
     LUNAR_GRID_DELETE_CONFIRM: 'lunar-grid-delete-confirm',
     LUNAR_GRID_LAST_CATEGORY_UPDATE: 'budget-app-last-category-update',
+    // FUTURE LUNARGRID PREFERENCES - ușor de adăugat:
+    // LUNAR_GRID_AUTO_SAVE_DELAY: 'lunar-grid-auto-save-delay',
+    // LUNAR_GRID_SHOW_GRID_LINES: 'lunar-grid-show-grid-lines', 
+    // LUNAR_GRID_COMPACT_MODE: 'lunar-grid-compact-mode',
+    // LUNAR_GRID_KEYBOARD_SHORTCUTS: 'lunar-grid-keyboard-shortcuts',
     // Component state persistence
     TABS_ACTIVE: 'tabs-active',
     EXPANDED_ROWS: 'expanded-rows'
@@ -43,6 +48,11 @@ export const STORAGE_KEYS = {
 export const PREFERENCE_DEFAULTS = {
     // LunarGrid preferences
     DELETE_CONFIRMATION_ENABLED: true,
+    // FUTURE DEFAULTS - exemplu de extensibilitate:
+    // AUTO_SAVE_DELAY: 1000, // ms
+    // SHOW_GRID_LINES: true,
+    // COMPACT_MODE: false,
+    // KEYBOARD_SHORTCUTS_ENABLED: true,
     // UI preferences
     SIDEBAR_EXPANDED: true,
     DARK_MODE: false
