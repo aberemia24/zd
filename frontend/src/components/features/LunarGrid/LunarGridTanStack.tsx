@@ -10,7 +10,8 @@ import {
   FrequencyType, 
   LUNAR_GRID_MESSAGES, 
   UI, 
-  LUNAR_GRID 
+  LUNAR_GRID,
+  LUNAR_GRID_FEATURE_FLAGS
 } from "@budget-app/shared-constants";
 import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 
@@ -19,6 +20,10 @@ import LunarGridRow from "./components/LunarGridRow";
 import LunarGridTable from "./components/LunarGridTable";
 import Button from "../../primitives/Button/Button";
 import { TransactionPopover } from './modals';
+
+// Orchestrator components (pentru feature flag)
+import LunarGridStateManager from "./components/LunarGridStateManager";
+import LunarGridEventHandler from "./components/LunarGridEventHandler";
 
 // Hooks specializate
 import {
@@ -112,7 +117,8 @@ interface LunarGridRowProps {
 // Componenta principală - utilizăm memo pentru a preveni re-renderizări inutile
 const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
   ({ year, month, onYearChange, onMonthChange, isFullscreen, onToggleFullscreen, monthOptions }) => {
-    // REMOVED: useStateManager feature flag and associated logic as it's not currently used.
+    // Feature flag pentru comutarea între monolithic pattern și orchestrator pattern
+    const useStateManager = LUNAR_GRID_FEATURE_FLAGS.USE_STATE_MANAGER;
     
     // Import userId from auth store pentru hooks monthly
     const { user } = useAuthStore();
@@ -423,13 +429,126 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
       [categories, expandedRows, subcategoryAction, editingSubcategoryName, highlightedCell, addingSubcategory, newSubcategoryName, table, transactionMap, setExpandedRows, subcategoryOps, handleEditableCellSave, handleSingleClickModal, navHandleCellClick, handleAddSubcategory, cancelAddingSubcategory, setAddingSubcategory, setNewSubcategoryName, isPositionFocused, isPositionSelected, year, month, validTransactions, transactionOps],
     );
 
-    // Renderizare (layout principal)
+    // Renderizare (layout principal) - conditional pe baza feature flag
+    if (useStateManager) {
+      // 🎯 ORCHESTRATOR PATTERN - Modern architecture with StateManager
+      return (
+        <LunarGridStateManager
+          year={year}
+          month={month}
+          expandedCategories={expandedRows}
+        >
+          {(stateResult) => (
+            <LunarGridEventHandler
+              stateManager={stateResult}
+              year={year}
+              month={month}
+            >
+              {(handlers) => (
+                <div 
+                  ref={stateResult.tableContainerRef}
+                  className={cn(
+                    gridContainer({ 
+                      variant: "professional",
+                      size: isFullscreen || stateResult.isFullscreen ? "fullscreen" : "default"
+                    }),
+                    "transition-all duration-200 hover-lift",
+                    focusRing({ variant: "default" })
+                  )}
+                  data-testid="lunar-grid-orchestrator-container"
+                  tabIndex={0}
+                >
+                  <div 
+                    ref={stateResult.scrollableContainerRef}
+                    className={cn(
+                      "relative",
+                      isFullscreen || stateResult.isFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
+                    )}
+                    data-testid="lunar-grid-orchestrator-inner"
+                  >
+                    {/* States folosind orchestrator pattern */}
+                    {stateResult.isLoading && (
+                      <div className={cn("text-center p-8", flex({ align: "center", justify: "center" }))}>
+                        {LUNAR_GRID.LOADING}
+                      </div>
+                    )}
+                    
+                    {stateResult.error && (
+                      <div className={cn("text-center p-8 text-red-600", flex({ align: "center", justify: "center" }))}>
+                        {LUNAR_GRID_MESSAGES.EROARE_INCARCARE}
+                      </div>
+                    )}
+                    
+                    {!stateResult.isLoading && !stateResult.error && stateResult.table.getRowModel().rows.length > 0 && (
+                      <LunarGridTable
+                        table={stateResult.table}
+                        dailyBalances={stateResult.dailyBalances}
+                        renderRow={(row) => (
+                          <LunarGridRow
+                            key={row.id}
+                            row={row}
+                            categories={stateResult.categories}
+                            _expandedRows={stateResult.expandedRows}
+                            // Orchestrator handlers
+                            onCellSave={handlers.handleEditableCellSave}
+                            onSingleClickModal={handlers.handleSingleClickModal}
+                            onCellClick={stateResult.navHandleCellClick}
+                            isPositionFocused={stateResult.isPositionFocused}
+                            isPositionSelected={stateResult.isPositionSelected}
+                            // ... toate celelalte props necesare pentru LunarGridRow
+                            year={year}
+                            month={month}
+                            // Placeholder props - vor fi completate cu handlers din orchestrator
+                            subcategoryAction={stateResult.subcategoryAction}
+                            editingSubcategoryName={stateResult.editingSubcategoryName}
+                            _highlightedCell={stateResult.highlightedCell}
+                            addingSubcategory={stateResult.addingSubcategory}
+                            newSubcategoryName={stateResult.newSubcategoryName}
+                            table={stateResult.table}
+                            transactionMap={stateResult.transactionMap}
+                            onExpandToggle={handlers.handleExpandToggle}
+                            onSubcategoryEdit={handlers.handleSubcategoryEdit}
+                            _onSubcategoryDelete={handlers.handleSubcategoryDelete}
+                            onEditingValueChange={handlers.handleEditingValueChange}
+                            onClearSubcategoryAction={stateResult.clearSubcategoryAction}
+                            onStartEditingSubcategory={stateResult.startEditingSubcategory}
+                            onStartDeletingSubcategory={stateResult.startDeletingSubcategory}
+                            onAddSubcategory={handlers.handleAddSubcategory}
+                            onCancelAddingSubcategory={stateResult.cancelAddingSubcategory}
+                            onSetAddingSubcategory={handlers.handleSetAddingSubcategory}
+                            onSetNewSubcategoryName={handlers.handleSetNewSubcategoryName}
+                            validTransactions={[]} // TODO: completează din stateResult
+                            transactionOps={stateResult.transactionOps}
+                          />
+                        )}
+                        highlightedCell={stateResult.highlightedCell}
+                        isPositionSelected={(position) => Boolean(stateResult.isPositionSelected(position))}
+                        isPositionFocused={(position) => Boolean(stateResult.isPositionFocused(position))}
+                        onCellClick={stateResult.navHandleCellClick}
+                        year={year}
+                        month={month}
+                        onYearChange={onYearChange}
+                        onMonthChange={onMonthChange}
+                        monthOptions={monthOptions}
+                        isAllRowsExpanded={stateResult.table.getIsAllRowsExpanded()}
+                        onToggleExpandAll={handlers.handleToggleExpandAll}
+                        onResetExpanded={handlers.handleResetExpanded}
+                        isFullscreen={isFullscreen || stateResult.isFullscreen}
+                        onToggleFullscreen={onToggleFullscreen || stateResult.toggleFullscreen}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+            </LunarGridEventHandler>
+          )}
+        </LunarGridStateManager>
+      );
+    }
+
+    // 🏛️ MONOLITHIC PATTERN - Legacy architecture (current implementation)
     return (
       <>
-        {/* REMOVED: LunarGridToolbar - controalele sunt mutate în header-ul tabelului */}
-
-        {/* REMOVED: Header principal global - mutat în header-ul tabelului */}
-
         <div 
           ref={tableContainerRef}
           className={cn(
@@ -440,11 +559,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             "transition-all duration-200 hover-lift",
             focusRing({ variant: "default" })
           )}
-          data-testid="lunar-grid-resize-container"
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
+          data-testid="lunar-grid-monolithic-container"
           onWheel={(e) => {
             e.stopPropagation();
           }}
@@ -453,17 +568,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             scrollBehavior: 'smooth'
           }}
         >
-          {/* Container interior - FĂRĂ overflow duplicat (scroll e gestionat de outer container) */}
           <div 
             ref={scrollableContainerRef}
             className={cn(
-              "relative", // REMOVED overflow-auto - scroll is handled by outer gridContainer
-              // Height constraints rămân pentru space management
+              "relative",
               isFullscreen || tableIsFullscreen ? "max-h-[calc(100vh-60px)]" : "max-h-[790px]"
             )}
-            data-testid="lunar-grid-container"
+            data-testid="lunar-grid-monolithic-inner"
           >
-            {/* 🎨 Professional Loading State */}
+            {/* Loading/Error/Empty states */}
             {isLoading && (
               <div className={cn(
                 "text-center p-8 text-gray-600",
@@ -477,7 +590,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               </div>
             )}
             
-            {/* 🎨 Professional Error State */}
             {error && (
               <div className={cn(
                 "text-center p-8 text-red-600",
@@ -489,7 +601,6 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               </div>
             )}
             
-            {/* 🎨 Professional Empty State */}
             {!isLoading && !error && table.getRowModel().rows.length === 0 && (
               <div className={cn(
                 "text-center p-8 text-gray-500",
@@ -501,55 +612,46 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
               </div>
             )}
             
-            {/* 🎨 Professional Grid Table cu header integrat */}
             {!isLoading && !error && table.getRowModel().rows.length > 0 && (
-              <>
-                {/* Tabelul cu header integrat - NU mai avem header separat */}
-                <LunarGridTable
-                  table={table}
-                  dailyBalances={dailyBalances}
-                  renderRow={renderRow}
-                  highlightedCell={highlightedCell}
-                  isPositionSelected={(position) => Boolean(isPositionSelected(position))}
-                  isPositionFocused={(position) => Boolean(isPositionFocused(position))}
-                  onCellClick={navHandleCellClick}
-                  // Header props - transmise către LunarGridTable pentru integrare
-                  year={year}
-                  month={month}
-                  onYearChange={onYearChange}
-                  onMonthChange={onMonthChange}
-                  monthOptions={monthOptions}
-                  isAllRowsExpanded={table.getIsAllRowsExpanded()}
-                  onToggleExpandAll={() => {
-                    const isCurrentlyExpanded = table.getIsAllRowsExpanded();
-                    const newExpandedState: Record<string, boolean> = {};
-                    
-                    if (!isCurrentlyExpanded) {
-                      // Expandează toate
-                      table.getRowModel().rows.forEach(row => {
-                        if (row.getCanExpand()) {
-                          newExpandedState[row.id] = true;
-                        }
-                      });
-                    }
-                    
-                    setExpandedRows(newExpandedState);
-                    table.toggleAllRowsExpanded(!isCurrentlyExpanded);
-                  }}
-                  onResetExpanded={() => {
-                    setExpandedRows({});
-                    table.resetExpanded();
-                  }}
-                  isFullscreen={isFullscreen || tableIsFullscreen}
-                  onToggleFullscreen={onToggleFullscreen || toggleFullscreen}
-                />
-              </>
+              <LunarGridTable
+                table={table}
+                dailyBalances={dailyBalances}
+                renderRow={renderRow}
+                highlightedCell={highlightedCell}
+                isPositionSelected={(position) => Boolean(isPositionSelected(position))}
+                isPositionFocused={(position) => Boolean(isPositionFocused(position))}
+                onCellClick={navHandleCellClick}
+                year={year}
+                month={month}
+                onYearChange={onYearChange}
+                onMonthChange={onMonthChange}
+                monthOptions={monthOptions}
+                isAllRowsExpanded={table.getIsAllRowsExpanded()}
+                onToggleExpandAll={() => {
+                  const isCurrentlyExpanded = table.getIsAllRowsExpanded();
+                  const newExpandedState: Record<string, boolean> = {};
+                  
+                  if (!isCurrentlyExpanded) {
+                    table.getRowModel().rows.forEach(row => {
+                      if (row.getCanExpand()) {
+                        newExpandedState[row.id] = true;
+                      }
+                    });
+                  }
+                  
+                  setExpandedRows(newExpandedState);
+                  table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+                }}
+                onResetExpanded={() => {
+                  setExpandedRows({});
+                  table.resetExpanded();
+                }}
+                isFullscreen={isFullscreen || tableIsFullscreen}
+                onToggleFullscreen={onToggleFullscreen || toggleFullscreen}
+              />
             )}
           </div>
         </div>
-        
-        {/* Modal Manager - toate modal-urile și popover-urile consolidate */}
-        {/* (Removed LunarGridModalManager JSX) */}
       </>
     );
   },

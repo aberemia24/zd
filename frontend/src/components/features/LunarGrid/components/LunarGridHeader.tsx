@@ -125,6 +125,12 @@ const LunarGridHeader: React.FC<LunarGridHeaderProps> = ({
                   onYearChange(newYear);
                 }
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  e.currentTarget.blur(); // Remove focus from input
+                }
+              }}
               min="1900"
               max="2100"
               className={cn(

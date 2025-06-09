@@ -17,4 +17,10 @@ export declare const INITIAL_FORM_STATE: {
     frequency: string;
     description: string;
 };
+export declare const LUNAR_GRID_FEATURE_FLAGS: {
+    USE_STATE_MANAGER: boolean;
+    USE_ENHANCED_KEYBOARD_NAV: boolean;
+    USE_PERFORMANCE_OPTIMIZATIONS: boolean;
+    USE_DEBUG_MODE: boolean;
+};
 //# sourceMappingURL=defaults.d.ts.map

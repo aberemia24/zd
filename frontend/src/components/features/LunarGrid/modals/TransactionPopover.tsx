@@ -13,6 +13,7 @@ const TransactionPopover: React.FC<TransactionPopoverProps> = ({
   children
 }) => {
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       onOpenChange(false);
     } catch (error) {

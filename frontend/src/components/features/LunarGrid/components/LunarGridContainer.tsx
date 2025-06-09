@@ -17,7 +17,6 @@ interface LunarGridContainerProps {
   isFullscreen: boolean;
   children: React.ReactNode;
   className?: string;
-  onSubmit?: (e: React.FormEvent) => void;
   onClick?: (e: React.MouseEvent) => void;
   onWheel?: (e: React.WheelEvent) => void;
 }
@@ -45,7 +44,6 @@ const LunarGridContainer = React.forwardRef<LunarGridContainerRef, LunarGridCont
     isFullscreen, 
     children, 
     className,
-    onSubmit,
     onClick,
     onWheel 
   }, ref) => {
@@ -72,12 +70,6 @@ const LunarGridContainer = React.forwardRef<LunarGridContainerRef, LunarGridCont
           className
         )}
         data-testid="lunar-grid-resize-container"
-        onSubmit={(e) => {
-          // Previne form submission care cauzează page refresh
-          e.preventDefault();
-          e.stopPropagation();
-          onSubmit?.(e);
-        }}
         onClick={(e) => {
           // Previne click-uri nedorite care pot cauza navigație
           e.stopPropagation();

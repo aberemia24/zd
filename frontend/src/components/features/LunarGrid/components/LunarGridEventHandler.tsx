@@ -60,6 +60,18 @@ export interface LunarGridHandlers {
   // Navigation and interaction handlers
   navHandleCellClick: (position: CellPosition, modifiers: { ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }) => void;
   
+  // Row expansion handlers
+  handleExpandToggle: (rowId: string, isExpanded: boolean) => void;
+  handleToggleExpandAll: () => void;
+  handleResetExpanded: () => void;
+  
+  // Subcategory editing handlers
+  handleSubcategoryEdit: (category: string, newName: string) => void;
+  handleSubcategoryDelete: (category: string, subcategory: string) => void;
+  handleEditingValueChange: (newName: string | null) => void;
+  handleSetAddingSubcategory: (category: string | null) => void;
+  handleSetNewSubcategoryName: (name: string) => void;
+  
   // Calculated values for UI
   popoverStyle: React.CSSProperties;
   
@@ -270,6 +282,80 @@ const LunarGridEventHandler: React.FC<LunarGridEventHandlerProps> = ({
     [subcategoryOps],
   );
 
+  // Row expansion handlers
+  const handleExpandToggle = useCallback(
+    (rowId: string, isExpanded: boolean) => {
+      stateManager.setExpandedRows(prev => ({
+        ...prev,
+        [rowId]: isExpanded
+      }));
+      
+      // Reset addingSubcategory state când categoria se collapses
+      if (!isExpanded && stateManager.addingSubcategory === rowId) {
+        stateManager.setAddingSubcategory(null);
+        stateManager.setNewSubcategoryName("");
+      }
+    },
+    [stateManager],
+  );
+
+  const handleToggleExpandAll = useCallback(() => {
+    const isCurrentlyExpanded = stateManager.table.getIsAllRowsExpanded();
+    const newExpandedState: Record<string, boolean> = {};
+    
+    if (!isCurrentlyExpanded) {
+      stateManager.table.getRowModel().rows.forEach(row => {
+        if (row.getCanExpand()) {
+          newExpandedState[row.id] = true;
+        }
+      });
+    }
+    
+    stateManager.setExpandedRows(newExpandedState);
+    stateManager.table.toggleAllRowsExpanded(!isCurrentlyExpanded);
+  }, [stateManager]);
+
+  const handleResetExpanded = useCallback(() => {
+    stateManager.setExpandedRows({});
+    stateManager.table.resetExpanded();
+  }, [stateManager]);
+
+  // Subcategory editing handlers
+  const handleSubcategoryEdit = useCallback(
+    (category: string, newName: string) => {
+      subcategoryOps.handleRenameSubcategory(category, newName);
+    },
+    [subcategoryOps],
+  );
+
+  const handleSubcategoryDelete = useCallback(
+    (category: string, subcategory: string) => {
+      stateManager.startDeletingSubcategory(category, subcategory);
+    },
+    [stateManager],
+  );
+
+  const handleEditingValueChange = useCallback(
+    (newName: string | null) => {
+      stateManager.setEditingSubcategoryName(newName || "");
+    },
+    [stateManager],
+  );
+
+  const handleSetAddingSubcategory = useCallback(
+    (category: string | null) => {
+      stateManager.setAddingSubcategory(category);
+    },
+    [stateManager],
+  );
+
+  const handleSetNewSubcategoryName = useCallback(
+    (name: string) => {
+      stateManager.setNewSubcategoryName(name);
+    },
+    [stateManager],
+  );
+
   // Container event handlers
   const onContainerSubmit = useCallback((e: React.FormEvent) => {
     // Prevent form submission causing page refresh
@@ -358,6 +444,18 @@ const LunarGridEventHandler: React.FC<LunarGridEventHandlerProps> = ({
     
     // Navigation handler
     navHandleCellClick,
+    
+    // Row expansion handlers
+    handleExpandToggle,
+    handleToggleExpandAll,
+    handleResetExpanded,
+    
+    // Subcategory editing handlers
+    handleSubcategoryEdit,
+    handleSubcategoryDelete,
+    handleEditingValueChange,
+    handleSetAddingSubcategory,
+    handleSetNewSubcategoryName,
     
     // Calculated values
     popoverStyle: popoverStyle || {},

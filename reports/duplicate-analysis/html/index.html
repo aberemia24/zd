@@ -1,0 +1,1528 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">363</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">66531</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">76</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">1519 (2.28%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#typescript-clones">typescript</a></td><td class="py-3 px-6">55</td><td class="py-3 px-6">3679</td><td class="py-3 px-6">2</td><td class="py-3 px-6">34</td><td class="py-3 px-6">237</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#javascript-clones">javascript</a></td><td class="py-3 px-6">102</td><td class="py-3 px-6">11725</td><td class="py-3 px-6">13</td><td class="py-3 px-6">410</td><td class="py-3 px-6">3776</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#tsx-clones">tsx</a></td><td class="py-3 px-6">191</td><td class="py-3 px-6">47855</td><td class="py-3 px-6">61</td><td class="py-3 px-6">1075</td><td class="py-3 px-6">10404</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#markdown-clones">markdown</a></td><td class="py-3 px-6">14</td><td class="py-3 px-6">3161</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#css-clones">css</a></td><td class="py-3 px-6">1</td><td class="py-3 px-6">111</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td><td class="py-3 px-6">0</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="typescript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">typescript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\styles\cva-v2\compositions\data-table.ts (Line 355:2 - Line 379:15), frontend\src\styles\cva-v2\compositions\data-table.ts (Line 305:2 - Line 329:18)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-typescript text-sm text-gray-800">= cva([
+  // Base styles
+  'w-12',
+  'px-token-md',
+  'py-token-md',
+  'text-center',
+  'border-r',
+  'border-border-subtle',
+], {
+  variants: {
+    size: {
+      xs: 'w-8 px-token-sm py-token-xs',
+      sm: 'w-10 px-token-sm py-token-sm',
+      md: 'w-12 px-token-md py-token-md',
+      lg: 'w-14 px-token-lg py-token-lg',
+      xl: 'w-16 px-token-xl py-token-xl',
+    },
+  },
+  defaultVariants: {
+    size: 'md',
+  },
+});
+
+// =============================================================================
+// EMPTY STATE</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\styles\themeTypes.ts (Line 140:7 - Line 150:10), frontend\src\styles\themeTypes.ts (Line 125:7 - Line 135:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup53"><code class="language-typescript text-sm text-gray-800">disabled?: string;
+      [key: string]: string | undefined;
+    };
+    variants?: {
+      [key: string]: string | undefined;
+    };
+    sizes?: {
+      [key: string]: string | undefined;
+    };
+  };
+  formGroup</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="javascript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">javascript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Modal\Modal.stories.tsx (Line 319:18 - Line 370:22), frontend\src\components\primitives\Modal\Modal.stories.tsx (Line 204:8 - Line 229:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-javascript text-sm text-gray-800">}
+          onClose={() =&gt; setActiveModal(null)}
+          size=&quot;lg&quot;
+        &gt;
+          &lt;ModalHeader onClose={() =&gt; setActiveModal(null)}&gt;
+            &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+              &lt;DollarSign className=&quot;h-5 w-5&quot; /&gt;
+              Add New Transaction
+            &lt;/div&gt;
+          &lt;/ModalHeader&gt;
+          &lt;ModalBody&gt;
+            &lt;div className=&quot;space-y-4&quot;&gt;
+              &lt;div className=&quot;grid grid-cols-2 gap-4&quot;&gt;
+                &lt;div&gt;
+                  &lt;label className=&quot;block text-sm font-medium mb-2&quot;&gt;Amount&lt;/label&gt;
+                  &lt;input 
+                    type=&quot;number&quot; 
+                    placeholder=&quot;0.00&quot;
+                    className=&quot;w-full px-3 py-2 border border-input rounded-md&quot;
+                  /&gt;
+                &lt;/div&gt;
+                &lt;div&gt;
+                  &lt;label className=&quot;block text-sm font-medium mb-2&quot;&gt;Category&lt;/label&gt;
+                  &lt;select className=&quot;w-full px-3 py-2 border border-input rounded-md&quot;&gt;
+                    &lt;option&gt;Food &amp; Dining&lt;/option&gt;
+                    &lt;option&gt;Transportation&lt;/option&gt;
+                    &lt;option&gt;Utilities&lt;/option&gt;
+                  &lt;/select&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div&gt;
+                &lt;label className=&quot;block text-sm font-medium mb-2&quot;&gt;Description&lt;/label&gt;
+                &lt;input 
+                  placeholder=&quot;Transaction description...&quot;
+                  className=&quot;w-full px-3 py-2 border border-input rounded-md&quot;
+                /&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/ModalBody&gt;
+          &lt;ModalFooter&gt;
+            &lt;Button variant=&quot;ghost&quot; onClick={() =&gt; setActiveModal(null)}&gt;
+              Cancel
+            &lt;/Button&gt;
+            &lt;Button onClick={() =&gt; setActiveModal(null)}&gt;
+              Save Transaction
+            &lt;/Button&gt;
+          &lt;/ModalFooter&gt;
+        &lt;/Modal&gt;
+
+        {/* Delete Confirmation Modal */}
+        &lt;Modal
+          isOpen={activeModal === 'delete-confirmation'</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Modal\Modal.stories.tsx (Line 370:22 - Line 398:5), frontend\src\components\primitives\Modal\Modal.stories.tsx (Line 250:12 - Line 286:18)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-javascript text-sm text-gray-800">}
+          onClose={() =&gt; setActiveModal(null)}
+          size=&quot;sm&quot;
+          closeOnBackdropClick={false}
+        &gt;
+          &lt;ModalHeader onClose={() =&gt; setActiveModal(null)}&gt;
+            &lt;div className=&quot;flex items-center gap-2 text-destructive&quot;&gt;
+              &lt;AlertTriangle className=&quot;h-5 w-5&quot; /&gt;
+              Confirm Deletion
+            &lt;/div&gt;
+          &lt;/ModalHeader&gt;
+          &lt;ModalBody&gt;
+            &lt;div className=&quot;space-y-3&quot;&gt;
+              &lt;p&gt;Are you sure you want to delete this account?&lt;/p&gt;
+              &lt;div className=&quot;bg-destructive/10 p-3 rounded border-l-4 border-destructive&quot;&gt;
+                &lt;p className=&quot;text-sm font-medium text-destructive&quot;&gt;
+                  This action cannot be undone.
+                &lt;/p&gt;
+                &lt;p className=&quot;text-sm text-muted-foreground&quot;&gt;
+                  All transaction history will be permanently lost.
+                &lt;/p&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/ModalBody&gt;
+          &lt;ModalFooter&gt;
+            &lt;Button variant=&quot;ghost&quot; onClick={() =&gt; setActiveModal(null)}&gt;
+              Cancel
+            &lt;/Button&gt;
+            &lt;Button variant=&quot;danger&quot; onClick={() =&gt; setActiveModal(null</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\LineChart.tsx (Line 276:2 - Line 287:20), frontend\src\components\primitives\Charts\LineChart.tsx (Line 268:9 - Line 276:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup22"><code class="language-javascript text-sm text-gray-800">}
+            /&gt;
+            
+            &lt;YAxis
+              tick={{ 
+                fontSize: theme.fonts.sizes.axis,
+                fill: theme.colors.text,
+                fontFamily: theme.fonts.family,
+              }}
+              tickLine={{ stroke: theme.colors.grid }}
+              axisLine={{ stroke: theme.colors.grid }}
+              tickFormatter={formatChartCurrency</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 135:2 - Line 202:5), frontend\src\components\primitives\Charts\PieChart.tsx (Line 178:2 - Line 295:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup27"><code class="language-javascript text-sm text-gray-800">}&gt;
+              {formatChartCurrency(entry.value)}
+            &lt;/span&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+    );
+  };
+
+  // =============================================================================
+  // LOADING &amp; ERROR STATES
+  // =============================================================================
+
+  if (loading) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-carbon-50 rounded&quot;&gt;
+          &lt;div className=&quot;text-center&quot;&gt;
+            &lt;div className=&quot;animate-spin rounded-full h-8 w-8 border-b-2 border-copper-600 mx-auto mb-4&quot;&gt;&lt;/div&gt;
+            &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;Se încarcă graficul...&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (error) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-red-50 rounded border border-red-200&quot;&gt;
+          &lt;div className=&quot;text-center&quot;&gt;
+            &lt;p className={cn(&quot;mb-2&quot;, captionProfessional({ size: &quot;sm&quot;, variant: &quot;danger&quot; }))}&gt;Eroare la încărcarea graficului&lt;/p&gt;
+            &lt;p className={captionProfessional({ size: &quot;xs&quot;, variant: &quot;danger&quot; })}&gt;{error}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (!data || data.length === 0) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-carbon-50 rounded&quot;&gt;
+          &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;Nu există date pentru afișare&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  // =============================================================================
+  // RENDER CHART
+  // =============================================================================
+
+  return (
+    &lt;div className={cn(chartContainerStyles, className)} style={{ width, height: 'auto' }}&gt;
+      {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+      {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+      
+      &lt;div style={{ width: '100%', height }}&gt;
+        &lt;ResponsiveContainer width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+          &lt;RechartsBarChart
+            data={data</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 210:15 - Line 232:2), frontend\src\components\primitives\Charts\LineChart.tsx (Line 257:16 - Line 276:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup28"><code class="language-javascript text-sm text-gray-800">}
+          &gt;
+            {showGridLines &amp;&amp; (
+              &lt;CartesianGrid 
+                strokeDasharray=&quot;3 3&quot; 
+                stroke={theme.colors.grid}
+                opacity={0.6}
+              /&gt;
+            )}
+            
+            &lt;XAxis
+              dataKey={xAxisKey}
+              tick={{ 
+                fontSize: theme.fonts.sizes.axis,
+                fill: theme.colors.text,
+                fontFamily: theme.fonts.family,
+              }}
+              tickLine={{ stroke: theme.colors.grid }}
+              axisLine={{ stroke: theme.colors.grid }}
+            /&gt;
+            
+            &lt;YAxis
+              tick={{</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 228:2 - Line 249:2), frontend\src\components\primitives\Charts\LineChart.tsx (Line 268:9 - Line 297:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup29"><code class="language-javascript text-sm text-gray-800">}
+            /&gt;
+            
+            &lt;YAxis
+              tick={{ 
+                fontSize: theme.fonts.sizes.axis,
+                fill: theme.colors.text,
+                fontFamily: theme.fonts.family,
+              }}
+              tickLine={{ stroke: theme.colors.grid }}
+              axisLine={{ stroke: theme.colors.grid }}
+              tickFormatter={formatChartCurrency}
+            /&gt;
+
+            {showTooltip &amp;&amp; &lt;Tooltip content={&lt;CustomTooltip /&gt;} /&gt;}
+            
+            {showLegend &amp;&amp; (
+              &lt;Legend
+                wrapperStyle={{
+                  fontSize: theme.fonts.sizes.legend,
+                  fontFamily: theme.fonts.family,
+                }}</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 203:8 - Line 227:5), frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 182:8 - Line 204:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup34"><code class="language-javascript text-sm text-gray-800">={8}
+          className={tableCell({ align: &quot;center&quot;, size: &quot;md&quot;, variant: &quot;default&quot; })}
+          aria-live=&quot;polite&quot;
+        &gt;
+          &lt;div
+            className={flexLayout({ direction: &quot;row&quot;, justify: &quot;center&quot;, align: &quot;center&quot;, gap: 2 })}
+          &gt;
+            &lt;Spinner size=&quot;sm&quot; /&gt;
+            &lt;span data-testid=&quot;table-loading-more-text&quot;&gt;
+              {TABLE.LOADING_MORE || &quot;Se încarcă mai multe...&quot;}
+            &lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    ),
+    [],
+  );
+
+  // Memoizăm rândul pentru tabelul gol
+  const emptyRow = useMemo(
+    () =&gt; (
+      &lt;tr data-testid=&quot;transaction-table-empty&quot;&gt;
+        &lt;td
+          colSpan={8}
+          className={tableCell({ align: &quot;center&quot;, size: &quot;lg&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 277:2 - Line 327:2), frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 271:2 - Line 295:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup35"><code class="language-javascript text-sm text-gray-800">)}
+                  data-testid=&quot;header-date&quot;
+                &gt;
+                  {TABLE.HEADERS.DATE}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-description&quot;
+                &gt;
+                  {TABLE.HEADERS.DESCRIPTION}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-amount&quot;
+                &gt;
+                  {TABLE.HEADERS.AMOUNT}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-category&quot;
+                &gt;
+                  {TABLE.HEADERS.CATEGORY}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-subcategory&quot;
+                &gt;
+                  {TABLE.HEADERS.SUBCATEGORY}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-recurring&quot;
+                &gt;
+                  {TABLE.HEADERS.RECURRING}
+                &lt;/th&gt;
+                &lt;th
+                  className={tableHeader({ align: &quot;left&quot;, size: &quot;md&quot; })}
+                  data-testid=&quot;header-frequency&quot;
+                &gt;
+                  {TABLE.HEADERS.FREQUENCY}
+                &lt;/th&gt;
+              &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+              {isLoading
+                ? loadingRow
+                : !isFetching &amp;&amp; transactions &amp;&amp; transactions.length === 0
+                  ? emptyRow
+                  : transactions.map((t, idx) =&gt; (
+                      &lt;tr
+                        key={`</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 342:7 - Line 388:3), frontend\src\components\features\TransactionTable\TransactionTable.tsx (Line 331:10 - Line 339:16)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup36"><code class="language-javascript text-sm text-gray-800"> })}&gt;
+                            {formatAmount(t.amount)}
+                          &lt;/span&gt;
+                        &lt;/td&gt;
+                        &lt;td className={tableCell({ align: &quot;left&quot;, size: &quot;md&quot;, variant: &quot;default&quot; })}&gt;
+                          {t.category || &quot;&quot;}
+                        &lt;/td&gt;
+                        &lt;td className={tableCell({ align: &quot;left&quot;, size: &quot;md&quot;, variant: &quot;default&quot; })}&gt;
+                          {t.subcategory || &quot;&quot;}
+                        &lt;/td&gt;
+                        &lt;td className={tableCell({ align: &quot;left&quot;, size: &quot;md&quot;, variant: &quot;default&quot; })}&gt;
+                          {t.recurring === true ? (
+                            &lt;Badge
+                              variant=&quot;primary&quot;
+                            &gt;
+                              Da
+                            &lt;/Badge&gt;
+                          ) : (
+                            &lt;Badge
+                              variant=&quot;secondary&quot;
+                            &gt;
+                              Nu
+                            &lt;/Badge&gt;
+                          )}
+                        &lt;/td&gt;
+                        &lt;td className={tableCell({ align: &quot;left&quot;, size: &quot;md&quot;, variant: &quot;default&quot; })}&gt;
+                          {t.frequency &amp;&amp; (
+                            &lt;Badge
+                              variant=&quot;primary&quot;
+                            &gt;
+                              {t.frequency}
+                            &lt;/Badge&gt;
+                          )}
+                        &lt;/td&gt;
+                      &lt;/tr&gt;
+                    ))}
+              {/* Fără date, dar în curs de încărcare - arăta indicator de loading pentru următoarea pagină */}
+              {isFetchingNextPage &amp;&amp; loadingMoreRow}
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Informații despre numărul total de tranzacții */}
+      {!isLoading &amp;&amp; transactions &amp;&amp; transactions.length &gt; 0 &amp;&amp; (
+        &lt;div
+          className={cn</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\Auth\LoginForm.tsx (Line 74:10 - Line 102:3), frontend\src\components\features\Auth\RegisterForm.tsx (Line 89:10 - Line 117:22)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup41"><code class="language-javascript text-sm text-gray-800">={cn(
+        card({ variant: &quot;elevated&quot; }),
+        &quot;w-full max-w-md mx-auto&quot;,
+      )}
+      onSubmit={handleSubmit}
+      data-testid=&quot;login-form&quot;
+    &gt;
+      &lt;div className=&quot;px-6 py-4 border-b border-gray-200&quot;&gt;
+        &lt;h2 className=&quot;text-xl font-semibold text-gray-900&quot;&gt;Autentificare&lt;/h2&gt;
+      &lt;/div&gt;
+
+      &lt;div className={cn(&quot;p-6&quot;, spaceY({ spacing: 4 }))}&gt;
+        {/* Email Input - FIXED: removed unsupported error variant */}
+        &lt;Input
+          id=&quot;email&quot;
+          type=&quot;email&quot;
+          label={`${LABELS.EMAIL}*`}
+          value={email}
+          onChange={(e) =&gt; setEmail(e.target.value)}
+          required
+          variant=&quot;default&quot;
+          data-testid=&quot;login-email&quot;
+        /&gt;
+
+        {/* Password Input - FIXED: removed unsupported error variant */}
+        &lt;Input
+          id=&quot;password&quot;
+          type=&quot;password&quot;
+          label={`${LABELS.PAROLA}*`</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\pages\OptionsPage.tsx (Line 441:5 - Line 462:3), frontend\src\pages\OptionsPage.tsx (Line 419:2 - Line 441:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup68"><code class="language-javascript text-sm text-gray-800">)}
+            &gt;
+              {UI.MANAGE_CATEGORIES || &quot;Gestionare categorii&quot;}
+            &lt;/Button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {/* Alte secțiuni de opțiuni */}
+        &lt;div className={cn(card({ variant: &quot;elevated&quot; }), spacingMargin({ bottom: 6 }))}&gt;
+          &lt;div className={cardHeader({ variant: &quot;default&quot; })}&gt;
+            &lt;h2 className={headingProfessional({ level: &quot;h4&quot; })}&gt;
+              {UI.DISPLAY_OPTIONS || &quot;Opțiuni de afișare&quot;}
+            &lt;/h2&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;p-6&quot;&gt;
+            &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;
+              {UI.COMING_SOON || &quot;În curând&quot;}
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className={cn</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\pages\OptionsPage.tsx (Line 456:5 - Line 477:9), frontend\src\pages\OptionsPage.tsx (Line 419:5 - Line 463:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup69"><code class="language-javascript text-sm text-gray-800"> })}&gt;
+              {UI.COMING_SOON || &quot;În curând&quot;}
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className={cn(card({ variant: &quot;elevated&quot; }), spacingMargin({ bottom: 6 }))}&gt;
+          &lt;div className={cardHeader({ variant: &quot;default&quot; })}&gt;
+            &lt;h2 className={headingProfessional({ level: &quot;h4&quot; })}&gt;
+              {UI.DATA_EXPORT || &quot;Export date&quot;}
+            &lt;/h2&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;p-6&quot;&gt;
+            &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;
+              {UI.COMING_SOON || &quot;În curând&quot;}
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {/* Secțiunea Reset to Defaults */}
+        &lt;div className={cn(card({ variant: &quot;elevated&quot; }), spacingMargin({ bottom: 6 }))}&gt;
+          &lt;div className={cardHeader({ variant: &quot;danger&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\pages\OptionsPage.tsx (Line 537:2 - Line 557:7), frontend\src\pages\OptionsPage.tsx (Line 419:2 - Line 433:20)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup70"><code class="language-javascript text-sm text-gray-800">)}&gt;
+                &lt;div className=&quot;flex items-center&quot;&gt;
+                  &lt;div className=&quot;animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2&quot;&gt;&lt;/div&gt;
+                  &lt;span className=&quot;text-blue-800 text-sm&quot;&gt;
+                    Se procesează resetarea... Vă rugăm să așteptați.
+                  &lt;/span&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+            )}
+          &lt;/div&gt;
+        &lt;/div&gt;
+
+        {/* Secțiunea Cont Utilizator */}
+        &lt;div className={cn(card({ variant: &quot;elevated&quot; }), spacingMargin({ bottom: 6 }))}&gt;
+          &lt;div className={cardHeader({ variant: &quot;default&quot; })}&gt;
+            &lt;h2 className={headingProfessional({ level: &quot;h4&quot; })}&gt;
+              {UI.ACCOUNT_SETTINGS || &quot;Setări Cont&quot;}
+            &lt;/h2&gt;
+          &lt;/div&gt;
+          &lt;div className=&quot;p-6&quot;&gt;
+            &lt;div className={spaceY</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="tsx-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">tsx</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\inline-editing\useGridNavigation.tsx (Line 1:1 - Line 143:2), frontend\src\components\features\LunarGrid\inline-editing\useGridNavigation_Simplified.tsx (Line 1:1 - Line 143:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-tsx text-sm text-gray-800">import { useState, useCallback, useEffect, RefObject } from &quot;react&quot;;
+
+/**
+ * SIMPLIFIED Hook pentru gestionarea navigării Excel-like în LunarGrid
+ * Redus de la 346 linii la ~80 linii - păstrează doar esențialul
+ * 
+ * KEPT: Arrow keys, Enter/F2 edit, basic focus management
+ * REMOVED: Tab cycling, complex ARIA, focus trap, navigation tracking, performance optimizations
+ */
+
+export interface GridPosition {
+  row: number;
+  col: number;
+}
+
+export interface UseGridNavigationProps {
+  gridRef: RefObject&lt;HTMLDivElement&gt;;
+  totalRows: number;
+  totalCols: number;
+  onCellFocus: (row: number, col: number) =&gt; void;
+  onCellEdit: (row: number, col: number) =&gt; void;
+  onNavigate?: (params: {
+    from: GridPosition;
+    to: GridPosition;
+    direction: string;
+    key: string;
+  }) =&gt; void;
+  isEnabled?: boolean;
+}
+
+export interface UseGridNavigationReturn {
+  // State
+  currentCell: GridPosition | null;
+  focusedCell: GridPosition;
+  isNavigating: boolean;
+
+  // Actions
+  focusCell: (row: number, col: number) =&gt; void;
+  moveFocus: (direction: &quot;up&quot; | &quot;down&quot; | &quot;left&quot; | &quot;right&quot;) =&gt; void;
+  setFocusedCell: (position: GridPosition) =&gt; void;
+  startEdit: () =&gt; void;
+
+  // Event handlers
+  handleKeyDown: (e: KeyboardEvent) =&gt; void;
+  handleCellClick: (row: number, col: number) =&gt; void;
+}
+
+export const useGridNavigation = ({
+  gridRef,
+  totalRows,
+  totalCols,
+  onCellFocus,
+  onCellEdit,
+  onNavigate,
+  isEnabled = true,
+}: UseGridNavigationProps): UseGridNavigationReturn =&gt; {
+  // Basic state management
+  const [focusedCell, setFocusedCell] = useState&lt;GridPosition&gt;({ row: 0, col: 0 });
+  const [currentCell, setCurrentCell] = useState&lt;GridPosition | null&gt;(null);
+  const [isNavigating, setIsNavigating] = useState&lt;boolean&gt;(false);
+
+  // SIMPLIFIED: Focus a specific cell
+  const focusCell = useCallback((row: number, col: number) =&gt; {
+    if (!isEnabled) return;
+    const position = { row, col };
+    setFocusedCell(position);
+    setCurrentCell(position);
+    onCellFocus(row, col);
+  }, [onCellFocus, isEnabled]);
+
+  // SIMPLIFIED: Move focus with boundary checking
+  const moveFocus = useCallback((direction: &quot;up&quot; | &quot;down&quot; | &quot;left&quot; | &quot;right&quot;) =&gt; {
+    if (!isEnabled) return;
+    
+    setFocusedCell((prev) =&gt; {
+      const next = { ...prev };
+      
+      switch (direction) {
+        case &quot;up&quot;: next.row = Math.max(0, prev.row - 1); break;
+        case &quot;down&quot;: next.row = Math.min(totalRows - 1, prev.row + 1); break;
+        case &quot;left&quot;: next.col = Math.max(0, prev.col - 1); break;
+        case &quot;right&quot;: next.col = Math.min(totalCols - 1, prev.col + 1); break;
+      }
+      
+      // Update focus if position changed
+      if (next.row !== prev.row || next.col !== prev.col) {
+        setCurrentCell(next);
+        onCellFocus(next.row, next.col);
+        
+        // Simple navigation callback (simplified)
+        onNavigate?.({ from: prev, to: next, direction, key: `Arrow${direction}` });
+      }
+      
+      return next;
+    });
+  }, [totalRows, totalCols, onCellFocus, onNavigate, isEnabled]);
+
+  // SIMPLIFIED: Start edit for current focused cell
+  const startEdit = useCallback(() =&gt; {
+    if (!isEnabled) return;
+    onCellEdit(focusedCell.row, focusedCell.col);
+  }, [focusedCell, onCellEdit, isEnabled]);
+
+  // SIMPLIFIED: Handle keyboard events (essential keys only)
+  const handleKeyDown = useCallback((e: KeyboardEvent) =&gt; {
+    if (!isEnabled) return;
+    
+    switch (e.key) {
+      case &quot;ArrowUp&quot;: e.preventDefault(); moveFocus(&quot;up&quot;); break;
+      case &quot;ArrowDown&quot;: e.preventDefault(); moveFocus(&quot;down&quot;); break;
+      case &quot;ArrowLeft&quot;: e.preventDefault(); moveFocus(&quot;left&quot;); break;
+      case &quot;ArrowRight&quot;: e.preventDefault(); moveFocus(&quot;right&quot;); break;
+      case &quot;Enter&quot;:
+      case &quot;F2&quot;: e.preventDefault(); startEdit(); break;
+    }
+  }, [moveFocus, startEdit, isEnabled]);
+
+  // SIMPLIFIED: Handle cell click
+  const handleCellClick = useCallback((row: number, col: number) =&gt; {
+    if (!isEnabled) return;
+    focusCell(row, col);
+  }, [focusCell, isEnabled]);
+
+  // SIMPLIFIED: Event listener setup
+  useEffect(() =&gt; {
+    if (!isEnabled) return;
+    
+    document.addEventListener(&quot;keydown&quot;, handleKeyDown);
+    return () =&gt; document.removeEventListener(&quot;keydown&quot;, handleKeyDown);
+  }, [handleKeyDown, isEnabled]);
+
+  return {
+    currentCell,
+    focusedCell,
+    isNavigating,
+    focusCell,
+    moveFocus,
+    setFocusedCell,
+    startEdit,
+    handleKeyDown,
+    handleCellClick,
+  };
+};</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\hooks\useLunarGridTable.tsx (Line 556:5 - Line 568:48), frontend\src\components\features\LunarGrid\hooks\useLunarGridTable.tsx (Line 260:5 - Line 269:21)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-tsx text-sm text-gray-800">for (const [key, transactions] of transactionGroups) {
+
+      
+      // 🔥 NEW STRATEGY: Selectează tranzacția cea mai recentă (ultima modificată/creată)
+      const primaryTransaction = transactions.reduce((latest, current) =&gt; {
+        // Folosește updated_at dacă există, altfel created_at, altfel fallback pe amount
+        const latestTime = new Date(latest.updated_at || latest.created_at || '1970-01-01').getTime();
+        const currentTime = new Date(current.updated_at || current.created_at || '1970-01-01').getTime();
+        
+        return currentTime &gt; latestTime ? current : latest;
+      });
+      
+      // Extrage ziua din primul element pentru debug</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridStateManager.tsx (Line 22:1 - Line 47:16), frontend\src\components\features\LunarGrid\hooks\useTransactionOperations.tsx (Line 14:1 - Line 39:30)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-tsx text-sm text-gray-800">interface PopoverState {
+  isOpen: boolean;
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  amount: string;
+  type: TransactionType;
+  element: HTMLElement | null;
+  anchorEl?: HTMLElement;
+}
+
+interface ModalState {
+  isOpen: boolean;
+  mode: 'add' | 'edit';
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  year: number;
+  month: number;
+  existingValue?: string | number;
+  transactionId?: string | null;
+  anchorEl?: HTMLElement;
+  position?: { top: number; left: number };
+}
+
+interface HighlightedCell</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 183:28 - Line 189:28), frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 173:11 - Line 179:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-tsx text-sm text-gray-800">) return false;
+    
+    const categoryData = categories.find(cat =&gt; cat.name === original.category);
+    const customSubcategoriesCount = categoryData?.subcategories?.filter(sub =&gt; sub.isCustom).length || 0;
+    
+    return customSubcategoriesCount &gt;= VALIDATION.MAX_CUSTOM_SUBCATEGORIES;
+  }, [isCategory, isLastSubcategoryInCategory</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 397:2 - Line 404:7), frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 230:2 - Line 245:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-tsx text-sm text-gray-800">{
+                      const day = parseInt(cell.column.id.split(&quot;-&quot;)[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) =&gt; row.original.category === original.category &amp;&amp; row.original.subcategory === original.subcategory));
+                      const cellPosition: CellPosition = {
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
+                      };
+                      return</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 406:10 - Line 413:18), frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 397:11 - Line 404:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-tsx text-sm text-gray-800">={(() =&gt; {
+                      const day = parseInt(cell.column.id.split(&quot;-&quot;)[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) =&gt; row.original.category === original.category &amp;&amp; row.original.subcategory === original.subcategory));
+                      const cellPosition: CellPosition = {
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
+                      };
+                      return isPositionFocused</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 419:23 - Line 425:12), frontend\src\components\features\LunarGrid\components\LunarGridRow.tsx (Line 231:15 - Line 245:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-tsx text-sm text-gray-800">const day = parseInt(cell.column.id.split(&quot;-&quot;)[1]);
+                      const rowIndex = Math.max(0, table.getRowModel().rows.findIndex((row) =&gt; row.original.category === original.category &amp;&amp; row.original.subcategory === original.subcategory));
+                      const cellPosition: CellPosition = {
+                        category: original.category, subcategory: original.subcategory, day, rowIndex,
+                        colIndex: day - 1, categoryIndex: rowIndex,
+                      };
+                      onCellClick</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\components\LunarGridModals.tsx (Line 7:1 - Line 32:21), frontend\src\components\features\LunarGrid\hooks\useTransactionOperations.tsx (Line 14:1 - Line 39:30)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-tsx text-sm text-gray-800">interface PopoverState {
+  isOpen: boolean;
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  amount: string;
+  type: TransactionType;
+  element: HTMLElement | null;
+  anchorEl?: HTMLElement;
+}
+
+interface ModalState {
+  isOpen: boolean;
+  mode: 'add' | 'edit';
+  category: string;
+  subcategory: string | undefined;
+  day: number;
+  year: number;
+  month: number;
+  existingValue?: string | number;
+  transactionId?: string | null;
+  anchorEl?: HTMLElement;
+  position?: { top: number; left: number };
+}
+
+interface LunarGridModalsProps</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\styles\cva-v2\compositions\layout.tsx (Line 152:8 - Line 166:6), frontend\src\styles\cva-v2\compositions\layout.tsx (Line 63:4 - Line 77:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-tsx text-sm text-gray-800">: {
+      0: &quot;gap-0&quot;,
+      1: &quot;gap-1&quot;,
+      2: &quot;gap-2&quot;,
+      3: &quot;gap-3&quot;,
+      4: &quot;gap-4&quot;,
+      5: &quot;gap-5&quot;,
+      6: &quot;gap-6&quot;,
+      8: &quot;gap-8&quot;,
+      10: &quot;gap-10&quot;,
+      12: &quot;gap-12&quot;,
+      16: &quot;gap-16&quot;,
+      20: &quot;gap-20&quot;
+    },
+    align</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Table\Table.stories.tsx (Line 187:5 - Line 201:2), frontend\src\components\primitives\Table\Table.stories.tsx (Line 124:7 - Line 139:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-tsx text-sm text-gray-800">)
+  },
+  {
+    id: 'status',
+    header: 'Status',
+    accessorKey: 'status',
+    cell: ({ getValue }) =&gt; (
+      &lt;Badge variant={
+        (getValue() as string) === 'completed' ? 'success' :
+        (getValue() as string) === 'pending' ? 'warning' : 'secondary'
+      }&gt;
+        {(getValue() as string).charAt(0).toUpperCase() + (getValue() as string).slice(1)}
+      &lt;/Badge&gt;
+    )
+  },</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Table\Table.stories.tsx (Line 332:7 - Line 348:7), frontend\src\components\primitives\Table\Table.stories.tsx (Line 125:3 - Line 141:42)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-tsx text-sm text-gray-800">},
+      {
+        id: 'status',
+        header: 'Status',
+        accessorKey: 'status',
+        cell: ({ getValue }) =&gt; (
+          &lt;Badge variant={
+            (getValue() as string) === 'completed' ? 'success' :
+            (getValue() as string) === 'pending' ? 'warning' : 'secondary'
+          }&gt;
+            {(getValue() as string).charAt(0).toUpperCase() + (getValue() as string).slice(1)}
+          &lt;/Badge&gt;
+        )
+      }
+    ];
+
+    return</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Progress\Progress.tsx (Line 106:9 - Line 117:2), frontend\src\components\primitives\Progress\Progress.tsx (Line 91:13 - Line 102:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-tsx text-sm text-gray-800">&lt;div className={cn(progressContainer({ size }))}&gt;
+          &lt;div
+            className={cn(progressBar({ variant, animated }))}
+            style={{ width: `${percentage}%` }}
+            role=&quot;progressbar&quot;
+            aria-valuenow={clampedValue}
+            aria-valuemin={0}
+            aria-valuemax={max}
+            aria-label={label || `Progress: ${percentage.toFixed(1)}%`}
+          /&gt;
+        &lt;/div&gt;
+      )</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\List\List.tsx (Line 452:3 - Line 469:3), frontend\src\components\primitives\List\List.tsx (Line 422:5 - Line 438:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-tsx text-sm text-gray-800">return (
+    &lt;div className={cn(list({ variant, spacing }), className)} {...props}&gt;
+      {(title || subtitle) &amp;&amp; (
+        &lt;div className=&quot;px-4 py-3 border-b border-carbon-200 dark:border-carbon-700&quot;&gt;
+          {title &amp;&amp; (
+            &lt;h3 className=&quot;text-lg font-semibold text-carbon-900 dark:text-carbon-100&quot;&gt;
+              {title}
+            &lt;/h3&gt;
+          )}
+          {subtitle &amp;&amp; (
+            &lt;p className=&quot;text-sm text-carbon-600 dark:text-carbon-400 mt-1&quot;&gt;
+              {subtitle}
+            &lt;/p&gt;
+          )}
+        &lt;/div&gt;
+      )}
+      
+      &lt;ul</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Input\Input.tsx (Line 114:9 - Line 138:15), frontend\src\components\primitives\Select\Select.tsx (Line 126:9 - Line 150:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup16"><code class="language-tsx text-sm text-gray-800">&lt;/div&gt;
+
+        {error &amp;&amp; (
+          &lt;p className=&quot;text-sm text-red-600 dark:text-red-400&quot; role=&quot;alert&quot;&gt;
+            {error}
+          &lt;/p&gt;
+        )}
+        
+        {success &amp;&amp; !error &amp;&amp; (
+          &lt;p className=&quot;text-sm text-emerald-600 dark:text-emerald-400&quot;&gt;
+            {success}
+          &lt;/p&gt;
+        )}
+        
+        {hint &amp;&amp; !error &amp;&amp; !success &amp;&amp; (
+          &lt;p className=&quot;text-sm text-neutral-500 dark:text-neutral-400&quot;&gt;
+            {hint}
+          &lt;/p&gt;
+        )}
+      &lt;/div&gt;
+    );
+  }
+);
+
+InputComponent</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\FormGroup\FormGroup.stories.tsx (Line 222:10 - Line 236:5), frontend\src\components\primitives\FormLabel\FormLabel.stories.tsx (Line 226:4 - Line 240:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup17"><code class="language-tsx text-sm text-gray-800">&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  )
+};
+
+/**
+ * Financial Use Cases
+ */
+export const FinancialUseCases: Story = {
+  render: () =&gt; (
+    &lt;div className=&quot;space-y-8 p-6&quot;&gt;
+      &lt;div className=&quot;space-y-6&quot;&gt;
+        &lt;div className=&quot;flex items-center gap-2 mb-4&quot;&gt;
+          &lt;User</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\ContextMenu\ContextMenu.stories.tsx (Line 211:8 - Line 224:2), frontend\src\components\primitives\ContextMenu\ContextMenu.stories.tsx (Line 158:2 - Line 171:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup18"><code class="language-tsx text-sm text-gray-800">);
+      setContextMenu({
+        isVisible: true,
+        x: e.clientX,
+        y: e.clientY
+      });
+    };
+
+    const handleClose = () =&gt; {
+      setContextMenu({ isVisible: false, x: 0, y: 0 });
+    };
+
+    return (
+      &lt;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\ContextMenu\ContextMenu.stories.tsx (Line 296:12 - Line 318:14), frontend\src\components\primitives\ContextMenu\ContextMenu.stories.tsx (Line 149:8 - Line 224:27)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup19"><code class="language-tsx text-sm text-gray-800">: Story = {
+  render: () =&gt; {
+    const [contextMenu, setContextMenu] = useState&lt;ContextMenuState&gt;({
+      isVisible: false,
+      x: 0,
+      y: 0
+    });
+
+    const handleRightClick = (e: React.MouseEvent) =&gt; {
+      e.preventDefault();
+      setContextMenu({
+        isVisible: true,
+        x: e.clientX,
+        y: e.clientY
+      });
+    };
+
+    const handleClose = () =&gt; {
+      setContextMenu({ isVisible: false, x: 0, y: 0 });
+    };
+
+    return (
+      &lt;div className=&quot;p-8 space-y-6</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Checkbox\Checkbox.tsx (Line 48:11 - Line 56:2), frontend\src\components\primitives\Select\Select.tsx (Line 60:9 - Line 68:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup20"><code class="language-tsx text-sm text-gray-800">${Math.random().toString(36).substr(2, 9)}`;
+    const hasError = !!error;
+    
+    // Determine label variant based on state
+    const determinedLabelVariant = labelVariant || (hasError ? &quot;error&quot; : success ? &quot;success&quot; : &quot;default&quot;);
+
+    return (
+      &lt;div className={cn(inputWrapper({ variant: wrapperVariant }))}&gt;
+        &lt;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Checkbox\Checkbox.tsx (Line 82:6 - Line 108:9), frontend\src\components\primitives\Input\Input.tsx (Line 112:4 - Line 150:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup21"><code class="language-tsx text-sm text-gray-800">&gt;
+          )}
+        &lt;/div&gt;
+
+        {error &amp;&amp; (
+          &lt;p className=&quot;text-sm text-red-600 dark:text-red-400&quot; role=&quot;alert&quot;&gt;
+            {error}
+          &lt;/p&gt;
+        )}
+        
+        {success &amp;&amp; !error &amp;&amp; (
+          &lt;p className=&quot;text-sm text-emerald-600 dark:text-emerald-400&quot;&gt;
+            {success}
+          &lt;/p&gt;
+        )}
+        
+        {hint &amp;&amp; !error &amp;&amp; !success &amp;&amp; (
+          &lt;p className=&quot;text-sm text-neutral-500 dark:text-neutral-400&quot;&gt;
+            {hint}
+          &lt;/p&gt;
+        )}
+      &lt;/div&gt;
+    );
+  }
+);
+
+Checkbox</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\LineChart.tsx (Line 189:2 - Line 200:57), frontend\src\components\primitives\Charts\PieChart.tsx (Line 234:2 - Line 245:59)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup23"><code class="language-tsx text-sm text-gray-800">;
+
+  // =============================================================================
+  // LOADING &amp; ERROR STATES
+  // =============================================================================
+
+  if (loading) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-gray-50 rounded</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\LineChart.tsx (Line 203:2 - Line 217:2), frontend\src\components\primitives\Charts\PieChart.tsx (Line 248:2 - Line 262:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup24"><code class="language-tsx text-sm text-gray-800">&gt;Se încarcă graficul...&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (error) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-red-50 rounded border border-red-200&quot;&gt;
+          &lt;div className=&quot;text-center&quot;&gt;
+            &lt;p className=</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\LineChart.tsx (Line 218:2 - Line 230:57), frontend\src\components\primitives\Charts\PieChart.tsx (Line 263:2 - Line 275:59)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup25"><code class="language-tsx text-sm text-gray-800">&gt;{error}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (!processedData || processedData.length === 0) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-gray-50 rounded</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\LineChart.tsx (Line 231:2 - Line 248:18), frontend\src\components\primitives\Charts\PieChart.tsx (Line 276:2 - Line 293:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup26"><code class="language-tsx text-sm text-gray-800">&gt;Nu există date pentru afișare&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  // =============================================================================
+  // RENDER CHART
+  // =============================================================================
+
+  return (
+    &lt;div className={cn(chartContainerStyles, className)} style={{ width, height: 'auto' }}&gt;
+      {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+      {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+      
+      &lt;div style={{ width: '100%', height }}&gt;
+        &lt;ResponsiveContainer width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+          &lt;RechartsLineChart</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 23:2 - Line 48:9), frontend\src\components\primitives\Charts\PieChart.tsx (Line 22:2 - Line 47:9)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup30"><code class="language-tsx text-sm text-gray-800">} from '../../../types/charts';
+import { 
+  cn,
+  headingProfessional,
+  captionProfessional
+} from '../../../styles/cva-v2';
+
+// =============================================================================
+// STYLES &amp; THEME CONFIGURATION
+// =============================================================================
+
+const chartContainerStyles = cn(
+  'w-full h-full',
+  'bg-white rounded-lg border border-carbon-200',
+  'p-4 space-y-4'
+);
+
+// Typography migrated to CVA-v2
+const titleStyles = headingProfessional({ level: &quot;h4&quot; });
+const subtitleStyles = captionProfessional({ size: &quot;sm&quot; });
+
+// =============================================================================
+// COMPONENT IMPLEMENTATION
+// =============================================================================
+
+export const BarChart</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 98:2 - Line 115:2), frontend\src\components\primitives\Charts\LineChart.tsx (Line 117:2 - Line 134:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup31"><code class="language-tsx text-sm text-gray-800">= useCallback((data: any, index: number) =&gt; {
+    if (onDataPointHover) {
+      onDataPointHover(data, index);
+    }
+  }, [onDataPointHover]);
+
+  // =============================================================================
+  // CUSTOM TOOLTIP
+  // =============================================================================
+
+  interface TooltipProps {
+    active?: boolean;
+    payload?: Array&lt;{
+      color: string;
+      dataKey: string;
+      value: number;
+    }&gt;;
+    label?: string;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 140:4 - Line 178:5), frontend\src\components\primitives\Charts\PieChart.tsx (Line 232:5 - Line 270:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup32"><code class="language-tsx text-sm text-gray-800">&gt;
+    );
+  };
+
+  // =============================================================================
+  // LOADING &amp; ERROR STATES
+  // =============================================================================
+
+  if (loading) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-carbon-50 rounded&quot;&gt;
+          &lt;div className=&quot;text-center&quot;&gt;
+            &lt;div className=&quot;animate-spin rounded-full h-8 w-8 border-b-2 border-copper-600 mx-auto mb-4&quot;&gt;&lt;/div&gt;
+            &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;Se încarcă graficul...&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (error) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-red-50 rounded border border-red-200&quot;&gt;
+          &lt;div className=&quot;text-center&quot;&gt;
+            &lt;p className={cn(&quot;mb-2&quot;, captionProfessional({ size: &quot;sm&quot;, variant: &quot;danger&quot; }))}&gt;Eroare la încărcarea graficului&lt;/p&gt;
+            &lt;p className={captionProfessional({ size: &quot;xs&quot;, variant: &quot;danger&quot; })}&gt;{error}&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  if (!data</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\primitives\Charts\BarChart.tsx (Line 178:5 - Line 201:17), frontend\src\components\primitives\Charts\PieChart.tsx (Line 270:14 - Line 293:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup33"><code class="language-tsx text-sm text-gray-800">.length === 0) {
+    return (
+      &lt;div className={cn(chartContainerStyles, className)}&gt;
+        {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+        {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+        &lt;div className=&quot;flex items-center justify-center h-64 bg-carbon-50 rounded&quot;&gt;
+          &lt;p className={captionProfessional({ size: &quot;sm&quot; })}&gt;Nu există date pentru afișare&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  // =============================================================================
+  // RENDER CHART
+  // =============================================================================
+
+  return (
+    &lt;div className={cn(chartContainerStyles, className)} style={{ width, height: 'auto' }}&gt;
+      {title &amp;&amp; &lt;h3 className={titleStyles}&gt;{title}&lt;/h3&gt;}
+      {subtitle &amp;&amp; &lt;p className={subtitleStyles}&gt;{subtitle}&lt;/p&gt;}
+      
+      &lt;div style={{ width: '100%', height }}&gt;
+        &lt;ResponsiveContainer width=&quot;100%&quot; height=&quot;100%&quot;&gt;
+          &lt;RechartsBarChart</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\LunarGridTanStack.tsx (Line 187:5 - Line 197:68), frontend\src\components\features\LunarGrid\components\LunarGridEventHandler.tsx (Line 122:3 - Line 131:41)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup37"><code class="language-tsx text-sm text-gray-800">const handleEditableCellSave = useCallback(
+      async (
+        category: string,
+        subcategory: string | undefined,
+        day: number,
+        value: string | number,
+        transactionId: string | null,
+      ): Promise&lt;void&gt; =&gt; {
+        await transactionOps.handleEditableCellSave(category, subcategory, day, value, transactionId);
+        
+        // NU resetez highlight aici - se face doar la închiderea modalului</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\LunarGrid\LunarGridTanStack.tsx (Line 232:2 - Line 240:75), frontend\src\components\features\LunarGrid\components\LunarGridStateManager.tsx (Line 218:2 - Line 226:48)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup38"><code class="language-tsx text-sm text-gray-800">useMemo(() =&gt; {
+      return table.getRowModel().rows.map(row =&gt; ({
+        category: row.original.category,
+        subcategory: row.original.subcategory,
+        isExpanded: row.getIsExpanded(),
+      }));
+    }, [table]);
+
+    // Handle focus change from keyboard navigation and update highlightedCell</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\ExportButton\ExportModal.tsx (Line 236:9 - Line 242:2), frontend\src\components\primitives\Sidebar\Sidebar.tsx (Line 203:15 - Line 212:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup39"><code class="language-tsx text-sm text-gray-800">&gt;
+          &lt;svg className=&quot;w-5 h-5&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; viewBox=&quot;0 0 24 24&quot;&gt;
+            &lt;path strokeLinecap=&quot;round&quot; strokeLinejoin=&quot;round&quot; strokeWidth={2} d=&quot;M6 18L18 6M6 6l12 12&quot; /&gt;
+          &lt;/svg&gt;
+        &lt;/button&gt;
+
+        {</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\CategoryEditor\CategoryEditor.tsx (Line 77:7 - Line 102:2), frontend\src\components\primitives\ConfirmationModal\ConfirmationModal.tsx (Line 51:12 - Line 77:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup40"><code class="language-tsx text-sm text-gray-800">;
+
+    // Save current scroll positions for restoration
+    const currentPageScrollY = window.scrollY;
+    const currentPageScrollX = window.scrollX;
+    
+    // Get scrollbar width to prevent layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    
+    // Save original styles for restoration
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    
+    // Apply scroll lock with scrollbar compensation
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    
+    // Cleanup function - restore scroll when modal closes
+    return () =&gt; {
+      // Restore original styles
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      
+      // Restore scroll position precisely
+      window.scrollTo(currentPageScrollX, currentPageScrollY);
+    }</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\features\Auth\LoginForm.tsx (Line 1:1 - Line 14:15), frontend\src\components\features\Auth\RegisterForm.tsx (Line 1:1 - Line 14:18)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup42"><code class="language-tsx text-sm text-gray-800">import React, { useState } from &quot;react&quot;;
+import { Link } from &quot;react-router-dom&quot;;
+import { useAuthStore } from &quot;../../../stores/authStore&quot;;
+import toast from &quot;react-hot-toast&quot;;
+import { MESAJE, LABELS, BUTTONS } from &quot;@budget-app/shared-constants&quot;;
+
+// CVA styling imports - UNIFIED MIGRATION
+import { cn, card, button, spaceY } from &quot;../../../styles/cva-v2&quot;;
+
+import Input from &quot;../../primitives/Input/Input&quot;;
+import { ValidatedSubmitButton } from &quot;../../primitives/Button&quot;;
+import Alert from &quot;../../primitives/Alert/Alert&quot;;
+
+interface LoginFormProps</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 142:3 - Line 153:4), frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 24:3 - Line 35:62)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup43"><code class="language-tsx text-sm text-gray-800">const sortedDates = Array.from(transactionsByDate.keys()).sort();
+
+  for (const date of sortedDates) {
+    const dayTransactions = transactionsByDate.get(date) || [];
+
+    let dayAvailableChange = 0;
+    let daySavingsChange = 0;
+    let dailyIncome = 0;
+    let dailyExpenses = 0;
+    let dailySavings = 0;
+
+    for</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 153:5 - Line 170:19), frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 36:5 - Line 53:62)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup44"><code class="language-tsx text-sm text-gray-800">for (const transaction of dayTransactions) {
+      // Convertește amount la number dacă este string
+      const amount =
+        typeof transaction.amount === &quot;string&quot;
+          ? parseFloat(transaction.amount)
+          : transaction.amount;
+
+      switch (transaction.type) {
+        case TransactionType.INCOME:
+          dayAvailableChange += amount;
+          dailyIncome += amount;
+          break;
+        case TransactionType.EXPENSE:
+          dayAvailableChange -= amount;
+          dailyExpenses += amount;
+          break;
+        case TransactionType.SAVING:
+          dayAvailableChange</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 177:5 - Line 199:4), frontend\src\utils\lunarGrid\financialCalculations.tsx (Line 62:5 - Line 85:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup45"><code class="language-tsx text-sm text-gray-800">runningAvailable += dayAvailableChange;
+    runningSavings += daySavingsChange;
+
+    results.push({
+      date,
+      availableBalance: runningAvailable,
+      savingsBalance: runningSavings,
+      totalBalance: runningAvailable + runningSavings,
+      transactions: dayTransactions,
+      breakdown: {
+        dailyIncome,
+        dailyExpenses,
+        dailySavings,
+      },
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Creează sumar financiar din calculele zilnice
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\lunarGrid\calculations.tsx (Line 118:5 - Line 127:24), frontend\src\utils\lunarGrid\calculations.tsx (Line 68:13 - Line 77:21)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup46"><code class="language-tsx text-sm text-gray-800">)
+    .forEach((t) =&gt; {
+      const day = new Date(t.date).getDate();
+      result.set(day, (result.get(day) || 0) + t.amount);
+    });
+
+  const resultObj = Object.fromEntries(result);
+
+  // Salvare în cache
+  subcategoryAmountsCache</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\hooks\transactionMutations.tsx (Line 145:10 - Line 163:4), frontend\src\services\hooks\transactionMutations.tsx (Line 80:15 - Line 98:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup47"><code class="language-tsx text-sm text-gray-800">, context) =&gt; {
+      // Rollback - restaurăm datele la starea anterioară
+      if (context?.previousData) {
+        queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
+      }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
+    },
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
+    },
+  });
+}
+
+/**
+ * Hook pentru ștergerea unei tranzacții
+ * @returns Obiect cu mutația și funcțiile asociate
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\hooks\transactionMutations.tsx (Line 206:14 - Line 224:4), frontend\src\services\hooks\transactionMutations.tsx (Line 80:15 - Line 98:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup48"><code class="language-tsx text-sm text-gray-800">, context) =&gt; {
+      // Rollback - restaurăm datele la starea anterioară
+      if (context?.previousData) {
+        queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
+      }
+      
+      // Enhanced error handling cu context complet
+      handleMutationError(err);
+    },
+    onSuccess: () =&gt; {
+      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
+    },
+  });
+}
+
+/**
+ * Hook pentru actualizarea stării unei tranzacții (ex: schimbare status)
+ * @returns Obiect cu mutația și funcțiile asociate
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\hooks\cacheSync.tsx (Line 121:1 - Line 131:13), frontend\src\services\hooks\cacheSync.tsx (Line 89:1 - Line 99:12)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup49"><code class="language-tsx text-sm text-gray-800">): InfiniteData&lt;TransactionPage&gt; | undefined =&gt; {
+  if (!oldData || !oldData.pages?.length) {
+    return oldData;
+  }
+
+  const updatedPages = oldData.pages.map(page =&gt; {
+    if (!page || !Array.isArray(page.data)) {
+      return page;
+    }
+
+    const filteredData</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\hooks\cacheSync.tsx (Line 353:7 - Line 361:47), frontend\src\services\hooks\cacheSync.tsx (Line 197:9 - Line 205:97)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup50"><code class="language-tsx text-sm text-gray-800">const monthlyCacheKeys = allQueries
+        .filter(query =&gt; {
+          const key = query.queryKey;
+          const matches = (
+            Array.isArray(key) &amp;&amp;
+            key.length &gt;= 5 &amp;&amp; // Length trebuie să fie cel puțin 5 pentru ['transactions', 'monthly', year, month, userId]
+            key[0] === 'transactions' &amp;&amp;
+            key[1] === 'monthly' &amp;&amp;
+            key[4] === userId // user ID e pe pozitia 4 în monthly cache key</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\hooks\cacheSync.tsx (Line 375:9 - Line 417:56), frontend\src\services\hooks\cacheSync.tsx (Line 224:11 - Line 266:63)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup51"><code class="language-tsx text-sm text-gray-800">let updatedMonthlyCount = 0;
+        
+        monthlyCacheKeys.forEach(queryKey =&gt; {
+          try {
+            console.log('[DEBUG-CACHE-SYNC] Updating monthly cache with key:', queryKey);
+            queryClient.setQueryData(queryKey, (oldData: MonthlyTransactionsResult | undefined) =&gt; {
+              if (!oldData) return oldData;
+
+              switch (operation) {
+                case 'create':
+                  updatedMonthlyCount++;
+                  return {
+                    data: [transaction, ...oldData.data],
+                    count: oldData.count + 1,
+                  };
+                  
+                case 'update':
+                  updatedMonthlyCount++;
+                  return {
+                    data: oldData.data.map((tx: TransactionValidated) =&gt;
+                      tx.id === transaction.id ? transaction : tx
+                    ),
+                    count: oldData.count,
+                  };
+                  
+                case 'delete':
+                  if (!deletedId) return oldData;
+                  updatedMonthlyCount++;
+                  return {
+                    data: oldData.data.filter((tx: TransactionValidated) =&gt; tx.id !== deletedId),
+                    count: oldData.count - 1,
+                  };
+                  
+                default:
+                  return oldData;
+              }
+            });
+          } catch (error) {
+            console.error('[CACHE-SYNC] Error updating monthly cache for key:', queryKey, error);
+          }
+        });
+
+        console.log(`[DEBUG-CACHE-SYNC] Monthly cache update completed for </code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\financial.tsx (Line 310:5 - Line 317:7), frontend\src\utils\financial.tsx (Line 293:5 - Line 301:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup52"><code class="language-tsx text-sm text-gray-800">return transactions.filter(transaction =&gt; {
+      return searchColumns.some(column =&gt; {
+        const value = (transaction as any)[column];
+        if (!value) return false;
+
+        const stringValue = String(value);
+        const searchValue = caseSensitive ? stringValue : stringValue.toLowerCase();
+        return</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\transactionFormStore.tsx (Line 255:9 - Line 265:5), frontend\src\stores\transactionStore.tsx (Line 131:2 - Line 143:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup54"><code class="language-tsx text-sm text-gray-800">,
+      clearError: () =&gt; {
+        set({ error: null, lastUpdated: new Date() }, false, &quot;clearError&quot;);
+        logAction(&quot;Error cleared&quot;);
+      },
+      reset: () =&gt; {
+        set(
+          {
+            loading: false,
+            error: null,
+            form</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\transactionFiltersStore.tsx (Line 195:13 - Line 206:12), frontend\src\stores\transactionFiltersStore.tsx (Line 86:7 - Line 97:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup55"><code class="language-tsx text-sm text-gray-800">filterType: &quot;&quot;,
+            filterCategory: &quot;&quot;,
+            filterSubcategory: &quot;&quot;,
+            dateFrom: &quot;&quot;,
+            dateTo: &quot;&quot;,
+            amountMin: &quot;&quot;,
+            amountMax: &quot;&quot;,
+            searchText: &quot;&quot;,
+            limit: PAGINATION.DEFAULT_LIMIT,
+            offset: PAGINATION.DEFAULT_OFFSET,
+            sort: PAGINATION.DEFAULT_SORT,
+            lastUpdated</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\transactionFiltersStore.tsx (Line 374:7 - Line 402:11), frontend\src\stores\transactionStore.tsx (Line 115:2 - Line 143:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup56"><code class="language-tsx text-sm text-gray-800">;
+      },
+
+      // Base store actions
+      setLoading: (loading: boolean) =&gt; {
+        set({ loading, lastUpdated: new Date() }, false, &quot;setLoading&quot;);
+        logAction(&quot;Loading state changed&quot;, { loading });
+      },
+
+      setError: (error: string | null) =&gt; {
+        set({ error, lastUpdated: new Date() }, false, &quot;setError&quot;);
+        if (error) {
+          storeLogger.error(STORE_NAME, &quot;Error set&quot;, error);
+        } else {
+          logAction(&quot;Error cleared&quot;);
+        }
+      },
+
+      clearError: () =&gt; {
+        set({ error: null, lastUpdated: new Date() }, false, &quot;clearError&quot;);
+        logAction(&quot;Error cleared&quot;);
+      },
+
+      reset: () =&gt; {
+        set(
+          {
+            loading: false,
+            error: null,
+            filterType</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\transactionFiltersStore.tsx (Line 402:13 - Line 414:12), frontend\src\stores\transactionFiltersStore.tsx (Line 86:7 - Line 99:42)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup57"><code class="language-tsx text-sm text-gray-800">filterType: &quot;&quot;,
+            filterCategory: &quot;&quot;,
+            filterSubcategory: &quot;&quot;,
+            dateFrom: &quot;&quot;,
+            dateTo: &quot;&quot;,
+            amountMin: &quot;&quot;,
+            amountMax: &quot;&quot;,
+            searchText: &quot;&quot;,
+            limit: PAGINATION.DEFAULT_LIMIT,
+            offset: PAGINATION.DEFAULT_OFFSET,
+            sort: PAGINATION.DEFAULT_SORT,
+            totalItems: 0,
+            lastUpdated</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\categoryStore.tsx (Line 51:8 - Line 71:21), frontend\src\stores\transactionFormStore.tsx (Line 41:9 - Line 60:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup58"><code class="language-tsx text-sm text-gray-800">(
+      (set, get) =&gt; {
+        // Helper pentru logging standardizat
+        const logAction = (action: string, data?: Record&lt;string, unknown&gt;) =&gt; {
+          storeLogger.info(STORE_NAME, action, data);
+        };
+
+        // Helper pentru setări standardizate
+        const setLoading = (loading: boolean) =&gt; {
+          set({ loading, lastUpdated: new Date() }, false, &quot;setLoading&quot;);
+        };
+
+        const setError = (error: string | null) =&gt; {
+          set({ error, lastUpdated: new Date() }, false, &quot;setError&quot;);
+          if (error) {
+            storeLogger.error(STORE_NAME, &quot;Error set&quot;, error);
+          }
+        };
+
+        // Creăm acțiuni async standardizate
+        const createCategoryAction</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\categoryStore.tsx (Line 381:2 - Line 395:11), frontend\src\stores\transactionFormStore.tsx (Line 251:8 - Line 143:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup59"><code class="language-tsx text-sm text-gray-800">,
+
+          // Base store actions
+          setLoading,
+          setError,
+          clearError: () =&gt; {
+            set({ error: null, lastUpdated: new Date() }, false, &quot;clearError&quot;);
+            logAction(&quot;Error cleared&quot;);
+          },
+          reset: () =&gt; {
+            set(
+              {
+                loading: false,
+                error: null,
+                categories</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\stores\authStore.tsx (Line 115:15 - Line 131:19), frontend\src\stores\authStore.tsx (Line 84:9 - Line 100:16)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup60"><code class="language-tsx text-sm text-gray-800">);
+
+              if (result.error) {
+                setError(result.error, result.errorType);
+                throw new Error(result.error);
+              }
+
+              set(
+                {
+                  user: result.user,
+                  isAuthenticated: !!result.user,
+                  error: null,
+                  errorType: undefined,
+                  lastUpdated: new Date(),
+                },
+                false,
+                &quot;register_success&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\supabaseService.tsx (Line 300:30 - Line 320:21), frontend\src\services\supabaseService.tsx (Line 250:30 - Line 270:31)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup61"><code class="language-tsx text-sm text-gray-800">, error);
+
+      // Folosim mesajele din constante pentru erori cu mesaj îmbunătățit
+      if (
+        error.message?.includes(&quot;category&quot;) ||
+        error.message?.includes(&quot;subcategory&quot;)
+      ) {
+        // Folosim mesajul standard din MESAJE pentru a menține consistența UI
+        const errorMessage =
+          MESAJE.EROARE_CATEGORIE_SUBCATEGORIE_INVALIDA ||
+          &quot;Categoria sau subcategoria nu este validă. Verificați categoriile disponibile în aplicație.&quot;;
+        throw new Error(errorMessage);
+      }
+
+      throw error;
+    }
+
+    return data as TransactionValidated;
+  },
+
+  // Șterge tranzacție</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\supabaseAuthService.tsx (Line 85:2 - Line 95:11), frontend\src\services\supabaseAuthService.tsx (Line 39:5 - Line 49:28)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup62"><code class="language-tsx text-sm text-gray-800">});
+    let errorType: AuthErrorType | undefined = undefined;
+    let user: AuthUser | null = null;
+    if (data?.user) {
+      user = {
+        id: data.user.id,
+        email: data.user.email || &quot;&quot;,
+      };
+    }
+    if (error) {
+      if (error.message?.toLowerCase().includes(&quot;password&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\supabaseAuthService.tsx (Line 96:14 - Line 112:6), frontend\src\services\supabaseAuthService.tsx (Line 52:11 - Line 68:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup63"><code class="language-tsx text-sm text-gray-800">;
+      } else if (error.message?.toLowerCase().includes(&quot;network&quot;)) {
+        errorType = AuthErrorType.NETWORK;
+      } else {
+        errorType = AuthErrorType.UNKNOWN;
+      }
+    }
+    return {
+      user,
+      error: error?.message || null,
+      errorType,
+    };
+  },
+
+  /**
+   * Logout
+   */</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\reactQueryUtils.tsx (Line 295:5 - Line 308:12), frontend\src\services\reactQueryUtils.tsx (Line 247:6 - Line 260:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup64"><code class="language-tsx text-sm text-gray-800">,
+    ): UseMutationOptions&lt;
+      TData,
+      TError,
+      TVariables,
+      MutationContext&lt;TData&gt;
+    &gt; =&gt; ({
+      ...baseOptions,
+      onMutate: async (variables) =&gt; {
+        await queryClient.cancelQueries({ queryKey });
+        const previousData = queryClient.getQueryData&lt;TData[]&gt;(queryKey);
+
+        // Actualizare optimistă
+        queryClient</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\reactQueryUtils.tsx (Line 313:2 - Line 339:8), frontend\src\services\reactQueryUtils.tsx (Line 264:2 - Line 290:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup65"><code class="language-tsx text-sm text-gray-800">);
+
+        return { previousData };
+      },
+      onError: (err, variables, context) =&gt; {
+        // Restaurare date anterioare în caz de eroare
+        if (context?.previousData) {
+          queryClient.setQueryData(queryKey, context.previousData);
+        }
+
+        if (baseOptions.onError) {
+          baseOptions.onError(err, variables, context);
+        }
+      },
+      onSettled: (data, error, variables, context) =&gt; {
+        // Invalidare query pentru a asigura sincronizarea cu serverul
+        queryClient.invalidateQueries({ queryKey: queryKey });
+
+        if (baseOptions.onSettled) {
+          baseOptions.onSettled(data, error, variables, context);
+        }
+      },
+    }),
+
+    /**
+     * Șterge un element din array
+     */</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\reactQueryUtils.tsx (Line 340:11 - Line 358:7), frontend\src\services\reactQueryUtils.tsx (Line 291:11 - Line 309:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup66"><code class="language-tsx text-sm text-gray-800">: (
+      queryClient: QueryClient,
+      queryKey: QueryKey,
+      itemId: string | number,
+      idField: string = &quot;id&quot;,
+    ): UseMutationOptions&lt;
+      TData,
+      TError,
+      TVariables,
+      MutationContext&lt;TData&gt;
+    &gt; =&gt; ({
+      ...baseOptions,
+      onMutate: async (variables) =&gt; {
+        await queryClient.cancelQueries({ queryKey });
+        const previousData = queryClient.getQueryData&lt;TData[]&gt;(queryKey);
+
+        // Actualizare optimistă
+        queryClient.setQueryData&lt;TData[]&gt;(queryKey, (old = []) =&gt; {
+          return old.filter</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\services\reactQueryUtils.tsx (Line 361:7 - Line 386:2), frontend\src\services\reactQueryUtils.tsx (Line 311:5 - Line 290:8)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup67"><code class="language-tsx text-sm text-gray-800">,
+          );
+        });
+
+        return { previousData };
+      },
+      onError: (err, variables, context) =&gt; {
+        // Restaurare date anterioare în caz de eroare
+        if (context?.previousData) {
+          queryClient.setQueryData(queryKey, context.previousData);
+        }
+
+        if (baseOptions.onError) {
+          baseOptions.onError(err, variables, context);
+        }
+      },
+      onSettled: (data, error, variables, context) =&gt; {
+        // Invalidare query pentru a asigura sincronizarea cu serverul
+        queryClient.invalidateQueries({ queryKey: queryKey });
+
+        if (baseOptions.onSettled) {
+          baseOptions.onSettled(data, error, variables, context);
+        }
+      },
+    }),
+  }</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useValidation.tsx (Line 275:2 - Line 289:19), frontend\src\hooks\useValidation.tsx (Line 158:5 - Line 172:15)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup71"><code class="language-tsx text-sm text-gray-800">} = options;
+    
+    const stringValue = String(value).trim();
+    
+    if (!stringValue) {
+      return {
+        isValid: allowEmpty,
+        error: allowEmpty ? undefined : VALIDATION_MESSAGES.EMPTY_VALUE
+      };
+    }
+    
+    if (!VALIDATION_HELPERS.isValidNumber(stringValue)) {
+      return {
+        isValid: false,
+        error: VALIDATION_MESSAGES.INVALID_PERCENTAGE</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useStatePersistence.tsx (Line 202:13 - Line 207:4), frontend\src\hooks\useStatePersistence.tsx (Line 56:2 - Line 63:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup72"><code class="language-tsx text-sm text-gray-800">, debug = false } = config;
+  const [value, setValueState] = useState&lt;T&gt;(defaultValue);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+
+  const log</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useStatePersistence.tsx (Line 272:3 - Line 278:10), frontend\src\hooks\useStatePersistence.tsx (Line 140:3 - Line 146:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup73"><code class="language-tsx text-sm text-gray-800">const setValue = useCallback((newValue: T | ((prev: T) =&gt; T)) =&gt; {
+    const finalValue = typeof newValue === 'function' 
+      ? (newValue as (prev: T) =&gt; T)(value)
+      : newValue;
+    
+    setValueState(finalValue);
+    saveToURL</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\usePrefetchRoutes.tsx (Line 186:6 - Line 197:3), frontend\src\hooks\usePrefetchRoutes.tsx (Line 149:7 - Line 160:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup74"><code class="language-tsx text-sm text-gray-800">) {
+        // Prefetch componenta
+        if (prefetchComponents &amp;&amp; route.component) {
+          preloadComponent(route.component);
+        }
+
+        // Prefetch date
+        if (prefetchQueries &amp;&amp; route.queryKeys) {
+          route.queryKeys.forEach((queryKey) =&gt; {
+            queryClient.prefetchQuery({
+              queryKey: queryKey,
+              staleTime: 30</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useNavigationState.tsx (Line 334:2 - Line 344:2), frontend\src\hooks\useNavigationState.tsx (Line 113:2 - Line 123:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup75"><code class="language-tsx text-sm text-gray-800">{
+      sidebarVariant: DEFAULT_NAVIGATION_STATE.sidebarVariant,
+      currentPage: DEFAULT_NAVIGATION_STATE.currentPage,
+      lastVisitedPages: DEFAULT_NAVIGATION_STATE.lastVisitedPages,
+      breadcrumbMaxItems: DEFAULT_NAVIGATION_STATE.breadcrumbMaxItems,
+      openTabs: DEFAULT_NAVIGATION_STATE.openTabs,
+      activeTabId: DEFAULT_NAVIGATION_STATE.activeTabId,
+      persistenceEnabled: DEFAULT_NAVIGATION_STATE.persistenceEnabled,
+      autoHideSidebar: DEFAULT_NAVIGATION_STATE.autoHideSidebar,
+      maxOpenTabs: DEFAULT_NAVIGATION_STATE.maxOpenTabs,
+    })</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="markdown-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">markdown</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="css-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">css</h2><div class="divide-y divide-gray-200 border-b-2"><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>
