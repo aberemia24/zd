@@ -7,7 +7,6 @@ import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@budget-app/shared-constants";
 import { TransactionData } from "../modals/types";
-import UniversalTransactionPopover, { TransactionFormData } from "../popover/UniversalTransactionPopover";
 
 // ===== ENHANCED CVA VARIANTS =====
 const cellVariants = cva(
@@ -408,78 +407,40 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     onTogglePopover();
   }, [onTogglePopover, cellId, existingTransaction]);
 
-  // ===== POPOVER HANDLERS =====
-  const handlePopoverSave = useCallback(async (data: TransactionFormData) => {
-    console.log("🎯 UniversalTransactionPopover onSave called with:", { data, existingTransaction, date });
-    const transactionData = {
-      amount: parseFloat(data.amount),
-      description: data.description,
-      isRecurring: data.recurring,
-      frequency: data.frequency as any,
-      category: existingTransaction?.category || category,
-      subcategory: existingTransaction?.subcategory || subcategory,
-      type: (existingTransaction?.type as any) || "expense",
-      date: date,
-    };
-    console.log("🚀 Calling onSaveTransaction with:", transactionData);
-    await onSaveTransaction(transactionData);
+  // ===== POPOVER HANDLERS (DISABLED - UniversalTransactionPopover not available) =====
+  // TODO: Re-implement when UniversalTransactionPopover is available
+  const handlePopoverSave = useCallback(async (data: any) => {
+    // Temporary implementation without popover
+    console.log("🎯 Transaction save (temporary):", { data, existingTransaction, date });
     setIsPopoverOpen(false);
-  }, [existingTransaction, date, onSaveTransaction, category, subcategory]);
+  }, [existingTransaction, date]);
 
   const handlePopoverCancel = useCallback(() => setIsPopoverOpen(false), []);
 
-  // NOU: Handler pentru ștergere din popover
   const handlePopoverDelete = useCallback(async () => {
     if (onDeleteTransaction && existingTransaction?.id) {
       await onDeleteTransaction(existingTransaction.id);
-      setIsPopoverOpen(false); // Închide popover-ul după ștergere
+      setIsPopoverOpen(false);
     }
   }, [onDeleteTransaction, existingTransaction]);
 
-  // Memoize the entire popover component to prevent re-renders from parent
+  // Temporary placeholder for popover component
   const PopoverComponent = useMemo(() => (
-    <UniversalTransactionPopover
-      isOpen={isPopoverOpen}
-      onOpenChange={setIsPopoverOpen}
-      initialAmount={existingTransaction?.amount || 0}
-      day={day}
-      month={month}
-      year={year}
-      category={existingTransaction?.category || category}
-      subcategory={existingTransaction?.subcategory || subcategory}
-      type={existingTransaction?.type || "expense"}
-      onSave={handlePopoverSave}
-      onCancel={handlePopoverCancel}
-      onDelete={handlePopoverDelete}
-      trigger={
-        <button
-          onClick={handleMoreButtonClick}
-          className="p-1 rounded hover:bg-copper-100 dark:hover:bg-copper-700 transition-colors focus:outline-none focus:ring-2 focus:ring-copper-500"
-          title="Advanced options"
-          aria-label="Open advanced options"
-          tabIndex={0}
-          data-testid={`more-button-${cellId}`}
-        >
-          <MoreHorizontal size={14} />
-        </button>
-      }
-      existingTransaction={existingTransaction}
-    />
-  ), [
-    isPopoverOpen, 
-    day, 
-    month, 
-    year, 
-    handlePopoverSave, 
-    handlePopoverCancel, 
-    handlePopoverDelete,
-    handleMoreButtonClick, 
-    cellId,
-    setIsPopoverOpen,
-    existingTransaction,
-    category,
-    subcategory
-  ]);
+    <div>
+      {/* TODO: Re-implement UniversalTransactionPopover when available */}
+      <button
+        onClick={handleMoreButtonClick}
+        className="p-1 rounded hover:bg-copper-100 dark:hover:bg-copper-700 transition-colors focus:outline-none focus:ring-2 focus:ring-copper-500"
+        title="Advanced options (disabled)"
+        aria-label="Open advanced options (disabled)"
+        tabIndex={0}
+        data-testid={`more-button-${cellId}`}
+        disabled
+      >
+        <MoreHorizontal size={14} />
+      </button>
+    </div>
+  ), [handleMoreButtonClick, cellId]);
 
   const handleQuickSave = useCallback(() => {
     if (internalEditing) {

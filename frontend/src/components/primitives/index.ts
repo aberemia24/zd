@@ -36,7 +36,6 @@ export { Tabs, TabButton, TabList, TabPanel, useTabs, useTabContext, useTabsKeyb
 export { Dropdown, useDropdown } from './Dropdown';
 export { Pagination, usePagination } from './Pagination';
 export { CommandPalette, useCommandPalette, CommandPaletteProvider } from './CommandPalette';
-export { NavigationStateDemo } from './NavigationStateDemo';
 
 // Modal Components
 export { default as ConfirmationModal } from './ConfirmationModal/ConfirmationModal';

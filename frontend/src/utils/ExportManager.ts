@@ -1,20 +1,14 @@
 import type { Transaction } from "../types/Transaction";
-import { TransactionType, OPTIONS } from "@budget-app/shared-constants";
+import { TransactionType, LABELS } from "@budget-app/shared-constants";
 import { LazyExportManager, type ExportProgressCallback } from "./lazyExportUtils";
-import { LABELS } from '@budget-app/shared-constants';
+import {
+  isFormatSupported,
+  estimateFileSize,
+  getTransactionTypeLabel,
+  type ExportFormat,
+  type ExportOptions
+} from "../shared/utils/exportUtils";
 
-export type ExportFormat = "csv" | "pdf" | "excel";
-
-export interface ExportOptions {
-  filename?: string;
-  title?: string;
-  onProgress?: (progress: number) => void;
-  includeHeaders?: boolean;
-  dateRange?: {
-    from: string;
-    to: string;
-  };
-}
 
 /**
  * ExportManager cu lazy loading pentru performanță optimă
@@ -64,7 +58,7 @@ export class ExportManager {
       Descriere: t.description || "",
       Categorie: t.category || "",
       Subcategorie: t.subcategory || "",
-      Tip: this.getTransactionTypeLabel(t.type),
+      Tip: getTransactionTypeLabel(t.type),
       Suma: `${typeof t.amount === "number" ? t.amount.toFixed(2) : parseFloat(t.amount.toString()).toFixed(2)} RON`,
       Status: t.status || "ACTIVE",
     }));
@@ -81,48 +75,6 @@ export class ExportManager {
         return lazyExporter.exportToExcel(exportData, filename, "Tranzacții");
       default:
         throw new Error(`Format de export nesuportat: ${format}`);
-    }
-  }
-
-  /**
-   * Conversie tip tranzacție în label pentru afișare
-   */
-  private static getTransactionTypeLabel(type: TransactionType): string {
-    switch (type) {
-      case TransactionType.INCOME:
-        return LABELS.INCOME_TYPE;
-      case TransactionType.EXPENSE:
-        return LABELS.EXPENSE_TYPE;
-      default:
-        return "Necunoscut";
-    }
-  }
-
-  /**
-   * Validare format suportat
-   */
-  static isFormatSupported(format: string): format is ExportFormat {
-    return ["csv", "pdf", "excel"].includes(format);
-  }
-
-  /**
-   * Calculare dimensiune aproximativă fișier pentru progress tracking
-   */
-  static estimateFileSize(
-    transactions: Transaction[],
-    format: ExportFormat,
-  ): number {
-    const baseSize = transactions.length * 100; // ~100 bytes per transaction
-
-    switch (format) {
-      case "csv":
-        return baseSize;
-      case "pdf":
-        return baseSize * 3; // PDF-urile sunt mai mari
-      case "excel":
-        return baseSize * 2; // Excel-urile sunt mai mari decât CSV
-      default:
-        return baseSize;
     }
   }
 }
