@@ -7,6 +7,7 @@ import { cva } from "class-variance-authority";
 import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@budget-app/shared-constants";
 import { TransactionData } from "../modals/types";
+import UniversalTransactionPopover, { TransactionFormData } from "../popover/UniversalTransactionPopover";
 
 // ===== ENHANCED CVA VARIANTS =====
 const cellVariants = cva(
@@ -84,8 +85,11 @@ export interface EditableCellProps {
   
   // Popover integration props
   date: string;
-  existingTransaction?: TransactionData;
+  category: string;
+  subcategory?: string;
+  validTransactions: TransactionData[];
   onSaveTransaction: (transaction: Omit<TransactionData, "id">) => Promise<void>;
+  onDeleteTransaction?: (transactionId: string) => Promise<void>;
   isSavingTransaction?: boolean;
   onTogglePopover: () => void;
   
@@ -133,8 +137,11 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   onHoverChange,
   showHoverActions = false,
   date,
-  existingTransaction,
+  category,
+  subcategory,
+  validTransactions,
   onSaveTransaction,
+  onDeleteTransaction,
   isSavingTransaction,
   onTogglePopover,
   warning,
@@ -150,6 +157,26 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   
   // Use external hover state if provided, otherwise internal
   const isActuallyHovered = onHoverChange ? isHovered : internalHovered;
+  
+  // Memoized date parts to prevent infinite re-renders in UniversalTransactionPopover
+  const { day, month, year } = useMemo(() => {
+    const parts = date.split('-');
+    return {
+      day: parseInt(parts[2], 10),
+      month: parseInt(parts[1], 10),
+      year: parseInt(parts[0], 10)
+    };
+  }, [date]);
+
+  // NOU: Găsește tranzacția existentă aici, într-un mediu stabil
+  const existingTransaction = useMemo(() => {
+    const dayOfMonth = parseInt(date.split('-')[2], 10);
+    return validTransactions.find(t => 
+      t.category === category && 
+      t.subcategory === subcategory && 
+      new Date(t.date).getUTCDate() === dayOfMonth
+    );
+  }, [validTransactions, category, subcategory, date]);
 
   // ===== INLINE EDIT HOOK =====
   const {
@@ -372,9 +399,87 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   const handleMoreButtonClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+    // LOG PENTRU DEBUG
+    console.log("🅿️ Opening Popover for Cell:", {
+      cellId,
+      existingTransaction
+    });
     setIsPopoverOpen(true);
     onTogglePopover();
-  }, [onTogglePopover]);
+  }, [onTogglePopover, cellId, existingTransaction]);
+
+  // ===== POPOVER HANDLERS =====
+  const handlePopoverSave = useCallback(async (data: TransactionFormData) => {
+    console.log("🎯 UniversalTransactionPopover onSave called with:", { data, existingTransaction, date });
+    const transactionData = {
+      amount: parseFloat(data.amount),
+      description: data.description,
+      isRecurring: data.recurring,
+      frequency: data.frequency as any,
+      category: existingTransaction?.category || category,
+      subcategory: existingTransaction?.subcategory || subcategory,
+      type: (existingTransaction?.type as any) || "expense",
+      date: date,
+    };
+    console.log("🚀 Calling onSaveTransaction with:", transactionData);
+    await onSaveTransaction(transactionData);
+    setIsPopoverOpen(false);
+  }, [existingTransaction, date, onSaveTransaction, category, subcategory]);
+
+  const handlePopoverCancel = useCallback(() => setIsPopoverOpen(false), []);
+
+  // NOU: Handler pentru ștergere din popover
+  const handlePopoverDelete = useCallback(async () => {
+    if (onDeleteTransaction && existingTransaction?.id) {
+      await onDeleteTransaction(existingTransaction.id);
+      setIsPopoverOpen(false); // Închide popover-ul după ștergere
+    }
+  }, [onDeleteTransaction, existingTransaction]);
+
+  // Memoize the entire popover component to prevent re-renders from parent
+  const PopoverComponent = useMemo(() => (
+    <UniversalTransactionPopover
+      isOpen={isPopoverOpen}
+      onOpenChange={setIsPopoverOpen}
+      initialAmount={existingTransaction?.amount || 0}
+      day={day}
+      month={month}
+      year={year}
+      category={existingTransaction?.category || category}
+      subcategory={existingTransaction?.subcategory || subcategory}
+      type={existingTransaction?.type || "expense"}
+      onSave={handlePopoverSave}
+      onCancel={handlePopoverCancel}
+      onDelete={handlePopoverDelete}
+      trigger={
+        <button
+          onClick={handleMoreButtonClick}
+          className="p-1 rounded hover:bg-copper-100 dark:hover:bg-copper-700 transition-colors focus:outline-none focus:ring-2 focus:ring-copper-500"
+          title="Advanced options"
+          aria-label="Open advanced options"
+          tabIndex={0}
+          data-testid={`more-button-${cellId}`}
+        >
+          <MoreHorizontal size={14} />
+        </button>
+      }
+      existingTransaction={existingTransaction}
+    />
+  ), [
+    isPopoverOpen, 
+    day, 
+    month, 
+    year, 
+    handlePopoverSave, 
+    handlePopoverCancel, 
+    handlePopoverDelete,
+    handleMoreButtonClick, 
+    cellId,
+    setIsPopoverOpen,
+    existingTransaction,
+    category,
+    subcategory
+  ]);
 
   const handleQuickSave = useCallback(() => {
     if (internalEditing) {
@@ -556,62 +661,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
             <Edit2 size={14} />
           </button>
           
-          <Popover.Root open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-            <Popover.Trigger asChild>
-              <button
-                onClick={handleMoreButtonClick}
-                className="p-1 rounded hover:bg-copper-100 dark:hover:bg-copper-700 transition-colors focus:outline-none focus:ring-2 focus:ring-copper-500"
-                title="Advanced options"
-                aria-label="Open advanced options"
-                tabIndex={0}
-              >
-                <MoreHorizontal size={14} />
-              </button>
-            </Popover.Trigger>
-            
-            <Popover.Portal>
-              <Popover.Content
-                className="z-50 w-80 rounded-md border bg-white p-4 shadow-lg outline-none"
-                sideOffset={5}
-                align="start"
-              >
-                <div className="space-y-3">
-                  <h3 className="font-medium text-sm">Advanced Edit</h3>
-                  
-                  {/* Enhanced popover content */}
-                  <div className="space-y-2">
-                    <div className="text-xs text-gray-600">
-                      Date: {date}
-                    </div>
-                    
-                    {existingTransaction && (
-                      <div className="text-xs text-gray-600">
-                        Current: {existingTransaction.amount}
-                      </div>
-                    )}
-                    
-                    <div className="pt-2 border-t">
-                      <button
-                        onClick={() => {
-                          setIsPopoverOpen(false);
-                          if (onStartEdit) {
-                            onStartEdit();
-                          } else {
-                            startEdit();
-                          }
-                        }}
-                        className="w-full px-3 py-2 text-sm bg-copper-100 hover:bg-copper-200 rounded transition-colors"
-                      >
-                        Quick Edit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                
-                <Popover.Arrow className="fill-white" />
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
+          {PopoverComponent}
         </div>
       )}
       

@@ -49,6 +49,7 @@ interface UseTransactionOperationsProps {
 export interface UseTransactionOperationsReturn {
   handleSaveTransaction: (transaction: Omit<TransactionData, "id">, existingId?: string) => Promise<void>;
   handleEditableCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
+  handleDeleteTransaction: (transactionId: string) => Promise<void>;
   isSaving: boolean;
   confirmationModalProps: any; // Import ConfirmationModalProps if needed for proper typing
 }
@@ -407,9 +408,25 @@ export const useTransactionOperations = ({
     [deleteTransactionMutation],
   );
 
+  // NOU: Handler pentru ștergere simplă
+  const handleDeleteTransaction = useCallback(
+    async (transactionId: string): Promise<void> => {
+      try {
+        // Aici se poate adăuga logica de confirmare dacă e necesară
+        await deleteTransactionMutation.mutateAsync(transactionId);
+        toast.success(LUNAR_GRID_ACTIONS.DELETE_SUCCESS_SINGLE);
+      } catch (error) {
+        toast.error("Eroare la ștergerea tranzacției. Încercați din nou.");
+        throw error;
+      }
+    },
+    [deleteTransactionMutation]
+  );
+
   return {
     handleSaveTransaction,
     handleEditableCellSave,
+    handleDeleteTransaction,
     isSaving,
     confirmationModalProps: modalProps,
   };

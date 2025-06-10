@@ -186,6 +186,46 @@ addTransaction({ ... });
 
 ---
 
+## 🐞 Jurnal de Debugging
+
+### Sesiunea 2024-06-11: Debugging `UniversalTransactionPopover` în LunarGrid
+
+Această sesiune a avut ca scop rezolvarea unei serii de bug-uri complexe apărute după implementarea componentei consolidate `UniversalTransactionPopover`.
+
+**1. Problema Inițială: Câmpuri Dezactivate și Re-render Infinit**
+- **Simptom:** Câmpurile din popover erau nefuncționale, iar consola arăta o buclă infinită de re-render-uri.
+- **Cauza:** Props-uri instabile pasate de la `EditableCell`. Calculele (ex: extragerea zilei/lunii/anului din dată) și funcțiile de callback erau re-create la fiecare render.
+- **Soluția:** Stabilizarea props-urilor în `EditableCell` folosind `useMemo` pentru valori calculate și `useCallback` pentru funcții.
+
+**2. Problema 2: Încălcarea "Rules of Hooks"**
+- **Simptom:** Eroare critică în consolă: "Rendered more hooks than during the previous render".
+- **Cauza:** Hook-urile `useCallback` pentru `onSave` și `onCancel` erau definite în interiorul unui JSX redat condițional, încălcând regula fundamentală a hook-urilor.
+- **Soluția:** Mutarea definițiilor `useCallback` la nivelul superior al componentei `EditableCell`, asigurând o ordine constantă a apelurilor.
+
+**3. Problema 3: Pierderea Focusului la Tastare**
+- **Simptom:** La tastarea în câmpul "Descriere", input-ul pierdea focusul după fiecare caracter.
+- **Cauza:** O problemă de arhitectură subtilă. Componenta `FormContent` era definită *în interiorul* funcției de render a `UniversalTransactionPopover`. Orice schimbare de stare în popover ducea la re-crearea `FormContent`, distrugând astfel elementul DOM care avea focusul.
+- **Soluția:** Extragerea `FormContent` într-o componentă de sine stătătoare, stabilă, definită în afara `UniversalTransactionPopover`.
+
+**4. Problema 4: Evenimente de Tastatură Propagate (Bubbling)**
+- **Simptom:** Tastarea în inputurile din popover declanșa modul de editare inline în celula părinte.
+- **Cauza:** Evenimentele `keydown` se propagau de la popover în sus către `EditableCell`, care are un listener ce interpretează orice tastă ca o intenție de editare.
+- **Soluția:** Adăugarea `onKeyDown={(e) => e.stopPropagation()}` pe container-ul principal al `FormContent` pentru a opri propagarea evenimentelor.
+
+**5. Problema Finală (Nerezolvată): Date Inconsistente (`existingTransaction`)**
+- **Simptom:** Popover-ul se deschide mereu în modul "Adaugă", chiar și pentru celule cu valori existente. Butonul "Șterge" nu apare sau este dezactivat.
+- **Cauza Rădăcină:** Prop-ul `existingTransaction` este `undefined`. Problema provine din instabilitatea listei `validTransactions` și a logicii de `find` în componentele părinte (`LunarGridRow`, `LunarGridTanStack`).
+- **Soluție Aplicată (dar eșuată):** S-a încercat stabilizarea datelor la sursă (`LunarGridTanStack`) și pasarea întregii liste de tranzacții până la `EditableCell`, unde logica `find` ar trebui să funcționeze într-un mediu controlat.
+- **Stadiu Actual:** Soluția nu a funcționat. `existingTransaction` este în continuare `undefined`, indicând o problemă persistentă în fluxul de date. **Necesită investigație suplimentară.**
+
+**Lecții Învățate:**
+- **Stabilitatea Props-urilor este crucială:** Obiectele și funcțiile instabile pasate ca props pot declanșa cascade de re-render-uri greu de depanat.
+- **Arhitectura Componentelor contează:** Definirea unei componente în interiorul alteia este un anti-pattern care duce la probleme de stare și focus.
+- **Izolarea Problemelor:** Debugging-ul eficient necesită izolarea problemei strat cu strat, de la componenta de UI până la sursa de date.
+- **Fluxul de Date:** Asigurarea unui flux de date corect și stabil de la componenta părinte la cea copil este fundamentală pentru funcționalitatea corectă a aplicațiilor React complexe.
+
+---
+
 _Actualizat la: 2025-05-22_
 
 ---

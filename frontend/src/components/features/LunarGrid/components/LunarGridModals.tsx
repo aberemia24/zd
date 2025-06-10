@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import CellTransactionPopover from "../CellTransactionPopover";
+import UniversalTransactionPopover from "../popover/UniversalTransactionPopover";
 import { QuickAddModalSimplified as QuickAddModal } from "../modals/QuickAddModalSimplified";
 import { FrequencyType, TransactionType } from "@budget-app/shared-constants";
 import { cn } from "../../../../styles/cva-v2";
@@ -59,7 +59,7 @@ const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
 
   return (
     <>
-      {/* Popover pentru editare tranzacție */}
+      {/* Popover pentru editare tranzacție - MIGRATED TO UniversalTransactionPopover */}
       {props.popover && (
         <div 
           className={cn(
@@ -69,7 +69,7 @@ const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
           style={props.popoverStyle}
           data-testid="transaction-popover"
         >
-          <CellTransactionPopover
+          <UniversalTransactionPopover
             initialAmount={props.popover.amount || ""}
             day={props.popover.day}
             month={props.month}
@@ -79,6 +79,7 @@ const LunarGridModals: React.FC<LunarGridModalsProps> = (props) => {
             type={props.popover.type}
             onSave={props.onSavePopover}
             onCancel={props.onCancelPopover}
+            showAsStandalone={true}
           />
         </div>
       )}

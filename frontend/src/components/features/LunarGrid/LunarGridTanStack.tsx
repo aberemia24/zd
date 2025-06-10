@@ -19,7 +19,6 @@ import { LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants/ui";
 import LunarGridRow from "./components/LunarGridRow";
 import LunarGridTable from "./components/LunarGridTable";
 import Button from "../../primitives/Button/Button";
-import { TransactionPopover } from './modals';
 import { ConfirmationModal } from '../../primitives/ConfirmationModal';
 
 // Orchestrator components (pentru feature flag)
@@ -152,12 +151,15 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
 
     // Hook pentru tranzacțiile reale cu datele corecte pentru Financial Projections
     // Optimizat pentru optimistic updates - cache redus pentru a detecta schimbările
-    const { transactions: validTransactions } = useMonthlyTransactions(year, month, user?.id, {
+    const { transactions: rawTransactions, isLoading, error } = useMonthlyTransactions(year, month, user?.id, {
       includeAdjacentDays: true,
-      refetchOnMount: false, // Nu refetch automat la mount dacă datele sunt fresh
-      staleTime: 0, // 🔥 FIX: Cache zero pentru a permite detecția optimistic updates
-      refetchOnWindowFocus: false, // Evită refresh la focus
+      refetchOnMount: false,
+      staleTime: 0,
+      refetchOnWindowFocus: false,
     });
+
+    // Stabilizează `validTransactions` cu `useMemo`
+    const validTransactions = useMemo(() => rawTransactions || [], [rawTransactions]);
 
     // Hooks pentru operații specializate
     const transactionOps = useTransactionOperations({ year, month, userId: user?.id });
@@ -232,7 +234,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
     );
 
     // Interogare tabel optimizată (fără handleri de click/double-click)
-    const { table, isLoading, error, days, dailyBalances, tableContainerRef, transactionMap } =
+    const { table, isLoading: tableIsLoading, error: tableError, days, dailyBalances, tableContainerRef, transactionMap } =
       useLunarGridTable(year, month, expandedRows);
 
     // Prepare data pentru keyboard navigation
@@ -424,6 +426,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
             month={month}
             validTransactions={validTransactions}
             transactionOps={transactionOps}
+            onDeleteTransaction={transactionOps.handleDeleteTransaction}
           />
         );
       },
@@ -526,6 +529,7 @@ const LunarGridTanStack: React.FC<LunarGridTanStackProps> = memo(
                             onSetNewSubcategoryName={handlers.handleSetNewSubcategoryName}
                             validTransactions={[]} // TODO: completează din stateResult
                             transactionOps={stateResult.transactionOps}
+                            onDeleteTransaction={stateResult.transactionOps.handleDeleteTransaction}
                           />
                         )}
                         highlightedCell={stateResult.highlightedCell}

@@ -2,7 +2,7 @@ import React from 'react';
 import { EditableCell, EditableCellProps } from "../inline-editing/EditableCell";
 
 export interface LunarGridCellProps extends Pick<EditableCellProps, 
-  'date' | 'existingTransaction' | 'onSaveTransaction' | 'isSavingTransaction' | 'onTogglePopover'
+  'date' | 'existingTransaction' | 'onSaveTransaction' | 'isSavingTransaction' | 'onTogglePopover' | 'category' | 'subcategory' | 'onDeleteTransaction' | 'validTransactions'
 > {
   cellId: string;
   value: string;
@@ -31,10 +31,14 @@ const LunarGridCell: React.FC<LunarGridCellProps> = (props) => {
       onFocus={props.onFocus}
       onClick={props.onClick}
       date={props.date}
+      category={props.category}
+      subcategory={props.subcategory}
       existingTransaction={props.existingTransaction}
       onSaveTransaction={props.onSaveTransaction}
+      onDeleteTransaction={props.onDeleteTransaction}
       isSavingTransaction={props.isSavingTransaction}
       onTogglePopover={props.onTogglePopover}
+      validTransactions={props.validTransactions}
     />
   );
 };

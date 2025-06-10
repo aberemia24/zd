@@ -101,31 +101,7 @@ export interface SubcategoryRow {
   total?: number;
 }
 
-/**
- * Starea pentru popover-ul de editare a tranzacțiilor
- */
-export interface TransactionPopoverState {
-  /** Dacă popover-ul este activ */
-  active: boolean;
 
-  /** Ziua lunii pentru care se editează tranzacția */
-  day: number;
-
-  /** Numele categoriei */
-  category: string;
-
-  /** Numele subcategoriei */
-  subcategory: string;
-
-  /** Suma curentă (ca string pentru afișare/editare) */
-  amount: string;
-
-  /** Tipul tranzacției (venit/cheltuială) */
-  type: string;
-
-  /** Poziția popover-ului pe ecran */
-  position: { top: number; left: number } | null;
-}
 
 /**
  * Starea pentru editarea ștergerii subcategoriilor

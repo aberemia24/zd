@@ -74,6 +74,7 @@ interface LunarGridRowProps {
   onStartDeletingSubcategory: (category: string, subcategory: string) => void;
   onCellSave: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => Promise<void>;
   onSingleClickModal: (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null, element: HTMLElement) => void;
+  onDeleteTransaction: (transactionId: string) => Promise<void>;
   onCellClick?: (position: CellPosition, modifiers: { ctrlKey: boolean; shiftKey: boolean; metaKey: boolean }) => void;
   onAddSubcategory: (category: string) => void;
   onCancelAddingSubcategory: () => void;
@@ -121,6 +122,7 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
   onStartDeletingSubcategory,
   onCellSave,
   onSingleClickModal,
+  onDeleteTransaction,
   onCellClick,
   onAddSubcategory,
   onCancelAddingSubcategory,
@@ -395,6 +397,8 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       }
                       return String(cellValue);
                     })()}
+                    category={original.category}
+                    subcategory={original.subcategory}
                     onSave={async (value: string | number) => {
                       // FIX CRITIC: Conectează salvarea inline cu backend-ul
                       const day = parseInt(cell.column.id.split("-")[1]);
@@ -436,14 +440,11 @@ const LunarGridRowComponent: React.FC<LunarGridRowProps> = ({
                       });
                     }}
                     date={`${year}-${String(month + 1).padStart(2, '0')}-${String(parseInt(cell.column.id.split("-")[1])).padStart(2, '0')}`}
-                    existingTransaction={validTransactions.find(t => 
-                      t.category === original.category && 
-                      t.subcategory === original.subcategory && 
-                      new Date(t.date).getUTCDate() === parseInt(cell.column.id.split("-")[1])
-                    )}
+                    validTransactions={validTransactions}
                     onSaveTransaction={transactionOps.handleSaveTransaction}
+                    onDeleteTransaction={onDeleteTransaction}
                     isSavingTransaction={transactionOps.isSaving}
-                    onTogglePopover={() => {}} // Nu mai e necesar, păstrat doar pentru compatibilitate
+                    onTogglePopover={() => {}}
                   />
               ) : isDayCell && isCategory ? (
                 // Day Cell pentru categorii - DOAR afișare, fără interactivitate
