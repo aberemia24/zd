@@ -1,5 +1,5 @@
 import type { Transaction } from "../../types/Transaction"; 
-import type { ExportProgressCallback } from "../lazyExportUtils"; 
+import type { ExportProgressCallback } from "../../utils/lazyExportUtils"; 
 import { TransactionType, LABELS } from "@budget-app/shared-constants";
 
 export type ExportFormat = "csv" | "pdf" | "excel";
