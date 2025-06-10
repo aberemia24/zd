@@ -12,6 +12,11 @@ import type {
   RunningBalance,
   CurrencyConfig
 } from '../types/financial';
+import {
+  calculateRunningBalances,
+  calculateFinancialSummary,
+  searchTransactions
+} from '../shared/utils/dataUtils';
 
 // =============================================================================
 // CURRENCY CONFIGURATION
@@ -147,77 +152,6 @@ export function transformToTableRow(
   };
 }
 
-/**
- * Calculează soldul curent pentru fiecare tranzacție
- */
-export function calculateRunningBalances(
-  transactions: FinancialTransaction[],
-  initialBalance: number = 0
-): RunningBalance[] {
-  const sortedTransactions = [...transactions].sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
-  );
-
-  let runningBalance = initialBalance;
-  const balances: RunningBalance[] = [];
-
-  sortedTransactions.forEach((transaction) => {
-    const dailyChange = transaction.type === TransactionType.INCOME 
-      ? transaction.amount 
-      : -transaction.amount;
-    
-    runningBalance += dailyChange;
-
-    balances.push({
-      date: transaction.date,
-      balance: runningBalance,
-      dailyChange,
-      transactionId: transaction.id,
-    });
-  });
-
-  return balances;
-}
-
-/**
- * Calculează sumarul financiar pentru o listă de tranzacții
- */
-export function calculateFinancialSummary(
-  transactions: FinancialTransaction[],
-  periodStart: Date,
-  periodEnd: Date
-): FinancialSummary {
-  const filteredTransactions = transactions.filter(
-    t => t.date >= periodStart && t.date <= periodEnd
-  );
-
-  const totalIncome = filteredTransactions
-    .filter(t => t.type === TransactionType.INCOME)
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpenses = filteredTransactions
-    .filter(t => t.type === TransactionType.EXPENSE)
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const netBalance = totalIncome - totalExpenses;
-  const transactionCount = filteredTransactions.length;
-  const averageTransaction = transactionCount > 0 
-    ? (totalIncome + totalExpenses) / transactionCount 
-    : 0;
-
-  return {
-    totalIncome,
-    totalExpenses,
-    netBalance,
-    averageTransaction,
-    transactionCount,
-    period: {
-      start: periodStart,
-      end: periodEnd,
-    },
-  };
-}
-
 // =============================================================================
 // QUICK FILTER PERIODS
 // =============================================================================
@@ -272,53 +206,6 @@ export function getQuickFilterPeriods() {
 // =============================================================================
 // SEARCH & FILTERING
 // =============================================================================
-
-/**
- * Efectuează căutare în tranzacții
- */
-export function searchTransactions(
-  transactions: FinancialTransaction[],
-  query: string,
-  searchColumns: string[] = ['description', 'category', 'subcategory'],
-  caseSensitive: boolean = false,
-  useRegex: boolean = false
-): FinancialTransaction[] {
-  if (!query.trim()) return transactions;
-
-  const searchQuery = caseSensitive ? query : query.toLowerCase();
-
-  try {
-    const regex = useRegex ? new RegExp(searchQuery, caseSensitive ? 'g' : 'gi') : null;
-
-    return transactions.filter(transaction => {
-      return searchColumns.some(column => {
-        const value = (transaction as any)[column];
-        if (!value) return false;
-
-        const stringValue = String(value);
-        const searchValue = caseSensitive ? stringValue : stringValue.toLowerCase();
-
-        if (useRegex && regex) {
-          return regex.test(stringValue);
-        }
-
-        return searchValue.includes(searchQuery);
-      });
-    });
-  } catch (error) {
-    // Fallback la căutare simplă dacă regex este invalid
-    return transactions.filter(transaction => {
-      return searchColumns.some(column => {
-        const value = (transaction as any)[column];
-        if (!value) return false;
-
-        const stringValue = String(value);
-        const searchValue = caseSensitive ? stringValue : stringValue.toLowerCase();
-        return searchValue.includes(searchQuery);
-      });
-    });
-  }
-}
 
 // =============================================================================
 // PERFORMANCE UTILITIES
