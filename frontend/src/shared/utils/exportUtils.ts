@@ -1,8 +1,6 @@
-import type { Transaction } from "../../types/Transaction"; 
-import type { ExportProgressCallback } from "../../utils/lazyExportUtils"; 
+import type { Transaction } from "@budget-app/shared-constants"; 
 import { TransactionType, LABELS } from "@budget-app/shared-constants";
-
-export type ExportFormat = "csv" | "pdf" | "excel";
+import { ExportFormat, ExportProgressCallback } from "@budget-app/shared-constants";
 
 export interface ExportOptions {
   filename?: string;

@@ -151,22 +151,11 @@ export interface BulkOperationPayload {
 }
 
 // =============================================================================
-// EXPORT TYPES
+// EXPORT TYPES - MOVED TO @budget-app/shared-constants
 // =============================================================================
 
-export type ExportFormat = 'csv' | 'pdf' | 'excel';
-
-export interface ExportOptions {
-  format: ExportFormat;
-  includeHeaders: boolean;
-  includeFiltered: boolean;
-  includeSelected: boolean;
-  columns: string[];
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-}
+// Export types are now centralized in @budget-app/shared-constants/export.ts
+// Use imports: import { ExportFormat, ExportOptions } from '@budget-app/shared-constants';
 
 // =============================================================================
 // CURRENCY & FORMATTING

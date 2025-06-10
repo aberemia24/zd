@@ -45,3 +45,17 @@ api.ts: Configurare API
 - Folosește pattern-ul robust: păstrează datele vechi la fetch/filtrare (useRef/useMemo) pentru UX fluid, fără blink sau re-mount.
 - Testează cu loguri temporare, dar elimină-le după validare.
 </logging_and_ux>
+
+<automation_and_enforcement>
+**Shared Constants Automation (pnpm Workspaces):**
+- **Sincronizare automată**: `pnpm` gestionează legăturile simbolice. Orice modificare în `shared-constants` este disponibilă instantaneu în `frontend` și `backend`.
+- **Build centralizat**: `pnpm -r build` compilează toate pachetele în ordinea corectă, asigurând că dependențele sunt gata de utilizare.
+- **Validare implicită**: TypeScript și ESLint, configurate la nivel de workspace, validează automat corectitudinea importurilor și a tipurilor. Scripturile manuale de validare au fost eliminate.
+
+**Quality Assurance:**
+- ESLint Rules: detectează string-uri hardcodate și importuri incorecte la nivel de workspace.
+- TypeScript Validation: verifică tipizarea corectă a constantelor direct între pachete.
+- CI/CD Pipeline: execută `pnpm install` și `pnpm -r build` pentru a valida întreaga structură a monorepoului.
+- Automated Testing: verifică că testele folosesc constante din pachetul `@budget-app/shared-constants`.
+- Pattern Detection: identifică violări ale principiului "single source of truth" prin reguli de linting.
+</automation_and_enforcement>

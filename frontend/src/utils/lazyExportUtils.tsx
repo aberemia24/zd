@@ -1,16 +1,20 @@
-import { TransactionType } from '@budget-app/shared-constants';
-import { BUTTONS } from '@budget-app/shared-constants';
+import { TransactionType, BUTTONS } from '@budget-app/shared-constants';
+import { 
+  ExportFormat,
+  ExportProgress,
+  ExportProgressCallback,
+  DEFAULT_EXPORT_PROGRESS 
+} from '@budget-app/shared-constants';
 /**
  * Lazy Export Utilities
  * 
  * Încărcare lazy pentru librăriile mari de export (Excel, PDF, HTML2Canvas)
  * pentru a reduce bundle-ul inițial și a încărca doar când sunt necesare.
+ * 
+ * Uses unified export types from @budget-app/shared-constants
  */
 
 import React from 'react';
-
-// Tipuri pentru exporturi
-export type ExportFormat = 'csv' | 'pdf' | 'excel' | 'png';
 
 // =============================================================================
 // LAZY IMPORT UTILITIES
@@ -69,13 +73,8 @@ export const loadCSVExport = async () => {
 // EXPORT PROGRESS TRACKING
 // =============================================================================
 
-export interface ExportProgress {
-  stage: 'loading' | 'processing' | 'generating' | TransactionType.SAVING | 'complete' | 'error';
-  progress: number; // 0-100
-  message: string;
-}
-
-export type ExportProgressCallback = (progress: ExportProgress) => void;
+// Types are now imported from @budget-app/shared-constants
+// This section kept for backwards compatibility documentation
 
 // =============================================================================
 // UNIFIED EXPORT MANAGER (LAZY LOADED)
@@ -97,7 +96,7 @@ export class LazyExportManager {
    */
   async exportToExcel(data: any[], filename: string, worksheetName: string = 'Data') {
     try {
-      this.reportProgress('loading', 10, 'Încărcare librării Excel...');
+      this.reportProgress('preparing', 10, 'Încărcare librării Excel...');
       
       const { ExcelJS, saveAs } = await loadExcelExport();
       
@@ -133,7 +132,7 @@ export class LazyExportManager {
         column.width = 15;
       });
       
-      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
+      this.reportProgress('downloading', 80, 'Salvare fișier...');
       
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], { 
@@ -156,7 +155,7 @@ export class LazyExportManager {
    */
   async exportToPDF(data: any[], filename: string, title: string = BUTTONS.EXPORT) {
     try {
-      this.reportProgress('loading', 10, 'Încărcare librării PDF...');
+      this.reportProgress('preparing', 10, 'Încărcare librării PDF...');
       
       const { jsPDF, saveAs } = await loadPDFExport();
       
@@ -184,7 +183,7 @@ export class LazyExportManager {
         });
       }
       
-      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
+      this.reportProgress('downloading', 80, 'Salvare fișier...');
       
       doc.save(`${filename}.pdf`);
       
@@ -202,7 +201,7 @@ export class LazyExportManager {
    */
   async exportToPNG(element: HTMLElement, filename: string, options: any = {}) {
     try {
-      this.reportProgress('loading', 10, 'Încărcare librării screenshot...');
+      this.reportProgress('preparing', 10, 'Încărcare librării screenshot...');
       
       const html2canvas = await loadHTML2Canvas();
       
@@ -214,7 +213,7 @@ export class LazyExportManager {
         ...options
       });
       
-      this.reportProgress(TransactionType.SAVING, 80, 'Salvare imagine...');
+      this.reportProgress('downloading', 80, 'Salvare imagine...');
       
       canvas.toBlob((blob) => {
         if (blob) {
@@ -241,7 +240,7 @@ export class LazyExportManager {
    */
   async exportToCSV(data: any[], filename: string) {
     try {
-      this.reportProgress('loading', 10, 'Încărcare librării CSV...');
+      this.reportProgress('preparing', 10, 'Încărcare librării CSV...');
       
       const { saveAs } = await loadCSVExport();
       
@@ -262,7 +261,7 @@ export class LazyExportManager {
         )
       ].join('\n');
       
-      this.reportProgress(TransactionType.SAVING, 80, 'Salvare fișier...');
+      this.reportProgress('downloading', 80, 'Salvare fișier...');
       
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       saveAs(blob, `${filename}.csv`);
@@ -282,9 +281,14 @@ export class LazyExportManager {
 // =============================================================================
 
 /**
- * Hook pentru progress tracking în componente React
+ * 🔄 LEGACY COMPATIBILITY - useExportProgress Hook
+ * 
+ * @deprecated Use useUnifiedExport from hooks/shared/useUnifiedExport instead
+ * This hook now wraps the unified implementation for backwards compatibility
  */
 export const useExportProgress = () => {
+  // We can't import useUnifiedExport here due to circular dependencies,
+  // so we maintain minimal compatibility implementation
   const [progress, setProgress] = React.useState<ExportProgress | null>(null);
   const [isExporting, setIsExporting] = React.useState(false);
 

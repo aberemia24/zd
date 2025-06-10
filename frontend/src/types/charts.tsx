@@ -183,10 +183,11 @@ export interface ChartSelection {
 // EXPORT AND PRINT TYPES
 // =============================================================================
 
-export type ChartExportFormat = 'png' | 'svg' | 'pdf' | 'csv';
+// ChartExportFormat moved to @budget-app/shared-constants
+// Use: import { ChartExportFormat } from '@budget-app/shared-constants';
 
 export interface ChartExportOptions {
-  format: ChartExportFormat;
+  format: import('@budget-app/shared-constants').ChartExportFormat;
   filename: string;
   quality?: number; // for PNG (0-1)
   width?: number;

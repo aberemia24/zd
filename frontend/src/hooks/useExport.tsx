@@ -1,12 +1,25 @@
-import { useCallback, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import {
-  ExportManager,
-  ExportFormat,
-  ExportOptions,
-} from "../utils/ExportManager";
+/**
+ * 🔄 LEGACY COMPATIBILITY - useExport Hook
+ * 
+ * This hook maintains backwards compatibility for existing components.
+ * It wraps the new unified export functionality with the old interface.
+ * 
+ * @deprecated Consider migrating to useUnifiedExport for new code
+ */
+
+import { useCallback } from "react";
+import { useUnifiedExport } from "./shared/useUnifiedExport";
+import { ExportFormat } from "@budget-app/shared-constants";
 import type { Transaction } from "../types/Transaction";
-import { MESAJE } from "@budget-app/shared-constants/messages";
+
+// Legacy interface for backwards compatibility
+interface ExportOptions {
+  filename?: string;
+  title?: string;
+  onProgress?: (progress: number) => void;
+  includeHeaders?: boolean;
+  dateRange?: { from: string; to: string };
+}
 
 interface ExportState {
   isExporting: boolean;
@@ -25,86 +38,27 @@ interface UseExportReturn {
 }
 
 /**
- * Hook specializat pentru export rapoarte
- * Implementează progress tracking și error handling
+ * Legacy export hook - wraps unified implementation
+ * @deprecated Use useUnifiedExport instead for new implementations
  */
 export const useExport = (): UseExportReturn => {
-  const [state, setState] = useState<ExportState>({
-    isExporting: false,
-    progress: 0,
-    error: null,
-  });
+  const unified = useUnifiedExport();
 
-  // Progress callback pentru tracking export
-  const onProgress = useCallback((progress: number) => {
-    setState((prev) => ({ ...prev, progress }));
-  }, []);
-
-  // Mutation pentru export
-  const exportMutation = useMutation({
-    mutationFn: async ({
-      transactions,
-      format,
-      options,
-    }: {
-      transactions: Transaction[];
-      format: ExportFormat;
-      options?: ExportOptions;
-    }) => {
-      setState((prev) => ({
-        ...prev,
-        isExporting: true,
-        error: null,
-        progress: 0,
-      }));
-
-      try {
-        await ExportManager.exportTransactions(transactions, format, {
-          ...options,
-          onProgress,
-        });
-
-        setState((prev) => ({ ...prev, progress: 100 }));
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : MESAJE.EROARE_NECUNOSCUTA;
-        setState((prev) => ({ ...prev, error: errorMessage }));
-        throw error;
-      } finally {
-        setState((prev) => ({ ...prev, isExporting: false }));
-      }
-    },
-    onError: (error: Error) => {
-      setState((prev) => ({
-        ...prev,
-        error: error.message || MESAJE.EROARE_EXPORT,
-        isExporting: false,
-      }));
-    },
-  });
-
+  // Adapter function to maintain legacy interface
   const exportData = useCallback(
     async (
       transactions: Transaction[],
       format: ExportFormat,
       options?: ExportOptions,
     ) => {
-      await exportMutation.mutateAsync({ transactions, format, options });
+      await unified.exportData(transactions, format, options);
     },
-    [exportMutation],
+    [unified.exportData],
   );
-
-  const resetState = useCallback(() => {
-    setState({
-      isExporting: false,
-      progress: 0,
-      error: null,
-    });
-  }, []);
 
   return {
     exportData,
-    state,
-    resetState,
+    state: unified.state,
+    resetState: unified.resetState,
   };
 };

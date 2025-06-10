@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useExport } from "../../../hooks/useExport";
+import { useUnifiedExport } from "../../../hooks/shared/useUnifiedExport";
 import Button from "../../primitives/Button/Button";
 import ExportModal from "./ExportModal";
-import type { Transaction } from "../../../types/Transaction";
-import type { ExportFormat } from "../../../utils/ExportManager";
+import type { Transaction } from "@budget-app/shared-constants";
+import { ExportFormat } from "@budget-app/shared-constants";
 import { BUTTONS } from "@budget-app/shared-constants/ui";
 
 interface ExportButtonProps {
@@ -22,7 +22,7 @@ const ExportButtonComponent: React.FC<ExportButtonProps> = ({
   className = "",
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { exportData, state, resetState } = useExport();
+  const { exportData, state, resetState } = useUnifiedExport();
 
   const handleExportClick = () => {
     setIsModalOpen(true);
