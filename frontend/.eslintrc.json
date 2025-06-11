@@ -1,8 +1,7 @@
 {
   "extends": [
     "react-app",
-    "react-app/jest",
-    "plugin:storybook/recommended"
+    "react-app/jest"
   ],
   "plugins": [
     "react-hooks"

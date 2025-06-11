@@ -193,7 +193,7 @@ const TransactionsPage: React.FC = () => {
     (newType?: string, newCategory?: string, newSubcategory?: string) => {
       if (newType !== undefined) setFilterType(newType as TransactionType | "");
       if (newCategory !== undefined)
-        setFilterCategory(newCategory as CategoryType | "");
+        {setFilterCategory(newCategory as CategoryType | "");}
       if (newSubcategory !== undefined) setFilterSubcategory(newSubcategory);
     },
     [setFilterType, setFilterCategory, setFilterSubcategory],

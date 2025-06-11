@@ -1,80 +1,154 @@
 ---
-description: 
-globs: frontend/src/components/**
-alwaysApply: false
+description: React hooks optimization patterns and performance best practices
+globs: src/hooks/**/*.ts, src/components/**/*.tsx
+alwaysApply: true
 ---
 
-<hook_rules>
-**CRITIC**: Hook-urile React trebuie apelate identic la fiecare render
-INTERZIS: Nu apela hook-uri în `if`, `?:`, bucle, return condiționat
-OBLIGATORIU: Hook-uri mereu în același număr și ordine
-CORECT: Condiții În INTERIORUL hook-urilor, nu în jurul lor
-PREFERAT: Funcții simple în loc de useCallback pentru handleri condiționați
-</hook_rules>
+# React Hooks Best Practices
 
-<best_patterns>
-Inițializați toate hook-urile la început grupate logic
-Extrageți componente/funcții separate pentru a evita apeluri condiționate
-Validare în handler-uri, nu în hook-uri condiționate
-Nu schimbați numărul de hook-uri între renderuri
-</best_patterns>
+## **HOOK OPTIMIZATION PATTERNS**
 
-<aria_accessibility>
-INTERZIS: Atribute ARIA pe elemente incompatibile
-- `aria-selected`: NU pe `<button>` → folosiți `aria-pressed`/`aria-expanded`
-EVITAȚI: Roluri implicite redundante (ex: `role="list"` pe `<ul>`)
-PREFERAT: Elemente semantice native în loc de `div`-uri cu roluri
-</aria_accessibility>
+### **useCallback & useMemo Usage**
+```typescript
+// ✅ DO: Use for expensive computations
+const expensiveValue = useMemo(() => 
+  data.reduce((acc, item) => acc + item.value, 0), 
+  [data]
+);
 
-<examples>
-// ✅ CORECT
-const GoodComponent = () => {
-  const [isActive, setIsActive] = useState(false); // Hook mereu apelat
+// ❌ DON'T: Over-memoize simple values
+const simpleString = useMemo(() => `Hello ${name}`, [name]); // OVERHEAD
+```
+
+### **Custom Hook Patterns**
+```typescript
+// ✅ DO: Single responsibility hooks
+const useApiData = (url: string) => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
   
-  // Condiția În INTERIORUL hook-ului
   useEffect(() => {
-    if (isActive) { doSomething(); }
-  }, [isActive]);
+    // fetch logic
+  }, [url]);
   
-  // Funcție simplă pentru handler condiționat
-  const handleAction = (id) => { /*...*/ };
-  
-  return (
-    <ul> {/* Fără role redundant */}
-      <li>
-        {isActive && (
-          <button aria-pressed={true}> {/* NU aria-selected */}
-            Acțiune
-          </button>
-        )}
-      </li>
-    </ul>
-  );
+  return { data, loading };
 };
 
-// ❌ GREȘIT
-const BadComponent = () => {
-  const [isActive, setIsActive] = useState(false);
+// ❌ DON'T: God hooks that do everything
+const useEverything = () => {
+  // 20+ lines of mixed concerns
+};
+```
+
+### **Effect Dependencies**
+```typescript
+// ✅ DO: Minimal, specific dependencies
+useEffect(() => {
+  fetchUser(userId);
+}, [userId]); // Only what you use
+
+// ❌ DON'T: Excessive dependencies
+useEffect(() => {
+  fetchUser(userId);
+}, [userId, config, theme, locale]); // Too many
+```
+
+### **State Optimization**
+```typescript
+// ✅ DO: Colocate related state
+const [formData, setFormData] = useState({
+  name: '',
+  email: '',
+  phone: ''
+});
+
+// ❌ DON'T: Separate state for related data
+const [name, setName] = useState('');
+const [email, setEmail] = useState('');
+const [phone, setPhone] = useState('');
+```
+
+### **Hook Composition**
+```typescript
+// ✅ DO: Compose hooks logically
+const useUserForm = (initialData) => {
+  const { data: user, loading } = useApiData(`/users/${initialData.id}`);
+  const { formData, handleChange, reset } = useForm(initialData);
+  const { save, saving } = useSaveUser();
   
-  if (isActive) { // INTERZIS: Hook condiționat
-    useEffect(() => { /*...*/ }, []);
+  return { user, loading, formData, handleChange, save, saving, reset };
+};
+```
+
+### **Performance Anti-Patterns**
+```typescript
+// ❌ AVOID: Creating objects in render
+const MyComponent = () => {
+  // New object every render!
+  const config = { theme: 'dark', locale: 'en' };
+  
+  return <ChildComponent config={config} />;
+};
+
+// ✅ FIX: Move outside or memoize
+const DEFAULT_CONFIG = { theme: 'dark', locale: 'en' };
+
+const MyComponent = () => {
+  return <ChildComponent config={DEFAULT_CONFIG} />;
+};
+```
+
+### **Hook Cleanup**
+```typescript
+// ✅ DO: Cleanup subscriptions
+useEffect(() => {
+  const subscription = api.subscribe(callback);
+  
+  return () => subscription.unsubscribe();
+}, [callback]);
+
+// ✅ DO: Cleanup timers
+useEffect(() => {
+  const timer = setTimeout(callback, 1000);
+  
+  return () => clearTimeout(timer);
+}, [callback]);
+```
+
+### **Conditional Effects**
+```typescript
+// ✅ DO: Conditional logic inside effect
+useEffect(() => {
+  if (shouldFetch && userId) {
+    fetchUser(userId);
   }
-  
-  return (
-    <ul role="list"> {/* Redundant */}
-      <li>
-        <button aria-selected={true}> {/* Incompatibil */}
-          Acțiune
-        </button>
-      </li>
-    </ul>
-  );
-};
-</examples>
+}, [shouldFetch, userId]);
 
-<hook_errors>
-Pentru "Rendered more hooks than during previous render":
-1. Extrage funcționalitatea ce folosea useCallback/useMemo în funcții simple
-2. Menține toate hook-urile la început, fără condiții
-3. Verifică if-uri/switch/?: care ar putea schimba ordinea hook-urilor
-</hook_errors>
+// ❌ DON'T: Conditional effects
+if (shouldFetch) {
+  useEffect(() => {
+    fetchUser(userId);
+  }, [userId]);
+}
+```
+
+### **Error Boundaries for Hooks**
+```typescript
+// ✅ DO: Handle errors in hooks
+const useApiData = (url: string) => {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  
+  useEffect(() => {
+    fetch(url)
+      .then(setData)
+      .catch(setError);
+  }, [url]);
+  
+  return { data, error };
+};
+```
+
+---
+
+**FOCUS**: Simple, performant hooks that follow React best practices without over-engineering.

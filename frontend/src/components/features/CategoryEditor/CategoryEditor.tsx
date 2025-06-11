@@ -317,11 +317,11 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                         e.key === "Enter" &&
                                         isValidSubcat(renameValue)
                                       )
-                                        handleRename(
+                                        {handleRename(
                                           selectedCategory,
                                           sc.name,
                                           renameValue,
-                                        );
+                                        );}
                                       if (e.key === "Escape") {
                                         setSubcatAction(null);
                                         setRenameValue("");
@@ -496,7 +496,7 @@ const CategoryEditorComponent: React.FC<Props> = ({
                                   (cat) => cat.name === selectedCategory,
                                 );
                                 if (selectedCat && isValidSubcat(newSubcat))
-                                  handleAdd(selectedCat);
+                                  {handleAdd(selectedCat);}
                               }}
                               className="min-w-[90px]"
                             >

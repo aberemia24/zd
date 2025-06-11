@@ -1,8 +1,11 @@
 ---
-description: docoument and maintain new or refactored functions, components, features etx. 
-globs: 
-alwaysApply: false
+description: Documentation standards for complex React components and refactored features
+globs: src/components/**/*.tsx, src/hooks/**/*.ts
+alwaysApply: true
 ---
+
+# Documentation Rules
+
 /**
  * NumeComponenta - Scurtă descriere a rolului componentei
  * 

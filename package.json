@@ -24,21 +24,38 @@
     "validate:jsx-extensions": "node scripts/validate-jsx-extensions.js",
     "validate:typescript-quality": "node scripts/validate-typescript-quality.js",
     "validate:transaction-types": "node scripts/validate-transaction-types.js",
-    "validate:all": "node scripts/validate-all-automation.js",
+    "validate:all": "pnpm -r --parallel --stream validate",
     "validate:quick": "pnpm run validate:constants && pnpm run validate:shared-constants && pnpm run validate:console-cleanup",
     "performance:monitor": "node scripts/performance-monitor.js",
     "performance:lighthouse": "RUN_LIGHTHOUSE=true node scripts/performance-monitor.js",
     "performance:check": "node scripts/performance-monitor.js --check-only",
-    "performance:ci": "CI=true node scripts/performance-monitor.js"
+    "performance:ci": "CI=true node scripts/performance-monitor.js",
+    "audit:dependencies:html": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-report.html --output-type html frontend/src",
+    "audit:dependencies:dot": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.dot --output-type dot frontend/src",
+    "audit:dependencies:mermaid": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.mmd --output-type mermaid frontend/src",
+    "test-e2e-debug": "pnpm --filter frontend run test:e2e:debug",
+    "prepare": "husky"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
     "@octokit/rest": "^21.0.0",
     "@types/nodemailer": "^6.4.17",
+    "@typescript-eslint/eslint-plugin": "^8.34.0",
+    "@typescript-eslint/parser": "^8.34.0",
     "concurrently": "^9.1.2",
     "dependency-cruiser": "^16.10.2",
-    "eslint": "^8.56.0",
+    "eslint": "^9.28.0",
     "jscpd": "^4.0.5",
     "prettier": "^3.2.5",
-    "typescript": "4.9.5"
+    "typescript": "^4.9.5",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
   }
 }

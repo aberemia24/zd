@@ -528,7 +528,7 @@ export function validateRecurringTemplate(
   }
 
   // Calculăm impact estimat
-  let estimatedImpact = {
+  const estimatedImpact = {
     transactionsPerMonth: 0,
     totalTransactionsNextYear: 0,
   };

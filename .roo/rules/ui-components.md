@@ -1,8 +1,10 @@
 ---
-description: 
-globs: frontend/src/components/**
-alwaysApply: false
+description: UI component development standards and reusability patterns
+globs: src/components/**/*.tsx, src/components/**/*.ts
+alwaysApply: true
 ---
+
+# UI Components Rules
 
 <component_structure>
 organizare:

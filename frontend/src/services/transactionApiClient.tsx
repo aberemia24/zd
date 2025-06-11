@@ -36,7 +36,7 @@ export class TransactionApiClient {
     queryParams?: Record<string, any>,
   ): string {
     // Verificăm dacă baseUrl este un URL absolut sau un path relativ
-    let baseIsAbsolute =
+    const baseIsAbsolute =
       this.baseUrl.startsWith("http://") || this.baseUrl.startsWith("https://");
     let fullUrl = "";
 

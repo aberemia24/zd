@@ -10,7 +10,7 @@ const validateTransactionData = (transaction: any): boolean => {
   if (!transaction) return false;
   if (!transaction.id || typeof transaction.id !== "string") return false;
   if (!transaction.amount || typeof transaction.amount !== "number")
-    return false;
+    {return false;}
   if (!Object.values(TransactionType).includes(transaction.type)) return false;
   return true;
 };

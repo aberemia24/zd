@@ -126,7 +126,7 @@ const TransactionFiltersComponent: React.FC<TransactionFiltersProps> = ({
       filteredCategories = customCategories.filter((cat) => {
         if (type === "INCOME") return cat.name === "VENITURI";
         if (type === "EXPENSE")
-          return cat.name !== "VENITURI" && cat.name !== "ECONOMII";
+          {return cat.name !== "VENITURI" && cat.name !== "ECONOMII";}
         if (type === "SAVING") return cat.name === "ECONOMII";
         return true;
       });

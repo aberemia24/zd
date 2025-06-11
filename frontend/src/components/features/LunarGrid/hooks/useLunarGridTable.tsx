@@ -282,7 +282,7 @@ export function useLunarGridTable(
       if (!cat) return;
       
       const subRows = categoriesMap[cat]?.subRows || [];
-      let subRow = subRows.find(
+      const subRow = subRows.find(
         (s: TransformedTableDataRow) => s.subcategory === subcat,
       );
       if (subRow) {
@@ -292,13 +292,13 @@ export function useLunarGridTable(
       }
       // Categorie (agregare totală) - acum fără dublă agregare
       if (!categoriesMap[cat])
-        categoriesMap[cat] = {
+        {categoriesMap[cat] = {
           id: cat,
           category: cat,
           isCategory: true,
           total: 0,
           subRows: [],
-        };
+        };}
       categoriesMap[cat][`day-${day}`] = (categoriesMap[cat][`day-${day}`] || 0) + amount;
       categoriesMap[cat].total = (categoriesMap[cat].total || 0) + amount;
     });

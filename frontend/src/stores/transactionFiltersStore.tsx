@@ -366,9 +366,9 @@ export const useTransactionFiltersStore = create<TransactionFiltersState>()(
         if (amountMax) params.set("amountMax", amountMax);
         if (searchText) params.set("search", searchText);
         if (limit !== PAGINATION.DEFAULT_LIMIT)
-          params.set("limit", limit.toString());
+          {params.set("limit", limit.toString());}
         if (offset !== PAGINATION.DEFAULT_OFFSET)
-          params.set("offset", offset.toString());
+          {params.set("offset", offset.toString());}
         if (sort !== PAGINATION.DEFAULT_SORT) params.set("sort", sort);
 
         return params;

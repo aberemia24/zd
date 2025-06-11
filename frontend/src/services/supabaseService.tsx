@@ -66,7 +66,7 @@ export const supabaseService = {
       query = query.eq("subcategory", filters.subcategory);
     }
     if (filters.recurring !== undefined)
-      query = query.eq("recurring", filters.recurring);
+      {query = query.eq("recurring", filters.recurring);}
 
     // Filtrare după interval de date
     if (filters.dateFrom) query = query.gte("date", filters.dateFrom);
@@ -74,9 +74,9 @@ export const supabaseService = {
 
     // Filtrare după interval de sume
     if (filters.minAmount !== undefined)
-      query = query.gte("amount", filters.minAmount);
+      {query = query.gte("amount", filters.minAmount);}
     if (filters.maxAmount !== undefined)
-      query = query.lte("amount", filters.maxAmount);
+      {query = query.lte("amount", filters.maxAmount);}
 
     // Căutare text în câmpurile configurate (ILIKE pentru case-insensitive)
     if (filters.search) {
@@ -89,9 +89,9 @@ export const supabaseService = {
     }
 
     if (pagination.sort)
-      query = query.order(pagination.sort, {
+      {query = query.order(pagination.sort, {
         ascending: pagination.order === "asc",
-      });
+      });}
     if (pagination.limit !== undefined && pagination.offset !== undefined) {
       query = query.range(
         pagination.offset,
@@ -227,9 +227,9 @@ export const supabaseService = {
     const { useAuthStore } = await import("../stores/authStore");
     const user = useAuthStore.getState().user;
     if (!user || !user.id)
-      throw new Error(
+      {throw new Error(
         MESAJE.EROARE_NECUNOSCUTA || "Utilizatorul nu este autentificat!",
-      );
+      );}
 
     // Validăm categoria și subcategoria - DEZACTIVAT, doar logăm pentru debugging
     // Am păstrat apelul pentru compatibilitate cu codul existent
@@ -275,9 +275,9 @@ export const supabaseService = {
     const { useAuthStore } = await import("../stores/authStore");
     const user = useAuthStore.getState().user;
     if (!user || !user.id)
-      throw new Error(
+      {throw new Error(
         MESAJE.EROARE_NECUNOSCUTA || "Utilizatorul nu este autentificat!",
-      );
+      );}
 
     // Validăm categoria și subcategoria dacă sunt furnizate - DEZACTIVAT, doar logăm pentru debugging
     // Am păstrat apelurile pentru compatibilitate cu codul existent
@@ -322,9 +322,9 @@ export const supabaseService = {
     const { useAuthStore } = await import("../stores/authStore");
     const user = useAuthStore.getState().user;
     if (!user || !user.id)
-      throw new Error(
+      {throw new Error(
         MESAJE.EROARE_NECUNOSCUTA || "Utilizatorul nu este autentificat!",
-      );
+      );}
     const { error } = await supabase
       .from(TABLE)
       .delete()

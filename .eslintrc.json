@@ -17,12 +17,6 @@
       "extends": ["./frontend/.eslintrc.json"]
     },
     {
-      "files": ["backend/**/*"],
-      "env": {
-        "node": true
-      }
-    },
-    {
       "files": ["scripts/**/*"],
       "env": {
         "node": true
