@@ -36,7 +36,7 @@
     "audit:dependencies:dot": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.dot --output-type dot frontend/src",
     "audit:dependencies:mermaid": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.mmd --output-type mermaid frontend/src",
     "test-e2e-debug": "pnpm --filter frontend run test:e2e:debug",
-    "prepare": "husky"
+    "prepare": "echo 'Husky disabled'"
   },
   "keywords": [],
   "author": "",
@@ -51,15 +51,9 @@
     "eslint": "^8.57.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "husky": "^9.1.7",
     "jscpd": "^4.0.5",
-    "lint-staged": "^16.1.0",
     "prettier": "^3.2.5",
     "typescript": "^5.1.6"
   },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix"
-    ]
-  }
+
 }

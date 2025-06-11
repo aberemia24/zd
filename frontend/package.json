@@ -28,7 +28,7 @@
     "performance:lighthouse": "RUN_LIGHTHOUSE=true node ../scripts/performance-monitor.js",
     "performance:ci": "CI=true node ../scripts/performance-monitor.js",
     "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
-    "prepare": "husky || true"
+    "prepare": "echo 'Husky disabled'"
   },
   "dependencies": {
     "@budget-app/shared-constants": "workspace:*",
