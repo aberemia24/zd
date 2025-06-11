@@ -1,6 +1,8 @@
 {
   "name": "budget-app",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "predev": "pnpm -r build",
@@ -8,7 +10,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "format": "pnpm -r format",
-    "lint": "pnpm -r lint",
+    "lint": "./node_modules/.bin/eslint .",
     "clean": "pnpm -r clean",
     "check:transaction-types": "node scripts/validate-transaction-types.js",
     "check:all": "pnpm run check:transaction-types && pnpm run lint",
@@ -42,16 +44,18 @@
   "devDependencies": {
     "@octokit/rest": "^21.0.0",
     "@types/nodemailer": "^6.4.17",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "concurrently": "^9.1.2",
     "dependency-cruiser": "^16.10.2",
-    "eslint": "^9.28.0",
-    "jscpd": "^4.0.5",
-    "prettier": "^3.2.5",
-    "typescript": "^4.9.5",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.0"
+    "jscpd": "^4.0.5",
+    "lint-staged": "^16.1.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.1.6"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

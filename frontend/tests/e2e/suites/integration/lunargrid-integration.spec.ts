@@ -45,7 +45,7 @@ test.describe('LunarGrid Integrare Completă cu Date Dinamice', () => {
     console.log('✅ Expandat toate categoriile');
     
     // Verifică că s-au expandat celule
-    let expandedCells = page.locator('[data-testid*="editable-cell"]');
+    const expandedCells = page.locator('[data-testid*="editable-cell"]');
     let cellCount = await expandedCells.count();
     
     // Dacă nu avem celule, încercăm din nou expandarea

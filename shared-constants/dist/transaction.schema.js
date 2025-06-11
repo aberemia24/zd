@@ -9,18 +9,18 @@ import { TransactionType, FrequencyType, TransactionStatus } from './enums';
 export const TransactionSchema = z.object({
     id: z.string().uuid(),
     amount: z.number(),
-    type: z.nativeEnum(TransactionType), // Enum strict pentru tip tranzacție
+    type: z.nativeEnum(TransactionType),
     date: z.string(),
     description: z.string().optional(),
     category: z.string().optional(),
     subcategory: z.string().optional(),
     recurring: z.boolean().optional(),
-    frequency: z.nativeEnum(FrequencyType).optional(), // Enum strict pentru frecvență
+    frequency: z.nativeEnum(FrequencyType).optional(),
     // --- câmpuri pentru workflow planificat/actual ---
-    actualAmount: z.number().optional(), // Suma efectivă cheltuită (dacă diferă de estimat)
-    status: z.nativeEnum(TransactionStatus).optional(), // 'PLANNED' sau 'COMPLETED'
+    actualAmount: z.number().optional(),
+    status: z.nativeEnum(TransactionStatus).optional(),
     // --- meta ---
-    created_at: z.string().optional(), // ISO date
+    created_at: z.string().optional(),
     updated_at: z.string().optional(), // ISO date
 });
 // Schema pentru CREATE (fără id, created_at, updated_at)

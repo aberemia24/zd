@@ -1,8 +1,4 @@
-// Punct central de export pentru toate constantele
+// Punct central de export pentru toate constantele - importăm din shared-constants
+// Conform regulilor: "single source of truth" în @budget-app/shared-constants
 
-export * from './api';
-export * from './defaults'; // proxy către @budget-app/shared-constants/defaults
-// Toate enums/constants sunt importate din '../../shared-constants' conform strategiei simplificate
-export * from './enums';
-export * from './messages';
-export * from './validation';
+export * from '@budget-app/shared-constants';

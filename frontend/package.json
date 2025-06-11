@@ -12,7 +12,6 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 110",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "type-check": "tsc --noEmit",
@@ -107,7 +106,7 @@
     "rollup-plugin-visualizer": "^6.0.1",
     "tailwindcss": "^3.4.16",
     "ts-unused-exports": "^11.0.1",
-    "typescript": "4.9.5",
+    "typescript": "5.1.6",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.4",
@@ -116,7 +115,7 @@
   "overrides": {
     "@types/react": "19.1.5",
     "@types/react-dom": "18.3.0",
-    "typescript": "4.9.5",
+    "typescript": "5.1.6",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "@testing-library/react": {

@@ -18,5 +18,22 @@
   "editor.quickSuggestions": {
     "strings": true
   },
-  "tailwindCSS.emmetCompletions": true
+  "tailwindCSS.emmetCompletions": true,
+  "remote.WSL.fileWatcher.polling": true,
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/coverage/**": true,
+    "**/test-results/**": true,
+    "**/.git/**": true
+  },
+  "remote.WSL.useShellEnvironment": true,
+  "terminal.integrated.defaultProfile.windows": "WSL",
+  "terminal.integrated.profiles.windows": {
+    "WSL": {
+      "path": "wsl.exe",
+      "args": []
+    }
+  },
+  "cursor.chat.persistence": "workspace",
+  "cursor.workspace.indexing": true
 } 
