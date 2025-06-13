@@ -21,7 +21,7 @@ export const INITIAL_FORM_STATE = {
 // Feature flags pentru componente LunarGrid
 export const LUNAR_GRID_FEATURE_FLAGS = {
     // Comutare între arhitectura monolitică și orchestrator
-    USE_STATE_MANAGER: true, // false = monolithic pattern, true = orchestrator pattern
+    USE_STATE_MANAGER: true,
     // Alte feature flags pentru dezvoltare graduală
     USE_ENHANCED_KEYBOARD_NAV: true,
     USE_PERFORMANCE_OPTIMIZATIONS: true,

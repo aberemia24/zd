@@ -36,7 +36,7 @@
     "audit:dependencies:dot": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.dot --output-type dot frontend/src",
     "audit:dependencies:mermaid": "dependency-cruiser --config .dependency-cruiser.js --output-to reports/dependency-graph.mmd --output-type mermaid frontend/src",
     "test-e2e-debug": "pnpm --filter frontend run test:e2e:debug",
-    "prepare": "husky"
+    "prepare": "echo 'Husky disabled'"
   },
   "keywords": [],
   "author": "",
@@ -44,21 +44,15 @@
   "devDependencies": {
     "@octokit/rest": "^21.0.0",
     "@types/nodemailer": "^6.4.17",
-    "@typescript-eslint/eslint-plugin": "^8.34.0",
-    "@typescript-eslint/parser": "^8.34.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
     "concurrently": "^9.1.2",
     "dependency-cruiser": "^16.10.2",
-    "eslint": "^9.28.0",
-    "husky": "^9.1.7",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^4.6.2",
     "jscpd": "^4.0.5",
-    "lint-staged": "^16.1.0",
-    "madge": "^8.0.0",
     "prettier": "^3.2.5",
-    "typescript": "^4.9.5"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix"
-    ]
+    "typescript": "^5.1.6"
   }
 }

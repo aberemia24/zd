@@ -5,10 +5,54 @@
 
 root = true
 
+# Setări generale pentru toate fișierele
 [*]
 indent_style = space
 indent_size = 2
 end_of_line = lf
 charset = utf-8
 trim_trailing_whitespace = true
-insert_final_newline = true 
+insert_final_newline = true
+max_line_length = 100
+
+# TypeScript/JavaScript files - configurare specifică pentru cod
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+max_line_length = 100
+trim_trailing_whitespace = true
+
+# JSON files - important pentru package.json, tsconfig.json etc.
+[*.json]
+indent_size = 2
+insert_final_newline = true
+
+# YAML files - pentru GitHub Actions, pnpm-workspace etc.
+[*.{yml,yaml}]
+indent_size = 2
+trim_trailing_whitespace = true
+
+# Markdown files - pentru README, documentație etc.
+[*.md]
+trim_trailing_whitespace = false  # Markdown poate avea trailing spaces pentru line breaks
+max_line_length = 120
+
+# CSS/SCSS files - pentru styling
+[*.{css,scss,sass}]
+indent_size = 2
+
+# HTML files
+[*.html]
+indent_size = 2
+
+# Shell scripts
+[*.{sh,bash}]
+indent_size = 2
+end_of_line = lf
+
+# Configuration files care pot avea indentări mai mari
+[*.{gitignore,gitattributes,prettierignore,eslintignore}]
+trim_trailing_whitespace = true
+
+# Package management files
+[{package.json,package-lock.json,pnpm-lock.yaml,pnpm-workspace.yaml}]
+indent_size = 2 

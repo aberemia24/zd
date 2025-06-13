@@ -69,7 +69,7 @@ export const LABELS = {
     FREQUENCY: 'Frecvență',
     TYPE_FILTER: 'Tip tranzacție:',
     CATEGORY_FILTER: 'Categoria:',
-    FORM: 'adăugare tranzacție', // pentru aria-label pe <form>
+    FORM: 'adăugare tranzacție',
     DESCRIPTION: 'Descriere',
     // Constante pentru pagina de autentificare/înregistrare
     EMAIL: 'Email',
@@ -97,7 +97,7 @@ export const PLACEHOLDERS = {
     AMOUNT: 'Introdu suma',
     DATE: 'Selectează data',
     DESCRIPTION: 'Adaugă o descriere (opțional)',
-    CATEGORY_EDITOR_SUBCATEGORY: 'Adaugă subcategorie nouă', // added
+    CATEGORY_EDITOR_SUBCATEGORY: 'Adaugă subcategorie nouă',
     SEARCH: 'Caută...',
     AMOUNT_MIN_FILTER: 'Suma minimă',
     AMOUNT_MAX_FILTER: 'Suma maximă',
@@ -192,9 +192,9 @@ export const TOAST = {
     },
     // Settings for toast behavior
     DURATION: {
-        SHORT: 3000, // 3 secunde pentru mesaje simple
-        MEDIUM: 5000, // 5 secunde pentru mesaje normale
-        LONG: 7000, // 7 secunde pentru mesaje importante
+        SHORT: 3000,
+        MEDIUM: 5000,
+        LONG: 7000,
         PERSISTENT: 0 // 0 = nu se închide automat
     }
 };
@@ -209,7 +209,7 @@ export const TABLE = {
         RECURRING: 'Recurent',
         FREQUENCY: 'Frecvență',
         DESCRIPTION: 'Descriere',
-        RUNNING_BALANCE: 'Sold curent', // Pentru running balance column
+        RUNNING_BALANCE: 'Sold curent',
         ACTIONS: 'Acțiuni', // Pentru actions column
     },
     EMPTY: EMPTY_STATE_MESSAGES.EMPTY_TRANSACTION_LIST,
@@ -637,11 +637,11 @@ export const BALANCE_DISPLAY = {
     },
     // Colors pentru Transaction Types (CSS classes pentru TailwindCSS)
     COLORS: {
-        INCOME: 'text-green-600 bg-green-50 border-green-200', // Verde pentru venituri
-        EXPENSE: 'text-red-600 bg-red-50 border-red-200', // Roșu pentru cheltuieli  
-        SAVING: 'text-blue-600 bg-blue-50 border-blue-200', // Albastru pentru economii/investiții
-        POSITIVE: 'text-green-600', // Pentru solduri pozitive
-        NEGATIVE: 'text-red-600', // Pentru solduri negative
+        INCOME: 'text-green-600 bg-green-50 border-green-200',
+        EXPENSE: 'text-red-600 bg-red-50 border-red-200',
+        SAVING: 'text-blue-600 bg-blue-50 border-blue-200',
+        POSITIVE: 'text-green-600',
+        NEGATIVE: 'text-red-600',
         NEUTRAL: 'text-gray-600', // Pentru solduri zero/neutrale
     },
     // Grid Styles pentru balance rows
@@ -685,9 +685,9 @@ export const BALANCE_MODALS = {
 };
 // 🚨 DUPLICATE FIX - Consolidez SOLD related constants
 export const BALANCE_LABELS = {
-    SOLD: 'Sold', // ✅ Consolidat din LABELS.SOLD (linia 113)
-    TOTAL_BALANCE: 'Sold total', // ✅ Înlocuiește LUNAR_GRID.TOTAL_BALANCE (linia 331)
-    DAILY_BALANCES: 'Balanțe zilnice', // ✅ Existent deja în UI
+    SOLD: 'Sold',
+    TOTAL_BALANCE: 'Sold total',
+    DAILY_BALANCES: 'Balanțe zilnice',
     BALANCE: 'Balanță',
     AVAILABLE: 'Disponibil',
     SAVINGS: 'Economii',
