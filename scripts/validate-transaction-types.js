@@ -6,8 +6,11 @@
  * în loc de enum-urile din shared-constants conform regulilor din code-standards.mdc
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('🔍 Validating transaction types usage...\n');
 
@@ -446,11 +449,11 @@ function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { 
+export { 
   checkFile, 
   scanDirectory, 
   analyzeIssues 

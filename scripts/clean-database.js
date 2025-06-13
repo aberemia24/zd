@@ -8,7 +8,8 @@
  * Rulare: node scripts/clean-database.js --confirm
  */
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
+import { fileURLToPath } from 'url';
 
 // Configurare Supabase - folosește valorile hardcodate pentru development
 const SUPABASE_URL = 'https://pzyvibdgpfgohvewdmit.supabase.co';
@@ -96,8 +97,8 @@ async function main() {
 }
 
 // Rulează scriptul dacă este apelat direct
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { cleanDatabase, checkTransactionCount }; 
+export { cleanDatabase, checkTransactionCount }; 

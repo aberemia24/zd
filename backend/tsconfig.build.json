@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDecoratorMetadata": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "target": "ES2022",
+    "module": "ES2022",
+    "verbatimModuleSyntax": true,
+    "importHelpers": true,
+    "preserveSymlinks": true
+  },
+  "exclude": [
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "node_modules",
+    "dist"
+  ]
+}

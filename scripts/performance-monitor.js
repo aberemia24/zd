@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import fs from 'fs';
+import path from 'path';
+import { execSync  } from 'child_process';
 
 /**
  * 🚀 PERFORMANCE MONITORING SYSTEM
@@ -453,9 +456,9 @@ class PerformanceMonitor {
 }
 
 // Run dacă este apelat direct
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const monitor = new PerformanceMonitor();
   monitor.run();
 }
 
-module.exports = PerformanceMonitor; 
+export default PerformanceMonitor; 

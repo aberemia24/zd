@@ -1,20 +1,27 @@
 {
   "compilerOptions": {
     "composite": true,
-    "module": "commonjs",
+    "module": "ES2022",
+    "moduleResolution": "Node",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es2020",
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true,
+    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "src",
+    "rootDir": "./src",
     "incremental": true,
     "strict": true,
     "skipLibCheck": true,
-    "paths": {}
+    "paths": {
+      "@budget-app/shared-constants/*": ["../shared-constants/dist/*"],
+      "@budget-app/shared-constants": ["../shared-constants/dist/index.js"]
+    }
   },
   "include": ["src/**/*"],
   "references": [{ "path": "../shared-constants" }],

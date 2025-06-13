@@ -5,9 +5,12 @@
  * Automat redenumește fișierele .ts cu conținut JSX în .tsx și actualizează importurile
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import fs from 'fs';
+import path from 'path';
+import { execSync  } from 'child_process';
 
 console.log('🔧 Fixing JSX Extension Issues...\n');
 
@@ -328,6 +331,6 @@ function main() {
 }
 
 // Rulează scriptul
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 } 

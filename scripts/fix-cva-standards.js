@@ -6,8 +6,8 @@
  * EXCLUDE: simple spacing care sunt OK hardcodate
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Funcție pentru a găsi recursiv fișierele .tsx și .ts
 function findTsxFiles(dir, excludePatterns = []) {
@@ -229,7 +229,7 @@ class CVAAutoFixer {
 }
 
 // Rulează auto-fixer-ul
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const fixer = new CVAAutoFixer();
   fixer.fixAll().catch(error => {
     console.error('❌ Auto-fixer error:', error);
@@ -237,4 +237,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = CVAAutoFixer; 
+export default CVAAutoFixer; 

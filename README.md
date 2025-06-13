@@ -20,7 +20,56 @@ Aplicație de bugetare modulară, modernă și extensibilă pentru web, Android 
 - **Backend:** NestJS, Supabase
 - **Shared:** TypeScript, Zod
   - **Chei query params tranzacții:** Toate cheile de query parametri pentru tranzacții (type, category, dateFrom, dateTo, limit, offset, sort) sunt definite o singură dată în `shared-constants/queryParams.ts` și se importă EXPLICIT din `@shared-constants/queryParams`.
-- **Tooling:** ESLint, Prettier, Husky, Commitlint, npm Workspaces
+- **Tooling:** ESLint, Prettier, Husky, Commitlint, pnpm Workspaces
+- **Arhitectură:** **ESM (ES Modules) complet** - toate pachetele folosesc native ESM
+
+## 🔧 Arhitectură ESM
+
+**Proiectul folosește ESM (ES Modules) complet** - toate pachetele sunt configurate cu `"type": "module"`:
+
+- **Root:** `package.json` cu `"type": "module"`
+- **Frontend:** ESM + Vite (native ESM support)
+- **Backend:** ESM + NestJS cu ts-node/esm loader
+- **Shared-constants:** ESM + barrel exports
+- **Scripts:** 21 script-uri `/scripts/` convertite la ESM cu import/export
+
+### Configurație ESM
+
+```json
+// package.json (toate pachetele)
+{
+  "type": "module"
+}
+
+// TypeScript configs
+{
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true
+  }
+}
+```
+
+### Comenzi ESM
+
+```bash
+# Backend cu ESM
+node --no-warnings --loader ts-node/esm src/main.ts
+
+# Scripts ESM (toate convertite)
+node scripts/validate-transaction-types.js
+node scripts/validate-console-cleanup.js
+```
+
+**Beneficii:**
+- Consistență completă în tot monorepo-ul
+- Standard JavaScript modern
+- Interoperabilitate îmbunătățită între pachete
+- Tree shaking și analiză statică
+- Arhitectură future-proof
 
 ---
 
@@ -182,6 +231,7 @@ addTransaction({ ... });
 - Implementare LunarGrid cu TanStack Table ✅
 - Eliminare string-uri hardcodate ✅
 - Sistem de design tokens implementat ✅
+- **Migrare completă la ESM (ES Modules)** ✅
 - Documentare actualizată ✅
 
 ---

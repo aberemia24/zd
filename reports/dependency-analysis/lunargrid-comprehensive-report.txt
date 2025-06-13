@@ -1,0 +1,380 @@
+Processed 117 files (1.2s) (21 warnings)
+
+../../../../../shared-constants/api.ts
+../../../../../shared-constants/categories.ts
+../../../../../shared-constants/category-mapping.ts
+  ../../../../../shared-constants/categories.ts
+  ../../../../../shared-constants/enums.ts
+../../../../../shared-constants/dist/api.d.ts
+../../../../../shared-constants/dist/categories.d.ts
+../../../../../shared-constants/dist/category-mapping.d.ts
+  ../../../../../shared-constants/dist/enums.d.ts
+../../../../../shared-constants/dist/defaults.d.ts
+../../../../../shared-constants/dist/enums.d.ts
+../../../../../shared-constants/dist/export.d.ts
+  ../../../../../shared-constants/dist/types.d.ts
+../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/dist/api.d.ts
+  ../../../../../shared-constants/dist/categories.d.ts
+  ../../../../../shared-constants/dist/category-mapping.d.ts
+  ../../../../../shared-constants/dist/defaults.d.ts
+  ../../../../../shared-constants/dist/enums.d.ts
+  ../../../../../shared-constants/dist/export.d.ts
+  ../../../../../shared-constants/dist/messages.d.ts
+  ../../../../../shared-constants/dist/queryParams.d.ts
+  ../../../../../shared-constants/dist/transaction.schema.d.ts
+  ../../../../../shared-constants/dist/types.d.ts
+  ../../../../../shared-constants/dist/ui.d.ts
+  ../../../../../shared-constants/dist/validation.d.ts
+../../../../../shared-constants/dist/messages.d.ts
+../../../../../shared-constants/dist/queryParams.d.ts
+../../../../../shared-constants/dist/transaction.schema.d.ts
+  ../../../../../shared-constants/dist/enums.d.ts
+../../../../../shared-constants/dist/types.d.ts
+  ../../../../../shared-constants/dist/enums.d.ts
+../../../../../shared-constants/dist/ui.d.ts
+  ../../../../../shared-constants/dist/enums.d.ts
+../../../../../shared-constants/dist/validation.d.ts
+../../../../../shared-constants/enums.ts
+../../../../../shared-constants/messages.ts
+../../../../../shared-constants/transaction.schema.ts
+  ../../../../../shared-constants/enums.ts
+../../../../../shared-constants/ui.ts
+  ../../../../../shared-constants/enums.ts
+../../../../../shared-constants/validation.ts
+../../../hooks/useErrorHandler.tsx
+  ../../../stores/authStore.tsx
+  ../../../utils/errorHandling.tsx
+../../../hooks/useLunarGridPreferences.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/ui.ts
+  ../../../hooks/useStatePersistence.tsx
+../../../hooks/useStatePersistence.tsx
+../../../hooks/useValidation.tsx
+  ../../../../../shared-constants/validation.ts
+  ../../../hooks/useErrorHandler.tsx
+../../../services/categoryService.tsx
+  ../../../../../shared-constants/api.ts
+  ../../../../../shared-constants/messages.ts
+  ../../../services/supabase.ts
+  ../../../types/Category.ts
+../../../services/hooks/cacheSync.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+../../../services/hooks/reactQueryUtils.tsx
+../../../services/hooks/transactionMutations.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/messages.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../hooks/useErrorHandler.tsx
+  ../../../services/hooks/cacheSync.tsx
+  ../../../services/supabaseService.tsx
+../../../services/hooks/useMonthlyTransactions.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../services/hooks/reactQueryUtils.tsx
+  ../../../services/supabaseService.tsx
+  ../../../stores/authStore.tsx
+../../../services/supabase.ts
+../../../services/supabaseAuthService.tsx
+  ../../../../../shared-constants/messages.ts
+  ../../../services/supabase.ts
+../../../services/supabaseService.tsx
+  ../../../../../shared-constants/categories.ts
+  ../../../../../shared-constants/messages.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../services/supabase.ts
+  ../../../stores/authStore.tsx
+../../../stores/authStore.tsx
+  ../../../services/supabaseAuthService.tsx
+  ../../../stores/storeUtils.ts
+../../../stores/categoryStore.tsx
+  ../../../services/categoryService.tsx
+  ../../../services/supabaseService.tsx
+  ../../../stores/storeUtils.ts
+  ../../../types/Category.ts
+../../../stores/storeUtils.ts
+../../../styles/cva-v2/compositions/data-table.ts
+../../../styles/cva-v2/compositions/grid.tsx
+../../../styles/cva-v2/compositions/layout.tsx
+../../../styles/cva-v2/compositions/modal.ts
+  ../../../styles/cva-v2/primitives/modal.ts
+../../../styles/cva-v2/compositions/navigation.tsx
+../../../styles/cva-v2/core/types.ts
+../../../styles/cva-v2/core/utils.ts
+../../../styles/cva-v2/domain/dashboard.tsx
+../../../styles/cva-v2/domain/financial.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+../../../styles/cva-v2/domain/theme-toggle.tsx
+../../../styles/cva-v2/foundations/animations.ts
+../../../styles/cva-v2/foundations/effects.tsx
+../../../styles/cva-v2/foundations/interactive.tsx
+../../../styles/cva-v2/foundations/typography.tsx
+../../../styles/cva-v2/index.ts
+  ../../../styles/cva-v2/compositions/data-table.ts
+  ../../../styles/cva-v2/compositions/grid.tsx
+  ../../../styles/cva-v2/compositions/layout.tsx
+  ../../../styles/cva-v2/compositions/modal.ts
+  ../../../styles/cva-v2/compositions/navigation.tsx
+  ../../../styles/cva-v2/core/types.ts
+  ../../../styles/cva-v2/core/utils.ts
+  ../../../styles/cva-v2/domain/dashboard.tsx
+  ../../../styles/cva-v2/domain/financial.tsx
+  ../../../styles/cva-v2/domain/theme-toggle.tsx
+  ../../../styles/cva-v2/foundations/animations.ts
+  ../../../styles/cva-v2/foundations/effects.tsx
+  ../../../styles/cva-v2/foundations/interactive.tsx
+  ../../../styles/cva-v2/foundations/typography.tsx
+  ../../../styles/cva-v2/primitives/button.tsx
+  ../../../styles/cva-v2/primitives/feedback.tsx
+  ../../../styles/cva-v2/primitives/inputs.tsx
+  ../../../styles/cva-v2/primitives/layout.tsx
+  ../../../styles/cva-v2/primitives/modal.ts
+  ../../../styles/cva-v2/primitives/navigation.ts
+../../../styles/cva-v2/primitives/button.tsx
+../../../styles/cva-v2/primitives/feedback.tsx
+../../../styles/cva-v2/primitives/inputs.tsx
+../../../styles/cva-v2/primitives/layout.tsx
+../../../styles/cva-v2/primitives/modal.ts
+../../../styles/cva-v2/primitives/navigation.ts
+../../../types/Category.ts
+  ../../../../../shared-constants/dist/index.d.ts
+../../../types/Transaction.tsx
+  ../../../../../shared-constants/enums.ts
+  ../../../../../shared-constants/transaction.schema.ts
+../../../types/lunarGrid/FinancialCalculations.tsx
+  ../../../types/Transaction.tsx
+../../../types/lunarGrid/RecurringTransactions.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+../../../utils/errorHandling.tsx
+  ../../../../../shared-constants/messages.ts
+../../../utils/lunarGrid/calculations.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/enums.ts
+  ../../../../../shared-constants/transaction.schema.ts
+../../../utils/lunarGrid/dataTransformers.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../utils/lunarGrid/calculations.tsx
+  ../../../utils/lunarGrid/formatters.tsx
+  types.tsx
+../../../utils/lunarGrid/financialCalculations.tsx
+  ../../../../../shared-constants/enums.ts
+  ../../../types/Transaction.tsx
+  ../../../types/lunarGrid/FinancialCalculations.tsx
+../../../utils/lunarGrid/formatters.tsx
+  ../../../../../shared-constants/enums.ts
+../../../utils/lunarGrid/index.ts
+  ../../../utils/lunarGrid/calculations.tsx
+  ../../../utils/lunarGrid/dataTransformers.tsx
+  ../../../utils/lunarGrid/financialCalculations.tsx
+  ../../../utils/lunarGrid/formatters.tsx
+  ../../../utils/lunarGrid/recurringTransactionGenerator.tsx
+  types.tsx
+../../../utils/lunarGrid/lunarGridHelpers.tsx
+../../../utils/lunarGrid/recurringTransactionGenerator.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../types/lunarGrid/RecurringTransactions.tsx
+../../primitives/Button/Button.tsx
+  ../../../styles/cva-v2/index.ts
+../../primitives/Button/ValidatedSubmitButton.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../primitives/Button/Button.tsx
+../../primitives/Button/index.ts
+  ../../primitives/Button/Button.tsx
+  ../../primitives/Button/ValidatedSubmitButton.tsx
+../../primitives/Checkbox/Checkbox.tsx
+  ../../../styles/cva-v2/index.ts
+../../primitives/ConfirmationModal/ConfirmationModal.tsx
+  ../../../styles/cva-v2/index.ts
+  ../../../styles/cva-v2/primitives/modal.ts
+  ../../primitives/Button/index.ts
+../../primitives/ConfirmationModal/PromptModal.tsx
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/Button/index.ts
+../../primitives/ConfirmationModal/index.ts
+  ../../primitives/ConfirmationModal/ConfirmationModal.tsx
+  ../../primitives/ConfirmationModal/PromptModal.tsx
+  ../../primitives/ConfirmationModal/useConfirmationModal.tsx
+../../primitives/ConfirmationModal/useConfirmationModal.tsx
+  ../../primitives/ConfirmationModal/ConfirmationModal.tsx
+../../primitives/Input/Input.tsx
+  ../../../styles/cva-v2/index.ts
+../../primitives/Select/Select.tsx
+  ../../../styles/cva-v2/index.ts
+../../primitives/Textarea/Textarea.tsx
+  ../../../styles/cva-v2/index.ts
+../../primitives/Tooltip/Tooltip.tsx
+  ../../../styles/cva-v2/index.ts
+LunarGridTanStack.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/ui.ts
+  ../../../services/hooks/transactionMutations.tsx
+  ../../../services/hooks/useMonthlyTransactions.tsx
+  ../../../stores/authStore.tsx
+  ../../../stores/categoryStore.tsx
+  ../../../styles/cva-v2/index.ts
+  ../../../utils/lunarGrid/index.ts
+  ../../../utils/lunarGrid/lunarGridHelpers.tsx
+  ../../primitives/Button/Button.tsx
+  ../../primitives/ConfirmationModal/index.ts
+  components/LunarGridEventHandler.tsx
+  components/LunarGridRow.tsx
+  components/LunarGridStateManager.tsx
+  components/LunarGridTable.tsx
+  hooks/useKeyboardNavigationSimplified.tsx
+  hooks/useLunarGridState.ts
+  hooks/useLunarGridTable.tsx
+  hooks/useSubcategoryOperations.tsx
+  hooks/useTableResize.tsx
+  hooks/useTransactionOperations.tsx
+components/DeleteSubcategoryModal.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/ConfirmationModal/ConfirmationModal.tsx
+components/LunarGridAddSubcategoryRow.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/Button/Button.tsx
+components/LunarGridCell.tsx
+  inline-editing/EditableCell.tsx
+components/LunarGridContainer.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+components/LunarGridEventHandler.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../utils/lunarGrid/lunarGridHelpers.tsx
+  components/LunarGridStateManager.tsx
+  hooks/useKeyboardNavigationSimplified.tsx
+components/LunarGridHeader.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  ../../../utils/lunarGrid/index.ts
+  ../../primitives/Button/Button.tsx
+components/LunarGridModals.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  modals/QuickAddModalSimplified.tsx
+components/LunarGridRow.tsx
+  ../../../../../shared-constants/category-mapping.ts
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/Tooltip/Tooltip.tsx
+  components/LunarGridAddSubcategoryRow.tsx
+  components/LunarGridCell.tsx
+  components/LunarGridSubcategoryRowCell.tsx
+  hooks/useKeyboardNavigationSimplified.tsx
+  hooks/useLunarGridTable.tsx
+  hooks/useTransactionOperations.tsx
+  inline-editing/EditableCell.tsx
+components/LunarGridStateManager.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../services/hooks/transactionMutations.tsx
+  ../../../services/hooks/useMonthlyTransactions.tsx
+  ../../../stores/authStore.tsx
+  ../../../stores/categoryStore.tsx
+  hooks/useKeyboardNavigationSimplified.tsx
+  hooks/useLunarGridState.ts
+  hooks/useLunarGridTable.tsx
+  hooks/useSubcategoryOperations.tsx
+  hooks/useTableResize.tsx
+  hooks/useTransactionOperations.tsx
+components/LunarGridSubcategoryRowCell.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/Button/Button.tsx
+components/LunarGridTable.tsx
+  ../../../styles/cva-v2/index.ts
+  ../../../utils/lunarGrid/index.ts
+  components/LunarGridHeader.tsx
+  components/LunarGridRow.tsx
+  hooks/useKeyboardNavigationSimplified.tsx
+  hooks/useLunarGridTable.tsx
+hooks/index.ts
+  hooks/useKeyboardNavigationSimplified.tsx
+  hooks/useLunarGridTable.tsx
+hooks/useKeyboardNavigationSimplified.tsx
+hooks/useLunarGridState.ts
+  hooks/useKeyboardNavigationSimplified.tsx
+hooks/useLunarGridTable.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  ../../../services/hooks/useMonthlyTransactions.tsx
+  ../../../stores/authStore.tsx
+  ../../../stores/categoryStore.tsx
+  ../../../styles/cva-v2/index.ts
+  ../../../utils/lunarGrid/index.ts
+hooks/useSubcategoryOperations.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../hooks/useErrorHandler.tsx
+  ../../../hooks/useValidation.tsx
+  ../../../stores/categoryStore.tsx
+hooks/useTableResize.tsx
+hooks/useTransactionOperations.tsx
+  ../../../../../shared-constants/category-mapping.ts
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../../../shared-constants/ui.ts
+  ../../../hooks/useLunarGridPreferences.tsx
+  ../../../services/hooks/transactionMutations.tsx
+  ../../../styles/cva-v2/primitives/feedback.tsx
+  ../../../types/Transaction.tsx
+  ../../primitives/ConfirmationModal/index.ts
+  modals/index.ts
+index.ts
+  LunarGridTanStack.tsx
+  hooks/index.ts
+  inline-editing/EditableCell.tsx
+  inline-editing/useInlineCellEdit.tsx
+  types.tsx
+inline-editing/EditableCell.test.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  inline-editing/EditableCell.tsx
+inline-editing/EditableCell.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  inline-editing/useInlineCellEdit.tsx
+  modals/types.ts
+inline-editing/LunarGridInlineIntegration.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  inline-editing/EditableCell.tsx
+  inline-editing/useGridNavigation.tsx
+inline-editing/index.ts
+  inline-editing/EditableCell.tsx
+  inline-editing/LunarGridInlineIntegration.tsx
+  inline-editing/useCellEditing.tsx
+  inline-editing/useCellState.tsx
+  inline-editing/useGridNavigation.tsx
+  inline-editing/useInlineCellEdit.tsx
+inline-editing/useCellEditing.test.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  inline-editing/useCellEditing.tsx
+inline-editing/useCellEditing.tsx
+  ../../../hooks/useValidation.tsx
+  inline-editing/useCellState.tsx
+inline-editing/useCellState.tsx
+inline-editing/useGridNavigation.test.tsx
+  inline-editing/useGridNavigation.tsx
+inline-editing/useGridNavigation.tsx
+inline-editing/useGridNavigation_Simplified.tsx
+inline-editing/useInlineCellEdit.test.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  inline-editing/useInlineCellEdit.tsx
+inline-editing/useInlineCellEdit.tsx
+  ../../../hooks/useValidation.tsx
+modals/QuickAddModalSimplified.tsx
+  ../../../../../shared-constants/dist/index.d.ts
+  ../../../styles/cva-v2/index.ts
+  ../../primitives/Button/Button.tsx
+  ../../primitives/Checkbox/Checkbox.tsx
+  ../../primitives/Input/Input.tsx
+  ../../primitives/Select/Select.tsx
+  ../../primitives/Textarea/Textarea.tsx
+modals/index.ts
+  modals/QuickAddModalSimplified.tsx
+modals/types.ts
+  ../../../../../shared-constants/dist/index.d.ts
+types.tsx
+  ../../../../../shared-constants/enums.ts
+  ../../../../../shared-constants/transaction.schema.ts
+  hooks/useLunarGridTable.tsx
+

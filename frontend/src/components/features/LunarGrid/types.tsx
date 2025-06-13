@@ -7,7 +7,7 @@ import { ReactNode } from "react";
 /**
  * Rezultatul returnat de hook-ul useLunarGridTable
  */
-import { TransformedTableDataRow } from "./hooks/useLunarGridTable";
+import { TransformedTableDataRow } from "./tableTypes";
 
 /**
  * Definirea tipurilor pentru LunarGrid cu TanStack Table

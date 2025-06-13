@@ -9,7 +9,7 @@
  * Rulare: node scripts/migrate-transaction-types.js
  */
 
-const { createClient } = require('@supabase/supabase-js');
+import { createClient  } from '@supabase/supabase-js';
 
 // Configurare Supabase - folosește variabilele de mediu
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://pzyvibdgpfgohvewdmit.supabase.co';
@@ -169,8 +169,8 @@ async function main() {
 }
 
 // Rulează scriptul dacă este apelat direct
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { migrateTransactionTypes, checkIncorrectTypes, verifyMigration }; 
+export {  migrateTransactionTypes, checkIncorrectTypes, verifyMigration  }; 

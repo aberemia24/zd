@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Funcție pentru a găsi recursiv fișierele .tsx și .ts
 function findTsxFiles(dir, excludePatterns = []) {
@@ -303,7 +303,7 @@ class ComponentConsistencyValidator {
 }
 
 // Rulează validatorul
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const validator = new ComponentConsistencyValidator();
   validator.validate().then(success => {
     if (!success) {
@@ -315,4 +315,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = ComponentConsistencyValidator; 
+export default ComponentConsistencyValidator; 

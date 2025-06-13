@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import fs from 'fs';
+import path from 'path';
 
 console.log('🔧 Fixing Shared Constants Issues...\n');
 
@@ -309,6 +312,6 @@ function main() {
   console.log('   4. Commit schimbările cu git commit');
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 } 

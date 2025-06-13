@@ -6,8 +6,11 @@
  * Raportează import-uri greșite, hardcoded strings și sugerează remedierea
  */
 
-const fs = require('fs');
-const path = require('path');
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+import fs from 'fs';
+import path from 'path';
 
 console.log('🔍 Validating @shared-constants usage...\n');
 
@@ -410,8 +413,8 @@ function main() {
   process.exit(1);
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { scanFileForPatterns, scanDirectory, analyzeIssues }; 
+export {  scanFileForPatterns, scanDirectory, analyzeIssues  }; 

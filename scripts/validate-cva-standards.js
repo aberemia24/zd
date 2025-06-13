@@ -6,8 +6,8 @@
  * EXCLUDE: simple spacing (mb-4, space-y-2) care sunt OK hardcodate
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Funcție pentru a găsi recursiv fișierele .tsx și .ts (same as fix script)
 function findTsxFiles(dir, excludePatterns = []) {
@@ -448,7 +448,7 @@ class CVAValidator {
 }
 
 // Rulează validatorul
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const validator = new CVAValidator();
   validator.validate().then(success => {
     if (!success) {
@@ -460,4 +460,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = CVAValidator; 
+export default CVAValidator; 

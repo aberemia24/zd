@@ -1,7 +1,7 @@
 // tailwind.config.js pentru frontend - OPTIMIZAT pentru bundle size
 // 🖤🔶 CARBON COPPER EDITION - Premium Fintech Design System OPTIMIZED
 // 🌙 DARK MODE SUPPORT - Complete sophisticated night theme cu Carbon scale
-const theme = require('./src/styles/theme').theme;
+const { theme } = require('./src/styles/theme');
 
 /**
  * Mapează tokens din theme.ts la formatul Tailwind

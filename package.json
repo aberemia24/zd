@@ -49,11 +49,12 @@
     "concurrently": "^9.1.2",
     "dependency-cruiser": "^16.10.2",
     "eslint": "^9.28.0",
-    "jscpd": "^4.0.5",
-    "prettier": "^3.2.5",
-    "typescript": "^4.9.5",
     "husky": "^9.1.7",
-    "lint-staged": "^16.1.0"
+    "jscpd": "^4.0.5",
+    "lint-staged": "^16.1.0",
+    "madge": "^8.0.0",
+    "prettier": "^3.2.5",
+    "typescript": "^4.9.5"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

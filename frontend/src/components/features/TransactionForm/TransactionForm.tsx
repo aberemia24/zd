@@ -53,24 +53,8 @@ function safeMessage(key: string): string {
   }
 }
 
-// Tipul datelor pentru formularul de tranzacție
-export type TransactionFormData = {
-  type: string;
-  amount: string;
-  category: string;
-  subcategory: string;
-  date: string;
-  recurring: boolean;
-  frequency: string;
-  description?: string; // Descriere opțională pentru tranzacție (necesar pentru React Query)
-  // currency nu este vizibilă în formular, se folosește valoarea implicită RON în store
-};
-
-// Componentă cu props opționale onSave și onCancel
-interface TransactionFormProps {
-  onSave?: (form: TransactionFormData) => void;
-  onCancel?: () => void;
-}
+// Import tipuri din fișierul dedicat (breaks circular dependency)
+import type { TransactionFormData, TransactionFormProps } from "../../../types/TransactionForm";
 
 const TransactionFormComponent: React.FC<TransactionFormProps> = ({
   onSave,

@@ -1,5 +1,5 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 // Maparea culorilor technical → semantic
 const COLOR_MIGRATION_MAP = {
@@ -232,7 +232,7 @@ function cleanupBackups() {
 }
 
 // CLI interface
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const command = process.argv[2];
   const migrator = new SemanticColorMigrator();
   
@@ -276,4 +276,4 @@ Exemplu migrare:
   }
 }
 
-module.exports = SemanticColorMigrator; 
+export default SemanticColorMigrator; 

@@ -6,7 +6,7 @@
  * Rulează toate script-urile de validare și sumarizează rezultatele
  */
 
-const { spawn } = require('child_process');
+import { spawn  } from 'child_process';
 
 console.log('🚀 Running complete automation validation suite...\n');
 
@@ -187,11 +187,11 @@ async function main() {
 }
 
 // Auto-run when called directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     console.error('🚨 Automation validation failed with error:', error);
     process.exit(1);
   });
 }
 
-module.exports = { runScript, formatResults }; 
+export {  runScript, formatResults  }; 

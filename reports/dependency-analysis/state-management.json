@@ -1,0 +1,198 @@
+{
+  "../../../shared-constants/api.ts": [],
+  "../../../shared-constants/categories.ts": [],
+  "../../../shared-constants/dist/api.d.ts": [],
+  "../../../shared-constants/dist/categories.d.ts": [],
+  "../../../shared-constants/dist/category-mapping.d.ts": [
+    "../../../shared-constants/dist/enums.d.ts"
+  ],
+  "../../../shared-constants/dist/defaults.d.ts": [],
+  "../../../shared-constants/dist/enums.d.ts": [],
+  "../../../shared-constants/dist/export.d.ts": [
+    "../../../shared-constants/dist/types.d.ts"
+  ],
+  "../../../shared-constants/dist/index.d.ts": [
+    "../../../shared-constants/dist/api.d.ts",
+    "../../../shared-constants/dist/categories.d.ts",
+    "../../../shared-constants/dist/category-mapping.d.ts",
+    "../../../shared-constants/dist/defaults.d.ts",
+    "../../../shared-constants/dist/enums.d.ts",
+    "../../../shared-constants/dist/export.d.ts",
+    "../../../shared-constants/dist/messages.d.ts",
+    "../../../shared-constants/dist/queryParams.d.ts",
+    "../../../shared-constants/dist/transaction.schema.d.ts",
+    "../../../shared-constants/dist/types.d.ts",
+    "../../../shared-constants/dist/ui.d.ts",
+    "../../../shared-constants/dist/validation.d.ts"
+  ],
+  "../../../shared-constants/dist/messages.d.ts": [],
+  "../../../shared-constants/dist/queryParams.d.ts": [],
+  "../../../shared-constants/dist/transaction.schema.d.ts": [
+    "../../../shared-constants/dist/enums.d.ts"
+  ],
+  "../../../shared-constants/dist/types.d.ts": [
+    "../../../shared-constants/dist/enums.d.ts"
+  ],
+  "../../../shared-constants/dist/ui.d.ts": [
+    "../../../shared-constants/dist/enums.d.ts"
+  ],
+  "../../../shared-constants/dist/validation.d.ts": [],
+  "../../../shared-constants/enums.ts": [],
+  "../../../shared-constants/messages.ts": [],
+  "../../../shared-constants/transaction.schema.ts": [
+    "../../../shared-constants/enums.ts"
+  ],
+  "../components/features/TransactionForm/TransactionForm.tsx": [
+    "../../../shared-constants/dist/index.d.ts",
+    "../components/primitives/Alert/Alert.tsx",
+    "../components/primitives/Badge/Badge.tsx",
+    "../components/primitives/Button/index.ts",
+    "../components/primitives/Checkbox/Checkbox.tsx",
+    "../components/primitives/FieldGrid/FieldGrid.tsx",
+    "../components/primitives/FormLayout/FormLayout.tsx",
+    "../components/primitives/Input/Input.tsx",
+    "../components/primitives/Select/Select.tsx",
+    "../styles/cva-v2/index.ts",
+    "categoryStore.tsx",
+    "transactionFormStore.tsx"
+  ],
+  "../components/primitives/Alert/Alert.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/Badge/Badge.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/Button/Button.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/Button/ValidatedSubmitButton.tsx": [
+    "../../../shared-constants/dist/index.d.ts",
+    "../components/primitives/Button/Button.tsx"
+  ],
+  "../components/primitives/Button/index.ts": [
+    "../components/primitives/Button/Button.tsx",
+    "../components/primitives/Button/ValidatedSubmitButton.tsx"
+  ],
+  "../components/primitives/Checkbox/Checkbox.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/FieldGrid/FieldGrid.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/FormLayout/FormLayout.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/Input/Input.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../components/primitives/Select/Select.tsx": [
+    "../styles/cva-v2/index.ts"
+  ],
+  "../hooks/balanceCalculator/useBalanceCalculator.types.tsx": [
+    "../types/Transaction.tsx"
+  ],
+  "../services/categoryService.tsx": [
+    "../../../shared-constants/api.ts",
+    "../../../shared-constants/messages.ts",
+    "../services/supabase.ts",
+    "../types/Category.ts"
+  ],
+  "../services/supabase.ts": [],
+  "../services/supabaseAuthService.tsx": [
+    "../../../shared-constants/messages.ts",
+    "../services/supabase.ts"
+  ],
+  "../services/supabaseService.tsx": [
+    "../../../shared-constants/categories.ts",
+    "../../../shared-constants/messages.ts",
+    "../../../shared-constants/transaction.schema.ts",
+    "../services/supabase.ts",
+    "authStore.tsx"
+  ],
+  "../styles/cva-v2/compositions/data-table.ts": [],
+  "../styles/cva-v2/compositions/grid.tsx": [],
+  "../styles/cva-v2/compositions/layout.tsx": [],
+  "../styles/cva-v2/compositions/modal.ts": [
+    "../styles/cva-v2/primitives/modal.ts"
+  ],
+  "../styles/cva-v2/compositions/navigation.tsx": [],
+  "../styles/cva-v2/core/types.ts": [],
+  "../styles/cva-v2/core/utils.ts": [],
+  "../styles/cva-v2/domain/dashboard.tsx": [],
+  "../styles/cva-v2/domain/financial.tsx": [
+    "../../../shared-constants/dist/index.d.ts"
+  ],
+  "../styles/cva-v2/domain/theme-toggle.tsx": [],
+  "../styles/cva-v2/foundations/animations.ts": [],
+  "../styles/cva-v2/foundations/effects.tsx": [],
+  "../styles/cva-v2/foundations/interactive.tsx": [],
+  "../styles/cva-v2/foundations/typography.tsx": [],
+  "../styles/cva-v2/index.ts": [
+    "../styles/cva-v2/compositions/data-table.ts",
+    "../styles/cva-v2/compositions/grid.tsx",
+    "../styles/cva-v2/compositions/layout.tsx",
+    "../styles/cva-v2/compositions/modal.ts",
+    "../styles/cva-v2/compositions/navigation.tsx",
+    "../styles/cva-v2/core/types.ts",
+    "../styles/cva-v2/core/utils.ts",
+    "../styles/cva-v2/domain/dashboard.tsx",
+    "../styles/cva-v2/domain/financial.tsx",
+    "../styles/cva-v2/domain/theme-toggle.tsx",
+    "../styles/cva-v2/foundations/animations.ts",
+    "../styles/cva-v2/foundations/effects.tsx",
+    "../styles/cva-v2/foundations/interactive.tsx",
+    "../styles/cva-v2/foundations/typography.tsx",
+    "../styles/cva-v2/primitives/button.tsx",
+    "../styles/cva-v2/primitives/feedback.tsx",
+    "../styles/cva-v2/primitives/inputs.tsx",
+    "../styles/cva-v2/primitives/layout.tsx",
+    "../styles/cva-v2/primitives/modal.ts",
+    "../styles/cva-v2/primitives/navigation.ts"
+  ],
+  "../styles/cva-v2/primitives/button.tsx": [],
+  "../styles/cva-v2/primitives/feedback.tsx": [],
+  "../styles/cva-v2/primitives/inputs.tsx": [],
+  "../styles/cva-v2/primitives/layout.tsx": [],
+  "../styles/cva-v2/primitives/modal.ts": [],
+  "../styles/cva-v2/primitives/navigation.ts": [],
+  "../types/Category.ts": [
+    "../../../shared-constants/dist/index.d.ts"
+  ],
+  "../types/Transaction.tsx": [
+    "../../../shared-constants/enums.ts",
+    "../../../shared-constants/transaction.schema.ts"
+  ],
+  "authStore.tsx": [
+    "../services/supabaseAuthService.tsx",
+    "storeUtils.ts"
+  ],
+  "categoryStore.tsx": [
+    "../services/categoryService.tsx",
+    "../services/supabaseService.tsx",
+    "../types/Category.ts",
+    "storeUtils.ts"
+  ],
+  "settingsStore.tsx": [
+    "../../../shared-constants/dist/index.d.ts",
+    "../hooks/balanceCalculator/useBalanceCalculator.types.tsx"
+  ],
+  "storeUtils.ts": [],
+  "transactionFiltersStore.tsx": [
+    "../../../shared-constants/dist/index.d.ts",
+    "storeUtils.ts"
+  ],
+  "transactionFormStore.tsx": [
+    "../../../shared-constants/api.ts",
+    "../../../shared-constants/dist/index.d.ts",
+    "../../../shared-constants/transaction.schema.ts",
+    "../components/features/TransactionForm/TransactionForm.tsx",
+    "../services/supabaseService.tsx",
+    "authStore.tsx",
+    "storeUtils.ts"
+  ],
+  "transactionStore.tsx": [
+    "../../../shared-constants/dist/index.d.ts",
+    "../types/Transaction.tsx",
+    "storeUtils.ts"
+  ]
+}

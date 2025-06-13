@@ -30,7 +30,15 @@ import { MESAJE, LUNAR_GRID_MESSAGES } from "@budget-app/shared-constants";
 // CVA styling imports
 import { cn, hoverBackground } from "../../../../styles/cva-v2";
 
-// Interfaces pentru structuri de date
+// Import tipuri din fișierul dedicat (breaks circular dependency)
+import type { 
+  TransformedTableDataRow, 
+  TransactionMap, 
+  UseLunarGridTableResult,
+  DailyAmount
+} from "../tableTypes";
+
+// Interfaces locale pentru structuri de date
 interface SubcategoryDefinition {
   name: string;
   source?: string;
@@ -38,44 +46,6 @@ interface SubcategoryDefinition {
 
 interface FallbackRow {
   subcategory: string;
-}
-
-interface DailyAmount {
-  [dayKey: `day-${number}`]: number;
-}
-
-// Tip pentru datele transformate pentru TanStack Table
-export type TransformedTableDataRow = {
-  id: string;
-  category: string;
-  subcategory?: string;
-  isCategory: boolean;
-  total: number;
-  subRows?: TransformedTableDataRow[]; // Adăugat pentru subrows native
-} & DailyAmount;
-
-// Tip pentru maparea tranzacțiilor individuale
-export type TransactionMap = Map<string, string>; // key: "category-subcategory-day", value: transactionId
-
-/**
- * Hook pentru gestionarea datelor și stării pentru LunarGrid bazat pe TanStack Table.
- * Abstractizează logica de procesare a datelor și construcția tabelului.
- */
-// Interfață pentru rezultatul hook-ului useLunarGridTable
-export interface UseLunarGridTableResult {
-  table: Table<TransformedTableDataRow>;
-  tableContainerRef: React.RefObject<HTMLDivElement>;
-  isLoading: boolean;
-  error: Error | null;
-  getCellId: (
-    category: string,
-    subcategory: string | undefined,
-    day: number,
-  ) => string;
-  columns: ColumnDef<TransformedTableDataRow>[];
-  days: number[];
-  dailyBalances: Record<number, number>;
-  transactionMap: TransactionMap;
 }
 
 // Helper robust pentru generare subRows UNICE cu indexare globală pe subcategory goală

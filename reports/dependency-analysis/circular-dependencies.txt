@@ -1,0 +1,8 @@
+- Finding files
+Processed 304 files (2s) (35 warnings)
+
+✖ Found 2 circular dependencies!
+
+1) components/features/LunarGrid/hooks/useLunarGridTable.tsx > utils/lunarGrid/index.ts > components/features/LunarGrid/types.tsx
+2) components/features/TransactionForm/TransactionForm.tsx > stores/transactionFormStore.tsx
+

@@ -16,6 +16,7 @@
 - **Table Library**: TanStack Table v8 pentru grid functionality
 - **Build Tool**: Vite cu optimizări pentru production
 - **Testing**: Jest + React Testing Library + Playwright
+- **🔧 Module System**: **ESM (ES Modules) complet** - toate pachetele sunt native ESM
 
 ### **Extend Technologies** (Pentru LunarGrid Improvements)
 - **Virtual Scrolling**: TanStack Virtual pentru large datasets
@@ -24,6 +25,80 @@
 - **Animation**: Framer Motion pentru smooth transitions
 - **Keyboard Navigation**: Improved keyboard handling library
 - **Performance Monitoring**: React DevTools Profiler integration
+
+---
+
+## 🏛️ **ESM ARCHITECTURE IMPLEMENTATION**
+
+### **ESM Migration Status (COMPLET)**
+**Data migrării**: Iunie 2025  
+**Status**: ✅ Implementare completă - toate pachetele native ESM
+
+#### **Pachete Convertite**
+- **Root Package**: `"type": "module"` + pnpm workspaces
+- **Frontend**: ESM + Vite (native support)
+- **Backend**: ESM + ts-node/esm loader + NestJS
+- **Shared-constants**: ESM + barrel exports
+- **Scripts Directory**: 21 script-uri convertite CommonJS → ESM
+
+#### **Configurație Tehnică**
+```json
+// package.json (toate pachetele)
+{
+  "type": "module"
+}
+
+// tsconfig.json configurations
+{
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "verbatimModuleSyntax": true
+  }
+}
+```
+
+#### **Pattern-uri de Implementare**
+```javascript
+// Script conversion pattern (automated)
+// BEFORE (CommonJS)
+const fs = require('fs');
+module.exports = { validateTypes };
+
+// AFTER (ESM)
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+export { validateTypes };
+```
+
+#### **Comenzi și Tooling**
+```bash
+# Backend startup cu ESM
+node --no-warnings --loader ts-node/esm src/main.ts
+
+# Scripts execution (toate ESM)
+node scripts/validate-transaction-types.js
+node scripts/validate-console-cleanup.js
+
+# Build complet (cross-package)
+pnpm -r build
+```
+
+#### **Beneficii Obținute**
+- ✅ **Consistență arhitecturală**: Tot monorepo-ul folosește același standard de module
+- ✅ **Interoperabilitate**: Zero probleme de import între pachete
+- ✅ **Performance**: Tree shaking și static analysis îmbunătățite
+- ✅ **Future-proof**: Standard JavaScript modern, eliminând technical debt
+- ✅ **Developer Experience**: No mixing CommonJS/ESM confusion
+
+#### **Challengeuri Rezolvate**
+- **Backend ESM + ts-node**: Configurație complexă cu `verbatimModuleSyntax: true`
+- **Scripts conversion**: Automated migration tool pentru 21 fișiere
+- **Import paths**: Extensii `.js` obligatorii în TypeScript pentru ESM
+- **Port discovery**: Enhanced backend port auto-detection pentru dev experience
 
 ---
 
