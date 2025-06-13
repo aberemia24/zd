@@ -1,0 +1,54 @@
+services:
+  # Cursor IDE Environment
+  cursor-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: budget-app-cursor
+    ports:
+      - "3010:3000"    # Frontend Vite
+      - "3011:3001"    # Backend NestJS
+    volumes:
+      - ./:/app
+      - cursor_node_modules:/app/node_modules
+      - cursor_frontend_nm:/app/frontend/node_modules
+      - cursor_backend_nm:/app/backend/node_modules
+    environment:
+      - IDE_SESSION=CURSOR
+      - NODE_ENV=development
+    networks:
+      - cursor-network
+
+  # Windsurf IDE Environment
+  windsurf-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: budget-app-windsurf
+    ports:
+      - "4000:3000"    # Frontend Vite (alt port)
+      - "4001:3001"    # Backend NestJS (alt port)
+    volumes:
+      - ./:/app
+      - windsurf_node_modules:/app/node_modules
+      - windsurf_frontend_nm:/app/frontend/node_modules
+      - windsurf_backend_nm:/app/backend/node_modules
+    environment:
+      - IDE_SESSION=WINDSURF
+      - NODE_ENV=development
+    networks:
+      - windsurf-network
+
+volumes:
+  cursor_node_modules:
+  cursor_frontend_nm:
+  cursor_backend_nm:
+  windsurf_node_modules:
+  windsurf_frontend_nm:
+  windsurf_backend_nm:
+
+networks:
+  cursor-network:
+    driver: bridge
+  windsurf-network:
+    driver: bridge

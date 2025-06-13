@@ -1,0 +1,25 @@
+FROM node:20-alpine
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies if package files exist
+COPY package*.json pnpm-*.yaml ./
+COPY frontend/package*.json ./frontend/
+COPY backend/package*.json ./backend/
+COPY shared-constants/package*.json ./shared-constants/
+
+# Install all dependencies
+RUN pnpm install
+
+# Copy source code
+COPY . .
+
+# Expose ports
+EXPOSE 3000 3001
+
+# Default command
+CMD ["pnpm", "dev"]
