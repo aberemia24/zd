@@ -16,29 +16,29 @@ export declare const TransactionSchema: z.ZodObject<{
     updated_at: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     date: string;
+    type: TransactionType;
     id: string;
     amount: number;
-    type: TransactionType;
-    status?: TransactionStatus | undefined;
-    description?: string | undefined;
     category?: string | undefined;
     subcategory?: string | undefined;
     recurring?: boolean | undefined;
     frequency?: FrequencyType | undefined;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
     actualAmount?: number | undefined;
     created_at?: string | undefined;
     updated_at?: string | undefined;
 }, {
     date: string;
+    type: TransactionType;
     id: string;
     amount: number;
-    type: TransactionType;
-    status?: TransactionStatus | undefined;
-    description?: string | undefined;
     category?: string | undefined;
     subcategory?: string | undefined;
     recurring?: boolean | undefined;
     frequency?: FrequencyType | undefined;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
     actualAmount?: number | undefined;
     created_at?: string | undefined;
     updated_at?: string | undefined;
@@ -59,25 +59,25 @@ export declare const CreateTransactionSchema: z.ZodObject<Omit<{
     updated_at: z.ZodOptional<z.ZodString>;
 }, "id" | "created_at" | "updated_at">, "strip", z.ZodTypeAny, {
     date: string;
-    amount: number;
     type: TransactionType;
-    status?: TransactionStatus | undefined;
-    description?: string | undefined;
+    amount: number;
     category?: string | undefined;
     subcategory?: string | undefined;
     recurring?: boolean | undefined;
     frequency?: FrequencyType | undefined;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
     actualAmount?: number | undefined;
 }, {
     date: string;
-    amount: number;
     type: TransactionType;
-    status?: TransactionStatus | undefined;
-    description?: string | undefined;
+    amount: number;
     category?: string | undefined;
     subcategory?: string | undefined;
     recurring?: boolean | undefined;
     frequency?: FrequencyType | undefined;
+    status?: TransactionStatus | undefined;
+    description?: string | undefined;
     actualAmount?: number | undefined;
 }>;
 export type TransactionValidated = z.infer<typeof TransactionSchema>;

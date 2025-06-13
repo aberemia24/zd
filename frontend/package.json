@@ -12,7 +12,6 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 110",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "type-check": "tsc --noEmit",
