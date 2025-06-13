@@ -1,9 +1,9 @@
-import { useState, useCallback, useEffect, RefObject } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 
 /**
  * SIMPLIFIED Hook pentru gestionarea navigării Excel-like în LunarGrid
  * Redus de la 346 linii la ~80 linii - păstrează doar esențialul
- * 
+ *
  * KEPT: Arrow keys, Enter/F2 edit, basic focus management
  * REMOVED: Tab cycling, complex ARIA, focus trap, navigation tracking, performance optimizations
  */
@@ -14,7 +14,7 @@ export interface GridPosition {
 }
 
 export interface UseGridNavigationProps {
-  gridRef: RefObject<HTMLDivElement>;
+  gridRef?: RefObject<HTMLDivElement>; // Made optional since it's not used in simplified version
   totalRows: number;
   totalCols: number;
   onCellFocus: (row: number, col: number) => void;
@@ -46,7 +46,7 @@ export interface UseGridNavigationReturn {
 }
 
 export const useGridNavigation = ({
-  gridRef,
+  gridRef, // Currently unused in simplified version but kept for interface compatibility
   totalRows,
   totalCols,
   onCellFocus,
@@ -57,7 +57,7 @@ export const useGridNavigation = ({
   // Basic state management
   const [focusedCell, setFocusedCell] = useState<GridPosition>({ row: 0, col: 0 });
   const [currentCell, setCurrentCell] = useState<GridPosition | null>(null);
-  const [isNavigating, setIsNavigating] = useState<boolean>(false);
+  const [isNavigating] = useState<boolean>(false); // Simplified: always false in current implementation
 
   // SIMPLIFIED: Focus a specific cell
   const focusCell = useCallback((row: number, col: number) => {
@@ -71,26 +71,26 @@ export const useGridNavigation = ({
   // SIMPLIFIED: Move focus with boundary checking
   const moveFocus = useCallback((direction: "up" | "down" | "left" | "right") => {
     if (!isEnabled) return;
-    
+
     setFocusedCell((prev) => {
       const next = { ...prev };
-      
+
       switch (direction) {
         case "up": next.row = Math.max(0, prev.row - 1); break;
         case "down": next.row = Math.min(totalRows - 1, prev.row + 1); break;
         case "left": next.col = Math.max(0, prev.col - 1); break;
         case "right": next.col = Math.min(totalCols - 1, prev.col + 1); break;
       }
-      
+
       // Update focus if position changed
       if (next.row !== prev.row || next.col !== prev.col) {
         setCurrentCell(next);
         onCellFocus(next.row, next.col);
-        
+
         // Simple navigation callback (simplified)
         onNavigate?.({ from: prev, to: next, direction, key: `Arrow${direction}` });
       }
-      
+
       return next;
     });
   }, [totalRows, totalCols, onCellFocus, onNavigate, isEnabled]);
@@ -104,7 +104,7 @@ export const useGridNavigation = ({
   // SIMPLIFIED: Handle keyboard events (essential keys only)
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (!isEnabled) return;
-    
+
     switch (e.key) {
       case "ArrowUp": e.preventDefault(); moveFocus("up"); break;
       case "ArrowDown": e.preventDefault(); moveFocus("down"); break;
@@ -124,7 +124,7 @@ export const useGridNavigation = ({
   // SIMPLIFIED: Event listener setup
   useEffect(() => {
     if (!isEnabled) return;
-    
+
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown, isEnabled]);
@@ -140,4 +140,4 @@ export const useGridNavigation = ({
     handleKeyDown,
     handleCellClick,
   };
-}; 
+};

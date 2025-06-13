@@ -1,0 +1,59 @@
+graph TD
+    A[User Action] --> B{State Type?}
+
+    B -->|Component Local| C[useState/useReducer]
+    B -->|Shared UI State| D[Zustand Store]
+    B -->|Server Data| E[React Query]
+    B -->|Persistent Data| F[useStatePersistence]
+
+    C --> C1[Form Inputs]
+    C --> C2[Modal States]
+    C --> C3[Animation States]
+    C --> C4[Selection States]
+
+    D --> D1[transactionStore]
+    D --> D2[categoryStore]
+    D --> D3[settingsStore]
+    D --> D4[filtersStore]
+
+    E --> E1[useTransactionQueries]
+    E --> E2[transactionMutations]
+    E --> E3[useMonthlyTransactions]
+
+    F --> F1[localStorage]
+    F --> F2[sessionStorage]
+    F --> F3[URL Params]
+
+    E2 --> G[Optimistic Update]
+    G --> H[API Call]
+    H --> I{Success?}
+    I -->|Yes| J[Cache Invalidation]
+    I -->|No| K[Rollback]
+
+    J --> L[UI Re-render]
+    K --> L
+
+    D1 --> M[UI Params Sync]
+    M --> L
+
+    F1 --> N[Storage Persistence]
+    F2 --> N
+    F3 --> N
+
+    L --> O[User Sees Update]
+
+    style A fill:#e1f5fe
+    style B fill:#fff3e0
+    style L fill:#e8f5e8
+    style O fill:#f3e5f5
+
+%% Legenda
+    classDef local fill:#bbdefb
+    classDef global fill:#c8e6c9
+    classDef server fill:#ffecb3
+    classDef persist fill:#f8bbd9
+
+    class C,C1,C2,C3,C4 local
+    class D,D1,D2,D3,D4,M global
+    class E,E1,E2,E3,G,H,I,J,K server
+    class F,F1,F2,F3,N persist

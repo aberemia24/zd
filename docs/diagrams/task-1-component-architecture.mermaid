@@ -1,0 +1,23 @@
+graph TD
+    A[LunarGridPage.tsx] --> B[LunarGridTanStack.tsx]
+    B --> C[useLunarGridTable]
+    B --> D[useKeyboardNavigation]
+    B --> E[QuickAddModal]
+    B --> F[TransactionModal]
+    B --> G[EditableCell]
+    B --> H[CellTransactionPopover]
+
+    C --> I[formatters.ts]
+    C --> J[dataTransformers.ts]
+    C --> K[calculations.ts]
+
+    B --> L[grid.ts CVA Styles]
+
+    M[useMonthlyTransactions] --> C
+    N[useCategoryStore] --> B
+    O[useAuthStore] --> B
+
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style L fill:#fff3e0

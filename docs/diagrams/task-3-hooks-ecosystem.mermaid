@@ -1,0 +1,19 @@
+graph TB
+    A[useLunarGridTable] --> B[useMonthlyTransactions]
+    A --> C[useCategoryStore]
+    A --> D[useAuthStore]
+
+    E[useInlineCellEdit] --> F[useValidation]
+    E --> G[useTransactionOperations]
+
+    G --> H[React Query Mutations]
+    G --> I[useLunarGridPreferences]
+
+    J[useKeyboardNavigationSimplified] --> K[Main Grid Components]
+
+    L[useLunarGridPreferences] --> M[useStatePersistence]
+
+    N[LunarGridTanStack] --> A
+    N --> E
+    N --> G
+    N --> J
