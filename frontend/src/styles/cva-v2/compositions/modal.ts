@@ -1,10 +1,10 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { modal as primitiveModal, modalContent as primitiveModalContent } from "../primitives/modal";
+import { modal as primitiveModal, modalContainer as primitiveModalContainer, modalContent as primitiveModalContent } from "../primitives/modal";
 
 /**
  * 🎨 MODAL COMPOSITIONS - Carbon Copper Design System
  * Componente pentru modal și dialog systems
- * 
+ *
  * IMPORTANT: Acestea sunt COMPUNERI ale primitive-urilor, nu redefiniri!
  */
 
@@ -33,8 +33,8 @@ export const enhancedModalOverlay = cva([
       zoom: "animate-in zoom-in-95 duration-300"
     }
   },
-  defaultVariants: { 
-    position: "center", 
+  defaultVariants: {
+    position: "center",
     backdrop: "default",
     animation: "fade"
   }
@@ -60,12 +60,12 @@ export const enhancedModalContent = cva([
     },
     animation: {
       fade: "animate-in fade-in duration-300",
-      slide: "animate-in slide-in-from-bottom-4 duration-300", 
+      slide: "animate-in slide-in-from-bottom-4 duration-300",
       zoom: "animate-in zoom-in-95 duration-300",
       "slide-up": "animate-in slide-in-from-top-4 duration-300"
     }
   },
-  defaultVariants: { 
+  defaultVariants: {
     elevation: "medium",
     responsive: true,
     animation: "zoom"
@@ -110,4 +110,5 @@ export type EnhancedModalContentProps = VariantProps<typeof enhancedModalContent
 export type FullScreenModalProps = VariantProps<typeof fullScreenModal>;
 
 // Re-export primitive types pentru convenience
-export type { ModalVariants, ModalContentVariants, ModalContainerVariants } from "../primitives/modal"; 
+export type { ModalContainerVariants, ModalContentVariants, ModalVariants } from "../primitives/modal";
+

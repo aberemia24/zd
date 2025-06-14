@@ -1,19 +1,20 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
-import { TransactionType, FrequencyType } from '@budget-app/shared-constants';
-import { LUNAR_GRID_ACTIONS, TOAST } from '@budget-app/shared-constants/ui';
+import { FrequencyType, TransactionType } from '@budget-app/shared-constants';
 import { getTransactionTypeForCategory } from '@budget-app/shared-constants/category-mapping';
-import {
-  useCreateTransaction,
-  useUpdateTransaction,
-  useDeleteTransactionMonthly
-} from '../../../../services/hooks/transactionMutations';
-import { Transaction } from '../../../../types/Transaction';
-import { TransactionData } from '../modals';
-import { useConfirmationModal } from '../../../primitives/ConfirmationModal';
+import { LUNAR_GRID_ACTIONS, TOAST } from '@budget-app/shared-constants/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useLunarGridPreferences } from '../../../../hooks/useLunarGridPreferences';
-import { toast as toastStyles, toastIcon, toastContent, toastTitle } from '../../../../styles/cva-v2/primitives/feedback';
+import { queryKeys } from "../../../../services/hooks/reactQueryUtils";
+import {
+    useCreateTransaction,
+    useDeleteTransactionMonthly,
+    useUpdateTransaction
+} from '../../../../services/hooks/transactionMutations';
+import { toastContent, toastIcon, toast as toastStyles, toastTitle } from '../../../../styles/cva-v2/primitives/feedback';
+import { Transaction } from '../../../../types/Transaction';
+import { useConfirmationModal } from '../../../primitives/ConfirmationModal';
+import { TransactionData } from '../modals';
 
 interface PopoverState {
   isOpen: boolean;
@@ -67,12 +68,12 @@ export const useTransactionOperations = ({
 
   // ✅ HOOK CALLS LA ÎNCEPUT - Rules of Hooks compliance
   const queryClient = useQueryClient();
-  
+
   // Hooks pentru mutații de tranzacții
   const createTransactionMutation = useCreateTransaction();
   const updateTransactionMutation = useUpdateTransaction();
   const deleteTransactionMutation = useDeleteTransactionMonthly(year, month, userId);
-  
+
   // ✅ FIX CRITICAL: Hook pentru preferences apelat la început, nu în handler
   const { preferences } = useLunarGridPreferences();
 
@@ -93,7 +94,7 @@ export const useTransactionOperations = ({
       // Ctrl+Z (sau Cmd+Z pe Mac) pentru undo
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
-        
+
         if (lastDeletedTransaction) {
           // Verifică dacă undo-ul e încă valid (maxim 30 secunde)
           const timeSinceDelete = Date.now() - lastDeletedTransaction.timestamp;
@@ -119,7 +120,7 @@ export const useTransactionOperations = ({
 
     try {
       const transactionData = lastDeletedTransaction.data;
-      
+
       await createTransactionMutation.mutateAsync({
         amount: typeof transactionData.amount === 'string' ? parseFloat(transactionData.amount) : transactionData.amount,
         type: transactionData.type,
@@ -130,7 +131,7 @@ export const useTransactionOperations = ({
         recurring: transactionData.recurring || false,
         frequency: transactionData.frequency
       });
-      
+
       toast.success(TOAST.TRANSACTION.UNDO.SUCCESS_CTRL_Z, { duration: 2000 });
       setLastDeletedTransaction(null); // Clear undo state după restore
       console.log(`[TransactionOps] Ctrl+Z undo successful`);
@@ -141,6 +142,10 @@ export const useTransactionOperations = ({
   };
 
   const handleSaveTransaction = async (transaction: Omit<TransactionData, "id">, existingId?: string) => {
+    // Evităm invalidarea globală pentru a preveni re-render masiv al gridului;
+    // rely on optimistic updates din mutation hooks pentru consistență UI.
+    // queryClient.invalidateQueries({ queryKey: ['transactions', year, month] });
+
     // Obiectul complet pentru mutație
     const mutationData = {
       amount: transaction.amount,
@@ -155,31 +160,48 @@ export const useTransactionOperations = ({
 
     if (existingId) {
       await updateTransactionMutation.mutateAsync({ id: existingId, transactionData: mutationData });
+      // 🟢 UPDATE CACHE LOCAL pentru monthly query
+      const monthlyKey = queryKeys.transactions.monthly(year, month, userId);
+      queryClient.setQueryData<any>(monthlyKey, (prev: any) => {
+        if (!prev) return prev;
+        const updatedData = prev.data.map((tx: any) => tx.id === existingId ? { ...tx, ...mutationData } as any : tx);
+        return { ...prev, data: updatedData };
+      });
     } else {
       await createTransactionMutation.mutateAsync(mutationData);
+      const monthlyKey = queryKeys.transactions.monthly(year, month, userId);
+      queryClient.setQueryData<any>(monthlyKey, (prev: any) => {
+        if (!prev) return prev;
+        const optimisticTx = {
+          id: `temp-${Date.now()}`,
+          ...mutationData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        } as any;
+        return { ...prev, data: [optimisticTx, ...prev.data], count: (prev.count || 0) + 1 };
+      });
     }
-    queryClient.invalidateQueries({ queryKey: ['transactions', year, month] });
   };
 
   // Handler pentru salvarea din EditableCell (inline editing)
   const handleEditableCellSave = async (category: string, subcategory: string | undefined, day: number, value: string | number, transactionId: string | null) => {
     const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    
+
     // FIX CRITIC: Când Delete key se apasă și value este empty/0, șterge tranzacția în loc să salvezi amount NULL
-    const isEmptyValue = value === "" || value === 0 || value === "0" || 
+    const isEmptyValue = value === "" || value === 0 || value === "0" ||
                         (typeof value === 'string' && (value.trim() === "" || parseFloat(value.trim()) === 0));
-    
+
     if (isEmptyValue) {
       // Dacă există tranzacție, verifică dacă trebuie să afișeze confirmarea
       if (transactionId) {
         const dontShowDeleteConfirm = !preferences.deleteConfirmationEnabled;
-        
+
         if (!dontShowDeleteConfirm) {
           // ✅ STEP 1: Găsește și salvează transaction data pentru undo
           const monthlyQueryKey = ['transactions', 'monthly', year, month, userId];
           const monthlyData = queryClient.getQueryData<{data: Transaction[], count: number}>(monthlyQueryKey);
           const transactionToDelete = monthlyData?.data.find(tx => tx.id === transactionId);
-          
+
           if (!transactionToDelete) {
             console.warn(`[TransactionOps] Transaction ${transactionId} not found in cache for undo`);
             // Fallback: direct delete fără undo
@@ -187,20 +209,20 @@ export const useTransactionOperations = ({
             toast.success(TOAST.TRANSACTION.DELETED);
             return;
           }
-          
+
           // ✅ STEP 2: SALVEAZĂ PENTRU CTRL+Z UNDO
           setLastDeletedTransaction({
             data: transactionToDelete,
             timestamp: Date.now()
           });
-          
+
           // ✅ STEP 3: OPTIMISTIC DELETE cu undo capability
           let undoPerformed = false;
-          
+
           // Execute delete immediately (optimistic)
           console.log(`[TransactionOps] Optimistic delete - removing transaction ${transactionId} from UI`);
           await deleteTransactionMutation.mutateAsync(transactionId);
-          
+
           // ✅ STEP 4: CVA STYLED UNDO TOAST
           const undoToast = toast((t) => (
             <div className={toastStyles({ variant: 'warning' })}>
@@ -214,7 +236,7 @@ export const useTransactionOperations = ({
                   undoPerformed = true;
                   toast.dismiss(t.id);
                   setLastDeletedTransaction(null); // Clear Ctrl+Z state când se face undo din toast
-                  
+
                   try {
                                          // Recreate transaction cu datele salvate
                      await createTransactionMutation.mutateAsync({
@@ -227,7 +249,7 @@ export const useTransactionOperations = ({
                        recurring: transactionToDelete.recurring || false,
                        frequency: transactionToDelete.frequency
                      });
-                    
+
                     toast.success(TOAST.TRANSACTION.UNDO.SUCCESS_TOAST, { duration: 2000 });
                     console.log(`[TransactionOps] Undo successful - transaction restored`);
                   } catch (error) {
@@ -246,18 +268,18 @@ export const useTransactionOperations = ({
             // ✅ FIX: Override react-hot-toast default styling să elimine containerul alb
             style: {
               background: 'transparent', // Elimină background-ul alb default
-              border: 'none',            // Elimină border-ul default  
+              border: 'none',            // Elimină border-ul default
               padding: '0',              // Elimină padding-ul default
               boxShadow: 'none',         // Elimină shadow-ul default
               margin: '0',               // Elimină margin-ul default
             },
           });
-          
+
           // ✅ STEP 5: Auto-confirm after timeout
           setTimeout(() => {
             if (!undoPerformed) {
               console.log(`[TransactionOps] Auto-confirming delete after 4s timeout for transaction ${transactionId}`);
-              toast.success(TOAST.TRANSACTION.DELETED_PERMANENT, { 
+              toast.success(TOAST.TRANSACTION.DELETED_PERMANENT, {
                 duration: 2000,
                 position: 'top-right'
               });
@@ -278,16 +300,16 @@ export const useTransactionOperations = ({
         return;
       }
     }
-    
+
     // Pentru valori non-empty, salvează/update tranzacția normal
     const amount = typeof value === 'string' ? parseFloat(value) : value;
-    
+
     if (isNaN(amount)) {
       throw new Error("Valoarea introdusă nu este un număr valid");
     }
-    
+
     const type = getTransactionTypeForCategory(category);
-    
+
     const transactionData: Omit<TransactionData, "id"> = {
       amount,
       type,
@@ -354,13 +376,13 @@ export const useTransactionOperations = ({
 
       const { category, subcategory, day, transactionId, mode } = modalState;
       const numValue = parseFloat(data.amount);
-      
+
       if (isNaN(numValue)) {
         throw new Error("Valoare invalidă");
       }
 
       const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      
+
       // Determină tipul de tranzacție pe baza categoriei
       const transactionType = getTransactionTypeForCategory(category) || TransactionType.EXPENSE;
 
@@ -378,7 +400,7 @@ export const useTransactionOperations = ({
           }
         });
       } else {
-        // CREATE: Creează o tranzacție nouă  
+        // CREATE: Creează o tranzacție nouă
         await createTransactionMutation.mutateAsync({
           amount: numValue,
           date,
@@ -430,4 +452,4 @@ export const useTransactionOperations = ({
     isSaving,
     confirmationModalProps: modalProps,
   };
-}; 
+};

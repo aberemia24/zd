@@ -1,17 +1,17 @@
-import {
-  useMutation,
-  useQueryClient,
-  type InfiniteData,
-} from "@tanstack/react-query";
-import { supabaseService } from "../supabaseService";
-import type { TransactionPage } from "../supabaseService";
-import {
-  TransactionValidated,
-  CreateTransaction,
-} from "@budget-app/shared-constants/transaction.schema";
 import { TransactionStatus } from "@budget-app/shared-constants";
-import { syncGlobalTransactionCache } from './cacheSync';
+import {
+    CreateTransaction,
+    TransactionValidated,
+} from "@budget-app/shared-constants/transaction.schema";
+import {
+    useMutation,
+    useQueryClient,
+    type InfiniteData,
+} from "@tanstack/react-query";
 import { useMutationErrorHandler } from '../../hooks/useErrorHandler';
+import type { TransactionPage } from "../supabaseService";
+import { supabaseService } from "../supabaseService";
+import { syncGlobalTransactionCache } from './cacheSync';
 
 export type CreateTransactionHookPayload = CreateTransaction;
 export type UpdateTransactionHookPayload = Partial<CreateTransaction>;
@@ -81,12 +81,12 @@ export function useCreateTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
+      // No global invalidation to avoid grid refresh
     },
   });
 }
@@ -146,12 +146,12 @@ export function useUpdateTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
+      // No global invalidation to avoid grid refresh
     },
   });
 }
@@ -207,12 +207,12 @@ export function useDeleteTransaction() {
       if (context?.previousData) {
         queryClient.setQueryData(TRANSACTIONS_BASE_KEY, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
+      // No global invalidation to avoid grid refresh
     },
   });
 }
@@ -281,9 +281,7 @@ export function useUpdateTransactionStatus() {
       return { previousData };
     },
     onSuccess: (data) => {
-      // Invalidăm toate query-urile de tranzacții pentru a asigura date proaspete
-      queryClient.invalidateQueries({ queryKey: TRANSACTIONS_BASE_KEY });
-      return data;
+      // No global invalidation to avoid grid refresh
     },
     onError: (err, variables, context) => {
       // Rollback - restaurăm datele la starea anterioară în caz de eroare
@@ -340,18 +338,18 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
           console.log('🔍 [CREATE-MUTATE] No existing cache, creating new with temp transaction');
           return { data: [tempTransaction], count: 1 };
         }
-        
+
         const newData = {
           data: [...old.data, tempTransaction],
           count: old.count + 1,
         };
-        
+
         console.log('🔍 [CREATE-MUTATE] Updated cache optimistically:', {
           oldSize: old.data.length,
           newSize: newData.data.length,
           tempId: tempTransaction.id
         });
-        
+
         return newData;
       });
 
@@ -368,7 +366,7 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
 
       // Manual cache update cu datele reale din server (elimină temp ID)
       const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
-      
+
       if (currentData) {
         console.log('🔍 [CREATE-SUCCESS] Current cache before update:', {
           size: currentData.data.length,
@@ -376,22 +374,22 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
         });
 
         const updatedResult: MonthlyTransactionsResult = {
-          data: currentData.data.map(tx => 
+          data: currentData.data.map(tx =>
             tx.id.startsWith('temp-') ? savedTransaction : tx
           ),
           count: currentData.count,
         };
-        
+
         console.log('🔍 [CREATE-SUCCESS] Updated cache with real transaction:', {
           newSize: updatedResult.data.length,
           realTransactionId: savedTransaction.id?.substring(0, 8) + '...'
         });
-        
+
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
       } else {
         console.warn('⚠️ [CREATE-SUCCESS] No current cache data found!');
       }
-      
+
       // 🔄 NEW: Sync cu global cache pentru consistență între module
       if (userId) {
         try {
@@ -406,7 +404,7 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
           // Nu oprește procesul, monthly cache-ul este deja actualizat
         }
       }
-      
+
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, newTransaction, context) => {
@@ -414,7 +412,7 @@ export const useCreateTransactionMonthly = (year: number, month: number, userId?
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
@@ -464,7 +462,7 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
 
       // Manual cache update cu datele reale din server (înlocuiește optimistic data)
       const currentData = queryClient.getQueryData<MonthlyTransactionsResult>(monthlyQueryKey);
-      
+
       if (currentData) {
         const updatedResult: MonthlyTransactionsResult = {
           data: currentData.data.map((tx: TransactionValidated) =>
@@ -472,15 +470,15 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
           ),
           count: currentData.count,
         };
-        
+
         console.log('🔍 [UPDATE-SUCCESS] Updated monthly cache data:', {
           totalTransactions: updatedResult.data.length,
           updatedTransactionInCache: updatedResult.data.find(tx => tx.id === updatedTransaction.id)
         });
-        
+
         queryClient.setQueryData(monthlyQueryKey, updatedResult);
       }
-      
+
       // 🔄 NEW: Sync cu global cache pentru consistență între module
       if (userId) {
         try {
@@ -495,7 +493,7 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
           // Nu oprește procesul, monthly cache-ul este deja actualizat
         }
       }
-      
+
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, variables, context) => {
@@ -503,7 +501,7 @@ export const useUpdateTransactionMonthly = (year: number, month: number, userId?
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
@@ -554,7 +552,7 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
           // Nu oprește procesul, monthly cache-ul este deja actualizat
         }
       }
-      
+
       // ELIMINAT: Nu mai facem invalidation forțat
     },
     onError: (err, deletedId, context) => {
@@ -562,9 +560,9 @@ export const useDeleteTransactionMonthly = (year: number, month: number, userId?
       if (context?.previousData) {
         queryClient.setQueryData(monthlyQueryKey, context.previousData);
       }
-      
+
       // Enhanced error handling cu context complet
       handleMutationError(err);
     },
   });
-}; 
+};

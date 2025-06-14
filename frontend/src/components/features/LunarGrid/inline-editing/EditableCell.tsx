@@ -1,12 +1,12 @@
 // EditableCell.tsx - ENHANCED PRAGMATIC ARCHITECTURE
-import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { Edit2, MoreHorizontal, Save, X, AlertCircle } from "lucide-react";
-import * as Popover from '@radix-ui/react-popover';
-import { cn } from "../../../../styles/cva-v2";
-import { cva } from "class-variance-authority";
-import { useInlineCellEdit } from "./useInlineCellEdit";
 import { EXCEL_GRID } from "@budget-app/shared-constants";
+import { cva } from "class-variance-authority";
+import { AlertCircle, Edit2, MoreHorizontal, Save, X } from "lucide-react";
+import React, { useCallback, useMemo, useState } from "react";
+import { cn } from "../../../../styles/cva-v2";
 import { TransactionData } from "../modals/types";
+import AdvancedEditPopover from "./AdvancedEditPopover";
+import { useInlineCellEdit } from "./useInlineCellEdit";
 
 // ===== ENHANCED CVA VARIANTS =====
 const cellVariants = cva(
@@ -76,12 +76,12 @@ export interface EditableCellProps {
   onCellClick?: (e: React.MouseEvent) => void;
   onClick?: (e: React.MouseEvent) => void;
   "data-testid"?: string;
-  
+
   // Enhanced hover props
   isHovered?: boolean;
   onHoverChange?: (hovered: boolean) => void;
   showHoverActions?: boolean;
-  
+
   // Popover integration props
   date: string;
   category: string;
@@ -91,7 +91,7 @@ export interface EditableCellProps {
   onDeleteTransaction?: (transactionId: string) => Promise<void>;
   isSavingTransaction?: boolean;
   onTogglePopover: () => void;
-  
+
   // NEW: Enhanced features
   warning?: string | null;
   contextualHints?: boolean;
@@ -153,10 +153,10 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
   const [interactionState, setInteractionState] = useState<InteractionState>('idle');
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  
+
   // Use external hover state if provided, otherwise internal
   const isActuallyHovered = onHoverChange ? isHovered : internalHovered;
-  
+
   // Memoized date parts to prevent infinite re-renders in UniversalTransactionPopover
   const { day, month, year } = useMemo(() => {
     const parts = date.split('-');
@@ -170,9 +170,9 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   // NOU: Găsește tranzacția existentă aici, într-un mediu stabil
   const existingTransaction = useMemo(() => {
     const dayOfMonth = parseInt(date.split('-')[2], 10);
-    return validTransactions.find(t => 
-      t.category === category && 
-      t.subcategory === subcategory && 
+    return validTransactions.find(t =>
+      t.category === category &&
+      t.subcategory === subcategory &&
       new Date(t.date).getUTCDate() === dayOfMonth
     );
   }, [validTransactions, category, subcategory, date]);
@@ -209,11 +209,11 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     else if (isSelected || isFocused) cellState = 'selected';
 
     // Determine if actions should show
-    const shouldShowActions = (isSelected || isFocused || isActuallyHovered) 
+    const shouldShowActions = (isSelected || isFocused || isActuallyHovered)
       && !internalEditing && !isReadonly && !propIsSaving && !internalIsSaving;
 
     // Determine if hints should show
-    const shouldShowHints = contextualHints && (isSelected || isFocused) 
+    const shouldShowHints = contextualHints && (isSelected || isFocused)
       && !internalEditing && !isReadonly && !shouldShowActions;
 
     return {
@@ -223,23 +223,23 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
       shouldShowHints,
     };
   }, [
-    isReadonly, propIsSaving, internalIsSaving, propError, internalError, 
-    warning, smartValidation, propIsEditing, internalEditing, isSelected, 
+    isReadonly, propIsSaving, internalIsSaving, propError, internalError,
+    warning, smartValidation, propIsEditing, internalEditing, isSelected,
     isFocused, isActuallyHovered, contextualHints
   ]);
 
   // ===== ENHANCED EVENT HANDLERS =====
-  
+
   // Smart input filtering pentru amount/percentage
   const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (!smartValidation) return;
-    
+
     if (validationType === 'amount' || validationType === 'percentage') {
       const allowedChars = /[0-9.,\-]/;
       const char = e.key;
-      
+
       if (char.length > 1) return; // Allow control keys
-      
+
       if (!allowedChars.test(char)) {
         e.preventDefault();
       }
@@ -249,11 +249,11 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   // Enhanced paste handler
   const handlePaste = useCallback((e: React.ClipboardEvent<HTMLInputElement>) => {
     if (!smartValidation) return;
-    
+
     if (validationType === 'amount' || validationType === 'percentage') {
       const pastedText = e.clipboardData.getData('text');
       const cleanText = pastedText.replace(/[^0-9.,\-]/g, '');
-      
+
       if (cleanText !== pastedText) {
         e.preventDefault();
         setValue(cleanText);
@@ -265,10 +265,10 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   const handleDoubleClickWrapper = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setInteractionState('pressed');
     setTimeout(() => setInteractionState('hover'), 100);
-    
+
     if (!isReadonly && !internalEditing) {
       if (onStartEdit) {
         onStartEdit();
@@ -280,6 +280,10 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
 
   // Enhanced keyboard handling with better Excel-like behavior
   const handleKeyDownWrapper = useCallback((e: React.KeyboardEvent) => {
+    // Dacă popover-ul este deschis, nu procesa key-down-urile în celulă
+    if (isPopoverOpen) {
+      return;
+    }
     if (internalEditing) {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -310,9 +314,9 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         }
       } else if (e.key === "Delete" && !isReadonly && (isSelected || isFocused)) {
         // FIXED: Delete key should work when cell is selected/focused, not just when actions are shown
-        console.log("🗑️ DELETE KEY PRESSED - clearing cell value", { 
-          cellId, 
-          value, 
+        console.log("🗑️ DELETE KEY PRESSED - clearing cell value", {
+          cellId,
+          value,
           isReadonly,
           isSelected,
           isFocused,
@@ -340,12 +344,12 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         setTimeout(() => setValue(e.key), 0);
       }
     }
-    
+
     onKeyDown?.(e);
   }, [
-    internalEditing, onCancel, inlineKeyDown, onStartEdit, startEdit, 
-    onKeyDown, isReadonly, computedState.shouldShowActions, onSave, 
-    setValue, setInternalHovered, onHoverChange, isSelected, isFocused, cellId, value
+    internalEditing, onCancel, inlineKeyDown, onStartEdit, startEdit,
+    onKeyDown, isReadonly, computedState.shouldShowActions, onSave,
+    setValue, setInternalHovered, onHoverChange, isSelected, isFocused, cellId, value, isPopoverOpen
   ]);
 
   // ===== ENHANCED MOBILE & ACCESSIBILITY SUPPORT =====
@@ -424,23 +428,67 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     }
   }, [onDeleteTransaction, existingTransaction]);
 
-  // Temporary placeholder for popover component
+  // Advanced popover component
   const PopoverComponent = useMemo(() => (
-    <div>
-      {/* TODO: Re-implement UniversalTransactionPopover when available */}
+    <AdvancedEditPopover
+      open={isPopoverOpen}
+      onOpenChange={setIsPopoverOpen}
+      initialAmount={existingTransaction?.amount?.toString() || ''}
+      initialDescription={existingTransaction?.description || ''}
+      initialRecurring={existingTransaction?.isRecurring || false}
+      initialFrequency={existingTransaction?.frequency}
+      category={category}
+      subcategory={subcategory}
+      date={date}
+      onSave={async (data) => {
+        console.log('[EditableCell] Popover save:', data);
+        await onSaveTransaction({
+          amount: parseFloat(data.amount),
+          description: data.description,
+          isRecurring: data.recurring,
+          frequency: data.frequency,
+          date,
+          category,
+          subcategory,
+          type: 'expense', // default type
+        });
+        setIsPopoverOpen(false);
+      }}
+      onCancel={() => {
+        console.log('[EditableCell] Popover cancel');
+        setIsPopoverOpen(false);
+      }}
+      onDelete={existingTransaction && onDeleteTransaction ? async () => {
+        console.log('[EditableCell] Popover delete:', existingTransaction.id);
+        if (existingTransaction.id) {
+          await onDeleteTransaction(existingTransaction.id);
+        }
+        setIsPopoverOpen(false);
+      } : undefined}
+      isLoading={isSavingTransaction}
+    >
       <button
-        onClick={handleMoreButtonClick}
+        onClick={() => setIsPopoverOpen(true)}
         className="p-1 rounded hover:bg-copper-100 dark:hover:bg-copper-700 transition-colors focus:outline-none focus:ring-2 focus:ring-copper-500"
-        title="Advanced options (disabled)"
-        aria-label="Open advanced options (disabled)"
+        title="More options"
+        aria-label="Open advanced options"
         tabIndex={0}
         data-testid={`more-button-${cellId}`}
-        disabled
       >
         <MoreHorizontal size={14} />
       </button>
-    </div>
-  ), [handleMoreButtonClick, cellId]);
+    </AdvancedEditPopover>
+  ), [
+    isPopoverOpen,
+    existingTransaction,
+    category,
+    subcategory,
+    date,
+    onSaveTransaction,
+    onDeleteTransaction,
+    isSavingTransaction,
+    cellId
+  ]);
 
   const handleQuickSave = useCallback(() => {
     if (internalEditing) {
@@ -460,14 +508,14 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     if (value === "" || value === null || value === undefined) {
       return "";
     }
-    
+
     if (validationType === "amount" && (value === 0 || value === "0")) {
       return "";
     }
-    
+
     return String(value);
   })();
-  
+
   const hasValue = displayValue.length > 0;
   const isError = !!(propError || internalError);
   const isWarning = !!(warning && smartValidation);
@@ -477,10 +525,10 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
     return (
       <div
         className={cn(
-          cellVariants({ 
-            state: computedState.cellState, 
-            interaction: computedState.interactionState 
-          }), 
+          cellVariants({
+            state: computedState.cellState,
+            interaction: computedState.interactionState
+          }),
           className
         )}
         data-testid={testId || `editable-cell-editing-${cellId}`}
@@ -509,7 +557,7 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
           onPaste={handlePaste}
           aria-label={`Editing ${validationType} cell`}
         />
-        
+
         {/* Enhanced editing controls */}
         <div className="absolute right-1 top-1 flex gap-1 opacity-80">
           <button
@@ -529,14 +577,14 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
             <X size={12} />
           </button>
         </div>
-        
+
         {/* Enhanced loading indicator */}
         {(propIsSaving || internalIsSaving) && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm">
             <div className="w-4 h-4 border-2 border-copper-500 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
-        
+
         {/* Enhanced error/warning display */}
         {(isError || isWarning) && (
           <div className={cn(
@@ -557,10 +605,10 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
   return (
     <div
       className={cn(
-        cellVariants({ 
-          state: computedState.cellState, 
-          interaction: computedState.interactionState 
-        }), 
+        cellVariants({
+          state: computedState.cellState,
+          interaction: computedState.interactionState
+        }),
         className
       )}
       onClick={(e) => {
@@ -594,13 +642,13 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
         )}>
           {hasValue ? displayValue : (placeholder || "")}
         </span>
-        
+
         {/* Value type indicator */}
         {hasValue && validationType === 'percentage' && (
           <span className="text-xs text-gray-500 ml-1">%</span>
         )}
       </div>
-      
+
       {/* Enhanced contextual hints */}
       {computedState.shouldShowHints && (
         <div className="absolute bottom-0 right-1 text-xs text-gray-400 opacity-75">
@@ -621,11 +669,11 @@ const EditableCellComponent: React.FC<EditableCellProps> = ({
           >
             <Edit2 size={14} />
           </button>
-          
-          {PopoverComponent}
+
+          {(isSelected || isFocused) && PopoverComponent}
         </div>
       )}
-      
+
       {/* Enhanced loading overlay */}
       {(propIsSaving || internalIsSaving) && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm rounded">
@@ -650,3 +698,4 @@ export default EditableCellComponent;
 
 // Named export pentru backwards compatibility
 export { EditableCellComponent as EditableCell };
+
