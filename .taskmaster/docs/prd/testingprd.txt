@@ -1,0 +1,27 @@
+am nevoie sa expandam testarea de pe proiect din momentul de fata.
+
+ce avem acum
+- niste unitests scattered pe ici pe colo, unele nu mai merg, altele mer ok, altele sunt exhaustive si nu ar trebui sa fie etc.
+- avem o suita de teste in playwright care nu mai merg majoritatea. nu au fost construite bine si dupa niste reguli concrete. unele sunt exhaustive, altele nu.
+- nu exista o logica clara a lor, unele au login la inceput de test, deci merg, altele nu, nu sunt integrate una cu alta cum trebuie.
+- nu se folosesc best practices cu POMs, selectors etc.
+
+Trebuie avute urmatoarele reguli de baza:
+- testele nu trebuie sa fie extensive, exhaustive sa acopere toate scenariile
+- trebuie sa se axeze pe happy path si sa fie user centric, sa urmeze cum ar folosi userul aplicatoa
+- trebuie facute intr-o ordine logica si fecare test sa poata rula standalone la nevoie, deci automat sa aiba pas de login, naviare la pagina pe care o testeaza etc.
+- trebuie facuta o suita de teste legate una de celalata dar fara sa se logheze la fiecare test, stiu ca exista o metoda perin care spoate face asta, darnu stiu sigur cum.
+- la fel trebuie vazut si cu credentialele. trebuie creat inca un cont de test, poate direct in supabase via mcp sau prin API si folosita smart in toate testele, si dinamic.
+- nu trebuie nimic hardocat in teste, totul sa fie dinamic si random daca se poate, sa nu testam de fiecare data aceasi valoare sau aceasi celula sau tranzactie etc.
+-
+
+as dori ca toate testele sa fie rulate intr-un docker image separat, care sa nu mai fie influentat de toate chestiile folosite in env de dezvoltare si sa fie tinut stabil.
+- as dori sa folosim si thunderbolt sau postman (in functie de ce e mai util ptr noi), si sa vedem cum putem testa si API-ul<
+
+inca odata vreau sa sublinieze ca nu vreau sa facem asta enterprize grade shit, sau exhaustiv, vreau sa facem unr esearach la inceput de best practuces de testare autonata si de unittests, dar best pracrices PRACTICE nu complicate sau enterprise/academic level.
+Pur si simplu vreau sa vad un overview al aplicatiei mele, cum sta dupa implementari.
+
+trebuie sa stabilim si o serie de reuli pentru viitor, cand se creaza unit tests, cum si unde, la fel si testele automate, cand si unde. etc. respectand regulile de mai sus si documentat, also adaugat in rreulile cursor si memorii.
+vreau sa implementam si rapoarte care sa imi arate at a glance in ce stadiu mai este aplicatia si fara pre amult zgomot.
+de asmenea de updatat github actions ca acolo ruleaza niste teste auotmate care nu mai merg demult, trebuie updatetate cu ceva care chiar merita, un sanity check ceva.
+ar trebuie s aavem un e2e, un sanity, un smoke, individual component tests etc, tot ce e best practice util.

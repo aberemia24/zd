@@ -43,7 +43,7 @@ This setup enables **simultaneous development** by multiple AI agents (Cursor + 
 
 - Docker installed and running
 - Git repository access
-- WSL (if on Windows)
+- Linux environment (tested on Zorin OS)
 
 ### **Initial Setup**
 
@@ -217,7 +217,7 @@ pnpm test:e2e                      # Run tests
 ```bash
 sudo usermod -aG docker $USER
 newgrp docker
-# or restart terminal/WSL
+# or restart terminal
 ```
 
 #### **Port Already in Use**
@@ -229,7 +229,7 @@ sudo lsof -ti:3000,3001,4000,4001 | xargs kill -9
 # Or use different ports in docker-compose.dev.yml
 ```
 
-#### **File Watcher Limits (WSL)**
+#### **File Watcher Limits (Linux)**
 
 ```bash
 echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
