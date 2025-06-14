@@ -1,4 +1,4 @@
-import { TransactionType, CategoryType, FrequencyType } from './enums';
+import { CategoryType, FrequencyType, TransactionType } from './enums';
 export declare const LOADING_MESSAGES: {
     GENERIC: string;
     WITH_CONTEXT: (context: string) => string;
@@ -175,6 +175,29 @@ export declare const TOAST: {
         MEDIUM: number;
         LONG: number;
         PERSISTENT: number;
+    };
+};
+export declare const POPOVER_CONSTANTS: {
+    ARIA_LABELS: {
+        CONTENT: string;
+        TRIGGER: string;
+        CLOSE: string;
+    };
+    POSITIONS: {
+        TOP: "top";
+        RIGHT: "right";
+        BOTTOM: "bottom";
+        LEFT: "left";
+    };
+    ALIGNMENTS: {
+        START: "start";
+        CENTER: "center";
+        END: "end";
+    };
+    DEFAULTS: {
+        SIDE_OFFSET: number;
+        MAX_WIDTH: string;
+        ANIMATION_DURATION: number;
     };
 };
 export declare const TABLE: {

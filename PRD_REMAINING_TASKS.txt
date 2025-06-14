@@ -1,0 +1,213 @@
+# PRD - BUDGET APP REMAINING TASKS
+## Product Requirements Document pentru Task-urile Rămase
+
+### 📋 OVERVIEW
+Acest PRD conține toate task-urile rămase din Budget App care sunt în status "pending" sau "in-progress". Scopul este să finalizăm dezvoltarea aplicației respectând principiile pragmatice și regulile obligatorii ale proiectului.
+
+### 🎯 PRINCIPII OBLIGATORII (CORE RULES)
+
+**1. RESEARCH FIRST** - Înainte de orice implementare, caută în baza de cod funcționalități existente. Reutilizează, extinde sau migrează - NU reimplementa.
+
+**2. PRAGMATIC OVER PERFECT** - Soluții simple, robuste și ușor de întreținut. Evită over-engineering și complexitate academică. Suntem o aplicație indie, nu enterprise.
+
+**3. SINGLE SOURCE OF TRUTH** - Toate constantele, enumerațiile, textele UI, mesajele și rutele API TREBUIE să se afle în pachetul `@budget-app/shared-constants`. NU sunt permise string-uri hardcodate.
+
+**4. SAFE & INCREMENTAL CHANGES** - Identifică toate dependențele și efectele secundare înainte să implementezi. Modificări incrementale care nu stric funcționalitatea existentă.
+
+**5. CONSISTENT NAMING & STRUCTURE** - Urmează convențiile: `PascalCase` pentru componente, `camelCase` pentru hook-uri. Respectă `components/primitives` vs `components/features`.
+
+**6. TYPE SAFETY** - Folosește tipuri TypeScript explicite. Evită `any`. Folosește extensia `.tsx` pentru orice fișier cu JSX.
+
+**MOTTO: "Better done than perfect, but still done right"**
+
+---
+
+## 🔧 TASK 12: REFACTOR MODAL AND POPOVER SYSTEM
+**Status:** IN-PROGRESS
+**Priority:** MEDIUM
+**Dependencies:** 8, 11
+
+### Obiectiv
+Îmbunătățește sistemul de modal și popover existent, fără refactorizare completă, respectând principiile pragmatice.
+
+### Subtask-uri Rămase:
+
+#### 12.3 - Extend Shared Constants for Modals and Popovers
+- **Descriere:** Adaugă DOAR textele lipsă pentru modale/popover în shared constants
+- **Detalii:** Actualizează `@budget-app/shared-constants` cu texte noi care lipsesc (titluri, butoane, aria-labels). Verifică să nu existe dubluri.
+- **Criteriu de succes:** Toate textele noi folosite din shared constants, zero string-uri hardcodate
+
+#### 12.4 - Migrate All Modals to CVA v2 Styling
+- **Descriere:** Aplică styling CVA v2 DOAR acolo unde este necesar și nu există deja
+- **Detalii:** Verifică fiecare componentă Modal (Modal, SimpleModal, ConfirmationModal, PromptModal) și aplică CVA v2 doar dacă nu există. Modificări incrementale.
+- **Criteriu de succes:** Styling consistent, fără refactorizare completă
+
+#### 12.5 - Standardize Props and Add Debugging Logs
+- **Descriere:** Standardizează API-ul de props DOAR unde există inconsistențe evidente
+- **Detalii:** Analizează props-urile pentru modale și popover. Modificări DOAR unde există probleme reale. Console logs DOAR în development.
+- **Criteriu de succes:** Props consistente, debugging logs funcționale în development
+
+---
+
+## ⚡ TASK 13: IMPLEMENT ESSENTIAL PERFORMANCE OPTIMIZATIONS
+**Status:** PENDING
+**Priority:** MEDIUM
+**Dependencies:** 9, 10, 11
+
+### Obiectiv
+Adaugă îmbunătățiri practice de performanță care se concentrează pe eficiența dezvoltării, nu optimizări premature.
+
+### Funcționalități Cheie:
+- **Virtualizare pentru dataset-uri mari** - când devine blocantă pentru dezvoltare
+- **React.memo pentru componente grele** - când performanța impactează workflow-ul
+- **useMemo și useCallback** - pentru operații costisitoare care încetinesc dezvoltarea
+- **Strategii eficiente de key-uri** - pentru listele principale
+- **Console logs pentru debugging performanță** - în timpul dezvoltării
+
+### Criteriu de Succes:
+- Performanță îmbunătățită fără impact negativ asupra dezvoltării
+- Debugging capabilities robuste
+- Soluții simple și maintainabile
+
+---
+
+## 🧪 TASK 14: CREATE FOCUSED TESTING SUITE
+**Status:** PENDING
+**Priority:** MEDIUM
+**Dependencies:** 12, 13
+
+### Obiectiv
+Implementează testare practică care acoperă funcționalitatea critică cu capabilități de debugging prietenoase pentru dezvoltare.
+
+### Componente de Testare:
+- **Unit tests** - pentru componente core folosind Jest + React Testing Library
+- **Integration tests** - pentru flow-uri critice de utilizator
+- **Hook tests** - pentru hook-urile esențiale
+- **Visual tests** - pentru componentele cheie
+- **Console logs pentru debugging** - test failures în timpul dezvoltării
+
+### Best Practices (2025):
+- Folosește `screen` din React Testing Library pentru interogări
+- Evită testele inutile de tipul "is rendering"
+- Testează comportamentul, nu detaliile de implementare
+- Menține testele izolate și independente
+- Coverage target: 70-80% pentru path-urile critice
+
+---
+
+## 🔄 TASK 15: IMPLEMENT SIMPLE MIGRATION STRATEGY
+**Status:** PENDING
+**Priority:** MEDIUM
+**Dependencies:** 14
+
+### Obiectiv
+Creează o cale de migrare simplă de la sistemul vechi la cel nou cu debugging și monitoring prietenoase pentru dezvoltare.
+
+### Strategii de Migrare:
+- **Feature flags** - pentru componente critice
+- **Compatibility layer** - unde este necesar
+- **Rollback mechanism** - pentru funcționalități critice
+- **Error tracking** - cu console logs extensive
+- **Documentație detaliată** - pentru migrare
+
+### Etape de Migrare:
+1. **Evaluarea aplicației** - analiza situației actuale
+2. **Curățarea setului de instrumente** - optimizarea performanței
+3. **Crearea de backup-uri** - asigurarea siguranței datelor
+4. **Verificări de sănătate** - pentru aplicația curentă și țintă
+
+---
+
+## 🛠️ TASK 16: CREATE ESSENTIAL DEVELOPER TOOLS
+**Status:** PENDING
+**Priority:** LOW
+**Dependencies:** 15
+
+### Obiectiv
+Construiește utilități de dezvoltare și documentație pentru a susține mentenanța și debugging-ul continuu.
+
+### Developer Tools:
+- **State inspector** - pentru debugging
+- **Component documentation** - comprehensivă
+- **API documentation** - detaliată
+- **Development guidelines** - esențiale
+- **Linting rules** - flexibile
+- **CI setup** - simplu
+
+### Focus:
+Instrumente care ajută un singur dezvoltator să mențină codebase-ul cu asistența AI.
+
+---
+
+## 📊 TASK 17: IMPLEMENT BASIC PERFORMANCE MONITORING
+**Status:** PENDING
+**Priority:** LOW
+**Dependencies:** 15
+
+### Obiectiv
+Adaugă monitoring simplu pentru metrici critice de performanță în timpul fazei de dezvoltare.
+
+### Monitoring Components:
+- **Performance metrics** - folosind Web Vitals
+- **Error tracking** - cu console logs
+- **Performance dashboard** - detaliat
+- **Usage analytics** - pentru insights de dezvoltare
+
+### Focus:
+Identificarea problemelor de workflow în dezvoltare și capabilități de debugging.
+
+---
+
+## 📚 TASK 18: CREATE PRACTICAL DOCUMENTATION
+**Status:** PENDING
+**Priority:** MEDIUM
+**Dependencies:** 16, 17
+
+### Obiectiv
+Dezvoltă documentație comprehensivă și utilă, concentrată pe eficiența dezvoltării și mentenanța viitoare.
+
+### Documentație Necesară:
+- **Architecture overview** - detaliat
+- **Component documentation** - comprehensivă
+- **Hook usage guides** - cu debugging tips
+- **Troubleshooting guide** - cu console log examples
+- **Code examples** - extensive
+
+### Focus:
+Documentație care ajută un singur dezvoltator să mențină codebase-ul cu asistența AI. Include strategii de debugging și pattern-uri de console log.
+
+---
+
+## 🎯 PRIORITIZARE ȘI DEPENDENCIES
+
+### Ordinea Recomandată de Implementare:
+1. **Task 12** (în progres) - finalizează sistemul Modal/Popover
+2. **Task 13** - optimizări de performanță
+3. **Task 14** - suite de testare
+4. **Task 15** - strategie de migrare
+5. **Task 18** - documentație practică
+6. **Task 16** - developer tools
+7. **Task 17** - performance monitoring
+
+### Dependencies Map:
+- Task 13 → depinde de 9, 10, 11
+- Task 14 → depinde de 12, 13
+- Task 15 → depinde de 14
+- Task 16 → depinde de 15
+- Task 17 → depinde de 15
+- Task 18 → depinde de 16, 17
+
+---
+
+## 🚀 CRITERII DE SUCCES GENERALE
+
+### Pentru fiecare task:
+- ✅ **Research completat** - verificat ce există deja
+- ✅ **Implementare pragmatică** - soluții simple și robuste
+- ✅ **Shared constants** - zero string-uri hardcodate
+- ✅ **Type safety** - tipuri TypeScript explicite
+- ✅ **Debugging capabilities** - console logs în development
+- ✅ **Documentație** - pentru mentenanța viitoare
+
+### Rezultat Final:
+O aplicație Budget App completă, robustă și ușor de întreținut de către un singur dezvoltator cu asistența AI, respectând toate principiile pragmatice și regulile obligatorii ale proiectului.

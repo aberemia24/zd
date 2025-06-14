@@ -1,4 +1,4 @@
-import { TransactionType, CategoryType, FrequencyType } from './enums';
+import { CategoryType, FrequencyType, TransactionType } from './enums';
 // 🚀 PHASE 2.1 - Loading Message Templates System
 // Template-based system pentru toate mesajele de loading din aplicație
 export const LOADING_MESSAGES = {
@@ -13,7 +13,7 @@ export const LOADING_MESSAGES = {
     SPECIFIC: (item) => `Se încarcă ${item}...`,
     DATE_CONTEXT: (month, year) => `Se încarcă datele pentru ${month} ${year}...`
 };
-// 🚀 PHASE 2.2 - Empty State Message Templates System  
+// 🚀 PHASE 2.2 - Empty State Message Templates System
 // Template-based system pentru toate mesajele de stare goală
 export const EMPTY_STATE_MESSAGES = {
     NO_ITEMS: (entity) => `Nu există ${entity}`,
@@ -198,6 +198,30 @@ export const TOAST = {
         PERSISTENT: 0 // 0 = nu se închide automat
     }
 };
+// 🎯 POPOVER CONSTANTS - Pentru componenta Popover wrapper
+export const POPOVER_CONSTANTS = {
+    ARIA_LABELS: {
+        CONTENT: 'Conținut popover',
+        TRIGGER: 'Deschide popover',
+        CLOSE: 'Închide popover'
+    },
+    POSITIONS: {
+        TOP: 'top',
+        RIGHT: 'right',
+        BOTTOM: 'bottom',
+        LEFT: 'left'
+    },
+    ALIGNMENTS: {
+        START: 'start',
+        CENTER: 'center',
+        END: 'end'
+    },
+    DEFAULTS: {
+        SIDE_OFFSET: 5,
+        MAX_WIDTH: '320px',
+        ANIMATION_DURATION: 200
+    }
+};
 export const TABLE = {
     HEADERS: {
         TYPE: 'Tip',
@@ -350,7 +374,7 @@ export const EXCEL_GRID = {
         FREQUENCY_SHORT: 'Frecv.',
         FINANCIAL_IMPACT_SHORT: 'Impact:',
         FINANCIAL_IMPACT_FULL: 'Impact financiar:',
-        // Button text pentru position mode  
+        // Button text pentru position mode
         SAVE_SHORT: 'OK',
         // Loading și status messages
         SAVING_MESSAGE: LOADING_MESSAGES.SAVING_TRANSACTION,
@@ -601,7 +625,7 @@ export const ACCOUNT_MANAGEMENT = {
         CANNOT_DELETE_LAST: 'Nu puteți șterge ultimul cont activ',
         CANNOT_DELETE_WITH_TRANSACTIONS: 'Nu puteți șterge un cont care are tranzacții',
     },
-    // Action Messages  
+    // Action Messages
     ACTIONS: {
         ADD_ACCOUNT: 'Adaugă cont nou',
         EDIT_ACCOUNT: 'Editează cont',
@@ -651,7 +675,7 @@ export const BALANCE_DISPLAY = {
         BALANCE_TOTAL: 'border-t-2 border-gray-300 font-bold',
         BALANCE_PROJECTION: 'bg-blue-50 border-blue-200',
     },
-    // Status indicators 
+    // Status indicators
     STATUS: {
         CALCULATED: 'Calculat automat',
         MANUAL_OVERRIDE: 'Suprascris manual',
@@ -668,7 +692,7 @@ export const BALANCE_MODALS = {
         DELETE_TITLE: 'Șterge cont',
         TRANSFER_TITLE: 'Transfer între conturi',
     },
-    // Balance Adjustment Modals  
+    // Balance Adjustment Modals
     BALANCE: {
         ADJUST_TITLE: 'Ajustează sold',
         RECONCILE_TITLE: 'Reconciliere sold',
@@ -893,7 +917,7 @@ export const LUNAR_GRID_DELETE_CONFIRM_RECOMMENDATION = "💡 Recomandat activat
 export const LUNAR_GRID_DELETE_CONFIRM_ENABLED_SUCCESS = "Confirmarea pentru ștergere a fost activată";
 export const LUNAR_GRID_DELETE_CONFIRM_DISABLED_SUCCESS = "Confirmarea pentru ștergere a fost dezactivată";
 // FUTURE UI CONSTANTS - exemplu pentru extensibilitate:
-// LUNAR_GRID_AUTO_SAVE_TITLE: "�� Auto-save delay",
+// LUNAR_GRID_AUTO_SAVE_TITLE: "Auto-save delay",
 // LUNAR_GRID_AUTO_SAVE_DESCRIPTION: "Controlează întârzierea pentru salvarea automată.",
 // LUNAR_GRID_GRID_LINES_TITLE: "📏 Afișare linii grid",
 // LUNAR_GRID_COMPACT_MODE_TITLE: "📦 Mod compact",

@@ -1,4 +1,4 @@
-import { TransactionType, CategoryType, FrequencyType } from './enums';
+import { CategoryType, FrequencyType, TransactionType } from './enums';
 
 // 🚀 PHASE 2.1 - Loading Message Templates System
 // Template-based system pentru toate mesajele de loading din aplicație
@@ -15,7 +15,7 @@ export const LOADING_MESSAGES = {
   DATE_CONTEXT: (month: string, year: string) => `Se încarcă datele pentru ${month} ${year}...`
 };
 
-// 🚀 PHASE 2.2 - Empty State Message Templates System  
+// 🚀 PHASE 2.2 - Empty State Message Templates System
 // Template-based system pentru toate mesajele de stare goală
 export const EMPTY_STATE_MESSAGES = {
   NO_ITEMS: (entity: string) => `Nu există ${entity}`,
@@ -32,15 +32,15 @@ export const EMPTY_STATE_MESSAGES = {
 // Consolidarea magic numbers și design constants
 export const DESIGN_TOKENS = {
   SIZES: {
-    SPINNER: { 
-      SMALL: 16, 
-      MEDIUM: 32, 
-      LARGE: 48, 
-      XLARGE: 64 
+    SPINNER: {
+      SMALL: 16,
+      MEDIUM: 32,
+      LARGE: 48,
+      XLARGE: 64
     },
     BREAKPOINTS: {
       SM: 640,
-      MD: 768, 
+      MD: 768,
       LG: 1024,
       XL: 1280
     },
@@ -75,19 +75,19 @@ export const LABELS = {
   CATEGORY_FILTER: 'Categoria:',
   FORM: 'adăugare tranzacție', // pentru aria-label pe <form>
   DESCRIPTION: 'Descriere',
-  
+
   // Constante pentru pagina de autentificare/înregistrare
   EMAIL: 'Email',
   PAROLA: 'Parolă',
   CONFIRMA_PAROLA: 'Confirmă parola',
-  
+
   // Filtre extinse
   SEARCH_FILTER: 'Caută:',
   DATE_FROM_FILTER: 'De la data:',
   DATE_TO_FILTER: 'Până la data:',
   AMOUNT_MIN_FILTER: 'Suma minimă:',
   AMOUNT_MAX_FILTER: 'Suma maximă:',
-  
+
   // Transaction type labels
   INCOME_TYPE: 'Venit',
   EXPENSE_TYPE: 'Cheltuială',
@@ -131,7 +131,7 @@ export const BUTTONS = {
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   MANAGE_CATEGORIES: 'Gestionare categorii',
   EXPORT: 'Exportă',
-  
+
   // Constante pentru autentificare/înregistrare
   LOGIN: 'Autentificare',
   REGISTER: 'Crează cont',
@@ -144,7 +144,7 @@ export const BUTTONS = {
 export const TOAST = {
   // Toast actions
   CLOSE: 'Închide notificarea',
-  
+
   // Toast variants and titles
   INFO: {
     TITLE: 'Informație',
@@ -155,14 +155,14 @@ export const TOAST = {
     DEFAULT_MESSAGE: 'Operația a fost finalizată cu succes'
   },
   WARNING: {
-    TITLE: 'Atenție', 
+    TITLE: 'Atenție',
     DEFAULT_MESSAGE: 'Verificați informațiile introduse'
   },
   ERROR: {
     TITLE: 'Eroare',
     DEFAULT_MESSAGE: 'A apărut o eroare neașteptată'
   },
-  
+
   // Common toast messages for Budget App
   TRANSACTION: {
     ADDED: 'Tranzacția a fost adăugată cu succes',
@@ -175,7 +175,7 @@ export const TOAST = {
     ERROR_UPDATING: 'Eroare la actualizarea tranzacției',
     ERROR_DELETING: 'Eroare la ștergerea tranzacției',
     ERROR_RESTORING: 'Eroare la restaurare',
-    
+
     // Undo functionality
     UNDO: {
       TITLE: 'Tranzacție ștearsă',
@@ -189,7 +189,7 @@ export const TOAST = {
   },
   CATEGORY: {
     ADDED: 'Categoria a fost adăugată',
-    UPDATED: 'Categoria a fost actualizată', 
+    UPDATED: 'Categoria a fost actualizată',
     DELETED: 'Categoria a fost ștearsă',
     ERROR_ADDING: 'Eroare la adăugarea categoriei',
     ERROR_UPDATING: 'Eroare la actualizarea categoriei',
@@ -205,7 +205,7 @@ export const TOAST = {
     LOGOUT_SUCCESS: 'V-ați deconectat cu succes',
     REGISTER_SUCCESS: 'Contul a fost creat cu succes'
   },
-  
+
   // Settings for toast behavior
   DURATION: {
     SHORT: 3000,    // 3 secunde pentru mesaje simple
@@ -213,6 +213,43 @@ export const TOAST = {
     LONG: 7000,     // 7 secunde pentru mesaje importante
     PERSISTENT: 0   // 0 = nu se închide automat
   }
+};
+
+// 🎯 POPOVER CONSTANTS - Pentru componenta Popover wrapper
+export const POPOVER_CONSTANTS = {
+  ARIA_LABELS: {
+    CONTENT: 'Conținut popover',
+    TRIGGER: 'Deschide popover',
+    CLOSE: 'Închide popover'
+  },
+  POSITIONS: {
+    TOP: 'top' as const,
+    RIGHT: 'right' as const,
+    BOTTOM: 'bottom' as const,
+    LEFT: 'left' as const
+  },
+  ALIGNMENTS: {
+    START: 'start' as const,
+    CENTER: 'center' as const,
+    END: 'end' as const
+  },
+  DEFAULTS: {
+    SIDE_OFFSET: 5,
+    MAX_WIDTH: '320px',
+    ANIMATION_DURATION: 200
+  },
+  // 🎯 TASK 12.2 - Constante pentru AdvancedEditPopover
+  EDIT_TITLE: 'Editează tranzacția',
+  ADD_TITLE: 'Adaugă tranzacție',
+  AMOUNT_LABEL: 'Suma (RON)',
+  DESCRIPTION_LABEL: 'Descriere',
+  RECURRING_LABEL: 'Recurentă',
+  FREQUENCY_LABEL: 'Frecvență',
+  FREQUENCY_PLACEHOLDER: 'Selectează frecvența',
+  FREQUENCY_MONTHLY: 'Lunar',
+  FREQUENCY_WEEKLY: 'Săptămânal',
+  FREQUENCY_YEARLY: 'Anual',
+  DELETE_TOOLTIP: 'Șterge tranzacția'
 };
 
 export const TABLE = {
@@ -240,7 +277,7 @@ export const TABLE = {
   },
   NO_TRANSACTIONS: EMPTY_STATE_MESSAGES.NO_TRANSACTIONS,
   NO_SUBCATEGORIES: EMPTY_STATE_MESSAGES.NO_SUBCATEGORIES,
-  
+
   // 🚀 TASK 8.2 - Desktop-First Table Features
   ADVANCED_FEATURES: {
     // Pagination enhanced
@@ -249,7 +286,7 @@ export const TABLE = {
     PAGE_SIZE_OPTIONS: 'Opțiuni mărime pagină',
     TOTAL_RECORDS: 'Total înregistrări: {count}',
     SELECTED_RECORDS: '{count} selectate',
-    
+
     // Search and filtering
     SEARCH_PLACEHOLDER: 'Caută în tranzacții...',
     ADVANCED_SEARCH: 'Căutare avansată',
@@ -257,13 +294,13 @@ export const TABLE = {
     CLEAR_FILTERS: 'Șterge filtrele',
     SAVE_FILTER_PRESET: 'Salvează preset filtru',
     LOAD_FILTER_PRESET: 'Încarcă preset filtru',
-    
+
     // Sorting
     SORT_BY: 'Sortează după',
     SECONDARY_SORT: 'Sortare secundară',
     REMOVE_SORT: 'Elimină sortarea',
     MULTI_COLUMN_SORT_HINT: 'Ține Shift + Click pentru sortare pe mai multe coloane',
-    
+
     // Selection and bulk operations
     SELECT_ALL: 'Selectează toate',
     SELECT_PAGE: 'Selectează pagina',
@@ -272,7 +309,7 @@ export const TABLE = {
     BULK_DELETE: 'Șterge selecțiile',
     BULK_EXPORT: 'Exportă selecțiile',
     BULK_EDIT_CATEGORY: 'Modifică categoria',
-    
+
     // Export functionality
     EXPORT_OPTIONS: 'Opțiuni export',
     EXPORT_CSV: 'Exportă CSV',
@@ -280,7 +317,7 @@ export const TABLE = {
     EXPORT_EXCEL: 'Exportă Excel',
     EXPORT_FILTERED: 'Exportă doar datele filtrate',
     EXPORT_ALL: 'Exportă toate datele',
-    
+
     // Financial calculations
     RUNNING_BALANCE_SHOW: 'Afișează soldul curent',
     RUNNING_BALANCE_HIDE: 'Ascunde soldul curent',
@@ -289,13 +326,13 @@ export const TABLE = {
     TOTAL_EXPENSES: 'Total cheltuieli',
     NET_BALANCE: 'Balanța netă',
     AVERAGE_TRANSACTION: 'Tranzacția medie',
-    
+
     // Keyboard shortcuts
     KEYBOARD_SHORTCUTS: 'Comenzi rapide tastatură',
     NAVIGATION_HINT: 'Folosește săgețile pentru navigare',
     EDIT_HINT: 'Enter pentru editare, Escape pentru anulare',
     SEARCH_HINT: 'Ctrl+F pentru căutare rapidă',
-    
+
     // Context menu
     CONTEXT_MENU: {
       EDIT: 'Editează tranzacția',
@@ -305,7 +342,7 @@ export const TABLE = {
       ADD_TO_FAVORITES: 'Adaugă la favorite',
       COPY_VALUES: 'Copiază valorile',
     },
-    
+
     // Desktop optimizations
     FULLSCREEN_MODE: 'Mod ecran complet',
     COMPACT_VIEW: 'Vizualizare compactă',
@@ -378,7 +415,7 @@ export const EXCEL_GRID = {
     FREQUENCY_SHORT: 'Frecv.',
     FINANCIAL_IMPACT_SHORT: 'Impact:',
     FINANCIAL_IMPACT_FULL: 'Impact financiar:',
-    // Button text pentru position mode  
+    // Button text pentru position mode
     SAVE_SHORT: 'OK',
     // Loading și status messages
     SAVING_MESSAGE: LOADING_MESSAGES.SAVING_TRANSACTION,
@@ -458,7 +495,7 @@ export const UI = {
   ADD_SUBCATEGORY: 'Adaugă subcategorie',
   DELETE_SUBCATEGORY: 'Șterge subcategorie',
   EDIT_SUBCATEGORY: 'Editează subcategorie',
-  
+
   // Secțiune UI pentru CategoryEditor
   CATEGORY_EDITOR: {
     TITLE: 'Gestionare Subcategorii',
@@ -477,7 +514,7 @@ export const UI = {
     CANCEL_BUTTON: 'Anulează'
   },
   FILTERS_ACTIVE: (count: number) => `${count} filtru${count === 1 ? '' : 'e'} activ${count === 1 ? '' : 'e'}`,
-  
+
   // Secțiune UI pentru TransactionFilters
   TRANSACTION_FILTERS: {
     TITLE: 'Filtre',
@@ -488,32 +525,32 @@ export const UI = {
     AMOUNT_RANGE: 'Interval sume',
     TEXT_SEARCH: 'Căutare text',
   },
-  
+
   // 🚨 AUDIT FIX - Adăugare titles hardcodate din LunarGrid
   SUBCATEGORY_ACTIONS: {
     DELETE_CUSTOM_TITLE: 'Șterge subcategoria custom',
     DELETE_ORPHAN_TITLE: 'Șterge tranzacțiile fără subcategorie (date murdare din trecut)',
     RENAME_TITLE: 'Redenumește subcategoria',
   },
-  
+
   LUNAR_GRID_TOOLTIPS: {
     CALCULATED_SUM: 'Suma calculată automată din subcategorii',
     DAILY_BALANCES: 'Balanțe zilnice',
   },
-  
+
   // 🚨 AUDIT FIX - Texte pentru LunarGridPage
   LUNAR_GRID_PAGE: {
     FULLSCREEN_EXIT_HINT: 'Press ESC pentru a ieși din fullscreen',
     NAVIGATION_LOADING: LOADING_MESSAGES.NAVIGATION,
     LOADING_MESSAGE_TEMPLATE: LOADING_MESSAGES.DATE_CONTEXT,
     LAYOUT_MODES: {
-      FULL_WIDTH: 'Lățime completă', 
+      FULL_WIDTH: 'Lățime completă',
       FULLSCREEN: 'Fullscreen',
     },
     LAYOUT_TOGGLE_TOOLTIP: 'Comută la modul următor ({nextMode})',
     MONTHS: {
       IANUARIE: 'Ianuarie',
-      FEBRUARIE: 'Februarie', 
+      FEBRUARIE: 'Februarie',
       MARTIE: 'Martie',
       APRILIE: 'Aprilie',
       MAI: 'Mai',
@@ -581,7 +618,7 @@ export const TEST_CONSTANTS = {
   SELECT: {
     PLACEHOLDER: 'Alege o opțiune',
     OPTION_1: 'Opțiunea 1',
-    OPTION_2: 'Opțiunea 2', 
+    OPTION_2: 'Opțiunea 2',
     OPTION_3: 'Opțiunea 3',
     LABEL: 'Selecție',
     REQUIRED_ERROR: 'Acest câmp este obligatoriu'
@@ -621,18 +658,18 @@ export const LUNAR_GRID_ACTIONS = {
 // 🆕 Account Management Constants - pentru sistem conturi multiple
 export const ACCOUNT_MANAGEMENT = {
   MAX_ACCOUNTS: 10,
-  
+
   // UI Labels
   LABELS: {
     ACCOUNT_NAME: 'Nume cont',
-    ACCOUNT_TYPE: 'Tip cont', 
+    ACCOUNT_TYPE: 'Tip cont',
     INITIAL_BALANCE: 'Sold inițial',
     CURRENT_BALANCE: 'Sold curent',
     ACCOUNT_DESCRIPTION: 'Descriere cont',
     DEFAULT_ACCOUNT: 'Cont principal',
     ACTIVE_STATUS: 'Activ',
   },
-  
+
   // Validation Messages
   VALIDATION: {
     NAME_REQUIRED: 'Numele contului este obligatoriu',
@@ -645,8 +682,8 @@ export const ACCOUNT_MANAGEMENT = {
     CANNOT_DELETE_LAST: 'Nu puteți șterge ultimul cont activ',
     CANNOT_DELETE_WITH_TRANSACTIONS: 'Nu puteți șterge un cont care are tranzacții',
   },
-  
-  // Action Messages  
+
+  // Action Messages
   ACTIONS: {
     ADD_ACCOUNT: 'Adaugă cont nou',
     EDIT_ACCOUNT: 'Editează cont',
@@ -655,11 +692,11 @@ export const ACCOUNT_MANAGEMENT = {
     ACTIVATE_ACCOUNT: 'Activează cont',
     DEACTIVATE_ACCOUNT: 'Dezactivează cont',
   },
-  
+
   // Status Messages
   STATUS: {
     ACCOUNT_CREATED: 'Cont creat cu succes',
-    ACCOUNT_UPDATED: 'Cont actualizat cu succes', 
+    ACCOUNT_UPDATED: 'Cont actualizat cu succes',
     ACCOUNT_DELETED: 'Cont șters cu succes',
     ACCOUNT_SET_DEFAULT: 'Cont setat ca principal',
   },
@@ -672,28 +709,28 @@ export const BALANCE_DISPLAY = {
   DECIMAL_PLACES: 2,
   THOUSAND_SEPARATOR: '.',
   DECIMAL_SEPARATOR: ',',
-  
+
   // Labels
   LABELS: {
     AVAILABLE_BALANCE: 'Sold disponibil',
-    SAVINGS_BALANCE: 'Sold economii', 
+    SAVINGS_BALANCE: 'Sold economii',
     TOTAL_BALANCE: 'Sold total',
     PROJECTED_BALANCE: 'Sold proiectat',
     DAILY_BALANCE: 'Sold zilnic',
     BALANCE_CHANGE: 'Schimbare sold',
     BALANCE_TREND: 'Tendință sold',
   },
-  
+
   // Colors pentru Transaction Types (CSS classes pentru TailwindCSS)
   COLORS: {
     INCOME: 'text-green-600 bg-green-50 border-green-200',      // Verde pentru venituri
-    EXPENSE: 'text-red-600 bg-red-50 border-red-200',         // Roșu pentru cheltuieli  
+    EXPENSE: 'text-red-600 bg-red-50 border-red-200',         // Roșu pentru cheltuieli
     SAVING: 'text-blue-600 bg-blue-50 border-blue-200',       // Albastru pentru economii/investiții
     POSITIVE: 'text-green-600',                               // Pentru solduri pozitive
     NEGATIVE: 'text-red-600',                                 // Pentru solduri negative
     NEUTRAL: 'text-gray-600',                                 // Pentru solduri zero/neutrale
   },
-  
+
   // Grid Styles pentru balance rows
   GRID_STYLES: {
     BALANCE_ROW: 'font-semibold bg-gray-50',
@@ -701,12 +738,12 @@ export const BALANCE_DISPLAY = {
     BALANCE_TOTAL: 'border-t-2 border-gray-300 font-bold',
     BALANCE_PROJECTION: 'bg-blue-50 border-blue-200',
   },
-  
-  // Status indicators 
+
+  // Status indicators
   STATUS: {
     CALCULATED: 'Calculat automat',
     MANUAL_OVERRIDE: 'Suprascris manual',
-    PROJECTED: 'Valoare proiectată', 
+    PROJECTED: 'Valoare proiectată',
     CONFIRMED: 'Confirmat',
   },
 };
@@ -720,15 +757,15 @@ export const BALANCE_MODALS = {
     DELETE_TITLE: 'Șterge cont',
     TRANSFER_TITLE: 'Transfer între conturi',
   },
-  
-  // Balance Adjustment Modals  
+
+  // Balance Adjustment Modals
   BALANCE: {
     ADJUST_TITLE: 'Ajustează sold',
     RECONCILE_TITLE: 'Reconciliere sold',
     PROJECTION_TITLE: 'Proiecție sold',
     HISTORY_TITLE: 'Istoric sold',
   },
-  
+
   // Confirmation Messages
   CONFIRMATIONS: {
     DELETE_ACCOUNT: 'Ștergeți contul și toate datele asociate?',
@@ -763,7 +800,7 @@ export const TOOLTIP = {
   DEFAULT_DELAY: 200,
   PLACEMENTS: {
     TOP: 'Sus',
-    BOTTOM: 'Jos', 
+    BOTTOM: 'Jos',
     LEFT: 'Stânga',
     RIGHT: 'Dreapta'
   },
@@ -786,7 +823,7 @@ export const PROGRESS = {
   VARIANTS: {
     DEFAULT: 'Implicit',
     SUCCESS: 'Succes',
-    WARNING: 'Avertisment', 
+    WARNING: 'Avertisment',
     ERROR: 'Eroare',
     FINANCIAL: 'Financiar'
   },
@@ -833,7 +870,7 @@ export const NAVIGATION = {
     OPTIONS: 'Opțiuni',
     SETTINGS: 'Setări'
   },
-  
+
   // Sidebar specific
   SIDEBAR: {
     TOGGLE: 'Comută sidebar',
@@ -842,7 +879,7 @@ export const NAVIGATION = {
     PERSISTENT: 'Sidebar persistent',
     AUTO_HIDE: 'Ascunde automat'
   },
-  
+
   // Breadcrumbs
   BREADCRUMBS: {
     HOME: 'Acasă',
@@ -850,7 +887,7 @@ export const NAVIGATION = {
     BACK_TO: 'Înapoi la',
     CURRENT_PAGE: 'Pagina curentă'
   },
-  
+
   // Context menu
   CONTEXT_MENU: {
     OPEN: 'Deschide meniu contextual',
@@ -859,7 +896,7 @@ export const NAVIGATION = {
     BOOKMARK: 'Adaugă la favorite',
     SHARE: 'Partajează'
   },
-  
+
   // Tabs system
   TABS: {
     NEW_TAB: 'Tab nou',
@@ -869,7 +906,7 @@ export const NAVIGATION = {
     NEXT_TAB: 'Tab următor',
     PREV_TAB: 'Tab anterior'
   },
-  
+
   // Keyboard shortcuts
   SHORTCUTS: {
     TOGGLE_SIDEBAR: 'Ctrl+\\',
@@ -884,7 +921,7 @@ export const NAVIGATION = {
     COMMAND_PALETTE: 'Ctrl+K',
     TOGGLE_DARK_MODE: 'Ctrl+D'
   },
-  
+
   // Command Palette system
   COMMAND_PALETTE: {
     TITLE: 'Comandă rapidă',
@@ -904,7 +941,7 @@ export const NAVIGATION = {
       TOGGLE: 'Comută'
     }
   },
-  
+
   // Theme System Constants
   THEME: {
     TOGGLE_DARK_MODE: 'Comută tema întunecată',
@@ -913,14 +950,14 @@ export const NAVIGATION = {
     SYSTEM_PREFERENCE: 'Preferința sistemului',
     TOGGLE_DESCRIPTION: 'Comută între tema deschisă și întunecată'
   },
-  
+
   // Mobile navigation
   MOBILE: {
     HAMBURGER: 'Deschide meniul principal',
     CLOSE_MENU: 'Închide meniul',
     MENU_OVERLAY: 'Overlay meniu mobil'
   },
-  
+
   // Accessibility
   ARIA: {
     NAVIGATION: 'Navigare principală',
@@ -931,7 +968,7 @@ export const NAVIGATION = {
     EXTERNAL_LINK: 'Deschide în fereastră nouă',
     CONTEXT_MENU: 'Meniu contextual'
   },
-  
+
   // Persistence storage keys
   STORAGE: {
     SIDEBAR_EXPANDED: 'sidebar-expanded',
@@ -941,7 +978,7 @@ export const NAVIGATION = {
     LAST_VISITED_PAGE: 'navigation-last-page',
     USER_PREFERENCES: 'navigation-user-preferences'
   },
-  
+
   // State management
   STATE: {
     PERSISTENCE_ENABLED: 'Persistența navigării activată',
@@ -967,7 +1004,7 @@ export const LUNAR_GRID_DELETE_CONFIRM_ENABLED_SUCCESS = "Confirmarea pentru șt
 export const LUNAR_GRID_DELETE_CONFIRM_DISABLED_SUCCESS = "Confirmarea pentru ștergere a fost dezactivată";
 
 // FUTURE UI CONSTANTS - exemplu pentru extensibilitate:
-// LUNAR_GRID_AUTO_SAVE_TITLE: "�� Auto-save delay",
+// LUNAR_GRID_AUTO_SAVE_TITLE: "Auto-save delay",
 // LUNAR_GRID_AUTO_SAVE_DESCRIPTION: "Controlează întârzierea pentru salvarea automată.",
 // LUNAR_GRID_GRID_LINES_TITLE: "📏 Afișare linii grid",
 // LUNAR_GRID_COMPACT_MODE_TITLE: "📦 Mod compact",

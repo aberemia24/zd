@@ -1,7 +1,7 @@
 /**
  * 🎨 PRIMITIVE COMPONENTS - Carbon Copper Design System
  * Componente de bază reutilizabile migrated la CVA v2
- * 
+ *
  * Toate componentele folosesc noul sistem cva-v2 modular pentru:
  * - Tree-shaking optimizat
  * - Type safety îmbunătățit
@@ -11,16 +11,16 @@
 
 // Form Components
 export { default as Button } from './Button/Button';
+export { default as Checkbox } from './Checkbox/Checkbox';
+export { default as FormGroup } from './FormGroup/FormGroup';
+export { default as FormLabel } from './FormLabel/FormLabel';
 export { default as Input } from './Input/Input';
 export { default as Select } from './Select/Select';
 export { default as Textarea } from './Textarea/Textarea';
-export { default as Checkbox } from './Checkbox/Checkbox';
-export { default as FormLabel } from './FormLabel/FormLabel';
-export { default as FormGroup } from './FormGroup/FormGroup';
 
 // Feedback Components
-export { default as Badge } from './Badge/Badge';
 export { default as Alert } from './Alert/Alert';
+export { default as Badge } from './Badge/Badge';
 export { Toast, ToastContainer, ToastProvider, useToast, useToastPosition } from './Toast';
 
 // Loading Components
@@ -28,18 +28,18 @@ export { default as Loader } from './Loader/Loader';
 export { default as Spinner } from './Spinner/Spinner';
 
 // Navigation Components
-export { default as NavLink } from './NavLink/NavLink';
-export { Sidebar, SidebarItem } from './Sidebar';
 export { Breadcrumb, useBreadcrumb, useBreadcrumbNavigation } from './Breadcrumb';
+export { CommandPalette, CommandPaletteProvider, useCommandPalette } from './CommandPalette';
 export { ContextMenu, useContextMenu } from './ContextMenu';
-export { Tabs, TabButton, TabList, TabPanel, useTabs, useTabContext, useTabsKeyboardIntegration } from './Tabs';
 export { Dropdown, useDropdown } from './Dropdown';
+export { default as NavLink } from './NavLink/NavLink';
 export { Pagination, usePagination } from './Pagination';
-export { CommandPalette, useCommandPalette, CommandPaletteProvider } from './CommandPalette';
+export { Sidebar, SidebarItem } from './Sidebar';
+export { TabButton, TabList, TabPanel, Tabs, useTabContext, useTabs, useTabsKeyboardIntegration } from './Tabs';
 
 // Modal Components
 export { default as ConfirmationModal } from './ConfirmationModal/ConfirmationModal';
-export { Modal, ModalHeader, ModalBody, ModalFooter, useModal, useModalContext } from './Modal';
+export { Modal, ModalBody, ModalFooter, ModalHeader, useModal, useModalContext } from './Modal';
 
 // UI Components
 export { default as ThemeToggle } from './ThemeToggle/ThemeToggle';
@@ -49,10 +49,10 @@ export { default as Table } from './Table/Table';
 
 // Layout Components
 export { default as Container } from './Container/Container';
-export { default as Grid } from './Grid/Grid';
 export { default as FlexLayout } from './FlexLayout/FlexLayout';
-export { default as StackLayout } from './StackLayout/StackLayout';
+export { default as Grid } from './Grid/Grid';
 export { default as Section } from './Section/Section';
+export { default as StackLayout } from './StackLayout/StackLayout';
 
 // New components
 export { Card } from './Card';
@@ -71,53 +71,49 @@ export type { ProgressProps } from './Progress/Progress';
 /**
  * Type exports for primitive components
  */
-export type { ButtonProps } from './Button/Button';
-export type { InputProps } from './Input/Input';
-export type { SelectProps, SelectOption } from './Select/Select';
-export type { TextareaProps } from './Textarea/Textarea';
-export type { CheckboxProps } from './Checkbox/Checkbox';
-export type { FormLabelProps } from './FormLabel/FormLabel';
-export type { FormGroupProps } from './FormGroup/FormGroup';
-export type { BadgeProps } from './Badge/Badge';
 export type { AlertProps } from './Alert/Alert';
-export type { ToastProps, ToastData, ToastVariant, ToastPosition, UseToastReturn, ToastProviderProps } from './Toast';
-export type { SidebarProps, SidebarItemProps } from './Sidebar';
-export type { BreadcrumbProps, BreadcrumbItem } from './Breadcrumb';
-export type { ContextMenuProps, ContextMenuOption, ContextMenuState } from './ContextMenu';
-export type { TabsProps, TabItem, TabButtonProps, TabListProps, TabPanelProps } from './Tabs';
-export type { DropdownProps, DropdownItem } from './Dropdown';
-export type { PaginationProps } from './Pagination';
-export type { CommandPaletteProps, CommandAction, CommandPaletteProviderProps } from './CommandPalette';
-export type { LoaderProps } from './Loader/Loader';
-export type { SpinnerProps } from './Spinner/Spinner';
+export type { BadgeProps } from './Badge/Badge';
+export type { BreadcrumbItem, BreadcrumbProps } from './Breadcrumb';
+export type { ButtonProps } from './Button/Button';
+export type { CheckboxProps } from './Checkbox/Checkbox';
+export type { CommandAction, CommandPaletteProps, CommandPaletteProviderProps } from './CommandPalette';
 export type { ConfirmationModalProps } from './ConfirmationModal/ConfirmationModal';
+export type { ContextMenuOption, ContextMenuProps, ContextMenuState } from './ContextMenu';
+export type { DropdownItem, DropdownProps } from './Dropdown';
+export type { FormGroupProps } from './FormGroup/FormGroup';
+export type { FormLabelProps } from './FormLabel/FormLabel';
+export type { InputProps } from './Input/Input';
+export type { LoaderProps } from './Loader/Loader';
+export type { PaginationProps } from './Pagination';
+export type { SelectOption, SelectProps } from './Select/Select';
+export type { SidebarItemProps, SidebarProps } from './Sidebar';
+export type { SpinnerProps } from './Spinner/Spinner';
+export type { TabButtonProps, TabItem, TabListProps, TabPanelProps, TabsProps } from './Tabs';
+export type { TextareaProps } from './Textarea/Textarea';
+export type { ToastData, ToastPosition, ToastProps, ToastProviderProps, ToastVariant, UseToastReturn } from './Toast';
 
 // Layout Component Types
 export type { ContainerProps } from './Container/Container';
-export type { GridProps } from './Grid/Grid';
 export type { FlexLayoutProps } from './FlexLayout/FlexLayout';
-export type { StackLayoutProps } from './StackLayout/StackLayout';
+export type { GridProps } from './Grid/Grid';
 export type { SectionProps } from './Section/Section';
+export type { StackLayoutProps } from './StackLayout/StackLayout';
 
 // Data Display Component Types
-export type { TableProps, TableColumn } from './Table/Table';
+export type { TableColumn, TableProps } from './Table/Table';
 
 // New data display types
 export type { CardComponentProps, FinancialCardData } from './Card';
-export type { ListComponentProps, FinancialListItem, CategoryListItem } from './List';
+export type { CategoryListItem, FinancialListItem, ListComponentProps } from './List';
 
 // New chart types
-export type { 
-  BarChartProps, 
-  LineChartProps, 
-  PieChartProps,
-  ChartDataPoint,
-  TimeSeriesDataPoint,
-  CategoryDataPoint
+export type {
+    BarChartProps, CategoryDataPoint, ChartDataPoint, LineChartProps,
+    PieChartProps, TimeSeriesDataPoint
 } from './Charts';
 
 /**
- * Migration Status: 
+ * Migration Status:
  * ✅ Button - migrated to cva-v2
  * ✅ Input - migrated to cva-v2 with enhanced validation
  * ✅ Select - migrated to cva-v2 with dedicated select variant
@@ -125,7 +121,7 @@ export type {
  * ✅ Checkbox - migrated to cva-v2 with enhanced styling
  * ✅ FormLabel - NEW: migrated to cva-v2 with ARIA support
  * ✅ FormGroup - NEW: migrated to cva-v2 with semantic grouping
- * ✅ Badge - migrated to cva-v2 
+ * ✅ Badge - migrated to cva-v2
  * ✅ Alert - migrated to cva-v2 with Carbon Copper palette
  * ✅ Loader - migrated to cva-v2 with overlay support
  * ✅ Spinner - migrated to cva-v2 with Carbon Copper colors
@@ -148,6 +144,44 @@ export type {
  * ✅ LineChart - NEW: migrated to cva-v2 with line chart component
  * ✅ PieChart - NEW: migrated to cva-v2 with pie chart component
  * ✅ Toast - NEW: migrated to cva-v2 with toast notification system
- * 
+ *
  * 🎉 ALL PRIMITIVE COMPONENTS + FORM COMPONENTS + FEEDBACK COMPONENTS MIGRATED TO CVA-V2!
- */ 
+ */
+
+// Primitives exports
+export * from './Alert';
+export * from './Badge';
+export * from './Breadcrumb';
+export * from './Button';
+export * from './Card';
+export * from './Charts';
+export * from './Checkbox';
+export * from './CommandPalette';
+export * from './ConfirmationModal';
+export * from './Container';
+export * from './ContextMenu';
+export * from './Dropdown';
+export * from './FieldGrid';
+export * from './FlexLayout';
+export * from './FormLayout';
+export * from './Grid';
+export * from './Input';
+export * from './List';
+export * from './Loader';
+export * from './Modal';
+export * from './NavLink';
+export * from './Pagination';
+export * from './Popover';
+export * from './PreferenceToggle';
+export * from './Section';
+export * from './Select';
+export * from './Sidebar';
+export * from './SimpleModal';
+export * from './Spinner';
+export * from './StackLayout';
+export * from './Table';
+export * from './Tabs';
+export * from './Textarea';
+export * from './ThemeToggle';
+export * from './Toast';
+
