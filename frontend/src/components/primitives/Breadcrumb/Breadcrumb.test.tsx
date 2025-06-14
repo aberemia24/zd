@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter, MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import Breadcrumb, { useBreadcrumb, type BreadcrumbItem } from './Breadcrumb';
 
 // Mock pentru NAVIGATION constants

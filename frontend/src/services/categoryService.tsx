@@ -3,7 +3,6 @@
 import { supabase } from "./supabase";
 import { CustomCategoriesPayload } from "../types/Category";
 import { API } from "@budget-app/shared-constants/api";
-import { MESAJE } from "@budget-app/shared-constants/messages";
 
 // Helper pentru logging consistent
 const logError = (context: string, error: unknown) => {

@@ -9,8 +9,6 @@ import { supabaseService } from "./supabaseService";
 
 // Import-uri corecte folosind alias-ul @budget-app/shared-constants conform regulilor globale
 import { TransactionType, FrequencyType } from "@budget-app/shared-constants/enums";
-import { API } from "@budget-app/shared-constants/api";
-import { MESAJE } from "@budget-app/shared-constants/messages";
 import type { CreateTransaction } from "@budget-app/shared-constants/transaction.schema";
 
 // Mock direct pentru Supabase (serviciu extern care necesită mockuri)

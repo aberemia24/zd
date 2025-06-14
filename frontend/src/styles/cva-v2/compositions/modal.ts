@@ -1,5 +1,5 @@
 import { cva, type VariantProps } from "class-variance-authority";
-import { modal as primitiveModal, modalContent as primitiveModalContent, modalContainer as primitiveModalContainer } from "../primitives/modal";
+import { modal as primitiveModal, modalContent as primitiveModalContent } from "../primitives/modal";
 
 /**
  * 🎨 MODAL COMPOSITIONS - Carbon Copper Design System

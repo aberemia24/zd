@@ -2,7 +2,7 @@
 import { Transaction } from "../types/Transaction";
 import { MOCK_USER_ID } from "./mockData";
 
-import { render, fireEvent, within, RenderResult, RenderOptions } from "@testing-library/react";
+import { render, RenderResult, RenderOptions } from "@testing-library/react";
 import { ReactElement } from "react";
 
 // Creează rapid o tranzacție mock cu override-uri

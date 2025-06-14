@@ -4,7 +4,7 @@
  */
 
 import { TransactionType } from '@budget-app/shared-constants';
-import { formatCurrencyRON, formatDateRON } from './financial';
+import { formatCurrencyRON } from './financial';
 import type {
   ChartDataPoint,
   TimeSeriesDataPoint,

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronRight, Check } from "lucide-react";
 import Button from "../../../primitives/Button/Button";
 import { Edit, Trash2 } from "lucide-react";
 

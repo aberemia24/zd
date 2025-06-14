@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, memo, useEffect, useRef } from 'react';
-import { flexRender, Row } from "@tanstack/react-table";
+import { Row } from "@tanstack/react-table";
 import toast from 'react-hot-toast';
-import { Maximize2, Minimize2 } from 'lucide-react';
 import * as Popover from '@radix-ui/react-popover';
 
 // Constants și shared (@budget-app/shared-constants)
@@ -46,7 +45,6 @@ import { useCategoryStore } from "../../../stores/categoryStore";
 import { useAuthStore } from "../../../stores/authStore";
 
 // Utilitare și styling - MIGRATED TO UNIFIED CVA SYSTEM
-import { formatCurrencyForGrid, formatMonthYear } from "../../../utils/lunarGrid";
 import { calculatePopoverStyle } from "../../../utils/lunarGrid/lunarGridHelpers";
 // CVA styling imports - MIGRATED TO CVA-V2
 import { 

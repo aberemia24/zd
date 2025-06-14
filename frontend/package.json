@@ -29,6 +29,8 @@
     "performance:lighthouse": "RUN_LIGHTHOUSE=true node ../scripts/performance-monitor.js",
     "performance:ci": "CI=true node ../scripts/performance-monitor.js",
     "lighthouse:ci": "lhci autorun --config=lighthouserc.js",
+    "cleanup": "node scripts/cleanup-dead-code.cjs",
+    "cleanup:fix": "node scripts/cleanup-dead-code.cjs --fix",
     "prepare": "echo 'Husky disabled'"
   },
   "dependencies": {

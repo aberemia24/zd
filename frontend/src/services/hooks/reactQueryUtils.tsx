@@ -1,4 +1,4 @@
-import { QueryClient, QueryKey, UseQueryOptions } from "@tanstack/react-query";
+import { QueryKey, UseQueryOptions } from "@tanstack/react-query";
 
 /**
  * Generator de chei pentru Query-uri

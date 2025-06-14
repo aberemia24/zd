@@ -8,7 +8,7 @@ import FormLayout from "../../primitives/FormLayout/FormLayout";
 import FieldGrid, { FieldWrapper } from "../../primitives/FieldGrid/FieldGrid";
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { ExportFormat } from "../../../types/financial";
-import { EXPORT_UI, EXPORT_MESSAGES } from "@budget-app/shared-constants";
+import { EXPORT_UI } from "@budget-app/shared-constants";
 import { 
   cn,
   flexLayout

@@ -16,7 +16,7 @@ import { useCategoryStore } from "../../../../stores/categoryStore";
 import { useAuthStore } from "../../../../stores/authStore";
 
 // Types și constants
-import { TransactionType, FrequencyType } from "@budget-app/shared-constants";
+import { TransactionType } from "@budget-app/shared-constants";
 
 // Interfaces pentru state result
 interface PopoverState {

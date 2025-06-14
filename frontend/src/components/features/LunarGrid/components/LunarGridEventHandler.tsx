@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { FrequencyType, TransactionType, LUNAR_GRID_ACTIONS } from "@budget-app/shared-constants";
+import { FrequencyType, TransactionType } from "@budget-app/shared-constants";
 import { calculatePopoverStyle } from "../../../../utils/lunarGrid/lunarGridHelpers";
 import type { LunarGridStateResult } from './LunarGridStateManager';
 import type { CellPosition } from "../hooks/useKeyboardNavigationSimplified";

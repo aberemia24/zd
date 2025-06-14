@@ -1,6 +1,6 @@
 import type { Transaction } from "@budget-app/shared-constants"; 
 import { TransactionType, LABELS } from "@budget-app/shared-constants";
-import { ExportFormat, ExportProgressCallback } from "@budget-app/shared-constants";
+import { ExportFormat } from "@budget-app/shared-constants";
 
 export interface ExportOptions {
   filename?: string;

@@ -8,7 +8,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useCellEditing } from "./useCellEditing";
-import { EXCEL_GRID, VALIDATION_MESSAGES } from "@budget-app/shared-constants";
 import { vi } from "vitest";
 
 // Live data setup - no mocks

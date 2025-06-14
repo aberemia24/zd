@@ -1,4 +1,4 @@
-import { TransactionType, BUTTONS } from '@budget-app/shared-constants';
+import { BUTTONS } from '@budget-app/shared-constants';
 import { 
   ExportFormat,
   ExportProgress,

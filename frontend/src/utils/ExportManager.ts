@@ -1,5 +1,4 @@
 import type { Transaction } from "../types/Transaction";
-import { TransactionType, LABELS } from "@budget-app/shared-constants";
 import { LazyExportManager, type ExportProgressCallback } from "./lazyExportUtils";
 import {
   isFormatSupported,

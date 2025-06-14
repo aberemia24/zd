@@ -1,6 +1,5 @@
 import React, { CSSProperties } from 'react';
 import UniversalTransactionPopover from "../popover/UniversalTransactionPopover";
-import { QuickAddModalSimplified as QuickAddModal } from "../modals/QuickAddModalSimplified";
 import { FrequencyType, TransactionType } from "@budget-app/shared-constants";
 import { cn } from "../../../../styles/cva-v2";
 

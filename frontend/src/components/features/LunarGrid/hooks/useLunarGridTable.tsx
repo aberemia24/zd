@@ -25,7 +25,6 @@ import {
   formatCurrencyForGrid,
   formatMonthYear,
 } from "../../../../utils/lunarGrid";
-import { MESAJE, LUNAR_GRID_MESSAGES } from "@budget-app/shared-constants";
 
 // CVA styling imports
 import { cn, hoverBackground } from "../../../../styles/cva-v2";

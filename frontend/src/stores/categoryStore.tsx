@@ -2,7 +2,7 @@
 // Owner: echipa FE
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import { CustomCategoriesPayload, CustomCategory, CustomSubcategory } from "../types/Category";
+import { CustomCategory, CustomSubcategory } from "../types/Category";
 import { categoryService } from "../services/categoryService";
 import { supabaseService } from "../services/supabaseService";
 import {

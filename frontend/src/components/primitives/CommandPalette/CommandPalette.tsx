@@ -5,7 +5,7 @@ import { Search, ArrowRight, Clock, Hash, Zap } from 'lucide-react';
 import { cn } from '../../../styles/cva-v2';
 import { modal } from '../../../styles/cva-v2';
 import { navigationItem } from '../../../styles/cva-v2/compositions/navigation';
-import { NAVIGATION, UI } from '@budget-app/shared-constants';
+import { NAVIGATION } from '@budget-app/shared-constants';
 import { TransactionType } from '@budget-app/shared-constants';
 
 /**

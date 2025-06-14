@@ -1,16 +1,14 @@
 import React, { useEffect, useState, useMemo, useCallback, useTransition } from "react";
-import { EXCEL_GRID, UI, TITLES, CATEGORIES } from "@budget-app/shared-constants";
+import { UI } from "@budget-app/shared-constants";
 import LunarGridTanStack from "../components/features/LunarGrid/LunarGridTanStack";
-import { useTransactionStore } from "../stores/transactionStore";
 import { useCategoryStore } from "../stores/categoryStore";
 import { useAuthStore } from "../stores/authStore";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMonthlyTransactions, useAdjacentMonthsPreload } from "../services/hooks/useMonthlyTransactions";
 
 // CVA styling imports
-import { cn, dashboard, modal, headingProfessional, captionProfessional } from "../styles/cva-v2";
+import { cn, modal, captionProfessional } from "../styles/cva-v2";
 
-import { Maximize2, Minimize2 } from "lucide-react";
 import Badge from "../components/primitives/Badge/Badge";
 import Spinner from "../components/primitives/Spinner/Spinner";
 import { Container } from "../components/primitives";
